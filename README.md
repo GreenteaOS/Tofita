@@ -2,7 +2,7 @@
 
 ![Tofita Logo](docs/logo.png?raw=true)
 
-All-new kernel for Greentea OS
+All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 
 ## LICENSE
 
