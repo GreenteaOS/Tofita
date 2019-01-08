@@ -25,7 +25,21 @@ clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone
 	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
 	-c -o /mnt/r/tofita/loader.o public-prototype/boot/loader/loader.c
 
+# Kernel
+as -o /mnt/r/tofita/tofita.s.o public-prototype/kernel/tofita.s
+as -o /mnt/r/tofita/cpu.o public-prototype/devices/cpu/cpu.s
+
+clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
+	-Wimplicit-function-declaration -Werror \
+	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC \
+	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
+	-c -o /mnt/r/tofita/tofita.o public-prototype/kernel/tofita.c
+
 # Link
+ld -T public-prototype/kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img /mnt/r/tofita/tofita.s.o /mnt/r/tofita/tofita.o /mnt/r/tofita/cpu.o
+objcopy -O binary /mnt/r/tofita/tofita_kernel.elf.img /mnt/r/tofita/tofita.img
+objcopy -I binary -O elf64-x86-64 -B i386 /mnt/r/tofita/tofita.img /mnt/r/tofita/tofitaimg.o
+
 ld -T public-prototype/boot/loader/loader.ld -o /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader.s.o /mnt/r/tofita/loader.o /mnt/r/tofita/tofitaimg.o
 objcopy -O binary /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader_kernel.img
 objcopy -I binary -O elf64-x86-64 -B i386 /mnt/r/tofita/loader_kernel.img /mnt/r/tofita/loader_kernelimg.o
