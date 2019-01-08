@@ -4,13 +4,12 @@
 # sudo apt install xorriso
 # sudo apt-get install clang-6.0
 
-# /mnt/r/ temp folder
+# /mnt/r/ is a temp folder
 
 # Clean
 
-rm -f /mnt/r/boot.o
-rm -f /mnt/r/loader.efi
-rm -f /mnt/r/loader.so
+rm -rf /mnt/r/tofita/
+mkdir -p /mnt/r/tofita/iso/EFI/BOOT/
 
 # Bootloader
 
@@ -33,17 +32,14 @@ objcopy \
 	--target=efi-app-x86_64 /mnt/r/loader.so /mnt/r/loader.efi
 
 # Create floppy image
-dd if=/dev/zero of=/mnt/r/disk.img bs=1k count=2880
-mformat -i /mnt/r/disk.img -f 2880 ::
-mmd -i /mnt/r/disk.img ::/EFI
-mmd -i /mnt/r/disk.img ::/EFI/BOOT
-mcopy -i /mnt/r/disk.img /mnt/r/loader.efi ::/EFI/BOOT/BOOTx64.EFI
+dd if=/dev/zero of=/mnt/r/tofita/disk.img bs=1k count=2880
+mformat -i /mnt/r/tofita/disk.img -f 2880 ::
+mmd -i /mnt/r/tofita/disk.img ::/EFI
+mmd -i /mnt/r/tofita/disk.img ::/EFI/BOOT
+mcopy -i /mnt/r/tofita/disk.img /mnt/r/tofita/loader.efi ::/EFI/BOOT/BOOTx64.EFI
 
 # Create disk image
-mkdir -p /mnt/r/iso/EFI/BOOT/
-rm -f /mnt/r/uefi.iso
-rm -f /mnt/r/iso/EFI/BOOT/BOOTX64.EFI
-cp -f /mnt/r/loader.efi /mnt/r/iso/EFI/BOOT/BOOTX64.EFI
-xorriso -as mkisofs -o /mnt/r/uefi.iso -iso-level 3 -V UEFI /mnt/r/iso /mnt/r/disk.img -e /disk.img -no-emul-boot
+cp -f /mnt/r/tofita/loader.efi /mnt/r/tofita/iso/EFI/BOOT/BOOTX64.EFI
+xorriso -as mkisofs -o /mnt/r/uefi.iso -iso-level 3 -V UEFI /mnt/r/tofita/iso /mnt/r/tofita/disk.img -e /disk.img -no-emul-boot
 
 echo [Build complete]

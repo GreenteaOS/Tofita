@@ -1,5 +1,6 @@
+@echo off
 :: Configure
-@set R=R:\
+@set R=R:
 @set QEMU=C:\qemu
 
 :: Build Kernel
@@ -13,8 +14,8 @@ bash build.sh
 	-net none ^
 	-boot menu=off ^
 	-pflash OVMF-20160813.fd ^
-	-serial file:%R%qemu-serial.log ^
-	-cdrom %R%uefi.iso ^
+	-serial file:%R%\qemu-serial.log ^
+	-cdrom %R%\tofita\uefi.iso ^
 	-s ^
 	-no-reboot ^
 	-vga std ^
