@@ -1,3 +1,8 @@
+# Tofita
+
+/OVMF*
+
+# Temp
 *DS_Store
 *.tmp
 *~*
