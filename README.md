@@ -4,6 +4,15 @@
 
 All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 
+## Features
+
+ - UEFI boot
+ - 64-bit x86
+ - Colorful graphics
+ - PS/2 mouse
+ - PS/2 keyboard
+ - COM-port debug output
+
 ## LICENSE
 
 This program is free software: you can redistribute it and/or modify
