@@ -32,5 +32,4 @@ void kernelMain(KernelParams *params) {
 
 	enableInterrupts();
 
-	for(;;);
 }
