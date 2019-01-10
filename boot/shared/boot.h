@@ -1,12 +1,12 @@
 #define MEMORY_MAP_BUFFER_SIZE 512 * 1024 // 512 KiB
-char memoryMapBuffer[MEMORY_MAP_BUFFER_SIZE];
+uint8_t memoryMapBuffer[MEMORY_MAP_BUFFER_SIZE];
 
 typedef struct {
 	EFI_MEMORY_DESCRIPTOR *memoryMap;
-	UINT64 memoryMapSize;
-	UINT64 mapKey;
-	UINT64 descriptorSize;
-	UINT32 descriptorVersion;
+	uint64_t memoryMapSize;
+	uint64_t mapKey;
+	uint64_t descriptorSize;
+	uint32_t descriptorVersion;
 } EfiMemoryMap;
 
 typedef struct {

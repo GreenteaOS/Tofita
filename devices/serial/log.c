@@ -15,11 +15,11 @@ serialPrint("\r\n"); \
 
 uint64_t serialPortWrite(uint8_t *buffer, uint64_t size);
 
-void serialPrint(const char *print);
+void serialPrint(const uint8_t *print);
 
-void serialPrintln(const char *print);
+void serialPrintln(const uint8_t *print);
 
-void serialPrintf(const char *print, ...);
+void serialPrintf(const uint8_t *print, ...);
 
 void serialPrintInt(uint64_t n);
 
@@ -72,7 +72,7 @@ void *memset(void *dest, int e, size_t len) {
 	return dest;
 }
 
-uint64_t kstrlen(const char *data) {
+uint64_t kstrlen(const uint8_t *data) {
 	uint64_t r;
 	for(r = 0; *data != 0; data++, r++);
 	return r;
@@ -172,17 +172,17 @@ uint64_t serialPortWrite(uint8_t *buffer, uint64_t size)
 	return size;
 }
 
-void serialPrint(const char *print) {
+void serialPrint(const uint8_t *print) {
 	serialPortWrite((uint8_t *)print, kstrlen(print));
 }
 
-void serialPrintln(const char *print) {
+void serialPrintln(const uint8_t *print) {
 	serialPrint(print);
 	serialPrint("\r\n");
 }
 
 void serialPrintInt(uint64_t n) {
-	char buf[24] = {0}, *bp = buf + 24;
+	uint8_t buf[24] = {0}, *bp = buf + 24;
 	do {
 		bp--;
 		*bp = '0' + n % 10;
@@ -192,7 +192,7 @@ void serialPrintInt(uint64_t n) {
 }
 
 void serialPrintHex(uint64_t n) {
-	char buf[16], *bp = buf + 16;
+	uint8_t buf[16], *bp = buf + 16;
 	for(int i = 0; i < 16; i++) buf[i] = '0';
 	do {
 		bp--;
@@ -235,18 +235,18 @@ void serialPrintBits(uint64_t value)
 }
 
 int __cdecl putchar(int c) {
-	char buffer[] = {c, 0};
+	uint8_t buffer[] = {c, 0};
 	serialPrint(buffer);
 	return c;
 }
 
 #define EOF 0
-int puts(const char *string)
+int puts(const uint8_t *string)
 {
 	int i = 0;
    while(string[i])  //standard c idiom for looping through a null-terminated string
 	{
-		if ( putchar(string[i]) == EOF)  //if we got the EOF value from writing the char
+		if ( putchar(string[i]) == EOF)  //if we got the EOF value from writing the uint8_t
 		{
 			return EOF;
 		}
@@ -259,9 +259,9 @@ int puts(const char *string)
    return 1; //to meet spec.
 }
 
-char* comItoA(int i, char b[]){
-	char const digit[] = "0123456789";
-	char* p = b;
+uint8_t* comItoA(int i, uint8_t b[]){
+	uint8_t const digit[] = "0123456789";
+	uint8_t* p = b;
 	if(i<0){
 		*p++ = '-';
 		i *= -1;
@@ -279,9 +279,9 @@ char* comItoA(int i, char b[]){
 	return b;
 }
 
-void serialPrintf(const char *c, ...)
+void serialPrintf(const uint8_t *c, ...)
 {
-	char *s;
+	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);
 	while(*c != '\0')
@@ -302,13 +302,13 @@ void serialPrintf(const char *c, ...)
 
 		switch(*c)
 		{
-			case 's': puts(va_arg(lst, char *)); break;
+			case 's': puts(va_arg(lst, uint8_t *)); break;
 			case 'c': putchar(va_arg(lst, int)); break;
 			case 'd': {
 			  int value = va_arg(lst, int);
-			  char buffer[16] = {0};
+			  uint8_t buffer[16] = {0};
 			  comItoA(value, buffer);
-			  char *c = buffer;
+			  uint8_t *c = buffer;
 			  while (*c != '\0') {
 				putchar(*c);
 				c++;

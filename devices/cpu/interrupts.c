@@ -17,8 +17,8 @@ uint8_t mouseRead();
 #define PACKED __attribute__((packed))
 
 void* memcpy(void* dest, const void* src, size_t count) {
-	char* dst8 = (char*)dest;
-	char* src8 = (char*)src;
+	uint8_t* dst8 = (uint8_t*)dest;
+	uint8_t* src8 = (uint8_t*)src;
 
 	while (count--) {
 			*dst8++ = *src8++;
