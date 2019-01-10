@@ -52,8 +52,17 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices");
+	uint8_t oops = 0;
 	while (status != EFI_SUCCESS) {
-		serialPrintln("[[[efi_main]]] try: ExitBootServices");
+		if (oops < 10) serialPrintln("[[[efi_main]]] try: ExitBootServices");
+		if (oops == 100) {
+			serialPrintln("[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices");
+			serialPrintln("[[[efi_main]]] <ERROR?> system may or may not start");
+			oops = 200;
+		}
+		if (oops < 100) {
+			oops++;
+		}
 		status = ST->BootServices->ExitBootServices(imageHandle,
 			initParameters.efiMemoryMap.mapKey);
 	}
