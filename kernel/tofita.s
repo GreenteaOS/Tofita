@@ -1,6 +1,9 @@
 .section .head1
 call kernelMain
-hlt
+; Don't waste CPU
+halt:
+	hlt
+	jmp halt
 
 .section .stack1
 .align 16
