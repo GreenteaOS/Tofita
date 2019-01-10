@@ -22,7 +22,7 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
  - COM-port debug output
 
 
-This system is going to be coded exclusively in @hexalang, but I also recommend you to take a look at @ziglang, another promising systems programming language!
+This system is going to be coded exclusively in [@hexalang](https://github.com/hexalang), but I also recommend you to take a look at [@ziglang](https://github.com/ziglang), another promising systems programming language!
 
 ## LICENSE
 
