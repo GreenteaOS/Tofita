@@ -39,8 +39,12 @@ EFI_STATUS uefiAllocate(EFI_BOOT_SERVICES *bootsvc, EFI_MEMORY_TYPE allocationTy
 
 	status = bootsvc->AllocatePages(AllocateAddress, allocationType, pages, &addr);
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
+		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAddress status %d, using AllocateAnyPages\r\n", status);
 		status = bootsvc->AllocatePages(AllocateAnyPages, allocationType, pages, &addr);
 	}
+
+	if (status != EFI_SUCCESS)
+		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, rounded to %d pages, of type %d, status %d\r\n", bytes, pages, allocationType, status);
 
 	*bytes = pages * PAGE_SIZE;
 	*destination = (void *)addr;

@@ -10,19 +10,31 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 	if (status == EFI_NOT_FOUND)
 		return status;
 
+	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Open %d\r\n", status);
+
 	char info[sizeof(EFI_FILE_INFO) + 100];
 	size_t infoSize = sizeof(info);
 
 	status = file->GetInfo(file, &GenericFileInfo, &infoSize, info);
+	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: GetInfo %d\r\n", status);
+
 	size_t size = ((EFI_FILE_INFO *)info)->FileSize;
+	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] FileSize %d\r\n", size);
+
 	void *address;
 	status = uefiAllocate(
 			bootsvc,
 			EfiLoaderData,
 			&size,
 			&address);
+	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\r\n", status, size, address);
+
 	status = file->Read(file, &size, address);
+	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Read %d\r\n", status);
+
 	status = file->Close(file);
+	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Close %d\r\n", status);
+
 	return EFI_SUCCESS;
 }
 
