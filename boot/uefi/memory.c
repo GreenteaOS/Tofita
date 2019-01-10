@@ -10,7 +10,7 @@ void fillMemoryMap(EfiMemoryMap *efiMemoryMap) {
 		&efiMemoryMap->descriptorVersion);
 
 	if (status != EFI_SUCCESS) {
-		serialPrint("[[[efi_main]]] fillMemoryMap: failed\r\n");
+		serialPrint("[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\r\n");
 	}
 }
 
