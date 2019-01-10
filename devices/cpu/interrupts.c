@@ -153,7 +153,7 @@ arguments:
 
 Taken from http://wiki.osdev.org/8259_PIC
 */
-void remapPic(int offset1, int offset2) {
+void remapPic(uint8_t offset1, uint8_t offset2) {
 	writePort(0x20, 0x11);
 	writePort(0xA0, 0x11);
 	writePort(0x21, 0x20);
@@ -276,9 +276,7 @@ struct GdtDescriptor g_gdt_table[10];
 struct TablePtr g_gdtr;
 struct TssEntry g_tss;
 
-#define bool int
-void
-gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType type)
+void gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType type)
 {
 	g_gdt_table[i].limitLow = limit & 0xffff;
 	g_gdt_table[i].size = (limit >> 16) & 0xf;
