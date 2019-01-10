@@ -1,6 +1,6 @@
 #include "log.c"
 
-int initSerial()
+uint8_t initSerial()
 {
 	// Calculate divisor for baud generator
 	//    Ref_Clk_Rate / Baud_Rate / 16

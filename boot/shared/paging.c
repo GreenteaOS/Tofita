@@ -91,7 +91,7 @@ static inline void writeCr3(uint64_t value) {
 }
 
 static uint8_t pages[PAGES_TO_ALLOCATE][PAGE_SIZE] PAGE_ALIGNED;
-static int lastPageIndex = 0;
+static uint8_t lastPageIndex = 0;
 
 static inline void *allocatePage() {
 	return (void *) pages[lastPageIndex++];
