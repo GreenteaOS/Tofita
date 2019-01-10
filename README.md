@@ -21,6 +21,9 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
  - PS/2 keyboard
  - COM-port debug output
 
+
+This system is going to be coded exclusively in @hexalang, but I also recommend you to take a look at @ziglang, another promising systems programming language!
+
 ## LICENSE
 
 This program is free software: you can redistribute it and/or modify
