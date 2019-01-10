@@ -244,38 +244,38 @@ int __cdecl putchar(int c) {
 int puts(const uint8_t *string)
 {
 	int i = 0;
-   while(string[i])  //standard c idiom for looping through a null-terminated string
+	while(string[i]) //standard c idiom for looping through a null-terminated string
 	{
-		if ( putchar(string[i]) == EOF)  //if we got the EOF value from writing the uint8_t
+		if ( putchar(string[i]) == EOF) //if we got the EOF value from writing the uint8_t
 		{
 			return EOF;
 		}
 		i++;
 	}
-   if(putchar('\n') == EOF)  //this will occur right after we quit due to the null terminated character.
-   {
-	   return EOF;
-   }
-   return 1; //to meet spec.
+	if(putchar('\n') == EOF) //this will occur right after we quit due to the null terminated character.
+	{
+		return EOF;
+	}
+	return 1; //to meet spec.
 }
 
 uint8_t* comItoA(int i, uint8_t b[]){
 	uint8_t const digit[] = "0123456789";
 	uint8_t* p = b;
-	if(i<0){
+	if (i<0){
 		*p++ = '-';
 		i *= -1;
 	}
 	int shifter = i;
-	do{ //Move to where representation ends
+	do { //Move to where representation ends
 		++p;
 		shifter = shifter/10;
-	}while(shifter);
+	} while(shifter);
 	*p = '\0';
-	do{ //Move back, inserting digits as u go
+	do { //Move back, inserting digits as u go
 		*--p = digit[i%10];
 		i = i/10;
-	}while(i);
+	} while(i);
 	return b;
 }
 
@@ -284,9 +284,9 @@ void serialPrintf(const uint8_t *c, ...)
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);
-	while(*c != '\0')
+	while (*c != '\0')
 	{
-		if(*c != '%')
+		if (*c != '%')
 		{
 			putchar(*c);
 			c++;
@@ -295,25 +295,25 @@ void serialPrintf(const uint8_t *c, ...)
 
 		c++;
 
-		if(*c == '\0')
+		if (*c == '\0')
 		{
 			break;
 		}
 
-		switch(*c)
+		switch (*c)
 		{
 			case 's': puts(va_arg(lst, uint8_t *)); break;
 			case 'c': putchar(va_arg(lst, int)); break;
 			case 'd': {
-			  int value = va_arg(lst, int);
-			  uint8_t buffer[16] = {0};
-			  comItoA(value, buffer);
-			  uint8_t *c = buffer;
-			  while (*c != '\0') {
-				putchar(*c);
-				c++;
-			  }
-			  break;
+				int value = va_arg(lst, int);
+				uint8_t buffer[16] = {0};
+				comItoA(value, buffer);
+				uint8_t *c = buffer;
+				while (*c != '\0') {
+					putchar(*c);
+					c++;
+				}
+				break;
 			}
 		}
 		c++;

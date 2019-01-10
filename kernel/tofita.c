@@ -19,8 +19,8 @@ void kernelMain(KernelParams *params) {
 
 	setFramebuffer(&params->framebuffer);
 
-	if (sizeof(int*) == 4) serialPrintln("<Tofita> void*: 4 bytes");
-	if (sizeof(int*) == 8) serialPrintln("<Tofita> void*: 8 bytes");
+	if (sizeof(uint8_t*) == 4) serialPrintln("<Tofita> void*: 4 bytes");
+	if (sizeof(uint8_t*) == 8) serialPrintln("<Tofita> void*: 8 bytes");
 
 	#if defined(__clang__)
 		serialPrintln("<Tofita> __clang__");
