@@ -9,6 +9,7 @@
 #include "../shared/boot.h"
 #include "../shared/paging.c"
 #include "memory.c"
+#include "ramdisk.c"
 
 void* memcpy(void* dest, const void* src, size_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
@@ -45,6 +46,9 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	fillMemoryMap(&initParameters.efiMemoryMap);
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap");
 
+	// Initial RAM disk
+	findAndLoadRamDisk(systemTable->BootServices);
+
 	EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices");
@@ -55,7 +59,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 
 	if (status != EFI_SUCCESS) {
-		serialPrintln("[[[efi_main]]] ExitBootServices: EFI_LOAD_ERROR");
+		serialPrintln("[[[efi_main]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR");
 		return EFI_LOAD_ERROR;
 	}
 	serialPrintln("[[[efi_main]]] done: ExitBootServices");
