@@ -14,8 +14,6 @@ typedef struct {
 
 _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to have 64 bits");
 
-void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb);
-
 // 512 entries * 8 bytes = 4 KiB
 // PML4 size = PDP size = PD size = PT size
 //
@@ -147,6 +145,8 @@ static inline void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr,
 
 	uint64_t vAddress = virtualAddr;
 	uint64_t pAddress = physicalAddr;
+
+	serialPrintf("[paging.range] bytes = %d or %d\r\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
 	serialPrint("[paging.range] virtual address = ");
 	serialPrintHex((uint64_t) (virtualAddr));

@@ -36,23 +36,23 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 
 	KernelParams initParameters;
 	initParameters.efiRuntimeServices = RT;
+	EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer");
 	initializeFramebuffer(&initParameters.framebuffer);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	serialPrintln("[[[efi_main]]] done: initializeFramebuffer");
 
+	// Initial RAM disk
+	findAndLoadRamDisk(systemTable->BootServices);
+
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap");
 	fillMemoryMap(&initParameters.efiMemoryMap);
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap");
 
-	// Initial RAM disk
-	findAndLoadRamDisk(systemTable->BootServices);
-
-	EFI_STATUS status = EFI_NOT_READY;
-
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices");
 	uint8_t oops = 0;
+	status = EFI_NOT_READY;
 	while (status != EFI_SUCCESS) {
 		if (oops < 10) serialPrintln("[[[efi_main]]] try: ExitBootServices");
 		if (oops == 100) {
