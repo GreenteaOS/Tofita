@@ -10,8 +10,8 @@
 #include "../shared/paging.c"
 
 void* memcpy(void* dest, const void* src, size_t count) {
-	char* dst8 = (char*)dest;
-	char* src8 = (char*)src;
+	uint8_t* dst8 = (uint8_t*)dest;
+	uint8_t* src8 = (uint8_t*)src;
 
 	while (count--) {
 			*dst8++ = *src8++;
@@ -20,8 +20,8 @@ void* memcpy(void* dest, const void* src, size_t count) {
 	return dest;
 }
 
-extern char _binary__mnt_r_tofita_loader_kernel_img_start;
-extern char _binary__mnt_r_tofita_loader_kernel_img_end;
+extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_start;
+extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_end;
 
 void fillMemoryMap(EfiMemoryMap *efiMemoryMap) {
 	efiMemoryMap->memoryMap = (EFI_MEMORY_DESCRIPTOR *) memoryMapBuffer;

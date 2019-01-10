@@ -174,7 +174,7 @@ static inline void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr,
 }
 
 static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(
-	const EFI_MEMORY_DESCRIPTOR *descriptor, UINT64 descriptorSize)
+	const EFI_MEMORY_DESCRIPTOR *descriptor, uint64_t descriptorSize)
 {
 	const uint8_t *desc = ((const uint8_t *) descriptor) + descriptorSize;
 	return (const EFI_MEMORY_DESCRIPTOR *) desc;
@@ -182,9 +182,9 @@ static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(
 
 static inline void mapEfi(EfiMemoryMap *memoryMap) {
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
-	const UINT64 descriptorSize = memoryMap->descriptorSize;
+	const uint64_t descriptorSize = memoryMap->descriptorSize;
 
-	for (UINT64 i = 0; i < memoryMap->memoryMapSize; ++i) {
+	for (uint64_t i = 0; i < memoryMap->memoryMapSize; ++i) {
 		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
 			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart,
 					descriptor->NumberOfPages);

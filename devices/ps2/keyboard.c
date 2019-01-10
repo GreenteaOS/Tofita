@@ -102,8 +102,8 @@ void handleKeyboard() {
 	//    //if (keycode < 0) {
 			return;
 	//    //}
-	//    //char buffer[] = {keyboardMap[keycode], 0};
-	//    char buffer[] = {'M','o','u','s','e',':', 0};
+	//    //uint8_t buffer[] = {keyboardMap[keycode], 0};
+	//    uint8_t buffer[] = {'M','o','u','s','e',':', 0};
 	//    serialPrint(buffer);
 	//    serialPrint(buffer);
 	}
@@ -119,7 +119,7 @@ void handleKeyboard() {
 		serialPrint("handleKeyboard 5\r\n");
 
 		if (keycode < 128 && keyboardMap[keycode]) {
-			char buffer[] = {keyboardMap[keycode], 0};
+			uint8_t buffer[] = {keyboardMap[keycode], 0};
 			serialPrint("handleKeyboard 6\r\n");
 			serialPrint(buffer);
 			serialPrint("handleKeyboard 7\r\n");
@@ -128,12 +128,12 @@ void handleKeyboard() {
 		serialPrint("handleKeyboard 8\r\n");
 
 		//if (status & 0x20) {
-		//    char buffer[] = {'M', 0};
+		//    uint8_t buffer[] = {'M', 0};
 		//    serialPrint(buffer);
 		//}
 	} else {
 		serialPrint("handleKeyboard status not 0x1!\r\n");
-		char buffer[] = {'w', 0};
+		uint8_t buffer[] = {'w', 0};
 		serialPrint(buffer);
 	}
 }
