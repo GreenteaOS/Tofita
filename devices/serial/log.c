@@ -64,7 +64,7 @@ void serialPrintBits(uint64_t value);
 #define   B_UART_MSR_RI       (1 << 7)
 #define   B_UART_MSR_DCD      (1 << 8)
 
-void *memset(void *dest, int e, unsigned long len) {
+void *memset(void *dest, int e, size_t len) {
 	uint8_t *d = dest;
 	for(uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
@@ -212,7 +212,7 @@ void serialPrintMem(const void *mem, int n)
 	serialPrint("@");
 	serialPrintHex((uint64_t) mem);
 	serialPrint("\r\n");
-	const unsigned char *memc = (const unsigned char *) mem;
+	const uint8_t *memc = (const uint8_t *) mem;
 	for(int i = 0; i < n; ++i) {
 		if(i) serialPrint(":");
 		serialPrintHex(memc[i]);

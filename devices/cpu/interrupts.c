@@ -167,7 +167,7 @@ void remapPic(int offset1, int offset2) {
 
 	return;
 
-	unsigned char a1, a2;
+	uint8_t a1, a2;
 
 	a1 = readPort(PIC1_DATA); // save masks
 	a2 = readPort(PIC2_DATA);
@@ -415,7 +415,7 @@ void enableInterrupts() {
 	#define PS2_DATA_PORT 0x60
 	#define PS2_CONTROL_PORT 0x64
 
-	uint8_t _status;  //unsigned char
+	uint8_t _status;
 	//Enable the auxiliary mouse device
 	mouseWait(1);
 	writePort(PS2_CONTROL_PORT, 0xA8);
@@ -451,9 +451,9 @@ void enableInterrupts() {
 	serialPrintln("[cpu] done: setting PS/2 mouse");
 }
 
-void mouseWait(uint8_t aType) //unsigned char
+void mouseWait(uint8_t aType)
 {
-  uint32_t _timeOut=100000; //unsigned int
+  uint32_t _timeOut=100000;
   if(aType==0)
   {
 	while(_timeOut--) //Data
@@ -478,7 +478,7 @@ void mouseWait(uint8_t aType) //unsigned char
   }
 }
 
-void mouseWrite(uint8_t aWrite) //unsigned char
+void mouseWrite(uint8_t aWrite)
 {
   //Wait to be able to send a command
   mouseWait(1);

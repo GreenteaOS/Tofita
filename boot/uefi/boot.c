@@ -50,7 +50,6 @@ void initializeFramebuffer(Framebuffer *fb) {
 
 	fb->width = gop->Mode->Info->HorizontalResolution;
 	fb->height = gop->Mode->Info->VerticalResolution;
-	fb->pixelsPerScanline = gop->Mode->Info->PixelsPerScanLine;
 
 	gop->SetMode(gop, gop->Mode->Mode);
 }
