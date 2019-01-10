@@ -17,8 +17,6 @@ uint64_t serialPortWrite(uint8_t *buffer, uint64_t size);
 
 void serialPrint(const uint8_t *print);
 
-void serialPrintln(const uint8_t *print);
-
 void serialPrintf(const uint8_t *print, ...);
 
 void serialPrintInt(uint64_t n);
@@ -244,15 +242,15 @@ int __cdecl putchar(int c) {
 int puts(const uint8_t *string)
 {
 	int i = 0;
-	while(string[i]) //standard c idiom for looping through a null-terminated string
+	while (string[i]) //standard c idiom for looping through a null-terminated string
 	{
-		if ( putchar(string[i]) == EOF) //if we got the EOF value from writing the uint8_t
+		if (putchar(string[i]) == EOF) //if we got the EOF value from writing the uint8_t
 		{
 			return EOF;
 		}
 		i++;
 	}
-	if(putchar('\n') == EOF) //this will occur right after we quit due to the null terminated character.
+	if (putchar('\n') == EOF) //this will occur right after we quit due to the null terminated character.
 	{
 		return EOF;
 	}
@@ -262,7 +260,7 @@ int puts(const uint8_t *string)
 uint8_t* comItoA(int i, uint8_t b[]){
 	uint8_t const digit[] = "0123456789";
 	uint8_t* p = b;
-	if (i<0){
+	if (i<0) {
 		*p++ = '-';
 		i *= -1;
 	}

@@ -8,6 +8,7 @@
 #include "../../devices/serial/init.c"
 #include "../shared/boot.h"
 #include "../shared/paging.c"
+#include "memory.c"
 
 void* memcpy(void* dest, const void* src, size_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
@@ -23,43 +24,13 @@ void* memcpy(void* dest, const void* src, size_t count) {
 extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_start;
 extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_end;
 
-void fillMemoryMap(EfiMemoryMap *efiMemoryMap) {
-	efiMemoryMap->memoryMap = (EFI_MEMORY_DESCRIPTOR *) memoryMapBuffer;
-	efiMemoryMap->memoryMapSize = MEMORY_MAP_BUFFER_SIZE;
-
-	EFI_STATUS status = ST->BootServices->GetMemoryMap(
-		&efiMemoryMap->memoryMapSize,
-		efiMemoryMap->memoryMap,
-		&efiMemoryMap->mapKey,
-		&efiMemoryMap->descriptorSize,
-		&efiMemoryMap->descriptorVersion);
-
-	if (status != EFI_SUCCESS) {
-		serialPrint("[[[efi_main]]] fillMemoryMap: failed\r\n");
-	}
-}
-
-void initializeFramebuffer(Framebuffer *fb) {
-	EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-	EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
-
-	ST->BootServices->LocateProtocol(&gopGuid, NULL, (void **) &gop);
-
-	fb->base = (void *) gop->Mode->FrameBufferBase;
-	fb->size = gop->Mode->FrameBufferSize;
-
-	fb->width = gop->Mode->Info->HorizontalResolution;
-	fb->height = gop->Mode->Info->VerticalResolution;
-
-	gop->SetMode(gop, gop->Mode->Mode);
-}
-
-EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
+// Entry point
+EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
 	serialPrint("\r\n[[[efi_main]]] This is Tofita UEFI bootloader. Welcome!\r\n");
 
 	serialPrintln("[[[efi_main]]] begin: InitializeLib");
-	InitializeLib(ImageHandle, SystemTable);
+	InitializeLib(imageHandle, systemTable);
 	serialPrintln("[[[efi_main]]] done: InitializeLib");
 
 	KernelParams initParameters;
@@ -79,7 +50,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices");
 	while (status != EFI_SUCCESS) {
 		serialPrintln("[[[efi_main]]] try: ExitBootServices");
-		status = ST->BootServices->ExitBootServices(ImageHandle,
+		status = ST->BootServices->ExitBootServices(imageHandle,
 			initParameters.efiMemoryMap.mapKey);
 	}
 

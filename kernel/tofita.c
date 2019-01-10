@@ -31,5 +31,4 @@ void kernelMain(KernelParams *params) {
 	#endif
 
 	enableInterrupts();
-
 }
