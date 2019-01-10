@@ -1,6 +1,6 @@
 .section .head1
 call kernelMain
-; Don't waste CPU
+# Don't waste CPU
 halt:
 	hlt
 	jmp halt
