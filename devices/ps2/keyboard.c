@@ -1,5 +1,5 @@
 /* http://www.osdever.net/bkerndev/Docs/keyboard.htm */
-unsigned char keyboardMap[128] =
+uint8_t keyboardMap[128] =
 {
 	0,
 	27,

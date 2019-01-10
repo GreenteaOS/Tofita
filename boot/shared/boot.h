@@ -11,10 +11,9 @@ typedef struct {
 
 typedef struct {
 	void *base; // physical address
-	UINTN size; // in bytes
-	UINT32 width;
-	UINT32 height;
-	UINT32 pixelsPerScanline;
+	uint32_t size; // in bytes
+	uint16_t width;
+	uint16_t height;
 } Framebuffer;
 
 // Start of kernel sections in memory, see loader.ld
