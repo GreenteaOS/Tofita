@@ -199,7 +199,12 @@ static inline void mapFramebuffer(Framebuffer *fb) {
 	mapMemory(FRAMEBUFFER_START, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
 }
 
-void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb) {
+static inline void mapRamDisk(RamDisk *ramdisk) {
+	void *ramdiskBase = ramdisk->base;
+	mapMemory(RAMDISK_START, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
+}
+
+void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk) {
 	mapMemory(KERNEL_START, KERNEL_START, 256);
 	serialPrintln("[paging] kernel mapped");
 
@@ -211,6 +216,9 @@ void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb) 
 
 	mapFramebuffer(fb);
 	serialPrintln("[paging] framebuffer mapped");
+
+	mapRamDisk(ramdisk);
+	serialPrintln("[paging] ramdisk mapped");
 
 	serialPrint("[paging] CR3 points to: ");
 	serialPrintHex((uint64_t) pml4);

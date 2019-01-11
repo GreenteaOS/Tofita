@@ -16,18 +16,25 @@ typedef struct {
 	uint16_t height;
 } Framebuffer;
 
+typedef struct {
+	void *base; // physical address
+	uint32_t size; // in bytes
+} RamDisk;
+
 // Start of kernel sections in memory, see loader.ld
 #define KERNEL_START (1 * 1024 * 1024)
 
 #define KERNEL_VIRTUAL_BASE 0xffff800000000000
 #define EFI_VIRTUAL_BASE (KERNEL_VIRTUAL_BASE + 0x40000000)
 #define FRAMEBUFFER_START (EFI_VIRTUAL_BASE + 0x40000000)
+#define RAMDISK_START (EFI_VIRTUAL_BASE + 0x45000000)
 
 typedef struct {
 	const EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
 	EFI_RUNTIME_SERVICES *efiRuntimeServices;
 	Framebuffer framebuffer;
+	RamDisk ramdisk;
 } KernelParams;
 
 typedef void (*InitKernel)(const KernelParams *);

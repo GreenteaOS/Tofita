@@ -44,7 +44,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	serialPrintln("[[[efi_main]]] done: initializeFramebuffer");
 
 	// Initial RAM disk
-	findAndLoadRamDisk(systemTable->BootServices);
+	findAndLoadRamDisk(systemTable->BootServices, &initParameters.ramdisk);
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap");
 	fillMemoryMap(&initParameters.efiMemoryMap);
