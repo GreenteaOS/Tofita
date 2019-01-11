@@ -16,7 +16,7 @@ uint8_t mouseRead();
 
 #define PACKED __attribute__((packed))
 
-void* memcpy(void* dest, const void* src, size_t count) {
+void* tmemcpy(void* dest, const void* src, size_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
 	uint8_t* src8 = (uint8_t*)src;
 
@@ -324,7 +324,7 @@ tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 		execute |
 		ring3 |
 		present;
-	memcpy(&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
+	tmemcpy(&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
 }
 
 void gdt_write(uint16_t cs, uint16_t ds, uint16_t tr);
@@ -332,7 +332,7 @@ void gdt_write(uint16_t cs, uint16_t ds, uint16_t tr);
 void enableInterrupts() {
 	serialPrintln("[cpu] initializing lgdt");
 
-	memset(&g_gdt_table, 0, sizeof(g_gdt_table));
+	tmemset(&g_gdt_table, 0, sizeof(g_gdt_table));
 	g_gdtr.limit = sizeof(g_gdt_table) - 1;
 	g_gdtr.base = (uint64_t)(&g_gdt_table);
 
@@ -350,7 +350,7 @@ void enableInterrupts() {
 
 	size_t sizeof_TssEntry = sizeof(g_tss);
 
-	memset(&g_tss, 0, sizeof_TssEntry);
+	tmemset(&g_tss, 0, sizeof_TssEntry);
 	g_tss.iomap_offset = sizeof_TssEntry;
 
 	uintptr_t tssBase = (uintptr_t)(&g_tss);

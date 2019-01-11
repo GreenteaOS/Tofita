@@ -17,10 +17,6 @@ uint64_t serialPortWrite(uint8_t *buffer, uint64_t size);
 
 void serialPrint(const uint8_t *print);
 
-void serialPrintf(const uint8_t *print, ...);
-
-void serialPrintInt(uint64_t n);
-
 void serialPrintHex(uint64_t n);
 
 void serialPrintMem(const void *mem, int n);
@@ -62,7 +58,7 @@ void serialPrintBits(uint64_t value);
 #define   B_UART_MSR_RI       (1 << 7)
 #define   B_UART_MSR_DCD      (1 << 8)
 
-void *memset(void *dest, int e, size_t len) {
+void *tmemset(void *dest, int e, size_t len) {
 	uint8_t *d = dest;
 	for(uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
@@ -180,7 +176,9 @@ void serialPrintln(const uint8_t *print) {
 }
 
 void serialPrintInt(uint64_t n) {
-	uint8_t buf[24] = {0}, *bp = buf + 24;
+	uint8_t buf[24];
+	for (uint8_t i = 0; i < 24; i++) buf[i] = 0;
+	uint8_t *bp = buf + 24;
 	do {
 		bp--;
 		*bp = '0' + n % 10;
@@ -304,7 +302,8 @@ void serialPrintf(const uint8_t *c, ...)
 			case 'c': putchar(va_arg(lst, int)); break;
 			case 'd': {
 				int value = va_arg(lst, int);
-				uint8_t buffer[16] = {0};
+				uint8_t buffer[16];
+				for (uint8_t i = 0; i < 16; i++) buffer[i] = 0;
 				comItoA(value, buffer);
 				uint8_t *c = buffer;
 				while (*c != '\0') {
