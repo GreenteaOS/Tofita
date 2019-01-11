@@ -4,6 +4,7 @@
 @set QEMU=C:\qemu
 
 :: Build Kernel
+node assets\assets.js
 bash build.sh
 
 :: VirtualBox
