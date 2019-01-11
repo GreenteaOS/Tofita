@@ -12,6 +12,8 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 [![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
 [![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/TODO/build/artifacts)
 
+This project is aimed to run `.exe` files natively, and to provide full operating system environment for that.
+
 ## Features
 
  - UEFI boot
@@ -20,6 +22,9 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
  - PS/2 mouse
  - PS/2 keyboard
  - COM-port debug output
+ - Initial RAM disk for LiveCD/LiveUSB and installer
+ - Currently works only in QEMU :trollface:
+ - Monolithic performance-oriented kernel
 
 
 This system is going to be coded exclusively in [@hexalang](https://github.com/hexalang), but I also recommend you to take a look at [@ziglang](https://github.com/ziglang), another promising systems programming language!

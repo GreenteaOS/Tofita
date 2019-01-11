@@ -24,5 +24,5 @@ bash build.sh
 	-no-reboot ^
 	-vga std ^
 	-smp 4 ^
-	-m 256M ^
+	-m 512M ^
 	-net nic,macaddr=52-54-00-B3-47-55,model=rtl8139
