@@ -1,4 +1,4 @@
-EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *root)
+EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *root, RamDisk* ramdisk)
 {
 	EFI_STATUS status;
 	static CHAR16 name[] = L"TOFITA.IMG";
@@ -21,10 +21,10 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 	size_t size = ((EFI_FILE_INFO *)info)->FileSize;
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] FileSize %d\r\n", size);
 
-	void *address;
+	void *address = 242352128; // arbitary physical address to fit in RAM
 	status = uefiAllocate(
 			bootsvc,
-			EfiLoaderData,
+			EfiBootServicesCode,
 			&size,
 			&address);
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\r\n", status, size, address);
@@ -35,11 +35,14 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 	status = file->Close(file);
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Close %d\r\n", status);
 
+	ramdisk->base = address;
+	ramdisk->size = size;
+
 	return EFI_SUCCESS;
 }
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
-EFI_STATUS findAndLoadRamDisk(EFI_BOOT_SERVICES *bootsvc) {
+EFI_STATUS findAndLoadRamDisk(EFI_BOOT_SERVICES *bootsvc, RamDisk* ramdisk) {
 	EFI_STATUS status = EFI_NOT_READY;
 	EFI_HANDLE *handleBuffer = NULL;
 	size_t handleCount = 0;
@@ -69,7 +72,7 @@ EFI_STATUS findAndLoadRamDisk(EFI_BOOT_SERVICES *bootsvc) {
 			continue ;
 		}
 
-		status = loadRamDiskFromVolume(bootsvc, root);
+		status = loadRamDiskFromVolume(bootsvc, root, ramdisk);
 		if (status != EFI_SUCCESS) {
 			serialPrintf("[[[efi_main.findAndLoadRamDisk]]] failed: loadRamDiskFromVolume with status %d, continue to the next one\r\n", status);
 			continue ;
