@@ -1,7 +1,7 @@
 EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *root, RamDisk* ramdisk)
 {
 	EFI_STATUS status;
-	static CHAR16 name[] = L"TOFITA.IMG";
+	static CHAR16 name[] = L"TOFITA.DAT";
 
 	EFI_FILE_PROTOCOL *file = NULL;
 	status = root->Open(root, &file, (CHAR16 *)name, EFI_FILE_MODE_READ,

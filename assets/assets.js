@@ -56,6 +56,6 @@ for (const asset of assets) {
 	assetInfoOffset += assetInfoSize
 }
 
-fs.writeFile("R:\\tofita\\TOFITA.DAT", buffer, "binary", function(error) {
+fs.writeFile("R:\\TOFITA.DAT", buffer, "binary", function(error) {
 	if (error) console.error(error)
 })
