@@ -314,14 +314,47 @@ StrCpy (
     );
 
 VOID
+StrnCpy (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16    *Src,
+    IN UINTN     Len
+    );
+
+CHAR16 *
+StpCpy (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16    *Src
+    );
+
+CHAR16 *
+StpnCpy (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16    *Src,
+    IN UINTN     Len
+    );
+
+VOID
 StrCat (
     IN CHAR16   *Dest,
     IN CONST CHAR16   *Src
     );
 
+VOID
+StrnCat (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16   *Src,
+    IN UINTN     Len
+    );
+
 UINTN
 StrLen (
     IN CONST CHAR16   *s1
+    );
+
+UINTN
+StrnLen (
+    IN CONST CHAR16   *s1,
+    IN UINTN           Len
     );
 
 UINTN
