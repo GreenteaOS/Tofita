@@ -25,6 +25,14 @@ void* tmemcpy(void* dest, const void* src, size_t count) {
 extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_start;
 extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_end;
 
+// Loading animation, progress 0...2
+void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
+	uint32_t* pixels = framebuffer->base;
+	for (uint8_t y = 0; y < 24; y++)
+		for (uint8_t x = 0; x < 24; x++)
+			pixels[((y + framebuffer->height/2) * framebuffer->width) + x + framebuffer->width/2 - 12 + progress*24*2] = 0xFFFFFFFF;
+}
+
 // Entry point
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
@@ -40,11 +48,13 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer");
 	initializeFramebuffer(&initParameters.framebuffer);
+	drawLoading(&initParameters.framebuffer, 0);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	serialPrintln("[[[efi_main]]] done: initializeFramebuffer");
 
 	// Initial RAM disk
 	findAndLoadRamDisk(systemTable->BootServices, &initParameters.ramdisk);
+	drawLoading(&initParameters.framebuffer, 1);
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap");
 	fillMemoryMap(&initParameters.efiMemoryMap);
@@ -76,6 +86,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	void *kernelBase = (void *) KERNEL_START;
 	const void *kernelImage = (const void *) &_binary__mnt_r_tofita_loader_kernel_img_start;
 	size_t kernelImgSize = ((size_t) &_binary__mnt_r_tofita_loader_kernel_img_end) - ((size_t) kernelImage);
+	drawLoading(&initParameters.framebuffer, 2);
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader");
 
