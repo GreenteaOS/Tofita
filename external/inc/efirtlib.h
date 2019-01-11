@@ -71,15 +71,53 @@ RtStrCpy (
 
 VOID
 RUNTIMEFUNCTION
+RtStrnCpy (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16    *Src,
+    IN UINTN     Len
+    );
+
+CHAR16 *
+RUNTIMEFUNCTION
+RtStpCpy (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16    *Src
+    );
+
+CHAR16 *
+RUNTIMEFUNCTION
+RtStpnCpy (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16    *Src,
+    IN UINTN     Len
+    );
+
+VOID
+RUNTIMEFUNCTION
 RtStrCat (
     IN CHAR16   *Dest,
     IN CONST CHAR16   *Src
+    );
+
+VOID
+RUNTIMEFUNCTION
+RtStrnCat (
+    IN CHAR16   *Dest,
+    IN CONST CHAR16   *Src,
+    IN UINTN     Len
     );
 
 UINTN
 RUNTIMEFUNCTION
 RtStrLen (
     IN CONST CHAR16   *s1
+    );
+
+UINTN
+RUNTIMEFUNCTION
+RtStrnLen (
+    IN CONST CHAR16   *s1,
+    IN UINTN           Len
     );
 
 UINTN
