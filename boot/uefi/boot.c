@@ -11,7 +11,7 @@
 #include "memory.c"
 #include "ramdisk.c"
 
-void* memcpy(void* dest, const void* src, size_t count) {
+void* tmemcpy(void* dest, const void* src, size_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
 	uint8_t* src8 = (uint8_t*)src;
 
@@ -79,7 +79,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader");
 
-	memcpy(kernelBase, kernelImage, kernelImgSize);
+	tmemcpy(kernelBase, kernelImage, kernelImgSize);
 	InitKernel startFunction = (InitKernel) kernelBase;
 
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader");
