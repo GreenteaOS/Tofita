@@ -142,6 +142,14 @@ void drawRectangle(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16
 	}
 }
 
+void drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+	for (int yy = 0; yy < height; yy++) {
+		for (int xx = 0; xx < width; xx++) {
+			if (yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1) setPixel(x + xx, y + yy, color);
+		}
+	}
+}
+
 enum WallpaperStyle {
 	Center,
 	Stretch,
