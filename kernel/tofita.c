@@ -51,4 +51,8 @@ void kernelMain(KernelParams *params) {
 		serialPrintf("Asset 'cursors\\normal.cur' %d bytes", a.size);
 		serialPrintln(a.data);
 	}
+
+	Pixel32 color;
+	color.color = 0x55AA9944;
+	drawRectangleWithAlpha(color, 300, 100, 300, 100);
 }
