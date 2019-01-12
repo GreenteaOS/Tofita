@@ -43,11 +43,10 @@ RamDiskAsset getRamDiskAsset(uint8_t *path) {
 
 	for (uint32_t id = 0; id < ramDiskInfo->assetsCount; id++) {
 		// Pointer arithmetic like a boss
-		RamDiskAssetInfo* ramDiskAssetInfo = _ramdisk->base + (4 + 4) + (256 + 4 + 4) * id;
-		uint8_t at = 0;
+		RamDiskAssetInfo* ramDiskAssetInfo = _ramdisk->base + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id;
 		uint8_t found = 1;
 
-		for (at = 0; at < 256; at++) {
+		for (uint8_t at = 0; at < 255; at++) {
 			if (ramDiskAssetInfo->path[at] != path[at]) {
 				found = 0;
 				break;
