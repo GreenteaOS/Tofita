@@ -1,3 +1,20 @@
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// Performs visualization onto the screen
+
 Framebuffer *_framebuffer;
 
 typedef struct {
@@ -14,7 +31,15 @@ typedef struct {
 	};
 } Pixel32;
 
+typedef struct {
+	uint16_t width;
+	uint16_t height;
+	Pixel32 pixels[];
+} Bitmap32;
+
 Pixel32 *_pixels;
+Pixel32 *wallpaper; // Size of framebuffer
+Pixel32 *vibrance; // Size of framebuffer, maybe do 0.5x to save bandwidth?
 
 void putPixel(uint16_t x, uint16_t y, uint32_t px)
 {
@@ -45,23 +70,26 @@ void clearScreen() {
 	}
 }
 
-void setFramebuffer(Framebuffer *framebuffer) {
-	_framebuffer = framebuffer;
-	_pixels = (Pixel32 *)_framebuffer->base;
-	clearScreen();
-}
-
 void safePutPixel(uint16_t x, uint16_t y, uint32_t px) {
 	if (x < _framebuffer->width && y < _framebuffer->height) {
 		putPixel(x, y, px);
 	}
 }
 
-typedef struct {
-	uint16_t width;
-	uint16_t height;
-	Pixel32 pixels[];
-} Bitmap32;
+Bitmap32* allocateBitmapFromBuffer(uint16_t width, uint16_t height) {
+	Bitmap32* result = (Bitmap32*)allocateFromBuffer(sizeof(uint16_t) * 2 + sizeof(Pixel32) * width * height);
+}
+
+void setFramebuffer(Framebuffer *framebuffer) {
+	_framebuffer = framebuffer;
+	_pixels = (Pixel32 *)_framebuffer->base;
+
+	// Wallpaper
+	wallpaper = (Pixel32*)allocateFromBuffer(sizeof(Pixel32) * _framebuffer->width * _framebuffer->height);
+	vibrance = (Pixel32*)allocateFromBuffer(sizeof(Pixel32) * _framebuffer->width * _framebuffer->height);
+
+	clearScreen();
+}
 
 // Very fast, but not precise, alpha multiply
 #define Mul255(a255, c255) (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
@@ -85,7 +113,15 @@ void setPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
 void drawBitmap32WithAlpha(Bitmap32* bitmap, uint16_t x, uint16_t y) {
 	for (int yy = 0; yy < bitmap->height; yy++) {
 		for (int xx = 0; xx < bitmap->width; xx++) {
-			blendPixel(x + xx, y + yy, bitmap->pixels[y * bitmap->width]);
+			blendPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
+		}
+	}
+}
+
+void drawBitmap32(Bitmap32* bitmap, uint16_t x, uint16_t y) {
+	for (int yy = 0; yy < bitmap->height; yy++) {
+		for (int xx = 0; xx < bitmap->width; xx++) {
+			setPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
 		}
 	}
 }
@@ -104,4 +140,16 @@ void drawRectangle(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16
 			setPixel(x + xx, y + yy, color);
 		}
 	}
+}
+
+enum WallpaperStyle {
+	Center,
+	Stretch,
+	Fill
+	// TODO more options
+};
+
+// Also generates vibrance and blur
+void setWallpaper(Bitmap32* bitmap, enum WallpaperStyle style) {
+	// Hmmm....
 }
