@@ -7,6 +7,7 @@
 
 #include "../boot/shared/boot.h"
 
+#include "allocator.c"
 #include "../devices/serial/log.c"
 #include "../devices/cpu/interrupts.c"
 #include "../devices/screen/framebuffer.c"
