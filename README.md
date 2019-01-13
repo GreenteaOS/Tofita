@@ -26,6 +26,8 @@ This project is aimed to run `.exe` files natively, and to provide full operatin
  - Currently works only in QEMU :trollface:
  - Monolithic performance-oriented kernel
 
+[![Give a star](docs/star.png?raw=true) 
+Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
 
 This system is going to be coded exclusively in [@hexalang](https://github.com/hexalang), but I also recommend you to take a look at [@ziglang](https://github.com/ziglang), another promising systems programming language!
 
