@@ -10,6 +10,7 @@ bash build.sh
 :: VirtualBox
 ::"C:\Program Files\Oracle\VirtualBox\VBoxManage" modifyvm Tofita --bioslogodisplaytime 0
 ::"C:\Program Files\Oracle\VirtualBox\VBoxManage" --nologo startvm Tofita
+::node listen.js
 
 :: Run
 %QEMU%\qemu-system-x86_64 ^
