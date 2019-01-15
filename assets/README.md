@@ -5,6 +5,7 @@ Resources bundled into initial RAM disk.
 Structure of `TOFITA.DAT`:
 
 ```c
+uint32_t ramDiskChecksum;
 uint32_t ramDiskSize;
 uint32_t assetsCount;
 struct assetDefinition
