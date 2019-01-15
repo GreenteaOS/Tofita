@@ -53,7 +53,7 @@ void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 // Entry point
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
-	serialPrint("\r\n[[[efi_main]]] This is Tofita UEFI bootloader. Welcome!\r\n");
+	serialPrint("\r\n[[[efi_main]]] This is Tofita " Version " UEFI bootloader. Welcome!\r\n");
 
 	serialPrintln("[[[efi_main]]] begin: InitializeLib");
 	InitializeLib(imageHandle, systemTable);
@@ -120,7 +120,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 	serialPrintln("[[[efi_main]]] done: ExitBootServices");
 
-	void *kernelBase = (void *) KERNEL_START;
+	void *kernelBase = (void *) KernelStart;
 	const void *kernelImage = (const void *) &_binary__mnt_r_tofita_loader_kernel_img_start;
 	size_t kernelImgSize = ((size_t) &_binary__mnt_r_tofita_loader_kernel_img_end) - ((size_t) kernelImage);
 	drawLoading(&initParameters.framebuffer, 2);

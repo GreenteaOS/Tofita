@@ -1,6 +1,6 @@
 void fillMemoryMap(EfiMemoryMap *efiMemoryMap) {
 	efiMemoryMap->memoryMap = (EFI_MEMORY_DESCRIPTOR *) memoryMapBuffer;
-	efiMemoryMap->memoryMapSize = MEMORY_MAP_BUFFER_SIZE;
+	efiMemoryMap->memoryMapSize = MemoryMapBufferSize;
 
 	EFI_STATUS status = ST->BootServices->GetMemoryMap(
 		&efiMemoryMap->memoryMapSize,
@@ -39,7 +39,7 @@ EFI_STATUS uefiAllocate(EFI_BOOT_SERVICES *bootsvc, EFI_MEMORY_TYPE allocationTy
 
 	status = bootsvc->AllocatePages(AllocateAddress, allocationType, pages, &addr);
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
-		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAddress status %d, using AllocateAnyPages\r\n", status);
+		serialPrintf("[[[efi_main.uefiAllocate]]] failed (non-fatal): AllocateAddress status %d, using AllocateAnyPages\r\n", status);
 		status = bootsvc->AllocatePages(AllocateAnyPages, allocationType, pages, &addr);
 	}
 

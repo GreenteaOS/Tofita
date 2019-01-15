@@ -196,19 +196,19 @@ static inline void mapEfi(EfiMemoryMap *memoryMap) {
 
 static inline void mapFramebuffer(Framebuffer *fb) {
 	void *framebufferBase = fb->base;
-	mapMemory(FRAMEBUFFER_START, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
+	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
 }
 
 static inline void mapRamDisk(RamDisk *ramdisk) {
 	void *ramdiskBase = ramdisk->base;
-	mapMemory(RAMDISK_START, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
+	mapMemory(RamdiskStart, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
 }
 
 void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk) {
-	mapMemory(KERNEL_START, KERNEL_START, 256);
+	mapMemory(KernelStart, KernelStart, 256);
 	serialPrintln("[paging] kernel mapped");
 
-	mapMemory(KERNEL_VIRTUAL_BASE, (uint64_t) tofitaKernel, 256);
+	mapMemory(KernelVirtualBase, (uint64_t) tofitaKernel, 256);
 	serialPrintln("[paging] Tofita kernel mapped");
 
 	mapEfi(memoryMap);
