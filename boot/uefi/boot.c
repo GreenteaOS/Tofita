@@ -1,3 +1,20 @@
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
+
 #include <efi.h>
 #include <efilib.h>
 #include <stddef.h>
@@ -41,6 +58,26 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	serialPrintln("[[[efi_main]]] begin: InitializeLib");
 	InitializeLib(imageHandle, systemTable);
 	serialPrintln("[[[efi_main]]] done: InitializeLib");
+
+	{
+		serialPrintln("[[[efi_main]]] begin: ACPI");
+		void *acpiTable = NULL;
+		EFI_GUID acpi20 = ACPI_20_TABLE_GUID;
+		EFI_GUID acpi = ACPI_TABLE_GUID;
+
+		for (size_t i = 0; i < systemTable->NumberOfTableEntries; i++) {
+			EFI_CONFIGURATION_TABLE *efiTable = &systemTable->ConfigurationTable[i];
+			if (0 == CompareGuid(&efiTable->VendorGuid, &acpi20)) { // Prefer ACPI 2.0
+				acpiTable = efiTable->VendorTable;
+				serialPrintln("[[[efi_main]]] found: ACPI 2.0");
+				break;
+			} else if (0 == CompareGuid(&efiTable->VendorGuid, &acpi)) {
+				acpiTable = (void *)((intptr_t)efiTable->VendorTable | 0x1); // LSB high
+				serialPrintln("[[[efi_main]]] found: ACPI 1.0");
+			}
+		}
+		serialPrintln("[[[efi_main]]] done: ACPI");
+	}
 
 	KernelParams initParameters;
 	initParameters.efiRuntimeServices = RT;
