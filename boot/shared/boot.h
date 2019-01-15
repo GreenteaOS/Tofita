@@ -1,5 +1,17 @@
-#define MEMORY_MAP_BUFFER_SIZE 512 * 1024 // 512 KiB
-uint8_t memoryMapBuffer[MEMORY_MAP_BUFFER_SIZE];
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 typedef struct {
 	EFI_MEMORY_DESCRIPTOR *memoryMap;
@@ -21,13 +33,17 @@ typedef struct {
 	uint32_t size; // in bytes
 } RamDisk;
 
-// Start of kernel sections in memory, see loader.ld
-#define KERNEL_START (1 * 1024 * 1024)
+#define Version "2019.0" // Tofita kernel version
 
-#define KERNEL_VIRTUAL_BASE 0xffff800000000000
-#define EFI_VIRTUAL_BASE (KERNEL_VIRTUAL_BASE + 0x40000000)
-#define FRAMEBUFFER_START (EFI_VIRTUAL_BASE + 0x40000000)
-#define RAMDISK_START (EFI_VIRTUAL_BASE + 0x45000000)
+// Start of kernel sections in memory, see loader.ld
+#define KernelStart (1 * 1024 * 1024)
+#define KernelVirtualBase 0xffff800000000000
+#define EfiVirtualBase (KernelVirtualBase + 0x40000000)
+#define FramebufferStart (EfiVirtualBase + 0x40000000)
+#define RamdiskStart (EfiVirtualBase + 0x45000000)
+#define MemoryMapBufferSize 512 * 1024 // 512 KiB
+
+uint8_t memoryMapBuffer[MemoryMapBufferSize];
 
 typedef struct {
 	const EFI_HANDLE imageHandle;

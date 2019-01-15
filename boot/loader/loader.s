@@ -1,6 +1,6 @@
 .section .head
 mov $stack_top, %rsp
-call startTofitaKernel
+call startTofitaKernelLoader
 ret
 
 .section .stack
