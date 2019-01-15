@@ -25,6 +25,7 @@ This project is aimed to run `.exe` files natively, and to provide full operatin
  - Initial RAM disk for LiveCD/LiveUSB and installer
  - Currently works only in QEMU :trollface:
  - Monolithic performance-oriented kernel
+ - ACPI
 
 [![Give a star](docs/star.png?raw=true) 
 Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
