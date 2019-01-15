@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 typedef struct {
+	uint32_t ramDiskChecksum;
 	uint32_t ramDiskSize;
 	uint32_t assetsCount;
 } RamDiskInfo;
