@@ -1,7 +1,7 @@
 ---
 name: Feature proposal
 about: Suggest an idea for Tofita kernel
-title: "[FEATURE PROPOSAL] "
+title: "[FEATURE PROPOSAL] name of proposal"
 labels: enhancement
 assignees: ''
 
@@ -9,7 +9,7 @@ assignees: ''
 
 **Is you bug report relates to kernel, and you're a kernel contributor?**
 
-If you're not sure, fill bug report here: https://github.com/GreenteaOS/Greentea/issues
+If you're not sure, fill your proposal here: https://github.com/GreenteaOS/Greentea/issues
 
 **Is your feature request related to a problem? Please describe.**
 
