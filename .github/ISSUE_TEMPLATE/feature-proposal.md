@@ -7,6 +7,10 @@ assignees: ''
 
 ---
 
+**Is you bug report relates to kernel, and you're a kernel contributor?**
+
+If you're not sure, fill bug report here: https://github.com/GreenteaOS/Greentea/issues
+
 **Is your feature request related to a problem? Please describe.**
 
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
