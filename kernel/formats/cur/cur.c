@@ -45,7 +45,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 		// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
 		// Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
 		// Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
-		serialPrintf("%d image is %dx%d, palette = %d\n", i, buffer[offset], buffer[offset + 1], buffer[offset + 2]);
+		serialPrintf("[cur] %d image is %dx%d, palette = %d\r\n", i, buffer[offset], buffer[offset + 1], buffer[offset + 2]);
 		if (buffer[offset] + buffer[offset + 1] > buffer[best] + buffer[best + 1]) best = offset;
 		offset += 16;
 		// Reserved. Should be 0.
@@ -60,7 +60,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 		// Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
 	}
 
-	serialPrintf("The best image is %dx%d\n", buffer[best], buffer[best + 1]);
+	serialPrintf("[cur] The best image is %dx%d\r\n", buffer[best], buffer[best + 1]);
 
 	struct Cursor *cur = allocateFromBuffer(sizeof(struct Cursor));
 	// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
@@ -78,10 +78,10 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 	// Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
 	offset = toInt32(buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15]);
 
-	serialPrintf("The cursor is %dx%d, %d:%d, %d bytes at %d\n", cur->width, cur->height, cur->x, cur->y, imageSize, offset);
+	serialPrintf("[cur] The cursor is %dx%d, %d:%d, %d bytes at %d\r\n", cur->width, cur->height, cur->x, cur->y, imageSize, offset);
 	// A PNG file starts with an 8-byte signature (refer to hex editor image on the right):
-	serialPrintf("Header at %d: %d %d %d %d\n", offset, buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3]);
-	serialPrintf("Header at %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15]);
+	serialPrintf("[cur] Header at %d: %d %d %d %d\r\n", offset, buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3]);
+	serialPrintf("[cur] Header at %d %d %d %d\r\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15]);
 
 	uint32_t fsize = cur->width * cur->height * 4;
 	uint8_t* bmp = allocateFromBuffer(fsize);
