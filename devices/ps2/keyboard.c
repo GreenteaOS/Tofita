@@ -1,4 +1,20 @@
-/* http://www.osdever.net/bkerndev/Docs/keyboard.htm */
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+uint8_t keyboardPressedState[128];
+uint8_t keyboardPressedStates = 0;
 uint8_t keyboardMap[128] =
 {
 	0,
@@ -30,7 +46,7 @@ uint8_t keyboardMap[128] =
 	'[',
 	']',
 	'\n', // Enter key
-	0, 		// 29   - Control
+	0, // 29 - Control
 	'a',
 	's',
 	'd',
@@ -55,7 +71,7 @@ uint8_t keyboardMap[128] =
 	',',
 	'.',
 	'/',
-	0, 			// Right shift
+	0, // Right shift
 	'*',
 	0, // Alt
 	' ', // Space bar
@@ -88,13 +104,13 @@ uint8_t keyboardMap[128] =
 #define DATA_PORT       0x60
 
 void handleKeyboard() {
-	/* EOI */
-	serialPrint("handleKeyboard 0\r\n");
-	writePort(PIC1_COMMAND, PIC_EOI);
-	serialPrint("handleKeyboard 1\r\n");
+	// TODO move this to init
+	if (keyboardPressedStates == 0) for (uint8_t i = 0; i < 128; i++) {
+		// Cleanup states
+		keyboardPressedState[i] = 0;
+	}
 
 	uint8_t status = readPort(STATUS_REGISTER);
-	serialPrint("handleKeyboard 2\r\n");
 
 	// PS2 Mouse
 	if (status & 0x20) {
@@ -109,23 +125,30 @@ void handleKeyboard() {
 	}
 
 	if (status & 0x1) {
-		serialPrint("handleKeyboard 3\r\n");
 		uint8_t keycode = readPort(DATA_PORT);
-		serialPrint("handleKeyboard 4\r\n");
 
 		if (keycode < 0) {
 			return;
 		}
-		serialPrint("handleKeyboard 5\r\n");
 
-		if (keycode < 128 && keyboardMap[keycode]) {
+		if (keycode < 128) {
 			uint8_t buffer[] = {keyboardMap[keycode], 0};
-			serialPrint("handleKeyboard 6\r\n");
+			if (buffer[0] == 0) buffer[0] = '?';
+			serialPrint("[keyboard] [");
 			serialPrint(buffer);
-			serialPrint("handleKeyboard 7\r\n");
+			if (keyboardPressedState[keycode] == 0) keyboardPressedStates++;
+			serialPrintf(" down] %d keys are down, %d keycode\r\n", keyboardPressedStates, keycode);
+			keyboardPressedState[keycode] = 1;
+		} else {
+			keycode = keycode - 128;
+			uint8_t buffer[] = {keyboardMap[keycode], 0};
+			if (buffer[0] == 0) buffer[0] = '?';
+			serialPrint("[keyboard] [");
 			serialPrint(buffer);
-		} else serialPrintf("[%d]", keycode);
-		serialPrint("handleKeyboard 8\r\n");
+			if (keyboardPressedState[keycode] != 0) keyboardPressedStates--;
+			serialPrintf(" up] %d keys are down, %d keycode\r\n", keyboardPressedStates, keycode + 128);
+			keyboardPressedState[keycode] = 0;
+		}
 
 		//if (status & 0x20) {
 		//    uint8_t buffer[] = {'M', 0};
@@ -136,4 +159,7 @@ void handleKeyboard() {
 		uint8_t buffer[] = {'w', 0};
 		serialPrint(buffer);
 	}
+
+	// EOI
+	writePort(PIC1_COMMAND, PIC_EOI);
 }

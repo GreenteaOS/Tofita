@@ -17,8 +17,8 @@
 
 uint8_t mouseCycle = 0;
 int8_t mouseByte[3];
-uint16_t mxx = 256;
-uint16_t myy = 256;
+uint16_t mouseX = 256;
+uint16_t mouseY = 256;
 
 uint8_t getBit(uint8_t byte, uint8_t bit) {
 	return (byte & ( 1 << bit )) >> bit;
@@ -42,8 +42,8 @@ void handleMouse() {
 		int8_t mouseXd = mouseByte[1];
 		int8_t mouseYd = mouseByte[2];
 		mouseCycle = 0;
-		mxx += mouseXd;
-		myy -= mouseYd;
+		mouseX += mouseXd;
+		mouseY -= mouseYd;
 
 		if (getBit(mouseByte[0], 0) != 0) serialPrintln("[mouse] left button is down");
 		if (getBit(mouseByte[0], 1) != 0) serialPrintln("[mouse] right button is down");
@@ -58,6 +58,7 @@ void handleMouse() {
 		break;
 	}
 
+	// EOI
 	writePort(0xA0, 0x20);
 	writePort(0x20, 0x20);
 }
