@@ -93,6 +93,22 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	findAndLoadRamDisk(systemTable->BootServices, &initParameters.ramdisk);
 	drawLoading(&initParameters.framebuffer, 1);
 
+	// Simple memory buffer for in-kernel allocations
+	serialPrintln("[[[efi_main]]] begin: uefiAllocate the buffer");
+	initParameters.bufferSize = 128 * 1024 * 1024;
+	void *address = 342352128; // arbitary physical address to fit in RAM
+	size_t size = initParameters.bufferSize;
+	status = uefiAllocate(
+			bootsvc,
+			EfiBootServicesCode,
+			&size,
+			&address);
+	if (status != EFI_SUCCESS) {
+		serialPrintf("[[[efi_main]]] <ERROR> failed uefiAllocate with status %d\r\n", status);
+	}
+	initParameters.buffer = address;
+	serialPrintf("[[[efi_main]]] done: uefiAllocate the buffer, size %d\r\n", size);
+
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap");
 	fillMemoryMap(&initParameters.efiMemoryMap);
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap");

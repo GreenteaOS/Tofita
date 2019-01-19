@@ -34,6 +34,7 @@
 void kernelMain(KernelParams *params) {
 	serialPrintln("<Tofita> kernel loaded and operational");
 
+	initAllocatorForBuffer(params->bufferSize, params->buffer);
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
 

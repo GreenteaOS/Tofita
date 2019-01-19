@@ -15,6 +15,9 @@
 
 // Performs visualization onto the screen
 
+// Speed of rendering mostly depends on cache-locality
+// Remember: top-down, left-to-right: for(y) for(x) {}, not other way!
+
 Framebuffer *_framebuffer;
 
 typedef struct {
@@ -78,6 +81,8 @@ void safePutPixel(uint16_t x, uint16_t y, uint32_t px) {
 
 Bitmap32* allocateBitmapFromBuffer(uint16_t width, uint16_t height) {
 	Bitmap32* result = (Bitmap32*)allocateFromBuffer(sizeof(uint16_t) * 2 + sizeof(Pixel32) * width * height);
+	result->width = width;
+	result->height = height;
 }
 
 void setFramebuffer(Framebuffer *framebuffer) {
@@ -145,6 +150,9 @@ void drawRectangle(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16
 void drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
 	for (int yy = 0; yy < height; yy++) {
 		for (int xx = 0; xx < width; xx++) {
+			// Rendering left and far right points sequentally should be
+			// better for cache-locality than vertical lines
+			// At least this is true for small rectangles (like buttons)
 			if (yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1) setPixel(x + xx, y + yy, color);
 		}
 	}

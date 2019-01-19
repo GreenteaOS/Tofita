@@ -5,7 +5,7 @@ uint8_t initSerial()
 	// Calculate divisor for baud generator
 	//    Ref_Clk_Rate / Baud_Rate / 16
 	uint32_t divisor = SERIAL_CLOCK_RATE / (SERIAL_BAUD_RATE * 16);
-	if((SERIAL_CLOCK_RATE % (SERIAL_BAUD_RATE * 16)) >= SERIAL_BAUD_RATE * 8) {
+	if ((SERIAL_CLOCK_RATE % (SERIAL_BAUD_RATE * 16)) >= SERIAL_BAUD_RATE * 8) {
 		divisor++;
 	}
 	// See if the serial port is already initialized
