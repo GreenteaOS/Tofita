@@ -22,6 +22,10 @@
 
 #include "../boot/shared/boot.h"
 
+// Avoids PIT-triggered rendering
+// This is not a best solution
+uint8_t haveToRender = 1;
+
 #include "../devices/serial/log.c"
 #include "allocator.c"
 #include "../devices/cpu/interrupts.c"
@@ -74,6 +78,8 @@ void kernelMain(KernelParams *params) {
 
 	while (true) {
 		__asm__ volatile("hlt");
+		if (haveToRender == 0) continue ;
+		haveToRender = 0;
 
 		Pixel32 color;
 		color.color = 0xFF0000FF;

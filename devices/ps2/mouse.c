@@ -55,6 +55,8 @@ void handleMouse() {
 		if (getBit(mouseByte[0], 6) != 0) serialPrintln("[mouse] 6 bit is set");
 		if (getBit(mouseByte[0], 7) != 0) serialPrintln("[mouse] 7 bit is set");
 
+		// Toggle rendering
+		haveToRender = 1;
 		break;
 	}
 
