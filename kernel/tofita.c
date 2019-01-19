@@ -30,6 +30,7 @@
 #include "../devices/ps2/mouse.c"
 #include "../devices/cpu/fallback.c"
 #include "ramdisk.c"
+#include "formats/cur/cur.c"
 
 void kernelMain(KernelParams *params) {
 	serialPrintln("<Tofita> kernel loaded and operational");
@@ -63,11 +64,9 @@ void kernelMain(KernelParams *params) {
 		serialPrintln(a.data);
 	}
 
-	{
-		RamDiskAsset a = getRamDiskAsset("cursors\\normal.cur");
-		serialPrintf("Asset 'cursors\\normal.cur' %d bytes", a.size);
-		serialPrintln(a.data);
-	}
+	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
+	serialPrintf("Asset 'cursors\\normal.cur' %d bytes", asset.size);
+	struct Cursor *cur = loadCursor(&asset);
 
 	Pixel32 color;
 	color.color = 0x55AA9944;
@@ -79,5 +78,6 @@ void kernelMain(KernelParams *params) {
 		Pixel32 color;
 		color.color = 0xFF0000FF;
 		drawRectangle(color, mouseX - 10, mouseY - 10, 20, 20);
+		drawCursor(cur, mouseX, mouseY);
 	}
 }
