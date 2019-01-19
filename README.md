@@ -18,7 +18,7 @@ This project is aimed to run `.exe` files natively, and to provide full operatin
 
  - UEFI boot
  - 64-bit x86
- - Colorful graphics
+ - Colorful graphics (transparent mouse cursors, bitmaps)
  - PS/2 mouse
  - PS/2 keyboard
  - COM-port debug output

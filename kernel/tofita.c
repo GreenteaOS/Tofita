@@ -35,6 +35,7 @@ uint8_t haveToRender = 1;
 #include "../devices/cpu/fallback.c"
 #include "ramdisk.c"
 #include "formats/cur/cur.c"
+#include "formats/bmp/bmp.c"
 
 void kernelMain(KernelParams *params) {
 	serialPrintln("<Tofita> kernel loaded and operational");
@@ -58,18 +59,18 @@ void kernelMain(KernelParams *params) {
 
 	{
 		RamDiskAsset a = getRamDiskAsset("assets.json");
-		serialPrintf("Asset 'assets.json' %d bytes", a.size);
+		serialPrintf("Asset 'assets.json' %d bytes at %d\r\n", a.size, a.data);
 		serialPrintln(a.data);
 	}
 
 	{
 		RamDiskAsset a = getRamDiskAsset("README.md");
-		serialPrintf("Asset 'README.md' %d bytes", a.size);
+		serialPrintf("Asset 'README.md' %d bytes at %d\r\n", a.size, a.data);
 		serialPrintln(a.data);
 	}
 
 	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
-	serialPrintf("Asset 'cursors\\normal.cur' %d bytes", asset.size);
+	serialPrintf("Asset 'cursors\\normal.cur' %d bytes at %d\r\n", asset.size, asset.data);
 	struct Cursor *cur = loadCursor(&asset);
 
 	Pixel32 color;
