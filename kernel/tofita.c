@@ -77,6 +77,6 @@ void kernelMain(KernelParams *params) {
 
 		Pixel32 color;
 		color.color = 0xFF0000FF;
-		drawRectangle(color, mxx - 10, myy - 10, 20, 20);
+		drawRectangle(color, mouseX - 10, mouseY - 10, 20, 20);
 	}
 }
