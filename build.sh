@@ -59,8 +59,8 @@ objcopy \
 	--target=efi-app-x86_64 /mnt/r/tofita/loader.so /mnt/r/tofita/loader.efi
 
 # Create floppy image
-dd if=/dev/zero of=/mnt/r/tofita/disk.img bs=1k count=2880
-mformat -i /mnt/r/tofita/disk.img -f 2880 ::
+dd if=/dev/zero of=/mnt/r/tofita/disk.img bs=1k count=6272
+mkfs.vfat /mnt/r/tofita/disk.img
 mmd -i /mnt/r/tofita/disk.img ::/EFI
 mmd -i /mnt/r/tofita/disk.img ::/EFI/BOOT
 mcopy -i /mnt/r/tofita/disk.img /mnt/r/tofita/loader.efi ::/EFI/BOOT/BOOTx64.EFI
