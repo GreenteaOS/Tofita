@@ -8,8 +8,6 @@
 #define PIC_EOI		0x20		// End-of-interrupt command code
 #define PIC_EOI_0x20		0x20		// End-of-interrupt command code
 
-void enableInterrupts();
-
 uint8_t readPort(uint16_t port);
 void writePort(uint16_t port, uint8_t value);
 uint8_t mouseRead();

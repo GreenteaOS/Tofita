@@ -51,6 +51,8 @@ typedef struct {
 	EFI_RUNTIME_SERVICES *efiRuntimeServices;
 	Framebuffer framebuffer;
 	RamDisk ramdisk;
+	uint64_t bufferSize;
+	void* buffer;
 } KernelParams;
 
 typedef void (*InitKernel)(const KernelParams *);

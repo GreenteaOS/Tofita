@@ -42,7 +42,7 @@ void startTofitaKernelLoader(const KernelParams *params) {
 	// Copy to stack
 	KernelParams newParams = *params;
 
-	enablePaging(kernelImage, &newParams.efiMemoryMap, &newParams.framebuffer, &newParams.ramdisk);
+	enablePaging(kernelImage, &newParams.efiMemoryMap, &newParams.framebuffer, &newParams.ramdisk, &newParams);
 	serialPrintln("[[boot]] done: paging enabled");
 
 	newParams.framebuffer.base = (void *) FramebufferStart;

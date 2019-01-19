@@ -13,18 +13,6 @@ serialPrint(#expr " -> "); \
 serialPrintBits((uint64_t) (expr)); \
 serialPrint("\r\n"); \
 
-uint64_t serialPortWrite(uint8_t *buffer, uint64_t size);
-
-void serialPrint(const uint8_t *print);
-
-void serialPrintHex(uint64_t n);
-
-void serialPrintMem(const void *mem, int n);
-
-void serialPrintPtr(void *ptr);
-
-void serialPrintBits(uint64_t value);
-
 #define SERIAL_REGISTER_BASE 0x03F8
 #define SERIAL_BAUD_RATE 115200
 #define SERIAL_CLOCK_RATE 1843200
@@ -95,7 +83,7 @@ void writeSerialRegister(uint16_t offset, uint8_t d)
 	portOutb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE, d);
 }
 
-bool serialPortWritable ()
+bool serialPortWritable()
 {
 	if (SERIAL_USE_HW_FLOW_CONTROL) {
 		if (SERIAL_DETECT_CABLE) {
