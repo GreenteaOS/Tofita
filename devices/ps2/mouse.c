@@ -17,8 +17,6 @@
 
 uint8_t mouseCycle = 0;
 int8_t mouseByte[3];
-int8_t mouseX = 0;
-int8_t mouseY = 0;
 uint16_t mxx = 256;
 uint16_t myy = 256;
 
@@ -41,12 +39,11 @@ void handleMouse() {
 		break;
 	case 2:
 		mouseByte[2] = mouseRead(0x60);
-		mouseX = mouseByte[1];
-		mouseY = mouseByte[2];
+		int8_t mouseXd = mouseByte[1];
+		int8_t mouseYd = mouseByte[2];
 		mouseCycle = 0;
-
-		mxx += mouseX;
-		myy -= mouseY;
+		mxx += mouseXd;
+		myy -= mouseYd;
 
 		if (getBit(mouseByte[0], 0) != 0) serialPrintln("[mouse] left button is down");
 		if (getBit(mouseByte[0], 1) != 0) serialPrintln("[mouse] right button is down");
@@ -58,11 +55,6 @@ void handleMouse() {
 		if (getBit(mouseByte[0], 6) != 0) serialPrintln("[mouse] 6 bit is set");
 		if (getBit(mouseByte[0], 7) != 0) serialPrintln("[mouse] 7 bit is set");
 
-		Pixel32 color;
-		color.color = 0x44FFFFFF;
-		drawRectangle(color, mxx, myy, 20, 40);
-		color.color = 0x44FF33FF;
-		drawRectangleWithAlpha(color, mxx + 30, myy, 20, 40);
 		break;
 	}
 

@@ -71,4 +71,12 @@ void kernelMain(KernelParams *params) {
 	Pixel32 color;
 	color.color = 0x55AA9944;
 	drawRectangleWithAlpha(color, 300, 100, 300, 100);
+
+	while (true) {
+		__asm__ volatile("hlt");
+
+		Pixel32 color;
+		color.color = 0xFF0000FF;
+		drawRectangle(color, mxx - 10, myy - 10, 20, 20);
+	}
 }
