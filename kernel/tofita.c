@@ -37,6 +37,15 @@ uint8_t haveToRender = 1;
 #include "formats/cur/cur.c"
 #include "formats/bmp/bmp.c"
 
+// STB library
+#define STBI_NO_SIMD
+#define STBI_NO_STDIO
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
+#include "formats/stb_image/libc.c"
+#include "formats/stb_image/stb_image.h"
+#include "formats/stb_image/unlibc.c"
+
 void kernelMain(KernelParams *params) {
 	serialPrintln("<Tofita> kernel loaded and operational");
 
