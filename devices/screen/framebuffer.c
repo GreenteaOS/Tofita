@@ -41,8 +41,6 @@ typedef struct {
 } Bitmap32;
 
 Pixel32 *_pixels;
-Pixel32 *wallpaper; // Size of framebuffer
-Pixel32 *vibrance; // Size of framebuffer, maybe do 0.5x to save bandwidth?
 
 void putPixel(uint16_t x, uint16_t y, uint32_t px)
 {
@@ -90,15 +88,12 @@ void setFramebuffer(Framebuffer *framebuffer) {
 	_framebuffer = framebuffer;
 	_pixels = (Pixel32 *)_framebuffer->base;
 
-	// Wallpaper
-	wallpaper = (Pixel32*)allocateFromBuffer(sizeof(Pixel32) * _framebuffer->width * _framebuffer->height);
-	vibrance = (Pixel32*)allocateFromBuffer(sizeof(Pixel32) * _framebuffer->width * _framebuffer->height);
-
 	clearScreen();
 }
 
 // Very fast, but not precise, alpha multiply
 #define Mul255(a255, c255) (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
+#define Blend255(target, color, alpha) (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
 void blendPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
 	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1)) return ;
@@ -159,14 +154,3 @@ void drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t width,
 	}
 }
 
-enum WallpaperStyle {
-	Center,
-	Stretch,
-	Fill
-	// TODO more options
-};
-
-// Also generates vibrance and blur
-void setWallpaper(Bitmap32* bitmap, enum WallpaperStyle style) {
-	// Hmmm....
-}
