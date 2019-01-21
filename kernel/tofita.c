@@ -85,6 +85,7 @@ void kernelMain(KernelParams *params) {
 		Bitmap32* bmp = loadBmp24(&a);
 		setWallpaper(bmp, Center);
 	}
+
 	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
 	serialPrintf("Asset 'cursors\\normal.cur' %d bytes at %d\r\n", asset.size, asset.data);
 	struct Cursor *cur = loadCursor(&asset);
@@ -99,6 +100,8 @@ void kernelMain(KernelParams *params) {
 		haveToRender = 0;
 
 		composite();
+
+		drawVibrancedRectangle(mouseX - 150, mouseY - 150, 300, 300);
 
 		drawCursor(cur, mouseX, mouseY);
 	}
