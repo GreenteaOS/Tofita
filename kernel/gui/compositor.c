@@ -20,6 +20,7 @@
 // Differential composition is not yet supported, performance with large amount of apps may be low
 
 Bitmap32* wallpaper; // Size of framebuffer
+Bitmap32* vibrance; // Size of framebuffer
 
 typedef enum {
 	Center,
