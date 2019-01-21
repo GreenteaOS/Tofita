@@ -36,6 +36,8 @@ uint8_t haveToRender = 1;
 #include "ramdisk.c"
 #include "formats/cur/cur.c"
 #include "formats/bmp/bmp.c"
+#include "gui/blur.c"
+#include "gui/compositor.c"
 
 // STB library
 #define STBI_NO_SIMD
@@ -78,6 +80,11 @@ void kernelMain(KernelParams *params) {
 		serialPrintln(a.data);
 	}
 
+	{
+		RamDiskAsset a = getRamDiskAsset("hello.bmp");
+		Bitmap32* bmp = loadBmp24(&a);
+		setWallpaper(bmp, Center);
+	}
 	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
 	serialPrintf("Asset 'cursors\\normal.cur' %d bytes at %d\r\n", asset.size, asset.data);
 	struct Cursor *cur = loadCursor(&asset);
@@ -91,9 +98,8 @@ void kernelMain(KernelParams *params) {
 		if (haveToRender == 0) continue ;
 		haveToRender = 0;
 
-		Pixel32 color;
-		color.color = 0xFF0000FF;
-		drawRectangle(color, mouseX - 10, mouseY - 10, 20, 20);
+		composite();
+
 		drawCursor(cur, mouseX, mouseY);
 	}
 }
