@@ -47,7 +47,11 @@ void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 	uint32_t* pixels = framebuffer->base;
 	for (uint8_t y = 0; y < 24; y++)
 		for (uint8_t x = 0; x < 24; x++)
-			pixels[((y + (framebuffer->height/4) * 3) * framebuffer->width) + x + framebuffer->width/2 - 12 + progress*24*2] = 0xFFFFFFFF;
+			pixels[
+				((y + (framebuffer->height/4) * 3) * framebuffer->width)
+				+ x + framebuffer->width/2
+				- 12 + progress*24*2 - 48
+			] = 0xFFFFFFFF;
 }
 
 // Entry point
