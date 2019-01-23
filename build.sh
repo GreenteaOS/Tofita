@@ -31,8 +31,9 @@ clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone
 as -o /mnt/r/tofita/tofita.s.o kernel/tofita.s
 as -o /mnt/r/tofita/cpu.o devices/cpu/cpu.s
 
-clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
+clang-6.0 -O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
+	-DTOFITA -mtune=nocona \
 	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC \
 	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
 	-c -o /mnt/r/tofita/tofita.o kernel/tofita.c
