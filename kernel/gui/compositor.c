@@ -93,6 +93,30 @@ void drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t heigh
 	}
 }
 
+Bitmap32* doublebuffer;
+void initializeCompositor() {
+	serialPrintln("[compositor.initializeCompositor] begin");
+	doublebuffer = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
+	_pixels = doublebuffer->pixels;
+	serialPrintln("[compositor.initializeCompositor] done");
+}
+
 void composite() {
 	drawBitmap32(wallpaper, 0, 0);
+}
+
+void copyToScreen() {
+	// On 64-bit platform registers are 64-bit,
+	// so lets copy two pixels at a time
+	const uint64_t *source = (uint64_t *)_pixels;
+	uint64_t *destination = (uint64_t *)_framebuffer->base;
+	const uint32_t count = (_framebuffer->width * _framebuffer->height) / 2;
+
+	for (uint32_t i = 0; i < count; i += 4) { // note +4
+		// All screen resolutions are guaranteed to be divisible by 8 pixels
+		destination[i + 0] = source[i + 0]; // each step is 2 pixels
+		destination[i + 1] = source[i + 1]; // thus 4 * 2 = 8 pixels
+		destination[i + 2] = source[i + 2]; // so CPU applies pipelining optimization
+		destination[i + 3] = source[i + 3];
+	}
 }

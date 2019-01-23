@@ -29,6 +29,7 @@ uint8_t haveToRender = 1;
 #include "../devices/serial/log.c"
 #include "allocator.c"
 #include "../devices/cpu/interrupts.c"
+#include "../devices/cpu/rdtsc.c"
 #include "../devices/screen/framebuffer.c"
 #include "../devices/ps2/keyboard.c"
 #include "../devices/ps2/mouse.c"
@@ -68,6 +69,8 @@ void kernelMain(KernelParams *params) {
 
 	enableInterrupts();
 
+	initializeCompositor();
+
 	{
 		RamDiskAsset a = getRamDiskAsset("assets.json");
 		serialPrintf("Asset 'assets.json' %d bytes at %d\r\n", a.size, a.data);
@@ -104,5 +107,7 @@ void kernelMain(KernelParams *params) {
 		drawVibrancedRectangle(mouseX - 150, mouseY - 150, 300, 300);
 
 		drawCursor(cur, mouseX, mouseY);
+
+		copyToScreen();
 	}
 }

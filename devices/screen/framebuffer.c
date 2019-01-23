@@ -40,42 +40,8 @@ typedef struct {
 	Pixel32 pixels[];
 } Bitmap32;
 
+// Avoid one level of pointer indirection
 Pixel32 *_pixels;
-
-void putPixel(uint16_t x, uint16_t y, uint32_t px)
-{
-	int32_t *fbBase = (int32_t *) _framebuffer->base;
-	int32_t *pixelAddress = fbBase + y * _framebuffer->width + x;
-	*pixelAddress = px;
-}
-
-void clearScreen() {
-	union {
-		uint8_t bytes[4];
-		uint32_t int32_value;
-	} encoder;
-
-	for (uint16_t y = 0; y < _framebuffer->height; ++y) {
-		for (uint16_t x = 0; x < _framebuffer->width; ++x) {
-			encoder.bytes[0] = x / 3;
-			encoder.bytes[1] = y / 3;
-			encoder.bytes[2] = x+y;
-			encoder.bytes[3] = 0xFF;
-			putPixel(x, y, encoder.int32_value);
-
-			if (x < 5) putPixel(x, y, 0xA0A0A0FF);
-			if (x > 795) putPixel(x, y, 0xA0A0A0FF);
-			if (y > 595) putPixel(x, y, 0xA0A0A0FF);
-			if (y < 5) putPixel(x, y, 0xA0A0A0FF);
-		}
-	}
-}
-
-void safePutPixel(uint16_t x, uint16_t y, uint32_t px) {
-	if (x < _framebuffer->width && y < _framebuffer->height) {
-		putPixel(x, y, px);
-	}
-}
 
 Bitmap32* allocateBitmapFromBuffer(uint16_t width, uint16_t height) {
 	Bitmap32* result = (Bitmap32*)allocateFromBuffer(sizeof(uint16_t) * 2 + sizeof(Pixel32) * width * height);
@@ -87,8 +53,6 @@ Bitmap32* allocateBitmapFromBuffer(uint16_t width, uint16_t height) {
 void setFramebuffer(Framebuffer *framebuffer) {
 	_framebuffer = framebuffer;
 	_pixels = (Pixel32 *)_framebuffer->base;
-
-	clearScreen();
 }
 
 // Very fast, but not precise, alpha multiply
