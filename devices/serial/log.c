@@ -51,8 +51,18 @@ void *tmemset(void *dest, int e, size_t len) {
 	for(uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
 	}
+}
+
+// Solve conflict with gnu-efi
+#ifdef TOFITA
+void *memset(void *dest, int e, size_t len) {
+	uint8_t *d = dest;
+	for(uint64_t i = 0; i < len; i++, d++) {
+		*d = e;
+	}
 	return dest;
 }
+#endif
 
 uint64_t kstrlen(const uint8_t *data) {
 	uint64_t r;
