@@ -12,13 +12,13 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 [![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
 [![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/TODO/build/artifacts)
 
-This project is aimed to run `.exe` files natively, and to provide full operating system environment for that.
+Greentea OS is aimed to run `.exe` files natively, and to provide full operating system environment for that.
 
 ## Features
 
  - UEFI boot
  - 64-bit x86
- - Colorful graphics (transparent mouse cursors, bitmaps)
+ - Colorful graphics with transparency
  - PS/2 mouse
  - PS/2 keyboard
  - COM-port debug output
