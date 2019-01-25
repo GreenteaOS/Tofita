@@ -23,7 +23,6 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 #define PAGE_TABLE_SIZE 512
 
 // How many pages to allocate in order to assign them later to be used by paging
-
 #define PAGES_TO_ALLOCATE 32
 
 // Entry in a page table
@@ -47,11 +46,9 @@ typedef struct {
 	uint8_t accessed : 1;
 
 	// Has the page been written to? Only applicable for PTE.
-
 	uint8_t dirty : 1;
 
 	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
-
 	uint8_t largePage : 1;
 
 	// Prevent the translations cache from updating
@@ -61,7 +58,6 @@ typedef struct {
 	// enable this feature.
 	//
 	// Only applicable for PTE
-
 	uint8_t global : 1;
 
 	// Not used by the processor
@@ -123,11 +119,10 @@ static void map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) 
 }
 
 #define CREATE_MAPPING(fromTable, toTable) \
-	static inline void map_ ## fromTable (PageEntry fromTable[],     \
-			uint64_t virtualAddr, uint64_t physicalAddr)              \
-	{                                                                   \
+	static void map_ ## fromTable (PageEntry fromTable[],                            \
+			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
 		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
-		map_ ## toTable (toTable, virtualAddr, physicalAddr);       \
+		map_ ## toTable (toTable, virtualAddr, physicalAddr);                        \
 	}
 
 CREATE_MAPPING(pd, pt)
@@ -160,8 +155,7 @@ static void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t page
 	serialPrintHex((uint64_t) (virtualAddrEnd));
 	serialPrint("\r\n");
 
-	while (vAddress < virtualAddrEnd)
-	{
+	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4, vAddress, pAddress);
 
 		vAddress += PAGE_SIZE;
@@ -169,9 +163,7 @@ static void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t page
 	}
 }
 
-static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(
-	const EFI_MEMORY_DESCRIPTOR *descriptor, uint64_t descriptorSize)
-{
+static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const EFI_MEMORY_DESCRIPTOR *descriptor, uint64_t descriptorSize) {
 	const uint8_t *desc = ((const uint8_t *) descriptor) + descriptorSize;
 	return (const EFI_MEMORY_DESCRIPTOR *) desc;
 }

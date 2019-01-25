@@ -39,7 +39,7 @@ void freeFromBuffer(uint64_t size, void* base) {
 	uint64_t address = (uint64_t)base;
 	if (_allocatorDoubleFreeProtector == address) {
 		serialPrintln(
-			"[freeFromBuffer] <ERROR> (non-fatal, but code is surely broken): "
+			"[allocator.freeFromBuffer] <ERROR> (non-fatal, but code is surely broken): "
 			"double-free detected and avoided, no memory ruined, report to the kernel developer!"
 		);
 		return ; // Phew!!!
