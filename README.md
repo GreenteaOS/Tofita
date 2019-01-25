@@ -23,7 +23,10 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - PS/2 keyboard
  - COM-port debug output
  - Initial RAM disk for LiveCD/LiveUSB and installer
- - Currently works only in QEMU :trollface:
+ - Tested on:
+   - QEMU 3.0.0 `(last test: 24 jan 2019)`
+   - VirtualBox 6.0 `(last test: 24 jan 2019)`
+   - Intel Sandy Bridge (socket 1155) `(last test: 24 jan 2019)`
  - Monolithic performance-oriented kernel
  - ACPI
 
