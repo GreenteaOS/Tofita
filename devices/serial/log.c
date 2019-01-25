@@ -1,4 +1,5 @@
-/* Copyright (c) gitlab.com/nagisa */
+// Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
+
 #define SERIAL_DUMP_HEX(expr) \
 serialPrint(#expr " = "); \
 serialPrintHex((uint64_t) (expr)); \
@@ -70,31 +71,26 @@ uint64_t kstrlen(const uint8_t *data) {
 	return r;
 }
 
-static inline uint8_t portInb(uint16_t port)
-{
+static inline uint8_t portInb(uint16_t port) {
 	uint8_t data;
 	__asm__ volatile("inb %w1,%b0" : "=a" (data) : "d"(port));
 	return data;
 }
 
-static inline uint8_t portOutb(uint16_t port, uint8_t value)
-{
+static inline uint8_t portOutb(uint16_t port, uint8_t value) {
 	__asm__ volatile("outb %b0,%w1" : : "a" (value), "d"(port));
 	return value;
 }
 
-uint8_t readSerialRegister(uint16_t offset)
-{
+uint8_t readSerialRegister(uint16_t offset) {
 	return portInb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE);
 }
 
-void writeSerialRegister(uint16_t offset, uint8_t d)
-{
+void writeSerialRegister(uint16_t offset, uint8_t d) {
 	portOutb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE, d);
 }
 
-bool serialPortWritable()
-{
+bool serialPortWritable() {
 	if (SERIAL_USE_HW_FLOW_CONTROL) {
 		if (SERIAL_DETECT_CABLE) {
 			// Wait for both DSR and CTS to be set
@@ -127,9 +123,7 @@ bool serialPortWritable()
 	return true;
 }
 
-
-uint64_t serialPortWrite(uint8_t *buffer, uint64_t size)
-{
+uint64_t serialPortWrite(uint8_t *buffer, uint64_t size) {
 	if (buffer == NULL) { return 0; }
 	if (size == 0) {
 		// Flush the hardware
@@ -273,15 +267,12 @@ uint8_t* comItoA(int i, uint8_t b[]){
 	return b;
 }
 
-void serialPrintf(const uint8_t *c, ...)
-{
+void serialPrintf(const uint8_t *c, ...) {
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);
-	while (*c != '\0')
-	{
-		if (*c != '%')
-		{
+	while (*c != '\0') {
+		if (*c != '%') {
 			putchar(*c);
 			c++;
 			continue;
@@ -289,8 +280,7 @@ void serialPrintf(const uint8_t *c, ...)
 
 		c++;
 
-		if (*c == '\0')
-		{
+		if (*c == '\0') {
 			break;
 		}
 
