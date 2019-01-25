@@ -59,7 +59,7 @@ void setFramebuffer(Framebuffer *framebuffer) {
 #define Mul255(a255, c255) (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
 #define Blend255(target, color, alpha) (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
-void blendPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
+void __attribute__((fastcall)) blendPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
 	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1)) return ;
 	Pixel32 p = _pixels[y * _framebuffer->width + x];
 
@@ -70,7 +70,7 @@ void blendPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
 	_pixels[y * _framebuffer->width + x] = p;
 }
 
-void setPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
+void __attribute__((fastcall)) setPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
 	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1)) return ;
 	_pixels[y * _framebuffer->width + x] = pixel;
 }

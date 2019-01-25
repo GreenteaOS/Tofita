@@ -17,7 +17,6 @@ bash build.sh
 	-display sdl ^
 	-show-cursor ^
 	-monitor stdio ^
-	-net none ^
 	-boot menu=off ^
 	-pflash OVMF-20160813.fd ^
 	-serial file:%R%\qemu-serial.log ^

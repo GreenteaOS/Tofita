@@ -84,28 +84,28 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 
 PageEntry pml4[PAGE_TABLE_SIZE] PAGE_ALIGNED;
 
-static inline void writeCr3(uint64_t value) {
+static void writeCr3(uint64_t value) {
 	__asm__("movq %0, %%cr3" :: "r"(value));
 }
 
 static uint8_t pages[PAGES_TO_ALLOCATE][PAGE_SIZE] PAGE_ALIGNED;
 static uint8_t lastPageIndex = 0;
 
-static inline void *allocatePage() {
+static void *allocatePage() {
 	return (void *) pages[lastPageIndex++];
 }
 
-static inline LinearAddress getLinearAddress(uint64_t address) {
+static LinearAddress getLinearAddress(uint64_t address) {
 	return *((LinearAddress *) &address);
 }
 
-static inline void initializePage(PageEntry *entry, uint64_t address) {
+static void initializePage(PageEntry *entry, uint64_t address) {
 	entry->address = address >> ADDRESS_BITS;
 	entry->present = 1;
 	entry->writeAllowed = 1;
 }
 
-static inline void *getPage(PageEntry *table, uint64_t entryId) {
+static void *getPage(PageEntry *table, uint64_t entryId) {
 	PageEntry *entry = &table[entryId];
 
 	if (entry->present == 1) {
@@ -117,9 +117,7 @@ static inline void *getPage(PageEntry *table, uint64_t entryId) {
 	}
 }
 
-static inline void map_pt(PageEntry pt[], uint64_t virtualAddr,
-		uint64_t physicalAddr)
-{
+static void map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt];
 	initializePage(entry, physicalAddr);
 }
@@ -136,9 +134,7 @@ CREATE_MAPPING(pd, pt)
 CREATE_MAPPING(pdpt, pd)
 CREATE_MAPPING(pml4, pdpt)
 
-static inline void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr,
-		uint32_t pageCount)
-{
+static void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln("[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
@@ -180,11 +176,11 @@ static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(
 	return (const EFI_MEMORY_DESCRIPTOR *) desc;
 }
 
-static inline void mapEfi(EfiMemoryMap *memoryMap) {
+static void mapEfi(EfiMemoryMap *memoryMap) {
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
 
-	for (uint64_t i = 0; i < memoryMap->memoryMapSize; ++i) {
+	for (uint64_t i = 0; i < memoryMap->memoryMapSize; i++) {
 		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
 			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart,
 					descriptor->NumberOfPages);
@@ -194,12 +190,12 @@ static inline void mapEfi(EfiMemoryMap *memoryMap) {
 	}
 }
 
-static inline void mapFramebuffer(Framebuffer *fb) {
+static void mapFramebuffer(Framebuffer *fb) {
 	void *framebufferBase = fb->base;
 	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
 }
 
-static inline void mapRamDisk(RamDisk *ramdisk) {
+static void mapRamDisk(RamDisk *ramdisk) {
 	void *ramdiskBase = ramdisk->base;
 	mapMemory(RamdiskStart, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
 }
