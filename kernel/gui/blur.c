@@ -209,22 +209,22 @@ Bitmap32 *gaussBlur(Bitmap32* bitmap, double radius) {
 }
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
-PixelRGBAData __attribute__((fastcall)) interpolatePixel(const Bitmap32* bitmap, float x, float y) {
-	uint16_t px = (uint16_t)x; // Same as floor(x)
-	uint16_t py = (uint16_t)y; // Same as floor(y)
+PixelRGBAData __attribute__((fastcall)) interpolatePixel(const Bitmap32* bitmap, const float x, const float y) {
+	const uint16_t px = (uint16_t)x; // Same as floor(x)
+	const uint16_t py = (uint16_t)y; // Same as floor(y)
 	const uint16_t stride = bitmap->width;
 	const PixelRGBAData* p0 = bitmap->pixels + px + py * stride; // Pointer to first pixel
 
 	// Calculate the weights
-	float fx = x - px;
-	float fy = y - py;
-	float fx1 = 1.0f - fx;
-	float fy1 = 1.0f - fy;
+	const float fx = x - px;
+	const float fy = y - py;
+	const float fx1 = 1.0f - fx;
+	const float fy1 = 1.0f - fy;
 
-	uint32_t w1 = fx1 * fy1 * 256.0f;
-	uint32_t w2 = fx  * fy1 * 256.0f;
-	uint32_t w3 = fx1 * fy  * 256.0f;
-	uint32_t w4 = fx  * fy  * 256.0f;
+	const uint32_t w1 = fx1 * fy1 * 256.0f;
+	const uint32_t w2 = fx  * fy1 * 256.0f;
+	const uint32_t w3 = fx1 * fy  * 256.0f;
+	const uint32_t w4 = fx  * fy  * 256.0f;
 
 	PixelRGBAData result;
 

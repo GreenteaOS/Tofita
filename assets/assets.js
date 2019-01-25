@@ -15,7 +15,7 @@
 
 const fs = require('fs')
 
-const assets = JSON.parse(fs.readFileSync('assets/assets.json').toString())
+const assets = JSON.parse(fs.readFileSync('assets/assets.json').toString()).sort()
 console.log(assets)
 
 // Compute RAM disk size
