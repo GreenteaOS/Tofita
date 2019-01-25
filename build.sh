@@ -28,8 +28,8 @@ clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone
 	-c -o /mnt/r/tofita/loader.o boot/loader/loader.c
 
 # Kernel
-as -o /mnt/r/tofita/tofita.s.o kernel/tofita.s
 as -o /mnt/r/tofita/cpu.o devices/cpu/cpu.s
+nasm -f elf64 -o /mnt/r/tofita/tofita.asm.o kernel/tofita.asm
 
 clang-6.0 -O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
@@ -39,7 +39,11 @@ clang-6.0 -O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone
 	-c -o /mnt/r/tofita/tofita.o kernel/tofita.c
 
 # Link
-ld -T kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img /mnt/r/tofita/tofita.s.o /mnt/r/tofita/tofita.o /mnt/r/tofita/cpu.o
+ld -T kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img \
+	/mnt/r/tofita/tofita.asm.o \
+	/mnt/r/tofita/cpu.s.o \
+	/mnt/r/tofita/tofita.o
+
 objcopy -O binary /mnt/r/tofita/tofita_kernel.elf.img /mnt/r/tofita/tofita.img
 objcopy -I binary -O elf64-x86-64 -B i386 /mnt/r/tofita/tofita.img /mnt/r/tofita/tofitaimg.o
 
