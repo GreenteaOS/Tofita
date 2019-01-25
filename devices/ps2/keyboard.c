@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
+
 uint8_t keyboardPressedState[128];
 uint8_t keyboardPressedStates = 0;
 uint8_t keyboardMap[128] =
