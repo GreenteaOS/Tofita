@@ -29,6 +29,13 @@ for (const task of tasks) {
 				require('child_process').execSync(
 					'node assets\\assets.js', { stdio: 'inherit' }
 				)
+				// Assembly
+				const asm = ['kernel\\tofita.asm']
+				for (const as of asm)
+					require('child_process').execSync(
+						config.teapotFolder + '\\nasm-2.14.02\\nasm -f elf64 -o ' + config.tempFolder + '\\tofita\\' + as.split('\\')[1] + '.o ' + as, { stdio: 'inherit' }
+					)
+				break;
 				require('child_process').execSync(
 					'bash build.sh', { stdio: 'inherit' }
 				)

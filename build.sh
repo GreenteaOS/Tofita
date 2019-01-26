@@ -29,7 +29,6 @@ clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone
 
 # Kernel
 as -o /mnt/r/tofita/cpu.o devices/cpu/cpu.s
-nasm -f elf64 -o /mnt/r/tofita/tofita.asm.o kernel/tofita.asm
 
 clang-6.0 -O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
