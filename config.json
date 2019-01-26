@@ -1,4 +1,5 @@
 {
+	"teapotFolder": "..\\Teapot",
 	"tempFolder": "R:",
 	"qemuFolder": "C:\\qemu"
 }
