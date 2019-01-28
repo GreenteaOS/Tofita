@@ -13,6 +13,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+module {
+	declare class Config {
+		var qemuFolder: String
+		var tempFolder: String
+		var teapotFolder: String
+	}
+}
+
 let fs = require('fs')
 
 // Removes folder recursively
@@ -30,7 +38,7 @@ function deleteFolderRecursive(path) {
 	}
 }
 
-let config = JSON.parse(fs.readFileSync('config.json').toString())
+let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
 let tasks = process.argv.slice()
 tasks.shift()
 tasks.shift()
@@ -46,9 +54,9 @@ for (task in tasks) {
 				deleteFolderRecursive(config.tempFolder + '\\tofita')
 				if (!fs.existsSync(config.tempFolder + '\\tofita')) fs.mkdirSync(config.tempFolder + '\\tofita')
 				// Assets
-				require('child_process').execSync(
-					'node assets\\assets.js', { stdio: 'inherit' }
-				)
+				let assets = config.tempFolder + '\\TOFITA.DAT'
+				if (fs.existsSync(assets)) fs.unlinkSync(assets)
+				packAssets(config)
 				// Assembly
 				let asm = ['kernel\\tofita.asm']
 				for (a in asm)

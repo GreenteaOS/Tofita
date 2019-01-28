@@ -1,6 +1,7 @@
 {
 	"name": "Tofita Build Script",
 	"files": [
+		"assets.hexa",
 		"main.hexa"
 	],
 	"define":
