@@ -1,6 +1,7 @@
 # Tofita
 
 /OVMF*
+build.js
 
 # Temp
 *DS_Store
