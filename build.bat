@@ -1,3 +1,3 @@
 @echo off
 cmd /c hexa build\hexa.json
-node build.js build qemu
+node build.js build vbox
