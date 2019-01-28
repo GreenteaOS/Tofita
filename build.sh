@@ -10,7 +10,6 @@
 
 # Clean
 
-rm -rf /mnt/r/tofita/
 mkdir -p /mnt/r/tofita/iso/EFI/BOOT/
 
 # Bootloader

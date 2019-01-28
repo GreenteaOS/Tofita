@@ -1,0 +1,21 @@
+{
+	"name": "Tofita Build Script",
+	"files": [
+		"main.hexa"
+	],
+	"define":
+	{
+	},
+	"output": "../_build.js",
+	"license": "LGPL-3.0",
+	"author": "Oleg (PeyTy)",
+	"target":
+	{
+		"include": [],
+		"instance":
+		{
+			"generatePackageJson": false
+		},
+		"generator": "JavaScript"
+	}
+}

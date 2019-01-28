@@ -1,2 +1,3 @@
 @echo off
-node build.js build vbox
+cmd /c hexa build\hexa.json
+node build.js build qemu
