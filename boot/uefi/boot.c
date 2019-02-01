@@ -64,6 +64,13 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	serialPrintln("[[[efi_main]]] done: InitializeLib");
 
 	{
+		uint32_t revision = systemTable->FirmwareRevision;
+		uint16_t minor = (uint16_t)revision;
+		uint16_t major = (uint16_t)(revision >> 16);
+		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\r\n", major, minor);
+	}
+
+	{
 		serialPrintln("[[[efi_main]]] begin: ACPI");
 		void *acpiTable = NULL;
 		EFI_GUID acpi20 = ACPI_20_TABLE_GUID;
