@@ -30,7 +30,26 @@ typedef enum {
 } WallpaperStyle;
 
 void setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
-	wallpaper = bitmap;
+
+	{
+		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size");
+		Bitmap32* upscale = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
+
+		float hReciprocal = 1.0f / (float)_framebuffer->height;
+		float wReciprocal = 1.0f / (float)_framebuffer->width;
+
+		for (uint16_t y = 0; y < upscale->height; y++)
+			for (uint16_t x = 0; x < upscale->width; x++) {
+				PixelRGBAData rgba = interpolatePixel(bitmap,
+					((float)x * wReciprocal) * bitmap->width,
+					((float)y * hReciprocal) * (bitmap->height - 8)
+				);
+				upscale->pixels[y * upscale->width + x].rgba = rgba;
+			}
+
+		wallpaper = upscale;
+		bitmap = wallpaper;
+	}
 
 	serialPrintln("[compositor.setWallpaper] downscale 8x");
 
