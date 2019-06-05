@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Simple tool to read COM port data into TCP socket
+// Simple tool to read COM port data from TCP socket
 
 // Exits when connection lost, so it may be useful from terminal
 
@@ -41,10 +41,10 @@ function onClientConnected(sock) {
 		process.stdout.write(data)
 	})
 	sock.on('close', () => {
-		console.log('Connection from %s closed, exit', client)
+		console.log('\r\nConnection from %s closed, exit', client)
 		process.exit(0)
 	})
 	sock.on('error', (err) => {
-		console.log('Connection %s error: %s', client, err.message)
+		console.log('\r\nConnection %s error: %s', client, err.message)
 	})
 }

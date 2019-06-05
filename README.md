@@ -25,18 +25,24 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - COM-port debug output
  - Initial RAM disk for LiveCD/LiveUSB and installer
  - Tested on:
-   - QEMU 3.0.0 `(last test: 24 jan 2019)`
-   - VirtualBox 6.0 `(last test: 24 jan 2019)`
    - Intel Sandy Bridge (socket 1155) `(last test: 24 jan 2019)`
+   - QEMU 3.0.0+ `(use OVMF to emulate UEFI)`
+   - VirtualBox 6.0+ `(use macOS 64-bit mode, set COM port to pipe \\.\pipe\tofita-com1 deselect "Connect to existing")`
+   - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read pipe.js for more info)`
  - Monolithic performance-oriented kernel
  - ACPI
 
-[![Give a star](docs/star.png?raw=true) 
+[![Give a star](docs/star.png?raw=true)
 Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
 
 This system is going to be coded exclusively in [@hexalang](https://github.com/hexalang), but I also recommend you to take a look at [@ziglang](https://github.com/ziglang), another promising systems programming language!
 
-## LICENSE
+## Tools
+
+- [`listen.js`](listen.js) - listen to VirtualBox COM port in TCP socket mode `(localhost:1234)`
+- [`pipe.js`](pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode `(\\.\pipe\tofita-com1)`
+
+## License
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
