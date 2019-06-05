@@ -11,6 +11,7 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 [![GPL License](https://img.shields.io/badge/License-GNU%20LGPLv3-green.svg?style=flat)](https://github.com/GreenteaOS/Tofita/blob/master/LICENSE)
 [![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
 [![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/TODO/build/artifacts)
+[![Language Top](https://img.shields.io/github/languages/top/GreenteaOS/Tofita.svg?colorB=green)](https://github.com/hexalang/hexa)
 
 Greentea OS is aimed to run `.exe` files natively, and to provide full operating system environment for that.
 
@@ -48,3 +49,5 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+[More information about legal issues](https://github.com/GreenteaOS/Greentea/blob/master/README.md#license)
