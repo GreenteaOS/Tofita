@@ -34,7 +34,7 @@ const PIPE_NAME = "tofita-com1"
 const PIPE_PATH = "\\\\.\\pipe\\" + PIPE_NAME
 
 // Disallow breaking terminal by special chars
-const allowed = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*()_+-=[]{}\\|;\'",./<>?\t\r\n '
+const allowed = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*()_+-=[]{}\\|;\'",./<>?:\t\r\n '
 
 var client = require('net').connect(PIPE_PATH, function() {})
 

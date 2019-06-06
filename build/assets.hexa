@@ -79,6 +79,6 @@ module {
 		buffer.writeUInt32LE(ramDiskChecksum, 0)
 		console.log('ramDiskChecksum is', ramDiskChecksum)
 
-		fs.writeFileSync("R:\\TOFITA.DAT", buffer, "binary")
+		fs.writeFileSync(config.tempFolder + '\\TOFITA.DAT', buffer, "binary")
 	}
 }

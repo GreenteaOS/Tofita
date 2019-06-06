@@ -61,7 +61,8 @@ for (task in tasks) {
 				let asm = ['kernel\\tofita.asm']
 				for (a in asm)
 					require('child_process').execSync(
-						config.teapotFolder + '\\nasm-2.14.02\\nasm -f elf64 -o ' + config.tempFolder + '\\tofita\\' + a.split('\\')[1] + '.o ' + a, { stdio: 'inherit' }
+						config.teapotFolder + '\\nasm-2.14.02\\nasm -f elf64 -o ' +
+						config.tempFolder + '\\tofita\\' + a.split('\\')[1] + '.o ' + a, { stdio: 'inherit' }
 					)
 				require('child_process').execSync(
 					'bash build.sh', { stdio: 'inherit' }
