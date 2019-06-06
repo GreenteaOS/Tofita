@@ -27,8 +27,8 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - Tested on:
    - QEMU 3.0.0+ `(use OVMF to emulate UEFI)`
    - VirtualBox 6.0+ `(use macOS 64-bit mode, set COM port to pipe \\.\pipe\tofita-com1 deselect "Connect to existing")`
-   - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read pipe.js for more info)`
    - Intel Sandy Bridge `(socket 1155)`
+   - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
  - Monolithic performance-oriented kernel
  - ACPI
 
@@ -40,7 +40,7 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 ## Tools
 
 - [`listen.js`](listen.js) - listen to VirtualBox COM port in TCP socket mode `(localhost:1234)`
-- [`pipe.js`](pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode `(\\.\pipe\tofita-com1)`
+- [`pipe.js`](tools/pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode `(\\.\pipe\tofita-com1)`
 
 ## Build
 
