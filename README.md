@@ -46,6 +46,21 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 
 Currently Windows 10 with WSL is required. This requirement will be relaxed (to support winehq and any Windows version, no WSL). You may try to build under Linux by remaking build scripts.
 
+#### Teapot
+
+Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-latest-zip) and place alongside of Tofita repo:
+
+```
+.\Teapot
+.\Tofita
+```
+
+Teapot will take less space if cloned with limited depth of commit history:
+
+```sh
+git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
+```
+
 #### WSL
 
 ```sh
