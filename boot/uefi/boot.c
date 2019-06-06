@@ -70,6 +70,8 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\r\n", major, minor);
 	}
 
+	EFI_BOOT_SERVICES *bootsvc = systemTable->BootServices;
+
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI");
 		void *acpiTable = NULL;
