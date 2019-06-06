@@ -27,7 +27,7 @@ clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone
 	-c -o /mnt/r/tofita/loader.o boot/loader/loader.c
 
 # Kernel
-as -o /mnt/r/tofita/cpu.o devices/cpu/cpu.s
+as -o /mnt/r/tofita/cpu.s.o devices/cpu/cpu.s
 
 clang-6.0 -O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
