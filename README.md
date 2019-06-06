@@ -44,7 +44,7 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 
 ## Build
 
-Currently Windows 10 with WSL is required. This requirement will be relaxed (to support winehq and any Windows version, no WSL). You may try to build under Linux by remaking build scripts.
+Currently Windows 10 with WSL is required. This requirement will be relaxed (to support [WHQ](https://www.winehq.org/) and any Windows version, without WSL). You may try to build under Linux by remaking build scripts.
 
 #### Teapot
 
@@ -64,7 +64,7 @@ git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 #### WSL
 
 ```sh
-sudo apt install clang-6.0 nasm mtools xorriso
+sudo apt install clang-6.0 mtools xorriso
 ```
 
 #### CMD
