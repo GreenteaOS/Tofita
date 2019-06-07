@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Simple tool to read COM port data from pipe
+// `node pipe.js`
 
 // Reconnects automatically after VM reboots, so you don't have to restart this script
 
@@ -33,7 +34,7 @@ Get-VMComPort -VMName Tofita
 const PIPE_NAME = "tofita-com1"
 const PIPE_PATH = "\\\\.\\pipe\\" + PIPE_NAME
 
-// Disallow breaking terminal by special chars
+// Disallow breaking terminal with special chars
 const allowed = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*()_+-=[]{}\\|;\'",./<>?:\t\r\n '
 
 var client = require('net').connect(PIPE_PATH, function() {})
