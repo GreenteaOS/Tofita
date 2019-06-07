@@ -14,6 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Simple tool to read COM port data from TCP socket
+// `node listen.js`
+// Enable "Connect to existing pipe/socket"
+// Runs VirtualBox automatically
 
 // Exits when connection lost, so it may be useful from terminal
 
@@ -32,13 +35,22 @@ server.listen(port, host, function() {
 	require('child_process').exec(command)
 })
 
+// Disallow breaking terminal with special chars
+const allowed = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*()_+-=[]{}\\|;\'",./<>?:\t\r\n '
+
 function onClientConnected(sock) {
 	const client = sock.remoteAddress + ':' + sock.remotePort
 	console.log('VirtualBox connected:', client)
 
 	sock.on('data', (data) => {
-		// Print
-		process.stdout.write(data)
+		let s = []
+		for (let i = 0; i < data.length; i++) {
+			if (data[i] == 0) continue
+			const char = String.fromCharCode(data[i])
+			if (allowed.indexOf(char) != -1)
+				s.push(char)
+		}
+		process.stdout.write(s.join(''), 'ascii')
 	})
 	sock.on('close', () => {
 		console.log('\r\nConnection from %s closed, exit', client)
