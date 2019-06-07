@@ -92,7 +92,7 @@ for (task in tasks) {
 		case 'vbox':
 			{
 				require('child_process').execSync(
-					'node listen.js', { stdio: 'inherit' }
+					'node tools\\listen.js', { stdio: 'inherit' }
 				)
 			}
 		case _:
