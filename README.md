@@ -4,7 +4,6 @@
 
 All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 
-
 [![Telegram Channel](https://img.shields.io/badge/Telegram-Greentea%20NEWS-blue.svg)](https://telegram.me/greenteaos_news)
 [![Telegram Chatroom](https://img.shields.io/badge/Telegram-Greentea%20ENG-blue.svg)](https://telegram.me/greenteaos)
 [![Join the chat at Gitter!](https://img.shields.io/badge/Gitter-Join%20Chat-47B192.svg)](https://gitter.im/GreenteaOS/Lobby)
@@ -14,6 +13,8 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 [![Language Top](https://img.shields.io/github/languages/top/GreenteaOS/Tofita.svg?colorB=green)](https://github.com/hexalang/hexa)
 
 Greentea OS is aimed to run `.exe` files natively, and to provide full operating system environment for that.
+
+![Screenshot](https://raw.githubusercontent.com/GreenteaOS/Greentea/master/Images/screenshot.jpg)
 
 ## Features
 
@@ -43,6 +44,8 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 - [`pipe.js`](tools/pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode `(\\.\pipe\tofita-com1)`
 
 ## Build
+
+> **We are working to port this project to Hexa, so this repo currently has outdated code, don't build it**
 
 Currently Windows 10 with WSL is required. This requirement will be relaxed (to support [WHQ](https://www.winehq.org/) and any Windows version, without WSL). You may try to build under Linux by remaking build scripts.
 
