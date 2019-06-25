@@ -11,6 +11,7 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 [![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
 [![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/TODO/build/artifacts)
 [![Language Top](https://img.shields.io/github/languages/top/GreenteaOS/Tofita.svg?colorB=green)](https://github.com/hexalang/hexa)
+[![TODO](https://img.shields.io/badge/!-TODO-0f9d58.svg?style=flat)](https://github.com/GreenteaOS/Tofita/search?q=TODO&unscoped_q=TODO&type=Code)
 
 Greentea OS is aimed to run `.exe` files natively, and to provide full operating system environment for that.
 
