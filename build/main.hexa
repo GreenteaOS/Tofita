@@ -56,7 +56,6 @@ for (task in tasks) {
 				// Assets
 				let assets = config.tempFolder + '\\TOFITA.DAT'
 				if (fs.existsSync(assets)) fs.unlinkSync(assets)
-				packAssets(config)
 				// Assembly
 				let asm = ['kernel\\tofita.asm']
 				for (a in asm)
@@ -64,8 +63,15 @@ for (task in tasks) {
 						config.teapotFolder + '\\nasm-2.14.02\\nasm -f elf64 -o ' +
 						config.tempFolder + '\\tofita\\' + a.split('\\')[1] + '.o ' + a, { stdio: 'inherit' }
 					)
+
 				require('child_process').execSync(
 					'bash build.sh', { stdio: 'inherit' }
+				)
+
+				packAssets(config) // Loader
+
+				require('child_process').execSync(
+					'bash iso.sh', { stdio: 'inherit' }
 				)
 			}
 		case 'qemu':
