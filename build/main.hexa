@@ -79,7 +79,7 @@ for (task in tasks) {
 						'-boot menu=off',
 						'-pflash OVMF-20160813.fd',
 						'-serial stdio',
-						'-cdrom ' + config.tempFolder + '\\tofita\\uefi.iso',
+						'-cdrom ' + config.tempFolder + '\\tofita\\greenteaos-uefi.iso',
 						'-s',
 						'-no-reboot',
 						'-vga std',
