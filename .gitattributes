@@ -1,4 +1,6 @@
 * text=auto eol=crlf
 *.png binary
 *.cur binary
+*.a binary
+*.o binary
 build.sh text eol=lf
