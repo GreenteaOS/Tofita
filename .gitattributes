@@ -4,3 +4,4 @@
 *.a binary
 *.o binary
 build.sh text eol=lf
+iso.sh text eol=lf

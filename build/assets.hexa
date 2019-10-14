@@ -18,13 +18,19 @@ module {
 
 		let fs = require('fs')
 
-		let assets = JSON.parse(fs.readFileSync('assets/assets.json').toString()).sort()
-		console.log(assets)
+		let assetName: [String] = JSON.parse(fs.readFileSync('assets/assets.json').toString()).sort()
+		let assetPath: [String] = []
+
+		for (i in assetName.length) {
+			assetPath[i] = 'assets\\' + assetName[i]
+		}
+
+		console.log(assetName)
 
 		// Compute RAM disk size
 		var ramDiskSize = 0
-		for (asset in assets) {
-			ramDiskSize += fs.statSync('assets\\' + asset).size
+		for (asset in assetPath) {
+			ramDiskSize += fs.statSync(asset).size
 		}
 
 		ramDiskSize += 4 // uint32_t ramDiskChecksum;
@@ -36,7 +42,7 @@ module {
 			4 + //	    uint32_t size;
 			4 //	    uint32_t offsetFromRamDiskFirstByte; // NOT relative to `data`
 			//};
-		) * assets.length
+		) * assetName.length
 		//uint8_t* data;
 
 		// Round upto 4 bytes
@@ -46,16 +52,18 @@ module {
 		let buffer = Buffer.alloc(ramDiskSize) // zeroed
 		buffer.writeUInt32LE(0, 0)
 		buffer.writeUInt32LE(ramDiskSize,     4)
-		buffer.writeUInt32LE(assets.length,   8)
+		buffer.writeUInt32LE(assetName.length,   8)
 		let assetInfoSize = 256 + 4 + 4
 		var assetInfoOffset = 4 + 4 + 4
 		var assetDataOffset = ramDiskSize
-		for (asset in assets) {
-			let assetSize = fs.statSync('assets\\' + asset).size
+		for (i in assetName.length) {
+			let asset = assetName[i]
+			let path = assetPath[i]
+			let assetSize = fs.statSync(path).size
 			buffer.write(asset, assetInfoOffset, "utf-8")
 			buffer.writeUInt32LE(assetSize, assetInfoOffset + 256)
 
-			let file = fs.readFileSync('assets\\' + asset)
+			let file = fs.readFileSync(path)
 			assetDataOffset -= assetSize
 			file.copy(buffer, assetDataOffset)
 
