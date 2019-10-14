@@ -209,7 +209,7 @@ static void mapRamDisk(RamDisk *ramdisk) {
 
 void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
 	mapMemory(KernelStart, KernelStart, 256);
-	serialPrintln("[paging] kernel mapped");
+	serialPrintln("[paging] kernel loader mapped");
 
 	mapMemory(KernelVirtualBase, (uint64_t) tofitaKernel, 256);
 	serialPrintln("[paging] Tofita kernel mapped");

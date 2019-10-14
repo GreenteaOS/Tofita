@@ -27,6 +27,7 @@
 #include "../shared/paging.c"
 #include "memory.c"
 #include "ramdisk.c"
+#include "../../kernel/ramdisk.c"
 
 void* tmemcpy(void* dest, const void* src, size_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
@@ -38,9 +39,6 @@ void* tmemcpy(void* dest, const void* src, size_t count) {
 
 	return dest;
 }
-
-extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_start;
-extern uint8_t _binary__mnt_r_tofita_loader_kernel_img_end;
 
 // Loading animation, progress 0...2
 void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
@@ -149,14 +147,16 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 	serialPrintln("[[[efi_main]]] done: ExitBootServices");
 
+	setRamDisk(&initParameters.ramdisk);
+	RamDiskAsset asset = getRamDiskAsset("loader_kernel.img");
+	serialPrintf("[[[efi_main]]] loaded asset 'loader_kernel.img' %d bytes at %d\r\n", asset.size, asset.data);
+
 	void *kernelBase = (void *) KernelStart;
-	const void *kernelImage = (const void *) &_binary__mnt_r_tofita_loader_kernel_img_start;
-	size_t kernelImgSize = ((size_t) &_binary__mnt_r_tofita_loader_kernel_img_end) - ((size_t) kernelImage);
 	drawLoading(&initParameters.framebuffer, 2);
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader");
 
-	tmemcpy(kernelBase, kernelImage, kernelImgSize);
+	tmemcpy(kernelBase, asset.data, asset.size);
 	InitKernel startFunction = (InitKernel) kernelBase;
 
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader");
