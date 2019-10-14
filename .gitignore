@@ -5,6 +5,7 @@ build.js
 
 # Temp
 *DS_Store
+*DS_Store*
 *.tmp
 *~*
 .AppleDouble
