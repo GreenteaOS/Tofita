@@ -28,7 +28,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - Initial RAM disk for LiveCD/LiveUSB and installer
  - Tested on:
    - QEMU 3.0.0+ `(use OVMF to emulate UEFI)`
-   - VirtualBox 6.0+ `(use macOS 64-bit mode, set COM port to pipe \\.\pipe\tofita-com1 deselect "Connect to existing")`
+   - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
    - Intel Sandy Bridge `(socket 1155)`
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
  - Monolithic performance-oriented kernel
