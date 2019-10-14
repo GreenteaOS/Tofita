@@ -5,11 +5,16 @@
 		"main.hexa"
 	],
 	"define":
-	{
-	},
-	"output": "../build.js",
+	{},
 	"license": "LGPL-3.0",
 	"author": "Oleg (PeyTy)",
+	"targets": [
+	{
+		"name": "default",
+		"generator": "js",
+		"output": "../build.js",
+		"options": ["nodejs"]
+	}],
 	"target":
 	{
 		"include": [],
