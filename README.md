@@ -41,7 +41,7 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 
 ## Tools
 
-- [`listen.js`](tools/listen.js) - listen to VirtualBox COM port in TCP socket mode `(localhost:1234)`
+- [`listen.js`](tools/listen.js) - listen to VirtualBox COM port in TCP socket mode
 - [`pipe.js`](tools/pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode `(\\.\pipe\tofita-com1)`
 
 ## Build

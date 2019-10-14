@@ -14,8 +14,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Simple tool to read COM port data from TCP socket
+// In VirtualBox VM settings:
+// General -> Name `Tofita` or set vmname var
+// Serial Ports -> Port 1
+//                        -> Enable "Enable Serial Port"
+//                        -> Port Mode "TCP"
+//                        -> Port Mode "TCP"
+//                        -> Enable "Connect to existing pipe/socket"
+//                        -> Path localhost:1234 or edit host/port vars
 // `node listen.js`
-// Enable "Connect to existing pipe/socket"
 // Runs VirtualBox automatically
 
 // Exits when connection lost, so it may be useful from terminal
@@ -23,7 +30,8 @@
 const net = require('net')
 
 // Configuration
-const command = '"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage" --nologo startvm Tofita'
+const vmname = 'Tofita'
+const command = '"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage" --nologo startvm ' + vmname
 const host = 'localhost'
 const port = 1234
 
