@@ -72,12 +72,12 @@ for (task in tasks) {
 			{
 				require('child_process').execSync(
 					[
-						config.qemuFolder + '\\qemu-system-x86_64',
+						'"' + config.qemuFolder + '\\qemu-system-x86_64.exe"',
 						'-display sdl',
 						'-show-cursor',
 						'-monitor stdio',
 						'-boot menu=off',
-						'-pflash OVMF-20160813.fd',
+						'-pflash ' + config.teapotFolder + '\\OVMF-20160813.fd',
 						'-serial stdio',
 						'-cdrom ' + config.tempFolder + '\\tofita\\greenteaos-uefi.iso',
 						'-s',
