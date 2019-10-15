@@ -24,7 +24,7 @@
 #include "../../devices/serial/log.c"
 #include "../shared/paging.c"
 
-extern uint8_t _binary__mnt_r_tofita_tofita_img_start;
+extern uint8_t _binary_tofita_img_start;
 
 static void startTofitaKernel(const KernelParams *params) {
 	InitKernel start = (InitKernel) KernelVirtualBase;
@@ -37,7 +37,7 @@ static void startTofitaKernel(const KernelParams *params) {
 void startTofitaKernelLoader(const KernelParams *params) {
 	serialPrintln("[[boot]] begin: paging");
 
-	uint8_t *kernelImage = (uint8_t *) &_binary__mnt_r_tofita_tofita_img_start;
+	uint8_t *kernelImage = (uint8_t *) &_binary_tofita_img_start;
 
 	// Copy to stack
 	KernelParams newParams = *params;
