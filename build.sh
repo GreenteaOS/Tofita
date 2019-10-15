@@ -43,7 +43,9 @@ ld -T kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img \
 	/mnt/r/tofita/tofita.o
 
 objcopy -O binary /mnt/r/tofita/tofita_kernel.elf.img /mnt/r/tofita/tofita.img
-objcopy -I binary -O elf64-x86-64 -B i386 /mnt/r/tofita/tofita.img /mnt/r/tofita/tofitaimg.o
+cd /mnt/r/tofita/
+objcopy -I binary -O elf64-x86-64 -B i386 tofita.img /mnt/r/tofita/tofitaimg.o
+cd -
 
 ld -T boot/loader/loader.ld -o /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader.s.o /mnt/r/tofita/loader.o /mnt/r/tofita/tofitaimg.o
 objcopy -O binary /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader_kernel.img
