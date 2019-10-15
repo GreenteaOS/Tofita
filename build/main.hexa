@@ -83,7 +83,7 @@ for (task in tasks) {
 						'-show-cursor',
 						'-monitor stdio',
 						'-boot menu=off',
-						'-pflash ' + config.teapotFolder + '\\OVMF-20160813.fd',
+						'--bios ' + config.teapotFolder + '\\OVMF-20160813.fd',
 						'-serial stdio',
 						'-cdrom ' + config.tempFolder + '\\tofita\\greenteaos-uefi.iso',
 						'-s',
