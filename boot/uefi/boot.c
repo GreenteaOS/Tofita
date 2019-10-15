@@ -95,7 +95,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer");
-	initializeFramebuffer(&initParameters.framebuffer);
+	initializeFramebuffer(&initParameters.framebuffer, systemTable);
 	drawLoading(&initParameters.framebuffer, 0);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	serialPrintln("[[[efi_main]]] done: initializeFramebuffer");
@@ -121,7 +121,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	serialPrintf("[[[efi_main]]] done: uefiAllocate the buffer, size %d\r\n", size);
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap");
-	fillMemoryMap(&initParameters.efiMemoryMap);
+	fillMemoryMap(&initParameters.efiMemoryMap, systemTable);
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap");
 
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices");
@@ -137,7 +137,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 		if (oops < 100) {
 			oops++;
 		}
-		status = ST->BootServices->ExitBootServices(imageHandle,
+		status = systemTable->BootServices->ExitBootServices(imageHandle,
 			initParameters.efiMemoryMap.mapKey);
 	}
 

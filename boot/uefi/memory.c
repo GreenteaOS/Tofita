@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-void fillMemoryMap(EfiMemoryMap *efiMemoryMap) {
+void fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
 	efiMemoryMap->memoryMap = (EFI_MEMORY_DESCRIPTOR *) memoryMapBuffer;
 	efiMemoryMap->memoryMapSize = MemoryMapBufferSize;
 
-	EFI_STATUS status = ST->BootServices->GetMemoryMap(
+	EFI_STATUS status = systemTable->BootServices->GetMemoryMap(
 		&efiMemoryMap->memoryMapSize,
 		efiMemoryMap->memoryMap,
 		&efiMemoryMap->mapKey,
@@ -29,11 +29,11 @@ void fillMemoryMap(EfiMemoryMap *efiMemoryMap) {
 	}
 }
 
-void initializeFramebuffer(Framebuffer *fb) {
+void initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
 	EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 	EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
 
-	ST->BootServices->LocateProtocol(&gopGuid, NULL, (void **) &gop);
+	systemTable->BootServices->LocateProtocol(&gopGuid, NULL, (void **) &gop);
 
 	fb->base = (void *) gop->Mode->FrameBufferBase;
 	fb->size = gop->Mode->FrameBufferSize;
