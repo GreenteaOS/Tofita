@@ -72,18 +72,6 @@ void kernelMain(KernelParams *params) {
 	initializeCompositor();
 
 	{
-		RamDiskAsset a = getRamDiskAsset("assets.json");
-		serialPrintf("Asset 'assets.json' %d bytes at %d\r\n", a.size, a.data);
-		serialPrintln(a.data);
-	}
-
-	{
-		RamDiskAsset a = getRamDiskAsset("README.md");
-		serialPrintf("Asset 'README.md' %d bytes at %d\r\n", a.size, a.data);
-		serialPrintln(a.data);
-	}
-
-	{
 		RamDiskAsset a = getRamDiskAsset("hello.bmp");
 		Bitmap32* bmp = loadBmp24(&a);
 		setWallpaper(bmp, Center);
