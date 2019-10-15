@@ -90,7 +90,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 
 	KernelParams initParameters;
-	initParameters.efiRuntimeServices = RT;
+	initParameters.efiRuntimeServices = systemTable->RuntimeServices;
 	EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer");
