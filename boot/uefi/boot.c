@@ -24,7 +24,6 @@
 
 #include "../../devices/serial/init.c"
 #include "../shared/boot.h"
-#include "../shared/paging.c"
 #include "memory.c"
 #include "ramdisk.c"
 #include "../../kernel/ramdisk.c"

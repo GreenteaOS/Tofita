@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define PAGE_SIZE 4096  // 4 KiB
 #define ADDRESS_BITS 12
 #define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
 #define PACKED __attribute__((packed))
