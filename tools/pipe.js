@@ -31,6 +31,12 @@ Get-VMComPort -VMName Tofita
 
 */
 
+/* VirtualBox
+
+Set Serial Ports -> Port 1 -> \\.\pipe\tofita-com1
+
+*/
+
 const PIPE_NAME = "tofita-com1"
 const PIPE_PATH = "\\\\.\\pipe\\" + PIPE_NAME
 
