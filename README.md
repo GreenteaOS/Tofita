@@ -42,13 +42,17 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 ## Tools
 
 - [`listen.js`](tools/listen.js) - listen to VirtualBox COM port in TCP socket mode
-- [`pipe.js`](tools/pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode `(\\.\pipe\tofita-com1)`
+- [`pipe.js`](tools/pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode
 
 ## Build
 
 > **We are working to port this project to Hexa, so this repo currently has outdated code, don't build it**
 
 Currently Windows 10 with WSL is required. This requirement will be relaxed (to support [WHQ](https://www.winehq.org/) and any Windows version, without WSL). You may try to build under Linux by remaking build scripts.
+
+#### Nightly builds
+
+If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/TODO/build/artifacts)
 
 #### Teapot
 
@@ -62,6 +66,7 @@ Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-la
 Teapot will take less space if cloned with limited depth of commit history:
 
 ```sh
+git clone --recursive --depth 1 https://github.com/GreenteaOS/Tofita.git
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 ```
 
@@ -71,7 +76,7 @@ git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 sudo apt install clang-6.0 mtools xorriso
 ```
 
-#### CMD
+#### Compile and generate disk image
 
 Install [node.js](https://nodejs.org/en/download/).
 
@@ -82,6 +87,8 @@ You also need [Hexa compiler](https://github.com/hexalang/hexa#unstable).
 ```sh
 cmd /c build
 ```
+
+Or just open `build.bat` file with Explorer.
 
 ## License
 
