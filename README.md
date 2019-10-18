@@ -70,19 +70,14 @@ git clone --recursive --depth 1 https://github.com/GreenteaOS/Tofita.git
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 ```
 
-#### WSL
-
-```sh
-sudo apt install clang-6.0 mtools xorriso
-```
-
 #### Compile and generate disk image
 
 Install [node.js](https://nodejs.org/en/download/).
 
-Create `R:\` ram disk or just configure `config.json > tempFolder`.
+Create `R:` ram disk for faster builds and configure `config.json > tempFolder`.
+Otherwise `C:` is used to store builds by default.
 
-You also need [Hexa compiler](https://github.com/hexalang/hexa#unstable).
+You also need to install [Hexa compiler](https://github.com/hexalang/hexa#unstable).
 
 ```sh
 cmd /c build
