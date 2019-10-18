@@ -60,6 +60,9 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	InitializeLib(imageHandle, systemTable);
 	serialPrintln("[[[efi_main]]] done: InitializeLib");
 
+	// Disable watchdog timer
+	systemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
+
 	{
 		uint32_t revision = systemTable->FirmwareRevision;
 		uint16_t minor = (uint16_t)revision;
