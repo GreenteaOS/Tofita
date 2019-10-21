@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Create floppy image
-dd if=/dev/zero of=/mnt/r/tofita/disk.img bs=1k count=6272
-mkfs.vfat /mnt/r/tofita/disk.img
+cp ../Teapot/mtools/disk-template.img /mnt/r/tofita/disk.img
 ../Teapot/mtools/mmd.exe -i R:\\tofita\\disk.img ::/EFI
 ../Teapot/mtools/mmd.exe -i R:\\tofita\\disk.img ::/EFI/BOOT
 ../Teapot/mtools/mcopy.exe -i R:\\tofita\\disk.img R:\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI
