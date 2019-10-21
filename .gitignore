@@ -46,3 +46,4 @@ $RECYCLE.BIN/
 .directory
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
+tools/gos-devlist.txt
