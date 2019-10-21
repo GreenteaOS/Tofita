@@ -1,5 +1,18 @@
 * text=auto eol=crlf
+*.exe binary
+*.dll binary
+*.img binary
+*.lib binary
+*.so binary
+*.efi binary
+*.zip binary
+*.iso binary
+*.jpg binary
+*.ico binary
+*.bmp binary
 *.png binary
+*.gif binary
+*.ani binary
 *.cur binary
 *.a binary
 *.o binary
