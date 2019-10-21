@@ -28,8 +28,6 @@ module {
 		assetName.push('loader_kernel.img')
 		assetPath.push(config.tempFolder + '\\tofita\\loader_kernel.img')
 
-		console.log(assetName)
-
 		// Compute RAM disk size
 		var ramDiskSize = 0
 		for (asset in assetPath) {

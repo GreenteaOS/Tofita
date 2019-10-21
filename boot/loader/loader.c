@@ -26,7 +26,7 @@
 
 extern uint8_t _binary_tofita_img_start;
 
-static void startTofitaKernel(const KernelParams *params) {
+void startTofitaKernel(const KernelParams *params) {
 	InitKernel start = (InitKernel) KernelVirtualBase;
 	serialPrint("[[boot]] kernel start address = ");
 	serialPrintHex((uint64_t) (start));
