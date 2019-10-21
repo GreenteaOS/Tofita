@@ -2,6 +2,7 @@
 
 /OVMF*
 build.js
+node_modules
 
 # Temp
 *DS_Store
