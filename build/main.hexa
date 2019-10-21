@@ -53,7 +53,7 @@ for (task in tasks) {
 				deleteFolderRecursive(config.tempFolder + '\\tofita')
 				if (!fs.existsSync(config.tempFolder + '\\tofita')) fs.mkdirSync(config.tempFolder + '\\tofita')
 				// Assets
-				let assets = config.tempFolder + '\\TOFITA.DAT'
+				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
 				if (fs.existsSync(assets)) fs.unlinkSync(assets)
 				// Assembly
 				let asm = ['kernel\\tofita.asm']
