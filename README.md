@@ -43,6 +43,7 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 
 - [`listen.js`](tools/listen.js) - listen to VirtualBox COM port in TCP socket mode
 - [`pipe.js`](tools/pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode
+- [`gos-devlist.bat`](tools/gos-devlist.bat) - show useful device names and PCI IDs to gather user hardware stats
 
 ## Build
 
