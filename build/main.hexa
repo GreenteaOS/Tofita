@@ -72,6 +72,18 @@ for (task in tasks) {
 				fs.copyFileSync(
 					config.tempFolder + '\\tofita\\loader.efi',
 					config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI')
+				fs.copyFileSync(
+					'..\\Teapot\\mtools\\disk-template.img',
+					config.tempFolder + '\\tofita\\disk.img')
+				for (cmd in [
+					// TODO tempFolder
+					'..\\Teapot\\mtools\\mmd.exe -i R:\\tofita\\disk.img ::/EFI',
+					'..\\Teapot\\mtools\\mmd.exe -i R:\\tofita\\disk.img ::/EFI/BOOT',
+					'..\\Teapot\\mtools\\mcopy.exe -i R:\\tofita\\disk.img R:\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
+					'..\\Teapot\\mtools\\mcopy.exe -i R:\\tofita\\disk.img R:\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT'
+				]) require('child_process').execSync(
+					cmd, { stdio: 'inherit' }
+				)
 				require('child_process').execSync(
 					'bash iso.sh', { stdio: 'inherit' }
 				)
