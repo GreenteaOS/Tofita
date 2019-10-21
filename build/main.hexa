@@ -69,6 +69,9 @@ for (task in tasks) {
 
 				packAssets(config) // Loader
 
+				fs.copyFileSync(
+					config.tempFolder + '\\tofita\\loader.efi',
+					config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI')
 				require('child_process').execSync(
 					'bash iso.sh', { stdio: 'inherit' }
 				)
