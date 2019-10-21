@@ -17,7 +17,6 @@ module {
 	declare class Config {
 		var qemuFolder: String
 		var tempFolder: String
-		var teapotFolder: String
 	}
 }
 
@@ -60,7 +59,7 @@ for (task in tasks) {
 				let asm = ['kernel\\tofita.asm']
 				for (a in asm)
 					require('child_process').execSync(
-						config.teapotFolder + '\\nasm-2.14.02\\nasm -f elf64 -o ' +
+						'..\\Teapot\\nasm-2.14.02\\nasm -f elf64 -o ' +
 						config.tempFolder + '\\tofita\\' + a.split('\\')[1] + '.o ' + a, { stdio: 'inherit' }
 					)
 
@@ -83,7 +82,7 @@ for (task in tasks) {
 						'-show-cursor',
 						'-monitor stdio',
 						'-boot menu=off',
-						'--bios ' + config.teapotFolder + '\\OVMF-20160813.fd',
+						'--bios ..\\Teapot\\OVMF-20160813.fd',
 						'-serial stdio',
 						'-cdrom ' + config.tempFolder + '\\tofita\\greenteaos-uefi.iso',
 						'-s',
