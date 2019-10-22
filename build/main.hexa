@@ -23,7 +23,7 @@ module {
 let fs = require('fs')
 
 // Removes folder recursively
-function deleteFolderRecursive(path) {
+function deleteFolderRecursive(path, noRemoveSelf) {
 	if (fs.existsSync(path)) {
 		fs.readdirSync(path).forEach(function(file, index) {
 			let curPath = path + "/" + file
@@ -33,7 +33,8 @@ function deleteFolderRecursive(path) {
 				fs.unlinkSync(curPath)
 			}
 		})
-		fs.rmdirSync(path)
+		// Fixes some random errors
+		if (noRemoveSelf != true) fs.rmdirSync(path)
 	}
 }
 
@@ -50,8 +51,7 @@ for (task in tasks) {
 			{
 				// Cleanup
 				if (!fs.existsSync(config.tempFolder + '\\tofita')) fs.mkdirSync(config.tempFolder + '\\tofita')
-				deleteFolderRecursive(config.tempFolder + '\\tofita')
-				if (!fs.existsSync(config.tempFolder + '\\tofita')) fs.mkdirSync(config.tempFolder + '\\tofita')
+				deleteFolderRecursive(config.tempFolder + '\\tofita', noRemoveSelf: true)
 				// Assets
 				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
 				if (fs.existsSync(assets)) fs.unlinkSync(assets)
@@ -72,20 +72,33 @@ for (task in tasks) {
 				fs.copyFileSync(
 					config.tempFolder + '\\tofita\\loader.efi',
 					config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI')
+				// Create floppy image
 				fs.copyFileSync(
 					'..\\Teapot\\mtools\\disk-template.img',
 					config.tempFolder + '\\tofita\\disk.img')
 				for (cmd in [
 					// TODO tempFolder
-					'..\\Teapot\\mtools\\mmd.exe -i R:\\tofita\\disk.img ::/EFI',
-					'..\\Teapot\\mtools\\mmd.exe -i R:\\tofita\\disk.img ::/EFI/BOOT',
-					'..\\Teapot\\mtools\\mcopy.exe -i R:\\tofita\\disk.img R:\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
-					'..\\Teapot\\mtools\\mcopy.exe -i R:\\tofita\\disk.img R:\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT'
+					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI',
+					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI/BOOT',
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT'
 				]) require('child_process').execSync(
 					cmd, { stdio: 'inherit' }
 				)
+				// Create disk image
+				fs.copyFileSync(
+					config.tempFolder + '\\tofita\\disk.img',
+					config.tempFolder + '\\tofita\\iso\\disk.img')
 				require('child_process').execSync(
-					'bash iso.sh', { stdio: 'inherit' }
+					[
+						'..\\Teapot\\xorriso-1.3.4\\xorriso.exe',
+						'-as mkisofs -R -f -e',
+						'disk.img',
+						'-no-emul-boot -o',
+						'/cygdrive/r/tofita/greenteaos-uefi.iso',
+						'-V GreenteaOS-UEFI',
+						'/cygdrive/r/tofita/iso'
+					].join(' '), { stdio: 'inherit' }
 				)
 			}
 		case 'qemu':
