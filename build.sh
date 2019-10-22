@@ -7,6 +7,7 @@ clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone
 	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC \
 	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
 	-c -o /mnt/r/tofita/boot.o boot/uefi/boot.c
+
 clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
 	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC -mcmodel=large \
@@ -41,7 +42,7 @@ ld -nostdlib -znocombreloc -T external/gnuefi/elf_x86_64_efi.lds -shared -Bsymbo
 	/mnt/r/tofita/boot.o \
 	-o /mnt/r/tofita/loader.so -lgnuefi
 
-objcopy \
+../Teapot/x86_64-w64-mingw32/objcopy.exe \
 	-j .text -j .sdata -j .data -j .dynamic \
 	-j .dynsym  -j .rel -j .rela -j .reloc \
-	--target=efi-app-x86_64 /mnt/r/tofita/loader.so /mnt/r/tofita/loader.efi
+	--target=efi-app-x86_64 R:/tofita/loader.so R:/tofita/loader.efi
