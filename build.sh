@@ -27,13 +27,13 @@ ld -T kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img \
 	/mnt/r/tofita/cpu.s.o \
 	/mnt/r/tofita/tofita.o
 
-objcopy -O binary /mnt/r/tofita/tofita_kernel.elf.img /mnt/r/tofita/tofita.img
+../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -O binary r:/tofita/tofita_kernel.elf.img r:/tofita/tofita.img
 cd /mnt/r/tofita/
 objcopy -I binary -O elf64-x86-64 -B i386 tofita.img tofitaimg.o
 cd - > /dev/null
 
 ld -T boot/loader/loader.ld -o /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader.s.o /mnt/r/tofita/loader.o /mnt/r/tofita/tofitaimg.o
-objcopy -O binary /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader_kernel.img
+../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -O binary r:/tofita/loader_kernel.elf.img r:/tofita/loader_kernel.img
 
 ld -nostdlib -znocombreloc -T external/gnuefi/elf_x86_64_efi.lds -shared -Bsymbolic -L external/gnuefi \
 	-L /usr/lib \
@@ -45,4 +45,3 @@ objcopy \
 	-j .text -j .sdata -j .data -j .dynamic \
 	-j .dynsym  -j .rel -j .rela -j .reloc \
 	--target=efi-app-x86_64 /mnt/r/tofita/loader.so /mnt/r/tofita/loader.efi
-
