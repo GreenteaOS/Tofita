@@ -33,7 +33,7 @@ ld -T kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img \
 objcopy -O binary /mnt/r/tofita/tofita_kernel.elf.img /mnt/r/tofita/tofita.img
 cd /mnt/r/tofita/
 objcopy -I binary -O elf64-x86-64 -B i386 tofita.img /mnt/r/tofita/tofitaimg.o
-cd -
+cd - > /dev/null
 
 ld -T boot/loader/loader.ld -o /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader.s.o /mnt/r/tofita/loader.o /mnt/r/tofita/tofitaimg.o
 objcopy -O binary /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader_kernel.img
@@ -42,7 +42,7 @@ ld -nostdlib -znocombreloc -T external/gnuefi/elf_x86_64_efi.lds -shared -Bsymbo
 	-L /usr/lib \
 	external/gnuefi/crt0-efi-x86_64.o \
 	/mnt/r/tofita/boot.o \
-	-o /mnt/r/tofita/loader.so -lefi -lgnuefi
+	-o /mnt/r/tofita/loader.so -lgnuefi
 
 objcopy \
 	-j .text -j .sdata -j .data -j .dynamic \
