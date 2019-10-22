@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# Configure
-
-# sudo apt-get install --reinstall make
-# sudo apt install xorriso
-# sudo apt-get install clang-6.0
-
-# /mnt/r/ is a temp folder
-
-# Clean
-
-mkdir -p /mnt/r/tofita/iso/EFI/BOOT/
-
 # Bootloader
 as -o /mnt/r/tofita/loader.s.o boot/loader/loader.s
 

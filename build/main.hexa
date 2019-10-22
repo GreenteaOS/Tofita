@@ -52,6 +52,16 @@ for (task in tasks) {
 				// Cleanup
 				if (!fs.existsSync(config.tempFolder + '\\tofita')) fs.mkdirSync(config.tempFolder + '\\tofita')
 				deleteFolderRecursive(config.tempFolder + '\\tofita', noRemoveSelf: true)
+				// Create directory tofita/iso/EFI/BOOT/
+				let dirs = [
+					'\\tofita',
+					'\\tofita\\iso',
+					'\\tofita\\iso\\EFI',
+					'\\tofita\\iso\\EFI\\BOOT'
+				]
+				for (dir in dirs)
+					if (!fs.existsSync(config.tempFolder + dir))
+						fs.mkdirSync(config.tempFolder + dir)
 				// Assets
 				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
 				if (fs.existsSync(assets)) fs.unlinkSync(assets)
@@ -77,7 +87,6 @@ for (task in tasks) {
 					'..\\Teapot\\mtools\\disk-template.img',
 					config.tempFolder + '\\tofita\\disk.img')
 				for (cmd in [
-					// TODO tempFolder
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI',
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI/BOOT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
