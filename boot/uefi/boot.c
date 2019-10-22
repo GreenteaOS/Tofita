@@ -16,7 +16,6 @@
 // Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
 
 #include <efi.h>
-#include <efilib.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,6 +26,17 @@
 #include "memory.c"
 #include "ramdisk.c"
 #include "../../kernel/ramdisk.c"
+
+INTN CompareGuid (EFI_GUID *guid1, EFI_GUID *guid2) {
+    INT32 *g1, *g2, r;
+    g1 = (INT32 *) guid1;
+    g2 = (INT32 *) guid2;
+    r  = g1[0] - g2[0];
+    r |= g1[1] - g2[1];
+    r |= g1[2] - g2[2];
+    r |= g1[3] - g2[3];
+    return r;
+}
 
 void* tmemcpy(void* dest, const void* src, size_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
@@ -55,10 +65,6 @@ void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
 	serialPrint("\r\n[[[efi_main]]] This is Tofita " Version " UEFI bootloader. Welcome!\r\n");
-
-	serialPrintln("[[[efi_main]]] begin: InitializeLib");
-	InitializeLib(imageHandle, systemTable);
-	serialPrintln("[[[efi_main]]] done: InitializeLib");
 
 	// Disable watchdog timer
 	systemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
