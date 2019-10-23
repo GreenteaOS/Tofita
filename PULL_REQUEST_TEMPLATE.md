@@ -14,9 +14,9 @@ My code is self-explanatory, no extended description required
 
 ### Check list
 
-- [ ] `(optional)` I added my real name to improve protective power of [GPL license](https://en.wikipedia.org/wiki/GNU_General_Public_License) to all touched source code files
+- [ ] `(optional)` I added my real name to improve protective power of [GPL license](https://en.wikipedia.org/wiki/GNU_General_Public_License) to all touched source code files and [AUTHORS.md](https://github.com/GreenteaOS/Tofita/blob/master/AUTHORS.md)
 - [ ] My code is *autoformatted*
-- [ ] I have waited for completion of [automatic builds] for this project, downloaded [artifacts], and checked their behavior
+- [ ] I have waited for completion of [automatic builds](https://ci.appveyor.com/project/PeyTy/tofita) for this project, downloaded [artifacts](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts), and checked their behavior
 - [ ] My code covered by at least basic automated tests
 - [ ] My code is **not** copy-pasted from leaked source codes of commercial projects, nor from protected with incompatible to GPL licenses
 - [ ] My code contains comments and adequate variable/methods names, I have made corresponding changes to the documentation
