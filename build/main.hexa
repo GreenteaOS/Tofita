@@ -127,7 +127,9 @@ for (task in tasks) {
 
 				require('child_process').execSync(
 					[
-						'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary r:/tofita/tofita_kernel.elf.img r:/tofita/tofita.img'
+						'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary ',
+						config.tempFolder + '/tofita/tofita_kernel.elf.img ',
+						config.tempFolder + '/tofita/tofita.img'
 					].join(''), { stdio: 'inherit' }
 				)
 
@@ -150,7 +152,9 @@ for (task in tasks) {
 
 				require('child_process').execSync(
 					[
-						'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary r:/tofita/loader_kernel.elf.img r:/tofita/loader_kernel.img'
+						'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary ',
+						config.tempFolder + '/tofita/loader_kernel.elf.img ',
+						config.tempFolder + '/tofita/loader_kernel.img'
 					].join(''), { stdio: 'inherit' }
 				)
 
