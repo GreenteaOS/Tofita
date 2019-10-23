@@ -1,7 +1,5 @@
 #!/bin/bash
 
-as -o /mnt/r/tofita/loader.s.o boot/loader/loader.s
-
 clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
 	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC \

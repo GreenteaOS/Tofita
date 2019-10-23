@@ -66,11 +66,14 @@ for (task in tasks) {
 				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
 				if (fs.existsSync(assets)) fs.unlinkSync(assets)
 				// Assembly
-				let asm = ['kernel\\tofita.asm']
-				for (a in asm)
+				let asm = [
+					'kernel\\tofita.asm' : 'tofita.asm.o',
+					'boot\\loader\\loader.asm' : 'loader.asm.o'
+				]
+				for (a in asm.keys())
 					require('child_process').execSync(
 						'..\\Teapot\\nasm-2.14.02\\nasm -f elf64 -o ' +
-						config.tempFolder + '\\tofita\\' + a.split('\\')[1] + '.o ' + a, { stdio: 'inherit' }
+						config.tempFolder + '\\tofita\\' + asm.get(a) + ' ' + a, { stdio: 'inherit' }
 					)
 
 				require('child_process').execSync(
