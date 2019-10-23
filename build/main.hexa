@@ -78,6 +78,50 @@ for (task in tasks) {
 					)
 
 				require('child_process').execSync(
+					[
+						'..\\Teapot\\LLVM-9.0.0\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
+						'-O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
+						'-Wimplicit-function-declaration -Werror ',
+						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER ',
+						'-c -o R:/tofita/boot.o boot/uefi/boot.c'
+					].join(''), { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\LLVM-9.0.0\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
+						'-O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
+						'-Wimplicit-function-declaration -Werror ',
+						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC -mcmodel=large ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER ',
+						'-c -o R:/tofita/loader.o boot/loader/loader.c'
+					].join(''), { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\LLVM-9.0.0\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
+						'-O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
+						'-Wimplicit-function-declaration -Werror ',
+						'-DTOFITA -mtune=nocona ',
+						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER ',
+						'-c -o R:/tofita/tofita.o kernel/tofita.c'
+					].join(''), { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\linux-ubuntu-natty_x86_64-bin_x86_64-mingw_20101218_vityan\\bin\\x86_64-vityan-linux-gnu-ld.exe -m elf_x86_64 ',
+						'-T kernel/kernel.ld -o R:/tofita/tofita_kernel.elf.img ',
+						'R:/tofita/tofita.asm.o ',
+						'R:/tofita/cpu.asm.o ',
+						'R:/tofita/tofita.o'
+					].join(''), { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
 					'bash build.sh', { stdio: 'inherit' }
 				)
 
