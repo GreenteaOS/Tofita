@@ -9,7 +9,7 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS)
 [![Join the chat at Gitter!](https://img.shields.io/badge/Gitter-Join%20Chat-47B192.svg)](https://gitter.im/GreenteaOS/Lobby)
 [![GPL License](https://img.shields.io/badge/License-GNU%20LGPLv3-green.svg?style=flat)](https://github.com/GreenteaOS/Tofita/blob/master/LICENSE)
 [![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
-[![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/TODO/build/artifacts)
+[![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 [![Language Top](https://img.shields.io/github/languages/top/GreenteaOS/Tofita.svg?colorB=green)](https://github.com/hexalang/hexa)
 [![TODO](https://img.shields.io/badge/!-TODO-0f9d58.svg?style=flat)](https://github.com/GreenteaOS/Tofita/search?q=TODO&unscoped_q=TODO&type=Code)
 
@@ -53,7 +53,7 @@ Windows or [WHQ on Linux/macOS](https://www.winehq.org/) is required to run buil
 
 #### Nightly builds
 
-If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/TODO/build/artifacts)
+If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 
 #### Teapot
 
