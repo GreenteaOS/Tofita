@@ -7,18 +7,20 @@
 	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
 	-c -o r:/tofita/boot.o boot/uefi/boot.c
 
-clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
+../Teapot/LLVM-9.0.0/bin/clang.exe -target x86_64-pc-linux-gnu \
+	-O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
 	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC -mcmodel=large \
 	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
-	-c -o /mnt/r/tofita/loader.o boot/loader/loader.c
+	-c -o r:/tofita/loader.o boot/loader/loader.c
 
-clang-6.0 -O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
+../Teapot/LLVM-9.0.0/bin/clang.exe -target x86_64-pc-linux-gnu \
+	-O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
 	-DTOFITA -mtune=nocona \
 	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC \
 	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
-	-c -o /mnt/r/tofita/tofita.o kernel/tofita.c
+	-c -o r:/tofita/tofita.o kernel/tofita.c
 
 ld -T kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img \
 	/mnt/r/tofita/tofita.asm.o \
