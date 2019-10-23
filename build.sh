@@ -1,10 +1,11 @@
 #!/bin/bash
 
-clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
+../Teapot/LLVM-9.0.0/bin/clang.exe -target x86_64-pc-linux-gnu \
+	-O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
 	-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC \
 	-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER \
-	-c -o /mnt/r/tofita/boot.o boot/uefi/boot.c
+	-c -o r:/tofita/boot.o boot/uefi/boot.c
 
 clang-6.0 -O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra \
 	-Wimplicit-function-declaration -Werror \
