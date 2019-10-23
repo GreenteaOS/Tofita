@@ -29,8 +29,9 @@ ld -T kernel/kernel.ld -o /mnt/r/tofita/tofita_kernel.elf.img \
 	/mnt/r/tofita/tofita.o
 
 ../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -O binary r:/tofita/tofita_kernel.elf.img r:/tofita/tofita.img
+cwd=$(pwd)
 cd /mnt/r/tofita/
-objcopy -I binary -O elf64-x86-64 -B i386 tofita.img tofitaimg.o
+$cwd/../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -I binary -O elf64-x86-64 -B i386 tofita.img tofitaimg.o
 cd - > /dev/null
 
 ld -T boot/loader/loader.ld -o /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader.s.o /mnt/r/tofita/loader.o /mnt/r/tofita/tofitaimg.o
