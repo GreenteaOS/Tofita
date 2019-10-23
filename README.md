@@ -49,7 +49,7 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 
 > **We are working to port this project to Hexa, so this repo currently has outdated code, don't build it**
 
-Currently Windows 10 with WSL is required. This requirement will be relaxed (to support [WHQ](https://www.winehq.org/) and any Windows version, without WSL). You may try to build under Linux by remaking build scripts.
+Windows or [WHQ on Linux/macOS](https://www.winehq.org/) is required to run build scripts and tools
 
 #### Nightly builds
 
