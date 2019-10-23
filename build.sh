@@ -1,10 +1,5 @@
 #!/bin/bash
 
-../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -O binary r:/tofita/tofita_kernel.elf.img r:/tofita/tofita.img
-cwd=$(pwd)
-cd /mnt/r/tofita/
-$cwd/../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -I binary -O elf64-x86-64 -B i386 tofita.img tofitaimg.o
-cd - > /dev/null
 
 ../Teapot/linux-ubuntu-natty_x86_64-bin_x86_64-mingw_20101218_vityan/bin/x86_64-vityan-linux-gnu-ld.exe -m elf_x86_64 \
 	-T boot/loader/loader.ld \
