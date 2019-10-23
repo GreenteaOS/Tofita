@@ -83,7 +83,7 @@ for (task in tasks) {
 						'-O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-Wimplicit-function-declaration -Werror ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
 						'-c -o R:/tofita/boot.o boot/uefi/boot.c'
 					].join(''), { stdio: 'inherit' }
 				)
@@ -94,7 +94,7 @@ for (task in tasks) {
 						'-O0 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-Wimplicit-function-declaration -Werror ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC -mcmodel=large ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
 						'-c -o R:/tofita/loader.o boot/loader/loader.c'
 					].join(''), { stdio: 'inherit' }
 				)
@@ -106,7 +106,7 @@ for (task in tasks) {
 						'-Wimplicit-function-declaration -Werror ',
 						'-DTOFITA -mtune=nocona ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -Iexternal/inc/protocol -DEFI_FUNCTION_WRAPPER ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
 						'-c -o R:/tofita/tofita.o kernel/tofita.c'
 					].join(''), { stdio: 'inherit' }
 				)
