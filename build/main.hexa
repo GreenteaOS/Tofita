@@ -84,7 +84,8 @@ for (task in tasks) {
 						'-Wimplicit-function-declaration -Werror ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-c -o R:/tofita/boot.o boot/uefi/boot.c'
+						'-c -o ',
+						config.tempFolder + '/tofita/boot.o boot/uefi/boot.c'
 					].join(''), { stdio: 'inherit' }
 				)
 
@@ -95,7 +96,8 @@ for (task in tasks) {
 						'-Wimplicit-function-declaration -Werror ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC -mcmodel=large ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-c -o R:/tofita/loader.o boot/loader/loader.c'
+						'-c -o ',
+						config.tempFolder + '/tofita/loader.o boot/loader/loader.c'
 					].join(''), { stdio: 'inherit' }
 				)
 
@@ -107,14 +109,16 @@ for (task in tasks) {
 						'-DTOFITA -mtune=nocona ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-c -o R:/tofita/tofita.o kernel/tofita.c'
+						'-c -o ',
+						config.tempFolder + '/tofita/tofita.o kernel/tofita.c'
 					].join(''), { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
 					[
 						'..\\Teapot\\linux-ubuntu-natty_x86_64-bin_x86_64-mingw_20101218_vityan\\bin\\x86_64-vityan-linux-gnu-ld.exe -m elf_x86_64 ',
-						'-T kernel/kernel.ld -o R:/tofita/tofita_kernel.elf.img ',
+						'-T kernel/kernel.ld -o ',
+						config.tempFolder + '/tofita/tofita_kernel.elf.img ',
 						config.tempFolder + '/tofita/tofita.asm.o ',
 						config.tempFolder + '/tofita/cpu.asm.o ',
 						config.tempFolder + '/tofita/tofita.o'
@@ -122,7 +126,9 @@ for (task in tasks) {
 				)
 
 				require('child_process').execSync(
-					'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary r:/tofita/tofita_kernel.elf.img r:/tofita/tofita.img', { stdio: 'inherit' }
+					[
+						'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary r:/tofita/tofita_kernel.elf.img r:/tofita/tofita.img'
+					].join(''), { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
@@ -134,7 +140,8 @@ for (task in tasks) {
 					[
 						'..\\Teapot\\linux-ubuntu-natty_x86_64-bin_x86_64-mingw_20101218_vityan\\bin\\x86_64-vityan-linux-gnu-ld.exe -m elf_x86_64 ',
 						'-T boot/loader/loader.ld ',
-						'-o r:/tofita/loader_kernel.elf.img ',
+						'-o ',
+						config.tempFolder + '/tofita/loader_kernel.elf.img ',
 						config.tempFolder + '/tofita/loader.asm.o ',
 						config.tempFolder + '/tofita/loader.o ',
 						config.tempFolder + '/tofita/tofitaimg.o'
@@ -154,7 +161,8 @@ for (task in tasks) {
 						'-L /usr/lib ',
 						'external/gnuefi/crt0-efi-x86_64.o ',
 						config.tempFolder + '/tofita/boot.o ',
-						'-o r:/tofita/loader.so -lgnuefi'
+						'-o ',
+						config.tempFolder + '/tofita/loader.so -lgnuefi'
 					].join(''), { stdio: 'inherit' }
 				)
 
