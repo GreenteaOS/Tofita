@@ -16,7 +16,7 @@
 EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *root, RamDisk* ramdisk)
 {
 	EFI_STATUS status;
-	static CHAR16 name[] = L"TOFITA.DAT";
+	static CHAR16 *name = (CHAR16 *)L"TOFITA.DAT";
 
 	EFI_FILE_PROTOCOL *file = NULL;
 	status = root->Open(root, &file, (CHAR16 *)name, EFI_FILE_MODE_READ,
@@ -29,6 +29,8 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 
 	char info[sizeof(EFI_FILE_INFO) + 100];
 	size_t infoSize = sizeof(info);
+
+	EFI_GUID GenericFileInfo = EFI_FILE_INFO_ID;
 
 	status = file->GetInfo(file, &GenericFileInfo, &infoSize, info);
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: GetInfo %d\r\n", status);

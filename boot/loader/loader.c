@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <efi.h>
-#include <efilib.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
