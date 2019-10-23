@@ -68,6 +68,7 @@ for (task in tasks) {
 				// Assembly
 				let asm = [
 					'kernel\\tofita.asm' : 'tofita.asm.o',
+					'devices\\cpu\\cpu.asm' : 'cpu.asm.o',
 					'boot\\loader\\loader.asm' : 'loader.asm.o'
 				]
 				for (a in asm.keys())
