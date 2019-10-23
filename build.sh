@@ -33,10 +33,16 @@ cd /mnt/r/tofita/
 $cwd/../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -I binary -O elf64-x86-64 -B i386 tofita.img tofitaimg.o
 cd - > /dev/null
 
-ld -T boot/loader/loader.ld -o /mnt/r/tofita/loader_kernel.elf.img /mnt/r/tofita/loader.asm.o /mnt/r/tofita/loader.o /mnt/r/tofita/tofitaimg.o
+ld \
+	-T boot/loader/loader.ld \
+	-o /mnt/r/tofita/loader_kernel.elf.img \
+	/mnt/r/tofita/loader.asm.o \
+	/mnt/r/tofita/loader.o \
+	/mnt/r/tofita/tofitaimg.o
 ../Teapot/LLVM-9.0.0/bin/llvm-objcopy.exe -O binary r:/tofita/loader_kernel.elf.img r:/tofita/loader_kernel.img
 
-ld -nostdlib -znocombreloc -T external/gnuefi/elf_x86_64_efi.lds -shared -Bsymbolic -L external/gnuefi \
+ld \
+	-nostdlib -znocombreloc -T external/gnuefi/elf_x86_64_efi.lds -shared -Bsymbolic -L external/gnuefi \
 	-L /usr/lib \
 	external/gnuefi/crt0-efi-x86_64.o \
 	/mnt/r/tofita/boot.o \
