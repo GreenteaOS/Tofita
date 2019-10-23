@@ -122,6 +122,15 @@ for (task in tasks) {
 				)
 
 				require('child_process').execSync(
+					'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary r:/tofita/tofita_kernel.elf.img r:/tofita/tofita.img', { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					__dirname + '\\..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -I binary -O elf64-x86-64 -B i386 tofita.img tofitaimg.o',
+					{ stdio: 'inherit', cwd: config.tempFolder + '\\tofita' }
+				)
+
+				require('child_process').execSync(
 					'bash build.sh', { stdio: 'inherit' }
 				)
 
