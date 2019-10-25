@@ -1,0 +1,1 @@
+You must disable Secure Boot in your BIOS to run this on PC

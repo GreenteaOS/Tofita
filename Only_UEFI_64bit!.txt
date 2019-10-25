@@ -1,0 +1,3 @@
+This software works only on the modern computers, with 64-bit UEFI firmware
+
+Legacy BIOS and 32-bit UEFI are *not* supported!
