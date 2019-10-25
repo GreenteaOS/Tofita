@@ -22,4 +22,5 @@ color 0C
 echo [Exiting on error]
 :done
 :: Clear error code
+set errorlevel=0
 exit /b 0
