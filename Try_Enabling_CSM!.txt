@@ -1,0 +1,5 @@
+If you struggle running from USB drive, even having 64-bit UEFI, try enabling Compatibility Support Module (CSM) in your boot settings
+
+It may also be called Enable Legacy/CSM Boot Support or something like that
+
+This also helps if USB drive formatted incorrectly (still may work on some computers with some UEFI firmware)
