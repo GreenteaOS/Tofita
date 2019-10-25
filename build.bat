@@ -21,3 +21,5 @@ goto done
 color 0C
 echo [Exiting on error]
 :done
+:: Clear error code
+exit /b 0
