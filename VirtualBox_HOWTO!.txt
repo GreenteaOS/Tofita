@@ -1,0 +1,2 @@
+Use exactly "Mac OS X (64-bit)" preset (it enables UEFI and other stuff)
+Set 2 Gb RAM or more
