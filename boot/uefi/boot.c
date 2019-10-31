@@ -64,7 +64,7 @@ void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 // Entry point
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
-	serialPrint("\r\n[[[efi_main]]] This is Tofita " Version " UEFI bootloader. Welcome!\r\n");
+	serialPrint("\r\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(versionMinor) " " versionName " UEFI bootloader. Welcome!\r\n");
 
 	// Disable watchdog timer
 	systemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);

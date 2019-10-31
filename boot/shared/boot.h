@@ -33,7 +33,8 @@ typedef struct {
 	uint32_t size; // in bytes
 } RamDisk;
 
-#define Version "2019.0" // Tofita kernel version
+#define STR_IMPL_(x) #x      // stringify argument
+#define STR(x) STR_IMPL_(x)  // indirection to expand argument macros
 
 // Start of kernel sections in memory, see loader.ld
 #define KernelStart (1 * 1024 * 1024)

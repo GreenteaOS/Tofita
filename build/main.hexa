@@ -15,8 +15,11 @@
 
 module {
 	declare class Config {
-		var qemuFolder: String
-		var tempFolder: String
+		let qemuFolder: String
+		let tempFolder: String
+		let versionMajor: Int
+		let versionMinor: Int
+		let versionName: String
 	}
 }
 
@@ -84,6 +87,9 @@ for (task in tasks) {
 						'-Wimplicit-function-declaration -Werror ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
+						'-D versionMajor=' + config.versionMajor + ' ',
+						'-D versionMinor=' + config.versionMinor + ' ',
+						'-D versionName=\\"' + config.versionName + '\\" ',
 						'-c -o ',
 						config.tempFolder + '/tofita/boot.o boot/uefi/boot.c'
 					].join(''), { stdio: 'inherit' }
