@@ -1,4 +1,7 @@
 {
+	"versionMajor": 2019,
+	"versionMinor": 11,
+	"versionName": "Spyro",
 	"tempFolder": "C:",
 	"qemuFolder": "C:\\qemu"
 }
