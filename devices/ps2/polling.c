@@ -26,9 +26,9 @@ const uint8_t PollingPS2NothingHappened = 0;
 uint8_t pollPS2Devices() {
 	uint8_t result = PollingPS2NothingHappened;
 	uint8_t poll = readPort(0x64);
-	while (poll == 29 || poll == 61) { // 0b0
+	while (getBit(poll, 0) == 1) {
 		result = PollingPS2SomethingHappened;
-		if (poll == 29) {
+		if (getBit(poll, 5) == 0) {
 			handleKeyboard();
 			if (keyboardPressedState[72]) mouseY -= 4;
 			if (keyboardPressedState[80]) mouseY += 4;
@@ -36,11 +36,9 @@ uint8_t pollPS2Devices() {
 			if (keyboardPressedState[75]) mouseX -= 4;
 			keyDownHandler = (void*)0;
 			haveToRender = 1;
-		} else if (poll == 61) {
+		} else if (getBit(poll, 5) == 1) {
 			handleMouse();
 			haveToRender = 1;
-		} else if (poll != 0 && poll != 28) {
-			serialPrintf("Polling 0x64 == ?: %d\r\n", poll);
 		}
 		poll = readPort(0x64);
 	}
