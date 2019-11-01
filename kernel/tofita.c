@@ -32,6 +32,7 @@ uint8_t haveToRender = 1;
 #include "../devices/screen/framebuffer.c"
 #include "../devices/ps2/keyboard.c"
 #include "../devices/ps2/mouse.c"
+#include "../devices/ps2/polling.c"
 #include "../devices/cpu/fallback.c"
 #include "ramdisk.c"
 #include "formats/cur/cur.c"
@@ -47,6 +48,11 @@ uint8_t haveToRender = 1;
 #include "formats/stb_image/libc.c"
 #include "formats/stb_image/stb_image.h"
 #include "formats/stb_image/unlibc.c"
+
+void (*keyDownHandler)(int) = (void*)0;
+void handleKeyDown(uint8_t key) {
+	if (keyDownHandler) keyDownHandler(key);
+}
 
 void kernelMain(KernelParams *params) {
 	serialPrintln("<Tofita> kernel loaded and operational");
@@ -66,7 +72,6 @@ void kernelMain(KernelParams *params) {
 		serialPrintln("<Tofita> _MSC_VER");
 	#endif
 
-	enableInterrupts();
 	enablePS2Mouse();
 
 	initializeCompositor();
@@ -86,7 +91,12 @@ void kernelMain(KernelParams *params) {
 	drawRectangleWithAlpha(color, 300, 100, 300, 100);
 
 	while (true) {
-		__asm__ volatile("hlt");
+		// Poll PS/2 devices
+		haveToRender = haveToRender || (pollPS2Devices() == PollingPS2SomethingHappened);
+
+		if (mouseX > _framebuffer->width) mouseX = _framebuffer->width;
+		if (mouseY > _framebuffer->height) mouseY = _framebuffer->height;
+
 		if (haveToRender == 0) continue ;
 		haveToRender = 0;
 

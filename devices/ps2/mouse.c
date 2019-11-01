@@ -49,18 +49,22 @@ void handleMouse() {
 		if (getBit(mouseByte[0], 1) != 0) serialPrintln("[mouse] right button is down");
 		if (getBit(mouseByte[0], 2) != 0) serialPrintln("[mouse] middle button is down");
 
-		if (getBit(mouseByte[0], 3) != 0) serialPrintln("[mouse] 3 bit is set");
-		if (getBit(mouseByte[0], 4) != 0) serialPrintln("[mouse] 4 bit is set");
-		if (getBit(mouseByte[0], 5) != 0) serialPrintln("[mouse] 5 bit is set");
-		if (getBit(mouseByte[0], 6) != 0) serialPrintln("[mouse] 6 bit is set");
-		if (getBit(mouseByte[0], 7) != 0) serialPrintln("[mouse] 7 bit is set");
+		serialPrintf("[mouseByte[0]] 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d 7:%d 8:%d bits are set\r\n",
+			getBit(mouseByte[0], 0),
+			getBit(mouseByte[0], 1),
+			getBit(mouseByte[0], 2),
+			getBit(mouseByte[0], 3),
+			getBit(mouseByte[0], 4),
+			getBit(mouseByte[0], 5),
+			getBit(mouseByte[0], 6),
+			getBit(mouseByte[0], 7)
+		);
 
-		// Toggle rendering
-		haveToRender = 1;
 		break;
 	}
 
 	// EOI
-	writePort(0xA0, 0x20);
-	writePort(0x20, 0x20);
+	// Disabled cause polling is used
+	//writePort(0xA0, 0x20);
+	//writePort(0x20, 0x20);
 }

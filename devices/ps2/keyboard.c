@@ -15,8 +15,8 @@
 
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
-uint8_t keyboardPressedState[128];
-uint8_t keyboardPressedStates = 0;
+void handleKeyDown(uint8_t key);
+uint8_t keyboardPressedState[128] = {0};
 uint8_t keyboardMap[128] =
 {
 	0,
@@ -106,12 +106,6 @@ uint8_t keyboardMap[128] =
 #define DATA_PORT       0x60
 
 void handleKeyboard() {
-	// TODO move this to init
-	if (keyboardPressedStates == 0) for (uint8_t i = 0; i < 128; i++) {
-		// Cleanup states
-		keyboardPressedState[i] = 0;
-	}
-
 	uint8_t status = readPort(STATUS_REGISTER);
 
 	// PS2 Mouse
@@ -138,17 +132,16 @@ void handleKeyboard() {
 			if (buffer[0] == 0) buffer[0] = '?';
 			serialPrint("[keyboard] [");
 			serialPrint(buffer);
-			if (keyboardPressedState[keycode] == 0) keyboardPressedStates++;
-			serialPrintf(" down] %d keys are down, %d keycode\r\n", keyboardPressedStates, keycode);
+			serialPrintf(" down] %d keycode\r\n", keycode);
 			keyboardPressedState[keycode] = 1;
+			handleKeyDown(keycode);
 		} else {
 			keycode = keycode - 128;
 			uint8_t buffer[] = {keyboardMap[keycode], 0};
 			if (buffer[0] == 0) buffer[0] = '?';
 			serialPrint("[keyboard] [");
 			serialPrint(buffer);
-			if (keyboardPressedState[keycode] != 0) keyboardPressedStates--;
-			serialPrintf(" up] %d keys are down, %d keycode\r\n", keyboardPressedStates, keycode + 128);
+			serialPrintf(" up] %d keycode\r\n", keycode + 128);
 			keyboardPressedState[keycode] = 0;
 		}
 
@@ -156,12 +149,9 @@ void handleKeyboard() {
 		//    uint8_t buffer[] = {'M', 0};
 		//    serialPrint(buffer);
 		//}
-	} else {
-		serialPrint("handleKeyboard status not 0x1!\r\n");
-		uint8_t buffer[] = {'w', 0};
-		serialPrint(buffer);
 	}
 
 	// EOI
-	writePort(PIC1_COMMAND, PIC_EOI);
+	// Disabled cause polling is used
+	//writePort(PIC1_COMMAND, PIC_EOI);
 }
