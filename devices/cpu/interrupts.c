@@ -427,6 +427,11 @@ void enableInterrupts() {
 	#define PS2_CONTROL_PORT 0x64
 
 	uint8_t _status;
+}
+
+void enablePS2Mouse() {
+	serialPrintln("[cpu] begin: setting PS/2 mouse");
+	uint8_t _status;
 	//Enable the auxiliary mouse device
 	mouseWait(1);
 	writePort(PS2_CONTROL_PORT, 0xA8);
@@ -445,7 +450,7 @@ void enableInterrupts() {
 	mouseWait(1);
 	writePort(PS2_CONTROL_PORT, 0x20);
 	mouseWait(0);
-	_status=(readPort(PS2_DATA_PORT) | 2); // Turn on IRQ12
+	_status = (readPort(PS2_DATA_PORT) | 2); // Turn on IRQ12
 	//_status &= ~0x20; // Enable mouse clock line
 	mouseWait(1);
 	writePort(PS2_CONTROL_PORT, 0x60);
@@ -453,10 +458,10 @@ void enableInterrupts() {
 	writePort(PS2_DATA_PORT, _status);
 	//Tell the mouse to use default settings
 	mouseWrite(0xF6);
-	mouseRead();  //Acknowledge
+	mouseRead(); // Acknowledge
 	//Enable the mouse
 	mouseWrite(0xF4);
-	mouseRead();  //Acknowledge
+	mouseRead(); // Acknowledge
 	//Setup the mouse handler
 //    irq_install_handler(12, mouseHandler);
 	serialPrintln("[cpu] done: setting PS/2 mouse");
