@@ -67,6 +67,7 @@ void kernelMain(KernelParams *params) {
 	#endif
 
 	enableInterrupts();
+	enablePS2Mouse();
 
 	initializeCompositor();
 
