@@ -13,6 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifdef __cplusplus
+extern "C" {
+#else
+	#define nullptr ((void*)0)
+#endif
 #include <efi.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -49,7 +54,7 @@ uint8_t haveToRender = 1;
 #include "formats/stb_image/stb_image.h"
 #include "formats/stb_image/unlibc.c"
 
-void (*keyDownHandler)(int) = (void*)0;
+void (*keyDownHandler)(uint8_t) = nullptr;
 void handleKeyDown(uint8_t key) {
 	if (keyDownHandler) keyDownHandler(key);
 }
@@ -63,6 +68,12 @@ void kernelMain(KernelParams *params) {
 
 	if (sizeof(uint8_t*) == 4) serialPrintln("<Tofita> void*: 4 bytes");
 	if (sizeof(uint8_t*) == 8) serialPrintln("<Tofita> void*: 8 bytes");
+
+	#ifdef __cplusplus
+		serialPrintln("<Tofita> __cplusplus");
+	#else
+		serialPrintln("<Tofita> !__cplusplus");
+	#endif
 
 	#if defined(__clang__)
 		serialPrintln("<Tofita> __clang__");
@@ -109,3 +120,6 @@ void kernelMain(KernelParams *params) {
 		copyToScreen();
 	}
 }
+#ifdef __cplusplus
+}
+#endif

@@ -25,7 +25,7 @@ typedef struct {
 	uint32_t offsetFromRamDiskFirstByte;
 } RamDiskAssetInfo;
 
-static RamDisk *_ramdisk;
+static const RamDisk *_ramdisk;
 void setRamDisk(const RamDisk *ramdisk) {
 	_ramdisk = ramdisk;
 }
@@ -35,16 +35,20 @@ typedef struct {
 	uint8_t *data;
 } RamDiskAsset;
 
-RamDiskAsset getRamDiskAsset(uint8_t *path) {
+RamDiskAsset getRamDiskAsset(const char *path) {
 	RamDiskAsset asset;
 	asset.size = 0;
 	asset.data = 0;
 
-	RamDiskInfo* ramDiskInfo = _ramdisk->base;
+	const RamDiskInfo* ramDiskInfo = (RamDiskInfo*)_ramdisk->base;
 
 	for (uint32_t id = 0; id < ramDiskInfo->assetsCount; id++) {
 		// Pointer arithmetic like a boss
-		RamDiskAssetInfo* ramDiskAssetInfo = _ramdisk->base + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id;
+		const uint64_t ramDiskAssetInfoPtr =
+			(uint64_t)_ramdisk->base
+			+ sizeof(RamDiskInfo)
+			+ sizeof(RamDiskAssetInfo) * id;
+		const RamDiskAssetInfo* ramDiskAssetInfo = (RamDiskAssetInfo*)ramDiskAssetInfoPtr;
 		uint8_t found = 1;
 
 		for (uint8_t at = 0; at < 255; at++) {
@@ -57,7 +61,7 @@ RamDiskAsset getRamDiskAsset(uint8_t *path) {
 
 		if (found) {
 			asset.size = ramDiskAssetInfo->size;
-			asset.data = _ramdisk->base + ramDiskAssetInfo->offsetFromRamDiskFirstByte;
+			asset.data = (uint8_t *)((uint64_t)_ramdisk->base + ramDiskAssetInfo->offsetFromRamDiskFirstByte);
 			return asset;
 		}
 	}

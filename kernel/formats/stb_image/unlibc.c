@@ -26,7 +26,7 @@ Bitmap32* loadPng32(const RamDiskAsset* asset) {
 	uint8_t* colors = stbi_load_from_memory(asset->data, asset->size, &width, &height, &png_bpp, 4);
 	Bitmap32* bitmap = allocateBitmapFromBuffer(width, height);
 
-	uint32_t* rgba = colors;
+	uint32_t* rgba = (uint32_t*)colors;
 	for (uint16_t y = 0; y < height; y++)
 		for (uint16_t x = 0; x < width; x++) {
 			bitmap->pixels[y * width + x].color = rgba[y * width + x];
