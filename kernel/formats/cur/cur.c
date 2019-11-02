@@ -62,7 +62,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 
 	serialPrintf("[cur] The best image is %dx%d\r\n", buffer[best], buffer[best + 1]);
 
-	struct Cursor *cur = allocateFromBuffer(sizeof(struct Cursor));
+	struct Cursor *cur = (struct Cursor *)allocateFromBuffer(sizeof(struct Cursor));
 	// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
 	cur->width = buffer[best];
 	// Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
@@ -84,7 +84,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 	serialPrintf("[cur] Header at %d %d %d %d\r\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15]);
 
 	uint32_t fsize = cur->width * cur->height * 4;
-	uint8_t* bmp = allocateFromBuffer(fsize);
+	uint8_t* bmp = (uint8_t*)allocateFromBuffer(fsize);
 	for (int i = 0; i < fsize; i++) {
 		bmp[i] = buffer[offset + i + 20 + 16 + 4];
 	}
@@ -98,7 +98,7 @@ void drawCursor(const struct Cursor *cur, uint16_t x, uint16_t y) {
 	for (uint8_t yi = 0; yi < cur->height; yi++)
 		for (uint8_t xi = 0; xi < cur->width; xi++) {
 			uint32_t yy = cur->height - yi - 1;
-			uint32_t* bmp = cur->bmp;
+			uint32_t* bmp = (uint32_t*)cur->bmp;
 			pixel.color = bmp[xi + yy*cur->width];
 			blendPixel(x+xi-cur->x+1, y+yi-cur->y+1, pixel);
 		}

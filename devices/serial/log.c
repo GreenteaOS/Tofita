@@ -63,7 +63,7 @@ serialPrint("\r\n"); \
 #define   B_UART_MSR_DCD      (1 << 8)
 
 void *tmemset(void *dest, int e, size_t len) {
-	uint8_t *d = dest;
+	uint8_t *d = (uint8_t *)dest;
 	for(uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
 	}
@@ -72,7 +72,7 @@ void *tmemset(void *dest, int e, size_t len) {
 // Solve conflict with gnu-efi
 #ifdef TOFITA
 void *memset(void *dest, int e, size_t len) {
-	uint8_t *d = dest;
+	uint8_t *d = (uint8_t *)dest;
 	for(uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
 	}
@@ -173,11 +173,11 @@ uint64_t serialPortWrite(uint8_t *buffer, uint64_t size) {
 	return size;
 }
 
-void serialPrint(const uint8_t *print) {
-	serialPortWrite((uint8_t *)print, kstrlen(print));
+void serialPrint(const char *print) {
+	serialPortWrite((uint8_t *)print, kstrlen((uint8_t *)print));
 }
 
-void serialPrintln(const uint8_t *print) {
+void serialPrintln(const char *print) {
 	serialPrint(print);
 	serialPrint("\r\n");
 }
@@ -237,8 +237,8 @@ void serialPrintBits(uint64_t value)
 	}
 }
 
-int __cdecl putchar(int c) {
-	uint8_t buffer[] = {c, 0};
+int __cdecl putchar(char c) {
+	char buffer[] = {c, 0};
 	serialPrint(buffer);
 	return c;
 }
@@ -282,7 +282,7 @@ uint8_t* comItoA(int i, uint8_t b[]){
 	return b;
 }
 
-void serialPrintf(const uint8_t *c, ...) {
+void serialPrintf(const char *c, ...) {
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);

@@ -128,7 +128,7 @@ void handleKeyboard() {
 		}
 
 		if (keycode < 128) {
-			uint8_t buffer[] = {keyboardMap[keycode], 0};
+			char buffer[] = {(char)keyboardMap[keycode], 0};
 			if (buffer[0] == 0) buffer[0] = '?';
 			serialPrint("[keyboard] [");
 			serialPrint(buffer);
@@ -137,7 +137,7 @@ void handleKeyboard() {
 			handleKeyDown(keycode);
 		} else {
 			keycode = keycode - 128;
-			uint8_t buffer[] = {keyboardMap[keycode], 0};
+			char buffer[] = {(char)keyboardMap[keycode], 0};
 			if (buffer[0] == 0) buffer[0] = '?';
 			serialPrint("[keyboard] [");
 			serialPrint(buffer);

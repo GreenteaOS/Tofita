@@ -289,6 +289,10 @@ struct GdtDescriptor g_gdt_table[10];
 struct TablePtr g_gdtr;
 struct TssEntry g_tss;
 
+#define PS2_DATA_PORT 0x60
+#define PS2_CONTROL_PORT 0x64
+
+#if 0
 void gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType type)
 {
 	g_gdt_table[i].limitLow = limit & 0xffff;
@@ -341,7 +345,6 @@ tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 }
 
 void gdt_write(uint16_t cs, uint16_t ds, uint16_t tr);
-
 void enableInterrupts() {
 	serialPrintln("[cpu] initializing lgdt");
 
@@ -423,11 +426,10 @@ void enableInterrupts() {
 
 	serialPrintln("[cpu] begin: setting PS/2 mouse");
 
-	#define PS2_DATA_PORT 0x60
-	#define PS2_CONTROL_PORT 0x64
 
 	uint8_t _status;
 }
+#endif
 
 void enablePS2Mouse() {
 	serialPrintln("[cpu] begin: setting PS/2 mouse");

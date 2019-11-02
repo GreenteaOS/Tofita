@@ -189,7 +189,7 @@ uint8_t* boxesForGauss(double sigma, uint8_t n) {
 	int8_t m = round(mIdeal);
 	#undef round
 
-	uint8_t* sizes = allocateFromBuffer(n);
+	uint8_t* sizes = (uint8_t*)allocateFromBuffer(n);
 	for (uint8_t i = 0; i < n; i++) {
 		sizes[i] = i < m ? wl : wu;
 	}
@@ -197,7 +197,7 @@ uint8_t* boxesForGauss(double sigma, uint8_t n) {
 }
 
 Bitmap32 *gaussBlur(Bitmap32* bitmap, double radius) {
-	Bitmap32* target = allocateBitmapFromBuffer(bitmap->width, bitmap->height);
+	Bitmap32* target = (Bitmap32*)allocateBitmapFromBuffer(bitmap->width, bitmap->height);
 
 	uint8_t* boxes = boxesForGauss(radius, 3);
 	boxBlur(bitmap, target, bitmap->width, bitmap->height, (boxes[0] - 1) / 2);
@@ -213,7 +213,8 @@ PixelRGBAData __attribute__((fastcall)) interpolatePixel(const Bitmap32* bitmap,
 	const uint16_t px = (uint16_t)x; // Same as floor(x)
 	const uint16_t py = (uint16_t)y; // Same as floor(y)
 	const uint16_t stride = bitmap->width;
-	const PixelRGBAData* p0 = bitmap->pixels + px + py * stride; // Pointer to first pixel
+	const PixelRGBAData* data = (const PixelRGBAData*)bitmap->pixels;
+	const PixelRGBAData* p0 = &data[px + py * stride]; // pointer to first pixel
 
 	// Calculate the weights
 	const float fx = x - px;
