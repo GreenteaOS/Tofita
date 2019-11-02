@@ -110,7 +110,7 @@ for (task in tasks) {
 				require('child_process').execSync(
 					[
 						'..\\Teapot\\LLVM-9.0.0\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
-						'-O2 -xc -std=gnu11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
+						'-O2 -x c++ -std=gnu++11 -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-fno-rtti -fno-exceptions ',
 						'-Wimplicit-function-declaration -Werror ',
 						'-DTOFITA -mtune=nocona ',
