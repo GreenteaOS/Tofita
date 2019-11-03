@@ -30,8 +30,10 @@ extern "C" {
 // This is not a best solution
 uint8_t haveToRender = 1;
 
+#include "../devices/cpu/amd64.cpp"
 #include "../devices/serial/log.c"
 #include "allocator.c"
+#include "../devices/cpu/cpuid.cpp"
 #include "../devices/cpu/interrupts.c"
 #include "../devices/cpu/rdtsc.c"
 #include "../devices/screen/framebuffer.c"
@@ -84,6 +86,10 @@ void kernelMain(KernelParams *params) {
 	#endif
 
 	enablePS2Mouse();
+
+	CPUID cpuid = getCPUID();
+	serialPrintln(cpuid.vendorID);
+	serialPrintln(cpuid.brandName);
 
 	initializeCompositor();
 
