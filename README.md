@@ -33,7 +33,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
    - AMD APU A10
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
  - Monolithic performance-oriented kernel
- - ACPI
+ - ACPI 2.0, CPUID
 
 [![Give a star](docs/star.png?raw=true)
 Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
