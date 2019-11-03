@@ -112,6 +112,9 @@ void kernelMain(KernelParams *params) {
 	color.color = 0x55AA9944;
 	drawRectangleWithAlpha(color, 300, 100, 300, 100);
 
+	mouseX = _framebuffer->width / 2;
+	mouseY = _framebuffer->height / 2;
+
 	while (true) {
 		// Poll PS/2 devices
 		haveToRender = haveToRender || (pollPS2Devices() == PollingPS2SomethingHappened);
@@ -123,8 +126,6 @@ void kernelMain(KernelParams *params) {
 		haveToRender = 0;
 
 		composite();
-
-		drawVibrancedRectangle(mouseX - 150, mouseY - 150, 300, 300);
 
 		drawCursor(cur, mouseX, mouseY);
 
