@@ -25,7 +25,7 @@ void fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
 		&efiMemoryMap->descriptorVersion);
 
 	if (status != EFI_SUCCESS) {
-		serialPrint("[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\r\n");
+		serialPrint("[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n");
 	}
 }
 
@@ -54,12 +54,12 @@ EFI_STATUS uefiAllocate(EFI_BOOT_SERVICES *bootsvc, EFI_MEMORY_TYPE allocationTy
 
 	status = bootsvc->AllocatePages(AllocateAddress, allocationType, pages, &addr);
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
-		serialPrintf("[[[efi_main.uefiAllocate]]] failed (non-fatal): AllocateAddress status %d, using AllocateAnyPages\r\n", status);
+		serialPrintf("[[[efi_main.uefiAllocate]]] failed (non-fatal): AllocateAddress status %d, using AllocateAnyPages %d bytes, rounded to %d pages\n", status, *bytes, pages);
 		status = bootsvc->AllocatePages(AllocateAnyPages, allocationType, pages, &addr);
 	}
 
 	if (status != EFI_SUCCESS)
-		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, rounded to %d pages, of type %d, status %d\r\n", bytes, pages, allocationType, status);
+		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, status %d\n", *bytes, pages, allocationType, status);
 
 	*bytes = pages * PAGE_SIZE;
 	*destination = (void *)addr;

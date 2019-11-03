@@ -132,7 +132,7 @@ void handleKeyboard() {
 			if (buffer[0] == 0) buffer[0] = '?';
 			serialPrint("[keyboard] [");
 			serialPrint(buffer);
-			serialPrintf(" down] %d keycode\r\n", keycode);
+			serialPrintf(" down] %d keycode\n", keycode);
 			keyboardPressedState[keycode] = 1;
 			handleKeyDown(keycode);
 		} else {
@@ -141,7 +141,7 @@ void handleKeyboard() {
 			if (buffer[0] == 0) buffer[0] = '?';
 			serialPrint("[keyboard] [");
 			serialPrint(buffer);
-			serialPrintf(" up] %d keycode\r\n", keycode + 128);
+			serialPrintf(" up] %d keycode\n", keycode + 128);
 			keyboardPressedState[keycode] = 0;
 		}
 

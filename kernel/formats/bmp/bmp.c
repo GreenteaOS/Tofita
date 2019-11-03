@@ -27,7 +27,7 @@ Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 
 	Bitmap32* result = allocateBitmapFromBuffer(width, height);
 
-	serialPrintf("[bmp] The bitmap image is %dx%d at %d\r\n", width, height, result);
+	serialPrintf("[bmp] The bitmap image is %dx%d at %d\n", width, height, result);
 
 	uint8_t* colors = (uint8_t*)(buffer + 54);
 	for (uint16_t y = 0; y < height; y++)
@@ -38,7 +38,7 @@ Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 			result->pixels[y * width + x].rgba.b = colors[((height - y - 1) * width + x) * 3 + 2];
 		}
 
-	serialPrintf("[bmp] Pixels filled\r\n");
+	serialPrintf("[bmp] Pixels filled\n");
 
 	return result;
 }

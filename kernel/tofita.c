@@ -94,7 +94,7 @@ void kernelMain(KernelParams *params) {
 	}
 
 	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
-	serialPrintf("Asset 'cursors\\normal.cur' %d bytes at %d\r\n", asset.size, asset.data);
+	serialPrintf("Asset 'cursors\\normal.cur' %d bytes at %d\n", asset.size, asset.data);
 	struct Cursor *cur = loadCursor(&asset);
 
 	Pixel32 color;

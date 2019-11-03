@@ -29,7 +29,7 @@ void startTofitaKernel(const KernelParams *params) {
 	InitKernel start = (InitKernel) KernelVirtualBase;
 	serialPrint("[[boot]] kernel start address = ");
 	serialPrintHex((uint64_t) (start));
-	serialPrint("\r\n");
+	serialPrint("\n");
 	start(params);
 }
 

@@ -151,23 +151,23 @@ static void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t page
 	uint64_t vAddress = virtualAddr;
 	uint64_t pAddress = physicalAddr;
 
-	serialPrintf("[paging.range] bytes = %d or %d\r\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
+	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
 	serialPrint("[paging.range] virtual address = ");
 	serialPrintHex((uint64_t) (virtualAddr));
-	serialPrint("\r\n");
+	serialPrint("\n");
 
 	serialPrint("[paging.range] physical address = ");
 	serialPrintHex((uint64_t) (physicalAddr));
-	serialPrint("\r\n");
+	serialPrint("\n");
 
 	serialPrint("[paging.range] page count = ");
 	serialPrintHex((uint64_t) (pageCount));
-	serialPrint("\r\n");
+	serialPrint("\n");
 
 	serialPrint("[paging.range] virtual address end = ");
 	serialPrintHex((uint64_t) (virtualAddrEnd));
-	serialPrint("\r\n");
+	serialPrint("\n");
 
 	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4, vAddress, pAddress);
@@ -231,7 +231,7 @@ void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, 
 
 	serialPrint("[paging] CR3 points to: ");
 	serialPrintHex((uint64_t) pml4);
-	serialPrint("\r\n");
+	serialPrint("\n");
 
 	writeCr3((uint64_t) pml4);
 }
