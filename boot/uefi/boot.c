@@ -64,8 +64,8 @@ void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 // Entry point
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
-	serialPrint("\r\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(versionMinor) " " versionName " UEFI bootloader. Welcome!\r\n");
 
+	serialPrint("\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(versionMinor) " " versionName " UEFI bootloader. Welcome!\n");
 	// Disable watchdog timer
 	systemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
 
@@ -73,7 +73,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 		uint32_t revision = systemTable->FirmwareRevision;
 		uint16_t minor = (uint16_t)revision;
 		uint16_t major = (uint16_t)(revision >> 16);
-		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\r\n", major, minor);
+		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\n", major, minor);
 	}
 
 	EFI_BOOT_SERVICES *bootsvc = systemTable->BootServices;
@@ -123,10 +123,10 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 			&size,
 			&address);
 	if (status != EFI_SUCCESS) {
-		serialPrintf("[[[efi_main]]] <ERROR> failed uefiAllocate with status %d\r\n", status);
+		serialPrintf("[[[efi_main]]] <ERROR> failed uefiAllocate with status %d\n", status);
 	}
 	initParameters.buffer = address;
-	serialPrintf("[[[efi_main]]] done: uefiAllocate the buffer, size %d\r\n", size);
+	serialPrintf("[[[efi_main]]] done: uefiAllocate the buffer, size %d\n", size);
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap");
 	fillMemoryMap(&initParameters.efiMemoryMap, systemTable);
@@ -157,7 +157,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 
 	setRamDisk(&initParameters.ramdisk);
 	RamDiskAsset asset = getRamDiskAsset("loader_kernel.img");
-	serialPrintf("[[[efi_main]]] loaded asset 'loader_kernel.img' %d bytes at %d\r\n", asset.size, asset.data);
+	serialPrintf("[[[efi_main]]] loaded asset 'loader_kernel.img' %d bytes at %d\n", asset.size, asset.data);
 
 	void *kernelBase = (void *) KernelStart;
 	drawLoading(&initParameters.framebuffer, 2);

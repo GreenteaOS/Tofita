@@ -18,7 +18,7 @@
 #define SERIAL_DUMP_HEX(expr) \
 serialPrint(#expr " = "); \
 serialPrintHex((uint64_t) (expr)); \
-serialPrint("\r\n");
+serialPrint("\n");
 
 #define SERIAL_DUMP_HEX0(expr) \
 serialPrint(#expr " = "); \
@@ -27,7 +27,7 @@ serialPrintHex((uint64_t) (expr));
 #define SERIAL_DUMP_BITS(expr) \
 serialPrint(#expr " -> "); \
 serialPrintBits((uint64_t) (expr)); \
-serialPrint("\r\n"); \
+serialPrint("\n"); \
 
 #define SERIAL_REGISTER_BASE 0x03F8
 #define SERIAL_BAUD_RATE 115200
@@ -179,7 +179,7 @@ void serialPrint(const char *print) {
 
 void serialPrintln(const char *print) {
 	serialPrint(print);
-	serialPrint("\r\n");
+	serialPrint("\n");
 }
 
 void serialPrintInt(uint64_t n) {
@@ -214,7 +214,7 @@ void serialPrintMem(const void *mem, int n)
 {
 	serialPrint("@");
 	serialPrintHex((uint64_t) mem);
-	serialPrint("\r\n");
+	serialPrint("\n");
 	const uint8_t *memc = (const uint8_t *) mem;
 	for(int i = 0; i < n; ++i) {
 		if(i) serialPrint(":");

@@ -51,7 +51,7 @@ void handleMouse() {
 		if (getBit(mouseByte[0], 1) != 0) serialPrintln("[mouse] right button is down");
 		if (getBit(mouseByte[0], 2) != 0) serialPrintln("[mouse] middle button is down");
 
-		serialPrintf("[mouseByte[0]] 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d 7:%d 8:%d bits are set\r\n",
+		serialPrintf("[mouseByte[0]] 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d 7:%d 8:%d bits are set\n",
 			getBit(mouseByte[0], 0),
 			getBit(mouseByte[0], 1),
 			getBit(mouseByte[0], 2),

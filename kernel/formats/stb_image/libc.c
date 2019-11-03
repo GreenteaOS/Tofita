@@ -25,11 +25,11 @@
 
 void libc_free(void* addr) {
 	// Do nothing for now
-	serialPrintf("[libc] libc_free\r\n");
+	serialPrintf("[libc] libc_free\n");
 }
 
 void* libc_malloc(size_t size) {
-	serialPrintf("[libc] libc_malloc\r\n");
+	serialPrintf("[libc] libc_malloc\n");
 
 	void* result = allocateFromBuffer(size + 4);
 
@@ -37,12 +37,12 @@ void* libc_malloc(size_t size) {
 	uint32_t* sizes = (uint32_t*)result;
 	sizes[0] = size;
 
-	serialPrintf("[libc] libc_malloc done\r\n");
+	serialPrintf("[libc] libc_malloc done\n");
 	return (void*)((uint64_t)result + 4);
 }
 
 void* libc_realloc(void* addr, size_t size) {
-	serialPrintf("[libc] libc_realloc\r\n");
+	serialPrintf("[libc] libc_realloc\n");
 
 	// Get old size information
 	uint32_t* sizes = (uint32_t*)addr;
@@ -60,12 +60,12 @@ void* libc_realloc(void* addr, size_t size) {
 	sizes = (uint32_t*)result;
 	sizes[0] = size;
 
-	serialPrintf("[libc] libc_realloc done\r\n");
+	serialPrintf("[libc] libc_realloc done\n");
 	return result;
 }
 
 void *libc_memset(void *b, int c, int len) {
-	serialPrintf("[libc] libc_memset\r\n");
+	serialPrintf("[libc] libc_memset\n");
 	int i;
 	unsigned char *p = (unsigned char *)b;
 	i = 0;
@@ -74,7 +74,7 @@ void *libc_memset(void *b, int c, int len) {
 		p++;
 		len--;
 	}
-	serialPrintf("[libc] libc_memset done\r\n");
+	serialPrintf("[libc] libc_memset done\n");
 	return(b);
 }
 
@@ -95,9 +95,9 @@ int libc_pow(int a, int n) {
 }
 
 void libc_memcpy(void *dest, void *src, size_t n) {
-	serialPrintf("[libc] libc_memcpy\r\n");
+	serialPrintf("[libc] libc_memcpy\n");
 	const char *csrc = (char *)src;
 	char *cdest = (char *)dest;
 	for (int i = 0; i < n; i++) cdest[i] = csrc[i];
-	serialPrintf("[libc] libc_memcpy done\r\n");
+	serialPrintf("[libc] libc_memcpy done\n");
 }
