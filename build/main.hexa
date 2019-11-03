@@ -116,6 +116,9 @@ for (task in tasks) {
 						'-DTOFITA -mtune=nocona ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
+						'-D versionMajor=' + config.versionMajor + ' ',
+						'-D versionMinor=' + config.versionMinor + ' ',
+						'-D versionName=\\"' + config.versionName + '\\" ',
 						'-c -o ',
 						config.tempFolder + '/tofita/tofita.o kernel/tofita.c'
 					].join(''), { stdio: 'inherit' }

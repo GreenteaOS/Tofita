@@ -62,7 +62,7 @@ void handleKeyDown(uint8_t key) {
 }
 
 void kernelMain(KernelParams *params) {
-	serialPrintln("<Tofita> kernel loaded and operational");
+	serialPrintln("<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
 
 	initAllocatorForBuffer(params->bufferSize, params->buffer);
 	setFramebuffer(&params->framebuffer);

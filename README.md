@@ -19,9 +19,9 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
 
 ## Features
 
- - UEFI boot
- - 64-bit x86
- - Colorful graphics with transparency
+ - UEFI 64-bit boot
+ - 64-bit x86 oriented
+ - Colorful graphics with transparency and double buffering
  - PS/2 mouse
  - PS/2 keyboard
  - COM-port debug output
@@ -30,6 +30,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
    - QEMU 3.0.0+ `(use OVMF to emulate UEFI)`
    - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
    - Intel Sandy Bridge `(socket 1155)`
+   - AMD APU A10
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
  - Monolithic performance-oriented kernel
  - ACPI
