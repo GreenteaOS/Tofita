@@ -44,8 +44,10 @@ void startTofitaKernelLoader(const KernelParams *params) {
 	enablePaging(kernelImage, &newParams.efiMemoryMap, &newParams.framebuffer, &newParams.ramdisk, &newParams);
 	serialPrintln("[[boot]] done: paging enabled");
 
+	// Replace to virtual adresses
 	newParams.framebuffer.base = (void *) FramebufferStart;
 	newParams.ramdisk.base = (void *) RamdiskStart;
+	newParams.acpiTable = (void *) ACPIStart;
 
 	serialPrintln("[[boot]] entering Tofita");
 	startTofitaKernel(&newParams);

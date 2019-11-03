@@ -94,7 +94,7 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 
 PageEntry pml4[PAGE_TABLE_SIZE] PAGE_ALIGNED;
 
-static void writeCr3(uint64_t value) {
+static inline void writeCr3(uint64_t value) {
 	__asm__("movq %0, %%cr3" :: "r"(value));
 }
 
@@ -206,6 +206,10 @@ static void mapRamDisk(RamDisk *ramdisk) {
 	mapMemory(RamdiskStart, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
 }
 
+static void mapACPI(void *acpiTable) {
+	mapMemory(ACPIStart, (uint64_t) acpiTable, 1);
+}
+
 void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
 	mapMemory(KernelStart, KernelStart, 256);
 	serialPrintln("[paging] kernel loader mapped");
@@ -222,6 +226,9 @@ void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, 
 	mapRamDisk(ramdisk);
 	serialPrintln("[paging] ramdisk mapped");
 
+	mapACPI(params->acpiTable);
+	serialPrintln("[paging] ACPI mapped");
+
 	// Round upto page size
 	uint64_t BUFFER_START = RamdiskStart / PAGE_SIZE + params->ramdisk.size / PAGE_SIZE + 1;
 	BUFFER_START *= PAGE_SIZE;
@@ -234,4 +241,5 @@ void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, 
 	serialPrint("\n");
 
 	writeCr3((uint64_t) pml4);
+	serialPrint("[paging] CR3 written");
 }

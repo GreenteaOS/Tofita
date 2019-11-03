@@ -41,7 +41,8 @@ typedef struct {
 #define KernelVirtualBase 0xffff800000000000
 #define EfiVirtualBase (KernelVirtualBase + 0x40000000)
 #define FramebufferStart (EfiVirtualBase + 0x40000000)
-#define RamdiskStart (EfiVirtualBase + 0x45000000)
+#define RamdiskStart (FramebufferStart + 0x45000000)
+#define ACPIStart (RamdiskStart + 0x45000000)
 #define MemoryMapBufferSize 512 * 1024 // 512 KiB
 #define PAGE_SIZE 4096  // 4 KiB
 
@@ -55,6 +56,7 @@ typedef struct {
 	RamDisk ramdisk;
 	uint64_t bufferSize;
 	void* buffer;
+	void* acpiTable; // TODO = nullptr in C++
 } KernelParams;
 
 typedef void (*InitKernel)(const KernelParams *);

@@ -77,6 +77,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 
 	EFI_BOOT_SERVICES *bootsvc = systemTable->BootServices;
+	KernelParams initParameters;
 
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI");
@@ -92,13 +93,16 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 				break;
 			} else if (0 == CompareGuid(&efiTable->VendorGuid, &acpi)) {
 				acpiTable = (void *)((intptr_t)efiTable->VendorTable | 0x1); // LSB high
+				// ACPI 2.0 is required by Windows 7
+				// So we don't need to support ACPI 1.0
+				acpiTable = NULL;
 				serialPrintln("[[[efi_main]]] found: ACPI 1.0");
 			}
 		}
+		initParameters.acpiTable = acpiTable;
 		serialPrintln("[[[efi_main]]] done: ACPI");
 	}
 
-	KernelParams initParameters;
 	initParameters.efiRuntimeServices = systemTable->RuntimeServices;
 	EFI_STATUS status = EFI_NOT_READY;
 
