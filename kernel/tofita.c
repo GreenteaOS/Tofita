@@ -41,6 +41,7 @@ uint8_t haveToRender = 1;
 #include "../devices/ps2/mouse.c"
 #include "../devices/ps2/polling.c"
 #include "../devices/cpu/fallback.c"
+#include "../devices/acpi/acpi.cpp"
 #include "ramdisk.c"
 #include "formats/cur/cur.c"
 #include "formats/bmp/bmp.c"
@@ -90,6 +91,10 @@ void kernelMain(KernelParams *params) {
 	CPUID cpuid = getCPUID();
 	serialPrintln(cpuid.vendorID);
 	serialPrintln(cpuid.brandName);
+
+	if (!acpi::parse(params->acpiTable)) {
+	} else {
+	}
 
 	initializeCompositor();
 
