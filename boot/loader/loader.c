@@ -13,6 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifdef __cplusplus
+extern "C" {
+#else
+	#define nullptr ((void*)0)
+#endif
+
 #include <efi.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -52,3 +58,6 @@ void startTofitaKernelLoader(const KernelParams *params) {
 	serialPrintln("[[boot]] entering Tofita");
 	startTofitaKernel(&newParams);
 }
+#ifdef __cplusplus
+}
+#endif
