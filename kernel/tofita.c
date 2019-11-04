@@ -46,6 +46,8 @@ uint8_t haveToRender = 1;
 #include "formats/cur/cur.c"
 #include "formats/bmp/bmp.c"
 #include "gui/blur.c"
+#include "gui/quake.c"
+#include "gui/text.cpp"
 #include "gui/compositor.c"
 
 // STB library
@@ -88,16 +90,24 @@ void kernelMain(const KernelParams *params) {
 
 	enablePS2Mouse();
 
+	initText();
 	initializeCompositor();
+
+	quakePrintf("GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
 	serialPrintln(cpuid.vendorID);
+	quakePrintf(cpuid.vendorID);
 	serialPrintln(cpuid.brandName);
+	quakePrintf(cpuid.brandName);
 
 	if (!acpi::parse(params->acpiTable)) {
+		quakePrintf("ACPI is *not* loaded\n");
 	} else {
+		quakePrintf("ACPI 2.0 is loaded and ready\n");
 	}
 
+	quakePrintf("Enter 'help' for commands\n");
 
 	{
 		RamDiskAsset a = getRamDiskAsset("hello.bmp");
