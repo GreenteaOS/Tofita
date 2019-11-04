@@ -16,6 +16,7 @@
 // Passively check for PS/2 updates
 
 extern uint8_t haveToRender;
+extern uint8_t haveToQuake;
 void handleKeyDown(uint8_t key);
 extern void (*keyDownHandler)(uint8_t);
 void quakeHandleButtonDown(uint8_t key);
@@ -34,7 +35,9 @@ uint8_t pollPS2Devices() {
 			if (keyboardPressedState[80]) mouseY += 4;
 			if (keyboardPressedState[77]) mouseX += 4;
 			if (keyboardPressedState[75]) mouseX -= 4;
+			if (keyboardPressedState[41]) haveToQuake = !haveToQuake;
 			keyDownHandler = nullptr;
+			if (haveToQuake) keyDownHandler = quakeHandleButtonDown;
 			haveToRender = 1;
 		} else if (getBit(poll, 5) == 1) {
 			handleMouse();

@@ -132,6 +132,7 @@ void initializeCompositor() {
 void composite() {
 	drawBitmap32(wallpaper, 0, 0);
 	drawBitmap32WithAlpha(desktopIcon, 12, 10);
+	drawAsciiText("Recycle Bin", 60, 12);
 	drawVibrancedRectangle(0, _framebuffer->height - 30, _framebuffer->width, 30);
 	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
 	Pixel32 color;
@@ -140,6 +141,7 @@ void composite() {
 	auto trayButtonX = _framebuffer->width - 20;
 	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
+	quake();
 }
 
 void copyToScreen() {

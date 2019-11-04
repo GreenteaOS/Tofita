@@ -467,6 +467,8 @@ void enablePS2Mouse() {
 	//Setup the mouse handler
 //    irq_install_handler(12, mouseHandler);
 	serialPrintln("[cpu] done: setting PS/2 mouse");
+	void quakePrintf(const char *c, ...);
+	quakePrintf("Enabled PS/2 mouse and keyboard");
 }
 
 void mouseWait(uint8_t aType)
