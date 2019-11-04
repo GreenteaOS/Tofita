@@ -62,7 +62,7 @@ void handleKeyDown(uint8_t key) {
 	if (keyDownHandler) keyDownHandler(key);
 }
 
-void kernelMain(KernelParams *params) {
+void kernelMain(const KernelParams *params) {
 	serialPrintln("<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
 
 	initAllocatorForBuffer(params->bufferSize, params->buffer);
@@ -88,6 +88,8 @@ void kernelMain(KernelParams *params) {
 
 	enablePS2Mouse();
 
+	initializeCompositor();
+
 	CPUID cpuid = getCPUID();
 	serialPrintln(cpuid.vendorID);
 	serialPrintln(cpuid.brandName);
@@ -96,7 +98,6 @@ void kernelMain(KernelParams *params) {
 	} else {
 	}
 
-	initializeCompositor();
 
 	{
 		RamDiskAsset a = getRamDiskAsset("hello.bmp");

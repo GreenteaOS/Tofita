@@ -21,6 +21,8 @@
 
 Bitmap32* wallpaper; // Size of framebuffer
 Bitmap32* vibrance; // Size of framebuffer
+Bitmap32* leaves;
+Bitmap32* desktopIcon;
 
 typedef enum {
 	Center,
@@ -88,11 +90,9 @@ void setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 			);
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
-			if (x < 512) {
 				rgba.r = Blend255(rgba.r, 255, 168);
 				rgba.g = Blend255(rgba.g, 255, 168);
 				rgba.b = Blend255(rgba.b, 255, 168);
-			}
 			upscale->pixels[y * upscale->width + x].rgba = rgba;
 		}
 
@@ -117,11 +117,29 @@ void initializeCompositor() {
 	serialPrintln("[compositor.initializeCompositor] begin");
 	doublebuffer = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
 	_pixels = doublebuffer->pixels;
+
+	Bitmap32* loadPng32(const RamDiskAsset* asset);
+	RamDiskAsset a = getRamDiskAsset("leaves.png");
+	leaves = loadPng32(&a);
+
+	Bitmap32* loadPng32(const RamDiskAsset* asset);
+	RamDiskAsset b = getRamDiskAsset("trash-empty48.png");
+	desktopIcon = loadPng32(&b);
+
 	serialPrintln("[compositor.initializeCompositor] done");
 }
 
 void composite() {
 	drawBitmap32(wallpaper, 0, 0);
+	drawBitmap32WithAlpha(desktopIcon, 12, 10);
+	drawVibrancedRectangle(0, _framebuffer->height - 30, _framebuffer->width, 30);
+	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
+	Pixel32 color;
+	color.color = 0x00000000;
+	drawRectangle(color, _framebuffer->width - 4, _framebuffer->height - 30, 1, 30);
+	auto trayButtonX = _framebuffer->width - 20;
+	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
+	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
 }
 
 void copyToScreen() {

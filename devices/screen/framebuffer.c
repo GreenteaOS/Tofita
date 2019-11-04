@@ -50,8 +50,8 @@ Bitmap32* allocateBitmapFromBuffer(uint16_t width, uint16_t height) {
 	return result;
 }
 
-void setFramebuffer(Framebuffer *framebuffer) {
-	_framebuffer = framebuffer;
+void setFramebuffer(const Framebuffer *framebuffer) {
+	_framebuffer = const_cast<Framebuffer *>(framebuffer);
 	_pixels = (Pixel32 *)_framebuffer->base;
 }
 
@@ -116,5 +116,18 @@ void drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t width,
 			if (yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1) setPixel(x + xx, y + yy, color);
 		}
 	}
+}
+
+void line45smooth(Pixel32 color, int x, int y, int width, int mod) {
+	color.rgba.a = 98;
+	int xx = 0;
+	for (int xi = 0; xi < width - 1; xi++) {
+		xx += mod;
+		setPixel(xx + x, y + xi, color);
+		blendPixel(xx + x, y + xi + 1, color);
+		blendPixel(xx + x + mod, y + xi, color);
+	}
+	xx += mod;
+	setPixel(xx + x, y + width - 1, color);
 }
 
