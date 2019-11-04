@@ -38,7 +38,7 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 	size_t size = ((EFI_FILE_INFO *)info)->FileSize;
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] FileSize %d\n", size);
 
-	void *address = 242352128; // arbitary physical address to fit in RAM
+	void *address = (void*)242352128; // arbitary physical address to fit in RAM
 	status = uefiAllocate(
 			bootsvc,
 			EfiBootServicesCode,
