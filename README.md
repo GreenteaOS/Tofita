@@ -22,6 +22,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - UEFI 64-bit boot
  - 64-bit x86 oriented
  - Colorful graphics with transparency and double buffering
+ - Desktop GUI
  - PS/2 mouse
  - PS/2 keyboard
  - COM-port debug output
