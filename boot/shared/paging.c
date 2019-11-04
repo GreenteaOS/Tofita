@@ -136,7 +136,7 @@ static void map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) 
 	static void map_ ## fromTable (PageEntry fromTable[],                            \
 			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
 		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
-		map_ ## toTable (toTable, virtualAddr, physicalAddr);                        \
+		map_ ## toTable ((PageEntry *)toTable, virtualAddr, physicalAddr);           \
 	}
 
 CREATE_MAPPING(pd, pt)
@@ -233,7 +233,7 @@ void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, 
 	uint64_t BUFFER_START = RamdiskStart / PAGE_SIZE + params->ramdisk.size / PAGE_SIZE + 1;
 	BUFFER_START *= PAGE_SIZE;
 	mapMemory(BUFFER_START, (uint64_t) params->buffer, params->bufferSize / PAGE_SIZE + 1);
-	params->buffer = BUFFER_START;
+	params->buffer = (void*)BUFFER_START;
 	serialPrintln("[paging] buffer mapped");
 
 	serialPrint("[paging] CR3 points to: ");
