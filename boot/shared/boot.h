@@ -49,7 +49,7 @@ typedef struct {
 uint8_t memoryMapBuffer[MemoryMapBufferSize];
 
 typedef struct {
-	const EFI_HANDLE imageHandle;
+	EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
 	EFI_RUNTIME_SERVICES *efiRuntimeServices;
 	Framebuffer framebuffer;
