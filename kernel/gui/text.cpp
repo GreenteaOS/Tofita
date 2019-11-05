@@ -17,6 +17,7 @@
 // Non-monospace
 
 Bitmap32* textFontBitmap;
+extern Pixel32 *_pixels;
 
 typedef struct {
 	uint16_t x;
@@ -53,7 +54,11 @@ double drawChar(const char c, double x, uint16_t y) {
 				(textChar.y + yi) * textFontBitmap->width + (textChar.x + xi)
 			];
 
-			setPixel(xx + xi, y + yi, color);
+			Pixel32 p = _pixels[(y + yi) * _framebuffer->width + (xx + xi)];
+			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, color.rgba.r);
+			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, color.rgba.g);
+			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, color.rgba.b);
+			_pixels[(y + yi) * _framebuffer->width + (xx + xi)] = p;
 		}
 
 	return textChar.width;
