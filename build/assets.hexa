@@ -14,6 +14,27 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module {
+	function packFonts(config: Config) {
+		let fs = require('fs')
+		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
+			JSON.parse(fs.readFileSync('assets/fonts/default.json').toString().trim())
+
+		let charSize = 2 + 2 + 8
+		let size = 256 * charSize // Just ASCII for now
+		let buffer = Buffer.alloc(size) // zeroed
+
+		for (ascii in 256) {
+			for (char in chars) if (char.code == ascii) {
+				var offset = charSize * ascii
+				offset = buffer.writeUInt16LE(char.x, offset)
+				offset = buffer.writeUInt16LE(char.y, offset)
+				offset = buffer.writeDoubleLE(char.width, offset)
+			}
+		}
+
+		fs.writeFileSync(config.tempFolder + '\\tofita\\ascii.tofita', buffer, "binary")
+	}
+
 	function packAssets(config: Config) {
 
 		let fs = require('fs')
@@ -25,8 +46,12 @@ module {
 			assetPath[i] = 'assets\\' + assetName[i]
 		}
 
-		assetName.push('loader_kernel.img')
+		assetName.push('loader.tofita')
 		assetPath.push(config.tempFolder + '\\tofita\\loader_kernel.img')
+
+		packFonts(config)
+		assetName.push('ascii.tofita')
+		assetPath.push(config.tempFolder + '\\tofita\\ascii.tofita')
 
 		// Compute RAM disk size
 		var ramDiskSize = 0

@@ -27,7 +27,7 @@ void quake() {
 
 	void drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height);
 	drawVibrancedRectangle(0, 0, _framebuffer->width, quakeHeight);
-	uint16_t drawAsciiText(const char* text, uint16_t x, uint16_t y);
+	uint16_t drawAsciiText(const char* text, double x, uint16_t y);
 	drawAsciiText(quakeCommand, 2, quakeHeight - 11);
 }
 
@@ -45,7 +45,11 @@ void quakeHandleButtonDown(uint8_t key) {
     }
 
     // TODO 123 etc
-    if (keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z')
+    if (
+    	(keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z')
+    	||
+    	(keyboardMap[key] == ' ')
+    )
     if (quakeCommandSize < 255) {
     	quakeCommand[quakeCommandSize] = keyboardMap[key];
     	quakeCommandSize++;

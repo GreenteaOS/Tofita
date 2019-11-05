@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>fontGen</title>
+	<style>
+		* {
+			margin: 0 !important;
+			padding: 0 !important;
+			border: none !important;
+		}
+		canvas {
+			width: 512px;
+			height: 32px;
+		}
+	  </style>
+</head>
+
+<body>
+	<canvas id="canvas" width="512" height="32"></canvas>
+	<script type="text/javascript">
+	var canvas = document.getElementById('canvas')
+
+	var ctx = canvas.getContext('2d', { alpha: false })
+
+	ctx.fillStyle = '#FFFFFFFF'
+	ctx.font = "12px 'Segoe UI'"
+	ctx.textBaseline = 'top'
+
+	const chars = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-=_+\\|/*[]{};:\'",.<>?!@#$%^&()`~ \t'
+	const char = chars.split('')
+	const json = []
+
+	let y = 2;
+	let x = 2;
+
+	for (const c of char) {
+		const w = ctx.measureText(c).width
+		ctx.fillText(c, Math.round(x), Math.round(y))
+		json.push({ code: c.charCodeAt(0), x: Math.round(x), y: Math.round(y), width: w })
+		x += w + 2
+		if (x > 512 - 10) {
+			x = 2
+			y += 14
+		}
+	}
+
+	console.log(JSON.stringify(json))
+
+	function drawNativeAdvance(text) {
+		const w = ctx.measureText(text).width
+		ctx.fillText(text, Math.round(x), Math.round(y))
+		x += w
+	}
+
+	function drawSingleAdvance(text) {
+		for (const c of text.split('')) {
+			let code = c.charCodeAt(0)
+			let w = 8
+			for (const j of json) {
+				if (j.code == code) w = j.width
+			}
+			ctx.fillText(c, Math.round(x), Math.round(y))
+			x += w
+		}
+	}
+
+	function drawDoubleAdvance(text) {
+		drawSingleAdvance(text)
+		// TODO `fi`.w != 'f'.w + 'i'.w etc
+	}
+
+	drawNativeAdvance("Illinois!! Warm ")
+	drawSingleAdvance("Illinois!! Warm ")
+	drawDoubleAdvance("Illinois!! Warm ")
+	//drawSingleAdvance("C:\\Program Files (x86) ")
+	//drawDoubleAdvance("C:\\Program Files (x86) ")
+	</script>
+</body>
+
+</html>
