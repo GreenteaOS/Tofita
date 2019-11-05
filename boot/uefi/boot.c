@@ -166,8 +166,8 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	serialPrintln("[[[efi_main]]] done: ExitBootServices");
 
 	setRamDisk(&initParameters.ramdisk);
-	RamDiskAsset asset = getRamDiskAsset("loader_kernel.img");
-	serialPrintf("[[[efi_main]]] loaded asset 'loader_kernel.img' %d bytes at %d\n", asset.size, asset.data);
+	RamDiskAsset asset = getRamDiskAsset("loader.tofita");
+	serialPrintf("[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
 
 	void *kernelBase = (void *) KernelStart;
 	drawLoading(&initParameters.framebuffer, 2);

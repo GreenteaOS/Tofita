@@ -132,7 +132,7 @@ void initializeCompositor() {
 void composite() {
 	drawBitmap32(wallpaper, 0, 0);
 	drawBitmap32WithAlpha(desktopIcon, 12, 10);
-	drawAsciiText("Recycle Bin", 60, 12);
+	drawAsciiText("Recycle Bin", 8, 62);
 	drawVibrancedRectangle(0, _framebuffer->height - 30, _framebuffer->width, 30);
 	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
 	Pixel32 color;
