@@ -132,10 +132,12 @@ void initializeCompositor() {
 void composite() {
 	drawBitmap32(wallpaper, 0, 0);
 	drawBitmap32WithAlpha(desktopIcon, 12, 10);
-	drawAsciiText("Recycle Bin", 8, 62);
+	Pixel32 color;
+	color.color = 0x00000000;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
+	drawAsciiText("Recycle Bin", 8, 62, color);
 	drawVibrancedRectangle(0, _framebuffer->height - 30, _framebuffer->width, 30);
 	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
-	Pixel32 color;
 	color.color = 0x00000000;
 	drawRectangle(color, _framebuffer->width - 4, _framebuffer->height - 30, 1, 30);
 	auto trayButtonX = _framebuffer->width - 20;
