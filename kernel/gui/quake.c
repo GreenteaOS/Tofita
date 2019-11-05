@@ -27,8 +27,10 @@ void quake() {
 
 	void drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height);
 	drawVibrancedRectangle(0, 0, _framebuffer->width, quakeHeight);
-	uint16_t drawAsciiText(const char* text, double x, uint16_t y);
-	drawAsciiText(quakeCommand, 2, quakeHeight - 11);
+	uint16_t drawAsciiText(const char* text, double x, uint16_t y, Pixel32 color);
+	Pixel32 color;
+	color.rgba.r = color.rgba.g = color.rgba.b = 48;
+	drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
 }
 
 void quakeHandleButtonDown(uint8_t key) {
