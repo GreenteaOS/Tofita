@@ -140,6 +140,7 @@ int _quake_puts(const uint8_t *string)
 		}
 		i++;
 	}
+	return 1;
 }
 
 void quakePrintf(const char *c, ...) {
