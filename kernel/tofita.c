@@ -97,9 +97,8 @@ void kernelMain(const KernelParams *params) {
 
 	CPUID cpuid = getCPUID();
 	serialPrintln(cpuid.vendorID);
-	quakePrintf(cpuid.vendorID);
 	serialPrintln(cpuid.brandName);
-	quakePrintf(cpuid.brandName);
+	quakePrintf("[CPUID] %s %s\n", cpuid.vendorID, cpuid.brandName);
 
 	if (!acpi::parse(params->acpiTable)) {
 		quakePrintf("ACPI is *not* loaded\n");

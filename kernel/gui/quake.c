@@ -18,7 +18,13 @@
 uint8_t haveToQuake = 0;
 uint8_t quakeHeight = 255;
 char quakeCommand[256] = {0};
+char quakeLines[17][256] = {0};
+uint8_t quakeLine = 0;
+uint8_t quakeRow = 0;
+double quakeAdvance = 0.0;
 uint8_t quakeCommandSize = 0;
+
+void quakePrintf(const char *c, ...);
 
 void quake() {
 	if (haveToQuake == 0) {
@@ -30,7 +36,12 @@ void quake() {
 	uint16_t drawAsciiText(const char* text, double x, uint16_t y, Pixel32 color);
 	Pixel32 color;
 	color.rgba.r = color.rgba.g = color.rgba.b = 48;
-	drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
+	auto x = drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
+	drawAsciiText("|", x + 2, quakeHeight - 15, color);
+
+	for (auto i = 0; i < 17; i++) {
+		drawAsciiText(quakeLines[i], 2, i * 14 + 2, color);
+	}
 }
 
 void quakeHandleButtonDown(uint8_t key) {
@@ -42,6 +53,8 @@ void quakeHandleButtonDown(uint8_t key) {
     }
 
     if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
+    		quakePrintf("Enter 'help' for commands\n");
+    		quakePrintf("Command '%s' not supported\n", quakeCommand);
     	for (uint8_t i = 0; i < 255; i++) quakeCommand[i] = 0;
     	quakeCommandSize = 0;
     }
@@ -80,9 +93,37 @@ uint8_t* _quakeItoA(int i, uint8_t b[]){
 	return b;
 }
 
-int __cdecl _quake_putchar(int c) {
-	if (c) {
+void _quake_newline() {
+	quakeLine++;
+	quakeRow = 0;
+	quakeAdvance = 0.0;
+	if (quakeLine == 17) {
+		// Move all lines upper
+		quakeLine = 16;
+		for (auto i = 0; i < 16; i++) {
+			for (auto k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = 0;
+			for (auto k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = quakeLines[i + 1][k];
+		}
+		for (auto i = 0; i < sizeof(quakeLines[16]); i++) quakeLines[16][i] = 0;
+	}
+}
 
+uint8_t __cdecl _quake_putchar(const uint8_t c) {
+	double getCharAdvance(const char c);
+
+	if (c != 0) {
+		if (c == '\n') {
+			_quake_newline();
+			return c;
+		}
+		quakeAdvance += getCharAdvance(c);
+		if (quakeAdvance > _framebuffer->width) {
+			_quake_newline();
+			quakeAdvance = getCharAdvance(c);
+		}
+		quakeLines[quakeLine][quakeRow] = c;
+		quakeRow++;
+		if (quakeRow > 255) _quake_newline();
 		return c;
 	}
 	return EOF;
@@ -91,19 +132,14 @@ int __cdecl _quake_putchar(int c) {
 int _quake_puts(const uint8_t *string)
 {
 	int i = 0;
-	while (string[i]) //standard c idiom for looping through a null-terminated string
+	while (string[i] != 0)
 	{
-		if (_quake_putchar(string[i]) == EOF) //if we got the EOF value from writing the uint8_t
+		if (_quake_putchar(string[i]) == EOF)
 		{
 			return EOF;
 		}
 		i++;
 	}
-	if (_quake_putchar('\n') == EOF) //this will occur right after we quit due to the null terminated character.
-	{
-		return EOF;
-	}
-	return 1; //to meet spec.
 }
 
 void quakePrintf(const char *c, ...) {

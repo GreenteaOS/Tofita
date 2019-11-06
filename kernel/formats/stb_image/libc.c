@@ -21,7 +21,6 @@
 #define memset libc_memset
 #define abs libc_abs
 #define pow libc_pow
-#define memcpy libc_memcpy
 
 void libc_free(void* addr) {
 	// Do nothing for now
@@ -100,4 +99,8 @@ void libc_memcpy(void *dest, void *src, size_t n) {
 	char *cdest = (char *)dest;
 	for (int i = 0; i < n; i++) cdest[i] = csrc[i];
 	serialPrintf("[libc] libc_memcpy done\n");
+}
+
+void memcpy(void *dest, void *src, size_t n) {
+	libc_memcpy(dest, src, n);
 }
