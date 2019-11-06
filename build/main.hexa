@@ -254,6 +254,29 @@ for (task in tasks) {
 					'node tools\\listen.js', { stdio: 'inherit' }
 				)
 			}
+		case 'clang-format':
+			{
+				function formatFolderRecursive(path) {
+					if (fs.existsSync(path)) {
+						fs.readdirSync(path).forEach(function(file, index) {
+							let curPath = path + "/" + file
+							if (fs.lstatSync(curPath).isDirectory()) {
+								formatFolderRecursive(curPath)
+							} else {
+								if (curPath.endsWith('.cpp')) {
+									console.log('clang-format: ' + curPath)
+									let clang = `clang-format`
+									require('child_process').execSync(
+										clang + ` -style=file -i ` + curPath, { stdio: 'inherit' }
+									)
+								}
+							}
+						})
+					}
+				}
+
+				formatFolderRecursive('.')
+			}
 		case _:
 			console.log('Unknown task', task)
 	}
