@@ -16,7 +16,7 @@
 // Simple bitmap font drawing
 // Non-monospace
 
-Bitmap32* textFontBitmap;
+Bitmap32 *textFontBitmap;
 extern Pixel32 *_pixels;
 
 typedef struct {
@@ -25,25 +25,28 @@ typedef struct {
 	double width;
 } __attribute__((packed)) TextFontList;
 
-TextFontList* textFontList = nullptr;
+TextFontList *textFontList = nullptr;
 
 void initText() {
 	RamDiskAsset textFont = getRamDiskAsset("ascii.tofita");
-	textFontList = (TextFontList*)textFont.data;
+	textFontList = (TextFontList *)textFont.data;
 
-	Bitmap32* loadPng32(const RamDiskAsset* asset);
+	Bitmap32 *loadPng32(const RamDiskAsset *asset);
 	RamDiskAsset a = getRamDiskAsset("fonts\\default.png");
 	textFontBitmap = loadPng32(&a);
 }
 
 int8_t getLigatureAdvance(const char left, const char right) {
-	if (left == 0) return 0;
-	if (right == 0) return 0;
+	if (left == 0)
+		return 0;
+	if (right == 0)
+		return 0;
 	return 8;
 }
 
 double getCharAdvance(const char c) {
-	if (textFontList == nullptr) return 8;
+	if (textFontList == nullptr)
+		return 8;
 	TextFontList textChar = textFontList[(size_t)c];
 	return textChar.width;
 }
@@ -56,9 +59,10 @@ double drawChar(const char c, double x, uint16_t y, Pixel32 color) {
 
 	for (uint8_t yi = 0; yi < 12; yi++)
 		for (uint8_t xi = 0; xi < w; xi++) {
-			Pixel32 font = textFontBitmap->pixels[
-				(textChar.y + yi) * textFontBitmap->width + (textChar.x + xi)
-			];
+			Pixel32 font =
+				textFontBitmap
+					->pixels[(textChar.y + yi) * textFontBitmap->width +
+							 (textChar.x + xi)];
 
 			Pixel32 p = _pixels[(y + yi) * _framebuffer->width + (xx + xi)];
 			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r);
@@ -71,10 +75,10 @@ double drawChar(const char c, double x, uint16_t y, Pixel32 color) {
 }
 
 /// Returns advance after last character
-uint16_t drawAsciiText(const char* text, double x, uint16_t y, Pixel32 color) {
+uint16_t drawAsciiText(const char *text, double x, uint16_t y, Pixel32 color) {
 	uint16_t i = 0;
 	double xx = x;
-	while (text[i] != 0 && i < 255*255) {
+	while (text[i] != 0 && i < 255 * 255) {
 		xx += drawChar(text[i], xx, y, color);
 		i++;
 	}

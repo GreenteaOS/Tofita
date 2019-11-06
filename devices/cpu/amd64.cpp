@@ -16,17 +16,20 @@
 // AMD64 assembly instructions wrapper
 
 namespace amd64 {
-	inline void cpuid(uint32_t leaf, uint32_t subleaf,
-		uint32_t *eax,
-		uint32_t *ebx = nullptr,
-		uint32_t *ecx = nullptr,
-		uint32_t *edx = nullptr
-	) {
-		uint32_t a, b, c, d;
-		asm volatile ("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf));
-		if (eax) *eax = a;
-		if (ebx) *ebx = b;
-		if (ecx) *ecx = c;
-		if (edx) *edx = d;
-	}
+inline void cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax,
+				  uint32_t *ebx = nullptr, uint32_t *ecx = nullptr,
+				  uint32_t *edx = nullptr) {
+	uint32_t a, b, c, d;
+	asm volatile("cpuid"
+				 : "=a"(a), "=b"(b), "=c"(c), "=d"(d)
+				 : "a"(leaf), "c"(subleaf));
+	if (eax)
+		*eax = a;
+	if (ebx)
+		*ebx = b;
+	if (ecx)
+		*ecx = c;
+	if (edx)
+		*edx = d;
 }
+} // namespace amd64
