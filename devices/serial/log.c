@@ -255,10 +255,6 @@ int puts(const uint8_t *string)
 		}
 		i++;
 	}
-	if (putchar('\n') == EOF) //this will occur right after we quit due to the null terminated character.
-	{
-		return EOF;
-	}
 	return 1; //to meet spec.
 }
 

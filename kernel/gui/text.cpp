@@ -25,7 +25,7 @@ typedef struct {
 	double width;
 } __attribute__((packed)) TextFontList;
 
-TextFontList* textFontList;
+TextFontList* textFontList = nullptr;
 
 void initText() {
 	RamDiskAsset textFont = getRamDiskAsset("ascii.tofita");
@@ -40,6 +40,12 @@ int8_t getLigatureAdvance(const char left, const char right) {
 	if (left == 0) return 0;
 	if (right == 0) return 0;
 	return 8;
+}
+
+double getCharAdvance(const char c) {
+	if (textFontList == nullptr) return 8;
+	TextFontList textChar = textFontList[(size_t)c];
+	return textChar.width;
 }
 
 double drawChar(const char c, double x, uint16_t y, Pixel32 color) {
