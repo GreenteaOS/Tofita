@@ -201,6 +201,8 @@ uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 }
 
 static void mapEfi(EfiMemoryMap *memoryMap) {
+	serialPrintln("[paging] mapping efi");
+
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
 
@@ -212,6 +214,8 @@ static void mapEfi(EfiMemoryMap *memoryMap) {
 
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
+
+	serialPrintln("[paging] efi mapped");
 }
 
 static void mapFramebuffer(Framebuffer *fb) {
@@ -236,7 +240,6 @@ void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, 
 	serialPrintln("[paging] Tofita kernel mapped");
 
 	mapEfi(memoryMap);
-	serialPrintln("[paging] efi mapped");
 
 	mapFramebuffer(fb);
 	serialPrintln("[paging] framebuffer mapped");
