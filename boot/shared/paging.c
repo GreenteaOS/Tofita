@@ -182,6 +182,24 @@ static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const EFI_MEMORY_DESCRIPTO
 	return (const EFI_MEMORY_DESCRIPTOR *) desc;
 }
 
+uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
+	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
+	const uint64_t descriptorSize = memoryMap->descriptorSize;
+	uint64_t maxPhysicalStart = 0;
+	uint64_t numberOfPages = 0;
+
+	for (uint64_t i = 0; i < memoryMap->memoryMapSize; i++) {
+		if (descriptor->PhysicalStart > maxPhysicalStart) {
+			maxPhysicalStart = descriptor->PhysicalStart;
+			numberOfPages = descriptor->NumberOfPages;
+		}
+
+		descriptor = getNextDescriptor(descriptor, descriptorSize);
+	}
+
+	return maxPhysicalStart + numberOfPages * PAGE_SIZE;
+}
+
 static void mapEfi(EfiMemoryMap *memoryMap) {
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
@@ -235,6 +253,10 @@ void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, 
 	mapMemory(BUFFER_START, (uint64_t) params->buffer, params->bufferSize / PAGE_SIZE + 1);
 	params->buffer = (void*)BUFFER_START;
 	serialPrintln("[paging] buffer mapped");
+
+	uint64_t ram = getRAMSize(memoryMap);
+	serialPrintf("[paging] available RAM is %d megabytes\n", (uint32_t)(ram/(1024*1024)));
+	params->ramBytes = ram;
 
 	serialPrint("[paging] CR3 points to: ");
 	serialPrintHex((uint64_t) pml4);
