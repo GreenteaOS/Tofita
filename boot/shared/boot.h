@@ -57,6 +57,7 @@ typedef struct {
 	uint64_t bufferSize;
 	void* buffer;
 	void* acpiTable; // TODO = nullptr in C++
+	uint64_t ramBytes = 0;
 } KernelParams;
 
 typedef void (*InitKernel)(const KernelParams *);
