@@ -96,8 +96,6 @@ void kernelMain(const KernelParams *params) {
 	quakePrintf("GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
-	serialPrintln(cpuid.vendorID);
-	serialPrintln(cpuid.brandName);
 	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, (uint32_t)(params->ramBytes/(1024*1024)));
 
 	if (!acpi::parse(params->acpiTable)) {

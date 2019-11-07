@@ -35,6 +35,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
    - AMD APU A10
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
  - Monolithic performance-oriented kernel
+ - Very low on resources, just 1 GB RAM minimum required
  - ACPI 2.0, CPUID
 
 [![Give a star](docs/star.png?raw=true)

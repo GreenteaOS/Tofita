@@ -64,7 +64,6 @@ void* libc_realloc(void* addr, size_t size) {
 }
 
 void *libc_memset(void *b, int c, int len) {
-	serialPrintf("[libc] libc_memset\n");
 	int i;
 	unsigned char *p = (unsigned char *)b;
 	i = 0;
@@ -73,7 +72,6 @@ void *libc_memset(void *b, int c, int len) {
 		p++;
 		len--;
 	}
-	serialPrintf("[libc] libc_memset done\n");
 	return(b);
 }
 
@@ -94,11 +92,9 @@ int libc_pow(int a, int n) {
 }
 
 void libc_memcpy(void *dest, void *src, size_t n) {
-	serialPrintf("[libc] libc_memcpy\n");
 	const char *csrc = (char *)src;
 	char *cdest = (char *)dest;
 	for (int i = 0; i < n; i++) cdest[i] = csrc[i];
-	serialPrintf("[libc] libc_memcpy done\n");
 }
 
 void memcpy(void *dest, void *src, size_t n) {

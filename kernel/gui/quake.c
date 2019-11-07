@@ -112,6 +112,7 @@ uint8_t __cdecl _quake_putchar(const uint8_t c) {
 	double getCharAdvance(const char c);
 
 	if (c != 0) {
+		putchar(c); // Copy to serial log
 		if (c == '\n') {
 			_quake_newline();
 			return c;
