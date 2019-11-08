@@ -198,6 +198,12 @@ for (task in tasks) {
 				fs.copyFileSync(
 					config.tempFolder + '\\tofita\\loader.efi',
 					config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI')
+				fs.copyFileSync(
+					'assets\\autorun.ico',
+					config.tempFolder + '\\tofita\\iso\\autorun.ico')
+				fs.copyFileSync(
+					'assets\\autorun.inf',
+					config.tempFolder + '\\tofita\\iso\\autorun.inf')
 				// Create floppy image
 				fs.copyFileSync(
 					'..\\Teapot\\mtools\\disk-template.img',
@@ -206,7 +212,9 @@ for (task in tasks) {
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI',
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI/BOOT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
-					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT'
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\autorun.ico ::/autorun.ico',
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\autorun.inf ::/autorun.inf'
 				]) require('child_process').execSync(
 					cmd, { stdio: 'inherit' }
 				)
@@ -222,7 +230,7 @@ for (task in tasks) {
 						'disk.img',
 						'-no-emul-boot -o',
 						'/cygdrive/\(path)/tofita/greenteaos-uefi64.iso',
-						'-V GreenteaOS-UEFI',
+						'-V GreenteaOS',
 						'/cygdrive/\(path)/tofita/iso'
 					].join(' '), { stdio: 'inherit' }
 				)
