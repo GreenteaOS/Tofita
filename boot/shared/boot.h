@@ -43,10 +43,7 @@ typedef struct {
 #define FramebufferStart (EfiVirtualBase + 0x40000000)
 #define RamdiskStart (FramebufferStart + 0x45000000)
 #define ACPIStart (RamdiskStart + 0x45000000)
-#define MemoryMapBufferSize 512 * 1024 // 512 KiB
 #define PAGE_SIZE 4096  // 4 KiB
-
-uint8_t memoryMapBuffer[MemoryMapBufferSize];
 
 typedef struct {
 	EFI_HANDLE imageHandle;

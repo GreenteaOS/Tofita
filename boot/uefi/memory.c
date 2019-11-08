@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#define MemoryMapBufferSize 512 * 1024 // 512 KiB
+uint8_t memoryMapBuffer[MemoryMapBufferSize];
+
 void fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
 	efiMemoryMap->memoryMap = (EFI_MEMORY_DESCRIPTOR *) memoryMapBuffer;
 	efiMemoryMap->memoryMapSize = MemoryMapBufferSize;
