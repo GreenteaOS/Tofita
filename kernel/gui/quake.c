@@ -53,8 +53,16 @@ void quakeHandleButtonDown(uint8_t key) {
     }
 
     if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
-    		quakePrintf("Enter 'help' for commands\n");
+    	if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
+    		extern const KernelParams *paramsCache;
+    		InitKernel start = (InitKernel) KernelVirtualBase;
+			start(paramsCache);
+    	} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
+    		quakePrintf("Command 'reload' does quick kernel restart (without actual reboot) Note: this destroys all data!\n", quakeCommand);
+    	} else {
     		quakePrintf("Command '%s' not supported\n", quakeCommand);
+    		quakePrintf("Enter 'help' for commands\n");
+    	}
     	for (uint8_t i = 0; i < 255; i++) quakeCommand[i] = 0;
     	quakeCommandSize = 0;
     }
