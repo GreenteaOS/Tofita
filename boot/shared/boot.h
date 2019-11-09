@@ -62,5 +62,7 @@ struct KernelParams {
 	void* acpiTable; // TODO = nullptr in C++
 	void* buffer = null;
 	uint64_t ramBytes = 0;
+};
+
 typedef function (*InitKernel)(const KernelParams *);
 
