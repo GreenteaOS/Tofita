@@ -94,7 +94,7 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 
 PageEntry pml4[PAGE_TABLE_SIZE] PAGE_ALIGNED;
 
-static inline void writeCr3(uint64_t value) {
+static inline function writeCr3(uint64_t value) {
 	__asm__("movq %0, %%cr3" :: "r"(value));
 }
 
@@ -109,7 +109,7 @@ static LinearAddress getLinearAddress(uint64_t address) {
 	return *((LinearAddress *) &address);
 }
 
-static void initializePage(PageEntry *entry, uint64_t address) {
+static function initializePage(PageEntry *entry, uint64_t address) {
 	entry->address = address >> ADDRESS_BITS;
 	entry->present = 1;
 	entry->writeAllowed = 1;
@@ -127,7 +127,7 @@ static void *getPage(PageEntry *table, uint64_t entryId) {
 	}
 }
 
-static void map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
+function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt];
 	initializePage(entry, physicalAddr);
 }
@@ -143,7 +143,7 @@ CREATE_MAPPING(pd, pt)
 CREATE_MAPPING(pdpt, pd)
 CREATE_MAPPING(pml4, pdpt)
 
-static void mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
+function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln("[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
@@ -200,7 +200,7 @@ uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 	return maxPhysicalStart + numberOfPages * PAGE_SIZE;
 }
 
-static void mapEfi(EfiMemoryMap *memoryMap) {
+function mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintln("[paging] mapping efi");
 
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
@@ -218,21 +218,21 @@ static void mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintln("[paging] efi mapped");
 }
 
-static void mapFramebuffer(Framebuffer *fb) {
+function mapFramebuffer(Framebuffer *fb) {
 	void *framebufferBase = fb->base;
 	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
 }
 
-static void mapRamDisk(RamDisk *ramdisk) {
+function mapRamDisk(RamDisk *ramdisk) {
 	void *ramdiskBase = ramdisk->base;
 	mapMemory(RamdiskStart, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
 }
 
-static void mapACPI(void *acpiTable) {
+function mapACPI(void *acpiTable) {
 	mapMemory(ACPIStart, (uint64_t) acpiTable, 1);
 }
 
-void enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
+function enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
 	mapMemory(KernelStart, KernelStart, 256);
 	serialPrintln("[paging] kernel loader mapped");
 

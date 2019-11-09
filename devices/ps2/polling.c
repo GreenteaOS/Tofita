@@ -17,9 +17,9 @@
 
 extern uint8_t haveToRender;
 extern uint8_t haveToQuake;
-void handleKeyDown(uint8_t key);
-extern void (*keyDownHandler)(uint8_t);
-void quakeHandleButtonDown(uint8_t key);
+function handleKeyDown(uint8_t key);
+extern function (*keyDownHandler)(uint8_t);
+function quakeHandleButtonDown(uint8_t key);
 
 // Returns 1 if something happened
 const uint8_t PollingPS2SomethingHappened = 1;
@@ -36,7 +36,7 @@ uint8_t pollPS2Devices() {
 			if (keyboardPressedState[77]) mouseX += 4;
 			if (keyboardPressedState[75]) mouseX -= 4;
 			if (keyboardPressedState[41]) haveToQuake = !haveToQuake;
-			keyDownHandler = nullptr;
+			keyDownHandler = null;
 			if (haveToQuake) keyDownHandler = quakeHandleButtonDown;
 			haveToRender = 1;
 		} else if (getBit(poll, 5) == 1) {

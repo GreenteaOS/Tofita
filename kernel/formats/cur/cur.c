@@ -93,7 +93,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 	return cur;
 }
 
-void drawCursor(const struct Cursor *cur, uint16_t x, uint16_t y) {
+function drawCursor(const struct Cursor *cur, uint16_t x, uint16_t y) {
 	Pixel32 pixel;
 	for (uint8_t yi = 0; yi < cur->height; yi++)
 		for (uint8_t xi = 0; xi < cur->width; xi++) {

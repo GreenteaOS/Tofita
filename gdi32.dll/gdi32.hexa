@@ -1,0 +1,3833 @@
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+@stdcall
+module exports
+
+@draft
+@dllExport('AbortDoc')
+function abortDoc() {}
+
+@draft
+@dllExport('AbortPath')
+function abortPath() {}
+
+@draft
+@dllExport('AddFontMemResourceEx')
+function addFontMemResourceEx() {}
+
+@draft
+@dllExport('AddFontResourceA')
+function addFontResourceA() {}
+
+@draft
+@dllExport('AddFontResourceExA')
+function addFontResourceExA() {}
+
+@draft
+@dllExport('AddFontResourceExW')
+function addFontResourceExW() {}
+
+@draft
+@dllExport('AddFontResourceTracking')
+function addFontResourceTracking() {}
+
+@draft
+@dllExport('AddFontResourceW')
+function addFontResourceW() {}
+
+@draft
+@dllExport('AngleArc')
+function angleArc() {}
+
+@draft
+@dllExport('AnimatePalette')
+function animatePalette() {}
+
+@draft
+@dllExport('AnyLinkedFonts')
+function anyLinkedFonts() {}
+
+@draft
+@dllExport('Arc')
+function arc() {}
+
+@draft
+@dllExport('ArcTo')
+function arcTo() {}
+
+@draft
+@dllExport('bCreateDCW')
+function bCreateDCW() {}
+
+@draft
+@dllExport('bDeleteLDC')
+function bDeleteLDC() {}
+
+@draft
+@dllExport('BeginGdiRendering')
+function beginGdiRendering() {}
+
+@draft
+@dllExport('BeginPath')
+function beginPath() {}
+
+@draft
+@dllExport('bInitSystemAndFontsDirectoriesW')
+function bInitSystemAndFontsDirectoriesW() {}
+
+@draft
+@dllExport('BitBlt')
+function bitBlt() {}
+
+@draft
+@dllExport('bMakePathNameW')
+function bMakePathNameW() {}
+
+@draft
+@dllExport('BRUSHOBJ_hGetColorTransform')
+function bRUSHOBJ_hGetColorTransform() {}
+
+@draft
+@dllExport('BRUSHOBJ_pvAllocRbrush')
+function bRUSHOBJ_pvAllocRbrush() {}
+
+@draft
+@dllExport('BRUSHOBJ_pvGetRbrush')
+function bRUSHOBJ_pvGetRbrush() {}
+
+@draft
+@dllExport('BRUSHOBJ_ulGetBrushColor')
+function bRUSHOBJ_ulGetBrushColor() {}
+
+@draft
+@dllExport('CancelDC')
+function cancelDC() {}
+
+@draft
+@dllExport('cGetTTFFromFOT')
+function cGetTTFFromFOT() {}
+
+@draft
+@dllExport('CheckColorsInGamut')
+function checkColorsInGamut() {}
+
+@draft
+@dllExport('ChoosePixelFormat')
+function choosePixelFormat() {}
+
+@draft
+@dllExport('Chord')
+function chord() {}
+
+@draft
+@dllExport('ClearBitmapAttributes')
+function clearBitmapAttributes() {}
+
+@draft
+@dllExport('ClearBrushAttributes')
+function clearBrushAttributes() {}
+
+@draft
+@dllExport('CLIPOBJ_bEnum')
+function cLIPOBJ_bEnum() {}
+
+@draft
+@dllExport('CLIPOBJ_cEnumStart')
+function cLIPOBJ_cEnumStart() {}
+
+@draft
+@dllExport('CLIPOBJ_ppoGetPath')
+function cLIPOBJ_ppoGetPath() {}
+
+@draft
+@dllExport('CloseEnhMetaFile')
+function closeEnhMetaFile() {}
+
+@draft
+@dllExport('CloseFigure')
+function closeFigure() {}
+
+@draft
+@dllExport('CloseMetaFile')
+function closeMetaFile() {}
+
+@draft
+@dllExport('ColorCorrectPalette')
+function colorCorrectPalette() {}
+
+@draft
+@dllExport('ColorMatchToTarget')
+function colorMatchToTarget() {}
+
+@draft
+@dllExport('CombineRgn')
+function combineRgn() {}
+
+@draft
+@dllExport('CombineTransform')
+function combineTransform() {}
+
+@draft
+@dllExport('ConfigureOPMProtectedOutput')
+function configureOPMProtectedOutput() {}
+
+@draft
+@dllExport('CopyEnhMetaFileA')
+function copyEnhMetaFileA() {}
+
+@draft
+@dllExport('CopyEnhMetaFileW')
+function copyEnhMetaFileW() {}
+
+@draft
+@dllExport('CopyMetaFileA')
+function copyMetaFileA() {}
+
+@draft
+@dllExport('CopyMetaFileW')
+function copyMetaFileW() {}
+
+@draft
+@dllExport('CreateBitmap')
+function createBitmap() {}
+
+@draft
+@dllExport('CreateBitmapFromDxSurface')
+function createBitmapFromDxSurface() {}
+
+@draft
+@dllExport('CreateBitmapFromDxSurface2')
+function createBitmapFromDxSurface2() {}
+
+@draft
+@dllExport('CreateBitmapIndirect')
+function createBitmapIndirect() {}
+
+@draft
+@dllExport('CreateBrushIndirect')
+function createBrushIndirect() {}
+
+@draft
+@dllExport('CreateColorSpaceA')
+function createColorSpaceA() {}
+
+@draft
+@dllExport('CreateColorSpaceW')
+function createColorSpaceW() {}
+
+@draft
+@dllExport('CreateCompatibleBitmap')
+function createCompatibleBitmap() {}
+
+@draft
+@dllExport('CreateCompatibleDC')
+function createCompatibleDC() {}
+
+@draft
+@dllExport('CreateDCA')
+function createDCA() {}
+
+@draft
+@dllExport('CreateDCExW')
+function createDCExW() {}
+
+@draft
+@dllExport('CreateDCW')
+function createDCW() {}
+
+@draft
+@dllExport('CreateDIBitmap')
+function createDIBitmap() {}
+
+@draft
+@dllExport('CreateDIBPatternBrush')
+function createDIBPatternBrush() {}
+
+@draft
+@dllExport('CreateDIBPatternBrushPt')
+function createDIBPatternBrushPt() {}
+
+@draft
+@dllExport('CreateDIBSection')
+function createDIBSection() {}
+
+@draft
+@dllExport('CreateDiscardableBitmap')
+function createDiscardableBitmap() {}
+
+@draft
+@dllExport('CreateDPIScaledDIBSection')
+function createDPIScaledDIBSection() {}
+
+@draft
+@dllExport('CreateEllipticRgn')
+function createEllipticRgn() {}
+
+@draft
+@dllExport('CreateEllipticRgnIndirect')
+function createEllipticRgnIndirect() {}
+
+@draft
+@dllExport('CreateEnhMetaFileA')
+function createEnhMetaFileA() {}
+
+@draft
+@dllExport('CreateEnhMetaFileW')
+function createEnhMetaFileW() {}
+
+@draft
+@dllExport('CreateFontA')
+function createFontA() {}
+
+@draft
+@dllExport('CreateFontIndirectA')
+function createFontIndirectA() {}
+
+@draft
+@dllExport('CreateFontIndirectExA')
+function createFontIndirectExA() {}
+
+@draft
+@dllExport('CreateFontIndirectExW')
+function createFontIndirectExW() {}
+
+@draft
+@dllExport('CreateFontIndirectW')
+function createFontIndirectW() {}
+
+@draft
+@dllExport('CreateFontW')
+function createFontW() {}
+
+@draft
+@dllExport('CreateHalftonePalette')
+function createHalftonePalette() {}
+
+@draft
+@dllExport('CreateHatchBrush')
+function createHatchBrush() {}
+
+@draft
+@dllExport('CreateICA')
+function createICA() {}
+
+@draft
+@dllExport('CreateICW')
+function createICW() {}
+
+@draft
+@dllExport('CreateMetaFileA')
+function createMetaFileA() {}
+
+@draft
+@dllExport('CreateMetaFileW')
+function createMetaFileW() {}
+
+@draft
+@dllExport('CreateOPMProtectedOutput')
+function createOPMProtectedOutput() {}
+
+@draft
+@dllExport('CreateOPMProtectedOutputs')
+function createOPMProtectedOutputs() {}
+
+@draft
+@dllExport('CreatePalette')
+function createPalette() {}
+
+@draft
+@dllExport('CreatePatternBrush')
+function createPatternBrush() {}
+
+@draft
+@dllExport('CreatePen')
+function createPen() {}
+
+@draft
+@dllExport('CreatePenIndirect')
+function createPenIndirect() {}
+
+@draft
+@dllExport('CreatePolygonRgn')
+function createPolygonRgn() {}
+
+@draft
+@dllExport('CreatePolyPolygonRgn')
+function createPolyPolygonRgn() {}
+
+@draft
+@dllExport('CreateRectRgn')
+function createRectRgn() {}
+
+@draft
+@dllExport('CreateRectRgnIndirect')
+function createRectRgnIndirect() {}
+
+@draft
+@dllExport('CreateRoundRectRgn')
+function createRoundRectRgn() {}
+
+@draft
+@dllExport('CreateScalableFontResourceA')
+function createScalableFontResourceA() {}
+
+@draft
+@dllExport('CreateScalableFontResourceW')
+function createScalableFontResourceW() {}
+
+@draft
+@dllExport('CreateSessionMappedDIBSection')
+function createSessionMappedDIBSection() {}
+
+@draft
+@dllExport('CreateSolidBrush')
+function createSolidBrush() {}
+
+@draft
+@dllExport('D3DKMTAbandonSwapChain')
+function d3DKMTAbandonSwapChain() {}
+
+@draft
+@dllExport('D3DKMTAcquireKeyedMutex')
+function d3DKMTAcquireKeyedMutex() {}
+
+@draft
+@dllExport('D3DKMTAcquireKeyedMutex2')
+function d3DKMTAcquireKeyedMutex2() {}
+
+@draft
+@dllExport('D3DKMTAcquireSwapChain')
+function d3DKMTAcquireSwapChain() {}
+
+@draft
+@dllExport('D3DKMTAddSurfaceToSwapChain')
+function d3DKMTAddSurfaceToSwapChain() {}
+
+@draft
+@dllExport('D3DKMTAdjustFullscreenGamma')
+function d3DKMTAdjustFullscreenGamma() {}
+
+@draft
+@dllExport('D3DKMTCacheHybridQueryValue')
+function d3DKMTCacheHybridQueryValue() {}
+
+@draft
+@dllExport('D3DKMTChangeVideoMemoryReservation')
+function d3DKMTChangeVideoMemoryReservation() {}
+
+@draft
+@dllExport('D3DKMTCheckExclusiveOwnership')
+function d3DKMTCheckExclusiveOwnership() {}
+
+@draft
+@dllExport('D3DKMTCheckMonitorPowerState')
+function d3DKMTCheckMonitorPowerState() {}
+
+@draft
+@dllExport('D3DKMTCheckMultiPlaneOverlaySupport')
+function d3DKMTCheckMultiPlaneOverlaySupport() {}
+
+@draft
+@dllExport('D3DKMTCheckMultiPlaneOverlaySupport2')
+function d3DKMTCheckMultiPlaneOverlaySupport2() {}
+
+@draft
+@dllExport('D3DKMTCheckMultiPlaneOverlaySupport3')
+function d3DKMTCheckMultiPlaneOverlaySupport3() {}
+
+@draft
+@dllExport('D3DKMTCheckOcclusion')
+function d3DKMTCheckOcclusion() {}
+
+@draft
+@dllExport('D3DKMTCheckSharedResourceAccess')
+function d3DKMTCheckSharedResourceAccess() {}
+
+@draft
+@dllExport('D3DKMTCheckVidPnExclusiveOwnership')
+function d3DKMTCheckVidPnExclusiveOwnership() {}
+
+@draft
+@dllExport('D3DKMTCloseAdapter')
+function d3DKMTCloseAdapter() {}
+
+@draft
+@dllExport('D3DKMTConfigureSharedResource')
+function d3DKMTConfigureSharedResource() {}
+
+@draft
+@dllExport('D3DKMTCreateAllocation')
+function d3DKMTCreateAllocation() {}
+
+@draft
+@dllExport('D3DKMTCreateAllocation2')
+function d3DKMTCreateAllocation2() {}
+
+@draft
+@dllExport('D3DKMTCreateBundleObject')
+function d3DKMTCreateBundleObject() {}
+
+@draft
+@dllExport('D3DKMTCreateContext')
+function d3DKMTCreateContext() {}
+
+@draft
+@dllExport('D3DKMTCreateContextVirtual')
+function d3DKMTCreateContextVirtual() {}
+
+@draft
+@dllExport('D3DKMTCreateDCFromMemory')
+function d3DKMTCreateDCFromMemory() {}
+
+@draft
+@dllExport('D3DKMTCreateDevice')
+function d3DKMTCreateDevice() {}
+
+@draft
+@dllExport('D3DKMTCreateHwContext')
+function d3DKMTCreateHwContext() {}
+
+@draft
+@dllExport('D3DKMTCreateHwQueue')
+function d3DKMTCreateHwQueue() {}
+
+@draft
+@dllExport('D3DKMTCreateKeyedMutex')
+function d3DKMTCreateKeyedMutex() {}
+
+@draft
+@dllExport('D3DKMTCreateKeyedMutex2')
+function d3DKMTCreateKeyedMutex2() {}
+
+@draft
+@dllExport('D3DKMTCreateOutputDupl')
+function d3DKMTCreateOutputDupl() {}
+
+@draft
+@dllExport('D3DKMTCreateOverlay')
+function d3DKMTCreateOverlay() {}
+
+@draft
+@dllExport('D3DKMTCreatePagingQueue')
+function d3DKMTCreatePagingQueue() {}
+
+@draft
+@dllExport('D3DKMTCreateProtectedSession')
+function d3DKMTCreateProtectedSession() {}
+
+@draft
+@dllExport('D3DKMTCreateSwapChain')
+function d3DKMTCreateSwapChain() {}
+
+@draft
+@dllExport('D3DKMTCreateSynchronizationObject')
+function d3DKMTCreateSynchronizationObject() {}
+
+@draft
+@dllExport('D3DKMTCreateSynchronizationObject2')
+function d3DKMTCreateSynchronizationObject2() {}
+
+@draft
+@dllExport('D3DKMTDDisplayEnum')
+function d3DKMTDDisplayEnum() {}
+
+@draft
+@dllExport('D3DKMTDestroyAllocation')
+function d3DKMTDestroyAllocation() {}
+
+@draft
+@dllExport('D3DKMTDestroyAllocation2')
+function d3DKMTDestroyAllocation2() {}
+
+@draft
+@dllExport('D3DKMTDestroyContext')
+function d3DKMTDestroyContext() {}
+
+@draft
+@dllExport('D3DKMTDestroyDCFromMemory')
+function d3DKMTDestroyDCFromMemory() {}
+
+@draft
+@dllExport('D3DKMTDestroyDevice')
+function d3DKMTDestroyDevice() {}
+
+@draft
+@dllExport('D3DKMTDestroyHwContext')
+function d3DKMTDestroyHwContext() {}
+
+@draft
+@dllExport('D3DKMTDestroyHwQueue')
+function d3DKMTDestroyHwQueue() {}
+
+@draft
+@dllExport('D3DKMTDestroyKeyedMutex')
+function d3DKMTDestroyKeyedMutex() {}
+
+@draft
+@dllExport('D3DKMTDestroyOutputDupl')
+function d3DKMTDestroyOutputDupl() {}
+
+@draft
+@dllExport('D3DKMTDestroyOverlay')
+function d3DKMTDestroyOverlay() {}
+
+@draft
+@dllExport('D3DKMTDestroyPagingQueue')
+function d3DKMTDestroyPagingQueue() {}
+
+@draft
+@dllExport('D3DKMTDestroyProtectedSession')
+function d3DKMTDestroyProtectedSession() {}
+
+@draft
+@dllExport('D3DKMTDestroySynchronizationObject')
+function d3DKMTDestroySynchronizationObject() {}
+
+@draft
+@dllExport('D3DKMTDispMgrCreate')
+function d3DKMTDispMgrCreate() {}
+
+@draft
+@dllExport('D3DKMTDispMgrSourceOperation')
+function d3DKMTDispMgrSourceOperation() {}
+
+@draft
+@dllExport('D3DKMTDispMgrTargetOperation')
+function d3DKMTDispMgrTargetOperation() {}
+
+@draft
+@dllExport('D3DKMTEnumAdapters')
+function d3DKMTEnumAdapters() {}
+
+@draft
+@dllExport('D3DKMTEnumAdapters2')
+function d3DKMTEnumAdapters2() {}
+
+@draft
+@dllExport('D3DKMTEscape')
+function d3DKMTEscape() {}
+
+@draft
+@dllExport('D3DKMTEvict')
+function d3DKMTEvict() {}
+
+@draft
+@dllExport('D3DKMTExtractBundleObject')
+function d3DKMTExtractBundleObject() {}
+
+@draft
+@dllExport('D3DKMTFlipOverlay')
+function d3DKMTFlipOverlay() {}
+
+@draft
+@dllExport('D3DKMTFlushHeapTransitions')
+function d3DKMTFlushHeapTransitions() {}
+
+@draft
+@dllExport('D3DKMTFreeGpuVirtualAddress')
+function d3DKMTFreeGpuVirtualAddress() {}
+
+@draft
+@dllExport('D3DKMTGetAllocationPriority')
+function d3DKMTGetAllocationPriority() {}
+
+@draft
+@dllExport('D3DKMTGetCachedHybridQueryValue')
+function d3DKMTGetCachedHybridQueryValue() {}
+
+@draft
+@dllExport('D3DKMTGetContextInProcessSchedulingPriority')
+function d3DKMTGetContextInProcessSchedulingPriority() {}
+
+@draft
+@dllExport('D3DKMTGetContextSchedulingPriority')
+function d3DKMTGetContextSchedulingPriority() {}
+
+@draft
+@dllExport('D3DKMTGetDeviceState')
+function d3DKMTGetDeviceState() {}
+
+@draft
+@dllExport('D3DKMTGetDisplayModeList')
+function d3DKMTGetDisplayModeList() {}
+
+@draft
+@dllExport('D3DKMTGetDWMVerticalBlankEvent')
+function d3DKMTGetDWMVerticalBlankEvent() {}
+
+@draft
+@dllExport('D3DKMTGetMemoryBudgetTarget')
+function d3DKMTGetMemoryBudgetTarget() {}
+
+@draft
+@dllExport('D3DKMTGetMultiPlaneOverlayCaps')
+function d3DKMTGetMultiPlaneOverlayCaps() {}
+
+@draft
+@dllExport('D3DKMTGetMultisampleMethodList')
+function d3DKMTGetMultisampleMethodList() {}
+
+@draft
+@dllExport('D3DKMTGetOverlayState')
+function d3DKMTGetOverlayState() {}
+
+@draft
+@dllExport('D3DKMTGetPostCompositionCaps')
+function d3DKMTGetPostCompositionCaps() {}
+
+@draft
+@dllExport('D3DKMTGetPresentHistory')
+function d3DKMTGetPresentHistory() {}
+
+@draft
+@dllExport('D3DKMTGetPresentQueueEvent')
+function d3DKMTGetPresentQueueEvent() {}
+
+@draft
+@dllExport('D3DKMTGetProcessDeviceRemovalSupport')
+function d3DKMTGetProcessDeviceRemovalSupport() {}
+
+@draft
+@dllExport('D3DKMTGetProcessList')
+function d3DKMTGetProcessList() {}
+
+@draft
+@dllExport('D3DKMTGetProcessSchedulingPriorityBand')
+function d3DKMTGetProcessSchedulingPriorityBand() {}
+
+@draft
+@dllExport('D3DKMTGetProcessSchedulingPriorityClass')
+function d3DKMTGetProcessSchedulingPriorityClass() {}
+
+@draft
+@dllExport('D3DKMTGetResourcePresentPrivateDriverData')
+function d3DKMTGetResourcePresentPrivateDriverData() {}
+
+@draft
+@dllExport('D3DKMTGetRuntimeData')
+function d3DKMTGetRuntimeData() {}
+
+@draft
+@dllExport('D3DKMTGetScanLine')
+function d3DKMTGetScanLine() {}
+
+@draft
+@dllExport('D3DKMTGetSetSwapChainMetadata')
+function d3DKMTGetSetSwapChainMetadata() {}
+
+@draft
+@dllExport('D3DKMTGetSharedPrimaryHandle')
+function d3DKMTGetSharedPrimaryHandle() {}
+
+@draft
+@dllExport('D3DKMTGetSharedResourceAdapterLuid')
+function d3DKMTGetSharedResourceAdapterLuid() {}
+
+@draft
+@dllExport('D3DKMTGetYieldPercentage')
+function d3DKMTGetYieldPercentage() {}
+
+@draft
+@dllExport('D3DKMTInvalidateActiveVidPn')
+function d3DKMTInvalidateActiveVidPn() {}
+
+@draft
+@dllExport('D3DKMTInvalidateCache')
+function d3DKMTInvalidateCache() {}
+
+@draft
+@dllExport('D3DKMTLock')
+function d3DKMTLock() {}
+
+@draft
+@dllExport('D3DKMTLock2')
+function d3DKMTLock2() {}
+
+@draft
+@dllExport('D3DKMTMakeResident')
+function d3DKMTMakeResident() {}
+
+@draft
+@dllExport('D3DKMTMapGpuVirtualAddress')
+function d3DKMTMapGpuVirtualAddress() {}
+
+@draft
+@dllExport('D3DKMTMarkDeviceAsError')
+function d3DKMTMarkDeviceAsError() {}
+
+@draft
+@dllExport('D3DKMTNetDispGetNextChunkInfo')
+function d3DKMTNetDispGetNextChunkInfo() {}
+
+@draft
+@dllExport('D3DKMTNetDispQueryMiracastDisplayDeviceStatus')
+function d3DKMTNetDispQueryMiracastDisplayDeviceStatus() {}
+
+@draft
+@dllExport('D3DKMTNetDispQueryMiracastDisplayDeviceSupport')
+function d3DKMTNetDispQueryMiracastDisplayDeviceSupport() {}
+
+@draft
+@dllExport('D3DKMTNetDispStartMiracastDisplayDevice')
+function d3DKMTNetDispStartMiracastDisplayDevice() {}
+
+@draft
+@dllExport('D3DKMTNetDispStartMiracastDisplayDevice2')
+function d3DKMTNetDispStartMiracastDisplayDevice2() {}
+
+@draft
+@dllExport('D3DKMTNetDispStartMiracastDisplayDeviceEx')
+function d3DKMTNetDispStartMiracastDisplayDeviceEx() {}
+
+@draft
+@dllExport('D3DKMTNetDispStopMiracastDisplayDevice')
+function d3DKMTNetDispStopMiracastDisplayDevice() {}
+
+@draft
+@dllExport('D3DKMTNetDispStopSessions')
+function d3DKMTNetDispStopSessions() {}
+
+@draft
+@dllExport('D3DKMTOfferAllocations')
+function d3DKMTOfferAllocations() {}
+
+@draft
+@dllExport('D3DKMTOpenAdapterFromDeviceName')
+function d3DKMTOpenAdapterFromDeviceName() {}
+
+@draft
+@dllExport('D3DKMTOpenAdapterFromGdiDisplayName')
+function d3DKMTOpenAdapterFromGdiDisplayName() {}
+
+@draft
+@dllExport('D3DKMTOpenAdapterFromHdc')
+function d3DKMTOpenAdapterFromHdc() {}
+
+@draft
+@dllExport('D3DKMTOpenAdapterFromLuid')
+function d3DKMTOpenAdapterFromLuid() {}
+
+@draft
+@dllExport('D3DKMTOpenBundleObjectNtHandleFromName')
+function d3DKMTOpenBundleObjectNtHandleFromName() {}
+
+@draft
+@dllExport('D3DKMTOpenKeyedMutex')
+function d3DKMTOpenKeyedMutex() {}
+
+@draft
+@dllExport('D3DKMTOpenKeyedMutex2')
+function d3DKMTOpenKeyedMutex2() {}
+
+@draft
+@dllExport('D3DKMTOpenKeyedMutexFromNtHandle')
+function d3DKMTOpenKeyedMutexFromNtHandle() {}
+
+@draft
+@dllExport('D3DKMTOpenNtHandleFromName')
+function d3DKMTOpenNtHandleFromName() {}
+
+@draft
+@dllExport('D3DKMTOpenProtectedSessionFromNtHandle')
+function d3DKMTOpenProtectedSessionFromNtHandle() {}
+
+@draft
+@dllExport('D3DKMTOpenResource')
+function d3DKMTOpenResource() {}
+
+@draft
+@dllExport('D3DKMTOpenResource2')
+function d3DKMTOpenResource2() {}
+
+@draft
+@dllExport('D3DKMTOpenResourceFromNtHandle')
+function d3DKMTOpenResourceFromNtHandle() {}
+
+@draft
+@dllExport('D3DKMTOpenSwapChain')
+function d3DKMTOpenSwapChain() {}
+
+@draft
+@dllExport('D3DKMTOpenSynchronizationObject')
+function d3DKMTOpenSynchronizationObject() {}
+
+@draft
+@dllExport('D3DKMTOpenSyncObjectFromNtHandle')
+function d3DKMTOpenSyncObjectFromNtHandle() {}
+
+@draft
+@dllExport('D3DKMTOpenSyncObjectFromNtHandle2')
+function d3DKMTOpenSyncObjectFromNtHandle2() {}
+
+@draft
+@dllExport('D3DKMTOpenSyncObjectNtHandleFromName')
+function d3DKMTOpenSyncObjectNtHandleFromName() {}
+
+@draft
+@dllExport('D3DKMTOutputDuplGetFrameInfo')
+function d3DKMTOutputDuplGetFrameInfo() {}
+
+@draft
+@dllExport('D3DKMTOutputDuplGetMetaData')
+function d3DKMTOutputDuplGetMetaData() {}
+
+@draft
+@dllExport('D3DKMTOutputDuplGetPointerShapeData')
+function d3DKMTOutputDuplGetPointerShapeData() {}
+
+@draft
+@dllExport('D3DKMTOutputDuplPresent')
+function d3DKMTOutputDuplPresent() {}
+
+@draft
+@dllExport('D3DKMTOutputDuplReleaseFrame')
+function d3DKMTOutputDuplReleaseFrame() {}
+
+@draft
+@dllExport('D3DKMTPinDirectFlipResources')
+function d3DKMTPinDirectFlipResources() {}
+
+@draft
+@dllExport('D3DKMTPollDisplayChildren')
+function d3DKMTPollDisplayChildren() {}
+
+@draft
+@dllExport('D3DKMTPresent')
+function d3DKMTPresent() {}
+
+@draft
+@dllExport('D3DKMTPresentMultiPlaneOverlay')
+function d3DKMTPresentMultiPlaneOverlay() {}
+
+@draft
+@dllExport('D3DKMTPresentMultiPlaneOverlay2')
+function d3DKMTPresentMultiPlaneOverlay2() {}
+
+@draft
+@dllExport('D3DKMTPresentMultiPlaneOverlay3')
+function d3DKMTPresentMultiPlaneOverlay3() {}
+
+@draft
+@dllExport('D3DKMTPresentRedirected')
+function d3DKMTPresentRedirected() {}
+
+@draft
+@dllExport('D3DKMTQueryAdapterInfo')
+function d3DKMTQueryAdapterInfo() {}
+
+@draft
+@dllExport('D3DKMTQueryAllocationResidency')
+function d3DKMTQueryAllocationResidency() {}
+
+@draft
+@dllExport('D3DKMTQueryClockCalibration')
+function d3DKMTQueryClockCalibration() {}
+
+@draft
+@dllExport('D3DKMTQueryFSEBlock')
+function d3DKMTQueryFSEBlock() {}
+
+@draft
+@dllExport('D3DKMTQueryProcessOfferInfo')
+function d3DKMTQueryProcessOfferInfo() {}
+
+@draft
+@dllExport('D3DKMTQueryProtectedSessionInfoFromNtHandle')
+function d3DKMTQueryProtectedSessionInfoFromNtHandle() {}
+
+@draft
+@dllExport('D3DKMTQueryProtectedSessionStatus')
+function d3DKMTQueryProtectedSessionStatus() {}
+
+@draft
+@dllExport('D3DKMTQueryRemoteVidPnSourceFromGdiDisplayName')
+function d3DKMTQueryRemoteVidPnSourceFromGdiDisplayName() {}
+
+@draft
+@dllExport('D3DKMTQueryResourceInfo')
+function d3DKMTQueryResourceInfo() {}
+
+@draft
+@dllExport('D3DKMTQueryResourceInfoFromNtHandle')
+function d3DKMTQueryResourceInfoFromNtHandle() {}
+
+@draft
+@dllExport('D3DKMTQueryStatistics')
+function d3DKMTQueryStatistics() {}
+
+@draft
+@dllExport('D3DKMTQueryVideoMemoryInfo')
+function d3DKMTQueryVideoMemoryInfo() {}
+
+@draft
+@dllExport('D3DKMTQueryVidPnExclusiveOwnership')
+function d3DKMTQueryVidPnExclusiveOwnership() {}
+
+@draft
+@dllExport('D3DKMTReclaimAllocations')
+function d3DKMTReclaimAllocations() {}
+
+@draft
+@dllExport('D3DKMTReclaimAllocations2')
+function d3DKMTReclaimAllocations2() {}
+
+@draft
+@dllExport('D3DKMTRegisterTrimNotification')
+function d3DKMTRegisterTrimNotification() {}
+
+@draft
+@dllExport('D3DKMTRegisterVailProcess')
+function d3DKMTRegisterVailProcess() {}
+
+@draft
+@dllExport('D3DKMTReleaseKeyedMutex')
+function d3DKMTReleaseKeyedMutex() {}
+
+@draft
+@dllExport('D3DKMTReleaseKeyedMutex2')
+function d3DKMTReleaseKeyedMutex2() {}
+
+@draft
+@dllExport('D3DKMTReleaseProcessVidPnSourceOwners')
+function d3DKMTReleaseProcessVidPnSourceOwners() {}
+
+@draft
+@dllExport('D3DKMTReleaseSwapChain')
+function d3DKMTReleaseSwapChain() {}
+
+@draft
+@dllExport('D3DKMTRemoveSurfaceFromSwapChain')
+function d3DKMTRemoveSurfaceFromSwapChain() {}
+
+@draft
+@dllExport('D3DKMTRender')
+function d3DKMTRender() {}
+
+@draft
+@dllExport('D3DKMTReserveGpuVirtualAddress')
+function d3DKMTReserveGpuVirtualAddress() {}
+
+@draft
+@dllExport('D3DKMTSetAllocationPriority')
+function d3DKMTSetAllocationPriority() {}
+
+@draft
+@dllExport('D3DKMTSetContextInProcessSchedulingPriority')
+function d3DKMTSetContextInProcessSchedulingPriority() {}
+
+@draft
+@dllExport('D3DKMTSetContextSchedulingPriority')
+function d3DKMTSetContextSchedulingPriority() {}
+
+@draft
+@dllExport('D3DKMTSetDisplayMode')
+function d3DKMTSetDisplayMode() {}
+
+@draft
+@dllExport('D3DKMTSetDisplayPrivateDriverFormat')
+function d3DKMTSetDisplayPrivateDriverFormat() {}
+
+@draft
+@dllExport('D3DKMTSetDodIndirectSwapchain')
+function d3DKMTSetDodIndirectSwapchain() {}
+
+@draft
+@dllExport('D3DKMTSetFSEBlock')
+function d3DKMTSetFSEBlock() {}
+
+@draft
+@dllExport('D3DKMTSetGammaRamp')
+function d3DKMTSetGammaRamp() {}
+
+@draft
+@dllExport('D3DKMTSetHwProtectionTeardownRecovery')
+function d3DKMTSetHwProtectionTeardownRecovery() {}
+
+@draft
+@dllExport('D3DKMTSetMemoryBudgetTarget')
+function d3DKMTSetMemoryBudgetTarget() {}
+
+@draft
+@dllExport('D3DKMTSetMonitorColorSpaceTransform')
+function d3DKMTSetMonitorColorSpaceTransform() {}
+
+@draft
+@dllExport('D3DKMTSetProcessDeviceRemovalSupport')
+function d3DKMTSetProcessDeviceRemovalSupport() {}
+
+@draft
+@dllExport('D3DKMTSetProcessSchedulingPriorityBand')
+function d3DKMTSetProcessSchedulingPriorityBand() {}
+
+@draft
+@dllExport('D3DKMTSetProcessSchedulingPriorityClass')
+function d3DKMTSetProcessSchedulingPriorityClass() {}
+
+@draft
+@dllExport('D3DKMTSetQueuedLimit')
+function d3DKMTSetQueuedLimit() {}
+
+@draft
+@dllExport('D3DKMTSetStablePowerState')
+function d3DKMTSetStablePowerState() {}
+
+@draft
+@dllExport('D3DKMTSetStereoEnabled')
+function d3DKMTSetStereoEnabled() {}
+
+@draft
+@dllExport('D3DKMTSetSyncRefreshCountWaitTarget')
+function d3DKMTSetSyncRefreshCountWaitTarget() {}
+
+@draft
+@dllExport('D3DKMTSetVidPnSourceHwProtection')
+function d3DKMTSetVidPnSourceHwProtection() {}
+
+@draft
+@dllExport('D3DKMTSetVidPnSourceOwner')
+function d3DKMTSetVidPnSourceOwner() {}
+
+@draft
+@dllExport('D3DKMTSetVidPnSourceOwner1')
+function d3DKMTSetVidPnSourceOwner1() {}
+
+@draft
+@dllExport('D3DKMTSetVidPnSourceOwner2')
+function d3DKMTSetVidPnSourceOwner2() {}
+
+@draft
+@dllExport('D3DKMTSetYieldPercentage')
+function d3DKMTSetYieldPercentage() {}
+
+@draft
+@dllExport('D3DKMTSharedPrimaryLockNotification')
+function d3DKMTSharedPrimaryLockNotification() {}
+
+@draft
+@dllExport('D3DKMTSharedPrimaryUnLockNotification')
+function d3DKMTSharedPrimaryUnLockNotification() {}
+
+@draft
+@dllExport('D3DKMTShareObjects')
+function d3DKMTShareObjects() {}
+
+@draft
+@dllExport('D3DKMTSignalSynchronizationObject')
+function d3DKMTSignalSynchronizationObject() {}
+
+@draft
+@dllExport('D3DKMTSignalSynchronizationObject2')
+function d3DKMTSignalSynchronizationObject2() {}
+
+@draft
+@dllExport('D3DKMTSignalSynchronizationObjectFromCpu')
+function d3DKMTSignalSynchronizationObjectFromCpu() {}
+
+@draft
+@dllExport('D3DKMTSignalSynchronizationObjectFromGpu')
+function d3DKMTSignalSynchronizationObjectFromGpu() {}
+
+@draft
+@dllExport('D3DKMTSignalSynchronizationObjectFromGpu2')
+function d3DKMTSignalSynchronizationObjectFromGpu2() {}
+
+@draft
+@dllExport('D3DKMTSubmitCommand')
+function d3DKMTSubmitCommand() {}
+
+@draft
+@dllExport('D3DKMTSubmitCommandToHwQueue')
+function d3DKMTSubmitCommandToHwQueue() {}
+
+@draft
+@dllExport('D3DKMTSubmitPresentBltToHwQueue')
+function d3DKMTSubmitPresentBltToHwQueue() {}
+
+@draft
+@dllExport('D3DKMTSubmitSignalSyncObjectsToHwQueue')
+function d3DKMTSubmitSignalSyncObjectsToHwQueue() {}
+
+@draft
+@dllExport('D3DKMTSubmitWaitForSyncObjectsToHwQueue')
+function d3DKMTSubmitWaitForSyncObjectsToHwQueue() {}
+
+@draft
+@dllExport('D3DKMTTrimProcessCommitment')
+function d3DKMTTrimProcessCommitment() {}
+
+@draft
+@dllExport('D3DKMTUnlock')
+function d3DKMTUnlock() {}
+
+@draft
+@dllExport('D3DKMTUnlock2')
+function d3DKMTUnlock2() {}
+
+@draft
+@dllExport('D3DKMTUnOrderedPresentSwapChain')
+function d3DKMTUnOrderedPresentSwapChain() {}
+
+@draft
+@dllExport('D3DKMTUnpinDirectFlipResources')
+function d3DKMTUnpinDirectFlipResources() {}
+
+@draft
+@dllExport('D3DKMTUnregisterTrimNotification')
+function d3DKMTUnregisterTrimNotification() {}
+
+@draft
+@dllExport('D3DKMTUpdateAllocationProperty')
+function d3DKMTUpdateAllocationProperty() {}
+
+@draft
+@dllExport('D3DKMTUpdateGpuVirtualAddress')
+function d3DKMTUpdateGpuVirtualAddress() {}
+
+@draft
+@dllExport('D3DKMTUpdateOverlay')
+function d3DKMTUpdateOverlay() {}
+
+@draft
+@dllExport('D3DKMTVailConnect')
+function d3DKMTVailConnect() {}
+
+@draft
+@dllExport('D3DKMTVailDisconnect')
+function d3DKMTVailDisconnect() {}
+
+@draft
+@dllExport('D3DKMTVailPromoteCompositionSurface')
+function d3DKMTVailPromoteCompositionSurface() {}
+
+@draft
+@dllExport('D3DKMTWaitForIdle')
+function d3DKMTWaitForIdle() {}
+
+@draft
+@dllExport('D3DKMTWaitForSynchronizationObject')
+function d3DKMTWaitForSynchronizationObject() {}
+
+@draft
+@dllExport('D3DKMTWaitForSynchronizationObject2')
+function d3DKMTWaitForSynchronizationObject2() {}
+
+@draft
+@dllExport('D3DKMTWaitForSynchronizationObjectFromCpu')
+function d3DKMTWaitForSynchronizationObjectFromCpu() {}
+
+@draft
+@dllExport('D3DKMTWaitForSynchronizationObjectFromGpu')
+function d3DKMTWaitForSynchronizationObjectFromGpu() {}
+
+@draft
+@dllExport('D3DKMTWaitForVerticalBlankEvent')
+function d3DKMTWaitForVerticalBlankEvent() {}
+
+@draft
+@dllExport('D3DKMTWaitForVerticalBlankEvent2')
+function d3DKMTWaitForVerticalBlankEvent2() {}
+
+@draft
+@dllExport('DDCCIGetCapabilitiesString')
+function dDCCIGetCapabilitiesString() {}
+
+@draft
+@dllExport('DDCCIGetCapabilitiesStringLength')
+function dDCCIGetCapabilitiesStringLength() {}
+
+@draft
+@dllExport('DDCCIGetTimingReport')
+function dDCCIGetTimingReport() {}
+
+@draft
+@dllExport('DDCCIGetVCPFeature')
+function dDCCIGetVCPFeature() {}
+
+@draft
+@dllExport('DDCCISaveCurrentSettings')
+function dDCCISaveCurrentSettings() {}
+
+@draft
+@dllExport('DDCCISetVCPFeature')
+function dDCCISetVCPFeature() {}
+
+@draft
+@dllExport('DdCreateFullscreenSprite')
+function ddCreateFullscreenSprite() {}
+
+@draft
+@dllExport('DdDestroyFullscreenSprite')
+function ddDestroyFullscreenSprite() {}
+
+@draft
+@dllExport('DdEntry0')
+function ddEntry0() {}
+
+@draft
+@dllExport('DdEntry1')
+function ddEntry1() {}
+
+@draft
+@dllExport('DdEntry10')
+function ddEntry10() {}
+
+@draft
+@dllExport('DdEntry11')
+function ddEntry11() {}
+
+@draft
+@dllExport('DdEntry12')
+function ddEntry12() {}
+
+@draft
+@dllExport('DdEntry13')
+function ddEntry13() {}
+
+@draft
+@dllExport('DdEntry14')
+function ddEntry14() {}
+
+@draft
+@dllExport('DdEntry15')
+function ddEntry15() {}
+
+@draft
+@dllExport('DdEntry16')
+function ddEntry16() {}
+
+@draft
+@dllExport('DdEntry17')
+function ddEntry17() {}
+
+@draft
+@dllExport('DdEntry18')
+function ddEntry18() {}
+
+@draft
+@dllExport('DdEntry19')
+function ddEntry19() {}
+
+@draft
+@dllExport('DdEntry2')
+function ddEntry2() {}
+
+@draft
+@dllExport('DdEntry20')
+function ddEntry20() {}
+
+@draft
+@dllExport('DdEntry21')
+function ddEntry21() {}
+
+@draft
+@dllExport('DdEntry22')
+function ddEntry22() {}
+
+@draft
+@dllExport('DdEntry23')
+function ddEntry23() {}
+
+@draft
+@dllExport('DdEntry24')
+function ddEntry24() {}
+
+@draft
+@dllExport('DdEntry25')
+function ddEntry25() {}
+
+@draft
+@dllExport('DdEntry26')
+function ddEntry26() {}
+
+@draft
+@dllExport('DdEntry27')
+function ddEntry27() {}
+
+@draft
+@dllExport('DdEntry28')
+function ddEntry28() {}
+
+@draft
+@dllExport('DdEntry29')
+function ddEntry29() {}
+
+@draft
+@dllExport('DdEntry3')
+function ddEntry3() {}
+
+@draft
+@dllExport('DdEntry30')
+function ddEntry30() {}
+
+@draft
+@dllExport('DdEntry31')
+function ddEntry31() {}
+
+@draft
+@dllExport('DdEntry32')
+function ddEntry32() {}
+
+@draft
+@dllExport('DdEntry33')
+function ddEntry33() {}
+
+@draft
+@dllExport('DdEntry34')
+function ddEntry34() {}
+
+@draft
+@dllExport('DdEntry35')
+function ddEntry35() {}
+
+@draft
+@dllExport('DdEntry36')
+function ddEntry36() {}
+
+@draft
+@dllExport('DdEntry37')
+function ddEntry37() {}
+
+@draft
+@dllExport('DdEntry38')
+function ddEntry38() {}
+
+@draft
+@dllExport('DdEntry39')
+function ddEntry39() {}
+
+@draft
+@dllExport('DdEntry4')
+function ddEntry4() {}
+
+@draft
+@dllExport('DdEntry40')
+function ddEntry40() {}
+
+@draft
+@dllExport('DdEntry41')
+function ddEntry41() {}
+
+@draft
+@dllExport('DdEntry42')
+function ddEntry42() {}
+
+@draft
+@dllExport('DdEntry43')
+function ddEntry43() {}
+
+@draft
+@dllExport('DdEntry44')
+function ddEntry44() {}
+
+@draft
+@dllExport('DdEntry45')
+function ddEntry45() {}
+
+@draft
+@dllExport('DdEntry46')
+function ddEntry46() {}
+
+@draft
+@dllExport('DdEntry47')
+function ddEntry47() {}
+
+@draft
+@dllExport('DdEntry48')
+function ddEntry48() {}
+
+@draft
+@dllExport('DdEntry49')
+function ddEntry49() {}
+
+@draft
+@dllExport('DdEntry5')
+function ddEntry5() {}
+
+@draft
+@dllExport('DdEntry50')
+function ddEntry50() {}
+
+@draft
+@dllExport('DdEntry51')
+function ddEntry51() {}
+
+@draft
+@dllExport('DdEntry52')
+function ddEntry52() {}
+
+@draft
+@dllExport('DdEntry53')
+function ddEntry53() {}
+
+@draft
+@dllExport('DdEntry54')
+function ddEntry54() {}
+
+@draft
+@dllExport('DdEntry55')
+function ddEntry55() {}
+
+@draft
+@dllExport('DdEntry56')
+function ddEntry56() {}
+
+@draft
+@dllExport('DdEntry6')
+function ddEntry6() {}
+
+@draft
+@dllExport('DdEntry7')
+function ddEntry7() {}
+
+@draft
+@dllExport('DdEntry8')
+function ddEntry8() {}
+
+@draft
+@dllExport('DdEntry9')
+function ddEntry9() {}
+
+@draft
+@dllExport('DdNotifyFullscreenSpriteUpdate')
+function ddNotifyFullscreenSpriteUpdate() {}
+
+@draft
+@dllExport('DdQueryVisRgnUniqueness')
+function ddQueryVisRgnUniqueness() {}
+
+@draft
+@dllExport('DeleteColorSpace')
+function deleteColorSpace() {}
+
+@draft
+@dllExport('DeleteDC')
+function deleteDC() {}
+
+@draft
+@dllExport('DeleteEnhMetaFile')
+function deleteEnhMetaFile() {}
+
+@draft
+@dllExport('DeleteMetaFile')
+function deleteMetaFile() {}
+
+@draft
+@dllExport('DeleteObject')
+function deleteObject() {}
+
+@draft
+@dllExport('DescribePixelFormat')
+function describePixelFormat() {}
+
+@draft
+@dllExport('DestroyOPMProtectedOutput')
+function destroyOPMProtectedOutput() {}
+
+@draft
+@dllExport('DestroyPhysicalMonitorInternal')
+function destroyPhysicalMonitorInternal() {}
+
+@draft
+@dllExport('DeviceCapabilitiesExA')
+function deviceCapabilitiesExA() {}
+
+@draft
+@dllExport('DeviceCapabilitiesExW')
+function deviceCapabilitiesExW() return ext_ms_win_gdi_desktop_l1_1_0.deviceCapabilitiesExA()
+
+@draft
+@dllExport('DPtoLP')
+function dPtoLP() {}
+
+@draft
+@dllExport('DrawEscape')
+function drawEscape() {}
+
+@draft
+@dllExport('DwmCreatedBitmapRemotingOutput')
+function dwmCreatedBitmapRemotingOutput() {}
+
+@draft
+@dllExport('DxTrimNotificationListHead')
+function dxTrimNotificationListHead() {}
+
+@draft
+@dllExport('Ellipse')
+function ellipse() {}
+
+@draft
+@dllExport('EnableEUDC')
+function enableEUDC() {}
+
+@draft
+@dllExport('EndDoc')
+function endDoc() {}
+
+@draft
+@dllExport('EndFormPage')
+function endFormPage() {}
+
+@draft
+@dllExport('EndGdiRendering')
+function endGdiRendering() {}
+
+@draft
+@dllExport('EndPage')
+function endPage() {}
+
+@draft
+@dllExport('EndPath')
+function endPath() {}
+
+@draft
+@dllExport('EngAcquireSemaphore')
+function engAcquireSemaphore() {}
+
+@draft
+@dllExport('EngAlphaBlend')
+function engAlphaBlend() {}
+
+@draft
+@dllExport('EngAssociateSurface')
+function engAssociateSurface() {}
+
+@draft
+@dllExport('EngBitBlt')
+function engBitBlt() {}
+
+@draft
+@dllExport('EngCheckAbort')
+function engCheckAbort() {}
+
+@draft
+@dllExport('EngComputeGlyphSet')
+function engComputeGlyphSet() {}
+
+@draft
+@dllExport('EngCopyBits')
+function engCopyBits() {}
+
+@draft
+@dllExport('EngCreateBitmap')
+function engCreateBitmap() {}
+
+@draft
+@dllExport('EngCreateClip')
+function engCreateClip() {}
+
+@draft
+@dllExport('EngCreateDeviceBitmap')
+function engCreateDeviceBitmap() {}
+
+@draft
+@dllExport('EngCreateDeviceSurface')
+function engCreateDeviceSurface() {}
+
+@draft
+@dllExport('EngCreatePalette')
+function engCreatePalette() {}
+
+@draft
+@dllExport('EngCreateSemaphore')
+function engCreateSemaphore() {}
+
+@draft
+@dllExport('EngDeleteClip')
+function engDeleteClip() {}
+
+@draft
+@dllExport('EngDeletePalette')
+function engDeletePalette() {}
+
+@draft
+@dllExport('EngDeletePath')
+function engDeletePath() {}
+
+@draft
+@dllExport('EngDeleteSemaphore')
+function engDeleteSemaphore() {}
+
+@draft
+@dllExport('EngDeleteSurface')
+function engDeleteSurface() {}
+
+@draft
+@dllExport('EngEraseSurface')
+function engEraseSurface() {}
+
+@draft
+@dllExport('EngFillPath')
+function engFillPath() {}
+
+@draft
+@dllExport('EngFindResource')
+function engFindResource() {}
+
+@draft
+@dllExport('EngFreeModule')
+function engFreeModule() {}
+
+@draft
+@dllExport('EngGetCurrentCodePage')
+function engGetCurrentCodePage() {}
+
+@draft
+@dllExport('EngGetDriverName')
+function engGetDriverName() {}
+
+@draft
+@dllExport('EngGetPrinterDataFileName')
+function engGetPrinterDataFileName() {}
+
+@draft
+@dllExport('EngGradientFill')
+function engGradientFill() {}
+
+@draft
+@dllExport('EngLineTo')
+function engLineTo() {}
+
+@draft
+@dllExport('EngLoadModule')
+function engLoadModule() {}
+
+@draft
+@dllExport('EngLockSurface')
+function engLockSurface() {}
+
+@draft
+@dllExport('EngMarkBandingSurface')
+function engMarkBandingSurface() {}
+
+@draft
+@dllExport('EngMultiByteToUnicodeN')
+function engMultiByteToUnicodeN() {}
+
+@draft
+@dllExport('EngMultiByteToWideChar')
+function engMultiByteToWideChar() {}
+
+@draft
+@dllExport('EngPaint')
+function engPaint() {}
+
+@draft
+@dllExport('EngPlgBlt')
+function engPlgBlt() {}
+
+@draft
+@dllExport('EngQueryEMFInfo')
+function engQueryEMFInfo() {}
+
+@draft
+@dllExport('EngQueryLocalTime')
+function engQueryLocalTime() {}
+
+@draft
+@dllExport('EngReleaseSemaphore')
+function engReleaseSemaphore() {}
+
+@draft
+@dllExport('EngStretchBlt')
+function engStretchBlt() {}
+
+@draft
+@dllExport('EngStretchBltROP')
+function engStretchBltROP() {}
+
+@draft
+@dllExport('EngStrokeAndFillPath')
+function engStrokeAndFillPath() {}
+
+@draft
+@dllExport('EngStrokePath')
+function engStrokePath() {}
+
+@draft
+@dllExport('EngTextOut')
+function engTextOut() {}
+
+@draft
+@dllExport('EngTransparentBlt')
+function engTransparentBlt() {}
+
+@draft
+@dllExport('EngUnicodeToMultiByteN')
+function engUnicodeToMultiByteN() {}
+
+@draft
+@dllExport('EngUnlockSurface')
+function engUnlockSurface() {}
+
+@draft
+@dllExport('EngWideCharToMultiByte')
+function engWideCharToMultiByte() {}
+
+@draft
+@dllExport('EnumEnhMetaFile')
+function enumEnhMetaFile() {}
+
+@draft
+@dllExport('EnumFontFamiliesA')
+function enumFontFamiliesA() {}
+
+@draft
+@dllExport('EnumFontFamiliesExA')
+function enumFontFamiliesExA() {}
+
+@draft
+@dllExport('EnumFontFamiliesExW')
+function enumFontFamiliesExW() {}
+
+@draft
+@dllExport('EnumFontFamiliesW')
+function enumFontFamiliesW() {}
+
+@draft
+@dllExport('EnumFontsA')
+function enumFontsA() {}
+
+@draft
+@dllExport('EnumFontsW')
+function enumFontsW() {}
+
+@draft
+@dllExport('EnumICMProfilesA')
+function enumICMProfilesA() {}
+
+@draft
+@dllExport('EnumICMProfilesW')
+function enumICMProfilesW() {}
+
+@draft
+@dllExport('EnumMetaFile')
+function enumMetaFile() {}
+
+@draft
+@dllExport('EnumObjects')
+function enumObjects() {}
+
+@draft
+@dllExport('EqualRgn')
+function equalRgn() {}
+
+@draft
+@dllExport('Escape')
+function escape() {}
+
+@draft
+@dllExport('EudcLoadLinkW')
+function eudcLoadLinkW() {}
+
+@draft
+@dllExport('EudcUnloadLinkW')
+function eudcUnloadLinkW() {}
+
+@draft
+@dllExport('ExcludeClipRect')
+function excludeClipRect() {}
+
+@draft
+@dllExport('ExtCreatePen')
+function extCreatePen() {}
+
+@draft
+@dllExport('ExtCreateRegion')
+function extCreateRegion() {}
+
+@draft
+@dllExport('ExtEscape')
+function extEscape() {}
+
+@draft
+@dllExport('ExtFloodFill')
+function extFloodFill() {}
+
+@draft
+@dllExport('ExtSelectClipRgn')
+function extSelectClipRgn() {}
+
+@draft
+@dllExport('ExtTextOutA')
+function extTextOutA() {}
+
+@draft
+@dllExport('ExtTextOutW')
+function extTextOutW() {}
+
+@draft
+@dllExport('FillPath')
+function fillPath() {}
+
+@draft
+@dllExport('FillRgn')
+function fillRgn() {}
+
+@draft
+@dllExport('FixBrushOrgEx')
+function fixBrushOrgEx() {}
+
+@draft
+@dllExport('FlattenPath')
+function flattenPath() {}
+
+@draft
+@dllExport('FloodFill')
+function floodFill() {}
+
+@draft
+@dllExport('FontIsLinked')
+function fontIsLinked() {}
+
+@draft
+@dllExport('FONTOBJ_cGetAllGlyphHandles')
+function fONTOBJ_cGetAllGlyphHandles() {}
+
+@draft
+@dllExport('FONTOBJ_cGetGlyphs')
+function fONTOBJ_cGetGlyphs() {}
+
+@draft
+@dllExport('FONTOBJ_pfdg')
+function fONTOBJ_pfdg() {}
+
+@draft
+@dllExport('FONTOBJ_pifi')
+function fONTOBJ_pifi() {}
+
+@draft
+@dllExport('FONTOBJ_pQueryGlyphAttrs')
+function fONTOBJ_pQueryGlyphAttrs() {}
+
+@draft
+@dllExport('FONTOBJ_pvTrueTypeFontFile')
+function fONTOBJ_pvTrueTypeFontFile() {}
+
+@draft
+@dllExport('FONTOBJ_pxoGetXform')
+function fONTOBJ_pxoGetXform() {}
+
+@draft
+@dllExport('FONTOBJ_vGetInfo')
+function fONTOBJ_vGetInfo() {}
+
+@draft
+@dllExport('fpClosePrinter')
+function fpClosePrinter() {}
+
+@draft
+@dllExport('FrameRgn')
+function frameRgn() {}
+
+@draft
+@dllExport('ftsWordBreak')
+function ftsWordBreak() return ext_ms_win_gdi_internal_desktop_l1_1_0.ftsWordBreak()
+
+@draft
+@dllExport('g_systemCallFilterId')
+function g_systemCallFilterId() {}
+
+@draft
+@dllExport('Gdi32DllInitialize')
+function gdi32DllInitialize() {}
+
+@draft
+@dllExport('GdiAddFontResourceW')
+function gdiAddFontResourceW() {}
+
+@draft
+@dllExport('GdiAddGlsBounds')
+function gdiAddGlsBounds() {}
+
+@draft
+@dllExport('GdiAddGlsRecord')
+function gdiAddGlsRecord() {}
+
+@draft
+@dllExport('GdiAddInitialFonts')
+function gdiAddInitialFonts() {}
+
+@draft
+@dllExport('GdiAlphaBlend')
+function gdiAlphaBlend() {}
+
+@draft
+@dllExport('GdiArtificialDecrementDriver')
+function gdiArtificialDecrementDriver() {}
+
+@draft
+@dllExport('GdiBatchLimit')
+function gdiBatchLimit() {}
+
+@draft
+@dllExport('GdiCleanCacheDC')
+function gdiCleanCacheDC() {}
+
+@draft
+@dllExport('GdiComment')
+function gdiComment() {}
+
+@draft
+@dllExport('GdiConsoleTextOut')
+function gdiConsoleTextOut() {}
+
+@draft
+@dllExport('GdiConvertAndCheckDC')
+function gdiConvertAndCheckDC() {}
+
+@draft
+@dllExport('GdiConvertBitmap')
+function gdiConvertBitmap() {}
+
+@draft
+@dllExport('GdiConvertBitmapV5')
+function gdiConvertBitmapV5() {}
+
+@draft
+@dllExport('GdiConvertBrush')
+function gdiConvertBrush() {}
+
+@draft
+@dllExport('GdiConvertDC')
+function gdiConvertDC() {}
+
+@draft
+@dllExport('GdiConvertEnhMetaFile')
+function gdiConvertEnhMetaFile() {}
+
+@draft
+@dllExport('GdiConvertFont')
+function gdiConvertFont() {}
+
+@draft
+@dllExport('GdiConvertMetaFilePict')
+function gdiConvertMetaFilePict() {}
+
+@draft
+@dllExport('GdiConvertPalette')
+function gdiConvertPalette() {}
+
+@draft
+@dllExport('GdiConvertRegion')
+function gdiConvertRegion() {}
+
+@draft
+@dllExport('GdiConvertToDevmodeW')
+function gdiConvertToDevmodeW() {}
+
+@draft
+@dllExport('GdiCreateLocalEnhMetaFile')
+function gdiCreateLocalEnhMetaFile() {}
+
+@draft
+@dllExport('GdiCreateLocalMetaFilePict')
+function gdiCreateLocalMetaFilePict() {}
+
+@draft
+@dllExport('GdiCurrentProcessSplWow64')
+function gdiCurrentProcessSplWow64() {}
+
+@draft
+@dllExport('GdiDeleteLocalDC')
+function gdiDeleteLocalDC() {}
+
+@draft
+@dllExport('GdiDeleteSpoolFileHandle')
+function gdiDeleteSpoolFileHandle() {}
+
+@draft
+@dllExport('GdiDescribePixelFormat')
+function gdiDescribePixelFormat() {}
+
+@draft
+@dllExport('GdiDllInitialize')
+function gdiDllInitialize() {}
+
+@draft
+@dllExport('GdiDrawStream')
+function gdiDrawStream() {}
+
+@draft
+@dllExport('GdiEndDocEMF')
+function gdiEndDocEMF() {}
+
+@draft
+@dllExport('GdiEndPageEMF')
+function gdiEndPageEMF() {}
+
+@draft
+@dllExport('GdiEntry1')
+function gdiEntry1() {}
+
+@draft
+@dllExport('GdiEntry10')
+function gdiEntry10() {}
+
+@draft
+@dllExport('GdiEntry11')
+function gdiEntry11() {}
+
+@draft
+@dllExport('GdiEntry12')
+function gdiEntry12() {}
+
+@draft
+@dllExport('GdiEntry13')
+function gdiEntry13() {}
+
+@draft
+@dllExport('GdiEntry14')
+function gdiEntry14() {}
+
+@draft
+@dllExport('GdiEntry15')
+function gdiEntry15() {}
+
+@draft
+@dllExport('GdiEntry16')
+function gdiEntry16() {}
+
+@draft
+@dllExport('GdiEntry2')
+function gdiEntry2() {}
+
+@draft
+@dllExport('GdiEntry3')
+function gdiEntry3() {}
+
+@draft
+@dllExport('GdiEntry4')
+function gdiEntry4() {}
+
+@draft
+@dllExport('GdiEntry5')
+function gdiEntry5() {}
+
+@draft
+@dllExport('GdiEntry6')
+function gdiEntry6() {}
+
+@draft
+@dllExport('GdiEntry7')
+function gdiEntry7() {}
+
+@draft
+@dllExport('GdiEntry8')
+function gdiEntry8() {}
+
+@draft
+@dllExport('GdiEntry9')
+function gdiEntry9() {}
+
+@draft
+@dllExport('GdiFixUpHandle')
+function gdiFixUpHandle() {}
+
+@draft
+@dllExport('GdiFlush')
+function gdiFlush() {}
+
+@draft
+@dllExport('GdiFullscreenControl')
+function gdiFullscreenControl() {}
+
+@draft
+@dllExport('GdiGetBatchLimit')
+function gdiGetBatchLimit() {}
+
+@draft
+@dllExport('GdiGetBitmapBitsSize')
+function gdiGetBitmapBitsSize() {}
+
+@draft
+@dllExport('GdiGetCharDimensions')
+function gdiGetCharDimensions() {}
+
+@draft
+@dllExport('GdiGetCodePage')
+function gdiGetCodePage() {}
+
+@draft
+@dllExport('GdiGetDC')
+function gdiGetDC() {}
+
+@draft
+@dllExport('GdiGetDevmodeForPage')
+function gdiGetDevmodeForPage() {}
+
+@draft
+@dllExport('GdiGetEntry')
+function gdiGetEntry() {}
+
+@draft
+@dllExport('GdiGetLocalBrush')
+function gdiGetLocalBrush() {}
+
+@draft
+@dllExport('GdiGetLocalDC')
+function gdiGetLocalDC() {}
+
+@draft
+@dllExport('GdiGetLocalFont')
+function gdiGetLocalFont() {}
+
+@draft
+@dllExport('GdiGetPageCount')
+function gdiGetPageCount() {}
+
+@draft
+@dllExport('GdiGetPageHandle')
+function gdiGetPageHandle() {}
+
+@draft
+@dllExport('GdiGetSpoolFileHandle')
+function gdiGetSpoolFileHandle() {}
+
+@draft
+@dllExport('GdiGetSpoolMessage')
+function gdiGetSpoolMessage() {}
+
+@draft
+@dllExport('GdiGetVariationStoreDelta')
+function gdiGetVariationStoreDelta() {}
+
+@draft
+@dllExport('GdiGradientFill')
+function gdiGradientFill() {}
+
+@draft
+@dllExport('GdiInitializeLanguagePack')
+function gdiInitializeLanguagePack() {}
+
+@draft
+@dllExport('GdiInitSpool')
+function gdiInitSpool() {}
+
+@draft
+@dllExport('GdiIsMetaFileDC')
+function gdiIsMetaFileDC() {}
+
+@draft
+@dllExport('GdiIsMetaPrintDC')
+function gdiIsMetaPrintDC() {}
+
+@draft
+@dllExport('GdiIsPlayMetafileDC')
+function gdiIsPlayMetafileDC() {}
+
+@draft
+@dllExport('GdiIsScreenDC')
+function gdiIsScreenDC() {}
+
+@draft
+@dllExport('GdiIsTrackingEnabled')
+function gdiIsTrackingEnabled() {}
+
+@draft
+@dllExport('GdiIsUMPDSandboxingEnabled')
+function gdiIsUMPDSandboxingEnabled() {}
+
+@draft
+@dllExport('GdiLoadType1Fonts')
+function gdiLoadType1Fonts() {}
+
+@draft
+@dllExport('GdiPlayDCScript')
+function gdiPlayDCScript() {}
+
+@draft
+@dllExport('GdiPlayEMF')
+function gdiPlayEMF() {}
+
+@draft
+@dllExport('GdiPlayJournal')
+function gdiPlayJournal() {}
+
+@draft
+@dllExport('GdiPlayPageEMF')
+function gdiPlayPageEMF() {}
+
+@draft
+@dllExport('GdiPlayPrivatePageEMF')
+function gdiPlayPrivatePageEMF() {}
+
+@draft
+@dllExport('GdiPlayScript')
+function gdiPlayScript() {}
+
+@draft
+@dllExport('gdiPlaySpoolStream')
+function gdiPlaySpoolStream() {}
+
+@draft
+@dllExport('GdiPrinterThunk')
+function gdiPrinterThunk() {}
+
+@draft
+@dllExport('GdiProcessSetup')
+function gdiProcessSetup() {}
+
+@draft
+@dllExport('GdiQueryFonts')
+function gdiQueryFonts() {}
+
+@draft
+@dllExport('GdiQueryTable')
+function gdiQueryTable() {}
+
+@draft
+@dllExport('GdiRealizationInfo')
+function gdiRealizationInfo() {}
+
+@draft
+@dllExport('GdiReleaseDC')
+function gdiReleaseDC() {}
+
+@draft
+@dllExport('GdiReleaseLocalDC')
+function gdiReleaseLocalDC() {}
+
+@draft
+@dllExport('GdiResetDCEMF')
+function gdiResetDCEMF() {}
+
+@draft
+@dllExport('GdiSetAttrs')
+function gdiSetAttrs() {}
+
+@draft
+@dllExport('GdiSetBatchLimit')
+function gdiSetBatchLimit() {}
+
+@draft
+@dllExport('GdiSetLastError')
+function gdiSetLastError() {}
+
+@draft
+@dllExport('GdiSetPixelFormat')
+function gdiSetPixelFormat() {}
+
+@draft
+@dllExport('GdiSetServerAttr')
+function gdiSetServerAttr() {}
+
+@draft
+@dllExport('GdiStartDocEMF')
+function gdiStartDocEMF() {}
+
+@draft
+@dllExport('GdiStartPageEMF')
+function gdiStartPageEMF() {}
+
+@draft
+@dllExport('GdiSupportsFontChangeEvent')
+function gdiSupportsFontChangeEvent() {}
+
+@draft
+@dllExport('GdiSwapBuffers')
+function gdiSwapBuffers() {}
+
+@draft
+@dllExport('GdiTrackHCreate')
+function gdiTrackHCreate() {}
+
+@draft
+@dllExport('GdiTrackHDelete')
+function gdiTrackHDelete() {}
+
+@draft
+@dllExport('GdiTransparentBlt')
+function gdiTransparentBlt() {}
+
+@draft
+@dllExport('GdiValidateHandle')
+function gdiValidateHandle() {}
+
+@draft
+@dllExport('GetArcDirection')
+function getArcDirection() {}
+
+@draft
+@dllExport('GetAspectRatioFilterEx')
+function getAspectRatioFilterEx() {}
+
+@draft
+@dllExport('GetBitmapAttributes')
+function getBitmapAttributes() {}
+
+@draft
+@dllExport('GetBitmapBits')
+function getBitmapBits() {}
+
+@draft
+@dllExport('GetBitmapDimensionEx')
+function getBitmapDimensionEx() {}
+
+@draft
+@dllExport('GetBitmapDpiScaleValue')
+function getBitmapDpiScaleValue() {}
+
+@draft
+@dllExport('GetBkColor')
+function getBkColor() {}
+
+@draft
+@dllExport('GetBkMode')
+function getBkMode() {}
+
+@draft
+@dllExport('GetBoundsRect')
+function getBoundsRect() {}
+
+@draft
+@dllExport('GetBrushAttributes')
+function getBrushAttributes() {}
+
+@draft
+@dllExport('GetBrushOrgEx')
+function getBrushOrgEx() {}
+
+@draft
+@dllExport('GetCertificate')
+function getCertificate() {}
+
+@draft
+@dllExport('GetCertificateByHandle')
+function getCertificateByHandle() {}
+
+@draft
+@dllExport('GetCertificateSize')
+function getCertificateSize() {}
+
+@draft
+@dllExport('GetCertificateSizeByHandle')
+function getCertificateSizeByHandle() {}
+
+@draft
+@dllExport('GetCharABCWidthsA')
+function getCharABCWidthsA() {}
+
+@draft
+@dllExport('GetCharABCWidthsFloatA')
+function getCharABCWidthsFloatA() {}
+
+@draft
+@dllExport('GetCharABCWidthsFloatI')
+function getCharABCWidthsFloatI() {}
+
+@draft
+@dllExport('GetCharABCWidthsFloatW')
+function getCharABCWidthsFloatW() {}
+
+@draft
+@dllExport('GetCharABCWidthsI')
+function getCharABCWidthsI() {}
+
+@draft
+@dllExport('GetCharABCWidthsW')
+function getCharABCWidthsW() {}
+
+@draft
+@dllExport('GetCharacterPlacementA')
+function getCharacterPlacementA() {}
+
+@draft
+@dllExport('GetCharacterPlacementW')
+function getCharacterPlacementW() {}
+
+@draft
+@dllExport('GetCharWidth32A')
+function getCharWidth32A() {}
+
+@draft
+@dllExport('GetCharWidth32W')
+function getCharWidth32W() {}
+
+@draft
+@dllExport('GetCharWidthA')
+function getCharWidthA() {}
+
+@draft
+@dllExport('GetCharWidthFloatA')
+function getCharWidthFloatA() {}
+
+@draft
+@dllExport('GetCharWidthFloatW')
+function getCharWidthFloatW() {}
+
+@draft
+@dllExport('GetCharWidthI')
+function getCharWidthI() {}
+
+@draft
+@dllExport('GetCharWidthInfo')
+function getCharWidthInfo() {}
+
+@draft
+@dllExport('GetCharWidthW')
+function getCharWidthW() {}
+
+@draft
+@dllExport('GetClipBox')
+function getClipBox() {}
+
+@draft
+@dllExport('GetClipRgn')
+function getClipRgn() {}
+
+@draft
+@dllExport('GetColorAdjustment')
+function getColorAdjustment() {}
+
+@draft
+@dllExport('GetColorSpace')
+function getColorSpace() {}
+
+@draft
+@dllExport('GetCOPPCompatibleOPMInformation')
+function getCOPPCompatibleOPMInformation() {}
+
+@draft
+@dllExport('GetCurrentDpiInfo')
+function getCurrentDpiInfo() {}
+
+@draft
+@dllExport('GetCurrentObject')
+function getCurrentObject() {}
+
+@draft
+@dllExport('GetCurrentPositionEx')
+function getCurrentPositionEx() {}
+
+@draft
+@dllExport('GetDCBrushColor')
+function getDCBrushColor() {}
+
+@draft
+@dllExport('GetDCDpiScaleValue')
+function getDCDpiScaleValue() {}
+
+@draft
+@dllExport('GetDCOrgEx')
+function getDCOrgEx() {}
+
+@draft
+@dllExport('GetDCPenColor')
+function getDCPenColor() {}
+
+@draft
+@dllExport('GetDeviceCaps')
+function getDeviceCaps() {}
+
+@draft
+@dllExport('GetDeviceGammaRamp')
+function getDeviceGammaRamp() {}
+
+@draft
+@dllExport('GetDIBColorTable')
+function getDIBColorTable() {}
+
+@draft
+@dllExport('GetDIBits')
+function getDIBits() {}
+
+@draft
+@dllExport('GetEnhMetaFileA')
+function getEnhMetaFileA() {}
+
+@draft
+@dllExport('GetEnhMetaFileBits')
+function getEnhMetaFileBits() {}
+
+@draft
+@dllExport('GetEnhMetaFileDescriptionA')
+function getEnhMetaFileDescriptionA() {}
+
+@draft
+@dllExport('GetEnhMetaFileDescriptionW')
+function getEnhMetaFileDescriptionW() {}
+
+@draft
+@dllExport('GetEnhMetaFileHeader')
+function getEnhMetaFileHeader() {}
+
+@draft
+@dllExport('GetEnhMetaFilePaletteEntries')
+function getEnhMetaFilePaletteEntries() {}
+
+@draft
+@dllExport('GetEnhMetaFilePixelFormat')
+function getEnhMetaFilePixelFormat() {}
+
+@draft
+@dllExport('GetEnhMetaFileW')
+function getEnhMetaFileW() {}
+
+@draft
+@dllExport('GetETM')
+function getETM() {}
+
+@draft
+@dllExport('GetEUDCTimeStamp')
+function getEUDCTimeStamp() {}
+
+@draft
+@dllExport('GetEUDCTimeStampExW')
+function getEUDCTimeStampExW() {}
+
+@draft
+@dllExport('GetFontAssocStatus')
+function getFontAssocStatus() {}
+
+@draft
+@dllExport('GetFontData')
+function getFontData() {}
+
+@draft
+@dllExport('GetFontFileData')
+function getFontFileData() {}
+
+@draft
+@dllExport('GetFontFileInfo')
+function getFontFileInfo() {}
+
+@draft
+@dllExport('GetFontLanguageInfo')
+function getFontLanguageInfo() {}
+
+@draft
+@dllExport('GetFontRealizationInfo')
+function getFontRealizationInfo() {}
+
+@draft
+@dllExport('GetFontResourceInfoW')
+function getFontResourceInfoW() {}
+
+@draft
+@dllExport('GetFontUnicodeRanges')
+function getFontUnicodeRanges() {}
+
+@draft
+@dllExport('GetGlyphIndicesA')
+function getGlyphIndicesA() {}
+
+@draft
+@dllExport('GetGlyphIndicesW')
+function getGlyphIndicesW() {}
+
+@draft
+@dllExport('GetGlyphOutline')
+function getGlyphOutline() {}
+
+@draft
+@dllExport('GetGlyphOutlineA')
+function getGlyphOutlineA() {}
+
+@draft
+@dllExport('GetGlyphOutlineW')
+function getGlyphOutlineW() {}
+
+@draft
+@dllExport('GetGlyphOutlineWow')
+function getGlyphOutlineWow() {}
+
+@draft
+@dllExport('GetGraphicsMode')
+function getGraphicsMode() {}
+
+@draft
+@dllExport('GetHFONT')
+function getHFONT() {}
+
+@draft
+@dllExport('GetICMProfileA')
+function getICMProfileA() {}
+
+@draft
+@dllExport('GetICMProfileW')
+function getICMProfileW() {}
+
+@draft
+@dllExport('GetKerningPairs')
+function getKerningPairs() {}
+
+@draft
+@dllExport('GetKerningPairsA')
+function getKerningPairsA() {}
+
+@draft
+@dllExport('GetKerningPairsW')
+function getKerningPairsW() {}
+
+@draft
+@dllExport('GetLayout')
+function getLayout() {}
+
+@draft
+@dllExport('GetLogColorSpaceA')
+function getLogColorSpaceA() {}
+
+@draft
+@dllExport('GetLogColorSpaceW')
+function getLogColorSpaceW() {}
+
+@draft
+@dllExport('GetMapMode')
+function getMapMode() {}
+
+@draft
+@dllExport('GetMetaFileA')
+function getMetaFileA() {}
+
+@draft
+@dllExport('GetMetaFileBitsEx')
+function getMetaFileBitsEx() {}
+
+@draft
+@dllExport('GetMetaFileW')
+function getMetaFileW() {}
+
+@draft
+@dllExport('GetMetaRgn')
+function getMetaRgn() {}
+
+@draft
+@dllExport('GetMiterLimit')
+function getMiterLimit() {}
+
+@draft
+@dllExport('GetNearestColor')
+function getNearestColor() {}
+
+@draft
+@dllExport('GetNearestPaletteIndex')
+function getNearestPaletteIndex() {}
+
+@draft
+@dllExport('GetNumberOfPhysicalMonitors')
+function getNumberOfPhysicalMonitors() {}
+
+@draft
+@dllExport('GetObjectA')
+function getObjectA() {}
+
+@draft
+@dllExport('GetObjectType')
+function getObjectType() {}
+
+@draft
+@dllExport('GetObjectW')
+function getObjectW() {}
+
+@draft
+@dllExport('GetOPMInformation')
+function getOPMInformation() {}
+
+@draft
+@dllExport('GetOPMRandomNumber')
+function getOPMRandomNumber() {}
+
+@draft
+@dllExport('GetOutlineTextMetricsA')
+function getOutlineTextMetricsA() {}
+
+@draft
+@dllExport('GetOutlineTextMetricsW')
+function getOutlineTextMetricsW() {}
+
+@draft
+@dllExport('GetPaletteEntries')
+function getPaletteEntries() {}
+
+@draft
+@dllExport('GetPath')
+function getPath() {}
+
+@draft
+@dllExport('GetPhysicalMonitorDescription')
+function getPhysicalMonitorDescription() {}
+
+@draft
+@dllExport('GetPhysicalMonitors')
+function getPhysicalMonitors() {}
+
+@draft
+@dllExport('GetPixel')
+function getPixel() {}
+
+@draft
+@dllExport('GetPixelFormat')
+function getPixelFormat() {}
+
+@draft
+@dllExport('GetPolyFillMode')
+function getPolyFillMode() {}
+
+@draft
+@dllExport('GetProcessSessionFonts')
+function getProcessSessionFonts() {}
+
+@draft
+@dllExport('GetRandomRgn')
+function getRandomRgn() {}
+
+@draft
+@dllExport('GetRasterizerCaps')
+function getRasterizerCaps() {}
+
+@draft
+@dllExport('GetRegionData')
+function getRegionData() {}
+
+@draft
+@dllExport('GetRelAbs')
+function getRelAbs() {}
+
+@draft
+@dllExport('GetRgnBox')
+function getRgnBox() {}
+
+@draft
+@dllExport('GetROP2')
+function getROP2() {}
+
+@draft
+@dllExport('GetStockObject')
+function getStockObject() {}
+
+@draft
+@dllExport('GetStretchBltMode')
+function getStretchBltMode() {}
+
+@draft
+@dllExport('GetStringBitmapA')
+function getStringBitmapA() {}
+
+@draft
+@dllExport('GetStringBitmapW')
+function getStringBitmapW() {}
+
+@draft
+@dllExport('GetSuggestedOPMProtectedOutputArraySize')
+function getSuggestedOPMProtectedOutputArraySize() {}
+
+@draft
+@dllExport('GetSystemPaletteEntries')
+function getSystemPaletteEntries() {}
+
+@draft
+@dllExport('GetSystemPaletteUse')
+function getSystemPaletteUse() {}
+
+@draft
+@dllExport('GetTextAlign')
+function getTextAlign() {}
+
+@draft
+@dllExport('GetTextCharacterExtra')
+function getTextCharacterExtra() {}
+
+@draft
+@dllExport('GetTextCharset')
+function getTextCharset() {}
+
+@draft
+@dllExport('GetTextCharsetInfo')
+function getTextCharsetInfo() {}
+
+@draft
+@dllExport('GetTextColor')
+function getTextColor() {}
+
+@draft
+@dllExport('GetTextExtentExPointA')
+function getTextExtentExPointA() {}
+
+@draft
+@dllExport('GetTextExtentExPointI')
+function getTextExtentExPointI() {}
+
+@draft
+@dllExport('GetTextExtentExPointW')
+function getTextExtentExPointW() {}
+
+@draft
+@dllExport('GetTextExtentExPointWPri')
+function getTextExtentExPointWPri() {}
+
+@draft
+@dllExport('GetTextExtentPoint32A')
+function getTextExtentPoint32A() {}
+
+@draft
+@dllExport('GetTextExtentPoint32W')
+function getTextExtentPoint32W() {}
+
+@draft
+@dllExport('GetTextExtentPointA')
+function getTextExtentPointA() {}
+
+@draft
+@dllExport('GetTextExtentPointI')
+function getTextExtentPointI() {}
+
+@draft
+@dllExport('GetTextExtentPointW')
+function getTextExtentPointW() {}
+
+@draft
+@dllExport('GetTextFaceA')
+function getTextFaceA() {}
+
+@draft
+@dllExport('GetTextFaceAliasW')
+function getTextFaceAliasW() {}
+
+@draft
+@dllExport('GetTextFaceW')
+function getTextFaceW() {}
+
+@draft
+@dllExport('GetTextMetricsA')
+function getTextMetricsA() {}
+
+@draft
+@dllExport('GetTextMetricsW')
+function getTextMetricsW() {}
+
+@draft
+@dllExport('GetTransform')
+function getTransform() {}
+
+@draft
+@dllExport('GetViewportExtEx')
+function getViewportExtEx() {}
+
+@draft
+@dllExport('GetViewportOrgEx')
+function getViewportOrgEx() {}
+
+@draft
+@dllExport('GetWindowExtEx')
+function getWindowExtEx() {}
+
+@draft
+@dllExport('GetWindowOrgEx')
+function getWindowOrgEx() {}
+
+@draft
+@dllExport('GetWinMetaFileBits')
+function getWinMetaFileBits() {}
+
+@draft
+@dllExport('GetWorldTransform')
+function getWorldTransform() {}
+
+@draft
+@dllExport('ghICM')
+function ghICM() {}
+
+@draft
+@dllExport('gMaxGdiHandleCount')
+function gMaxGdiHandleCount() {}
+
+@draft
+@dllExport('gW32PID')
+function gW32PID() {}
+
+@draft
+@dllExport('hGetPEBHandle')
+function hGetPEBHandle() {}
+
+@draft
+@dllExport('HT_Get8BPPFormatPalette')
+function hT_Get8BPPFormatPalette() {}
+
+@draft
+@dllExport('HT_Get8BPPMaskPalette')
+function hT_Get8BPPMaskPalette() {}
+
+@draft
+@dllExport('InternalDeleteDC')
+function internalDeleteDC() {}
+
+@draft
+@dllExport('IntersectClipRect')
+function intersectClipRect() {}
+
+@draft
+@dllExport('InvertRgn')
+function invertRgn() {}
+
+@draft
+@dllExport('IsValidEnhMetaRecord')
+function isValidEnhMetaRecord() {}
+
+@draft
+@dllExport('IsValidEnhMetaRecordOffExt')
+function isValidEnhMetaRecordOffExt() {}
+
+@draft
+@dllExport('LineDDA')
+function lineDDA() {}
+
+@draft
+@dllExport('LineTo')
+function lineTo() {}
+
+@draft
+@dllExport('LpkDrawTextEx')
+function lpkDrawTextEx() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkDrawTextEx()
+
+@draft
+@dllExport('LpkEditControl')
+function lpkEditControl() {}
+
+@draft
+@dllExport('LpkExtTextOut')
+function lpkExtTextOut() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkExtTextOut()
+
+@draft
+@dllExport('LpkGetCharacterPlacement')
+function lpkGetCharacterPlacement() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkGetCharacterPlacement()
+
+@draft
+@dllExport('LpkGetEditControl')
+function lpkGetEditControl() {}
+
+@draft
+@dllExport('LpkGetTextExtentExPoint')
+function lpkGetTextExtentExPoint() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkGetTextExtentExPoint()
+
+@draft
+@dllExport('LpkInitialize')
+function lpkInitialize() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkInitialize()
+
+@draft
+@dllExport('LpkpEditControlSize')
+function lpkpEditControlSize() {}
+
+@draft
+@dllExport('LpkpInitializeEditControl')
+function lpkpInitializeEditControl() {}
+
+@draft
+@dllExport('LpkPresent')
+function lpkPresent() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkPresent()
+
+@draft
+@dllExport('LpkPSMTextOut')
+function lpkPSMTextOut() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkPSMTextOut()
+
+@draft
+@dllExport('LpkTabbedTextOut')
+function lpkTabbedTextOut() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkTabbedTextOut()
+
+@draft
+@dllExport('LpkUseGDIWidthCache')
+function lpkUseGDIWidthCache() return ext_ms_win_gdi_internal_desktop_l1_1_0.lpkUseGDIWidthCache()
+
+@draft
+@dllExport('LPtoDP')
+function lPtoDP() {}
+
+@draft
+@dllExport('MaskBlt')
+function maskBlt() {}
+
+@draft
+@dllExport('MirrorRgn')
+function mirrorRgn() {}
+
+@draft
+@dllExport('ModerncoreGdiInit')
+function moderncoreGdiInit() {}
+
+@draft
+@dllExport('ModifyWorldTransform')
+function modifyWorldTransform() {}
+
+@draft
+@dllExport('MoveToEx')
+function moveToEx() {}
+
+@draft
+@dllExport('NamedEscape')
+function namedEscape() {}
+
+@draft
+@dllExport('OffsetClipRgn')
+function offsetClipRgn() {}
+
+@draft
+@dllExport('OffsetRgn')
+function offsetRgn() {}
+
+@draft
+@dllExport('OffsetViewportOrgEx')
+function offsetViewportOrgEx() {}
+
+@draft
+@dllExport('OffsetWindowOrgEx')
+function offsetWindowOrgEx() {}
+
+@draft
+@dllExport('PaintRgn')
+function paintRgn() {}
+
+@draft
+@dllExport('PatBlt')
+function patBlt() {}
+
+@draft
+@dllExport('PATHOBJ_bEnum')
+function pATHOBJ_bEnum() {}
+
+@draft
+@dllExport('PATHOBJ_bEnumClipLines')
+function pATHOBJ_bEnumClipLines() {}
+
+@draft
+@dllExport('PATHOBJ_vEnumStart')
+function pATHOBJ_vEnumStart() {}
+
+@draft
+@dllExport('PATHOBJ_vEnumStartClipLines')
+function pATHOBJ_vEnumStartClipLines() {}
+
+@draft
+@dllExport('PATHOBJ_vGetBounds')
+function pATHOBJ_vGetBounds() {}
+
+@draft
+@dllExport('PathToRegion')
+function pathToRegion() {}
+
+@draft
+@dllExport('pGdiDevCaps')
+function pGdiDevCaps() {}
+
+@draft
+@dllExport('pGdiSharedHandleTable')
+function pGdiSharedHandleTable() {}
+
+@draft
+@dllExport('pGdiSharedMemory')
+function pGdiSharedMemory() {}
+
+@draft
+@dllExport('Pie')
+function pie() {}
+
+@draft
+@dllExport('PlayEnhMetaFile')
+function playEnhMetaFile() {}
+
+@draft
+@dllExport('PlayEnhMetaFileRecord')
+function playEnhMetaFileRecord() {}
+
+@draft
+@dllExport('PlayMetaFile')
+function playMetaFile() {}
+
+@draft
+@dllExport('PlayMetaFileRecord')
+function playMetaFileRecord() {}
+
+@draft
+@dllExport('pldcGet')
+function pldcGet() {}
+
+@draft
+@dllExport('PlgBlt')
+function plgBlt() {}
+
+@draft
+@dllExport('PolyBezier')
+function polyBezier() {}
+
+@draft
+@dllExport('PolyBezierTo')
+function polyBezierTo() {}
+
+@draft
+@dllExport('PolyDraw')
+function polyDraw() {}
+
+@draft
+@dllExport('Polygon')
+function polygon() {}
+
+@draft
+@dllExport('Polyline')
+function polyline() {}
+
+@draft
+@dllExport('PolylineTo')
+function polylineTo() {}
+
+@draft
+@dllExport('PolyPatBlt')
+function polyPatBlt() {}
+
+@draft
+@dllExport('PolyPolygon')
+function polyPolygon() {}
+
+@draft
+@dllExport('PolyPolyline')
+function polyPolyline() {}
+
+@draft
+@dllExport('PolyTextOutA')
+function polyTextOutA() {}
+
+@draft
+@dllExport('PolyTextOutW')
+function polyTextOutW() {}
+
+@draft
+@dllExport('PtInRegion')
+function ptInRegion() {}
+
+@draft
+@dllExport('PtVisible')
+function ptVisible() {}
+
+@draft
+@dllExport('QueryFontAssocStatus')
+function queryFontAssocStatus() {}
+
+@draft
+@dllExport('RealizePalette')
+function realizePalette() {}
+
+@draft
+@dllExport('Rectangle')
+function rectangle() {}
+
+@draft
+@dllExport('RectInRegion')
+function rectInRegion() {}
+
+@draft
+@dllExport('RectVisible')
+function rectVisible() {}
+
+@draft
+@dllExport('RemoveFontMemResourceEx')
+function removeFontMemResourceEx() {}
+
+@draft
+@dllExport('RemoveFontResourceA')
+function removeFontResourceA() {}
+
+@draft
+@dllExport('RemoveFontResourceExA')
+function removeFontResourceExA() {}
+
+@draft
+@dllExport('RemoveFontResourceExW')
+function removeFontResourceExW() {}
+
+@draft
+@dllExport('RemoveFontResourceTracking')
+function removeFontResourceTracking() {}
+
+@draft
+@dllExport('RemoveFontResourceW')
+function removeFontResourceW() {}
+
+@draft
+@dllExport('ResetDCA')
+function resetDCA() {}
+
+@draft
+@dllExport('ResetDCW')
+function resetDCW() {}
+
+@draft
+@dllExport('ResizePalette')
+function resizePalette() {}
+
+@draft
+@dllExport('RestoreDC')
+function restoreDC() {}
+
+@draft
+@dllExport('RoundRect')
+function roundRect() {}
+
+@draft
+@dllExport('SaveDC')
+function saveDC() {}
+
+@draft
+@dllExport('ScaleRgn')
+function scaleRgn() {}
+
+@draft
+@dllExport('ScaleValues')
+function scaleValues() {}
+
+@draft
+@dllExport('ScaleViewportExtEx')
+function scaleViewportExtEx() {}
+
+@draft
+@dllExport('ScaleWindowExtEx')
+function scaleWindowExtEx() {}
+
+@draft
+@dllExport('ScriptApplyDigitSubstitution')
+function scriptApplyDigitSubstitution() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptApplyDigitSubstitution()
+
+@draft
+@dllExport('ScriptApplyLogicalWidth')
+function scriptApplyLogicalWidth() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptApplyLogicalWidth()
+
+@draft
+@dllExport('ScriptBreak')
+function scriptBreak() return ext_ms_win_usp10_l1_1_0.scriptBreak()
+
+@draft
+@dllExport('ScriptCacheGetHeight')
+function scriptCacheGetHeight() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptCacheGetHeight()
+
+@draft
+@dllExport('ScriptCPtoX')
+function scriptCPtoX() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptCPtoX()
+
+@draft
+@dllExport('ScriptFreeCache')
+function scriptFreeCache() return ext_ms_win_usp10_l1_1_0.scriptFreeCache()
+
+@draft
+@dllExport('ScriptGetCMap')
+function scriptGetCMap() return ext_ms_win_usp10_l1_1_0.scriptGetCMap()
+
+@draft
+@dllExport('ScriptGetFontAlternateGlyphs')
+function scriptGetFontAlternateGlyphs() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptGetFontAlternateGlyphs()
+
+@draft
+@dllExport('ScriptGetFontFeatureTags')
+function scriptGetFontFeatureTags() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptGetFontFeatureTags()
+
+@draft
+@dllExport('ScriptGetFontLanguageTags')
+function scriptGetFontLanguageTags() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptGetFontLanguageTags()
+
+@draft
+@dllExport('ScriptGetFontProperties')
+function scriptGetFontProperties() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptGetFontProperties()
+
+@draft
+@dllExport('ScriptGetFontScriptTags')
+function scriptGetFontScriptTags() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptGetFontScriptTags()
+
+@draft
+@dllExport('ScriptGetGlyphABCWidth')
+function scriptGetGlyphABCWidth() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptGetGlyphABCWidth()
+
+@draft
+@dllExport('ScriptGetLogicalWidths')
+function scriptGetLogicalWidths() return ext_ms_win_usp10_l1_1_0.scriptGetLogicalWidths()
+
+@draft
+@dllExport('ScriptGetProperties')
+function scriptGetProperties() return ext_ms_win_usp10_l1_1_0.scriptGetProperties()
+
+@draft
+@dllExport('ScriptIsComplex')
+function scriptIsComplex() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptIsComplex()
+
+@draft
+@dllExport('ScriptItemize')
+function scriptItemize() return ext_ms_win_usp10_l1_1_0.scriptItemize()
+
+@draft
+@dllExport('ScriptItemizeOpenType')
+function scriptItemizeOpenType() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptItemizeOpenType()
+
+@draft
+@dllExport('ScriptJustify')
+function scriptJustify() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptJustify()
+
+@draft
+@dllExport('ScriptLayout')
+function scriptLayout() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptLayout()
+
+@draft
+@dllExport('ScriptPlace')
+function scriptPlace() return ext_ms_win_usp10_l1_1_0.scriptPlace()
+
+@draft
+@dllExport('ScriptPlaceOpenType')
+function scriptPlaceOpenType() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptPlaceOpenType()
+
+@draft
+@dllExport('ScriptPositionSingleGlyph')
+function scriptPositionSingleGlyph() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptPositionSingleGlyph()
+
+@draft
+@dllExport('ScriptRecordDigitSubstitution')
+function scriptRecordDigitSubstitution() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptRecordDigitSubstitution()
+
+@draft
+@dllExport('ScriptShape')
+function scriptShape() return ext_ms_win_usp10_l1_1_0.scriptShape()
+
+@draft
+@dllExport('ScriptShapeOpenType')
+function scriptShapeOpenType() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptShapeOpenType()
+
+@draft
+@dllExport('ScriptString_pcOutChars')
+function scriptString_pcOutChars() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptString_pcOutChars()
+
+@draft
+@dllExport('ScriptString_pLogAttr')
+function scriptString_pLogAttr() return ext_ms_win_usp10_l1_1_0.scriptString_pLogAttr()
+
+@draft
+@dllExport('ScriptString_pSize')
+function scriptString_pSize() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptString_pSize()
+
+@draft
+@dllExport('ScriptStringAnalyse')
+function scriptStringAnalyse() return ext_ms_win_usp10_l1_1_0.scriptStringAnalyse()
+
+@draft
+@dllExport('ScriptStringCPtoX')
+function scriptStringCPtoX() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptStringCPtoX()
+
+@draft
+@dllExport('ScriptStringFree')
+function scriptStringFree() return ext_ms_win_usp10_l1_1_0.scriptStringFree()
+
+@draft
+@dllExport('ScriptStringGetLogicalWidths')
+function scriptStringGetLogicalWidths() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptStringGetLogicalWidths()
+
+@draft
+@dllExport('ScriptStringGetOrder')
+function scriptStringGetOrder() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptStringGetOrder()
+
+@draft
+@dllExport('ScriptStringOut')
+function scriptStringOut() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptStringOut()
+
+@draft
+@dllExport('ScriptStringValidate')
+function scriptStringValidate() return ext_ms_win_usp10_l1_1_0.scriptStringValidate()
+
+@draft
+@dllExport('ScriptStringXtoCP')
+function scriptStringXtoCP() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptStringXtoCP()
+
+@draft
+@dllExport('ScriptSubstituteSingleGlyph')
+function scriptSubstituteSingleGlyph() return ext_ms_win_usp10_l1_1_0.scriptSubstituteSingleGlyph()
+
+@draft
+@dllExport('ScriptTextOut')
+function scriptTextOut() return ext_ms_win_usp10_l1_1_0.scriptTextOut()
+
+@draft
+@dllExport('ScriptXtoCP')
+function scriptXtoCP() return ext_ms_win_gdi_internal_desktop_l1_1_0.scriptXtoCP()
+
+@draft
+@dllExport('SelectBrushLocal')
+function selectBrushLocal() {}
+
+@draft
+@dllExport('SelectClipPath')
+function selectClipPath() {}
+
+@draft
+@dllExport('SelectClipRgn')
+function selectClipRgn() {}
+
+@draft
+@dllExport('SelectFontLocal')
+function selectFontLocal() {}
+
+@draft
+@dllExport('SelectObject')
+function selectObject() {}
+
+@draft
+@dllExport('SelectPalette')
+function selectPalette() {}
+
+@draft
+@dllExport('semDxTrimNotification')
+function semDxTrimNotification() {}
+
+@draft
+@dllExport('SetAbortProc')
+function setAbortProc() {}
+
+@draft
+@dllExport('SetArcDirection')
+function setArcDirection() {}
+
+@draft
+@dllExport('SetBitmapAttributes')
+function setBitmapAttributes() {}
+
+@draft
+@dllExport('SetBitmapBits')
+function setBitmapBits() {}
+
+@draft
+@dllExport('SetBitmapDimensionEx')
+function setBitmapDimensionEx() {}
+
+@draft
+@dllExport('SetBkColor')
+function setBkColor() {}
+
+@draft
+@dllExport('SetBkMode')
+function setBkMode() {}
+
+@draft
+@dllExport('SetBoundsRect')
+function setBoundsRect() {}
+
+@draft
+@dllExport('SetBrushAttributes')
+function setBrushAttributes() {}
+
+@draft
+@dllExport('SetBrushOrgEx')
+function setBrushOrgEx() {}
+
+@draft
+@dllExport('SetColorAdjustment')
+function setColorAdjustment() {}
+
+@draft
+@dllExport('SetColorSpace')
+function setColorSpace() {}
+
+@draft
+@dllExport('SetDCBrushColor')
+function setDCBrushColor() {}
+
+@draft
+@dllExport('SetDCDpiScaleValue')
+function setDCDpiScaleValue() {}
+
+@draft
+@dllExport('SetDCPenColor')
+function setDCPenColor() {}
+
+@draft
+@dllExport('SetDeviceGammaRamp')
+function setDeviceGammaRamp() {}
+
+@draft
+@dllExport('SetDIBColorTable')
+function setDIBColorTable() {}
+
+@draft
+@dllExport('SetDIBits')
+function setDIBits() {}
+
+@draft
+@dllExport('SetDIBitsToDevice')
+function setDIBitsToDevice() {}
+
+@draft
+@dllExport('SetEnhMetaFileBits')
+function setEnhMetaFileBits() {}
+
+@draft
+@dllExport('SetFontEnumeration')
+function setFontEnumeration() {}
+
+@draft
+@dllExport('SetGraphicsMode')
+function setGraphicsMode() {}
+
+@draft
+@dllExport('SetICMMode')
+function setICMMode() {}
+
+@draft
+@dllExport('SetICMProfileA')
+function setICMProfileA() {}
+
+@draft
+@dllExport('SetICMProfileW')
+function setICMProfileW() {}
+
+@draft
+@dllExport('SetLayout')
+function setLayout() {}
+
+@draft
+@dllExport('SetLayoutWidth')
+function setLayoutWidth() {}
+
+@draft
+@dllExport('SetMagicColors')
+function setMagicColors() {}
+
+@draft
+@dllExport('SetMapMode')
+function setMapMode() {}
+
+@draft
+@dllExport('SetMapperFlags')
+function setMapperFlags() {}
+
+@draft
+@dllExport('SetMetaFileBitsEx')
+function setMetaFileBitsEx() {}
+
+@draft
+@dllExport('SetMetaRgn')
+function setMetaRgn() {}
+
+@draft
+@dllExport('SetMiterLimit')
+function setMiterLimit() {}
+
+@draft
+@dllExport('SetOPMSigningKeyAndSequenceNumbers')
+function setOPMSigningKeyAndSequenceNumbers() {}
+
+@draft
+@dllExport('SetPaletteEntries')
+function setPaletteEntries() {}
+
+@draft
+@dllExport('SetPixel')
+function setPixel() {}
+
+@draft
+@dllExport('SetPixelFormat')
+function setPixelFormat() {}
+
+@draft
+@dllExport('SetPixelV')
+function setPixelV() {}
+
+@draft
+@dllExport('SetPolyFillMode')
+function setPolyFillMode() {}
+
+@draft
+@dllExport('SetRectRgn')
+function setRectRgn() {}
+
+@draft
+@dllExport('SetRelAbs')
+function setRelAbs() {}
+
+@draft
+@dllExport('SetROP2')
+function setROP2() {}
+
+@draft
+@dllExport('SetStretchBltMode')
+function setStretchBltMode() {}
+
+@draft
+@dllExport('SetSystemPaletteUse')
+function setSystemPaletteUse() {}
+
+@draft
+@dllExport('SetTextAlign')
+function setTextAlign() {}
+
+@draft
+@dllExport('SetTextCharacterExtra')
+function setTextCharacterExtra() {}
+
+@draft
+@dllExport('SetTextColor')
+function setTextColor() {}
+
+@draft
+@dllExport('SetTextJustification')
+function setTextJustification() {}
+
+@draft
+@dllExport('SetViewportExtEx')
+function setViewportExtEx() {}
+
+@draft
+@dllExport('SetViewportOrgEx')
+function setViewportOrgEx() {}
+
+@draft
+@dllExport('SetVirtualResolution')
+function setVirtualResolution() {}
+
+@draft
+@dllExport('SetWindowExtEx')
+function setWindowExtEx() {}
+
+@draft
+@dllExport('SetWindowOrgEx')
+function setWindowOrgEx() {}
+
+@draft
+@dllExport('SetWinMetaFileBits')
+function setWinMetaFileBits() {}
+
+@draft
+@dllExport('SetWorldTransform')
+function setWorldTransform() {}
+
+@draft
+@dllExport('StartDocA')
+function startDocA() {}
+
+@draft
+@dllExport('StartDocW')
+function startDocW() {}
+
+@draft
+@dllExport('StartFormPage')
+function startFormPage() {}
+
+@draft
+@dllExport('StartPage')
+function startPage() {}
+
+@draft
+@dllExport('StretchBlt')
+function stretchBlt() {}
+
+@draft
+@dllExport('StretchDIBits')
+function stretchDIBits() {}
+
+@draft
+@dllExport('STROBJ_bEnum')
+function sTROBJ_bEnum() {}
+
+@draft
+@dllExport('STROBJ_bEnumPositionsOnly')
+function sTROBJ_bEnumPositionsOnly() {}
+
+@draft
+@dllExport('STROBJ_bGetAdvanceWidths')
+function sTROBJ_bGetAdvanceWidths() {}
+
+@draft
+@dllExport('STROBJ_dwGetCodePage')
+function sTROBJ_dwGetCodePage() {}
+
+@draft
+@dllExport('STROBJ_vEnumStart')
+function sTROBJ_vEnumStart() {}
+
+@draft
+@dllExport('StrokeAndFillPath')
+function strokeAndFillPath() {}
+
+@draft
+@dllExport('StrokePath')
+function strokePath() {}
+
+@draft
+@dllExport('SwapBuffers')
+function swapBuffers() {}
+
+@draft
+@dllExport('TextOutA')
+function textOutA() {}
+
+@draft
+@dllExport('TextOutW')
+function textOutW() {}
+
+@draft
+@dllExport('TranslateCharsetInfo')
+function translateCharsetInfo() {}
+
+@draft
+@dllExport('UnloadNetworkFonts')
+function unloadNetworkFonts() {}
+
+@draft
+@dllExport('UnrealizeObject')
+function unrealizeObject() {}
+
+@draft
+@dllExport('UpdateColors')
+function updateColors() {}
+
+@draft
+@dllExport('UpdateICMRegKeyA')
+function updateICMRegKeyA() {}
+
+@draft
+@dllExport('UpdateICMRegKeyW')
+function updateICMRegKeyW() {}
+
+@draft
+@dllExport('UspAllocCache')
+function uspAllocCache() return ext_ms_win_gdi_internal_desktop_l1_1_0.uspAllocCache()
+
+@draft
+@dllExport('UspAllocTemp')
+function uspAllocTemp() return ext_ms_win_gdi_internal_desktop_l1_1_0.uspAllocTemp()
+
+@draft
+@dllExport('UspFreeMem')
+function uspFreeMem() return ext_ms_win_gdi_internal_desktop_l1_1_0.uspFreeMem()
+
+@draft
+@dllExport('vSetPldc')
+function vSetPldc() {}
+
+@draft
+@dllExport('WidenPath')
+function widenPath() {}
+
+@draft
+@dllExport('XFORMOBJ_bApplyXform')
+function xFORMOBJ_bApplyXform() {}
+
+@draft
+@dllExport('XFORMOBJ_iGetXform')
+function xFORMOBJ_iGetXform() {}
+
+@draft
+@dllExport('XLATEOBJ_cGetPalette')
+function xLATEOBJ_cGetPalette() {}
+
+@draft
+@dllExport('XLATEOBJ_hGetColorTransform')
+function xLATEOBJ_hGetColorTransform() {}
+
+@draft
+@dllExport('XLATEOBJ_iXlate')
+function xLATEOBJ_iXlate() {}
+
+@draft
+@dllExport('XLATEOBJ_piVector')
+function xLATEOBJ_piVector() {}

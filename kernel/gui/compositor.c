@@ -23,6 +23,7 @@ Bitmap32* wallpaper; // Size of framebuffer
 Bitmap32* vibrance; // Size of framebuffer
 Bitmap32* leaves;
 Bitmap32* desktopIcon;
+struct Cursor *cur = null;
 
 typedef enum {
 	Center,
@@ -31,7 +32,7 @@ typedef enum {
 	// TODO more options
 } WallpaperStyle;
 
-void setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
+function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 
 	{
 		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size");
@@ -99,7 +100,7 @@ void setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 	vibrance = upscale;
 }
 
-void drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
+function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
 			if (x + xx < 0) continue ;
@@ -113,7 +114,7 @@ void drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t heigh
 }
 
 Bitmap32* doublebuffer;
-void initializeCompositor() {
+function initializeCompositor() {
 	serialPrintln("[compositor.initializeCompositor] begin");
 	doublebuffer = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
 	_pixels = doublebuffer->pixels;
@@ -122,31 +123,77 @@ void initializeCompositor() {
 	RamDiskAsset a = getRamDiskAsset("leaves.png");
 	leaves = loadPng32(&a);
 
-	Bitmap32* loadPng32(const RamDiskAsset* asset);
 	RamDiskAsset b = getRamDiskAsset("trash-empty48.png");
 	desktopIcon = loadPng32(&b);
+
+	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
+	cur = loadCursor(&asset);
 
 	serialPrintln("[compositor.initializeCompositor] done");
 }
 
-void composite() {
+var dragX = 255;
+var dragY = 255;
+var drag = false;
+
+function handleMouseDown(uint8_t key) {
+	if (drag == false) {
+		dragX = mouseX;
+		dragY = mouseY;
+	}
+	drag = true;
+}
+
+function handleMouseUp(uint8_t key) {
+	drag = false;
+}
+
+function composite() {
 	drawBitmap32(wallpaper, 0, 0);
 	drawBitmap32WithAlpha(desktopIcon, 12, 10);
 	Pixel32 color;
 	color.color = 0x00000000;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 	drawAsciiText("Recycle Bin", 8, 62, color);
+
+	var outlineX = mouseX < dragX? mouseX : dragX;
+	var outlineY = mouseY < dragY? mouseY : dragY;
+	var outlineW = mouseX < dragX? dragX - mouseX : mouseX - dragX;
+	var outlineH = mouseY < dragY? dragY - mouseY : mouseY - dragY;
+	color.rgba.a = 64;
+	if (
+		(mouseX > 20 && mouseX < (20 + 32) && mouseY > 12 && mouseY < (12 + 60))
+	) {
+		let outlineX = 1;
+		let outlineY = 10;
+		let outlineW = 72;
+		let outlineH = 64;
+		drawRectangleWithAlpha(color, outlineX, outlineY, outlineW, outlineH);
+		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH);
+	};
+	if (drag) {
+		drawRectangleWithAlpha(color, outlineX, outlineY, outlineW, outlineH);
+		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH);
+	}
+
 	drawVibrancedRectangle(0, _framebuffer->height - 30, _framebuffer->width, 30);
+	color.rgba.a = 128;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
+	if (mouseX < 40 && mouseY > (_framebuffer->height - 30))
+		drawRectangleWithAlpha(color, 0, _framebuffer->height - 30, 40, 30);
 	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
 	color.color = 0x00000000;
 	drawRectangle(color, _framebuffer->width - 4, _framebuffer->height - 30, 1, 30);
-	auto trayButtonX = _framebuffer->width - 20;
+	var trayButtonX = _framebuffer->width - 20 - 16;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0x11;
+	trayButtonX -= drawAsciiText("4:01 PM", _framebuffer->width - 60, _framebuffer->height - 20, color);
 	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
+	drawCursor(cur, mouseX, mouseY);
 	quake();
 }
 
-void copyToScreen() {
+function copyToScreen() {
 	// On 64-bit platform registers are 64-bit,
 	// so lets copy two pixels at a time
 	const uint64_t *source = (uint64_t *)_pixels;

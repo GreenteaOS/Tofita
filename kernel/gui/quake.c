@@ -24,27 +24,27 @@ uint8_t quakeRow = 0;
 double quakeAdvance = 0.0;
 uint8_t quakeCommandSize = 0;
 
-void quakePrintf(const char *c, ...);
+function quakePrintf(const char *c, ...);
 
-void quake() {
+function quake() {
 	if (haveToQuake == 0) {
 		return ;
 	}
 
-	void drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height);
+	function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height);
 	drawVibrancedRectangle(0, 0, _framebuffer->width, quakeHeight);
 	uint16_t drawAsciiText(const char* text, double x, uint16_t y, Pixel32 color);
 	Pixel32 color;
 	color.rgba.r = color.rgba.g = color.rgba.b = 48;
-	auto x = drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
+	var x = drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
 	drawAsciiText("|", x + 2, quakeHeight - 15, color);
 
-	for (auto i = 0; i < 17; i++) {
+	for (var i = 0; i < 17; i++) {
 		drawAsciiText(quakeLines[i], 2, i * 14 + 2, color);
 	}
 }
 
-void quakeHandleButtonDown(uint8_t key) {
+function quakeHandleButtonDown(uint8_t key) {
 	serialPrintf("quakeHandleButtonDown %d\n", key);
 
     if (keyboardMap[key] == '\b' && quakeCommandSize > 0) {
@@ -55,6 +55,7 @@ void quakeHandleButtonDown(uint8_t key) {
     if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
     	if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
     		extern const KernelParams *paramsCache;
+    		quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n");
     		InitKernel start = (InitKernel) KernelVirtualBase;
 			start(paramsCache);
     	} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
@@ -101,18 +102,18 @@ uint8_t* _quakeItoA(int i, uint8_t b[]){
 	return b;
 }
 
-void _quake_newline() {
+function _quake_newline() {
 	quakeLine++;
 	quakeRow = 0;
 	quakeAdvance = 0.0;
 	if (quakeLine == 17) {
 		// Move all lines upper
 		quakeLine = 16;
-		for (auto i = 0; i < 16; i++) {
-			for (auto k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = 0;
-			for (auto k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = quakeLines[i + 1][k];
+		for (var i = 0; i < 16; i++) {
+			for (var k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = 0;
+			for (var k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = quakeLines[i + 1][k];
 		}
-		for (auto i = 0; i < sizeof(quakeLines[16]); i++) quakeLines[16][i] = 0;
+		for (var i = 0; i < sizeof(quakeLines[16]); i++) quakeLines[16][i] = 0;
 	}
 }
 
@@ -152,7 +153,7 @@ int _quake_puts(const uint8_t *string)
 	return 1;
 }
 
-void quakePrintf(const char *c, ...) {
+function quakePrintf(const char *c, ...) {
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);

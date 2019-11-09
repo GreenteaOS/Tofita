@@ -22,7 +22,7 @@
 #define abs libc_abs
 #define pow libc_pow
 
-void libc_free(void* addr) {
+function libc_free(void* addr) {
 	// Do nothing for now
 	serialPrintf("[libc] libc_free\n");
 }
@@ -91,12 +91,12 @@ int libc_pow(int a, int n) {
 	return r;
 }
 
-void libc_memcpy(void *dest, void *src, size_t n) {
+function libc_memcpy(void *dest, void *src, size_t n) {
 	const char *csrc = (char *)src;
 	char *cdest = (char *)dest;
 	for (int i = 0; i < n; i++) cdest[i] = csrc[i];
 }
 
-void memcpy(void *dest, void *src, size_t n) {
+function memcpy(void *dest, void *src, size_t n) {
 	libc_memcpy(dest, src, n);
 }

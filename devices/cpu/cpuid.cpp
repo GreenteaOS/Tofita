@@ -48,7 +48,7 @@ CPUID getCPUID() {
 					 (uint32_t *)(&result.brandName[44]));
 	}
 
-	auto i = 0;
+	var i = 0;
 	while (i++ < sizeof(result.brandName))
 		if (result.brandName[i] == '\r')
 			result.brandName[i] = 0;

@@ -17,14 +17,17 @@
 
 uint8_t mouseCycle = 0;
 int8_t mouseByte[3];
-uint16_t mouseX = 256;
-uint16_t mouseY = 256;
+int16_t mouseX = 256;
+int16_t mouseY = 256;
+
+function handleMouseDown(uint8_t key);
+function handleMouseUp(uint8_t key);
 
 uint8_t getBit(uint8_t byte, uint8_t bit) {
 	return (byte & ( 1 << bit )) >> bit;
 }
 
-void handleMouse() {
+function handleMouse() {
 	switch(mouseCycle) {
 	case 0: {
 		mouseByte[0] = mouseRead();
@@ -50,6 +53,11 @@ void handleMouse() {
 		if (getBit(mouseByte[0], 0) != 0) serialPrintln("[mouse] left button is down");
 		if (getBit(mouseByte[0], 1) != 0) serialPrintln("[mouse] right button is down");
 		if (getBit(mouseByte[0], 2) != 0) serialPrintln("[mouse] middle button is down");
+
+		if ((getBit(mouseByte[0], 0) != 0) || (getBit(mouseByte[0], 1) != 0))
+			handleMouseDown(0);
+		else
+			handleMouseUp(0);
 
 		serialPrintf("[mouseByte[0]] 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d 7:%d 8:%d bits are set\n",
 			getBit(mouseByte[0], 0),

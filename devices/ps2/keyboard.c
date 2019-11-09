@@ -15,7 +15,7 @@
 
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
-void handleKeyDown(uint8_t key);
+function handleKeyDown(uint8_t key);
 uint8_t keyboardPressedState[128] = {0};
 uint8_t keyboardMap[128] =
 {
@@ -105,7 +105,7 @@ uint8_t keyboardMap[128] =
 #define STATUS_REGISTER 0x64
 #define DATA_PORT       0x60
 
-void handleKeyboard() {
+function handleKeyboard() {
 	uint8_t status = readPort(STATUS_REGISTER);
 
 	// PS2 Mouse

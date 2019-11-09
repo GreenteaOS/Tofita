@@ -1,0 +1,9414 @@
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+@stdcall
+module exports
+
+@draft
+@dllExport('__C_specific_handler')
+function __C_specific_handler() {}
+
+@draft
+@dllExport('__chkstk')
+function __chkstk() {}
+
+@draft
+@dllExport('__isascii')
+function __isascii() {}
+
+@draft
+@dllExport('__iscsym')
+function __iscsym() {}
+
+@draft
+@dllExport('__iscsymf')
+function __iscsymf() {}
+
+@draft
+@dllExport('__misaligned_access')
+function __misaligned_access() {}
+
+@draft
+@dllExport('__toascii')
+function __toascii() {}
+
+@draft
+@dllExport('_atoi64')
+function _atoi64() {}
+
+@draft
+@dllExport('_errno')
+function _errno() {}
+
+@draft
+@dllExport('_fltused')
+function _fltused() {}
+
+@draft
+@dllExport('_i64toa')
+function _i64toa() {}
+
+@draft
+@dllExport('_i64toa_s')
+function _i64toa_s() {}
+
+@draft
+@dllExport('_i64tow')
+function _i64tow() {}
+
+@draft
+@dllExport('_i64tow_s')
+function _i64tow_s() {}
+
+@draft
+@dllExport('_itoa')
+function _itoa() {}
+
+@draft
+@dllExport('_itoa_s')
+function _itoa_s() {}
+
+@draft
+@dllExport('_itow')
+function _itow() {}
+
+@draft
+@dllExport('_itow_s')
+function _itow_s() {}
+
+@draft
+@dllExport('_lfind')
+function _lfind() {}
+
+@draft
+@dllExport('_local_unwind')
+function _local_unwind() {}
+
+@draft
+@dllExport('_ltoa')
+function _ltoa() {}
+
+@draft
+@dllExport('_ltoa_s')
+function _ltoa_s() {}
+
+@draft
+@dllExport('_ltow')
+function _ltow() {}
+
+@draft
+@dllExport('_ltow_s')
+function _ltow_s() {}
+
+@draft
+@dllExport('_makepath_s')
+function _makepath_s() {}
+
+@draft
+@dllExport('_memccpy')
+function _memccpy() {}
+
+@draft
+@dllExport('_memicmp')
+function _memicmp() {}
+
+@draft
+@dllExport('_setjmp')
+function _setjmp() {}
+
+@draft
+@dllExport('_setjmpex')
+function _setjmpex() {}
+
+@draft
+@dllExport('_snprintf')
+function _snprintf() {}
+
+@draft
+@dllExport('_snprintf_s')
+function _snprintf_s() {}
+
+@draft
+@dllExport('_snscanf_s')
+function _snscanf_s() {}
+
+@draft
+@dllExport('_snwprintf')
+function _snwprintf() {}
+
+@draft
+@dllExport('_snwprintf_s')
+function _snwprintf_s() {}
+
+@draft
+@dllExport('_snwscanf_s')
+function _snwscanf_s() {}
+
+@draft
+@dllExport('_splitpath')
+function _splitpath() {}
+
+@draft
+@dllExport('_splitpath_s')
+function _splitpath_s() {}
+
+@draft
+@dllExport('_strcmpi')
+function _strcmpi() {}
+
+@draft
+@dllExport('_stricmp')
+function _stricmp() {}
+
+@draft
+@dllExport('_strlwr')
+function _strlwr() {}
+
+@draft
+@dllExport('_strlwr_s')
+function _strlwr_s() {}
+
+@draft
+@dllExport('_strnicmp')
+function _strnicmp() {}
+
+@draft
+@dllExport('_strnset_s')
+function _strnset_s() {}
+
+@draft
+@dllExport('_strset_s')
+function _strset_s() {}
+
+@draft
+@dllExport('_strupr')
+function _strupr() {}
+
+@draft
+@dllExport('_strupr_s')
+function _strupr_s() {}
+
+@draft
+@dllExport('_swprintf')
+function _swprintf() {}
+
+@draft
+@dllExport('_ui64toa')
+function _ui64toa() {}
+
+@draft
+@dllExport('_ui64toa_s')
+function _ui64toa_s() {}
+
+@draft
+@dllExport('_ui64tow')
+function _ui64tow() {}
+
+@draft
+@dllExport('_ui64tow_s')
+function _ui64tow_s() {}
+
+@draft
+@dllExport('_ultoa')
+function _ultoa() {}
+
+@draft
+@dllExport('_ultoa_s')
+function _ultoa_s() {}
+
+@draft
+@dllExport('_ultow')
+function _ultow() {}
+
+@draft
+@dllExport('_ultow_s')
+function _ultow_s() {}
+
+@draft
+@dllExport('_vscprintf')
+function _vscprintf() {}
+
+@draft
+@dllExport('_vscwprintf')
+function _vscwprintf() {}
+
+@draft
+@dllExport('_vsnprintf')
+function _vsnprintf() {}
+
+@draft
+@dllExport('_vsnprintf_s')
+function _vsnprintf_s() {}
+
+@draft
+@dllExport('_vsnwprintf')
+function _vsnwprintf() {}
+
+@draft
+@dllExport('_vsnwprintf_s')
+function _vsnwprintf_s() {}
+
+@draft
+@dllExport('_vswprintf')
+function _vswprintf() {}
+
+@draft
+@dllExport('_wcsicmp')
+function _wcsicmp() {}
+
+@draft
+@dllExport('_wcslwr')
+function _wcslwr() {}
+
+@draft
+@dllExport('_wcslwr_s')
+function _wcslwr_s() {}
+
+@draft
+@dllExport('_wcsnicmp')
+function _wcsnicmp() {}
+
+@draft
+@dllExport('_wcsnset_s')
+function _wcsnset_s() {}
+
+@draft
+@dllExport('_wcsset_s')
+function _wcsset_s() {}
+
+@draft
+@dllExport('_wcstoi64')
+function _wcstoi64() {}
+
+@draft
+@dllExport('_wcstoui64')
+function _wcstoui64() {}
+
+@draft
+@dllExport('_wcsupr')
+function _wcsupr() {}
+
+@draft
+@dllExport('_wcsupr_s')
+function _wcsupr_s() {}
+
+@draft
+@dllExport('_wmakepath_s')
+function _wmakepath_s() {}
+
+@draft
+@dllExport('_wsplitpath_s')
+function _wsplitpath_s() {}
+
+@draft
+@dllExport('_wtoi')
+function _wtoi() {}
+
+@draft
+@dllExport('_wtoi64')
+function _wtoi64() {}
+
+@draft
+@dllExport('_wtol')
+function _wtol() {}
+
+@draft
+@dllExport('A_SHAFinal')
+function a_SHAFinal() {}
+
+@draft
+@dllExport('A_SHAInit')
+function a_SHAInit() {}
+
+@draft
+@dllExport('A_SHAUpdate')
+function a_SHAUpdate() {}
+
+@draft
+@dllExport('abs')
+function abs() {}
+
+@draft
+@dllExport('AlpcAdjustCompletionListConcurrencyCount')
+function alpcAdjustCompletionListConcurrencyCount() {}
+
+@draft
+@dllExport('AlpcFreeCompletionListMessage')
+function alpcFreeCompletionListMessage() {}
+
+@draft
+@dllExport('AlpcGetCompletionListLastMessageInformation')
+function alpcGetCompletionListLastMessageInformation() {}
+
+@draft
+@dllExport('AlpcGetCompletionListMessageAttributes')
+function alpcGetCompletionListMessageAttributes() {}
+
+@draft
+@dllExport('AlpcGetHeaderSize')
+function alpcGetHeaderSize() {}
+
+@draft
+@dllExport('AlpcGetMessageAttribute')
+function alpcGetMessageAttribute() {}
+
+@draft
+@dllExport('AlpcGetMessageFromCompletionList')
+function alpcGetMessageFromCompletionList() {}
+
+@draft
+@dllExport('AlpcGetOutstandingCompletionListMessageCount')
+function alpcGetOutstandingCompletionListMessageCount() {}
+
+@draft
+@dllExport('AlpcInitializeMessageAttribute')
+function alpcInitializeMessageAttribute() {}
+
+@draft
+@dllExport('AlpcMaxAllowedMessageLength')
+function alpcMaxAllowedMessageLength() {}
+
+@draft
+@dllExport('AlpcRegisterCompletionList')
+function alpcRegisterCompletionList() {}
+
+@draft
+@dllExport('AlpcRegisterCompletionListWorkerThread')
+function alpcRegisterCompletionListWorkerThread() {}
+
+@draft
+@dllExport('AlpcRundownCompletionList')
+function alpcRundownCompletionList() {}
+
+@draft
+@dllExport('AlpcUnregisterCompletionList')
+function alpcUnregisterCompletionList() {}
+
+@draft
+@dllExport('AlpcUnregisterCompletionListWorkerThread')
+function alpcUnregisterCompletionListWorkerThread() {}
+
+@draft
+@dllExport('ApiSetQueryApiSetPresence')
+function apiSetQueryApiSetPresence() {}
+
+@draft
+@dllExport('atan')
+function atan() {}
+
+@draft
+@dllExport('atan2')
+function atan2() {}
+
+@draft
+@dllExport('atoi')
+function atoi() {}
+
+@draft
+@dllExport('atol')
+function atol() {}
+
+@draft
+@dllExport('bsearch')
+function bsearch() {}
+
+@draft
+@dllExport('bsearch_s')
+function bsearch_s() {}
+
+@draft
+@dllExport('ceil')
+function ceil() {}
+
+@draft
+@dllExport('cos')
+function cos() {}
+
+@draft
+@dllExport('CsrAllocateCaptureBuffer')
+function csrAllocateCaptureBuffer() {}
+
+@draft
+@dllExport('CsrAllocateMessagePointer')
+function csrAllocateMessagePointer() {}
+
+@draft
+@dllExport('CsrCaptureMessageBuffer')
+function csrCaptureMessageBuffer() {}
+
+@draft
+@dllExport('CsrCaptureMessageMultiUnicodeStringsInPlace')
+function csrCaptureMessageMultiUnicodeStringsInPlace() {}
+
+@draft
+@dllExport('CsrCaptureMessageString')
+function csrCaptureMessageString() {}
+
+@draft
+@dllExport('CsrCaptureTimeout')
+function csrCaptureTimeout() {}
+
+@draft
+@dllExport('CsrClientCallServer')
+function csrClientCallServer() {}
+
+@draft
+@dllExport('CsrClientConnectToServer')
+function csrClientConnectToServer() {}
+
+@draft
+@dllExport('CsrFreeCaptureBuffer')
+function csrFreeCaptureBuffer() {}
+
+@draft
+@dllExport('CsrGetProcessId')
+function csrGetProcessId() {}
+
+@draft
+@dllExport('CsrIdentifyAlertableThread')
+function csrIdentifyAlertableThread() {}
+
+@draft
+@dllExport('CsrSetPriorityClass')
+function csrSetPriorityClass() {}
+
+@draft
+@dllExport('CsrVerifyRegion')
+function csrVerifyRegion() {}
+
+@draft
+@dllExport('DbgBreakPoint')
+function dbgBreakPoint() {}
+
+@draft
+@dllExport('DbgPrint')
+function dbgPrint() {}
+
+@draft
+@dllExport('DbgPrintEx')
+function dbgPrintEx() {}
+
+@draft
+@dllExport('DbgPrintReturnControlC')
+function dbgPrintReturnControlC() {}
+
+@draft
+@dllExport('DbgPrompt')
+function dbgPrompt() {}
+
+@draft
+@dllExport('DbgQueryDebugFilterState')
+function dbgQueryDebugFilterState() {}
+
+@draft
+@dllExport('DbgSetDebugFilterState')
+function dbgSetDebugFilterState() {}
+
+@draft
+@dllExport('DbgUiConnectToDbg')
+function dbgUiConnectToDbg() {}
+
+@draft
+@dllExport('DbgUiContinue')
+function dbgUiContinue() {}
+
+@draft
+@dllExport('DbgUiConvertStateChangeStructure')
+function dbgUiConvertStateChangeStructure() {}
+
+@draft
+@dllExport('DbgUiConvertStateChangeStructureEx')
+function dbgUiConvertStateChangeStructureEx() {}
+
+@draft
+@dllExport('DbgUiDebugActiveProcess')
+function dbgUiDebugActiveProcess() {}
+
+@draft
+@dllExport('DbgUiGetThreadDebugObject')
+function dbgUiGetThreadDebugObject() {}
+
+@draft
+@dllExport('DbgUiIssueRemoteBreakin')
+function dbgUiIssueRemoteBreakin() {}
+
+@draft
+@dllExport('DbgUiRemoteBreakin')
+function dbgUiRemoteBreakin() {}
+
+@draft
+@dllExport('DbgUiSetThreadDebugObject')
+function dbgUiSetThreadDebugObject() {}
+
+@draft
+@dllExport('DbgUiStopDebugging')
+function dbgUiStopDebugging() {}
+
+@draft
+@dllExport('DbgUiWaitStateChange')
+function dbgUiWaitStateChange() {}
+
+@draft
+@dllExport('DbgUserBreakPoint')
+function dbgUserBreakPoint() {}
+
+@draft
+@dllExport('EtwCheckCoverage')
+function etwCheckCoverage() {}
+
+@draft
+@dllExport('EtwCreateTraceInstanceId')
+function etwCreateTraceInstanceId() {}
+
+@draft
+@dllExport('EtwDeliverDataBlock')
+function etwDeliverDataBlock() {}
+
+@draft
+@dllExport('EtwEnumerateProcessRegGuids')
+function etwEnumerateProcessRegGuids() {}
+
+@draft
+@dllExport('EtwEventActivityIdControl')
+function etwEventActivityIdControl() {}
+
+@draft
+@dllExport('EtwEventEnabled')
+function etwEventEnabled() {}
+
+@draft
+@dllExport('EtwEventProviderEnabled')
+function etwEventProviderEnabled() {}
+
+@draft
+@dllExport('EtwEventRegister')
+function etwEventRegister() {}
+
+@draft
+@dllExport('EtwEventSetInformation')
+function etwEventSetInformation() {}
+
+@draft
+@dllExport('EtwEventUnregister')
+function etwEventUnregister() {}
+
+@draft
+@dllExport('EtwEventWrite')
+function etwEventWrite() {}
+
+@draft
+@dllExport('EtwEventWriteEndScenario')
+function etwEventWriteEndScenario() {}
+
+@draft
+@dllExport('EtwEventWriteEx')
+function etwEventWriteEx() {}
+
+@draft
+@dllExport('EtwEventWriteFull')
+function etwEventWriteFull() {}
+
+@draft
+@dllExport('EtwEventWriteNoRegistration')
+function etwEventWriteNoRegistration() {}
+
+@draft
+@dllExport('EtwEventWriteStartScenario')
+function etwEventWriteStartScenario() {}
+
+@draft
+@dllExport('EtwEventWriteString')
+function etwEventWriteString() {}
+
+@draft
+@dllExport('EtwEventWriteTransfer')
+function etwEventWriteTransfer() {}
+
+@draft
+@dllExport('EtwGetTraceEnableFlags')
+function etwGetTraceEnableFlags() {}
+
+@draft
+@dllExport('EtwGetTraceEnableLevel')
+function etwGetTraceEnableLevel() {}
+
+@draft
+@dllExport('EtwGetTraceLoggerHandle')
+function etwGetTraceLoggerHandle() {}
+
+@draft
+@dllExport('EtwLogTraceEvent')
+function etwLogTraceEvent() {}
+
+@draft
+@dllExport('EtwNotificationRegister')
+function etwNotificationRegister() {}
+
+@draft
+@dllExport('EtwNotificationUnregister')
+function etwNotificationUnregister() {}
+
+@draft
+@dllExport('EtwpCreateEtwThread')
+function etwpCreateEtwThread() {}
+
+@draft
+@dllExport('EtwpGetCpuSpeed')
+function etwpGetCpuSpeed() {}
+
+@draft
+@dllExport('EtwProcessPrivateLoggerRequest')
+function etwProcessPrivateLoggerRequest() {}
+
+@draft
+@dllExport('EtwRegisterSecurityProvider')
+function etwRegisterSecurityProvider() {}
+
+@draft
+@dllExport('EtwRegisterTraceGuidsA')
+function etwRegisterTraceGuidsA() {}
+
+@draft
+@dllExport('EtwRegisterTraceGuidsW')
+function etwRegisterTraceGuidsW() {}
+
+@draft
+@dllExport('EtwReplyNotification')
+function etwReplyNotification() {}
+
+@draft
+@dllExport('EtwSendNotification')
+function etwSendNotification() {}
+
+@draft
+@dllExport('EtwSetMark')
+function etwSetMark() {}
+
+@draft
+@dllExport('EtwTraceEventInstance')
+function etwTraceEventInstance() {}
+
+@draft
+@dllExport('EtwTraceMessage')
+function etwTraceMessage() {}
+
+@draft
+@dllExport('EtwTraceMessageVa')
+function etwTraceMessageVa() {}
+
+@draft
+@dllExport('EtwUnregisterTraceGuids')
+function etwUnregisterTraceGuids() {}
+
+@draft
+@dllExport('EtwWriteUMSecurityEvent')
+function etwWriteUMSecurityEvent() {}
+
+@draft
+@dllExport('EvtIntReportAuthzEventAndSourceAsync')
+function evtIntReportAuthzEventAndSourceAsync() {}
+
+@draft
+@dllExport('EvtIntReportEventAndSourceAsync')
+function evtIntReportEventAndSourceAsync() {}
+
+@draft
+@dllExport('ExpInterlockedPopEntrySListEnd')
+function expInterlockedPopEntrySListEnd() {}
+
+@draft
+@dllExport('ExpInterlockedPopEntrySListFault')
+function expInterlockedPopEntrySListFault() {}
+
+@draft
+@dllExport('ExpInterlockedPopEntrySListResume')
+function expInterlockedPopEntrySListResume() {}
+
+@draft
+@dllExport('fabs')
+function fabs() {}
+
+@draft
+@dllExport('floor')
+function floor() {}
+
+@draft
+@dllExport('isalnum')
+function isalnum() {}
+
+@draft
+@dllExport('isalpha')
+function isalpha() {}
+
+@draft
+@dllExport('iscntrl')
+function iscntrl() {}
+
+@draft
+@dllExport('isdigit')
+function isdigit() {}
+
+@draft
+@dllExport('isgraph')
+function isgraph() {}
+
+@draft
+@dllExport('islower')
+function islower() {}
+
+@draft
+@dllExport('isprint')
+function isprint() {}
+
+@draft
+@dllExport('ispunct')
+function ispunct() {}
+
+@draft
+@dllExport('isspace')
+function isspace() {}
+
+@draft
+@dllExport('isupper')
+function isupper() {}
+
+@draft
+@dllExport('iswalnum')
+function iswalnum() {}
+
+@draft
+@dllExport('iswalpha')
+function iswalpha() {}
+
+@draft
+@dllExport('iswascii')
+function iswascii() {}
+
+@draft
+@dllExport('iswctype')
+function iswctype() {}
+
+@draft
+@dllExport('iswdigit')
+function iswdigit() {}
+
+@draft
+@dllExport('iswgraph')
+function iswgraph() {}
+
+@draft
+@dllExport('iswlower')
+function iswlower() {}
+
+@draft
+@dllExport('iswprint')
+function iswprint() {}
+
+@draft
+@dllExport('iswspace')
+function iswspace() {}
+
+@draft
+@dllExport('iswxdigit')
+function iswxdigit() {}
+
+@draft
+@dllExport('isxdigit')
+function isxdigit() {}
+
+@draft
+@dllExport('KiRaiseUserExceptionDispatcher')
+function kiRaiseUserExceptionDispatcher() {}
+
+@draft
+@dllExport('KiUserApcDispatcher')
+function kiUserApcDispatcher() {}
+
+@draft
+@dllExport('KiUserCallbackDispatcher')
+function kiUserCallbackDispatcher() {}
+
+@draft
+@dllExport('KiUserExceptionDispatcher')
+function kiUserExceptionDispatcher() {}
+
+@draft
+@dllExport('KiUserInvertedFunctionTable')
+function kiUserInvertedFunctionTable() {}
+
+@draft
+@dllExport('labs')
+function labs() {}
+
+@draft
+@dllExport('LdrAccessResource')
+function ldrAccessResource() {}
+
+@draft
+@dllExport('LdrAddDllDirectory')
+function ldrAddDllDirectory() {}
+
+@draft
+@dllExport('LdrAddLoadAsDataTable')
+function ldrAddLoadAsDataTable() {}
+
+@draft
+@dllExport('LdrAddRefDll')
+function ldrAddRefDll() {}
+
+@draft
+@dllExport('LdrAppxHandleIntegrityFailure')
+function ldrAppxHandleIntegrityFailure() {}
+
+@draft
+@dllExport('LdrCallEnclave')
+function ldrCallEnclave() {}
+
+@draft
+@dllExport('LdrControlFlowGuardEnforced')
+function ldrControlFlowGuardEnforced() {}
+
+@draft
+@dllExport('LdrCreateEnclave')
+function ldrCreateEnclave() {}
+
+@draft
+@dllExport('LdrDeleteEnclave')
+function ldrDeleteEnclave() {}
+
+@draft
+@dllExport('LdrDisableThreadCalloutsForDll')
+function ldrDisableThreadCalloutsForDll() {}
+
+@draft
+@dllExport('LdrEnumerateLoadedModules')
+function ldrEnumerateLoadedModules() {}
+
+@draft
+@dllExport('LdrEnumResources')
+function ldrEnumResources() {}
+
+@draft
+@dllExport('LdrFastFailInLoaderCallout')
+function ldrFastFailInLoaderCallout() {}
+
+@draft
+@dllExport('LdrFindEntryForAddress')
+function ldrFindEntryForAddress() {}
+
+@draft
+@dllExport('LdrFindResource_U')
+function ldrFindResource_U() {}
+
+@draft
+@dllExport('LdrFindResourceDirectory_U')
+function ldrFindResourceDirectory_U() {}
+
+@draft
+@dllExport('LdrFindResourceEx_U')
+function ldrFindResourceEx_U() {}
+
+@draft
+@dllExport('LdrFlushAlternateResourceModules')
+function ldrFlushAlternateResourceModules() {}
+
+@draft
+@dllExport('LdrGetDllDirectory')
+function ldrGetDllDirectory() {}
+
+@draft
+@dllExport('LdrGetDllFullName')
+function ldrGetDllFullName() {}
+
+@draft
+@dllExport('LdrGetDllHandle')
+function ldrGetDllHandle() {}
+
+@draft
+@dllExport('LdrGetDllHandleByMapping')
+function ldrGetDllHandleByMapping() {}
+
+@draft
+@dllExport('LdrGetDllHandleByName')
+function ldrGetDllHandleByName() {}
+
+@draft
+@dllExport('LdrGetDllHandleEx')
+function ldrGetDllHandleEx() {}
+
+@draft
+@dllExport('LdrGetDllPath')
+function ldrGetDllPath() {}
+
+@draft
+@dllExport('LdrGetFailureData')
+function ldrGetFailureData() {}
+
+@draft
+@dllExport('LdrGetFileNameFromLoadAsDataTable')
+function ldrGetFileNameFromLoadAsDataTable() {}
+
+@draft
+@dllExport('LdrGetKnownDllSectionHandle')
+function ldrGetKnownDllSectionHandle() {}
+
+@draft
+@dllExport('LdrGetProcedureAddress')
+function ldrGetProcedureAddress() {}
+
+@draft
+@dllExport('LdrGetProcedureAddressEx')
+function ldrGetProcedureAddressEx() {}
+
+@draft
+@dllExport('LdrGetProcedureAddressForCaller')
+function ldrGetProcedureAddressForCaller() {}
+
+@draft
+@dllExport('LdrInitializeEnclave')
+function ldrInitializeEnclave() {}
+
+@draft
+@dllExport('LdrInitializeThunk')
+function ldrInitializeThunk() {}
+
+@draft
+@dllExport('LdrInitShimEngineDynamic')
+function ldrInitShimEngineDynamic() {}
+
+@draft
+@dllExport('LdrLoadAlternateResourceModule')
+function ldrLoadAlternateResourceModule() {}
+
+@draft
+@dllExport('LdrLoadAlternateResourceModuleEx')
+function ldrLoadAlternateResourceModuleEx() {}
+
+@draft
+@dllExport('LdrLoadDll')
+function ldrLoadDll() {}
+
+@draft
+@dllExport('LdrLoadEnclaveModule')
+function ldrLoadEnclaveModule() {}
+
+@draft
+@dllExport('LdrLockLoaderLock')
+function ldrLockLoaderLock() {}
+
+@draft
+@dllExport('LdrOpenImageFileOptionsKey')
+function ldrOpenImageFileOptionsKey() {}
+
+@draft
+@dllExport('LdrpResGetMappingSize')
+function ldrpResGetMappingSize() {}
+
+@draft
+@dllExport('LdrpResGetResourceDirectory')
+function ldrpResGetResourceDirectory() {}
+
+@draft
+@dllExport('LdrProcessInitializationComplete')
+function ldrProcessInitializationComplete() {}
+
+@draft
+@dllExport('LdrProcessRelocationBlock')
+function ldrProcessRelocationBlock() {}
+
+@draft
+@dllExport('LdrProcessRelocationBlockEx')
+function ldrProcessRelocationBlockEx() {}
+
+@draft
+@dllExport('LdrQueryImageFileExecutionOptions')
+function ldrQueryImageFileExecutionOptions() {}
+
+@draft
+@dllExport('LdrQueryImageFileExecutionOptionsEx')
+function ldrQueryImageFileExecutionOptionsEx() {}
+
+@draft
+@dllExport('LdrQueryImageFileKeyOption')
+function ldrQueryImageFileKeyOption() {}
+
+@draft
+@dllExport('LdrQueryModuleServiceTags')
+function ldrQueryModuleServiceTags() {}
+
+@draft
+@dllExport('LdrQueryOptionalDelayLoadedAPI')
+function ldrQueryOptionalDelayLoadedAPI() {}
+
+@draft
+@dllExport('LdrQueryProcessModuleInformation')
+function ldrQueryProcessModuleInformation() {}
+
+@draft
+@dllExport('LdrRegisterDllNotification')
+function ldrRegisterDllNotification() {}
+
+@draft
+@dllExport('LdrRemoveDllDirectory')
+function ldrRemoveDllDirectory() {}
+
+@draft
+@dllExport('LdrRemoveLoadAsDataTable')
+function ldrRemoveLoadAsDataTable() {}
+
+@draft
+@dllExport('LdrResFindResource')
+function ldrResFindResource() {}
+
+@draft
+@dllExport('LdrResFindResourceDirectory')
+function ldrResFindResourceDirectory() {}
+
+@draft
+@dllExport('LdrResGetRCConfig')
+function ldrResGetRCConfig() {}
+
+@draft
+@dllExport('LdrResolveDelayLoadedAPI')
+function ldrResolveDelayLoadedAPI() {}
+
+@draft
+@dllExport('LdrResolveDelayLoadsFromDll')
+function ldrResolveDelayLoadsFromDll() {}
+
+@draft
+@dllExport('LdrResRelease')
+function ldrResRelease() {}
+
+@draft
+@dllExport('LdrResSearchResource')
+function ldrResSearchResource() {}
+
+@draft
+@dllExport('LdrRscIsTypeExist')
+function ldrRscIsTypeExist() {}
+
+@draft
+@dllExport('LdrSetAppCompatDllRedirectionCallback')
+function ldrSetAppCompatDllRedirectionCallback() {}
+
+@draft
+@dllExport('LdrSetDefaultDllDirectories')
+function ldrSetDefaultDllDirectories() {}
+
+@draft
+@dllExport('LdrSetDllDirectory')
+function ldrSetDllDirectory() {}
+
+@draft
+@dllExport('LdrSetDllManifestProber')
+function ldrSetDllManifestProber() {}
+
+@draft
+@dllExport('LdrSetImplicitPathOptions')
+function ldrSetImplicitPathOptions() {}
+
+@draft
+@dllExport('LdrSetMUICacheType')
+function ldrSetMUICacheType() {}
+
+@draft
+@dllExport('LdrShutdownProcess')
+function ldrShutdownProcess() {}
+
+@draft
+@dllExport('LdrShutdownThread')
+function ldrShutdownThread() {}
+
+@draft
+@dllExport('LdrStandardizeSystemPath')
+function ldrStandardizeSystemPath() {}
+
+@draft
+@dllExport('LdrSystemDllInitBlock')
+function ldrSystemDllInitBlock() {}
+
+@draft
+@dllExport('LdrUnloadAlternateResourceModule')
+function ldrUnloadAlternateResourceModule() {}
+
+@draft
+@dllExport('LdrUnloadAlternateResourceModuleEx')
+function ldrUnloadAlternateResourceModuleEx() {}
+
+@draft
+@dllExport('LdrUnloadDll')
+function ldrUnloadDll() {}
+
+@draft
+@dllExport('LdrUnlockLoaderLock')
+function ldrUnlockLoaderLock() {}
+
+@draft
+@dllExport('LdrUnregisterDllNotification')
+function ldrUnregisterDllNotification() {}
+
+@draft
+@dllExport('LdrUpdatePackageSearchPath')
+function ldrUpdatePackageSearchPath() {}
+
+@draft
+@dllExport('LdrVerifyImageMatchesChecksum')
+function ldrVerifyImageMatchesChecksum() {}
+
+@draft
+@dllExport('LdrVerifyImageMatchesChecksumEx')
+function ldrVerifyImageMatchesChecksumEx() {}
+
+@draft
+@dllExport('log')
+function log() {}
+
+@draft
+@dllExport('longjmp')
+function longjmp() {}
+
+@draft
+@dllExport('mbstowcs')
+function mbstowcs() {}
+
+@draft
+@dllExport('MD4Final')
+function mD4Final() {}
+
+@draft
+@dllExport('MD4Init')
+function mD4Init() {}
+
+@draft
+@dllExport('MD4Update')
+function mD4Update() {}
+
+@draft
+@dllExport('MD5Final')
+function mD5Final() {}
+
+@draft
+@dllExport('MD5Init')
+function mD5Init() {}
+
+@draft
+@dllExport('MD5Update')
+function mD5Update() {}
+
+@draft
+@dllExport('memchr')
+function memchr() {}
+
+@draft
+@dllExport('memcmp')
+function memcmp() {}
+
+@draft
+@dllExport('memcpy')
+function memcpy() {}
+
+@draft
+@dllExport('memcpy_s')
+function memcpy_s() {}
+
+@draft
+@dllExport('memmove')
+function memmove() {}
+
+@draft
+@dllExport('memmove_s')
+function memmove_s() {}
+
+@draft
+@dllExport('memset')
+function memset() {}
+
+@draft
+@dllExport('NlsAnsiCodePage')
+function nlsAnsiCodePage() {}
+
+@draft
+@dllExport('NlsMbCodePageTag')
+function nlsMbCodePageTag() {}
+
+@draft
+@dllExport('NlsMbOemCodePageTag')
+function nlsMbOemCodePageTag() {}
+
+@draft
+@dllExport('NtAcceptConnectPort')
+function ntAcceptConnectPort() {}
+
+@draft
+@dllExport('NtAccessCheck')
+function ntAccessCheck() {}
+
+@draft
+@dllExport('NtAccessCheckAndAuditAlarm')
+function ntAccessCheckAndAuditAlarm() {}
+
+@draft
+@dllExport('NtAccessCheckByType')
+function ntAccessCheckByType() {}
+
+@draft
+@dllExport('NtAccessCheckByTypeAndAuditAlarm')
+function ntAccessCheckByTypeAndAuditAlarm() {}
+
+@draft
+@dllExport('NtAccessCheckByTypeResultList')
+function ntAccessCheckByTypeResultList() {}
+
+@draft
+@dllExport('NtAccessCheckByTypeResultListAndAuditAlarm')
+function ntAccessCheckByTypeResultListAndAuditAlarm() {}
+
+@draft
+@dllExport('NtAccessCheckByTypeResultListAndAuditAlarmByHandle')
+function ntAccessCheckByTypeResultListAndAuditAlarmByHandle() {}
+
+@draft
+@dllExport('NtAcquireProcessActivityReference')
+function ntAcquireProcessActivityReference() {}
+
+@draft
+@dllExport('NtAddAtom')
+function ntAddAtom() {}
+
+@draft
+@dllExport('NtAddAtomEx')
+function ntAddAtomEx() {}
+
+@draft
+@dllExport('NtAddBootEntry')
+function ntAddBootEntry() {}
+
+@draft
+@dllExport('NtAddDriverEntry')
+function ntAddDriverEntry() {}
+
+@draft
+@dllExport('NtAdjustGroupsToken')
+function ntAdjustGroupsToken() {}
+
+@draft
+@dllExport('NtAdjustPrivilegesToken')
+function ntAdjustPrivilegesToken() {}
+
+@draft
+@dllExport('NtAdjustTokenClaimsAndDeviceGroups')
+function ntAdjustTokenClaimsAndDeviceGroups() {}
+
+@draft
+@dllExport('NtAlertResumeThread')
+function ntAlertResumeThread() {}
+
+@draft
+@dllExport('NtAlertThread')
+function ntAlertThread() {}
+
+@draft
+@dllExport('NtAlertThreadByThreadId')
+function ntAlertThreadByThreadId() {}
+
+@draft
+@dllExport('NtAllocateLocallyUniqueId')
+function ntAllocateLocallyUniqueId() {}
+
+@draft
+@dllExport('NtAllocateReserveObject')
+function ntAllocateReserveObject() {}
+
+@draft
+@dllExport('NtAllocateUserPhysicalPages')
+function ntAllocateUserPhysicalPages() {}
+
+@draft
+@dllExport('NtAllocateUuids')
+function ntAllocateUuids() {}
+
+@draft
+@dllExport('NtAllocateVirtualMemory')
+function ntAllocateVirtualMemory() {}
+
+@draft
+@dllExport('NtAllocateVirtualMemoryEx')
+function ntAllocateVirtualMemoryEx() {}
+
+@draft
+@dllExport('NtAlpcAcceptConnectPort')
+function ntAlpcAcceptConnectPort() {}
+
+@draft
+@dllExport('NtAlpcCancelMessage')
+function ntAlpcCancelMessage() {}
+
+@draft
+@dllExport('NtAlpcConnectPort')
+function ntAlpcConnectPort() {}
+
+@draft
+@dllExport('NtAlpcConnectPortEx')
+function ntAlpcConnectPortEx() {}
+
+@draft
+@dllExport('NtAlpcCreatePort')
+function ntAlpcCreatePort() {}
+
+@draft
+@dllExport('NtAlpcCreatePortSection')
+function ntAlpcCreatePortSection() {}
+
+@draft
+@dllExport('NtAlpcCreateResourceReserve')
+function ntAlpcCreateResourceReserve() {}
+
+@draft
+@dllExport('NtAlpcCreateSectionView')
+function ntAlpcCreateSectionView() {}
+
+@draft
+@dllExport('NtAlpcCreateSecurityContext')
+function ntAlpcCreateSecurityContext() {}
+
+@draft
+@dllExport('NtAlpcDeletePortSection')
+function ntAlpcDeletePortSection() {}
+
+@draft
+@dllExport('NtAlpcDeleteResourceReserve')
+function ntAlpcDeleteResourceReserve() {}
+
+@draft
+@dllExport('NtAlpcDeleteSectionView')
+function ntAlpcDeleteSectionView() {}
+
+@draft
+@dllExport('NtAlpcDeleteSecurityContext')
+function ntAlpcDeleteSecurityContext() {}
+
+@draft
+@dllExport('NtAlpcDisconnectPort')
+function ntAlpcDisconnectPort() {}
+
+@draft
+@dllExport('NtAlpcImpersonateClientContainerOfPort')
+function ntAlpcImpersonateClientContainerOfPort() {}
+
+@draft
+@dllExport('NtAlpcImpersonateClientOfPort')
+function ntAlpcImpersonateClientOfPort() {}
+
+@draft
+@dllExport('NtAlpcOpenSenderProcess')
+function ntAlpcOpenSenderProcess() {}
+
+@draft
+@dllExport('NtAlpcOpenSenderThread')
+function ntAlpcOpenSenderThread() {}
+
+@draft
+@dllExport('NtAlpcQueryInformation')
+function ntAlpcQueryInformation() {}
+
+@draft
+@dllExport('NtAlpcQueryInformationMessage')
+function ntAlpcQueryInformationMessage() {}
+
+@draft
+@dllExport('NtAlpcRevokeSecurityContext')
+function ntAlpcRevokeSecurityContext() {}
+
+@draft
+@dllExport('NtAlpcSendWaitReceivePort')
+function ntAlpcSendWaitReceivePort() {}
+
+@draft
+@dllExport('NtAlpcSetInformation')
+function ntAlpcSetInformation() {}
+
+@draft
+@dllExport('NtApphelpCacheControl')
+function ntApphelpCacheControl() {}
+
+@draft
+@dllExport('NtAreMappedFilesTheSame')
+function ntAreMappedFilesTheSame() {}
+
+@draft
+@dllExport('NtAssignProcessToJobObject')
+function ntAssignProcessToJobObject() {}
+
+@draft
+@dllExport('NtAssociateWaitCompletionPacket')
+function ntAssociateWaitCompletionPacket() {}
+
+@draft
+@dllExport('NtCallbackReturn')
+function ntCallbackReturn() {}
+
+@draft
+@dllExport('NtCallEnclave')
+function ntCallEnclave() {}
+
+@draft
+@dllExport('NtCancelIoFile')
+function ntCancelIoFile() {}
+
+@draft
+@dllExport('NtCancelIoFileEx')
+function ntCancelIoFileEx() {}
+
+@draft
+@dllExport('NtCancelSynchronousIoFile')
+function ntCancelSynchronousIoFile() {}
+
+@draft
+@dllExport('NtCancelTimer')
+function ntCancelTimer() {}
+
+@draft
+@dllExport('NtCancelTimer2')
+function ntCancelTimer2() {}
+
+@draft
+@dllExport('NtCancelWaitCompletionPacket')
+function ntCancelWaitCompletionPacket() {}
+
+@draft
+@dllExport('NtClearEvent')
+function ntClearEvent() {}
+
+@draft
+@dllExport('NtClose')
+function ntClose() {}
+
+@draft
+@dllExport('NtCloseObjectAuditAlarm')
+function ntCloseObjectAuditAlarm() {}
+
+@draft
+@dllExport('NtCommitComplete')
+function ntCommitComplete() {}
+
+@draft
+@dllExport('NtCommitEnlistment')
+function ntCommitEnlistment() {}
+
+@draft
+@dllExport('NtCommitRegistryTransaction')
+function ntCommitRegistryTransaction() {}
+
+@draft
+@dllExport('NtCommitTransaction')
+function ntCommitTransaction() {}
+
+@draft
+@dllExport('NtCompactKeys')
+function ntCompactKeys() {}
+
+@draft
+@dllExport('NtCompareObjects')
+function ntCompareObjects() {}
+
+@draft
+@dllExport('NtCompareSigningLevels')
+function ntCompareSigningLevels() {}
+
+@draft
+@dllExport('NtCompareTokens')
+function ntCompareTokens() {}
+
+@draft
+@dllExport('NtCompleteConnectPort')
+function ntCompleteConnectPort() {}
+
+@draft
+@dllExport('NtCompressKey')
+function ntCompressKey() {}
+
+@draft
+@dllExport('NtConnectPort')
+function ntConnectPort() {}
+
+@draft
+@dllExport('NtContinue')
+function ntContinue() {}
+
+@draft
+@dllExport('NtConvertBetweenAuxiliaryCounterAndPerformanceCounter')
+function ntConvertBetweenAuxiliaryCounterAndPerformanceCounter() {}
+
+@draft
+@dllExport('NtCreateDebugObject')
+function ntCreateDebugObject() {}
+
+@draft
+@dllExport('NtCreateDirectoryObject')
+function ntCreateDirectoryObject() {}
+
+@draft
+@dllExport('NtCreateDirectoryObjectEx')
+function ntCreateDirectoryObjectEx() {}
+
+@draft
+@dllExport('NtCreateEnclave')
+function ntCreateEnclave() {}
+
+@draft
+@dllExport('NtCreateEnlistment')
+function ntCreateEnlistment() {}
+
+@draft
+@dllExport('NtCreateEvent')
+function ntCreateEvent() {}
+
+@draft
+@dllExport('NtCreateEventPair')
+function ntCreateEventPair() {}
+
+@draft
+@dllExport('NtCreateFile')
+function ntCreateFile() {}
+
+@draft
+@dllExport('NtCreateIoCompletion')
+function ntCreateIoCompletion() {}
+
+@draft
+@dllExport('NtCreateIRTimer')
+function ntCreateIRTimer() {}
+
+@draft
+@dllExport('NtCreateJobObject')
+function ntCreateJobObject() {}
+
+@draft
+@dllExport('NtCreateJobSet')
+function ntCreateJobSet() {}
+
+@draft
+@dllExport('NtCreateKey')
+function ntCreateKey() {}
+
+@draft
+@dllExport('NtCreateKeyedEvent')
+function ntCreateKeyedEvent() {}
+
+@draft
+@dllExport('NtCreateKeyTransacted')
+function ntCreateKeyTransacted() {}
+
+@draft
+@dllExport('NtCreateLowBoxToken')
+function ntCreateLowBoxToken() {}
+
+@draft
+@dllExport('NtCreateMailslotFile')
+function ntCreateMailslotFile() {}
+
+@draft
+@dllExport('NtCreateMutant')
+function ntCreateMutant() {}
+
+@draft
+@dllExport('NtCreateNamedPipeFile')
+function ntCreateNamedPipeFile() {}
+
+@draft
+@dllExport('NtCreatePagingFile')
+function ntCreatePagingFile() {}
+
+@draft
+@dllExport('NtCreatePartition')
+function ntCreatePartition() {}
+
+@draft
+@dllExport('NtCreatePort')
+function ntCreatePort() {}
+
+@draft
+@dllExport('NtCreatePrivateNamespace')
+function ntCreatePrivateNamespace() {}
+
+@draft
+@dllExport('NtCreateProcess')
+function ntCreateProcess() {}
+
+@draft
+@dllExport('NtCreateProcessEx')
+function ntCreateProcessEx() {}
+
+@draft
+@dllExport('NtCreateProfile')
+function ntCreateProfile() {}
+
+@draft
+@dllExport('NtCreateProfileEx')
+function ntCreateProfileEx() {}
+
+@draft
+@dllExport('NtCreateRegistryTransaction')
+function ntCreateRegistryTransaction() {}
+
+@draft
+@dllExport('NtCreateResourceManager')
+function ntCreateResourceManager() {}
+
+@draft
+@dllExport('NtCreateSection')
+function ntCreateSection() {}
+
+@draft
+@dllExport('NtCreateSemaphore')
+function ntCreateSemaphore() {}
+
+@draft
+@dllExport('NtCreateSymbolicLinkObject')
+function ntCreateSymbolicLinkObject() {}
+
+@draft
+@dllExport('NtCreateThread')
+function ntCreateThread() {}
+
+@draft
+@dllExport('NtCreateThreadEx')
+function ntCreateThreadEx() {}
+
+@draft
+@dllExport('NtCreateTimer')
+function ntCreateTimer() {}
+
+@draft
+@dllExport('NtCreateTimer2')
+function ntCreateTimer2() {}
+
+@draft
+@dllExport('NtCreateToken')
+function ntCreateToken() {}
+
+@draft
+@dllExport('NtCreateTokenEx')
+function ntCreateTokenEx() {}
+
+@draft
+@dllExport('NtCreateTransaction')
+function ntCreateTransaction() {}
+
+@draft
+@dllExport('NtCreateTransactionManager')
+function ntCreateTransactionManager() {}
+
+@draft
+@dllExport('NtCreateUserProcess')
+function ntCreateUserProcess() {}
+
+@draft
+@dllExport('NtCreateWaitablePort')
+function ntCreateWaitablePort() {}
+
+@draft
+@dllExport('NtCreateWaitCompletionPacket')
+function ntCreateWaitCompletionPacket() {}
+
+@draft
+@dllExport('NtCreateWnfStateName')
+function ntCreateWnfStateName() {}
+
+@draft
+@dllExport('NtCreateWorkerFactory')
+function ntCreateWorkerFactory() {}
+
+@draft
+@dllExport('NtDebugActiveProcess')
+function ntDebugActiveProcess() {}
+
+@draft
+@dllExport('NtDebugContinue')
+function ntDebugContinue() {}
+
+@draft
+@dllExport('NtDelayExecution')
+function ntDelayExecution() {}
+
+@draft
+@dllExport('NtDeleteAtom')
+function ntDeleteAtom() {}
+
+@draft
+@dllExport('NtDeleteBootEntry')
+function ntDeleteBootEntry() {}
+
+@draft
+@dllExport('NtDeleteDriverEntry')
+function ntDeleteDriverEntry() {}
+
+@draft
+@dllExport('NtDeleteFile')
+function ntDeleteFile() {}
+
+@draft
+@dllExport('NtDeleteKey')
+function ntDeleteKey() {}
+
+@draft
+@dllExport('NtDeleteObjectAuditAlarm')
+function ntDeleteObjectAuditAlarm() {}
+
+@draft
+@dllExport('NtDeletePrivateNamespace')
+function ntDeletePrivateNamespace() {}
+
+@draft
+@dllExport('NtDeleteValueKey')
+function ntDeleteValueKey() {}
+
+@draft
+@dllExport('NtDeleteWnfStateData')
+function ntDeleteWnfStateData() {}
+
+@draft
+@dllExport('NtDeleteWnfStateName')
+function ntDeleteWnfStateName() {}
+
+@draft
+@dllExport('NtDeviceIoControlFile')
+function ntDeviceIoControlFile() {}
+
+@draft
+@dllExport('NtDisableLastKnownGood')
+function ntDisableLastKnownGood() {}
+
+@draft
+@dllExport('NtDisplayString')
+function ntDisplayString() {}
+
+@draft
+@dllExport('NtdllDefWindowProc_A')
+function ntdllDefWindowProc_A() {}
+
+@draft
+@dllExport('NtdllDefWindowProc_W')
+function ntdllDefWindowProc_W() {}
+
+@draft
+@dllExport('NtdllDialogWndProc_A')
+function ntdllDialogWndProc_A() {}
+
+@draft
+@dllExport('NtdllDialogWndProc_W')
+function ntdllDialogWndProc_W() {}
+
+@draft
+@dllExport('NtDrawText')
+function ntDrawText() {}
+
+@draft
+@dllExport('NtDuplicateObject')
+function ntDuplicateObject() {}
+
+@draft
+@dllExport('NtDuplicateToken')
+function ntDuplicateToken() {}
+
+@draft
+@dllExport('NtEnableLastKnownGood')
+function ntEnableLastKnownGood() {}
+
+@draft
+@dllExport('NtEnumerateBootEntries')
+function ntEnumerateBootEntries() {}
+
+@draft
+@dllExport('NtEnumerateDriverEntries')
+function ntEnumerateDriverEntries() {}
+
+@draft
+@dllExport('NtEnumerateKey')
+function ntEnumerateKey() {}
+
+@draft
+@dllExport('NtEnumerateSystemEnvironmentValuesEx')
+function ntEnumerateSystemEnvironmentValuesEx() {}
+
+@draft
+@dllExport('NtEnumerateTransactionObject')
+function ntEnumerateTransactionObject() {}
+
+@draft
+@dllExport('NtEnumerateValueKey')
+function ntEnumerateValueKey() {}
+
+@draft
+@dllExport('NtExtendSection')
+function ntExtendSection() {}
+
+@draft
+@dllExport('NtFilterBootOption')
+function ntFilterBootOption() {}
+
+@draft
+@dllExport('NtFilterToken')
+function ntFilterToken() {}
+
+@draft
+@dllExport('NtFilterTokenEx')
+function ntFilterTokenEx() {}
+
+@draft
+@dllExport('NtFindAtom')
+function ntFindAtom() {}
+
+@draft
+@dllExport('NtFlushBuffersFile')
+function ntFlushBuffersFile() {}
+
+@draft
+@dllExport('NtFlushBuffersFileEx')
+function ntFlushBuffersFileEx() {}
+
+@draft
+@dllExport('NtFlushInstallUILanguage')
+function ntFlushInstallUILanguage() {}
+
+@draft
+@dllExport('NtFlushInstructionCache')
+function ntFlushInstructionCache() {}
+
+@draft
+@dllExport('NtFlushKey')
+function ntFlushKey() {}
+
+@draft
+@dllExport('NtFlushProcessWriteBuffers')
+function ntFlushProcessWriteBuffers() {}
+
+@draft
+@dllExport('NtFlushVirtualMemory')
+function ntFlushVirtualMemory() {}
+
+@draft
+@dllExport('NtFlushWriteBuffer')
+function ntFlushWriteBuffer() {}
+
+@draft
+@dllExport('NtFreeUserPhysicalPages')
+function ntFreeUserPhysicalPages() {}
+
+@draft
+@dllExport('NtFreeVirtualMemory')
+function ntFreeVirtualMemory() {}
+
+@draft
+@dllExport('NtFreezeRegistry')
+function ntFreezeRegistry() {}
+
+@draft
+@dllExport('NtFreezeTransactions')
+function ntFreezeTransactions() {}
+
+@draft
+@dllExport('NtFsControlFile')
+function ntFsControlFile() {}
+
+@draft
+@dllExport('NtGetCachedSigningLevel')
+function ntGetCachedSigningLevel() {}
+
+@draft
+@dllExport('NtGetCompleteWnfStateSubscription')
+function ntGetCompleteWnfStateSubscription() {}
+
+@draft
+@dllExport('NtGetContextThread')
+function ntGetContextThread() {}
+
+@draft
+@dllExport('NtGetCurrentProcessorNumber')
+function ntGetCurrentProcessorNumber() {}
+
+@draft
+@dllExport('NtGetCurrentProcessorNumberEx')
+function ntGetCurrentProcessorNumberEx() {}
+
+@draft
+@dllExport('NtGetDevicePowerState')
+function ntGetDevicePowerState() {}
+
+@draft
+@dllExport('NtGetMUIRegistryInfo')
+function ntGetMUIRegistryInfo() {}
+
+@draft
+@dllExport('NtGetNextProcess')
+function ntGetNextProcess() {}
+
+@draft
+@dllExport('NtGetNextThread')
+function ntGetNextThread() {}
+
+@draft
+@dllExport('NtGetNlsSectionPtr')
+function ntGetNlsSectionPtr() {}
+
+@draft
+@dllExport('NtGetNotificationResourceManager')
+function ntGetNotificationResourceManager() {}
+
+@draft
+@dllExport('NtGetTickCount')
+function ntGetTickCount() {}
+
+@draft
+@dllExport('NtGetWriteWatch')
+function ntGetWriteWatch() {}
+
+@draft
+@dllExport('NtImpersonateAnonymousToken')
+function ntImpersonateAnonymousToken() {}
+
+@draft
+@dllExport('NtImpersonateClientOfPort')
+function ntImpersonateClientOfPort() {}
+
+@draft
+@dllExport('NtImpersonateThread')
+function ntImpersonateThread() {}
+
+@draft
+@dllExport('NtInitializeEnclave')
+function ntInitializeEnclave() {}
+
+@draft
+@dllExport('NtInitializeNlsFiles')
+function ntInitializeNlsFiles() {}
+
+@draft
+@dllExport('NtInitializeRegistry')
+function ntInitializeRegistry() {}
+
+@draft
+@dllExport('NtInitiatePowerAction')
+function ntInitiatePowerAction() {}
+
+@draft
+@dllExport('NtIsProcessInJob')
+function ntIsProcessInJob() {}
+
+@draft
+@dllExport('NtIsSystemResumeAutomatic')
+function ntIsSystemResumeAutomatic() {}
+
+@draft
+@dllExport('NtIsUILanguageComitted')
+function ntIsUILanguageComitted() {}
+
+@draft
+@dllExport('NtListenPort')
+function ntListenPort() {}
+
+@draft
+@dllExport('NtLoadDriver')
+function ntLoadDriver() {}
+
+@draft
+@dllExport('NtLoadEnclaveData')
+function ntLoadEnclaveData() {}
+
+@draft
+@dllExport('NtLoadHotPatch')
+function ntLoadHotPatch() {}
+
+@draft
+@dllExport('NtLoadKey')
+function ntLoadKey() {}
+
+@draft
+@dllExport('NtLoadKey2')
+function ntLoadKey2() {}
+
+@draft
+@dllExport('NtLoadKeyEx')
+function ntLoadKeyEx() {}
+
+@draft
+@dllExport('NtLockFile')
+function ntLockFile() {}
+
+@draft
+@dllExport('NtLockProductActivationKeys')
+function ntLockProductActivationKeys() {}
+
+@draft
+@dllExport('NtLockRegistryKey')
+function ntLockRegistryKey() {}
+
+@draft
+@dllExport('NtLockVirtualMemory')
+function ntLockVirtualMemory() {}
+
+@draft
+@dllExport('NtMakePermanentObject')
+function ntMakePermanentObject() {}
+
+@draft
+@dllExport('NtMakeTemporaryObject')
+function ntMakeTemporaryObject() {}
+
+@draft
+@dllExport('NtManagePartition')
+function ntManagePartition() {}
+
+@draft
+@dllExport('NtMapCMFModule')
+function ntMapCMFModule() {}
+
+@draft
+@dllExport('NtMapUserPhysicalPages')
+function ntMapUserPhysicalPages() {}
+
+@draft
+@dllExport('NtMapUserPhysicalPagesScatter')
+function ntMapUserPhysicalPagesScatter() {}
+
+@draft
+@dllExport('NtMapViewOfSection')
+function ntMapViewOfSection() {}
+
+@draft
+@dllExport('NtMapViewOfSectionEx')
+function ntMapViewOfSectionEx() {}
+
+@draft
+@dllExport('NtModifyBootEntry')
+function ntModifyBootEntry() {}
+
+@draft
+@dllExport('NtModifyDriverEntry')
+function ntModifyDriverEntry() {}
+
+@draft
+@dllExport('NtNotifyChangeDirectoryFile')
+function ntNotifyChangeDirectoryFile() {}
+
+@draft
+@dllExport('NtNotifyChangeDirectoryFileEx')
+function ntNotifyChangeDirectoryFileEx() {}
+
+@draft
+@dllExport('NtNotifyChangeKey')
+function ntNotifyChangeKey() {}
+
+@draft
+@dllExport('NtNotifyChangeMultipleKeys')
+function ntNotifyChangeMultipleKeys() {}
+
+@draft
+@dllExport('NtNotifyChangeSession')
+function ntNotifyChangeSession() {}
+
+@draft
+@dllExport('NtOpenDirectoryObject')
+function ntOpenDirectoryObject() {}
+
+@draft
+@dllExport('NtOpenEnlistment')
+function ntOpenEnlistment() {}
+
+@draft
+@dllExport('NtOpenEvent')
+function ntOpenEvent() {}
+
+@draft
+@dllExport('NtOpenEventPair')
+function ntOpenEventPair() {}
+
+@draft
+@dllExport('NtOpenFile')
+function ntOpenFile() {}
+
+@draft
+@dllExport('NtOpenIoCompletion')
+function ntOpenIoCompletion() {}
+
+@draft
+@dllExport('NtOpenJobObject')
+function ntOpenJobObject() {}
+
+@draft
+@dllExport('NtOpenKey')
+function ntOpenKey() {}
+
+@draft
+@dllExport('NtOpenKeyedEvent')
+function ntOpenKeyedEvent() {}
+
+@draft
+@dllExport('NtOpenKeyEx')
+function ntOpenKeyEx() {}
+
+@draft
+@dllExport('NtOpenKeyTransacted')
+function ntOpenKeyTransacted() {}
+
+@draft
+@dllExport('NtOpenKeyTransactedEx')
+function ntOpenKeyTransactedEx() {}
+
+@draft
+@dllExport('NtOpenMutant')
+function ntOpenMutant() {}
+
+@draft
+@dllExport('NtOpenObjectAuditAlarm')
+function ntOpenObjectAuditAlarm() {}
+
+@draft
+@dllExport('NtOpenPartition')
+function ntOpenPartition() {}
+
+@draft
+@dllExport('NtOpenPrivateNamespace')
+function ntOpenPrivateNamespace() {}
+
+@draft
+@dllExport('NtOpenProcess')
+function ntOpenProcess() {}
+
+@draft
+@dllExport('NtOpenProcessToken')
+function ntOpenProcessToken() {}
+
+@draft
+@dllExport('NtOpenProcessTokenEx')
+function ntOpenProcessTokenEx() {}
+
+@draft
+@dllExport('NtOpenRegistryTransaction')
+function ntOpenRegistryTransaction() {}
+
+@draft
+@dllExport('NtOpenResourceManager')
+function ntOpenResourceManager() {}
+
+@draft
+@dllExport('NtOpenSection')
+function ntOpenSection() {}
+
+@draft
+@dllExport('NtOpenSemaphore')
+function ntOpenSemaphore() {}
+
+@draft
+@dllExport('NtOpenSession')
+function ntOpenSession() {}
+
+@draft
+@dllExport('NtOpenSymbolicLinkObject')
+function ntOpenSymbolicLinkObject() {}
+
+@draft
+@dllExport('NtOpenThread')
+function ntOpenThread() {}
+
+@draft
+@dllExport('NtOpenThreadToken')
+function ntOpenThreadToken() {}
+
+@draft
+@dllExport('NtOpenThreadTokenEx')
+function ntOpenThreadTokenEx() {}
+
+@draft
+@dllExport('NtOpenTimer')
+function ntOpenTimer() {}
+
+@draft
+@dllExport('NtOpenTransaction')
+function ntOpenTransaction() {}
+
+@draft
+@dllExport('NtOpenTransactionManager')
+function ntOpenTransactionManager() {}
+
+@draft
+@dllExport('NtPlugPlayControl')
+function ntPlugPlayControl() {}
+
+@draft
+@dllExport('NtPowerInformation')
+function ntPowerInformation() {}
+
+@draft
+@dllExport('NtPrepareComplete')
+function ntPrepareComplete() {}
+
+@draft
+@dllExport('NtPrepareEnlistment')
+function ntPrepareEnlistment() {}
+
+@draft
+@dllExport('NtPrePrepareComplete')
+function ntPrePrepareComplete() {}
+
+@draft
+@dllExport('NtPrePrepareEnlistment')
+function ntPrePrepareEnlistment() {}
+
+@draft
+@dllExport('NtPrivilegeCheck')
+function ntPrivilegeCheck() {}
+
+@draft
+@dllExport('NtPrivilegedServiceAuditAlarm')
+function ntPrivilegedServiceAuditAlarm() {}
+
+@draft
+@dllExport('NtPrivilegeObjectAuditAlarm')
+function ntPrivilegeObjectAuditAlarm() {}
+
+@draft
+@dllExport('NtPropagationComplete')
+function ntPropagationComplete() {}
+
+@draft
+@dllExport('NtPropagationFailed')
+function ntPropagationFailed() {}
+
+@draft
+@dllExport('NtProtectVirtualMemory')
+function ntProtectVirtualMemory() {}
+
+@draft
+@dllExport('NtPulseEvent')
+function ntPulseEvent() {}
+
+@draft
+@dllExport('NtQueryAttributesFile')
+function ntQueryAttributesFile() {}
+
+@draft
+@dllExport('NtQueryAuxiliaryCounterFrequency')
+function ntQueryAuxiliaryCounterFrequency() {}
+
+@draft
+@dllExport('NtQueryBootEntryOrder')
+function ntQueryBootEntryOrder() {}
+
+@draft
+@dllExport('NtQueryBootOptions')
+function ntQueryBootOptions() {}
+
+@draft
+@dllExport('NtQueryDebugFilterState')
+function ntQueryDebugFilterState() {}
+
+@draft
+@dllExport('NtQueryDefaultLocale')
+function ntQueryDefaultLocale() {}
+
+@draft
+@dllExport('NtQueryDefaultUILanguage')
+function ntQueryDefaultUILanguage() {}
+
+@draft
+@dllExport('NtQueryDirectoryFile')
+function ntQueryDirectoryFile() {}
+
+@draft
+@dllExport('NtQueryDirectoryFileEx')
+function ntQueryDirectoryFileEx() {}
+
+@draft
+@dllExport('NtQueryDirectoryObject')
+function ntQueryDirectoryObject() {}
+
+@draft
+@dllExport('NtQueryDriverEntryOrder')
+function ntQueryDriverEntryOrder() {}
+
+@draft
+@dllExport('NtQueryEaFile')
+function ntQueryEaFile() {}
+
+@draft
+@dllExport('NtQueryEvent')
+function ntQueryEvent() {}
+
+@draft
+@dllExport('NtQueryFullAttributesFile')
+function ntQueryFullAttributesFile() {}
+
+@draft
+@dllExport('NtQueryInformationAtom')
+function ntQueryInformationAtom() {}
+
+@draft
+@dllExport('NtQueryInformationByName')
+function ntQueryInformationByName() {}
+
+@draft
+@dllExport('NtQueryInformationEnlistment')
+function ntQueryInformationEnlistment() {}
+
+@draft
+@dllExport('NtQueryInformationFile')
+function ntQueryInformationFile() {}
+
+@draft
+@dllExport('NtQueryInformationJobObject')
+function ntQueryInformationJobObject() {}
+
+@draft
+@dllExport('NtQueryInformationPort')
+function ntQueryInformationPort() {}
+
+@draft
+@dllExport('NtQueryInformationProcess')
+function ntQueryInformationProcess() {}
+
+@draft
+@dllExport('NtQueryInformationResourceManager')
+function ntQueryInformationResourceManager() {}
+
+@draft
+@dllExport('NtQueryInformationThread')
+function ntQueryInformationThread() {}
+
+@draft
+@dllExport('NtQueryInformationToken')
+function ntQueryInformationToken() {}
+
+@draft
+@dllExport('NtQueryInformationTransaction')
+function ntQueryInformationTransaction() {}
+
+@draft
+@dllExport('NtQueryInformationTransactionManager')
+function ntQueryInformationTransactionManager() {}
+
+@draft
+@dllExport('NtQueryInformationWorkerFactory')
+function ntQueryInformationWorkerFactory() {}
+
+@draft
+@dllExport('NtQueryInstallUILanguage')
+function ntQueryInstallUILanguage() {}
+
+@draft
+@dllExport('NtQueryIntervalProfile')
+function ntQueryIntervalProfile() {}
+
+@draft
+@dllExport('NtQueryIoCompletion')
+function ntQueryIoCompletion() {}
+
+@draft
+@dllExport('NtQueryKey')
+function ntQueryKey() {}
+
+@draft
+@dllExport('NtQueryLicenseValue')
+function ntQueryLicenseValue() {}
+
+@draft
+@dllExport('NtQueryMultipleValueKey')
+function ntQueryMultipleValueKey() {}
+
+@draft
+@dllExport('NtQueryMutant')
+function ntQueryMutant() {}
+
+@draft
+@dllExport('NtQueryObject')
+function ntQueryObject() {}
+
+@draft
+@dllExport('NtQueryOpenSubKeys')
+function ntQueryOpenSubKeys() {}
+
+@draft
+@dllExport('NtQueryOpenSubKeysEx')
+function ntQueryOpenSubKeysEx() {}
+
+@draft
+@dllExport('NtQueryPerformanceCounter')
+function ntQueryPerformanceCounter() {}
+
+@draft
+@dllExport('NtQueryPortInformationProcess')
+function ntQueryPortInformationProcess() {}
+
+@draft
+@dllExport('NtQueryQuotaInformationFile')
+function ntQueryQuotaInformationFile() {}
+
+@draft
+@dllExport('NtQuerySection')
+function ntQuerySection() {}
+
+@draft
+@dllExport('NtQuerySecurityAttributesToken')
+function ntQuerySecurityAttributesToken() {}
+
+@draft
+@dllExport('NtQuerySecurityObject')
+function ntQuerySecurityObject() {}
+
+@draft
+@dllExport('NtQuerySecurityPolicy')
+function ntQuerySecurityPolicy() {}
+
+@draft
+@dllExport('NtQuerySemaphore')
+function ntQuerySemaphore() {}
+
+@draft
+@dllExport('NtQuerySymbolicLinkObject')
+function ntQuerySymbolicLinkObject() {}
+
+@draft
+@dllExport('NtQuerySystemEnvironmentValue')
+function ntQuerySystemEnvironmentValue() {}
+
+@draft
+@dllExport('NtQuerySystemEnvironmentValueEx')
+function ntQuerySystemEnvironmentValueEx() {}
+
+@draft
+@dllExport('NtQuerySystemInformation')
+function ntQuerySystemInformation() {}
+
+@draft
+@dllExport('NtQuerySystemInformationEx')
+function ntQuerySystemInformationEx() {}
+
+@draft
+@dllExport('NtQuerySystemTime')
+function ntQuerySystemTime() {}
+
+@draft
+@dllExport('NtQueryTimer')
+function ntQueryTimer() {}
+
+@draft
+@dllExport('NtQueryTimerResolution')
+function ntQueryTimerResolution() {}
+
+@draft
+@dllExport('NtQueryValueKey')
+function ntQueryValueKey() {}
+
+@draft
+@dllExport('NtQueryVirtualMemory')
+function ntQueryVirtualMemory() {}
+
+@draft
+@dllExport('NtQueryVolumeInformationFile')
+function ntQueryVolumeInformationFile() {}
+
+@draft
+@dllExport('NtQueryWnfStateData')
+function ntQueryWnfStateData() {}
+
+@draft
+@dllExport('NtQueryWnfStateNameInformation')
+function ntQueryWnfStateNameInformation() {}
+
+@draft
+@dllExport('NtQueueApcThread')
+function ntQueueApcThread() {}
+
+@draft
+@dllExport('NtQueueApcThreadEx')
+function ntQueueApcThreadEx() {}
+
+@draft
+@dllExport('NtRaiseException')
+function ntRaiseException() {}
+
+@draft
+@dllExport('NtRaiseHardError')
+function ntRaiseHardError() {}
+
+@draft
+@dllExport('NtReadFile')
+function ntReadFile() {}
+
+@draft
+@dllExport('NtReadFileScatter')
+function ntReadFileScatter() {}
+
+@draft
+@dllExport('NtReadOnlyEnlistment')
+function ntReadOnlyEnlistment() {}
+
+@draft
+@dllExport('NtReadRequestData')
+function ntReadRequestData() {}
+
+@draft
+@dllExport('NtReadVirtualMemory')
+function ntReadVirtualMemory() {}
+
+@draft
+@dllExport('NtRecoverEnlistment')
+function ntRecoverEnlistment() {}
+
+@draft
+@dllExport('NtRecoverResourceManager')
+function ntRecoverResourceManager() {}
+
+@draft
+@dllExport('NtRecoverTransactionManager')
+function ntRecoverTransactionManager() {}
+
+@draft
+@dllExport('NtRegisterProtocolAddressInformation')
+function ntRegisterProtocolAddressInformation() {}
+
+@draft
+@dllExport('NtRegisterThreadTerminatePort')
+function ntRegisterThreadTerminatePort() {}
+
+@draft
+@dllExport('NtReleaseKeyedEvent')
+function ntReleaseKeyedEvent() {}
+
+@draft
+@dllExport('NtReleaseMutant')
+function ntReleaseMutant() {}
+
+@draft
+@dllExport('NtReleaseSemaphore')
+function ntReleaseSemaphore() {}
+
+@draft
+@dllExport('NtReleaseWorkerFactoryWorker')
+function ntReleaseWorkerFactoryWorker() {}
+
+@draft
+@dllExport('NtRemoveIoCompletion')
+function ntRemoveIoCompletion() {}
+
+@draft
+@dllExport('NtRemoveIoCompletionEx')
+function ntRemoveIoCompletionEx() {}
+
+@draft
+@dllExport('NtRemoveProcessDebug')
+function ntRemoveProcessDebug() {}
+
+@draft
+@dllExport('NtRenameKey')
+function ntRenameKey() {}
+
+@draft
+@dllExport('NtRenameTransactionManager')
+function ntRenameTransactionManager() {}
+
+@draft
+@dllExport('NtReplaceKey')
+function ntReplaceKey() {}
+
+@draft
+@dllExport('NtReplacePartitionUnit')
+function ntReplacePartitionUnit() {}
+
+@draft
+@dllExport('NtReplyPort')
+function ntReplyPort() {}
+
+@draft
+@dllExport('NtReplyWaitReceivePort')
+function ntReplyWaitReceivePort() {}
+
+@draft
+@dllExport('NtReplyWaitReceivePortEx')
+function ntReplyWaitReceivePortEx() {}
+
+@draft
+@dllExport('NtReplyWaitReplyPort')
+function ntReplyWaitReplyPort() {}
+
+@draft
+@dllExport('NtRequestPort')
+function ntRequestPort() {}
+
+@draft
+@dllExport('NtRequestWaitReplyPort')
+function ntRequestWaitReplyPort() {}
+
+@draft
+@dllExport('NtResetEvent')
+function ntResetEvent() {}
+
+@draft
+@dllExport('NtResetWriteWatch')
+function ntResetWriteWatch() {}
+
+@draft
+@dllExport('NtRestoreKey')
+function ntRestoreKey() {}
+
+@draft
+@dllExport('NtResumeProcess')
+function ntResumeProcess() {}
+
+@draft
+@dllExport('NtResumeThread')
+function ntResumeThread() {}
+
+@draft
+@dllExport('NtRevertContainerImpersonation')
+function ntRevertContainerImpersonation() {}
+
+@draft
+@dllExport('NtRollbackComplete')
+function ntRollbackComplete() {}
+
+@draft
+@dllExport('NtRollbackEnlistment')
+function ntRollbackEnlistment() {}
+
+@draft
+@dllExport('NtRollbackRegistryTransaction')
+function ntRollbackRegistryTransaction() {}
+
+@draft
+@dllExport('NtRollbackTransaction')
+function ntRollbackTransaction() {}
+
+@draft
+@dllExport('NtRollforwardTransactionManager')
+function ntRollforwardTransactionManager() {}
+
+@draft
+@dllExport('NtSaveKey')
+function ntSaveKey() {}
+
+@draft
+@dllExport('NtSaveKeyEx')
+function ntSaveKeyEx() {}
+
+@draft
+@dllExport('NtSaveMergedKeys')
+function ntSaveMergedKeys() {}
+
+@draft
+@dllExport('NtSecureConnectPort')
+function ntSecureConnectPort() {}
+
+@draft
+@dllExport('NtSerializeBoot')
+function ntSerializeBoot() {}
+
+@draft
+@dllExport('NtSetBootEntryOrder')
+function ntSetBootEntryOrder() {}
+
+@draft
+@dllExport('NtSetBootOptions')
+function ntSetBootOptions() {}
+
+@draft
+@dllExport('NtSetCachedSigningLevel')
+function ntSetCachedSigningLevel() {}
+
+@draft
+@dllExport('NtSetCachedSigningLevel2')
+function ntSetCachedSigningLevel2() {}
+
+@draft
+@dllExport('NtSetContextThread')
+function ntSetContextThread() {}
+
+@draft
+@dllExport('NtSetDebugFilterState')
+function ntSetDebugFilterState() {}
+
+@draft
+@dllExport('NtSetDefaultHardErrorPort')
+function ntSetDefaultHardErrorPort() {}
+
+@draft
+@dllExport('NtSetDefaultLocale')
+function ntSetDefaultLocale() {}
+
+@draft
+@dllExport('NtSetDefaultUILanguage')
+function ntSetDefaultUILanguage() {}
+
+@draft
+@dllExport('NtSetDriverEntryOrder')
+function ntSetDriverEntryOrder() {}
+
+@draft
+@dllExport('NtSetEaFile')
+function ntSetEaFile() {}
+
+@draft
+@dllExport('NtSetEvent')
+function ntSetEvent() {}
+
+@draft
+@dllExport('NtSetEventBoostPriority')
+function ntSetEventBoostPriority() {}
+
+@draft
+@dllExport('NtSetHighEventPair')
+function ntSetHighEventPair() {}
+
+@draft
+@dllExport('NtSetHighWaitLowEventPair')
+function ntSetHighWaitLowEventPair() {}
+
+@draft
+@dllExport('NtSetInformationDebugObject')
+function ntSetInformationDebugObject() {}
+
+@draft
+@dllExport('NtSetInformationEnlistment')
+function ntSetInformationEnlistment() {}
+
+@draft
+@dllExport('NtSetInformationFile')
+function ntSetInformationFile() {}
+
+@draft
+@dllExport('NtSetInformationJobObject')
+function ntSetInformationJobObject() {}
+
+@draft
+@dllExport('NtSetInformationKey')
+function ntSetInformationKey() {}
+
+@draft
+@dllExport('NtSetInformationObject')
+function ntSetInformationObject() {}
+
+@draft
+@dllExport('NtSetInformationProcess')
+function ntSetInformationProcess() {}
+
+@draft
+@dllExport('NtSetInformationResourceManager')
+function ntSetInformationResourceManager() {}
+
+@draft
+@dllExport('NtSetInformationSymbolicLink')
+function ntSetInformationSymbolicLink() {}
+
+@draft
+@dllExport('NtSetInformationThread')
+function ntSetInformationThread() {}
+
+@draft
+@dllExport('NtSetInformationToken')
+function ntSetInformationToken() {}
+
+@draft
+@dllExport('NtSetInformationTransaction')
+function ntSetInformationTransaction() {}
+
+@draft
+@dllExport('NtSetInformationTransactionManager')
+function ntSetInformationTransactionManager() {}
+
+@draft
+@dllExport('NtSetInformationVirtualMemory')
+function ntSetInformationVirtualMemory() {}
+
+@draft
+@dllExport('NtSetInformationWorkerFactory')
+function ntSetInformationWorkerFactory() {}
+
+@draft
+@dllExport('NtSetIntervalProfile')
+function ntSetIntervalProfile() {}
+
+@draft
+@dllExport('NtSetIoCompletion')
+function ntSetIoCompletion() {}
+
+@draft
+@dllExport('NtSetIoCompletionEx')
+function ntSetIoCompletionEx() {}
+
+@draft
+@dllExport('NtSetIRTimer')
+function ntSetIRTimer() {}
+
+@draft
+@dllExport('NtSetLdtEntries')
+function ntSetLdtEntries() {}
+
+@draft
+@dllExport('NtSetLowEventPair')
+function ntSetLowEventPair() {}
+
+@draft
+@dllExport('NtSetLowWaitHighEventPair')
+function ntSetLowWaitHighEventPair() {}
+
+@draft
+@dllExport('NtSetQuotaInformationFile')
+function ntSetQuotaInformationFile() {}
+
+@draft
+@dllExport('NtSetSecurityObject')
+function ntSetSecurityObject() {}
+
+@draft
+@dllExport('NtSetSystemEnvironmentValue')
+function ntSetSystemEnvironmentValue() {}
+
+@draft
+@dllExport('NtSetSystemEnvironmentValueEx')
+function ntSetSystemEnvironmentValueEx() {}
+
+@draft
+@dllExport('NtSetSystemInformation')
+function ntSetSystemInformation() {}
+
+@draft
+@dllExport('NtSetSystemPowerState')
+function ntSetSystemPowerState() {}
+
+@draft
+@dllExport('NtSetSystemTime')
+function ntSetSystemTime() {}
+
+@draft
+@dllExport('NtSetThreadExecutionState')
+function ntSetThreadExecutionState() {}
+
+@draft
+@dllExport('NtSetTimer')
+function ntSetTimer() {}
+
+@draft
+@dllExport('NtSetTimer2')
+function ntSetTimer2() {}
+
+@draft
+@dllExport('NtSetTimerEx')
+function ntSetTimerEx() {}
+
+@draft
+@dllExport('NtSetTimerResolution')
+function ntSetTimerResolution() {}
+
+@draft
+@dllExport('NtSetUuidSeed')
+function ntSetUuidSeed() {}
+
+@draft
+@dllExport('NtSetValueKey')
+function ntSetValueKey() {}
+
+@draft
+@dllExport('NtSetVolumeInformationFile')
+function ntSetVolumeInformationFile() {}
+
+@draft
+@dllExport('NtSetWnfProcessNotificationEvent')
+function ntSetWnfProcessNotificationEvent() {}
+
+@draft
+@dllExport('NtShutdownSystem')
+function ntShutdownSystem() {}
+
+@draft
+@dllExport('NtShutdownWorkerFactory')
+function ntShutdownWorkerFactory() {}
+
+@draft
+@dllExport('NtSignalAndWaitForSingleObject')
+function ntSignalAndWaitForSingleObject() {}
+
+@draft
+@dllExport('NtSinglePhaseReject')
+function ntSinglePhaseReject() {}
+
+@draft
+@dllExport('NtStartProfile')
+function ntStartProfile() {}
+
+@draft
+@dllExport('NtStopProfile')
+function ntStopProfile() {}
+
+@draft
+@dllExport('NtSubscribeWnfStateChange')
+function ntSubscribeWnfStateChange() {}
+
+@draft
+@dllExport('NtSuspendProcess')
+function ntSuspendProcess() {}
+
+@draft
+@dllExport('NtSuspendThread')
+function ntSuspendThread() {}
+
+@draft
+@dllExport('NtSystemDebugControl')
+function ntSystemDebugControl() {}
+
+@draft
+@dllExport('NtTerminateEnclave')
+function ntTerminateEnclave() {}
+
+@draft
+@dllExport('NtTerminateJobObject')
+function ntTerminateJobObject() {}
+
+@draft
+@dllExport('NtTerminateProcess')
+function ntTerminateProcess() {}
+
+@draft
+@dllExport('NtTerminateThread')
+function ntTerminateThread() {}
+
+@draft
+@dllExport('NtTestAlert')
+function ntTestAlert() {}
+
+@draft
+@dllExport('NtThawRegistry')
+function ntThawRegistry() {}
+
+@draft
+@dllExport('NtThawTransactions')
+function ntThawTransactions() {}
+
+@draft
+@dllExport('NtTraceControl')
+function ntTraceControl() {}
+
+@draft
+@dllExport('NtTraceEvent')
+function ntTraceEvent() {}
+
+@draft
+@dllExport('NtTranslateFilePath')
+function ntTranslateFilePath() {}
+
+@draft
+@dllExport('NtUmsThreadYield')
+function ntUmsThreadYield() {}
+
+@draft
+@dllExport('NtUnloadDriver')
+function ntUnloadDriver() {}
+
+@draft
+@dllExport('NtUnloadKey')
+function ntUnloadKey() {}
+
+@draft
+@dllExport('NtUnloadKey2')
+function ntUnloadKey2() {}
+
+@draft
+@dllExport('NtUnloadKeyEx')
+function ntUnloadKeyEx() {}
+
+@draft
+@dllExport('NtUnlockFile')
+function ntUnlockFile() {}
+
+@draft
+@dllExport('NtUnlockVirtualMemory')
+function ntUnlockVirtualMemory() {}
+
+@draft
+@dllExport('NtUnmapViewOfSection')
+function ntUnmapViewOfSection() {}
+
+@draft
+@dllExport('NtUnmapViewOfSectionEx')
+function ntUnmapViewOfSectionEx() {}
+
+@draft
+@dllExport('NtUnsubscribeWnfStateChange')
+function ntUnsubscribeWnfStateChange() {}
+
+@draft
+@dllExport('NtUpdateWnfStateData')
+function ntUpdateWnfStateData() {}
+
+@draft
+@dllExport('NtVdmControl')
+function ntVdmControl() {}
+
+@draft
+@dllExport('NtWaitForAlertByThreadId')
+function ntWaitForAlertByThreadId() {}
+
+@draft
+@dllExport('NtWaitForDebugEvent')
+function ntWaitForDebugEvent() {}
+
+@draft
+@dllExport('NtWaitForKeyedEvent')
+function ntWaitForKeyedEvent() {}
+
+@draft
+@dllExport('NtWaitForMultipleObjects')
+function ntWaitForMultipleObjects() {}
+
+@draft
+@dllExport('NtWaitForMultipleObjects32')
+function ntWaitForMultipleObjects32() {}
+
+@draft
+@dllExport('NtWaitForSingleObject')
+function ntWaitForSingleObject() {}
+
+@draft
+@dllExport('NtWaitForWorkViaWorkerFactory')
+function ntWaitForWorkViaWorkerFactory() {}
+
+@draft
+@dllExport('NtWaitHighEventPair')
+function ntWaitHighEventPair() {}
+
+@draft
+@dllExport('NtWaitLowEventPair')
+function ntWaitLowEventPair() {}
+
+@draft
+@dllExport('NtWorkerFactoryWorkerReady')
+function ntWorkerFactoryWorkerReady() {}
+
+@draft
+@dllExport('NtWriteFile')
+function ntWriteFile() {}
+
+@draft
+@dllExport('NtWriteFileGather')
+function ntWriteFileGather() {}
+
+@draft
+@dllExport('NtWriteRequestData')
+function ntWriteRequestData() {}
+
+@draft
+@dllExport('NtWriteVirtualMemory')
+function ntWriteVirtualMemory() {}
+
+@draft
+@dllExport('NtYieldExecution')
+function ntYieldExecution() {}
+
+@draft
+@dllExport('PfxFindPrefix')
+function pfxFindPrefix() {}
+
+@draft
+@dllExport('PfxInitialize')
+function pfxInitialize() {}
+
+@draft
+@dllExport('PfxInsertPrefix')
+function pfxInsertPrefix() {}
+
+@draft
+@dllExport('PfxRemovePrefix')
+function pfxRemovePrefix() {}
+
+@draft
+@dllExport('pow')
+function pow() {}
+
+@draft
+@dllExport('PssNtCaptureSnapshot')
+function pssNtCaptureSnapshot() {}
+
+@draft
+@dllExport('PssNtDuplicateSnapshot')
+function pssNtDuplicateSnapshot() {}
+
+@draft
+@dllExport('PssNtFreeRemoteSnapshot')
+function pssNtFreeRemoteSnapshot() {}
+
+@draft
+@dllExport('PssNtFreeSnapshot')
+function pssNtFreeSnapshot() {}
+
+@draft
+@dllExport('PssNtFreeWalkMarker')
+function pssNtFreeWalkMarker() {}
+
+@draft
+@dllExport('PssNtQuerySnapshot')
+function pssNtQuerySnapshot() {}
+
+@draft
+@dllExport('PssNtValidateDescriptor')
+function pssNtValidateDescriptor() {}
+
+@draft
+@dllExport('PssNtWalkSnapshot')
+function pssNtWalkSnapshot() {}
+
+@draft
+@dllExport('qsort')
+function qsort() {}
+
+@draft
+@dllExport('qsort_s')
+function qsort_s() {}
+
+@draft
+@dllExport('RtlAbortRXact')
+function rtlAbortRXact() {}
+
+@draft
+@dllExport('RtlAbsoluteToSelfRelativeSD')
+function rtlAbsoluteToSelfRelativeSD() {}
+
+@draft
+@dllExport('RtlAcquirePebLock')
+function rtlAcquirePebLock() {}
+
+@draft
+@dllExport('RtlAcquirePrivilege')
+function rtlAcquirePrivilege() {}
+
+@draft
+@dllExport('RtlAcquireReleaseSRWLockExclusive')
+function rtlAcquireReleaseSRWLockExclusive() {}
+
+@draft
+@dllExport('RtlAcquireResourceExclusive')
+function rtlAcquireResourceExclusive() {}
+
+@draft
+@dllExport('RtlAcquireResourceShared')
+function rtlAcquireResourceShared() {}
+
+@draft
+@dllExport('RtlAcquireSRWLockExclusive')
+function rtlAcquireSRWLockExclusive() {}
+
+@draft
+@dllExport('RtlAcquireSRWLockShared')
+function rtlAcquireSRWLockShared() {}
+
+@draft
+@dllExport('RtlActivateActivationContext')
+function rtlActivateActivationContext() {}
+
+@draft
+@dllExport('RtlActivateActivationContextEx')
+function rtlActivateActivationContextEx() {}
+
+@draft
+@dllExport('RtlActivateActivationContextUnsafeFast')
+function rtlActivateActivationContextUnsafeFast() {}
+
+@draft
+@dllExport('RtlAddAccessAllowedAce')
+function rtlAddAccessAllowedAce() {}
+
+@draft
+@dllExport('RtlAddAccessAllowedAceEx')
+function rtlAddAccessAllowedAceEx() {}
+
+@draft
+@dllExport('RtlAddAccessAllowedObjectAce')
+function rtlAddAccessAllowedObjectAce() {}
+
+@draft
+@dllExport('RtlAddAccessDeniedAce')
+function rtlAddAccessDeniedAce() {}
+
+@draft
+@dllExport('RtlAddAccessDeniedAceEx')
+function rtlAddAccessDeniedAceEx() {}
+
+@draft
+@dllExport('RtlAddAccessDeniedObjectAce')
+function rtlAddAccessDeniedObjectAce() {}
+
+@draft
+@dllExport('RtlAddAccessFilterAce')
+function rtlAddAccessFilterAce() {}
+
+@draft
+@dllExport('RtlAddAce')
+function rtlAddAce() {}
+
+@draft
+@dllExport('RtlAddActionToRXact')
+function rtlAddActionToRXact() {}
+
+@draft
+@dllExport('RtlAddAtomToAtomTable')
+function rtlAddAtomToAtomTable() {}
+
+@draft
+@dllExport('RtlAddAttributeActionToRXact')
+function rtlAddAttributeActionToRXact() {}
+
+@draft
+@dllExport('RtlAddAuditAccessAce')
+function rtlAddAuditAccessAce() {}
+
+@draft
+@dllExport('RtlAddAuditAccessAceEx')
+function rtlAddAuditAccessAceEx() {}
+
+@draft
+@dllExport('RtlAddAuditAccessObjectAce')
+function rtlAddAuditAccessObjectAce() {}
+
+@draft
+@dllExport('RtlAddCompoundAce')
+function rtlAddCompoundAce() {}
+
+@draft
+@dllExport('RtlAddFunctionTable')
+function rtlAddFunctionTable() {}
+
+@draft
+@dllExport('RtlAddGrowableFunctionTable')
+function rtlAddGrowableFunctionTable() {}
+
+@draft
+@dllExport('RtlAddIntegrityLabelToBoundaryDescriptor')
+function rtlAddIntegrityLabelToBoundaryDescriptor() {}
+
+@draft
+@dllExport('RtlAddMandatoryAce')
+function rtlAddMandatoryAce() {}
+
+@draft
+@dllExport('RtlAddProcessTrustLabelAce')
+function rtlAddProcessTrustLabelAce() {}
+
+@draft
+@dllExport('RtlAddRefActivationContext')
+function rtlAddRefActivationContext() {}
+
+@draft
+@dllExport('RtlAddRefMemoryStream')
+function rtlAddRefMemoryStream() {}
+
+@draft
+@dllExport('RtlAddResourceAttributeAce')
+function rtlAddResourceAttributeAce() {}
+
+@draft
+@dllExport('RtlAddressInSectionTable')
+function rtlAddressInSectionTable() {}
+
+@draft
+@dllExport('RtlAddScopedPolicyIDAce')
+function rtlAddScopedPolicyIDAce() {}
+
+@draft
+@dllExport('RtlAddSIDToBoundaryDescriptor')
+function rtlAddSIDToBoundaryDescriptor() {}
+
+@draft
+@dllExport('RtlAddVectoredContinueHandler')
+function rtlAddVectoredContinueHandler() {}
+
+@draft
+@dllExport('RtlAddVectoredExceptionHandler')
+function rtlAddVectoredExceptionHandler() {}
+
+@draft
+@dllExport('RtlAdjustPrivilege')
+function rtlAdjustPrivilege() {}
+
+@draft
+@dllExport('RtlAllocateActivationContextStack')
+function rtlAllocateActivationContextStack() {}
+
+@draft
+@dllExport('RtlAllocateAndInitializeSid')
+function rtlAllocateAndInitializeSid() {}
+
+@draft
+@dllExport('RtlAllocateAndInitializeSidEx')
+function rtlAllocateAndInitializeSidEx() {}
+
+@draft
+@dllExport('RtlAllocateHandle')
+function rtlAllocateHandle() {}
+
+@draft
+@dllExport('RtlAllocateHeap')
+function rtlAllocateHeap() {}
+
+@draft
+@dllExport('RtlAllocateMemoryBlockLookaside')
+function rtlAllocateMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlAllocateMemoryZone')
+function rtlAllocateMemoryZone() {}
+
+@draft
+@dllExport('RtlAllocateWnfSerializationGroup')
+function rtlAllocateWnfSerializationGroup() {}
+
+@draft
+@dllExport('RtlAnsiCharToUnicodeChar')
+function rtlAnsiCharToUnicodeChar() {}
+
+@draft
+@dllExport('RtlAnsiStringToUnicodeSize')
+function rtlAnsiStringToUnicodeSize() {}
+
+@draft
+@dllExport('RtlAnsiStringToUnicodeString')
+function rtlAnsiStringToUnicodeString() {}
+
+@draft
+@dllExport('RtlAppendAsciizToString')
+function rtlAppendAsciizToString() {}
+
+@draft
+@dllExport('RtlAppendPathElement')
+function rtlAppendPathElement() {}
+
+@draft
+@dllExport('RtlAppendStringToString')
+function rtlAppendStringToString() {}
+
+@draft
+@dllExport('RtlAppendUnicodeStringToString')
+function rtlAppendUnicodeStringToString() {}
+
+@draft
+@dllExport('RtlAppendUnicodeToString')
+function rtlAppendUnicodeToString() {}
+
+@draft
+@dllExport('RtlApplicationVerifierStop')
+function rtlApplicationVerifierStop() {}
+
+@draft
+@dllExport('RtlApplyRXact')
+function rtlApplyRXact() {}
+
+@draft
+@dllExport('RtlApplyRXactNoFlush')
+function rtlApplyRXactNoFlush() {}
+
+@draft
+@dllExport('RtlAppxIsFileOwnedByTrustedInstaller')
+function rtlAppxIsFileOwnedByTrustedInstaller() {}
+
+@draft
+@dllExport('RtlAreAllAccessesGranted')
+function rtlAreAllAccessesGranted() {}
+
+@draft
+@dllExport('RtlAreAnyAccessesGranted')
+function rtlAreAnyAccessesGranted() {}
+
+@draft
+@dllExport('RtlAreBitsClear')
+function rtlAreBitsClear() {}
+
+@draft
+@dllExport('RtlAreBitsSet')
+function rtlAreBitsSet() {}
+
+@draft
+@dllExport('RtlAreLongPathsEnabled')
+function rtlAreLongPathsEnabled() {}
+
+@draft
+@dllExport('RtlAssert')
+function rtlAssert() {}
+
+@draft
+@dllExport('RtlAvlInsertNodeEx')
+function rtlAvlInsertNodeEx() {}
+
+@draft
+@dllExport('RtlAvlRemoveNode')
+function rtlAvlRemoveNode() {}
+
+@draft
+@dllExport('RtlBarrier')
+function rtlBarrier() {}
+
+@draft
+@dllExport('RtlBarrierForDelete')
+function rtlBarrierForDelete() {}
+
+@draft
+@dllExport('RtlCallEnclaveReturn')
+function rtlCallEnclaveReturn() {}
+
+@draft
+@dllExport('RtlCancelTimer')
+function rtlCancelTimer() {}
+
+@draft
+@dllExport('RtlCanonicalizeDomainName')
+function rtlCanonicalizeDomainName() {}
+
+@draft
+@dllExport('RtlCapabilityCheck')
+function rtlCapabilityCheck() {}
+
+@draft
+@dllExport('RtlCapabilityCheckForSingleSessionSku')
+function rtlCapabilityCheckForSingleSessionSku() {}
+
+@draft
+@dllExport('RtlCaptureContext')
+function rtlCaptureContext() {}
+
+@draft
+@dllExport('RtlCaptureStackBackTrace')
+function rtlCaptureStackBackTrace() {}
+
+@draft
+@dllExport('RtlCharToInteger')
+function rtlCharToInteger() {}
+
+@draft
+@dllExport('RtlCheckBootStatusIntegrity')
+function rtlCheckBootStatusIntegrity() {}
+
+@draft
+@dllExport('RtlCheckForOrphanedCriticalSections')
+function rtlCheckForOrphanedCriticalSections() {}
+
+@draft
+@dllExport('RtlCheckPortableOperatingSystem')
+function rtlCheckPortableOperatingSystem() {}
+
+@draft
+@dllExport('RtlCheckRegistryKey')
+function rtlCheckRegistryKey() {}
+
+@draft
+@dllExport('RtlCheckSandboxedToken')
+function rtlCheckSandboxedToken() {}
+
+@draft
+@dllExport('RtlCheckSystemBootStatusIntegrity')
+function rtlCheckSystemBootStatusIntegrity() {}
+
+@draft
+@dllExport('RtlCheckTokenCapability')
+function rtlCheckTokenCapability() {}
+
+@draft
+@dllExport('RtlCheckTokenMembership')
+function rtlCheckTokenMembership() {}
+
+@draft
+@dllExport('RtlCheckTokenMembershipEx')
+function rtlCheckTokenMembershipEx() {}
+
+@draft
+@dllExport('RtlCleanUpTEBLangLists')
+function rtlCleanUpTEBLangLists() {}
+
+@draft
+@dllExport('RtlClearAllBits')
+function rtlClearAllBits() {}
+
+@draft
+@dllExport('RtlClearBit')
+function rtlClearBit() {}
+
+@draft
+@dllExport('RtlClearBits')
+function rtlClearBits() {}
+
+@draft
+@dllExport('RtlClearThreadWorkOnBehalfTicket')
+function rtlClearThreadWorkOnBehalfTicket() {}
+
+@draft
+@dllExport('RtlCloneMemoryStream')
+function rtlCloneMemoryStream() {}
+
+@draft
+@dllExport('RtlCloneUserProcess')
+function rtlCloneUserProcess() {}
+
+@draft
+@dllExport('RtlCmDecodeMemIoResource')
+function rtlCmDecodeMemIoResource() {}
+
+@draft
+@dllExport('RtlCmEncodeMemIoResource')
+function rtlCmEncodeMemIoResource() {}
+
+@draft
+@dllExport('RtlCommitDebugInfo')
+function rtlCommitDebugInfo() {}
+
+@draft
+@dllExport('RtlCommitMemoryStream')
+function rtlCommitMemoryStream() {}
+
+@draft
+@dllExport('RtlCompactHeap')
+function rtlCompactHeap() {}
+
+@draft
+@dllExport('RtlCompareAltitudes')
+function rtlCompareAltitudes() {}
+
+@draft
+@dllExport('RtlCompareMemory')
+function rtlCompareMemory() {}
+
+@draft
+@dllExport('RtlCompareMemoryUlong')
+function rtlCompareMemoryUlong() {}
+
+@draft
+@dllExport('RtlCompareString')
+function rtlCompareString() {}
+
+@draft
+@dllExport('RtlCompareUnicodeString')
+function rtlCompareUnicodeString() {}
+
+@draft
+@dllExport('RtlCompareUnicodeStrings')
+function rtlCompareUnicodeStrings() {}
+
+@draft
+@dllExport('RtlCompleteProcessCloning')
+function rtlCompleteProcessCloning() {}
+
+@draft
+@dllExport('RtlCompressBuffer')
+function rtlCompressBuffer() {}
+
+@draft
+@dllExport('RtlComputeCrc32')
+function rtlComputeCrc32() {}
+
+@draft
+@dllExport('RtlComputeImportTableHash')
+function rtlComputeImportTableHash() {}
+
+@draft
+@dllExport('RtlComputePrivatizedDllName_U')
+function rtlComputePrivatizedDllName_U() {}
+
+@draft
+@dllExport('RtlConnectToSm')
+function rtlConnectToSm() {}
+
+@draft
+@dllExport('RtlConsoleMultiByteToUnicodeN')
+function rtlConsoleMultiByteToUnicodeN() {}
+
+@draft
+@dllExport('RtlContractHashTable')
+function rtlContractHashTable() {}
+
+@draft
+@dllExport('RtlConvertDeviceFamilyInfoToString')
+function rtlConvertDeviceFamilyInfoToString() {}
+
+@draft
+@dllExport('RtlConvertExclusiveToShared')
+function rtlConvertExclusiveToShared() {}
+
+@draft
+@dllExport('RtlConvertLCIDToString')
+function rtlConvertLCIDToString() {}
+
+@draft
+@dllExport('RtlConvertSharedToExclusive')
+function rtlConvertSharedToExclusive() {}
+
+@draft
+@dllExport('RtlConvertSidToUnicodeString')
+function rtlConvertSidToUnicodeString() {}
+
+@draft
+@dllExport('RtlConvertSRWLockExclusiveToShared')
+function rtlConvertSRWLockExclusiveToShared() {}
+
+@draft
+@dllExport('RtlConvertToAutoInheritSecurityObject')
+function rtlConvertToAutoInheritSecurityObject() {}
+
+@draft
+@dllExport('RtlCopyBitMap')
+function rtlCopyBitMap() {}
+
+@draft
+@dllExport('RtlCopyContext')
+function rtlCopyContext() {}
+
+@draft
+@dllExport('RtlCopyExtendedContext')
+function rtlCopyExtendedContext() {}
+
+@draft
+@dllExport('RtlCopyLuid')
+function rtlCopyLuid() {}
+
+@draft
+@dllExport('RtlCopyLuidAndAttributesArray')
+function rtlCopyLuidAndAttributesArray() {}
+
+@draft
+@dllExport('RtlCopyMappedMemory')
+function rtlCopyMappedMemory() {}
+
+@draft
+@dllExport('RtlCopyMemory')
+function rtlCopyMemory() {}
+
+@draft
+@dllExport('RtlCopyMemoryNonTemporal')
+function rtlCopyMemoryNonTemporal() {}
+
+@draft
+@dllExport('RtlCopyMemoryStreamTo')
+function rtlCopyMemoryStreamTo() {}
+
+@draft
+@dllExport('RtlCopyOutOfProcessMemoryStreamTo')
+function rtlCopyOutOfProcessMemoryStreamTo() {}
+
+@draft
+@dllExport('RtlCopySecurityDescriptor')
+function rtlCopySecurityDescriptor() {}
+
+@draft
+@dllExport('RtlCopySid')
+function rtlCopySid() {}
+
+@draft
+@dllExport('RtlCopySidAndAttributesArray')
+function rtlCopySidAndAttributesArray() {}
+
+@draft
+@dllExport('RtlCopyString')
+function rtlCopyString() {}
+
+@draft
+@dllExport('RtlCopyUnicodeString')
+function rtlCopyUnicodeString() {}
+
+@draft
+@dllExport('RtlCrc32')
+function rtlCrc32() {}
+
+@draft
+@dllExport('RtlCrc64')
+function rtlCrc64() {}
+
+@draft
+@dllExport('RtlCreateAcl')
+function rtlCreateAcl() {}
+
+@draft
+@dllExport('RtlCreateActivationContext')
+function rtlCreateActivationContext() {}
+
+@draft
+@dllExport('RtlCreateAndSetSD')
+function rtlCreateAndSetSD() {}
+
+@draft
+@dllExport('RtlCreateAtomTable')
+function rtlCreateAtomTable() {}
+
+@draft
+@dllExport('RtlCreateBootStatusDataFile')
+function rtlCreateBootStatusDataFile() {}
+
+@draft
+@dllExport('RtlCreateBoundaryDescriptor')
+function rtlCreateBoundaryDescriptor() {}
+
+@draft
+@dllExport('RtlCreateEnvironment')
+function rtlCreateEnvironment() {}
+
+@draft
+@dllExport('RtlCreateEnvironmentEx')
+function rtlCreateEnvironmentEx() {}
+
+@draft
+@dllExport('RtlCreateHashTable')
+function rtlCreateHashTable() {}
+
+@draft
+@dllExport('RtlCreateHashTableEx')
+function rtlCreateHashTableEx() {}
+
+@draft
+@dllExport('RtlCreateHeap')
+function rtlCreateHeap() {}
+
+@draft
+@dllExport('RtlCreateMemoryBlockLookaside')
+function rtlCreateMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlCreateMemoryZone')
+function rtlCreateMemoryZone() {}
+
+@draft
+@dllExport('RtlCreateProcessParameters')
+function rtlCreateProcessParameters() {}
+
+@draft
+@dllExport('RtlCreateProcessParametersEx')
+function rtlCreateProcessParametersEx() {}
+
+@draft
+@dllExport('RtlCreateProcessReflection')
+function rtlCreateProcessReflection() {}
+
+@draft
+@dllExport('RtlCreateQueryDebugBuffer')
+function rtlCreateQueryDebugBuffer() {}
+
+@draft
+@dllExport('RtlCreateRegistryKey')
+function rtlCreateRegistryKey() {}
+
+@draft
+@dllExport('RtlCreateSecurityDescriptor')
+function rtlCreateSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlCreateServiceSid')
+function rtlCreateServiceSid() {}
+
+@draft
+@dllExport('RtlCreateSystemVolumeInformationFolder')
+function rtlCreateSystemVolumeInformationFolder() {}
+
+@draft
+@dllExport('RtlCreateTagHeap')
+function rtlCreateTagHeap() {}
+
+@draft
+@dllExport('RtlCreateTimer')
+function rtlCreateTimer() {}
+
+@draft
+@dllExport('RtlCreateTimerQueue')
+function rtlCreateTimerQueue() {}
+
+@draft
+@dllExport('RtlCreateUmsCompletionList')
+function rtlCreateUmsCompletionList() {}
+
+@draft
+@dllExport('RtlCreateUmsThreadContext')
+function rtlCreateUmsThreadContext() {}
+
+@draft
+@dllExport('RtlCreateUnicodeString')
+function rtlCreateUnicodeString() {}
+
+@draft
+@dllExport('RtlCreateUnicodeStringFromAsciiz')
+function rtlCreateUnicodeStringFromAsciiz() {}
+
+@draft
+@dllExport('RtlCreateUserProcess')
+function rtlCreateUserProcess() {}
+
+@draft
+@dllExport('RtlCreateUserProcessEx')
+function rtlCreateUserProcessEx() {}
+
+@draft
+@dllExport('RtlCreateUserSecurityObject')
+function rtlCreateUserSecurityObject() {}
+
+@draft
+@dllExport('RtlCreateUserStack')
+function rtlCreateUserStack() {}
+
+@draft
+@dllExport('RtlCreateUserThread')
+function rtlCreateUserThread() {}
+
+@draft
+@dllExport('RtlCreateVirtualAccountSid')
+function rtlCreateVirtualAccountSid() {}
+
+@draft
+@dllExport('RtlCultureNameToLCID')
+function rtlCultureNameToLCID() {}
+
+@draft
+@dllExport('RtlCustomCPToUnicodeN')
+function rtlCustomCPToUnicodeN() {}
+
+@draft
+@dllExport('RtlCutoverTimeToSystemTime')
+function rtlCutoverTimeToSystemTime() {}
+
+@draft
+@dllExport('RtlDeactivateActivationContext')
+function rtlDeactivateActivationContext() {}
+
+@draft
+@dllExport('RtlDeactivateActivationContextUnsafeFast')
+function rtlDeactivateActivationContextUnsafeFast() {}
+
+@draft
+@dllExport('RtlDebugPrintTimes')
+function rtlDebugPrintTimes() {}
+
+@draft
+@dllExport('RtlDecodePointer')
+function rtlDecodePointer() {}
+
+@draft
+@dllExport('RtlDecodeRemotePointer')
+function rtlDecodeRemotePointer() {}
+
+@draft
+@dllExport('RtlDecodeSystemPointer')
+function rtlDecodeSystemPointer() {}
+
+@draft
+@dllExport('RtlDeCommitDebugInfo')
+function rtlDeCommitDebugInfo() {}
+
+@draft
+@dllExport('RtlDecompressBuffer')
+function rtlDecompressBuffer() {}
+
+@draft
+@dllExport('RtlDecompressBufferEx')
+function rtlDecompressBufferEx() {}
+
+@draft
+@dllExport('RtlDecompressFragment')
+function rtlDecompressFragment() {}
+
+@draft
+@dllExport('RtlDefaultNpAcl')
+function rtlDefaultNpAcl() {}
+
+@draft
+@dllExport('RtlDelete')
+function rtlDelete() {}
+
+@draft
+@dllExport('RtlDeleteAce')
+function rtlDeleteAce() {}
+
+@draft
+@dllExport('RtlDeleteAtomFromAtomTable')
+function rtlDeleteAtomFromAtomTable() {}
+
+@draft
+@dllExport('RtlDeleteBarrier')
+function rtlDeleteBarrier() {}
+
+@draft
+@dllExport('RtlDeleteBoundaryDescriptor')
+function rtlDeleteBoundaryDescriptor() {}
+
+@draft
+@dllExport('RtlDeleteCriticalSection')
+function rtlDeleteCriticalSection() {}
+
+@draft
+@dllExport('RtlDeleteElementGenericTable')
+function rtlDeleteElementGenericTable() {}
+
+@draft
+@dllExport('RtlDeleteElementGenericTableAvl')
+function rtlDeleteElementGenericTableAvl() {}
+
+@draft
+@dllExport('RtlDeleteElementGenericTableAvlEx')
+function rtlDeleteElementGenericTableAvlEx() {}
+
+@draft
+@dllExport('RtlDeleteFunctionTable')
+function rtlDeleteFunctionTable() {}
+
+@draft
+@dllExport('RtlDeleteGrowableFunctionTable')
+function rtlDeleteGrowableFunctionTable() {}
+
+@draft
+@dllExport('RtlDeleteHashTable')
+function rtlDeleteHashTable() {}
+
+@draft
+@dllExport('RtlDeleteNoSplay')
+function rtlDeleteNoSplay() {}
+
+@draft
+@dllExport('RtlDeleteRegistryValue')
+function rtlDeleteRegistryValue() {}
+
+@draft
+@dllExport('RtlDeleteResource')
+function rtlDeleteResource() {}
+
+@draft
+@dllExport('RtlDeleteSecurityObject')
+function rtlDeleteSecurityObject() {}
+
+@draft
+@dllExport('RtlDeleteTimer')
+function rtlDeleteTimer() {}
+
+@draft
+@dllExport('RtlDeleteTimerQueue')
+function rtlDeleteTimerQueue() {}
+
+@draft
+@dllExport('RtlDeleteTimerQueueEx')
+function rtlDeleteTimerQueueEx() {}
+
+@draft
+@dllExport('RtlDeleteUmsCompletionList')
+function rtlDeleteUmsCompletionList() {}
+
+@draft
+@dllExport('RtlDeleteUmsThreadContext')
+function rtlDeleteUmsThreadContext() {}
+
+@draft
+@dllExport('RtlDeNormalizeProcessParams')
+function rtlDeNormalizeProcessParams() {}
+
+@draft
+@dllExport('RtlDequeueUmsCompletionListItems')
+function rtlDequeueUmsCompletionListItems() {}
+
+@draft
+@dllExport('RtlDeregisterSecureMemoryCacheCallback')
+function rtlDeregisterSecureMemoryCacheCallback() {}
+
+@draft
+@dllExport('RtlDeregisterWait')
+function rtlDeregisterWait() {}
+
+@draft
+@dllExport('RtlDeregisterWaitEx')
+function rtlDeregisterWaitEx() {}
+
+@draft
+@dllExport('RtlDeriveCapabilitySidsFromName')
+function rtlDeriveCapabilitySidsFromName() {}
+
+@draft
+@dllExport('RtlDestroyAtomTable')
+function rtlDestroyAtomTable() {}
+
+@draft
+@dllExport('RtlDestroyEnvironment')
+function rtlDestroyEnvironment() {}
+
+@draft
+@dllExport('RtlDestroyHandleTable')
+function rtlDestroyHandleTable() {}
+
+@draft
+@dllExport('RtlDestroyHeap')
+function rtlDestroyHeap() {}
+
+@draft
+@dllExport('RtlDestroyMemoryBlockLookaside')
+function rtlDestroyMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlDestroyMemoryZone')
+function rtlDestroyMemoryZone() {}
+
+@draft
+@dllExport('RtlDestroyProcessParameters')
+function rtlDestroyProcessParameters() {}
+
+@draft
+@dllExport('RtlDestroyQueryDebugBuffer')
+function rtlDestroyQueryDebugBuffer() {}
+
+@draft
+@dllExport('RtlDetectHeapLeaks')
+function rtlDetectHeapLeaks() {}
+
+@draft
+@dllExport('RtlDetermineDosPathNameType_U')
+function rtlDetermineDosPathNameType_U() {}
+
+@draft
+@dllExport('RtlDisableThreadProfiling')
+function rtlDisableThreadProfiling() {}
+
+@draft
+@dllExport('RtlDllShutdownInProgress')
+function rtlDllShutdownInProgress() {}
+
+@draft
+@dllExport('RtlDnsHostNameToComputerName')
+function rtlDnsHostNameToComputerName() {}
+
+@draft
+@dllExport('RtlDoesFileExists_U')
+function rtlDoesFileExists_U() {}
+
+@draft
+@dllExport('RtlDosApplyFileIsolationRedirection_Ustr')
+function rtlDosApplyFileIsolationRedirection_Ustr() {}
+
+@draft
+@dllExport('RtlDosLongPathNameToNtPathName_U_WithStatus')
+function rtlDosLongPathNameToNtPathName_U_WithStatus() {}
+
+@draft
+@dllExport('RtlDosLongPathNameToRelativeNtPathName_U_WithStatus')
+function rtlDosLongPathNameToRelativeNtPathName_U_WithStatus() {}
+
+@draft
+@dllExport('RtlDosPathNameToNtPathName_U')
+function rtlDosPathNameToNtPathName_U() {}
+
+@draft
+@dllExport('RtlDosPathNameToNtPathName_U_WithStatus')
+function rtlDosPathNameToNtPathName_U_WithStatus() {}
+
+@draft
+@dllExport('RtlDosPathNameToRelativeNtPathName_U')
+function rtlDosPathNameToRelativeNtPathName_U() {}
+
+@draft
+@dllExport('RtlDosPathNameToRelativeNtPathName_U_WithStatus')
+function rtlDosPathNameToRelativeNtPathName_U_WithStatus() {}
+
+@draft
+@dllExport('RtlDosSearchPath_U')
+function rtlDosSearchPath_U() {}
+
+@draft
+@dllExport('RtlDosSearchPath_Ustr')
+function rtlDosSearchPath_Ustr() {}
+
+@draft
+@dllExport('RtlDowncaseUnicodeChar')
+function rtlDowncaseUnicodeChar() {}
+
+@draft
+@dllExport('RtlDowncaseUnicodeString')
+function rtlDowncaseUnicodeString() {}
+
+@draft
+@dllExport('RtlDrainNonVolatileFlush')
+function rtlDrainNonVolatileFlush() {}
+
+@draft
+@dllExport('RtlDumpResource')
+function rtlDumpResource() {}
+
+@draft
+@dllExport('RtlDuplicateUnicodeString')
+function rtlDuplicateUnicodeString() {}
+
+@draft
+@dllExport('RtlEmptyAtomTable')
+function rtlEmptyAtomTable() {}
+
+@draft
+@dllExport('RtlEnableEarlyCriticalSectionEventCreation')
+function rtlEnableEarlyCriticalSectionEventCreation() {}
+
+@draft
+@dllExport('RtlEnableThreadProfiling')
+function rtlEnableThreadProfiling() {}
+
+@draft
+@dllExport('RtlEnclaveCallDispatch')
+function rtlEnclaveCallDispatch() {}
+
+@draft
+@dllExport('RtlEnclaveCallDispatchReturn')
+function rtlEnclaveCallDispatchReturn() {}
+
+@draft
+@dllExport('RtlEncodePointer')
+function rtlEncodePointer() {}
+
+@draft
+@dllExport('RtlEncodeRemotePointer')
+function rtlEncodeRemotePointer() {}
+
+@draft
+@dllExport('RtlEncodeSystemPointer')
+function rtlEncodeSystemPointer() {}
+
+@draft
+@dllExport('RtlEndEnumerationHashTable')
+function rtlEndEnumerationHashTable() {}
+
+@draft
+@dllExport('RtlEndStrongEnumerationHashTable')
+function rtlEndStrongEnumerationHashTable() {}
+
+@draft
+@dllExport('RtlEndWeakEnumerationHashTable')
+function rtlEndWeakEnumerationHashTable() {}
+
+@draft
+@dllExport('RtlEnterCriticalSection')
+function rtlEnterCriticalSection() {}
+
+@draft
+@dllExport('RtlEnterUmsSchedulingMode')
+function rtlEnterUmsSchedulingMode() {}
+
+@draft
+@dllExport('RtlEnumerateEntryHashTable')
+function rtlEnumerateEntryHashTable() {}
+
+@draft
+@dllExport('RtlEnumerateGenericTable')
+function rtlEnumerateGenericTable() {}
+
+@draft
+@dllExport('RtlEnumerateGenericTableAvl')
+function rtlEnumerateGenericTableAvl() {}
+
+@draft
+@dllExport('RtlEnumerateGenericTableLikeADirectory')
+function rtlEnumerateGenericTableLikeADirectory() {}
+
+@draft
+@dllExport('RtlEnumerateGenericTableWithoutSplaying')
+function rtlEnumerateGenericTableWithoutSplaying() {}
+
+@draft
+@dllExport('RtlEnumerateGenericTableWithoutSplayingAvl')
+function rtlEnumerateGenericTableWithoutSplayingAvl() {}
+
+@draft
+@dllExport('RtlEnumProcessHeaps')
+function rtlEnumProcessHeaps() {}
+
+@draft
+@dllExport('RtlEqualComputerName')
+function rtlEqualComputerName() {}
+
+@draft
+@dllExport('RtlEqualDomainName')
+function rtlEqualDomainName() {}
+
+@draft
+@dllExport('RtlEqualLuid')
+function rtlEqualLuid() {}
+
+@draft
+@dllExport('RtlEqualPrefixSid')
+function rtlEqualPrefixSid() {}
+
+@draft
+@dllExport('RtlEqualSid')
+function rtlEqualSid() {}
+
+@draft
+@dllExport('RtlEqualString')
+function rtlEqualString() {}
+
+@draft
+@dllExport('RtlEqualUnicodeString')
+function rtlEqualUnicodeString() {}
+
+@draft
+@dllExport('RtlEqualWnfChangeStamps')
+function rtlEqualWnfChangeStamps() {}
+
+@draft
+@dllExport('RtlEraseUnicodeString')
+function rtlEraseUnicodeString() {}
+
+@draft
+@dllExport('RtlEthernetAddressToStringA')
+function rtlEthernetAddressToStringA() {}
+
+@draft
+@dllExport('RtlEthernetAddressToStringW')
+function rtlEthernetAddressToStringW() {}
+
+@draft
+@dllExport('RtlEthernetStringToAddressA')
+function rtlEthernetStringToAddressA() {}
+
+@draft
+@dllExport('RtlEthernetStringToAddressW')
+function rtlEthernetStringToAddressW() {}
+
+@draft
+@dllExport('RtlExecuteUmsThread')
+function rtlExecuteUmsThread() {}
+
+@draft
+@dllExport('RtlExitUserProcess')
+function rtlExitUserProcess() {}
+
+@draft
+@dllExport('RtlExitUserThread')
+function rtlExitUserThread() {}
+
+@draft
+@dllExport('RtlExpandEnvironmentStrings')
+function rtlExpandEnvironmentStrings() {}
+
+@draft
+@dllExport('RtlExpandEnvironmentStrings_U')
+function rtlExpandEnvironmentStrings_U() {}
+
+@draft
+@dllExport('RtlExpandHashTable')
+function rtlExpandHashTable() {}
+
+@draft
+@dllExport('RtlExtendCorrelationVector')
+function rtlExtendCorrelationVector() {}
+
+@draft
+@dllExport('RtlExtendMemoryBlockLookaside')
+function rtlExtendMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlExtendMemoryZone')
+function rtlExtendMemoryZone() {}
+
+@draft
+@dllExport('RtlExtractBitMap')
+function rtlExtractBitMap() {}
+
+@draft
+@dllExport('RtlFillMemory')
+function rtlFillMemory() {}
+
+@draft
+@dllExport('RtlFinalReleaseOutOfProcessMemoryStream')
+function rtlFinalReleaseOutOfProcessMemoryStream() {}
+
+@draft
+@dllExport('RtlFindAceByType')
+function rtlFindAceByType() {}
+
+@draft
+@dllExport('RtlFindActivationContextSectionGuid')
+function rtlFindActivationContextSectionGuid() {}
+
+@draft
+@dllExport('RtlFindActivationContextSectionString')
+function rtlFindActivationContextSectionString() {}
+
+@draft
+@dllExport('RtlFindCharInUnicodeString')
+function rtlFindCharInUnicodeString() {}
+
+@draft
+@dllExport('RtlFindClearBits')
+function rtlFindClearBits() {}
+
+@draft
+@dllExport('RtlFindClearBitsAndSet')
+function rtlFindClearBitsAndSet() {}
+
+@draft
+@dllExport('RtlFindClearRuns')
+function rtlFindClearRuns() {}
+
+@draft
+@dllExport('RtlFindClosestEncodableLength')
+function rtlFindClosestEncodableLength() {}
+
+@draft
+@dllExport('RtlFindExportedRoutineByName')
+function rtlFindExportedRoutineByName() {}
+
+@draft
+@dllExport('RtlFindLastBackwardRunClear')
+function rtlFindLastBackwardRunClear() {}
+
+@draft
+@dllExport('RtlFindLeastSignificantBit')
+function rtlFindLeastSignificantBit() {}
+
+@draft
+@dllExport('RtlFindLongestRunClear')
+function rtlFindLongestRunClear() {}
+
+@draft
+@dllExport('RtlFindMessage')
+function rtlFindMessage() {}
+
+@draft
+@dllExport('RtlFindMostSignificantBit')
+function rtlFindMostSignificantBit() {}
+
+@draft
+@dllExport('RtlFindNextForwardRunClear')
+function rtlFindNextForwardRunClear() {}
+
+@draft
+@dllExport('RtlFindSetBits')
+function rtlFindSetBits() {}
+
+@draft
+@dllExport('RtlFindSetBitsAndClear')
+function rtlFindSetBitsAndClear() {}
+
+@draft
+@dllExport('RtlFindUnicodeSubstring')
+function rtlFindUnicodeSubstring() {}
+
+@draft
+@dllExport('RtlFirstEntrySList')
+function rtlFirstEntrySList() {}
+
+@draft
+@dllExport('RtlFirstFreeAce')
+function rtlFirstFreeAce() {}
+
+@draft
+@dllExport('RtlFlsAlloc')
+function rtlFlsAlloc() {}
+
+@draft
+@dllExport('RtlFlsFree')
+function rtlFlsFree() {}
+
+@draft
+@dllExport('RtlFlushHeaps')
+function rtlFlushHeaps() {}
+
+@draft
+@dllExport('RtlFlushNonVolatileMemory')
+function rtlFlushNonVolatileMemory() {}
+
+@draft
+@dllExport('RtlFlushNonVolatileMemoryRanges')
+function rtlFlushNonVolatileMemoryRanges() {}
+
+@draft
+@dllExport('RtlFlushSecureMemoryCache')
+function rtlFlushSecureMemoryCache() {}
+
+@draft
+@dllExport('RtlFormatCurrentUserKeyPath')
+function rtlFormatCurrentUserKeyPath() {}
+
+@draft
+@dllExport('RtlFormatMessage')
+function rtlFormatMessage() {}
+
+@draft
+@dllExport('RtlFormatMessageEx')
+function rtlFormatMessageEx() {}
+
+@draft
+@dllExport('RtlFreeActivationContextStack')
+function rtlFreeActivationContextStack() {}
+
+@draft
+@dllExport('RtlFreeAnsiString')
+function rtlFreeAnsiString() {}
+
+@draft
+@dllExport('RtlFreeHandle')
+function rtlFreeHandle() {}
+
+@draft
+@dllExport('RtlFreeHeap')
+function rtlFreeHeap() {}
+
+@draft
+@dllExport('RtlFreeMemoryBlockLookaside')
+function rtlFreeMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlFreeNonVolatileToken')
+function rtlFreeNonVolatileToken() {}
+
+@draft
+@dllExport('RtlFreeOemString')
+function rtlFreeOemString() {}
+
+@draft
+@dllExport('RtlFreeSid')
+function rtlFreeSid() {}
+
+@draft
+@dllExport('RtlFreeThreadActivationContextStack')
+function rtlFreeThreadActivationContextStack() {}
+
+@draft
+@dllExport('RtlFreeUnicodeString')
+function rtlFreeUnicodeString() {}
+
+@draft
+@dllExport('RtlFreeUserStack')
+function rtlFreeUserStack() {}
+
+@draft
+@dllExport('RtlGenerate8dot3Name')
+function rtlGenerate8dot3Name() {}
+
+@draft
+@dllExport('RtlGetAce')
+function rtlGetAce() {}
+
+@draft
+@dllExport('RtlGetActiveActivationContext')
+function rtlGetActiveActivationContext() {}
+
+@draft
+@dllExport('RtlGetActiveConsoleId')
+function rtlGetActiveConsoleId() {}
+
+@draft
+@dllExport('RtlGetAppContainerNamedObjectPath')
+function rtlGetAppContainerNamedObjectPath() {}
+
+@draft
+@dllExport('RtlGetAppContainerParent')
+function rtlGetAppContainerParent() {}
+
+@draft
+@dllExport('RtlGetAppContainerSidType')
+function rtlGetAppContainerSidType() {}
+
+@draft
+@dllExport('RtlGetCallersAddress')
+function rtlGetCallersAddress() {}
+
+@draft
+@dllExport('RtlGetCompressionWorkSpaceSize')
+function rtlGetCompressionWorkSpaceSize() {}
+
+@draft
+@dllExport('RtlGetConsoleSessionForegroundProcessId')
+function rtlGetConsoleSessionForegroundProcessId() {}
+
+@draft
+@dllExport('RtlGetControlSecurityDescriptor')
+function rtlGetControlSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlGetCriticalSectionRecursionCount')
+function rtlGetCriticalSectionRecursionCount() {}
+
+@draft
+@dllExport('RtlGetCurrentDirectory_U')
+function rtlGetCurrentDirectory_U() {}
+
+@draft
+@dllExport('RtlGetCurrentPeb')
+function rtlGetCurrentPeb() {}
+
+@draft
+@dllExport('RtlGetCurrentProcessorNumber')
+function rtlGetCurrentProcessorNumber() {}
+
+@draft
+@dllExport('RtlGetCurrentProcessorNumberEx')
+function rtlGetCurrentProcessorNumberEx() {}
+
+@draft
+@dllExport('RtlGetCurrentServiceSessionId')
+function rtlGetCurrentServiceSessionId() {}
+
+@draft
+@dllExport('RtlGetCurrentTransaction')
+function rtlGetCurrentTransaction() {}
+
+@draft
+@dllExport('RtlGetCurrentUmsThread')
+function rtlGetCurrentUmsThread() {}
+
+@draft
+@dllExport('RtlGetDaclSecurityDescriptor')
+function rtlGetDaclSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlGetDeviceFamilyInfoEnum')
+function rtlGetDeviceFamilyInfoEnum() {}
+
+@draft
+@dllExport('RtlGetElementGenericTable')
+function rtlGetElementGenericTable() {}
+
+@draft
+@dllExport('RtlGetElementGenericTableAvl')
+function rtlGetElementGenericTableAvl() {}
+
+@draft
+@dllExport('RtlGetEnabledExtendedFeatures')
+function rtlGetEnabledExtendedFeatures() {}
+
+@draft
+@dllExport('RtlGetExePath')
+function rtlGetExePath() {}
+
+@draft
+@dllExport('RtlGetExtendedContextLength')
+function rtlGetExtendedContextLength() {}
+
+@draft
+@dllExport('RtlGetExtendedFeaturesMask')
+function rtlGetExtendedFeaturesMask() {}
+
+@draft
+@dllExport('RtlGetFileMUIPath')
+function rtlGetFileMUIPath() {}
+
+@draft
+@dllExport('RtlGetFrame')
+function rtlGetFrame() {}
+
+@draft
+@dllExport('RtlGetFullPathName_U')
+function rtlGetFullPathName_U() {}
+
+@draft
+@dllExport('RtlGetFullPathName_UEx')
+function rtlGetFullPathName_UEx() {}
+
+@draft
+@dllExport('RtlGetFullPathName_UstrEx')
+function rtlGetFullPathName_UstrEx() {}
+
+@draft
+@dllExport('RtlGetFunctionTableListHead')
+function rtlGetFunctionTableListHead() {}
+
+@draft
+@dllExport('RtlGetGroupSecurityDescriptor')
+function rtlGetGroupSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlGetIntegerAtom')
+function rtlGetIntegerAtom() {}
+
+@draft
+@dllExport('RtlGetInterruptTimePrecise')
+function rtlGetInterruptTimePrecise() {}
+
+@draft
+@dllExport('RtlGetLastNtStatus')
+function rtlGetLastNtStatus() {}
+
+@draft
+@dllExport('RtlGetLastWin32Error')
+function rtlGetLastWin32Error() {}
+
+@draft
+@dllExport('RtlGetLengthWithoutLastFullDosOrNtPathElement')
+function rtlGetLengthWithoutLastFullDosOrNtPathElement() {}
+
+@draft
+@dllExport('RtlGetLengthWithoutTrailingPathSeperators')
+function rtlGetLengthWithoutTrailingPathSeperators() {}
+
+@draft
+@dllExport('RtlGetLocaleFileMappingAddress')
+function rtlGetLocaleFileMappingAddress() {}
+
+@draft
+@dllExport('RtlGetLongestNtPathLength')
+function rtlGetLongestNtPathLength() {}
+
+@draft
+@dllExport('RtlGetNativeSystemInformation')
+function rtlGetNativeSystemInformation() {}
+
+@draft
+@dllExport('RtlGetNextEntryHashTable')
+function rtlGetNextEntryHashTable() {}
+
+@draft
+@dllExport('RtlGetNextUmsListItem')
+function rtlGetNextUmsListItem() {}
+
+@draft
+@dllExport('RtlGetNonVolatileToken')
+function rtlGetNonVolatileToken() {}
+
+@draft
+@dllExport('RtlGetNtGlobalFlags')
+function rtlGetNtGlobalFlags() {}
+
+@draft
+@dllExport('RtlGetNtProductType')
+function rtlGetNtProductType() {}
+
+@draft
+@dllExport('RtlGetNtSystemRoot')
+function rtlGetNtSystemRoot() {}
+
+@draft
+@dllExport('RtlGetNtVersionNumbers')
+function rtlGetNtVersionNumbers() {}
+
+@draft
+@dllExport('RtlGetOwnerSecurityDescriptor')
+function rtlGetOwnerSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlGetParentLocaleName')
+function rtlGetParentLocaleName() {}
+
+@draft
+@dllExport('RtlGetPersistedStateLocation')
+function rtlGetPersistedStateLocation() {}
+
+@draft
+@dllExport('RtlGetProcessHeaps')
+function rtlGetProcessHeaps() {}
+
+@draft
+@dllExport('RtlGetProcessPreferredUILanguages')
+function rtlGetProcessPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlGetProductInfo')
+function rtlGetProductInfo() {}
+
+@draft
+@dllExport('RtlGetSaclSecurityDescriptor')
+function rtlGetSaclSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlGetSearchPath')
+function rtlGetSearchPath() {}
+
+@draft
+@dllExport('RtlGetSecurityDescriptorRMControl')
+function rtlGetSecurityDescriptorRMControl() {}
+
+@draft
+@dllExport('RtlGetSessionProperties')
+function rtlGetSessionProperties() {}
+
+@draft
+@dllExport('RtlGetSetBootStatusData')
+function rtlGetSetBootStatusData() {}
+
+@draft
+@dllExport('RtlGetSuiteMask')
+function rtlGetSuiteMask() {}
+
+@draft
+@dllExport('RtlGetSystemBootStatus')
+function rtlGetSystemBootStatus() {}
+
+@draft
+@dllExport('RtlGetSystemBootStatusEx')
+function rtlGetSystemBootStatusEx() {}
+
+@draft
+@dllExport('RtlGetSystemPreferredUILanguages')
+function rtlGetSystemPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlGetSystemTimePrecise')
+function rtlGetSystemTimePrecise() {}
+
+@draft
+@dllExport('RtlGetThreadErrorMode')
+function rtlGetThreadErrorMode() {}
+
+@draft
+@dllExport('RtlGetThreadLangIdByIndex')
+function rtlGetThreadLangIdByIndex() {}
+
+@draft
+@dllExport('RtlGetThreadPreferredUILanguages')
+function rtlGetThreadPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlGetThreadWorkOnBehalfTicket')
+function rtlGetThreadWorkOnBehalfTicket() {}
+
+@draft
+@dllExport('RtlGetTokenNamedObjectPath')
+function rtlGetTokenNamedObjectPath() {}
+
+@draft
+@dllExport('RtlGetUILanguageInfo')
+function rtlGetUILanguageInfo() {}
+
+@draft
+@dllExport('RtlGetUmsCompletionListEvent')
+function rtlGetUmsCompletionListEvent() {}
+
+@draft
+@dllExport('RtlGetUnloadEventTrace')
+function rtlGetUnloadEventTrace() {}
+
+@draft
+@dllExport('RtlGetUnloadEventTraceEx')
+function rtlGetUnloadEventTraceEx() {}
+
+@draft
+@dllExport('RtlGetUserInfoHeap')
+function rtlGetUserInfoHeap() {}
+
+@draft
+@dllExport('RtlGetUserPreferredUILanguages')
+function rtlGetUserPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlGetVersion')
+function rtlGetVersion() {}
+
+@draft
+@dllExport('RtlGrowFunctionTable')
+function rtlGrowFunctionTable() {}
+
+@draft
+@dllExport('RtlGuardCheckLongJumpTarget')
+function rtlGuardCheckLongJumpTarget() {}
+
+@draft
+@dllExport('RtlGUIDFromString')
+function rtlGUIDFromString() {}
+
+@draft
+@dllExport('RtlHashUnicodeString')
+function rtlHashUnicodeString() {}
+
+@draft
+@dllExport('RtlHeapTrkInitialize')
+function rtlHeapTrkInitialize() {}
+
+@draft
+@dllExport('RtlIdentifierAuthoritySid')
+function rtlIdentifierAuthoritySid() {}
+
+@draft
+@dllExport('RtlIdnToAscii')
+function rtlIdnToAscii() {}
+
+@draft
+@dllExport('RtlIdnToNameprepUnicode')
+function rtlIdnToNameprepUnicode() {}
+
+@draft
+@dllExport('RtlIdnToUnicode')
+function rtlIdnToUnicode() {}
+
+@draft
+@dllExport('RtlImageDirectoryEntryToData')
+function rtlImageDirectoryEntryToData() {}
+
+@draft
+@dllExport('RtlImageNtHeader')
+function rtlImageNtHeader() {}
+
+@draft
+@dllExport('RtlImageNtHeaderEx')
+function rtlImageNtHeaderEx() {}
+
+@draft
+@dllExport('RtlImageRvaToSection')
+function rtlImageRvaToSection() {}
+
+@draft
+@dllExport('RtlImageRvaToVa')
+function rtlImageRvaToVa() {}
+
+@draft
+@dllExport('RtlImpersonateSelf')
+function rtlImpersonateSelf() {}
+
+@draft
+@dllExport('RtlImpersonateSelfEx')
+function rtlImpersonateSelfEx() {}
+
+@draft
+@dllExport('RtlIncrementCorrelationVector')
+function rtlIncrementCorrelationVector() {}
+
+@draft
+@dllExport('RtlInitAnsiString')
+function rtlInitAnsiString() {}
+
+@draft
+@dllExport('RtlInitAnsiStringEx')
+function rtlInitAnsiStringEx() {}
+
+@draft
+@dllExport('RtlInitBarrier')
+function rtlInitBarrier() {}
+
+@draft
+@dllExport('RtlInitCodePageTable')
+function rtlInitCodePageTable() {}
+
+@draft
+@dllExport('RtlInitEnumerationHashTable')
+function rtlInitEnumerationHashTable() {}
+
+@draft
+@dllExport('RtlInitializeAtomPackage')
+function rtlInitializeAtomPackage() {}
+
+@draft
+@dllExport('RtlInitializeBitMap')
+function rtlInitializeBitMap() {}
+
+@draft
+@dllExport('RtlInitializeBitMapEx')
+function rtlInitializeBitMapEx() {}
+
+@draft
+@dllExport('RtlInitializeConditionVariable')
+function rtlInitializeConditionVariable() {}
+
+@draft
+@dllExport('RtlInitializeContext')
+function rtlInitializeContext() {}
+
+@draft
+@dllExport('RtlInitializeCorrelationVector')
+function rtlInitializeCorrelationVector() {}
+
+@draft
+@dllExport('RtlInitializeCriticalSection')
+function rtlInitializeCriticalSection() {}
+
+@draft
+@dllExport('RtlInitializeCriticalSectionAndSpinCount')
+function rtlInitializeCriticalSectionAndSpinCount() {}
+
+@draft
+@dllExport('RtlInitializeCriticalSectionEx')
+function rtlInitializeCriticalSectionEx() {}
+
+@draft
+@dllExport('RtlInitializeExtendedContext')
+function rtlInitializeExtendedContext() {}
+
+@draft
+@dllExport('RtlInitializeGenericTable')
+function rtlInitializeGenericTable() {}
+
+@draft
+@dllExport('RtlInitializeGenericTableAvl')
+function rtlInitializeGenericTableAvl() {}
+
+@draft
+@dllExport('RtlInitializeHandleTable')
+function rtlInitializeHandleTable() {}
+
+@draft
+@dllExport('RtlInitializeNtUserPfn')
+function rtlInitializeNtUserPfn() {}
+
+@draft
+@dllExport('RtlInitializeResource')
+function rtlInitializeResource() {}
+
+@draft
+@dllExport('RtlInitializeRXact')
+function rtlInitializeRXact() {}
+
+@draft
+@dllExport('RtlInitializeSid')
+function rtlInitializeSid() {}
+
+@draft
+@dllExport('RtlInitializeSidEx')
+function rtlInitializeSidEx() {}
+
+@draft
+@dllExport('RtlInitializeSListHead')
+function rtlInitializeSListHead() {}
+
+@draft
+@dllExport('RtlInitializeSRWLock')
+function rtlInitializeSRWLock() {}
+
+@draft
+@dllExport('RtlInitMemoryStream')
+function rtlInitMemoryStream() {}
+
+@draft
+@dllExport('RtlInitNlsTables')
+function rtlInitNlsTables() {}
+
+@draft
+@dllExport('RtlInitOutOfProcessMemoryStream')
+function rtlInitOutOfProcessMemoryStream() {}
+
+@draft
+@dllExport('RtlInitString')
+function rtlInitString() {}
+
+@draft
+@dllExport('RtlInitStringEx')
+function rtlInitStringEx() {}
+
+@draft
+@dllExport('RtlInitStrongEnumerationHashTable')
+function rtlInitStrongEnumerationHashTable() {}
+
+@draft
+@dllExport('RtlInitUnicodeString')
+function rtlInitUnicodeString() {}
+
+@draft
+@dllExport('RtlInitUnicodeStringEx')
+function rtlInitUnicodeStringEx() {}
+
+@draft
+@dllExport('RtlInitWeakEnumerationHashTable')
+function rtlInitWeakEnumerationHashTable() {}
+
+@draft
+@dllExport('RtlInsertElementGenericTable')
+function rtlInsertElementGenericTable() {}
+
+@draft
+@dllExport('RtlInsertElementGenericTableAvl')
+function rtlInsertElementGenericTableAvl() {}
+
+@draft
+@dllExport('RtlInsertElementGenericTableFull')
+function rtlInsertElementGenericTableFull() {}
+
+@draft
+@dllExport('RtlInsertElementGenericTableFullAvl')
+function rtlInsertElementGenericTableFullAvl() {}
+
+@draft
+@dllExport('RtlInsertEntryHashTable')
+function rtlInsertEntryHashTable() {}
+
+@draft
+@dllExport('RtlInstallFunctionTableCallback')
+function rtlInstallFunctionTableCallback() {}
+
+@draft
+@dllExport('RtlInt64ToUnicodeString')
+function rtlInt64ToUnicodeString() {}
+
+@draft
+@dllExport('RtlIntegerToChar')
+function rtlIntegerToChar() {}
+
+@draft
+@dllExport('RtlIntegerToUnicodeString')
+function rtlIntegerToUnicodeString() {}
+
+@draft
+@dllExport('RtlInterlockedClearBitRun')
+function rtlInterlockedClearBitRun() {}
+
+@draft
+@dllExport('RtlInterlockedFlushSList')
+function rtlInterlockedFlushSList() {}
+
+@draft
+@dllExport('RtlInterlockedPopEntrySList')
+function rtlInterlockedPopEntrySList() {}
+
+@draft
+@dllExport('RtlInterlockedPushEntrySList')
+function rtlInterlockedPushEntrySList() {}
+
+@draft
+@dllExport('RtlInterlockedPushListSList')
+function rtlInterlockedPushListSList() {}
+
+@draft
+@dllExport('RtlInterlockedPushListSListEx')
+function rtlInterlockedPushListSListEx() {}
+
+@draft
+@dllExport('RtlInterlockedSetBitRun')
+function rtlInterlockedSetBitRun() {}
+
+@draft
+@dllExport('RtlIoDecodeMemIoResource')
+function rtlIoDecodeMemIoResource() {}
+
+@draft
+@dllExport('RtlIoEncodeMemIoResource')
+function rtlIoEncodeMemIoResource() {}
+
+@draft
+@dllExport('RtlIpv4AddressToStringA')
+function rtlIpv4AddressToStringA() {}
+
+@draft
+@dllExport('RtlIpv4AddressToStringExA')
+function rtlIpv4AddressToStringExA() {}
+
+@draft
+@dllExport('RtlIpv4AddressToStringExW')
+function rtlIpv4AddressToStringExW() {}
+
+@draft
+@dllExport('RtlIpv4AddressToStringW')
+function rtlIpv4AddressToStringW() {}
+
+@draft
+@dllExport('RtlIpv4StringToAddressA')
+function rtlIpv4StringToAddressA() {}
+
+@draft
+@dllExport('RtlIpv4StringToAddressExA')
+function rtlIpv4StringToAddressExA() {}
+
+@draft
+@dllExport('RtlIpv4StringToAddressExW')
+function rtlIpv4StringToAddressExW() {}
+
+@draft
+@dllExport('RtlIpv4StringToAddressW')
+function rtlIpv4StringToAddressW() {}
+
+@draft
+@dllExport('RtlIpv6AddressToStringA')
+function rtlIpv6AddressToStringA() {}
+
+@draft
+@dllExport('RtlIpv6AddressToStringExA')
+function rtlIpv6AddressToStringExA() {}
+
+@draft
+@dllExport('RtlIpv6AddressToStringExW')
+function rtlIpv6AddressToStringExW() {}
+
+@draft
+@dllExport('RtlIpv6AddressToStringW')
+function rtlIpv6AddressToStringW() {}
+
+@draft
+@dllExport('RtlIpv6StringToAddressA')
+function rtlIpv6StringToAddressA() {}
+
+@draft
+@dllExport('RtlIpv6StringToAddressExA')
+function rtlIpv6StringToAddressExA() {}
+
+@draft
+@dllExport('RtlIpv6StringToAddressExW')
+function rtlIpv6StringToAddressExW() {}
+
+@draft
+@dllExport('RtlIpv6StringToAddressW')
+function rtlIpv6StringToAddressW() {}
+
+@draft
+@dllExport('RtlIsActivationContextActive')
+function rtlIsActivationContextActive() {}
+
+@draft
+@dllExport('RtlIsCapabilitySid')
+function rtlIsCapabilitySid() {}
+
+@draft
+@dllExport('RtlIsCloudFilesPlaceholder')
+function rtlIsCloudFilesPlaceholder() {}
+
+@draft
+@dllExport('RtlIsCriticalSectionLocked')
+function rtlIsCriticalSectionLocked() {}
+
+@draft
+@dllExport('RtlIsCriticalSectionLockedByThread')
+function rtlIsCriticalSectionLockedByThread() {}
+
+@draft
+@dllExport('RtlIsCurrentProcess')
+function rtlIsCurrentProcess() {}
+
+@draft
+@dllExport('RtlIsCurrentThread')
+function rtlIsCurrentThread() {}
+
+@draft
+@dllExport('RtlIsCurrentThreadAttachExempt')
+function rtlIsCurrentThreadAttachExempt() {}
+
+@draft
+@dllExport('RtlIsDosDeviceName_U')
+function rtlIsDosDeviceName_U() {}
+
+@draft
+@dllExport('RtlIsElevatedRid')
+function rtlIsElevatedRid() {}
+
+@draft
+@dllExport('RtlIsGenericTableEmpty')
+function rtlIsGenericTableEmpty() {}
+
+@draft
+@dllExport('RtlIsGenericTableEmptyAvl')
+function rtlIsGenericTableEmptyAvl() {}
+
+@draft
+@dllExport('RtlIsMultiSessionSku')
+function rtlIsMultiSessionSku() {}
+
+@draft
+@dllExport('RtlIsMultiUsersInSessionSku')
+function rtlIsMultiUsersInSessionSku() {}
+
+@draft
+@dllExport('RtlIsNameInExpression')
+function rtlIsNameInExpression() {}
+
+@draft
+@dllExport('RtlIsNameInUnUpcasedExpression')
+function rtlIsNameInUnUpcasedExpression() {}
+
+@draft
+@dllExport('RtlIsNameLegalDOS8Dot3')
+function rtlIsNameLegalDOS8Dot3() {}
+
+@draft
+@dllExport('RtlIsNonEmptyDirectoryReparsePointAllowed')
+function rtlIsNonEmptyDirectoryReparsePointAllowed() {}
+
+@draft
+@dllExport('RtlIsNormalizedString')
+function rtlIsNormalizedString() {}
+
+@draft
+@dllExport('RtlIsPackageSid')
+function rtlIsPackageSid() {}
+
+@draft
+@dllExport('RtlIsParentOfChildAppContainer')
+function rtlIsParentOfChildAppContainer() {}
+
+@draft
+@dllExport('RtlIsPartialPlaceholder')
+function rtlIsPartialPlaceholder() {}
+
+@draft
+@dllExport('RtlIsPartialPlaceholderFileHandle')
+function rtlIsPartialPlaceholderFileHandle() {}
+
+@draft
+@dllExport('RtlIsPartialPlaceholderFileInfo')
+function rtlIsPartialPlaceholderFileInfo() {}
+
+@draft
+@dllExport('RtlIsProcessorFeaturePresent')
+function rtlIsProcessorFeaturePresent() {}
+
+@draft
+@dllExport('RtlIsStateSeparationEnabled')
+function rtlIsStateSeparationEnabled() {}
+
+@draft
+@dllExport('RtlIsTextUnicode')
+function rtlIsTextUnicode() {}
+
+@draft
+@dllExport('RtlIsThreadWithinLoaderCallout')
+function rtlIsThreadWithinLoaderCallout() {}
+
+@draft
+@dllExport('RtlIsUntrustedObject')
+function rtlIsUntrustedObject() {}
+
+@draft
+@dllExport('RtlIsValidHandle')
+function rtlIsValidHandle() {}
+
+@draft
+@dllExport('RtlIsValidIndexHandle')
+function rtlIsValidIndexHandle() {}
+
+@draft
+@dllExport('RtlIsValidLocaleName')
+function rtlIsValidLocaleName() {}
+
+@draft
+@dllExport('RtlIsValidProcessTrustLabelSid')
+function rtlIsValidProcessTrustLabelSid() {}
+
+@draft
+@dllExport('RtlKnownExceptionFilter')
+function rtlKnownExceptionFilter() {}
+
+@draft
+@dllExport('RtlLargeIntegerToChar')
+function rtlLargeIntegerToChar() {}
+
+@draft
+@dllExport('RtlLCIDToCultureName')
+function rtlLCIDToCultureName() {}
+
+@draft
+@dllExport('RtlLcidToLocaleName')
+function rtlLcidToLocaleName() {}
+
+@draft
+@dllExport('RtlLeaveCriticalSection')
+function rtlLeaveCriticalSection() {}
+
+@draft
+@dllExport('RtlLengthRequiredSid')
+function rtlLengthRequiredSid() {}
+
+@draft
+@dllExport('RtlLengthSecurityDescriptor')
+function rtlLengthSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlLengthSid')
+function rtlLengthSid() {}
+
+@draft
+@dllExport('RtlLengthSidAsUnicodeString')
+function rtlLengthSidAsUnicodeString() {}
+
+@draft
+@dllExport('RtlLoadString')
+function rtlLoadString() {}
+
+@draft
+@dllExport('RtlLocaleNameToLcid')
+function rtlLocaleNameToLcid() {}
+
+@draft
+@dllExport('RtlLocalTimeToSystemTime')
+function rtlLocalTimeToSystemTime() {}
+
+@draft
+@dllExport('RtlLocateExtendedFeature')
+function rtlLocateExtendedFeature() {}
+
+@draft
+@dllExport('RtlLocateExtendedFeature2')
+function rtlLocateExtendedFeature2() {}
+
+@draft
+@dllExport('RtlLocateLegacyContext')
+function rtlLocateLegacyContext() {}
+
+@draft
+@dllExport('RtlLockBootStatusData')
+function rtlLockBootStatusData() {}
+
+@draft
+@dllExport('RtlLockCurrentThread')
+function rtlLockCurrentThread() {}
+
+@draft
+@dllExport('RtlLockHeap')
+function rtlLockHeap() {}
+
+@draft
+@dllExport('RtlLockMemoryBlockLookaside')
+function rtlLockMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlLockMemoryStreamRegion')
+function rtlLockMemoryStreamRegion() {}
+
+@draft
+@dllExport('RtlLockMemoryZone')
+function rtlLockMemoryZone() {}
+
+@draft
+@dllExport('RtlLockModuleSection')
+function rtlLockModuleSection() {}
+
+@draft
+@dllExport('RtlLogStackBackTrace')
+function rtlLogStackBackTrace() {}
+
+@draft
+@dllExport('RtlLookupAtomInAtomTable')
+function rtlLookupAtomInAtomTable() {}
+
+@draft
+@dllExport('RtlLookupElementGenericTable')
+function rtlLookupElementGenericTable() {}
+
+@draft
+@dllExport('RtlLookupElementGenericTableAvl')
+function rtlLookupElementGenericTableAvl() {}
+
+@draft
+@dllExport('RtlLookupElementGenericTableFull')
+function rtlLookupElementGenericTableFull() {}
+
+@draft
+@dllExport('RtlLookupElementGenericTableFullAvl')
+function rtlLookupElementGenericTableFullAvl() {}
+
+@draft
+@dllExport('RtlLookupEntryHashTable')
+function rtlLookupEntryHashTable() {}
+
+@draft
+@dllExport('RtlLookupFirstMatchingElementGenericTableAvl')
+function rtlLookupFirstMatchingElementGenericTableAvl() {}
+
+@draft
+@dllExport('RtlLookupFunctionEntry')
+function rtlLookupFunctionEntry() {}
+
+@draft
+@dllExport('RtlLookupFunctionTable')
+function rtlLookupFunctionTable() {}
+
+@draft
+@dllExport('RtlMakeSelfRelativeSD')
+function rtlMakeSelfRelativeSD() {}
+
+@draft
+@dllExport('RtlMapGenericMask')
+function rtlMapGenericMask() {}
+
+@draft
+@dllExport('RtlMapSecurityErrorToNtStatus')
+function rtlMapSecurityErrorToNtStatus() {}
+
+@draft
+@dllExport('RtlMoveMemory')
+function rtlMoveMemory() {}
+
+@draft
+@dllExport('RtlMultiAppendUnicodeStringBuffer')
+function rtlMultiAppendUnicodeStringBuffer() {}
+
+@draft
+@dllExport('RtlMultiByteToUnicodeN')
+function rtlMultiByteToUnicodeN() {}
+
+@draft
+@dllExport('RtlMultiByteToUnicodeSize')
+function rtlMultiByteToUnicodeSize() {}
+
+@draft
+@dllExport('RtlMultipleAllocateHeap')
+function rtlMultipleAllocateHeap() {}
+
+@draft
+@dllExport('RtlMultipleFreeHeap')
+function rtlMultipleFreeHeap() {}
+
+@draft
+@dllExport('RtlNewInstanceSecurityObject')
+function rtlNewInstanceSecurityObject() {}
+
+@draft
+@dllExport('RtlNewSecurityGrantedAccess')
+function rtlNewSecurityGrantedAccess() {}
+
+@draft
+@dllExport('RtlNewSecurityObject')
+function rtlNewSecurityObject() {}
+
+@draft
+@dllExport('RtlNewSecurityObjectEx')
+function rtlNewSecurityObjectEx() {}
+
+@draft
+@dllExport('RtlNewSecurityObjectWithMultipleInheritance')
+function rtlNewSecurityObjectWithMultipleInheritance() {}
+
+@draft
+@dllExport('RtlNormalizeProcessParams')
+function rtlNormalizeProcessParams() {}
+
+@draft
+@dllExport('RtlNormalizeString')
+function rtlNormalizeString() {}
+
+@draft
+@dllExport('RtlNtdllName')
+function rtlNtdllName() {}
+
+@draft
+@dllExport('RtlNtPathNameToDosPathName')
+function rtlNtPathNameToDosPathName() {}
+
+@draft
+@dllExport('RtlNtStatusToDosError')
+function rtlNtStatusToDosError() {}
+
+@draft
+@dllExport('RtlNtStatusToDosErrorNoTeb')
+function rtlNtStatusToDosErrorNoTeb() {}
+
+@draft
+@dllExport('RtlNumberGenericTableElements')
+function rtlNumberGenericTableElements() {}
+
+@draft
+@dllExport('RtlNumberGenericTableElementsAvl')
+function rtlNumberGenericTableElementsAvl() {}
+
+@draft
+@dllExport('RtlNumberOfClearBits')
+function rtlNumberOfClearBits() {}
+
+@draft
+@dllExport('RtlNumberOfClearBitsInRange')
+function rtlNumberOfClearBitsInRange() {}
+
+@draft
+@dllExport('RtlNumberOfSetBits')
+function rtlNumberOfSetBits() {}
+
+@draft
+@dllExport('RtlNumberOfSetBitsInRange')
+function rtlNumberOfSetBitsInRange() {}
+
+@draft
+@dllExport('RtlNumberOfSetBitsUlongPtr')
+function rtlNumberOfSetBitsUlongPtr() {}
+
+@draft
+@dllExport('RtlOemStringToUnicodeSize')
+function rtlOemStringToUnicodeSize() {}
+
+@draft
+@dllExport('RtlOemStringToUnicodeString')
+function rtlOemStringToUnicodeString() {}
+
+@draft
+@dllExport('RtlOemToUnicodeN')
+function rtlOemToUnicodeN() {}
+
+@draft
+@dllExport('RtlOpenCurrentUser')
+function rtlOpenCurrentUser() {}
+
+@draft
+@dllExport('RtlOsDeploymentState')
+function rtlOsDeploymentState() {}
+
+@draft
+@dllExport('RtlOwnerAcesPresent')
+function rtlOwnerAcesPresent() {}
+
+@draft
+@dllExport('RtlpApplyLengthFunction')
+function rtlpApplyLengthFunction() {}
+
+@draft
+@dllExport('RtlpCheckDynamicTimeZoneInformation')
+function rtlpCheckDynamicTimeZoneInformation() {}
+
+@draft
+@dllExport('RtlpCleanupRegistryKeys')
+function rtlpCleanupRegistryKeys() {}
+
+@draft
+@dllExport('RtlpConvertAbsoluteToRelativeSecurityAttribute')
+function rtlpConvertAbsoluteToRelativeSecurityAttribute() {}
+
+@draft
+@dllExport('RtlpConvertCultureNamesToLCIDs')
+function rtlpConvertCultureNamesToLCIDs() {}
+
+@draft
+@dllExport('RtlpConvertLCIDsToCultureNames')
+function rtlpConvertLCIDsToCultureNames() {}
+
+@draft
+@dllExport('RtlpConvertRelativeToAbsoluteSecurityAttribute')
+function rtlpConvertRelativeToAbsoluteSecurityAttribute() {}
+
+@draft
+@dllExport('RtlpCreateProcessRegistryInfo')
+function rtlpCreateProcessRegistryInfo() {}
+
+@draft
+@dllExport('RtlPcToFileHeader')
+function rtlPcToFileHeader() {}
+
+@draft
+@dllExport('RtlpEnsureBufferSize')
+function rtlpEnsureBufferSize() {}
+
+@draft
+@dllExport('RtlpExecuteUmsThread')
+function rtlpExecuteUmsThread() {}
+
+@draft
+@dllExport('RtlpFreezeTimeBias')
+function rtlpFreezeTimeBias() {}
+
+@draft
+@dllExport('RtlpGetDeviceFamilyInfoEnum')
+function rtlpGetDeviceFamilyInfoEnum() {}
+
+@draft
+@dllExport('RtlpGetLCIDFromLangInfoNode')
+function rtlpGetLCIDFromLangInfoNode() {}
+
+@draft
+@dllExport('RtlpGetNameFromLangInfoNode')
+function rtlpGetNameFromLangInfoNode() {}
+
+@draft
+@dllExport('RtlpGetSystemDefaultUILanguage')
+function rtlpGetSystemDefaultUILanguage() {}
+
+@draft
+@dllExport('RtlpGetUserOrMachineUILanguage4NLS')
+function rtlpGetUserOrMachineUILanguage4NLS() {}
+
+@draft
+@dllExport('RtlPinAtomInAtomTable')
+function rtlPinAtomInAtomTable() {}
+
+@draft
+@dllExport('RtlpInitializeLangRegistryInfo')
+function rtlpInitializeLangRegistryInfo() {}
+
+@draft
+@dllExport('RtlpIsQualifiedLanguage')
+function rtlpIsQualifiedLanguage() {}
+
+@draft
+@dllExport('RtlpLoadMachineUIByPolicy')
+function rtlpLoadMachineUIByPolicy() {}
+
+@draft
+@dllExport('RtlpLoadUserUIByPolicy')
+function rtlpLoadUserUIByPolicy() {}
+
+@draft
+@dllExport('RtlpMergeSecurityAttributeInformation')
+function rtlpMergeSecurityAttributeInformation() {}
+
+@draft
+@dllExport('RtlpMuiFreeLangRegistryInfo')
+function rtlpMuiFreeLangRegistryInfo() {}
+
+@draft
+@dllExport('RtlpMuiRegCreateRegistryInfo')
+function rtlpMuiRegCreateRegistryInfo() {}
+
+@draft
+@dllExport('RtlpMuiRegFreeRegistryInfo')
+function rtlpMuiRegFreeRegistryInfo() {}
+
+@draft
+@dllExport('RtlpMuiRegLoadRegistryInfo')
+function rtlpMuiRegLoadRegistryInfo() {}
+
+@draft
+@dllExport('RtlpNotOwnerCriticalSection')
+function rtlpNotOwnerCriticalSection() {}
+
+@draft
+@dllExport('RtlpNtCreateKey')
+function rtlpNtCreateKey() {}
+
+@draft
+@dllExport('RtlpNtEnumerateSubKey')
+function rtlpNtEnumerateSubKey() {}
+
+@draft
+@dllExport('RtlpNtMakeTemporaryKey')
+function rtlpNtMakeTemporaryKey() {}
+
+@draft
+@dllExport('RtlpNtOpenKey')
+function rtlpNtOpenKey() {}
+
+@draft
+@dllExport('RtlpNtQueryValueKey')
+function rtlpNtQueryValueKey() {}
+
+@draft
+@dllExport('RtlpNtSetValueKey')
+function rtlpNtSetValueKey() {}
+
+@draft
+@dllExport('RtlPopFrame')
+function rtlPopFrame() {}
+
+@draft
+@dllExport('RtlpQueryDefaultUILanguage')
+function rtlpQueryDefaultUILanguage() {}
+
+@draft
+@dllExport('RtlpQueryProcessDebugInformationFromWow64')
+function rtlpQueryProcessDebugInformationFromWow64() {}
+
+@draft
+@dllExport('RtlpQueryProcessDebugInformationRemote')
+function rtlpQueryProcessDebugInformationRemote() {}
+
+@draft
+@dllExport('RtlPrefixString')
+function rtlPrefixString() {}
+
+@draft
+@dllExport('RtlPrefixUnicodeString')
+function rtlPrefixUnicodeString() {}
+
+@draft
+@dllExport('RtlpRefreshCachedUILanguage')
+function rtlpRefreshCachedUILanguage() {}
+
+@draft
+@dllExport('RtlPrepareForProcessCloning')
+function rtlPrepareForProcessCloning() {}
+
+@draft
+@dllExport('RtlProcessFlsData')
+function rtlProcessFlsData() {}
+
+@draft
+@dllExport('RtlProtectHeap')
+function rtlProtectHeap() {}
+
+@draft
+@dllExport('RtlpSetInstallLanguage')
+function rtlpSetInstallLanguage() {}
+
+@draft
+@dllExport('RtlpSetPreferredUILanguages')
+function rtlpSetPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlpSetUserPreferredUILanguages')
+function rtlpSetUserPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlPublishWnfStateData')
+function rtlPublishWnfStateData() {}
+
+@draft
+@dllExport('RtlpUmsExecuteYieldThreadEnd')
+function rtlpUmsExecuteYieldThreadEnd() {}
+
+@draft
+@dllExport('RtlpUmsThreadYield')
+function rtlpUmsThreadYield() {}
+
+@draft
+@dllExport('RtlpUnWaitCriticalSection')
+function rtlpUnWaitCriticalSection() {}
+
+@draft
+@dllExport('RtlPushFrame')
+function rtlPushFrame() {}
+
+@draft
+@dllExport('RtlpVerifyAndCommitUILanguageSettings')
+function rtlpVerifyAndCommitUILanguageSettings() {}
+
+@draft
+@dllExport('RtlpWaitForCriticalSection')
+function rtlpWaitForCriticalSection() {}
+
+@draft
+@dllExport('RtlQueryActivationContextApplicationSettings')
+function rtlQueryActivationContextApplicationSettings() {}
+
+@draft
+@dllExport('RtlQueryAtomInAtomTable')
+function rtlQueryAtomInAtomTable() {}
+
+@draft
+@dllExport('RtlQueryCriticalSectionOwner')
+function rtlQueryCriticalSectionOwner() {}
+
+@draft
+@dllExport('RtlQueryDepthSList')
+function rtlQueryDepthSList() {}
+
+@draft
+@dllExport('RtlQueryDynamicTimeZoneInformation')
+function rtlQueryDynamicTimeZoneInformation() {}
+
+@draft
+@dllExport('RtlQueryElevationFlags')
+function rtlQueryElevationFlags() {}
+
+@draft
+@dllExport('RtlQueryEnvironmentVariable')
+function rtlQueryEnvironmentVariable() {}
+
+@draft
+@dllExport('RtlQueryEnvironmentVariable_U')
+function rtlQueryEnvironmentVariable_U() {}
+
+@draft
+@dllExport('RtlQueryHeapInformation')
+function rtlQueryHeapInformation() {}
+
+@draft
+@dllExport('RtlQueryImageMitigationPolicy')
+function rtlQueryImageMitigationPolicy() {}
+
+@draft
+@dllExport('RtlQueryInformationAcl')
+function rtlQueryInformationAcl() {}
+
+@draft
+@dllExport('RtlQueryInformationActivationContext')
+function rtlQueryInformationActivationContext() {}
+
+@draft
+@dllExport('RtlQueryInformationActiveActivationContext')
+function rtlQueryInformationActiveActivationContext() {}
+
+@draft
+@dllExport('RtlQueryInterfaceMemoryStream')
+function rtlQueryInterfaceMemoryStream() {}
+
+@draft
+@dllExport('RtlQueryModuleInformation')
+function rtlQueryModuleInformation() {}
+
+@draft
+@dllExport('RtlQueryPackageClaims')
+function rtlQueryPackageClaims() {}
+
+@draft
+@dllExport('RtlQueryPackageIdentity')
+function rtlQueryPackageIdentity() {}
+
+@draft
+@dllExport('RtlQueryPackageIdentityEx')
+function rtlQueryPackageIdentityEx() {}
+
+@draft
+@dllExport('RtlQueryPerformanceCounter')
+function rtlQueryPerformanceCounter() {}
+
+@draft
+@dllExport('RtlQueryPerformanceFrequency')
+function rtlQueryPerformanceFrequency() {}
+
+@draft
+@dllExport('RtlQueryProcessBackTraceInformation')
+function rtlQueryProcessBackTraceInformation() {}
+
+@draft
+@dllExport('RtlQueryProcessDebugInformation')
+function rtlQueryProcessDebugInformation() {}
+
+@draft
+@dllExport('RtlQueryProcessHeapInformation')
+function rtlQueryProcessHeapInformation() {}
+
+@draft
+@dllExport('RtlQueryProcessLockInformation')
+function rtlQueryProcessLockInformation() {}
+
+@draft
+@dllExport('RtlQueryProcessPlaceholderCompatibilityMode')
+function rtlQueryProcessPlaceholderCompatibilityMode() {}
+
+@draft
+@dllExport('RtlQueryProtectedPolicy')
+function rtlQueryProtectedPolicy() {}
+
+@draft
+@dllExport('RtlQueryRegistryValues')
+function rtlQueryRegistryValues() {}
+
+@draft
+@dllExport('RtlQueryRegistryValuesEx')
+function rtlQueryRegistryValuesEx() {}
+
+@draft
+@dllExport('RtlQueryRegistryValueWithFallback')
+function rtlQueryRegistryValueWithFallback() {}
+
+@draft
+@dllExport('RtlQueryResourcePolicy')
+function rtlQueryResourcePolicy() {}
+
+@draft
+@dllExport('RtlQuerySecurityObject')
+function rtlQuerySecurityObject() {}
+
+@draft
+@dllExport('RtlQueryTagHeap')
+function rtlQueryTagHeap() {}
+
+@draft
+@dllExport('RtlQueryThreadPlaceholderCompatibilityMode')
+function rtlQueryThreadPlaceholderCompatibilityMode() {}
+
+@draft
+@dllExport('RtlQueryThreadProfiling')
+function rtlQueryThreadProfiling() {}
+
+@draft
+@dllExport('RtlQueryTimeZoneInformation')
+function rtlQueryTimeZoneInformation() {}
+
+@draft
+@dllExport('RtlQueryTokenHostIdAsUlong64')
+function rtlQueryTokenHostIdAsUlong64() {}
+
+@draft
+@dllExport('RtlQueryUmsThreadInformation')
+function rtlQueryUmsThreadInformation() {}
+
+@draft
+@dllExport('RtlQueryUnbiasedInterruptTime')
+function rtlQueryUnbiasedInterruptTime() {}
+
+@draft
+@dllExport('RtlQueryValidationRunlevel')
+function rtlQueryValidationRunlevel() {}
+
+@draft
+@dllExport('RtlQueryWnfMetaNotification')
+function rtlQueryWnfMetaNotification() {}
+
+@draft
+@dllExport('RtlQueryWnfStateData')
+function rtlQueryWnfStateData() {}
+
+@draft
+@dllExport('RtlQueryWnfStateDataWithExplicitScope')
+function rtlQueryWnfStateDataWithExplicitScope() {}
+
+@draft
+@dllExport('RtlQueueApcWow64Thread')
+function rtlQueueApcWow64Thread() {}
+
+@draft
+@dllExport('RtlQueueWorkItem')
+function rtlQueueWorkItem() {}
+
+@draft
+@dllExport('RtlRaiseCustomSystemEventTrigger')
+function rtlRaiseCustomSystemEventTrigger() {}
+
+@draft
+@dllExport('RtlRaiseException')
+function rtlRaiseException() {}
+
+@draft
+@dllExport('RtlRaiseStatus')
+function rtlRaiseStatus() {}
+
+@draft
+@dllExport('RtlRandom')
+function rtlRandom() {}
+
+@draft
+@dllExport('RtlRandomEx')
+function rtlRandomEx() {}
+
+@draft
+@dllExport('RtlRbInsertNodeEx')
+function rtlRbInsertNodeEx() {}
+
+@draft
+@dllExport('RtlRbRemoveNode')
+function rtlRbRemoveNode() {}
+
+@draft
+@dllExport('RtlReadMemoryStream')
+function rtlReadMemoryStream() {}
+
+@draft
+@dllExport('RtlReadOutOfProcessMemoryStream')
+function rtlReadOutOfProcessMemoryStream() {}
+
+@draft
+@dllExport('RtlReadThreadProfilingData')
+function rtlReadThreadProfilingData() {}
+
+@draft
+@dllExport('RtlReAllocateHeap')
+function rtlReAllocateHeap() {}
+
+@draft
+@dllExport('RtlRealPredecessor')
+function rtlRealPredecessor() {}
+
+@draft
+@dllExport('RtlRealSuccessor')
+function rtlRealSuccessor() {}
+
+@draft
+@dllExport('RtlRegisterForWnfMetaNotification')
+function rtlRegisterForWnfMetaNotification() {}
+
+@draft
+@dllExport('RtlRegisterSecureMemoryCacheCallback')
+function rtlRegisterSecureMemoryCacheCallback() {}
+
+@draft
+@dllExport('RtlRegisterThreadWithCsrss')
+function rtlRegisterThreadWithCsrss() {}
+
+@draft
+@dllExport('RtlRegisterWait')
+function rtlRegisterWait() {}
+
+@draft
+@dllExport('RtlReleaseActivationContext')
+function rtlReleaseActivationContext() {}
+
+@draft
+@dllExport('RtlReleaseMemoryStream')
+function rtlReleaseMemoryStream() {}
+
+@draft
+@dllExport('RtlReleasePath')
+function rtlReleasePath() {}
+
+@draft
+@dllExport('RtlReleasePebLock')
+function rtlReleasePebLock() {}
+
+@draft
+@dllExport('RtlReleasePrivilege')
+function rtlReleasePrivilege() {}
+
+@draft
+@dllExport('RtlReleaseRelativeName')
+function rtlReleaseRelativeName() {}
+
+@draft
+@dllExport('RtlReleaseResource')
+function rtlReleaseResource() {}
+
+@draft
+@dllExport('RtlReleaseSRWLockExclusive')
+function rtlReleaseSRWLockExclusive() {}
+
+@draft
+@dllExport('RtlReleaseSRWLockShared')
+function rtlReleaseSRWLockShared() {}
+
+@draft
+@dllExport('RtlRemoteCall')
+function rtlRemoteCall() {}
+
+@draft
+@dllExport('RtlRemoveEntryHashTable')
+function rtlRemoveEntryHashTable() {}
+
+@draft
+@dllExport('RtlRemovePrivileges')
+function rtlRemovePrivileges() {}
+
+@draft
+@dllExport('RtlRemoveVectoredContinueHandler')
+function rtlRemoveVectoredContinueHandler() {}
+
+@draft
+@dllExport('RtlRemoveVectoredExceptionHandler')
+function rtlRemoveVectoredExceptionHandler() {}
+
+@draft
+@dllExport('RtlReplaceSidInSd')
+function rtlReplaceSidInSd() {}
+
+@draft
+@dllExport('RtlReplaceSystemDirectoryInPath')
+function rtlReplaceSystemDirectoryInPath() {}
+
+@draft
+@dllExport('RtlReportException')
+function rtlReportException() {}
+
+@draft
+@dllExport('RtlReportExceptionEx')
+function rtlReportExceptionEx() {}
+
+@draft
+@dllExport('RtlReportSilentProcessExit')
+function rtlReportSilentProcessExit() {}
+
+@draft
+@dllExport('RtlReportSqmEscalation')
+function rtlReportSqmEscalation() {}
+
+@draft
+@dllExport('RtlResetMemoryBlockLookaside')
+function rtlResetMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlResetMemoryZone')
+function rtlResetMemoryZone() {}
+
+@draft
+@dllExport('RtlResetNtUserPfn')
+function rtlResetNtUserPfn() {}
+
+@draft
+@dllExport('RtlResetRtlTranslations')
+function rtlResetRtlTranslations() {}
+
+@draft
+@dllExport('RtlRestoreBootStatusDefaults')
+function rtlRestoreBootStatusDefaults() {}
+
+@draft
+@dllExport('RtlRestoreContext')
+function rtlRestoreContext() {}
+
+@draft
+@dllExport('RtlRestoreLastWin32Error')
+function rtlRestoreLastWin32Error() {}
+
+@draft
+@dllExport('RtlRestoreSystemBootStatusDefaults')
+function rtlRestoreSystemBootStatusDefaults() {}
+
+@draft
+@dllExport('RtlRetrieveNtUserPfn')
+function rtlRetrieveNtUserPfn() {}
+
+@draft
+@dllExport('RtlRevertMemoryStream')
+function rtlRevertMemoryStream() {}
+
+@draft
+@dllExport('RtlRunDecodeUnicodeString')
+function rtlRunDecodeUnicodeString() {}
+
+@draft
+@dllExport('RtlRunEncodeUnicodeString')
+function rtlRunEncodeUnicodeString() {}
+
+@draft
+@dllExport('RtlRunOnceBeginInitialize')
+function rtlRunOnceBeginInitialize() {}
+
+@draft
+@dllExport('RtlRunOnceComplete')
+function rtlRunOnceComplete() {}
+
+@draft
+@dllExport('RtlRunOnceExecuteOnce')
+function rtlRunOnceExecuteOnce() {}
+
+@draft
+@dllExport('RtlRunOnceInitialize')
+function rtlRunOnceInitialize() {}
+
+@draft
+@dllExport('RtlSecondsSince1970ToTime')
+function rtlSecondsSince1970ToTime() {}
+
+@draft
+@dllExport('RtlSecondsSince1980ToTime')
+function rtlSecondsSince1980ToTime() {}
+
+@draft
+@dllExport('RtlSeekMemoryStream')
+function rtlSeekMemoryStream() {}
+
+@draft
+@dllExport('RtlSelfRelativeToAbsoluteSD')
+function rtlSelfRelativeToAbsoluteSD() {}
+
+@draft
+@dllExport('RtlSelfRelativeToAbsoluteSD2')
+function rtlSelfRelativeToAbsoluteSD2() {}
+
+@draft
+@dllExport('RtlSendMsgToSm')
+function rtlSendMsgToSm() {}
+
+@draft
+@dllExport('RtlSetAllBits')
+function rtlSetAllBits() {}
+
+@draft
+@dllExport('RtlSetAttributesSecurityDescriptor')
+function rtlSetAttributesSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlSetBit')
+function rtlSetBit() {}
+
+@draft
+@dllExport('RtlSetBits')
+function rtlSetBits() {}
+
+@draft
+@dllExport('RtlSetControlSecurityDescriptor')
+function rtlSetControlSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlSetCriticalSectionSpinCount')
+function rtlSetCriticalSectionSpinCount() {}
+
+@draft
+@dllExport('RtlSetCurrentDirectory_U')
+function rtlSetCurrentDirectory_U() {}
+
+@draft
+@dllExport('RtlSetCurrentEnvironment')
+function rtlSetCurrentEnvironment() {}
+
+@draft
+@dllExport('RtlSetCurrentTransaction')
+function rtlSetCurrentTransaction() {}
+
+@draft
+@dllExport('RtlSetDaclSecurityDescriptor')
+function rtlSetDaclSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlSetDynamicTimeZoneInformation')
+function rtlSetDynamicTimeZoneInformation() {}
+
+@draft
+@dllExport('RtlSetEnvironmentStrings')
+function rtlSetEnvironmentStrings() {}
+
+@draft
+@dllExport('RtlSetEnvironmentVar')
+function rtlSetEnvironmentVar() {}
+
+@draft
+@dllExport('RtlSetEnvironmentVariable')
+function rtlSetEnvironmentVariable() {}
+
+@draft
+@dllExport('RtlSetExtendedFeaturesMask')
+function rtlSetExtendedFeaturesMask() {}
+
+@draft
+@dllExport('RtlSetGroupSecurityDescriptor')
+function rtlSetGroupSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlSetHeapInformation')
+function rtlSetHeapInformation() {}
+
+@draft
+@dllExport('RtlSetImageMitigationPolicy')
+function rtlSetImageMitigationPolicy() {}
+
+@draft
+@dllExport('RtlSetInformationAcl')
+function rtlSetInformationAcl() {}
+
+@draft
+@dllExport('RtlSetIoCompletionCallback')
+function rtlSetIoCompletionCallback() {}
+
+@draft
+@dllExport('RtlSetLastWin32Error')
+function rtlSetLastWin32Error() {}
+
+@draft
+@dllExport('RtlSetLastWin32ErrorAndNtStatusFromNtStatus')
+function rtlSetLastWin32ErrorAndNtStatusFromNtStatus() {}
+
+@draft
+@dllExport('RtlSetMemoryStreamSize')
+function rtlSetMemoryStreamSize() {}
+
+@draft
+@dllExport('RtlSetOwnerSecurityDescriptor')
+function rtlSetOwnerSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlSetPortableOperatingSystem')
+function rtlSetPortableOperatingSystem() {}
+
+@draft
+@dllExport('RtlSetProcessDebugInformation')
+function rtlSetProcessDebugInformation() {}
+
+@draft
+@dllExport('RtlSetProcessIsCritical')
+function rtlSetProcessIsCritical() {}
+
+@draft
+@dllExport('RtlSetProcessPlaceholderCompatibilityMode')
+function rtlSetProcessPlaceholderCompatibilityMode() {}
+
+@draft
+@dllExport('RtlSetProcessPreferredUILanguages')
+function rtlSetProcessPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlSetProtectedPolicy')
+function rtlSetProtectedPolicy() {}
+
+@draft
+@dllExport('RtlSetProxiedProcessId')
+function rtlSetProxiedProcessId() {}
+
+@draft
+@dllExport('RtlSetSaclSecurityDescriptor')
+function rtlSetSaclSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlSetSearchPathMode')
+function rtlSetSearchPathMode() {}
+
+@draft
+@dllExport('RtlSetSecurityDescriptorRMControl')
+function rtlSetSecurityDescriptorRMControl() {}
+
+@draft
+@dllExport('RtlSetSecurityObject')
+function rtlSetSecurityObject() {}
+
+@draft
+@dllExport('RtlSetSecurityObjectEx')
+function rtlSetSecurityObjectEx() {}
+
+@draft
+@dllExport('RtlSetSystemBootStatus')
+function rtlSetSystemBootStatus() {}
+
+@draft
+@dllExport('RtlSetSystemBootStatusEx')
+function rtlSetSystemBootStatusEx() {}
+
+@draft
+@dllExport('RtlSetThreadErrorMode')
+function rtlSetThreadErrorMode() {}
+
+@draft
+@dllExport('RtlSetThreadIsCritical')
+function rtlSetThreadIsCritical() {}
+
+@draft
+@dllExport('RtlSetThreadPlaceholderCompatibilityMode')
+function rtlSetThreadPlaceholderCompatibilityMode() {}
+
+@draft
+@dllExport('RtlSetThreadPoolStartFunc')
+function rtlSetThreadPoolStartFunc() {}
+
+@draft
+@dllExport('RtlSetThreadPreferredUILanguages')
+function rtlSetThreadPreferredUILanguages() {}
+
+@draft
+@dllExport('RtlSetThreadSubProcessTag')
+function rtlSetThreadSubProcessTag() {}
+
+@draft
+@dllExport('RtlSetThreadWorkOnBehalfTicket')
+function rtlSetThreadWorkOnBehalfTicket() {}
+
+@draft
+@dllExport('RtlSetTimer')
+function rtlSetTimer() {}
+
+@draft
+@dllExport('RtlSetTimeZoneInformation')
+function rtlSetTimeZoneInformation() {}
+
+@draft
+@dllExport('RtlSetUmsThreadInformation')
+function rtlSetUmsThreadInformation() {}
+
+@draft
+@dllExport('RtlSetUnhandledExceptionFilter')
+function rtlSetUnhandledExceptionFilter() {}
+
+@draft
+@dllExport('RtlSetUserFlagsHeap')
+function rtlSetUserFlagsHeap() {}
+
+@draft
+@dllExport('RtlSetUserValueHeap')
+function rtlSetUserValueHeap() {}
+
+@draft
+@dllExport('RtlSidDominates')
+function rtlSidDominates() {}
+
+@draft
+@dllExport('RtlSidDominatesForTrust')
+function rtlSidDominatesForTrust() {}
+
+@draft
+@dllExport('RtlSidEqualLevel')
+function rtlSidEqualLevel() {}
+
+@draft
+@dllExport('RtlSidHashInitialize')
+function rtlSidHashInitialize() {}
+
+@draft
+@dllExport('RtlSidHashLookup')
+function rtlSidHashLookup() {}
+
+@draft
+@dllExport('RtlSidIsHigherLevel')
+function rtlSidIsHigherLevel() {}
+
+@draft
+@dllExport('RtlSizeHeap')
+function rtlSizeHeap() {}
+
+@draft
+@dllExport('RtlSleepConditionVariableCS')
+function rtlSleepConditionVariableCS() {}
+
+@draft
+@dllExport('RtlSleepConditionVariableSRW')
+function rtlSleepConditionVariableSRW() {}
+
+@draft
+@dllExport('RtlSplay')
+function rtlSplay() {}
+
+@draft
+@dllExport('RtlStartRXact')
+function rtlStartRXact() {}
+
+@draft
+@dllExport('RtlStatMemoryStream')
+function rtlStatMemoryStream() {}
+
+@draft
+@dllExport('RtlStringFromGUID')
+function rtlStringFromGUID() {}
+
+@draft
+@dllExport('RtlStringFromGUIDEx')
+function rtlStringFromGUIDEx() {}
+
+@draft
+@dllExport('RtlStronglyEnumerateEntryHashTable')
+function rtlStronglyEnumerateEntryHashTable() {}
+
+@draft
+@dllExport('RtlSubAuthorityCountSid')
+function rtlSubAuthorityCountSid() {}
+
+@draft
+@dllExport('RtlSubAuthoritySid')
+function rtlSubAuthoritySid() {}
+
+@draft
+@dllExport('RtlSubscribeWnfStateChangeNotification')
+function rtlSubscribeWnfStateChangeNotification() {}
+
+@draft
+@dllExport('RtlSubtreePredecessor')
+function rtlSubtreePredecessor() {}
+
+@draft
+@dllExport('RtlSubtreeSuccessor')
+function rtlSubtreeSuccessor() {}
+
+@draft
+@dllExport('RtlSwitchedVVI')
+function rtlSwitchedVVI() {}
+
+@draft
+@dllExport('RtlSystemTimeToLocalTime')
+function rtlSystemTimeToLocalTime() {}
+
+@draft
+@dllExport('RtlTestAndPublishWnfStateData')
+function rtlTestAndPublishWnfStateData() {}
+
+@draft
+@dllExport('RtlTestBit')
+function rtlTestBit() {}
+
+@draft
+@dllExport('RtlTestBitEx')
+function rtlTestBitEx() {}
+
+@draft
+@dllExport('RtlTestProtectedAccess')
+function rtlTestProtectedAccess() {}
+
+@draft
+@dllExport('RtlTimeFieldsToTime')
+function rtlTimeFieldsToTime() {}
+
+@draft
+@dllExport('RtlTimeToElapsedTimeFields')
+function rtlTimeToElapsedTimeFields() {}
+
+@draft
+@dllExport('RtlTimeToSecondsSince1970')
+function rtlTimeToSecondsSince1970() {}
+
+@draft
+@dllExport('RtlTimeToSecondsSince1980')
+function rtlTimeToSecondsSince1980() {}
+
+@draft
+@dllExport('RtlTimeToTimeFields')
+function rtlTimeToTimeFields() {}
+
+@draft
+@dllExport('RtlTraceDatabaseAdd')
+function rtlTraceDatabaseAdd() {}
+
+@draft
+@dllExport('RtlTraceDatabaseCreate')
+function rtlTraceDatabaseCreate() {}
+
+@draft
+@dllExport('RtlTraceDatabaseDestroy')
+function rtlTraceDatabaseDestroy() {}
+
+@draft
+@dllExport('RtlTraceDatabaseEnumerate')
+function rtlTraceDatabaseEnumerate() {}
+
+@draft
+@dllExport('RtlTraceDatabaseFind')
+function rtlTraceDatabaseFind() {}
+
+@draft
+@dllExport('RtlTraceDatabaseLock')
+function rtlTraceDatabaseLock() {}
+
+@draft
+@dllExport('RtlTraceDatabaseUnlock')
+function rtlTraceDatabaseUnlock() {}
+
+@draft
+@dllExport('RtlTraceDatabaseValidate')
+function rtlTraceDatabaseValidate() {}
+
+@draft
+@dllExport('RtlTryAcquirePebLock')
+function rtlTryAcquirePebLock() {}
+
+@draft
+@dllExport('RtlTryAcquireSRWLockExclusive')
+function rtlTryAcquireSRWLockExclusive() {}
+
+@draft
+@dllExport('RtlTryAcquireSRWLockShared')
+function rtlTryAcquireSRWLockShared() {}
+
+@draft
+@dllExport('RtlTryConvertSRWLockSharedToExclusiveOrRelease')
+function rtlTryConvertSRWLockSharedToExclusiveOrRelease() {}
+
+@draft
+@dllExport('RtlTryEnterCriticalSection')
+function rtlTryEnterCriticalSection() {}
+
+@draft
+@dllExport('RtlUmsThreadYield')
+function rtlUmsThreadYield() {}
+
+@draft
+@dllExport('RtlUnhandledExceptionFilter')
+function rtlUnhandledExceptionFilter() {}
+
+@draft
+@dllExport('RtlUnhandledExceptionFilter2')
+function rtlUnhandledExceptionFilter2() {}
+
+@draft
+@dllExport('RtlUnicodeStringToAnsiSize')
+function rtlUnicodeStringToAnsiSize() {}
+
+@draft
+@dllExport('RtlUnicodeStringToAnsiString')
+function rtlUnicodeStringToAnsiString() {}
+
+@draft
+@dllExport('RtlUnicodeStringToCountedOemString')
+function rtlUnicodeStringToCountedOemString() {}
+
+@draft
+@dllExport('RtlUnicodeStringToInteger')
+function rtlUnicodeStringToInteger() {}
+
+@draft
+@dllExport('RtlUnicodeStringToOemSize')
+function rtlUnicodeStringToOemSize() {}
+
+@draft
+@dllExport('RtlUnicodeStringToOemString')
+function rtlUnicodeStringToOemString() {}
+
+@draft
+@dllExport('RtlUnicodeToCustomCPN')
+function rtlUnicodeToCustomCPN() {}
+
+@draft
+@dllExport('RtlUnicodeToMultiByteN')
+function rtlUnicodeToMultiByteN() {}
+
+@draft
+@dllExport('RtlUnicodeToMultiByteSize')
+function rtlUnicodeToMultiByteSize() {}
+
+@draft
+@dllExport('RtlUnicodeToOemN')
+function rtlUnicodeToOemN() {}
+
+@draft
+@dllExport('RtlUnicodeToUTF8N')
+function rtlUnicodeToUTF8N() {}
+
+@draft
+@dllExport('RtlUniform')
+function rtlUniform() {}
+
+@draft
+@dllExport('RtlUnlockBootStatusData')
+function rtlUnlockBootStatusData() {}
+
+@draft
+@dllExport('RtlUnlockCurrentThread')
+function rtlUnlockCurrentThread() {}
+
+@draft
+@dllExport('RtlUnlockHeap')
+function rtlUnlockHeap() {}
+
+@draft
+@dllExport('RtlUnlockMemoryBlockLookaside')
+function rtlUnlockMemoryBlockLookaside() {}
+
+@draft
+@dllExport('RtlUnlockMemoryStreamRegion')
+function rtlUnlockMemoryStreamRegion() {}
+
+@draft
+@dllExport('RtlUnlockMemoryZone')
+function rtlUnlockMemoryZone() {}
+
+@draft
+@dllExport('RtlUnlockModuleSection')
+function rtlUnlockModuleSection() {}
+
+@draft
+@dllExport('RtlUnsubscribeWnfNotificationWaitForCompletion')
+function rtlUnsubscribeWnfNotificationWaitForCompletion() {}
+
+@draft
+@dllExport('RtlUnsubscribeWnfNotificationWithCompletionCallback')
+function rtlUnsubscribeWnfNotificationWithCompletionCallback() {}
+
+@draft
+@dllExport('RtlUnsubscribeWnfStateChangeNotification')
+function rtlUnsubscribeWnfStateChangeNotification() {}
+
+@draft
+@dllExport('RtlUnwind')
+function rtlUnwind() {}
+
+@draft
+@dllExport('RtlUnwindEx')
+function rtlUnwindEx() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeChar')
+function rtlUpcaseUnicodeChar() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeString')
+function rtlUpcaseUnicodeString() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeStringToAnsiString')
+function rtlUpcaseUnicodeStringToAnsiString() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeStringToCountedOemString')
+function rtlUpcaseUnicodeStringToCountedOemString() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeStringToOemString')
+function rtlUpcaseUnicodeStringToOemString() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeToCustomCPN')
+function rtlUpcaseUnicodeToCustomCPN() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeToMultiByteN')
+function rtlUpcaseUnicodeToMultiByteN() {}
+
+@draft
+@dllExport('RtlUpcaseUnicodeToOemN')
+function rtlUpcaseUnicodeToOemN() {}
+
+@draft
+@dllExport('RtlUpdateClonedCriticalSection')
+function rtlUpdateClonedCriticalSection() {}
+
+@draft
+@dllExport('RtlUpdateClonedSRWLock')
+function rtlUpdateClonedSRWLock() {}
+
+@draft
+@dllExport('RtlUpdateTimer')
+function rtlUpdateTimer() {}
+
+@draft
+@dllExport('RtlUpperChar')
+function rtlUpperChar() {}
+
+@draft
+@dllExport('RtlUpperString')
+function rtlUpperString() {}
+
+@draft
+@dllExport('RtlUserThreadStart')
+function rtlUserThreadStart() {}
+
+@draft
+@dllExport('RtlUTF8ToUnicodeN')
+function rtlUTF8ToUnicodeN() {}
+
+@draft
+@dllExport('RtlValidAcl')
+function rtlValidAcl() {}
+
+@draft
+@dllExport('RtlValidateCorrelationVector')
+function rtlValidateCorrelationVector() {}
+
+@draft
+@dllExport('RtlValidateHeap')
+function rtlValidateHeap() {}
+
+@draft
+@dllExport('RtlValidateProcessHeaps')
+function rtlValidateProcessHeaps() {}
+
+@draft
+@dllExport('RtlValidateUnicodeString')
+function rtlValidateUnicodeString() {}
+
+@draft
+@dllExport('RtlValidProcessProtection')
+function rtlValidProcessProtection() {}
+
+@draft
+@dllExport('RtlValidRelativeSecurityDescriptor')
+function rtlValidRelativeSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlValidSecurityDescriptor')
+function rtlValidSecurityDescriptor() {}
+
+@draft
+@dllExport('RtlValidSid')
+function rtlValidSid() {}
+
+@draft
+@dllExport('RtlVerifyVersionInfo')
+function rtlVerifyVersionInfo() {}
+
+@draft
+@dllExport('RtlVirtualUnwind')
+function rtlVirtualUnwind() {}
+
+@draft
+@dllExport('RtlWaitForWnfMetaNotification')
+function rtlWaitForWnfMetaNotification() {}
+
+@draft
+@dllExport('RtlWaitOnAddress')
+function rtlWaitOnAddress() {}
+
+@draft
+@dllExport('RtlWakeAddressAll')
+function rtlWakeAddressAll() {}
+
+@draft
+@dllExport('RtlWakeAddressAllNoFence')
+function rtlWakeAddressAllNoFence() {}
+
+@draft
+@dllExport('RtlWakeAddressSingle')
+function rtlWakeAddressSingle() {}
+
+@draft
+@dllExport('RtlWakeAddressSingleNoFence')
+function rtlWakeAddressSingleNoFence() {}
+
+@draft
+@dllExport('RtlWakeAllConditionVariable')
+function rtlWakeAllConditionVariable() {}
+
+@draft
+@dllExport('RtlWakeConditionVariable')
+function rtlWakeConditionVariable() {}
+
+@draft
+@dllExport('RtlWalkFrameChain')
+function rtlWalkFrameChain() {}
+
+@draft
+@dllExport('RtlWalkHeap')
+function rtlWalkHeap() {}
+
+@draft
+@dllExport('RtlWeaklyEnumerateEntryHashTable')
+function rtlWeaklyEnumerateEntryHashTable() {}
+
+@draft
+@dllExport('RtlWerpReportException')
+function rtlWerpReportException() {}
+
+@draft
+@dllExport('RtlWnfCompareChangeStamp')
+function rtlWnfCompareChangeStamp() {}
+
+@draft
+@dllExport('RtlWnfDllUnloadCallback')
+function rtlWnfDllUnloadCallback() {}
+
+@draft
+@dllExport('RtlWow64CallFunction64')
+function rtlWow64CallFunction64() {}
+
+@draft
+@dllExport('RtlWow64EnableFsRedirection')
+function rtlWow64EnableFsRedirection() {}
+
+@draft
+@dllExport('RtlWow64EnableFsRedirectionEx')
+function rtlWow64EnableFsRedirectionEx() {}
+
+@draft
+@dllExport('RtlWow64GetCpuAreaInfo')
+function rtlWow64GetCpuAreaInfo() {}
+
+@draft
+@dllExport('RtlWow64GetCurrentCpuArea')
+function rtlWow64GetCurrentCpuArea() {}
+
+@draft
+@dllExport('RtlWow64GetCurrentMachine')
+function rtlWow64GetCurrentMachine() {}
+
+@draft
+@dllExport('RtlWow64GetEquivalentMachineCHPE')
+function rtlWow64GetEquivalentMachineCHPE() {}
+
+@draft
+@dllExport('RtlWow64GetProcessMachines')
+function rtlWow64GetProcessMachines() {}
+
+@draft
+@dllExport('RtlWow64GetSharedInfoProcess')
+function rtlWow64GetSharedInfoProcess() {}
+
+@draft
+@dllExport('RtlWow64GetThreadContext')
+function rtlWow64GetThreadContext() {}
+
+@draft
+@dllExport('RtlWow64GetThreadSelectorEntry')
+function rtlWow64GetThreadSelectorEntry() {}
+
+@draft
+@dllExport('RtlWow64IsWowGuestMachineSupported')
+function rtlWow64IsWowGuestMachineSupported() {}
+
+@draft
+@dllExport('RtlWow64LogMessageInEventLogger')
+function rtlWow64LogMessageInEventLogger() {}
+
+@draft
+@dllExport('RtlWow64PopAllCrossProcessWork')
+function rtlWow64PopAllCrossProcessWork() {}
+
+@draft
+@dllExport('RtlWow64PopCrossProcessWork')
+function rtlWow64PopCrossProcessWork() {}
+
+@draft
+@dllExport('RtlWow64PushCrossProcessWork')
+function rtlWow64PushCrossProcessWork() {}
+
+@draft
+@dllExport('RtlWow64SetThreadContext')
+function rtlWow64SetThreadContext() {}
+
+@draft
+@dllExport('RtlWow64SuspendThread')
+function rtlWow64SuspendThread() {}
+
+@draft
+@dllExport('RtlWriteMemoryStream')
+function rtlWriteMemoryStream() {}
+
+@draft
+@dllExport('RtlWriteNonVolatileMemory')
+function rtlWriteNonVolatileMemory() {}
+
+@draft
+@dllExport('RtlWriteRegistryValue')
+function rtlWriteRegistryValue() {}
+
+@draft
+@dllExport('RtlxAnsiStringToUnicodeSize')
+function rtlxAnsiStringToUnicodeSize() {}
+
+@draft
+@dllExport('RtlxOemStringToUnicodeSize')
+function rtlxOemStringToUnicodeSize() {}
+
+@draft
+@dllExport('RtlxUnicodeStringToAnsiSize')
+function rtlxUnicodeStringToAnsiSize() {}
+
+@draft
+@dllExport('RtlxUnicodeStringToOemSize')
+function rtlxUnicodeStringToOemSize() {}
+
+@draft
+@dllExport('RtlZeroHeap')
+function rtlZeroHeap() {}
+
+@draft
+@dllExport('RtlZeroMemory')
+function rtlZeroMemory() {}
+
+@draft
+@dllExport('RtlZombifyActivationContext')
+function rtlZombifyActivationContext() {}
+
+@draft
+@dllExport('SbExecuteProcedure')
+function sbExecuteProcedure() {}
+
+@draft
+@dllExport('SbSelectProcedure')
+function sbSelectProcedure() {}
+
+@draft
+@dllExport('ShipAssert')
+function shipAssert() {}
+
+@draft
+@dllExport('ShipAssertGetBufferInfo')
+function shipAssertGetBufferInfo() {}
+
+@draft
+@dllExport('ShipAssertMsgA')
+function shipAssertMsgA() {}
+
+@draft
+@dllExport('ShipAssertMsgW')
+function shipAssertMsgW() {}
+
+@draft
+@dllExport('sin')
+function sin() {}
+
+@draft
+@dllExport('sprintf')
+function sprintf() {}
+
+@draft
+@dllExport('sprintf_s')
+function sprintf_s() {}
+
+@draft
+@dllExport('sqrt')
+function sqrt() {}
+
+@draft
+@dllExport('sscanf')
+function sscanf() {}
+
+@draft
+@dllExport('sscanf_s')
+function sscanf_s() {}
+
+@draft
+@dllExport('strcat')
+function strcat() {}
+
+@draft
+@dllExport('strcat_s')
+function strcat_s() {}
+
+@draft
+@dllExport('strchr')
+function strchr() {}
+
+@draft
+@dllExport('strcmp')
+function strcmp() {}
+
+@draft
+@dllExport('strcpy')
+function strcpy() {}
+
+@draft
+@dllExport('strcpy_s')
+function strcpy_s() {}
+
+@draft
+@dllExport('strcspn')
+function strcspn() {}
+
+@draft
+@dllExport('strlen')
+function strlen() {}
+
+@draft
+@dllExport('strncat')
+function strncat() {}
+
+@draft
+@dllExport('strncat_s')
+function strncat_s() {}
+
+@draft
+@dllExport('strncmp')
+function strncmp() {}
+
+@draft
+@dllExport('strncpy')
+function strncpy() {}
+
+@draft
+@dllExport('strncpy_s')
+function strncpy_s() {}
+
+@draft
+@dllExport('strnlen')
+function strnlen() {}
+
+@draft
+@dllExport('strpbrk')
+function strpbrk() {}
+
+@draft
+@dllExport('strrchr')
+function strrchr() {}
+
+@draft
+@dllExport('strspn')
+function strspn() {}
+
+@draft
+@dllExport('strstr')
+function strstr() {}
+
+@draft
+@dllExport('strtok_s')
+function strtok_s() {}
+
+@draft
+@dllExport('strtol')
+function strtol() {}
+
+@draft
+@dllExport('strtoul')
+function strtoul() {}
+
+@draft
+@dllExport('swprintf')
+function swprintf() {}
+
+@draft
+@dllExport('swprintf_s')
+function swprintf_s() {}
+
+@draft
+@dllExport('swscanf_s')
+function swscanf_s() {}
+
+@draft
+@dllExport('tan')
+function tan() {}
+
+@draft
+@dllExport('tolower')
+function tolower() {}
+
+@draft
+@dllExport('toupper')
+function toupper() {}
+
+@draft
+@dllExport('towlower')
+function towlower() {}
+
+@draft
+@dllExport('towupper')
+function towupper() {}
+
+@draft
+@dllExport('TpAllocAlpcCompletion')
+function tpAllocAlpcCompletion() {}
+
+@draft
+@dllExport('TpAllocAlpcCompletionEx')
+function tpAllocAlpcCompletionEx() {}
+
+@draft
+@dllExport('TpAllocCleanupGroup')
+function tpAllocCleanupGroup() {}
+
+@draft
+@dllExport('TpAllocIoCompletion')
+function tpAllocIoCompletion() {}
+
+@draft
+@dllExport('TpAllocJobNotification')
+function tpAllocJobNotification() {}
+
+@draft
+@dllExport('TpAllocPool')
+function tpAllocPool() {}
+
+@draft
+@dllExport('TpAllocTimer')
+function tpAllocTimer() {}
+
+@draft
+@dllExport('TpAllocWait')
+function tpAllocWait() {}
+
+@draft
+@dllExport('TpAllocWork')
+function tpAllocWork() {}
+
+@draft
+@dllExport('TpAlpcRegisterCompletionList')
+function tpAlpcRegisterCompletionList() {}
+
+@draft
+@dllExport('TpAlpcUnregisterCompletionList')
+function tpAlpcUnregisterCompletionList() {}
+
+@draft
+@dllExport('TpCallbackDetectedUnrecoverableError')
+function tpCallbackDetectedUnrecoverableError() {}
+
+@draft
+@dllExport('TpCallbackIndependent')
+function tpCallbackIndependent() {}
+
+@draft
+@dllExport('TpCallbackLeaveCriticalSectionOnCompletion')
+function tpCallbackLeaveCriticalSectionOnCompletion() {}
+
+@draft
+@dllExport('TpCallbackMayRunLong')
+function tpCallbackMayRunLong() {}
+
+@draft
+@dllExport('TpCallbackReleaseMutexOnCompletion')
+function tpCallbackReleaseMutexOnCompletion() {}
+
+@draft
+@dllExport('TpCallbackReleaseSemaphoreOnCompletion')
+function tpCallbackReleaseSemaphoreOnCompletion() {}
+
+@draft
+@dllExport('TpCallbackSendAlpcMessageOnCompletion')
+function tpCallbackSendAlpcMessageOnCompletion() {}
+
+@draft
+@dllExport('TpCallbackSendPendingAlpcMessage')
+function tpCallbackSendPendingAlpcMessage() {}
+
+@draft
+@dllExport('TpCallbackSetEventOnCompletion')
+function tpCallbackSetEventOnCompletion() {}
+
+@draft
+@dllExport('TpCallbackUnloadDllOnCompletion')
+function tpCallbackUnloadDllOnCompletion() {}
+
+@draft
+@dllExport('TpCancelAsyncIoOperation')
+function tpCancelAsyncIoOperation() {}
+
+@draft
+@dllExport('TpCaptureCaller')
+function tpCaptureCaller() {}
+
+@draft
+@dllExport('TpCheckTerminateWorker')
+function tpCheckTerminateWorker() {}
+
+@draft
+@dllExport('TpDbgDumpHeapUsage')
+function tpDbgDumpHeapUsage() {}
+
+@draft
+@dllExport('TpDbgSetLogRoutine')
+function tpDbgSetLogRoutine() {}
+
+@draft
+@dllExport('TpDisablePoolCallbackChecks')
+function tpDisablePoolCallbackChecks() {}
+
+@draft
+@dllExport('TpDisassociateCallback')
+function tpDisassociateCallback() {}
+
+@draft
+@dllExport('TpIsTimerSet')
+function tpIsTimerSet() {}
+
+@draft
+@dllExport('TpPostWork')
+function tpPostWork() {}
+
+@draft
+@dllExport('TpQueryPoolStackInformation')
+function tpQueryPoolStackInformation() {}
+
+@draft
+@dllExport('TpReleaseAlpcCompletion')
+function tpReleaseAlpcCompletion() {}
+
+@draft
+@dllExport('TpReleaseCleanupGroup')
+function tpReleaseCleanupGroup() {}
+
+@draft
+@dllExport('TpReleaseCleanupGroupMembers')
+function tpReleaseCleanupGroupMembers() {}
+
+@draft
+@dllExport('TpReleaseIoCompletion')
+function tpReleaseIoCompletion() {}
+
+@draft
+@dllExport('TpReleaseJobNotification')
+function tpReleaseJobNotification() {}
+
+@draft
+@dllExport('TpReleasePool')
+function tpReleasePool() {}
+
+@draft
+@dllExport('TpReleaseTimer')
+function tpReleaseTimer() {}
+
+@draft
+@dllExport('TpReleaseWait')
+function tpReleaseWait() {}
+
+@draft
+@dllExport('TpReleaseWork')
+function tpReleaseWork() {}
+
+@draft
+@dllExport('TpSetDefaultPoolMaxThreads')
+function tpSetDefaultPoolMaxThreads() {}
+
+@draft
+@dllExport('TpSetDefaultPoolStackInformation')
+function tpSetDefaultPoolStackInformation() {}
+
+@draft
+@dllExport('TpSetPoolMaxThreads')
+function tpSetPoolMaxThreads() {}
+
+@draft
+@dllExport('TpSetPoolMaxThreadsSoftLimit')
+function tpSetPoolMaxThreadsSoftLimit() {}
+
+@draft
+@dllExport('TpSetPoolMinThreads')
+function tpSetPoolMinThreads() {}
+
+@draft
+@dllExport('TpSetPoolStackInformation')
+function tpSetPoolStackInformation() {}
+
+@draft
+@dllExport('TpSetPoolThreadBasePriority')
+function tpSetPoolThreadBasePriority() {}
+
+@draft
+@dllExport('TpSetPoolWorkerThreadIdleTimeout')
+function tpSetPoolWorkerThreadIdleTimeout() {}
+
+@draft
+@dllExport('TpSetTimer')
+function tpSetTimer() {}
+
+@draft
+@dllExport('TpSetTimerEx')
+function tpSetTimerEx() {}
+
+@draft
+@dllExport('TpSetWait')
+function tpSetWait() {}
+
+@draft
+@dllExport('TpSetWaitEx')
+function tpSetWaitEx() {}
+
+@draft
+@dllExport('TpSimpleTryPost')
+function tpSimpleTryPost() {}
+
+@draft
+@dllExport('TpStartAsyncIoOperation')
+function tpStartAsyncIoOperation() {}
+
+@draft
+@dllExport('TpTimerOutstandingCallbackCount')
+function tpTimerOutstandingCallbackCount() {}
+
+@draft
+@dllExport('TpTrimPools')
+function tpTrimPools() {}
+
+@draft
+@dllExport('TpWaitForAlpcCompletion')
+function tpWaitForAlpcCompletion() {}
+
+@draft
+@dllExport('TpWaitForIoCompletion')
+function tpWaitForIoCompletion() {}
+
+@draft
+@dllExport('TpWaitForJobNotification')
+function tpWaitForJobNotification() {}
+
+@draft
+@dllExport('TpWaitForTimer')
+function tpWaitForTimer() {}
+
+@draft
+@dllExport('TpWaitForWait')
+function tpWaitForWait() {}
+
+@draft
+@dllExport('TpWaitForWork')
+function tpWaitForWork() {}
+
+@draft
+@dllExport('vDbgPrintEx')
+function vDbgPrintEx() {}
+
+@draft
+@dllExport('vDbgPrintExWithPrefix')
+function vDbgPrintExWithPrefix() {}
+
+@draft
+@dllExport('VerSetConditionMask')
+function verSetConditionMask() {}
+
+@draft
+@dllExport('vsprintf')
+function vsprintf() {}
+
+@draft
+@dllExport('vsprintf_s')
+function vsprintf_s() {}
+
+@draft
+@dllExport('vswprintf_s')
+function vswprintf_s() {}
+
+@draft
+@dllExport('wcscat')
+function wcscat() {}
+
+@draft
+@dllExport('wcscat_s')
+function wcscat_s() {}
+
+@draft
+@dllExport('wcschr')
+function wcschr() {}
+
+@draft
+@dllExport('wcscmp')
+function wcscmp() {}
+
+@draft
+@dllExport('wcscpy')
+function wcscpy() {}
+
+@draft
+@dllExport('wcscpy_s')
+function wcscpy_s() {}
+
+@draft
+@dllExport('wcscspn')
+function wcscspn() {}
+
+@draft
+@dllExport('wcslen')
+function wcslen() {}
+
+@draft
+@dllExport('wcsncat')
+function wcsncat() {}
+
+@draft
+@dllExport('wcsncat_s')
+function wcsncat_s() {}
+
+@draft
+@dllExport('wcsncmp')
+function wcsncmp() {}
+
+@draft
+@dllExport('wcsncpy')
+function wcsncpy() {}
+
+@draft
+@dllExport('wcsncpy_s')
+function wcsncpy_s() {}
+
+@draft
+@dllExport('wcsnlen')
+function wcsnlen() {}
+
+@draft
+@dllExport('wcspbrk')
+function wcspbrk() {}
+
+@draft
+@dllExport('wcsrchr')
+function wcsrchr() {}
+
+@draft
+@dllExport('wcsspn')
+function wcsspn() {}
+
+@draft
+@dllExport('wcsstr')
+function wcsstr() {}
+
+@draft
+@dllExport('wcstok_s')
+function wcstok_s() {}
+
+@draft
+@dllExport('wcstol')
+function wcstol() {}
+
+@draft
+@dllExport('wcstombs')
+function wcstombs() {}
+
+@draft
+@dllExport('wcstoul')
+function wcstoul() {}
+
+@draft
+@dllExport('WerReportExceptionWorker')
+function werReportExceptionWorker() {}
+
+@draft
+@dllExport('WerReportSQMEvent')
+function werReportSQMEvent() {}
+
+@draft
+@dllExport('WinSqmAddToAverageDWORD')
+function winSqmAddToAverageDWORD() {}
+
+@draft
+@dllExport('WinSqmAddToStream')
+function winSqmAddToStream() {}
+
+@draft
+@dllExport('WinSqmAddToStreamEx')
+function winSqmAddToStreamEx() {}
+
+@draft
+@dllExport('WinSqmCheckEscalationAddToStreamEx')
+function winSqmCheckEscalationAddToStreamEx() {}
+
+@draft
+@dllExport('WinSqmCheckEscalationSetDWORD')
+function winSqmCheckEscalationSetDWORD() {}
+
+@draft
+@dllExport('WinSqmCheckEscalationSetDWORD64')
+function winSqmCheckEscalationSetDWORD64() {}
+
+@draft
+@dllExport('WinSqmCheckEscalationSetString')
+function winSqmCheckEscalationSetString() {}
+
+@draft
+@dllExport('WinSqmCommonDatapointDelete')
+function winSqmCommonDatapointDelete() {}
+
+@draft
+@dllExport('WinSqmCommonDatapointSetDWORD')
+function winSqmCommonDatapointSetDWORD() {}
+
+@draft
+@dllExport('WinSqmCommonDatapointSetDWORD64')
+function winSqmCommonDatapointSetDWORD64() {}
+
+@draft
+@dllExport('WinSqmCommonDatapointSetStreamEx')
+function winSqmCommonDatapointSetStreamEx() {}
+
+@draft
+@dllExport('WinSqmCommonDatapointSetString')
+function winSqmCommonDatapointSetString() {}
+
+@draft
+@dllExport('WinSqmEndSession')
+function winSqmEndSession() {}
+
+@draft
+@dllExport('WinSqmEventEnabled')
+function winSqmEventEnabled() {}
+
+@draft
+@dllExport('WinSqmEventWrite')
+function winSqmEventWrite() {}
+
+@draft
+@dllExport('WinSqmGetEscalationRuleStatus')
+function winSqmGetEscalationRuleStatus() {}
+
+@draft
+@dllExport('WinSqmGetInstrumentationProperty')
+function winSqmGetInstrumentationProperty() {}
+
+@draft
+@dllExport('WinSqmIncrementDWORD')
+function winSqmIncrementDWORD() {}
+
+@draft
+@dllExport('WinSqmIsOptedIn')
+function winSqmIsOptedIn() {}
+
+@draft
+@dllExport('WinSqmIsOptedInEx')
+function winSqmIsOptedInEx() {}
+
+@draft
+@dllExport('WinSqmIsSessionDisabled')
+function winSqmIsSessionDisabled() {}
+
+@draft
+@dllExport('WinSqmSetDWORD')
+function winSqmSetDWORD() {}
+
+@draft
+@dllExport('WinSqmSetDWORD64')
+function winSqmSetDWORD64() {}
+
+@draft
+@dllExport('WinSqmSetEscalationInfo')
+function winSqmSetEscalationInfo() {}
+
+@draft
+@dllExport('WinSqmSetIfMaxDWORD')
+function winSqmSetIfMaxDWORD() {}
+
+@draft
+@dllExport('WinSqmSetIfMinDWORD')
+function winSqmSetIfMinDWORD() {}
+
+@draft
+@dllExport('WinSqmSetString')
+function winSqmSetString() {}
+
+@draft
+@dllExport('WinSqmStartSession')
+function winSqmStartSession() {}
+
+@draft
+@dllExport('WinSqmStartSessionForPartner')
+function winSqmStartSessionForPartner() {}
+
+@draft
+@dllExport('WinSqmStartSqmOptinListener')
+function winSqmStartSqmOptinListener() {}
+
+@draft
+@dllExport('ZwAcceptConnectPort')
+function zwAcceptConnectPort() {}
+
+@draft
+@dllExport('ZwAccessCheck')
+function zwAccessCheck() {}
+
+@draft
+@dllExport('ZwAccessCheckAndAuditAlarm')
+function zwAccessCheckAndAuditAlarm() {}
+
+@draft
+@dllExport('ZwAccessCheckByType')
+function zwAccessCheckByType() {}
+
+@draft
+@dllExport('ZwAccessCheckByTypeAndAuditAlarm')
+function zwAccessCheckByTypeAndAuditAlarm() {}
+
+@draft
+@dllExport('ZwAccessCheckByTypeResultList')
+function zwAccessCheckByTypeResultList() {}
+
+@draft
+@dllExport('ZwAccessCheckByTypeResultListAndAuditAlarm')
+function zwAccessCheckByTypeResultListAndAuditAlarm() {}
+
+@draft
+@dllExport('ZwAccessCheckByTypeResultListAndAuditAlarmByHandle')
+function zwAccessCheckByTypeResultListAndAuditAlarmByHandle() {}
+
+@draft
+@dllExport('ZwAcquireProcessActivityReference')
+function zwAcquireProcessActivityReference() {}
+
+@draft
+@dllExport('ZwAddAtom')
+function zwAddAtom() {}
+
+@draft
+@dllExport('ZwAddAtomEx')
+function zwAddAtomEx() {}
+
+@draft
+@dllExport('ZwAddBootEntry')
+function zwAddBootEntry() {}
+
+@draft
+@dllExport('ZwAddDriverEntry')
+function zwAddDriverEntry() {}
+
+@draft
+@dllExport('ZwAdjustGroupsToken')
+function zwAdjustGroupsToken() {}
+
+@draft
+@dllExport('ZwAdjustPrivilegesToken')
+function zwAdjustPrivilegesToken() {}
+
+@draft
+@dllExport('ZwAdjustTokenClaimsAndDeviceGroups')
+function zwAdjustTokenClaimsAndDeviceGroups() {}
+
+@draft
+@dllExport('ZwAlertResumeThread')
+function zwAlertResumeThread() {}
+
+@draft
+@dllExport('ZwAlertThread')
+function zwAlertThread() {}
+
+@draft
+@dllExport('ZwAlertThreadByThreadId')
+function zwAlertThreadByThreadId() {}
+
+@draft
+@dllExport('ZwAllocateLocallyUniqueId')
+function zwAllocateLocallyUniqueId() {}
+
+@draft
+@dllExport('ZwAllocateReserveObject')
+function zwAllocateReserveObject() {}
+
+@draft
+@dllExport('ZwAllocateUserPhysicalPages')
+function zwAllocateUserPhysicalPages() {}
+
+@draft
+@dllExport('ZwAllocateUuids')
+function zwAllocateUuids() {}
+
+@draft
+@dllExport('ZwAllocateVirtualMemory')
+function zwAllocateVirtualMemory() {}
+
+@draft
+@dllExport('ZwAllocateVirtualMemoryEx')
+function zwAllocateVirtualMemoryEx() {}
+
+@draft
+@dllExport('ZwAlpcAcceptConnectPort')
+function zwAlpcAcceptConnectPort() {}
+
+@draft
+@dllExport('ZwAlpcCancelMessage')
+function zwAlpcCancelMessage() {}
+
+@draft
+@dllExport('ZwAlpcConnectPort')
+function zwAlpcConnectPort() {}
+
+@draft
+@dllExport('ZwAlpcConnectPortEx')
+function zwAlpcConnectPortEx() {}
+
+@draft
+@dllExport('ZwAlpcCreatePort')
+function zwAlpcCreatePort() {}
+
+@draft
+@dllExport('ZwAlpcCreatePortSection')
+function zwAlpcCreatePortSection() {}
+
+@draft
+@dllExport('ZwAlpcCreateResourceReserve')
+function zwAlpcCreateResourceReserve() {}
+
+@draft
+@dllExport('ZwAlpcCreateSectionView')
+function zwAlpcCreateSectionView() {}
+
+@draft
+@dllExport('ZwAlpcCreateSecurityContext')
+function zwAlpcCreateSecurityContext() {}
+
+@draft
+@dllExport('ZwAlpcDeletePortSection')
+function zwAlpcDeletePortSection() {}
+
+@draft
+@dllExport('ZwAlpcDeleteResourceReserve')
+function zwAlpcDeleteResourceReserve() {}
+
+@draft
+@dllExport('ZwAlpcDeleteSectionView')
+function zwAlpcDeleteSectionView() {}
+
+@draft
+@dllExport('ZwAlpcDeleteSecurityContext')
+function zwAlpcDeleteSecurityContext() {}
+
+@draft
+@dllExport('ZwAlpcDisconnectPort')
+function zwAlpcDisconnectPort() {}
+
+@draft
+@dllExport('ZwAlpcImpersonateClientContainerOfPort')
+function zwAlpcImpersonateClientContainerOfPort() {}
+
+@draft
+@dllExport('ZwAlpcImpersonateClientOfPort')
+function zwAlpcImpersonateClientOfPort() {}
+
+@draft
+@dllExport('ZwAlpcOpenSenderProcess')
+function zwAlpcOpenSenderProcess() {}
+
+@draft
+@dllExport('ZwAlpcOpenSenderThread')
+function zwAlpcOpenSenderThread() {}
+
+@draft
+@dllExport('ZwAlpcQueryInformation')
+function zwAlpcQueryInformation() {}
+
+@draft
+@dllExport('ZwAlpcQueryInformationMessage')
+function zwAlpcQueryInformationMessage() {}
+
+@draft
+@dllExport('ZwAlpcRevokeSecurityContext')
+function zwAlpcRevokeSecurityContext() {}
+
+@draft
+@dllExport('ZwAlpcSendWaitReceivePort')
+function zwAlpcSendWaitReceivePort() {}
+
+@draft
+@dllExport('ZwAlpcSetInformation')
+function zwAlpcSetInformation() {}
+
+@draft
+@dllExport('ZwApphelpCacheControl')
+function zwApphelpCacheControl() {}
+
+@draft
+@dllExport('ZwAreMappedFilesTheSame')
+function zwAreMappedFilesTheSame() {}
+
+@draft
+@dllExport('ZwAssignProcessToJobObject')
+function zwAssignProcessToJobObject() {}
+
+@draft
+@dllExport('ZwAssociateWaitCompletionPacket')
+function zwAssociateWaitCompletionPacket() {}
+
+@draft
+@dllExport('ZwCallbackReturn')
+function zwCallbackReturn() {}
+
+@draft
+@dllExport('ZwCallEnclave')
+function zwCallEnclave() {}
+
+@draft
+@dllExport('ZwCancelIoFile')
+function zwCancelIoFile() {}
+
+@draft
+@dllExport('ZwCancelIoFileEx')
+function zwCancelIoFileEx() {}
+
+@draft
+@dllExport('ZwCancelSynchronousIoFile')
+function zwCancelSynchronousIoFile() {}
+
+@draft
+@dllExport('ZwCancelTimer')
+function zwCancelTimer() {}
+
+@draft
+@dllExport('ZwCancelTimer2')
+function zwCancelTimer2() {}
+
+@draft
+@dllExport('ZwCancelWaitCompletionPacket')
+function zwCancelWaitCompletionPacket() {}
+
+@draft
+@dllExport('ZwClearEvent')
+function zwClearEvent() {}
+
+@draft
+@dllExport('ZwClose')
+function zwClose() {}
+
+@draft
+@dllExport('ZwCloseObjectAuditAlarm')
+function zwCloseObjectAuditAlarm() {}
+
+@draft
+@dllExport('ZwCommitComplete')
+function zwCommitComplete() {}
+
+@draft
+@dllExport('ZwCommitEnlistment')
+function zwCommitEnlistment() {}
+
+@draft
+@dllExport('ZwCommitRegistryTransaction')
+function zwCommitRegistryTransaction() {}
+
+@draft
+@dllExport('ZwCommitTransaction')
+function zwCommitTransaction() {}
+
+@draft
+@dllExport('ZwCompactKeys')
+function zwCompactKeys() {}
+
+@draft
+@dllExport('ZwCompareObjects')
+function zwCompareObjects() {}
+
+@draft
+@dllExport('ZwCompareSigningLevels')
+function zwCompareSigningLevels() {}
+
+@draft
+@dllExport('ZwCompareTokens')
+function zwCompareTokens() {}
+
+@draft
+@dllExport('ZwCompleteConnectPort')
+function zwCompleteConnectPort() {}
+
+@draft
+@dllExport('ZwCompressKey')
+function zwCompressKey() {}
+
+@draft
+@dllExport('ZwConnectPort')
+function zwConnectPort() {}
+
+@draft
+@dllExport('ZwContinue')
+function zwContinue() {}
+
+@draft
+@dllExport('ZwConvertBetweenAuxiliaryCounterAndPerformanceCounter')
+function zwConvertBetweenAuxiliaryCounterAndPerformanceCounter() {}
+
+@draft
+@dllExport('ZwCreateDebugObject')
+function zwCreateDebugObject() {}
+
+@draft
+@dllExport('ZwCreateDirectoryObject')
+function zwCreateDirectoryObject() {}
+
+@draft
+@dllExport('ZwCreateDirectoryObjectEx')
+function zwCreateDirectoryObjectEx() {}
+
+@draft
+@dllExport('ZwCreateEnclave')
+function zwCreateEnclave() {}
+
+@draft
+@dllExport('ZwCreateEnlistment')
+function zwCreateEnlistment() {}
+
+@draft
+@dllExport('ZwCreateEvent')
+function zwCreateEvent() {}
+
+@draft
+@dllExport('ZwCreateEventPair')
+function zwCreateEventPair() {}
+
+@draft
+@dllExport('ZwCreateFile')
+function zwCreateFile() {}
+
+@draft
+@dllExport('ZwCreateIoCompletion')
+function zwCreateIoCompletion() {}
+
+@draft
+@dllExport('ZwCreateIRTimer')
+function zwCreateIRTimer() {}
+
+@draft
+@dllExport('ZwCreateJobObject')
+function zwCreateJobObject() {}
+
+@draft
+@dllExport('ZwCreateJobSet')
+function zwCreateJobSet() {}
+
+@draft
+@dllExport('ZwCreateKey')
+function zwCreateKey() {}
+
+@draft
+@dllExport('ZwCreateKeyedEvent')
+function zwCreateKeyedEvent() {}
+
+@draft
+@dllExport('ZwCreateKeyTransacted')
+function zwCreateKeyTransacted() {}
+
+@draft
+@dllExport('ZwCreateLowBoxToken')
+function zwCreateLowBoxToken() {}
+
+@draft
+@dllExport('ZwCreateMailslotFile')
+function zwCreateMailslotFile() {}
+
+@draft
+@dllExport('ZwCreateMutant')
+function zwCreateMutant() {}
+
+@draft
+@dllExport('ZwCreateNamedPipeFile')
+function zwCreateNamedPipeFile() {}
+
+@draft
+@dllExport('ZwCreatePagingFile')
+function zwCreatePagingFile() {}
+
+@draft
+@dllExport('ZwCreatePartition')
+function zwCreatePartition() {}
+
+@draft
+@dllExport('ZwCreatePort')
+function zwCreatePort() {}
+
+@draft
+@dllExport('ZwCreatePrivateNamespace')
+function zwCreatePrivateNamespace() {}
+
+@draft
+@dllExport('ZwCreateProcess')
+function zwCreateProcess() {}
+
+@draft
+@dllExport('ZwCreateProcessEx')
+function zwCreateProcessEx() {}
+
+@draft
+@dllExport('ZwCreateProfile')
+function zwCreateProfile() {}
+
+@draft
+@dllExport('ZwCreateProfileEx')
+function zwCreateProfileEx() {}
+
+@draft
+@dllExport('ZwCreateRegistryTransaction')
+function zwCreateRegistryTransaction() {}
+
+@draft
+@dllExport('ZwCreateResourceManager')
+function zwCreateResourceManager() {}
+
+@draft
+@dllExport('ZwCreateSection')
+function zwCreateSection() {}
+
+@draft
+@dllExport('ZwCreateSemaphore')
+function zwCreateSemaphore() {}
+
+@draft
+@dllExport('ZwCreateSymbolicLinkObject')
+function zwCreateSymbolicLinkObject() {}
+
+@draft
+@dllExport('ZwCreateThread')
+function zwCreateThread() {}
+
+@draft
+@dllExport('ZwCreateThreadEx')
+function zwCreateThreadEx() {}
+
+@draft
+@dllExport('ZwCreateTimer')
+function zwCreateTimer() {}
+
+@draft
+@dllExport('ZwCreateTimer2')
+function zwCreateTimer2() {}
+
+@draft
+@dllExport('ZwCreateToken')
+function zwCreateToken() {}
+
+@draft
+@dllExport('ZwCreateTokenEx')
+function zwCreateTokenEx() {}
+
+@draft
+@dllExport('ZwCreateTransaction')
+function zwCreateTransaction() {}
+
+@draft
+@dllExport('ZwCreateTransactionManager')
+function zwCreateTransactionManager() {}
+
+@draft
+@dllExport('ZwCreateUserProcess')
+function zwCreateUserProcess() {}
+
+@draft
+@dllExport('ZwCreateWaitablePort')
+function zwCreateWaitablePort() {}
+
+@draft
+@dllExport('ZwCreateWaitCompletionPacket')
+function zwCreateWaitCompletionPacket() {}
+
+@draft
+@dllExport('ZwCreateWnfStateName')
+function zwCreateWnfStateName() {}
+
+@draft
+@dllExport('ZwCreateWorkerFactory')
+function zwCreateWorkerFactory() {}
+
+@draft
+@dllExport('ZwDebugActiveProcess')
+function zwDebugActiveProcess() {}
+
+@draft
+@dllExport('ZwDebugContinue')
+function zwDebugContinue() {}
+
+@draft
+@dllExport('ZwDelayExecution')
+function zwDelayExecution() {}
+
+@draft
+@dllExport('ZwDeleteAtom')
+function zwDeleteAtom() {}
+
+@draft
+@dllExport('ZwDeleteBootEntry')
+function zwDeleteBootEntry() {}
+
+@draft
+@dllExport('ZwDeleteDriverEntry')
+function zwDeleteDriverEntry() {}
+
+@draft
+@dllExport('ZwDeleteFile')
+function zwDeleteFile() {}
+
+@draft
+@dllExport('ZwDeleteKey')
+function zwDeleteKey() {}
+
+@draft
+@dllExport('ZwDeleteObjectAuditAlarm')
+function zwDeleteObjectAuditAlarm() {}
+
+@draft
+@dllExport('ZwDeletePrivateNamespace')
+function zwDeletePrivateNamespace() {}
+
+@draft
+@dllExport('ZwDeleteValueKey')
+function zwDeleteValueKey() {}
+
+@draft
+@dllExport('ZwDeleteWnfStateData')
+function zwDeleteWnfStateData() {}
+
+@draft
+@dllExport('ZwDeleteWnfStateName')
+function zwDeleteWnfStateName() {}
+
+@draft
+@dllExport('ZwDeviceIoControlFile')
+function zwDeviceIoControlFile() {}
+
+@draft
+@dllExport('ZwDisableLastKnownGood')
+function zwDisableLastKnownGood() {}
+
+@draft
+@dllExport('ZwDisplayString')
+function zwDisplayString() {}
+
+@draft
+@dllExport('ZwDrawText')
+function zwDrawText() {}
+
+@draft
+@dllExport('ZwDuplicateObject')
+function zwDuplicateObject() {}
+
+@draft
+@dllExport('ZwDuplicateToken')
+function zwDuplicateToken() {}
+
+@draft
+@dllExport('ZwEnableLastKnownGood')
+function zwEnableLastKnownGood() {}
+
+@draft
+@dllExport('ZwEnumerateBootEntries')
+function zwEnumerateBootEntries() {}
+
+@draft
+@dllExport('ZwEnumerateDriverEntries')
+function zwEnumerateDriverEntries() {}
+
+@draft
+@dllExport('ZwEnumerateKey')
+function zwEnumerateKey() {}
+
+@draft
+@dllExport('ZwEnumerateSystemEnvironmentValuesEx')
+function zwEnumerateSystemEnvironmentValuesEx() {}
+
+@draft
+@dllExport('ZwEnumerateTransactionObject')
+function zwEnumerateTransactionObject() {}
+
+@draft
+@dllExport('ZwEnumerateValueKey')
+function zwEnumerateValueKey() {}
+
+@draft
+@dllExport('ZwExtendSection')
+function zwExtendSection() {}
+
+@draft
+@dllExport('ZwFilterBootOption')
+function zwFilterBootOption() {}
+
+@draft
+@dllExport('ZwFilterToken')
+function zwFilterToken() {}
+
+@draft
+@dllExport('ZwFilterTokenEx')
+function zwFilterTokenEx() {}
+
+@draft
+@dllExport('ZwFindAtom')
+function zwFindAtom() {}
+
+@draft
+@dllExport('ZwFlushBuffersFile')
+function zwFlushBuffersFile() {}
+
+@draft
+@dllExport('ZwFlushBuffersFileEx')
+function zwFlushBuffersFileEx() {}
+
+@draft
+@dllExport('ZwFlushInstallUILanguage')
+function zwFlushInstallUILanguage() {}
+
+@draft
+@dllExport('ZwFlushInstructionCache')
+function zwFlushInstructionCache() {}
+
+@draft
+@dllExport('ZwFlushKey')
+function zwFlushKey() {}
+
+@draft
+@dllExport('ZwFlushProcessWriteBuffers')
+function zwFlushProcessWriteBuffers() {}
+
+@draft
+@dllExport('ZwFlushVirtualMemory')
+function zwFlushVirtualMemory() {}
+
+@draft
+@dllExport('ZwFlushWriteBuffer')
+function zwFlushWriteBuffer() {}
+
+@draft
+@dllExport('ZwFreeUserPhysicalPages')
+function zwFreeUserPhysicalPages() {}
+
+@draft
+@dllExport('ZwFreeVirtualMemory')
+function zwFreeVirtualMemory() {}
+
+@draft
+@dllExport('ZwFreezeRegistry')
+function zwFreezeRegistry() {}
+
+@draft
+@dllExport('ZwFreezeTransactions')
+function zwFreezeTransactions() {}
+
+@draft
+@dllExport('ZwFsControlFile')
+function zwFsControlFile() {}
+
+@draft
+@dllExport('ZwGetCachedSigningLevel')
+function zwGetCachedSigningLevel() {}
+
+@draft
+@dllExport('ZwGetCompleteWnfStateSubscription')
+function zwGetCompleteWnfStateSubscription() {}
+
+@draft
+@dllExport('ZwGetContextThread')
+function zwGetContextThread() {}
+
+@draft
+@dllExport('ZwGetCurrentProcessorNumber')
+function zwGetCurrentProcessorNumber() {}
+
+@draft
+@dllExport('ZwGetCurrentProcessorNumberEx')
+function zwGetCurrentProcessorNumberEx() {}
+
+@draft
+@dllExport('ZwGetDevicePowerState')
+function zwGetDevicePowerState() {}
+
+@draft
+@dllExport('ZwGetMUIRegistryInfo')
+function zwGetMUIRegistryInfo() {}
+
+@draft
+@dllExport('ZwGetNextProcess')
+function zwGetNextProcess() {}
+
+@draft
+@dllExport('ZwGetNextThread')
+function zwGetNextThread() {}
+
+@draft
+@dllExport('ZwGetNlsSectionPtr')
+function zwGetNlsSectionPtr() {}
+
+@draft
+@dllExport('ZwGetNotificationResourceManager')
+function zwGetNotificationResourceManager() {}
+
+@draft
+@dllExport('ZwGetWriteWatch')
+function zwGetWriteWatch() {}
+
+@draft
+@dllExport('ZwImpersonateAnonymousToken')
+function zwImpersonateAnonymousToken() {}
+
+@draft
+@dllExport('ZwImpersonateClientOfPort')
+function zwImpersonateClientOfPort() {}
+
+@draft
+@dllExport('ZwImpersonateThread')
+function zwImpersonateThread() {}
+
+@draft
+@dllExport('ZwInitializeEnclave')
+function zwInitializeEnclave() {}
+
+@draft
+@dllExport('ZwInitializeNlsFiles')
+function zwInitializeNlsFiles() {}
+
+@draft
+@dllExport('ZwInitializeRegistry')
+function zwInitializeRegistry() {}
+
+@draft
+@dllExport('ZwInitiatePowerAction')
+function zwInitiatePowerAction() {}
+
+@draft
+@dllExport('ZwIsProcessInJob')
+function zwIsProcessInJob() {}
+
+@draft
+@dllExport('ZwIsSystemResumeAutomatic')
+function zwIsSystemResumeAutomatic() {}
+
+@draft
+@dllExport('ZwIsUILanguageComitted')
+function zwIsUILanguageComitted() {}
+
+@draft
+@dllExport('ZwListenPort')
+function zwListenPort() {}
+
+@draft
+@dllExport('ZwLoadDriver')
+function zwLoadDriver() {}
+
+@draft
+@dllExport('ZwLoadEnclaveData')
+function zwLoadEnclaveData() {}
+
+@draft
+@dllExport('ZwLoadHotPatch')
+function zwLoadHotPatch() {}
+
+@draft
+@dllExport('ZwLoadKey')
+function zwLoadKey() {}
+
+@draft
+@dllExport('ZwLoadKey2')
+function zwLoadKey2() {}
+
+@draft
+@dllExport('ZwLoadKeyEx')
+function zwLoadKeyEx() {}
+
+@draft
+@dllExport('ZwLockFile')
+function zwLockFile() {}
+
+@draft
+@dllExport('ZwLockProductActivationKeys')
+function zwLockProductActivationKeys() {}
+
+@draft
+@dllExport('ZwLockRegistryKey')
+function zwLockRegistryKey() {}
+
+@draft
+@dllExport('ZwLockVirtualMemory')
+function zwLockVirtualMemory() {}
+
+@draft
+@dllExport('ZwMakePermanentObject')
+function zwMakePermanentObject() {}
+
+@draft
+@dllExport('ZwMakeTemporaryObject')
+function zwMakeTemporaryObject() {}
+
+@draft
+@dllExport('ZwManagePartition')
+function zwManagePartition() {}
+
+@draft
+@dllExport('ZwMapCMFModule')
+function zwMapCMFModule() {}
+
+@draft
+@dllExport('ZwMapUserPhysicalPages')
+function zwMapUserPhysicalPages() {}
+
+@draft
+@dllExport('ZwMapUserPhysicalPagesScatter')
+function zwMapUserPhysicalPagesScatter() {}
+
+@draft
+@dllExport('ZwMapViewOfSection')
+function zwMapViewOfSection() {}
+
+@draft
+@dllExport('ZwMapViewOfSectionEx')
+function zwMapViewOfSectionEx() {}
+
+@draft
+@dllExport('ZwModifyBootEntry')
+function zwModifyBootEntry() {}
+
+@draft
+@dllExport('ZwModifyDriverEntry')
+function zwModifyDriverEntry() {}
+
+@draft
+@dllExport('ZwNotifyChangeDirectoryFile')
+function zwNotifyChangeDirectoryFile() {}
+
+@draft
+@dllExport('ZwNotifyChangeDirectoryFileEx')
+function zwNotifyChangeDirectoryFileEx() {}
+
+@draft
+@dllExport('ZwNotifyChangeKey')
+function zwNotifyChangeKey() {}
+
+@draft
+@dllExport('ZwNotifyChangeMultipleKeys')
+function zwNotifyChangeMultipleKeys() {}
+
+@draft
+@dllExport('ZwNotifyChangeSession')
+function zwNotifyChangeSession() {}
+
+@draft
+@dllExport('ZwOpenDirectoryObject')
+function zwOpenDirectoryObject() {}
+
+@draft
+@dllExport('ZwOpenEnlistment')
+function zwOpenEnlistment() {}
+
+@draft
+@dllExport('ZwOpenEvent')
+function zwOpenEvent() {}
+
+@draft
+@dllExport('ZwOpenEventPair')
+function zwOpenEventPair() {}
+
+@draft
+@dllExport('ZwOpenFile')
+function zwOpenFile() {}
+
+@draft
+@dllExport('ZwOpenIoCompletion')
+function zwOpenIoCompletion() {}
+
+@draft
+@dllExport('ZwOpenJobObject')
+function zwOpenJobObject() {}
+
+@draft
+@dllExport('ZwOpenKey')
+function zwOpenKey() {}
+
+@draft
+@dllExport('ZwOpenKeyedEvent')
+function zwOpenKeyedEvent() {}
+
+@draft
+@dllExport('ZwOpenKeyEx')
+function zwOpenKeyEx() {}
+
+@draft
+@dllExport('ZwOpenKeyTransacted')
+function zwOpenKeyTransacted() {}
+
+@draft
+@dllExport('ZwOpenKeyTransactedEx')
+function zwOpenKeyTransactedEx() {}
+
+@draft
+@dllExport('ZwOpenMutant')
+function zwOpenMutant() {}
+
+@draft
+@dllExport('ZwOpenObjectAuditAlarm')
+function zwOpenObjectAuditAlarm() {}
+
+@draft
+@dllExport('ZwOpenPartition')
+function zwOpenPartition() {}
+
+@draft
+@dllExport('ZwOpenPrivateNamespace')
+function zwOpenPrivateNamespace() {}
+
+@draft
+@dllExport('ZwOpenProcess')
+function zwOpenProcess() {}
+
+@draft
+@dllExport('ZwOpenProcessToken')
+function zwOpenProcessToken() {}
+
+@draft
+@dllExport('ZwOpenProcessTokenEx')
+function zwOpenProcessTokenEx() {}
+
+@draft
+@dllExport('ZwOpenRegistryTransaction')
+function zwOpenRegistryTransaction() {}
+
+@draft
+@dllExport('ZwOpenResourceManager')
+function zwOpenResourceManager() {}
+
+@draft
+@dllExport('ZwOpenSection')
+function zwOpenSection() {}
+
+@draft
+@dllExport('ZwOpenSemaphore')
+function zwOpenSemaphore() {}
+
+@draft
+@dllExport('ZwOpenSession')
+function zwOpenSession() {}
+
+@draft
+@dllExport('ZwOpenSymbolicLinkObject')
+function zwOpenSymbolicLinkObject() {}
+
+@draft
+@dllExport('ZwOpenThread')
+function zwOpenThread() {}
+
+@draft
+@dllExport('ZwOpenThreadToken')
+function zwOpenThreadToken() {}
+
+@draft
+@dllExport('ZwOpenThreadTokenEx')
+function zwOpenThreadTokenEx() {}
+
+@draft
+@dllExport('ZwOpenTimer')
+function zwOpenTimer() {}
+
+@draft
+@dllExport('ZwOpenTransaction')
+function zwOpenTransaction() {}
+
+@draft
+@dllExport('ZwOpenTransactionManager')
+function zwOpenTransactionManager() {}
+
+@draft
+@dllExport('ZwPlugPlayControl')
+function zwPlugPlayControl() {}
+
+@draft
+@dllExport('ZwPowerInformation')
+function zwPowerInformation() {}
+
+@draft
+@dllExport('ZwPrepareComplete')
+function zwPrepareComplete() {}
+
+@draft
+@dllExport('ZwPrepareEnlistment')
+function zwPrepareEnlistment() {}
+
+@draft
+@dllExport('ZwPrePrepareComplete')
+function zwPrePrepareComplete() {}
+
+@draft
+@dllExport('ZwPrePrepareEnlistment')
+function zwPrePrepareEnlistment() {}
+
+@draft
+@dllExport('ZwPrivilegeCheck')
+function zwPrivilegeCheck() {}
+
+@draft
+@dllExport('ZwPrivilegedServiceAuditAlarm')
+function zwPrivilegedServiceAuditAlarm() {}
+
+@draft
+@dllExport('ZwPrivilegeObjectAuditAlarm')
+function zwPrivilegeObjectAuditAlarm() {}
+
+@draft
+@dllExport('ZwPropagationComplete')
+function zwPropagationComplete() {}
+
+@draft
+@dllExport('ZwPropagationFailed')
+function zwPropagationFailed() {}
+
+@draft
+@dllExport('ZwProtectVirtualMemory')
+function zwProtectVirtualMemory() {}
+
+@draft
+@dllExport('ZwPulseEvent')
+function zwPulseEvent() {}
+
+@draft
+@dllExport('ZwQueryAttributesFile')
+function zwQueryAttributesFile() {}
+
+@draft
+@dllExport('ZwQueryAuxiliaryCounterFrequency')
+function zwQueryAuxiliaryCounterFrequency() {}
+
+@draft
+@dllExport('ZwQueryBootEntryOrder')
+function zwQueryBootEntryOrder() {}
+
+@draft
+@dllExport('ZwQueryBootOptions')
+function zwQueryBootOptions() {}
+
+@draft
+@dllExport('ZwQueryDebugFilterState')
+function zwQueryDebugFilterState() {}
+
+@draft
+@dllExport('ZwQueryDefaultLocale')
+function zwQueryDefaultLocale() {}
+
+@draft
+@dllExport('ZwQueryDefaultUILanguage')
+function zwQueryDefaultUILanguage() {}
+
+@draft
+@dllExport('ZwQueryDirectoryFile')
+function zwQueryDirectoryFile() {}
+
+@draft
+@dllExport('ZwQueryDirectoryFileEx')
+function zwQueryDirectoryFileEx() {}
+
+@draft
+@dllExport('ZwQueryDirectoryObject')
+function zwQueryDirectoryObject() {}
+
+@draft
+@dllExport('ZwQueryDriverEntryOrder')
+function zwQueryDriverEntryOrder() {}
+
+@draft
+@dllExport('ZwQueryEaFile')
+function zwQueryEaFile() {}
+
+@draft
+@dllExport('ZwQueryEvent')
+function zwQueryEvent() {}
+
+@draft
+@dllExport('ZwQueryFullAttributesFile')
+function zwQueryFullAttributesFile() {}
+
+@draft
+@dllExport('ZwQueryInformationAtom')
+function zwQueryInformationAtom() {}
+
+@draft
+@dllExport('ZwQueryInformationByName')
+function zwQueryInformationByName() {}
+
+@draft
+@dllExport('ZwQueryInformationEnlistment')
+function zwQueryInformationEnlistment() {}
+
+@draft
+@dllExport('ZwQueryInformationFile')
+function zwQueryInformationFile() {}
+
+@draft
+@dllExport('ZwQueryInformationJobObject')
+function zwQueryInformationJobObject() {}
+
+@draft
+@dllExport('ZwQueryInformationPort')
+function zwQueryInformationPort() {}
+
+@draft
+@dllExport('ZwQueryInformationProcess')
+function zwQueryInformationProcess() {}
+
+@draft
+@dllExport('ZwQueryInformationResourceManager')
+function zwQueryInformationResourceManager() {}
+
+@draft
+@dllExport('ZwQueryInformationThread')
+function zwQueryInformationThread() {}
+
+@draft
+@dllExport('ZwQueryInformationToken')
+function zwQueryInformationToken() {}
+
+@draft
+@dllExport('ZwQueryInformationTransaction')
+function zwQueryInformationTransaction() {}
+
+@draft
+@dllExport('ZwQueryInformationTransactionManager')
+function zwQueryInformationTransactionManager() {}
+
+@draft
+@dllExport('ZwQueryInformationWorkerFactory')
+function zwQueryInformationWorkerFactory() {}
+
+@draft
+@dllExport('ZwQueryInstallUILanguage')
+function zwQueryInstallUILanguage() {}
+
+@draft
+@dllExport('ZwQueryIntervalProfile')
+function zwQueryIntervalProfile() {}
+
+@draft
+@dllExport('ZwQueryIoCompletion')
+function zwQueryIoCompletion() {}
+
+@draft
+@dllExport('ZwQueryKey')
+function zwQueryKey() {}
+
+@draft
+@dllExport('ZwQueryLicenseValue')
+function zwQueryLicenseValue() {}
+
+@draft
+@dllExport('ZwQueryMultipleValueKey')
+function zwQueryMultipleValueKey() {}
+
+@draft
+@dllExport('ZwQueryMutant')
+function zwQueryMutant() {}
+
+@draft
+@dllExport('ZwQueryObject')
+function zwQueryObject() {}
+
+@draft
+@dllExport('ZwQueryOpenSubKeys')
+function zwQueryOpenSubKeys() {}
+
+@draft
+@dllExport('ZwQueryOpenSubKeysEx')
+function zwQueryOpenSubKeysEx() {}
+
+@draft
+@dllExport('ZwQueryPerformanceCounter')
+function zwQueryPerformanceCounter() {}
+
+@draft
+@dllExport('ZwQueryPortInformationProcess')
+function zwQueryPortInformationProcess() {}
+
+@draft
+@dllExport('ZwQueryQuotaInformationFile')
+function zwQueryQuotaInformationFile() {}
+
+@draft
+@dllExport('ZwQuerySection')
+function zwQuerySection() {}
+
+@draft
+@dllExport('ZwQuerySecurityAttributesToken')
+function zwQuerySecurityAttributesToken() {}
+
+@draft
+@dllExport('ZwQuerySecurityObject')
+function zwQuerySecurityObject() {}
+
+@draft
+@dllExport('ZwQuerySecurityPolicy')
+function zwQuerySecurityPolicy() {}
+
+@draft
+@dllExport('ZwQuerySemaphore')
+function zwQuerySemaphore() {}
+
+@draft
+@dllExport('ZwQuerySymbolicLinkObject')
+function zwQuerySymbolicLinkObject() {}
+
+@draft
+@dllExport('ZwQuerySystemEnvironmentValue')
+function zwQuerySystemEnvironmentValue() {}
+
+@draft
+@dllExport('ZwQuerySystemEnvironmentValueEx')
+function zwQuerySystemEnvironmentValueEx() {}
+
+@draft
+@dllExport('ZwQuerySystemInformation')
+function zwQuerySystemInformation() {}
+
+@draft
+@dllExport('ZwQuerySystemInformationEx')
+function zwQuerySystemInformationEx() {}
+
+@draft
+@dllExport('ZwQuerySystemTime')
+function zwQuerySystemTime() {}
+
+@draft
+@dllExport('ZwQueryTimer')
+function zwQueryTimer() {}
+
+@draft
+@dllExport('ZwQueryTimerResolution')
+function zwQueryTimerResolution() {}
+
+@draft
+@dllExport('ZwQueryValueKey')
+function zwQueryValueKey() {}
+
+@draft
+@dllExport('ZwQueryVirtualMemory')
+function zwQueryVirtualMemory() {}
+
+@draft
+@dllExport('ZwQueryVolumeInformationFile')
+function zwQueryVolumeInformationFile() {}
+
+@draft
+@dllExport('ZwQueryWnfStateData')
+function zwQueryWnfStateData() {}
+
+@draft
+@dllExport('ZwQueryWnfStateNameInformation')
+function zwQueryWnfStateNameInformation() {}
+
+@draft
+@dllExport('ZwQueueApcThread')
+function zwQueueApcThread() {}
+
+@draft
+@dllExport('ZwQueueApcThreadEx')
+function zwQueueApcThreadEx() {}
+
+@draft
+@dllExport('ZwRaiseException')
+function zwRaiseException() {}
+
+@draft
+@dllExport('ZwRaiseHardError')
+function zwRaiseHardError() {}
+
+@draft
+@dllExport('ZwReadFile')
+function zwReadFile() {}
+
+@draft
+@dllExport('ZwReadFileScatter')
+function zwReadFileScatter() {}
+
+@draft
+@dllExport('ZwReadOnlyEnlistment')
+function zwReadOnlyEnlistment() {}
+
+@draft
+@dllExport('ZwReadRequestData')
+function zwReadRequestData() {}
+
+@draft
+@dllExport('ZwReadVirtualMemory')
+function zwReadVirtualMemory() {}
+
+@draft
+@dllExport('ZwRecoverEnlistment')
+function zwRecoverEnlistment() {}
+
+@draft
+@dllExport('ZwRecoverResourceManager')
+function zwRecoverResourceManager() {}
+
+@draft
+@dllExport('ZwRecoverTransactionManager')
+function zwRecoverTransactionManager() {}
+
+@draft
+@dllExport('ZwRegisterProtocolAddressInformation')
+function zwRegisterProtocolAddressInformation() {}
+
+@draft
+@dllExport('ZwRegisterThreadTerminatePort')
+function zwRegisterThreadTerminatePort() {}
+
+@draft
+@dllExport('ZwReleaseKeyedEvent')
+function zwReleaseKeyedEvent() {}
+
+@draft
+@dllExport('ZwReleaseMutant')
+function zwReleaseMutant() {}
+
+@draft
+@dllExport('ZwReleaseSemaphore')
+function zwReleaseSemaphore() {}
+
+@draft
+@dllExport('ZwReleaseWorkerFactoryWorker')
+function zwReleaseWorkerFactoryWorker() {}
+
+@draft
+@dllExport('ZwRemoveIoCompletion')
+function zwRemoveIoCompletion() {}
+
+@draft
+@dllExport('ZwRemoveIoCompletionEx')
+function zwRemoveIoCompletionEx() {}
+
+@draft
+@dllExport('ZwRemoveProcessDebug')
+function zwRemoveProcessDebug() {}
+
+@draft
+@dllExport('ZwRenameKey')
+function zwRenameKey() {}
+
+@draft
+@dllExport('ZwRenameTransactionManager')
+function zwRenameTransactionManager() {}
+
+@draft
+@dllExport('ZwReplaceKey')
+function zwReplaceKey() {}
+
+@draft
+@dllExport('ZwReplacePartitionUnit')
+function zwReplacePartitionUnit() {}
+
+@draft
+@dllExport('ZwReplyPort')
+function zwReplyPort() {}
+
+@draft
+@dllExport('ZwReplyWaitReceivePort')
+function zwReplyWaitReceivePort() {}
+
+@draft
+@dllExport('ZwReplyWaitReceivePortEx')
+function zwReplyWaitReceivePortEx() {}
+
+@draft
+@dllExport('ZwReplyWaitReplyPort')
+function zwReplyWaitReplyPort() {}
+
+@draft
+@dllExport('ZwRequestPort')
+function zwRequestPort() {}
+
+@draft
+@dllExport('ZwRequestWaitReplyPort')
+function zwRequestWaitReplyPort() {}
+
+@draft
+@dllExport('ZwResetEvent')
+function zwResetEvent() {}
+
+@draft
+@dllExport('ZwResetWriteWatch')
+function zwResetWriteWatch() {}
+
+@draft
+@dllExport('ZwRestoreKey')
+function zwRestoreKey() {}
+
+@draft
+@dllExport('ZwResumeProcess')
+function zwResumeProcess() {}
+
+@draft
+@dllExport('ZwResumeThread')
+function zwResumeThread() {}
+
+@draft
+@dllExport('ZwRevertContainerImpersonation')
+function zwRevertContainerImpersonation() {}
+
+@draft
+@dllExport('ZwRollbackComplete')
+function zwRollbackComplete() {}
+
+@draft
+@dllExport('ZwRollbackEnlistment')
+function zwRollbackEnlistment() {}
+
+@draft
+@dllExport('ZwRollbackRegistryTransaction')
+function zwRollbackRegistryTransaction() {}
+
+@draft
+@dllExport('ZwRollbackTransaction')
+function zwRollbackTransaction() {}
+
+@draft
+@dllExport('ZwRollforwardTransactionManager')
+function zwRollforwardTransactionManager() {}
+
+@draft
+@dllExport('ZwSaveKey')
+function zwSaveKey() {}
+
+@draft
+@dllExport('ZwSaveKeyEx')
+function zwSaveKeyEx() {}
+
+@draft
+@dllExport('ZwSaveMergedKeys')
+function zwSaveMergedKeys() {}
+
+@draft
+@dllExport('ZwSecureConnectPort')
+function zwSecureConnectPort() {}
+
+@draft
+@dllExport('ZwSerializeBoot')
+function zwSerializeBoot() {}
+
+@draft
+@dllExport('ZwSetBootEntryOrder')
+function zwSetBootEntryOrder() {}
+
+@draft
+@dllExport('ZwSetBootOptions')
+function zwSetBootOptions() {}
+
+@draft
+@dllExport('ZwSetCachedSigningLevel')
+function zwSetCachedSigningLevel() {}
+
+@draft
+@dllExport('ZwSetCachedSigningLevel2')
+function zwSetCachedSigningLevel2() {}
+
+@draft
+@dllExport('ZwSetContextThread')
+function zwSetContextThread() {}
+
+@draft
+@dllExport('ZwSetDebugFilterState')
+function zwSetDebugFilterState() {}
+
+@draft
+@dllExport('ZwSetDefaultHardErrorPort')
+function zwSetDefaultHardErrorPort() {}
+
+@draft
+@dllExport('ZwSetDefaultLocale')
+function zwSetDefaultLocale() {}
+
+@draft
+@dllExport('ZwSetDefaultUILanguage')
+function zwSetDefaultUILanguage() {}
+
+@draft
+@dllExport('ZwSetDriverEntryOrder')
+function zwSetDriverEntryOrder() {}
+
+@draft
+@dllExport('ZwSetEaFile')
+function zwSetEaFile() {}
+
+@draft
+@dllExport('ZwSetEvent')
+function zwSetEvent() {}
+
+@draft
+@dllExport('ZwSetEventBoostPriority')
+function zwSetEventBoostPriority() {}
+
+@draft
+@dllExport('ZwSetHighEventPair')
+function zwSetHighEventPair() {}
+
+@draft
+@dllExport('ZwSetHighWaitLowEventPair')
+function zwSetHighWaitLowEventPair() {}
+
+@draft
+@dllExport('ZwSetInformationDebugObject')
+function zwSetInformationDebugObject() {}
+
+@draft
+@dllExport('ZwSetInformationEnlistment')
+function zwSetInformationEnlistment() {}
+
+@draft
+@dllExport('ZwSetInformationFile')
+function zwSetInformationFile() {}
+
+@draft
+@dllExport('ZwSetInformationJobObject')
+function zwSetInformationJobObject() {}
+
+@draft
+@dllExport('ZwSetInformationKey')
+function zwSetInformationKey() {}
+
+@draft
+@dllExport('ZwSetInformationObject')
+function zwSetInformationObject() {}
+
+@draft
+@dllExport('ZwSetInformationProcess')
+function zwSetInformationProcess() {}
+
+@draft
+@dllExport('ZwSetInformationResourceManager')
+function zwSetInformationResourceManager() {}
+
+@draft
+@dllExport('ZwSetInformationSymbolicLink')
+function zwSetInformationSymbolicLink() {}
+
+@draft
+@dllExport('ZwSetInformationThread')
+function zwSetInformationThread() {}
+
+@draft
+@dllExport('ZwSetInformationToken')
+function zwSetInformationToken() {}
+
+@draft
+@dllExport('ZwSetInformationTransaction')
+function zwSetInformationTransaction() {}
+
+@draft
+@dllExport('ZwSetInformationTransactionManager')
+function zwSetInformationTransactionManager() {}
+
+@draft
+@dllExport('ZwSetInformationVirtualMemory')
+function zwSetInformationVirtualMemory() {}
+
+@draft
+@dllExport('ZwSetInformationWorkerFactory')
+function zwSetInformationWorkerFactory() {}
+
+@draft
+@dllExport('ZwSetIntervalProfile')
+function zwSetIntervalProfile() {}
+
+@draft
+@dllExport('ZwSetIoCompletion')
+function zwSetIoCompletion() {}
+
+@draft
+@dllExport('ZwSetIoCompletionEx')
+function zwSetIoCompletionEx() {}
+
+@draft
+@dllExport('ZwSetIRTimer')
+function zwSetIRTimer() {}
+
+@draft
+@dllExport('ZwSetLdtEntries')
+function zwSetLdtEntries() {}
+
+@draft
+@dllExport('ZwSetLowEventPair')
+function zwSetLowEventPair() {}
+
+@draft
+@dllExport('ZwSetLowWaitHighEventPair')
+function zwSetLowWaitHighEventPair() {}
+
+@draft
+@dllExport('ZwSetQuotaInformationFile')
+function zwSetQuotaInformationFile() {}
+
+@draft
+@dllExport('ZwSetSecurityObject')
+function zwSetSecurityObject() {}
+
+@draft
+@dllExport('ZwSetSystemEnvironmentValue')
+function zwSetSystemEnvironmentValue() {}
+
+@draft
+@dllExport('ZwSetSystemEnvironmentValueEx')
+function zwSetSystemEnvironmentValueEx() {}
+
+@draft
+@dllExport('ZwSetSystemInformation')
+function zwSetSystemInformation() {}
+
+@draft
+@dllExport('ZwSetSystemPowerState')
+function zwSetSystemPowerState() {}
+
+@draft
+@dllExport('ZwSetSystemTime')
+function zwSetSystemTime() {}
+
+@draft
+@dllExport('ZwSetThreadExecutionState')
+function zwSetThreadExecutionState() {}
+
+@draft
+@dllExport('ZwSetTimer')
+function zwSetTimer() {}
+
+@draft
+@dllExport('ZwSetTimer2')
+function zwSetTimer2() {}
+
+@draft
+@dllExport('ZwSetTimerEx')
+function zwSetTimerEx() {}
+
+@draft
+@dllExport('ZwSetTimerResolution')
+function zwSetTimerResolution() {}
+
+@draft
+@dllExport('ZwSetUuidSeed')
+function zwSetUuidSeed() {}
+
+@draft
+@dllExport('ZwSetValueKey')
+function zwSetValueKey() {}
+
+@draft
+@dllExport('ZwSetVolumeInformationFile')
+function zwSetVolumeInformationFile() {}
+
+@draft
+@dllExport('ZwSetWnfProcessNotificationEvent')
+function zwSetWnfProcessNotificationEvent() {}
+
+@draft
+@dllExport('ZwShutdownSystem')
+function zwShutdownSystem() {}
+
+@draft
+@dllExport('ZwShutdownWorkerFactory')
+function zwShutdownWorkerFactory() {}
+
+@draft
+@dllExport('ZwSignalAndWaitForSingleObject')
+function zwSignalAndWaitForSingleObject() {}
+
+@draft
+@dllExport('ZwSinglePhaseReject')
+function zwSinglePhaseReject() {}
+
+@draft
+@dllExport('ZwStartProfile')
+function zwStartProfile() {}
+
+@draft
+@dllExport('ZwStopProfile')
+function zwStopProfile() {}
+
+@draft
+@dllExport('ZwSubscribeWnfStateChange')
+function zwSubscribeWnfStateChange() {}
+
+@draft
+@dllExport('ZwSuspendProcess')
+function zwSuspendProcess() {}
+
+@draft
+@dllExport('ZwSuspendThread')
+function zwSuspendThread() {}
+
+@draft
+@dllExport('ZwSystemDebugControl')
+function zwSystemDebugControl() {}
+
+@draft
+@dllExport('ZwTerminateEnclave')
+function zwTerminateEnclave() {}
+
+@draft
+@dllExport('ZwTerminateJobObject')
+function zwTerminateJobObject() {}
+
+@draft
+@dllExport('ZwTerminateProcess')
+function zwTerminateProcess() {}
+
+@draft
+@dllExport('ZwTerminateThread')
+function zwTerminateThread() {}
+
+@draft
+@dllExport('ZwTestAlert')
+function zwTestAlert() {}
+
+@draft
+@dllExport('ZwThawRegistry')
+function zwThawRegistry() {}
+
+@draft
+@dllExport('ZwThawTransactions')
+function zwThawTransactions() {}
+
+@draft
+@dllExport('ZwTraceControl')
+function zwTraceControl() {}
+
+@draft
+@dllExport('ZwTraceEvent')
+function zwTraceEvent() {}
+
+@draft
+@dllExport('ZwTranslateFilePath')
+function zwTranslateFilePath() {}
+
+@draft
+@dllExport('ZwUmsThreadYield')
+function zwUmsThreadYield() {}
+
+@draft
+@dllExport('ZwUnloadDriver')
+function zwUnloadDriver() {}
+
+@draft
+@dllExport('ZwUnloadKey')
+function zwUnloadKey() {}
+
+@draft
+@dllExport('ZwUnloadKey2')
+function zwUnloadKey2() {}
+
+@draft
+@dllExport('ZwUnloadKeyEx')
+function zwUnloadKeyEx() {}
+
+@draft
+@dllExport('ZwUnlockFile')
+function zwUnlockFile() {}
+
+@draft
+@dllExport('ZwUnlockVirtualMemory')
+function zwUnlockVirtualMemory() {}
+
+@draft
+@dllExport('ZwUnmapViewOfSection')
+function zwUnmapViewOfSection() {}
+
+@draft
+@dllExport('ZwUnmapViewOfSectionEx')
+function zwUnmapViewOfSectionEx() {}
+
+@draft
+@dllExport('ZwUnsubscribeWnfStateChange')
+function zwUnsubscribeWnfStateChange() {}
+
+@draft
+@dllExport('ZwUpdateWnfStateData')
+function zwUpdateWnfStateData() {}
+
+@draft
+@dllExport('ZwVdmControl')
+function zwVdmControl() {}
+
+@draft
+@dllExport('ZwWaitForAlertByThreadId')
+function zwWaitForAlertByThreadId() {}
+
+@draft
+@dllExport('ZwWaitForDebugEvent')
+function zwWaitForDebugEvent() {}
+
+@draft
+@dllExport('ZwWaitForKeyedEvent')
+function zwWaitForKeyedEvent() {}
+
+@draft
+@dllExport('ZwWaitForMultipleObjects')
+function zwWaitForMultipleObjects() {}
+
+@draft
+@dllExport('ZwWaitForMultipleObjects32')
+function zwWaitForMultipleObjects32() {}
+
+@draft
+@dllExport('ZwWaitForSingleObject')
+function zwWaitForSingleObject() {}
+
+@draft
+@dllExport('ZwWaitForWorkViaWorkerFactory')
+function zwWaitForWorkViaWorkerFactory() {}
+
+@draft
+@dllExport('ZwWaitHighEventPair')
+function zwWaitHighEventPair() {}
+
+@draft
+@dllExport('ZwWaitLowEventPair')
+function zwWaitLowEventPair() {}
+
+@draft
+@dllExport('ZwWorkerFactoryWorkerReady')
+function zwWorkerFactoryWorkerReady() {}
+
+@draft
+@dllExport('ZwWriteFile')
+function zwWriteFile() {}
+
+@draft
+@dllExport('ZwWriteFileGather')
+function zwWriteFileGather() {}
+
+@draft
+@dllExport('ZwWriteRequestData')
+function zwWriteRequestData() {}
+
+@draft
+@dllExport('ZwWriteVirtualMemory')
+function zwWriteVirtualMemory() {}
+
+@draft
+@dllExport('ZwYieldExecution')
+function zwYieldExecution() {}
+
