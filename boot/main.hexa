@@ -13,23 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// AMD64 assembly instructions wrapper
+module
 
-namespace amd64 {
-inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax,
-					  uint32_t *ebx = null, uint32_t *ecx = null,
-					  uint32_t *edx = null) {
-	uint32_t a, b, c, d;
-	asm volatile("cpuid"
-				 : "=a"(a), "=b"(b), "=c"(c), "=d"(d)
-				 : "a"(leaf), "c"(subleaf));
-	if (eax)
-		*eax = a;
-	if (ebx)
-		*ebx = b;
-	if (ecx)
-		*ecx = c;
-	if (edx)
-		*edx = d;
+@draft
+@entryPoint
+function efi_main(): EFI_STATUS {
+	return EFI_STATUS.EFI_SUCCESS
 }
-} // namespace amd64

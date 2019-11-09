@@ -16,7 +16,7 @@
 #define MemoryMapBufferSize 512 * 1024 // 512 KiB
 uint8_t memoryMapBuffer[MemoryMapBufferSize];
 
-void fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
+function fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
 	efiMemoryMap->memoryMap = (EFI_MEMORY_DESCRIPTOR *) memoryMapBuffer;
 	efiMemoryMap->memoryMapSize = MemoryMapBufferSize;
 
@@ -32,7 +32,7 @@ void fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
 	}
 }
 
-void initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
+function initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
 	EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 	EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
 

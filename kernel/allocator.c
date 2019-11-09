@@ -20,7 +20,7 @@ uint64_t _allocatorSize = 0;
 uint64_t _allocatorOffset = 0;
 uint64_t _allocatorDoubleFreeProtector = 0;
 
-void initAllocatorForBuffer(uint64_t size, void* base) {
+function initAllocatorForBuffer(uint64_t size, void* base) {
 	_allocatorBase = (uint64_t)base;
 	_allocatorSize = size;
 }
@@ -35,7 +35,7 @@ void* allocateFromBuffer(uint64_t size) {
 }
 
 // Currently deallocates only latest (if possible) allocation
-void freeFromBuffer(uint64_t size, void* base) {
+function freeFromBuffer(uint64_t size, void* base) {
 	uint64_t address = (uint64_t)base;
 	if (_allocatorDoubleFreeProtector == address) {
 		serialPrintln(

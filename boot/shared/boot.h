@@ -13,25 +13,32 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-typedef struct {
+#pragma once
+
+#define null nullptr
+#define let const auto
+#define var auto
+#define function void
+
+struct EfiMemoryMap {
 	EFI_MEMORY_DESCRIPTOR *memoryMap;
 	uint64_t memoryMapSize;
 	uint64_t mapKey;
 	uint64_t descriptorSize;
 	uint32_t descriptorVersion;
-} EfiMemoryMap;
+};
 
-typedef struct {
+struct Framebuffer {
 	void *base; // physical address
 	uint32_t size; // in bytes
 	uint16_t width;
 	uint16_t height;
-} Framebuffer;
+};
 
-typedef struct {
+struct RamDisk {
 	void *base; // physical address
 	uint32_t size; // in bytes
-} RamDisk;
+};
 
 #define STR_IMPL_(x) #x      // stringify argument
 #define STR(x) STR_IMPL_(x)  // indirection to expand argument macros
@@ -45,16 +52,15 @@ typedef struct {
 #define ACPIStart (RamdiskStart + 0x45000000)
 #define PAGE_SIZE 4096  // 4 KiB
 
-typedef struct {
+struct KernelParams {
 	EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
 	EFI_RUNTIME_SERVICES *efiRuntimeServices;
 	Framebuffer framebuffer;
 	RamDisk ramdisk;
 	uint64_t bufferSize;
-	void* buffer;
 	void* acpiTable; // TODO = nullptr in C++
+	void* buffer = null;
 	uint64_t ramBytes = 0;
-} KernelParams;
+typedef function (*InitKernel)(const KernelParams *);
 
-typedef void (*InitKernel)(const KernelParams *);

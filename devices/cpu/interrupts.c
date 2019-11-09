@@ -24,7 +24,7 @@
 #define PIC_EOI_0x20		0x20		// End-of-interrupt command code
 
 uint8_t readPort(uint16_t port);
-void writePort(uint16_t port, uint8_t value);
+function writePort(uint16_t port, uint8_t value);
 uint8_t mouseRead();
 
 #define PACKED __attribute__((packed))
@@ -65,17 +65,17 @@ uint8_t readPort(uint16_t port) {
 	return data;
 }
 
-void writePort(uint16_t port, uint8_t value) {
+function writePort(uint16_t port, uint8_t value) {
 	__asm__ volatile("outb %b0,%w1" : : "a" (value), "d"(port));
 }
 
-static inline void loadIdt(Idtr *idtr) {
+static inline function loadIdt(Idtr *idtr) {
 	__asm__ volatile("lidtq %0" : : "m" (*idtr));
 	__asm__ volatile("sti");
 }
 
 // http://wiki.osdev.org/Inline_Assembly/Examples#I.2FO_access
-static inline void ioWait(void) {
+static inline function ioWait(void) {
 	// TODO: reinvestigate
 	__asm__ volatile ( "jmp 1f\n\t"
 					 "1:jmp 2f\n\t"
@@ -89,8 +89,8 @@ static inline void ioWait(void) {
 IdtEntry IDT[IDT_SIZE];
 
 // Handling keyboard
-extern void keyboardHandler();
-void initializeKeyboard(IdtEntry *entry) {
+extern function keyboardHandler();
+function initializeKeyboard(IdtEntry *entry) {
 	uint64_t keyboardAddress = ((uint64_t) keyboardHandler);
 	entry->offsetLowerbits = keyboardAddress & 0xffff;
 	entry->offsetHigherbits = (keyboardAddress & 0xffffffffffff0000) >> 16;
@@ -103,8 +103,8 @@ void initializeKeyboard(IdtEntry *entry) {
 	entry->gateType = 0xe; // Interrupt gate
 }
 
-extern void mouseHandler();
-void initializeMouse(IdtEntry *entry) {
+extern function mouseHandler();
+function initializeMouse(IdtEntry *entry) {
 	uint64_t mouseAddress = ((uint64_t) mouseHandler);
 	entry->offsetLowerbits = mouseAddress & 0xffff;
 	entry->offsetHigherbits = (mouseAddress & 0xffffffffffff0000) >> 16;
@@ -117,23 +117,23 @@ void initializeMouse(IdtEntry *entry) {
 	entry->gateType = 0xe; // Interrupt gate
 }
 
-extern void fallback_handler0();
-extern void fallback_handler1();
-extern void fallback_handler2();
-extern void fallback_handler3();
-extern void fallback_handler4();
-extern void fallback_handler5();
-extern void fallback_handler6();
-extern void fallback_handler7();
-extern void fallback_handler8();
-extern void fallback_handler9();
-extern void fallback_handler10();
-extern void fallback_handler11();
-extern void fallback_handler12();
-extern void fallback_handler13();
-extern void fallback_handler14();
-extern void fallback_handler15();
-void initializeFallback(IdtEntry *entry, void* fallback_handler_) {
+extern function fallback_handler0();
+extern function fallback_handler1();
+extern function fallback_handler2();
+extern function fallback_handler3();
+extern function fallback_handler4();
+extern function fallback_handler5();
+extern function fallback_handler6();
+extern function fallback_handler7();
+extern function fallback_handler8();
+extern function fallback_handler9();
+extern function fallback_handler10();
+extern function fallback_handler11();
+extern function fallback_handler12();
+extern function fallback_handler13();
+extern function fallback_handler14();
+extern function fallback_handler15();
+function initializeFallback(IdtEntry *entry, void* fallback_handler_) {
 	uint64_t address = ((uint64_t) fallback_handler_);
 	entry->offsetLowerbits = address & 0xffff;
 	entry->offsetHigherbits = (address & 0xffffffffffff0000) >> 16;
@@ -166,7 +166,7 @@ arguments:
 
 Taken from http://wiki.osdev.org/8259_PIC
 */
-void remapPic(uint8_t offset1, uint8_t offset2) {
+function remapPic(uint8_t offset1, uint8_t offset2) {
 	writePort(0x20, 0x11);
 	writePort(0xA0, 0x11);
 	writePort(0x21, 0x20);
@@ -207,8 +207,8 @@ void remapPic(uint8_t offset1, uint8_t offset2) {
 	writePort(PIC2_DATA, a2);
 }
 
-void mouseWait(uint8_t aType);
-void mouseWrite(uint8_t aWrite);
+function mouseWait(uint8_t aType);
+function mouseWrite(uint8_t aWrite);
 uint8_t mouseRead();
 #define  IRQ0 32
 #define  IRQ1 0x21 // 33
@@ -233,7 +233,7 @@ struct TablePtr
 	uint64_t base;
 } __attribute__ ((packed));
 
-static inline void lgdt(const struct TablePtr *gdt) {
+static inline function lgdt(const struct TablePtr *gdt) {
 	asm volatile ("lgdt (%0)" : : "r" (gdt) : "memory");
 }
 
@@ -293,7 +293,7 @@ struct TssEntry g_tss;
 #define PS2_CONTROL_PORT 0x64
 
 #if 0
-void gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType type)
+function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType type)
 {
 	g_gdt_table[i].limitLow = limit & 0xffff;
 	g_gdt_table[i].size = (limit >> 16) & 0xf;
@@ -344,8 +344,8 @@ tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 	tmemcpy(&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
 }
 
-void gdt_write(uint16_t cs, uint16_t ds, uint16_t tr);
-void enableInterrupts() {
+function gdt_write(uint16_t cs, uint16_t ds, uint16_t tr);
+function enableInterrupts() {
 	serialPrintln("[cpu] initializing lgdt");
 
 	tmemset(&g_gdt_table, 0, sizeof(g_gdt_table));
@@ -431,7 +431,7 @@ void enableInterrupts() {
 }
 #endif
 
-void enablePS2Mouse() {
+function enablePS2Mouse() {
 	serialPrintln("[cpu] begin: setting PS/2 mouse");
 	uint8_t _status;
 	//Enable the auxiliary mouse device
@@ -467,11 +467,11 @@ void enablePS2Mouse() {
 	//Setup the mouse handler
 //    irq_install_handler(12, mouseHandler);
 	serialPrintln("[cpu] done: setting PS/2 mouse");
-	void quakePrintf(const char *c, ...);
+	function quakePrintf(const char *c, ...);
 	quakePrintf("Enabled PS/2 mouse and keyboard\n");
 }
 
-void mouseWait(uint8_t aType)
+function mouseWait(uint8_t aType)
 {
   uint32_t _timeOut=100000;
   if(aType==0)
@@ -498,7 +498,7 @@ void mouseWait(uint8_t aType)
   }
 }
 
-void mouseWrite(uint8_t aWrite)
+function mouseWrite(uint8_t aWrite)
 {
   //Wait to be able to send a command
   mouseWait(1);

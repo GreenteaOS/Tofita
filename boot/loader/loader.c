@@ -13,11 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifdef __cplusplus
 extern "C" {
-#else
-	#define nullptr ((void*)0)
-#endif
 
 #include <efi.h>
 #include <stddef.h>
@@ -31,7 +27,7 @@ extern "C" {
 
 extern uint8_t _binary_tofita_img_start;
 
-void startTofitaKernel(const KernelParams *params) {
+function startTofitaKernel(const KernelParams *params) {
 	InitKernel start = (InitKernel) KernelVirtualBase;
 	serialPrint("[[boot]] kernel start address = ");
 	serialPrintHex((uint64_t) (start));
@@ -39,7 +35,7 @@ void startTofitaKernel(const KernelParams *params) {
 	start(params);
 }
 
-void startTofitaKernelLoader(const KernelParams *params) {
+function startTofitaKernelLoader(const KernelParams *params) {
 	serialPrintln("[[boot]] begin: paging");
 
 	uint8_t *kernelImage = (uint8_t *) &_binary_tofita_img_start;
@@ -58,6 +54,4 @@ void startTofitaKernelLoader(const KernelParams *params) {
 	serialPrintln("[[boot]] entering Tofita");
 	startTofitaKernel(&newParams);
 }
-#ifdef __cplusplus
 }
-#endif

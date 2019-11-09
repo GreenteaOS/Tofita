@@ -13,11 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifdef __cplusplus
 extern "C" {
-#else
-	#define nullptr ((void*)0)
-#endif
+
 #include <efi.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -59,14 +56,15 @@ uint8_t haveToRender = 1;
 #include "formats/stb_image/stb_image.h"
 #include "formats/stb_image/unlibc.c"
 
-void (*keyDownHandler)(uint8_t) = nullptr;
-void handleKeyDown(uint8_t key) {
+function (*keyDownHandler)(uint8_t) = null;
+function handleKeyDown(uint8_t key) {
 	if (keyDownHandler) keyDownHandler(key);
 }
 
-void kernelMain(const KernelParams *params) {
+const KernelParams *paramsCache = null;
+function kernelMain(const KernelParams *params) {
 	serialPrintln("<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
-
+	paramsCache = params;
 	initAllocatorForBuffer(params->bufferSize, params->buffer);
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
@@ -112,13 +110,6 @@ void kernelMain(const KernelParams *params) {
 		setWallpaper(bmp, Center);
 	}
 
-	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
-	serialPrintf("Asset 'cursors\\normal.cur' %d bytes at %d\n", asset.size, asset.data);
-	struct Cursor *cur = loadCursor(&asset);
-
-	Pixel32 color;
-	color.color = 0x55AA9944;
-	drawRectangleWithAlpha(color, 300, 100, 300, 100);
 
 	mouseX = _framebuffer->width / 2;
 	mouseY = _framebuffer->height / 2;
@@ -129,17 +120,15 @@ void kernelMain(const KernelParams *params) {
 
 		if (mouseX > _framebuffer->width) mouseX = _framebuffer->width;
 		if (mouseY > _framebuffer->height) mouseY = _framebuffer->height;
+		if (mouseY < 0) mouseY = 0;
+		if (mouseX < 0) mouseX = 0;
 
 		if (haveToRender == 0) continue ;
 		haveToRender = 0;
 
 		composite();
 
-		drawCursor(cur, mouseX, mouseY);
-
 		copyToScreen();
 	}
 }
-#ifdef __cplusplus
 }
-#endif

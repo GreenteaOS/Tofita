@@ -25,9 +25,9 @@ typedef struct {
 	double width;
 } __attribute__((packed)) TextFontList;
 
-TextFontList *textFontList = nullptr;
+TextFontList *textFontList = null;
 
-void initText() {
+function initText() {
 	RamDiskAsset textFont = getRamDiskAsset("ascii.tofita");
 	textFontList = (TextFontList *)textFont.data;
 
@@ -45,7 +45,7 @@ int8_t getLigatureAdvance(const char left, const char right) {
 }
 
 double getCharAdvance(const char c) {
-	if (textFontList == nullptr)
+	if (textFontList == null)
 		return 8;
 	TextFontList textChar = textFontList[(size_t)c];
 	return textChar.width;

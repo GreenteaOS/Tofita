@@ -26,7 +26,7 @@ typedef struct {
 } RamDiskAssetInfo;
 
 static const RamDisk *_ramdisk;
-void setRamDisk(const RamDisk *ramdisk) {
+function setRamDisk(const RamDisk *ramdisk) {
 	_ramdisk = ramdisk;
 }
 

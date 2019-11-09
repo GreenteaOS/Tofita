@@ -1,4 +1,16 @@
 * text=auto eol=crlf
+
+*.hexa text eol=crlf
+*.h text eol=crlf
+*.c text eol=crlf
+*.cpp text eol=crlf
+*.asm text eol=crlf
+*.ld text eol=crlf
+*.json text eol=crlf
+*.s text eol=crlf
+*.bat text eol=crlf
+*.js text eol=crlf
+
 *.tofita binary
 *.exe binary
 *.dll binary

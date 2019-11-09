@@ -1,0 +1,79 @@
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+/// Shared memory allocator for Hexa projects
+module
+
+let defaultReserveMegabytes = #if bits64 4096 #else 128 #end
+let reserveAtVirtualMegabyte = #if bits64 4096*4096*4 #else (4096/4)*3 - (defaultReserveMegabytes*2) #end
+
+function reserveIgnore(megabytes: UInt16) {
+	// Nothing, already did reserve
+}
+
+// TODO take custom reserveAtVirtualMegabyte
+function reserve(megabytes: UInt16) {
+	// TODO
+	wrapReserve = reserveIgnore
+	wrapAllocate = allocate
+	wrapFree = free
+}
+
+function allocate(size: UInt32): #if bits64 UInt64 #else UInt32 #end {
+	// TODO
+	return 0
+}
+
+function allocateFirst(size: UInt32): #if bits64 UInt64 #else UInt32 #end {
+	reserve(defaultReserveMegabytes)
+	return allocate(size)
+}
+
+function free(pointer: UInt64, size: UInt32) {
+	// TODO
+}
+
+function freeStub(pointer: UInt64, size: UInt32) {
+	// Nothing, not yet ready
+}
+
+var wrapReserve = reserve
+
+var wrapAllocate = allocateFirst
+
+var wrapFree = freeStub
+
+
+@stdcall
+module exports
+
+// TODO Use higher allocation density on 32-bit to prolong buffer usage
+@draft
+@dllExport('tofitaHexaReserve')
+function tofitaHexaReserve(megabytes: UInt16) {
+	wrapReserve(megabytes)
+}
+
+@draft
+@dllExport('tofitaHexaAllocate')
+function tofitaHexaAllocate(size: UInt32) {
+	return wrapAllocate(size)
+}
+
+@draft
+@dllExport('tofitaHexaAllocate')
+function tofitaHexaFree(pointer: #if bits64 UInt64 #else UInt32 #end, size: UInt32) {
+	return wrapFree(pointer, size)
+}

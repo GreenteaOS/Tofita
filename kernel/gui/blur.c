@@ -41,7 +41,7 @@ float __attribute__((fastcall)) sqrt(float number) {
 	return 1.0f / y;
 }
 
-void __attribute__((fastcall)) boxBlurT(Bitmap32 *source, Bitmap32 *target, uint16_t width, uint16_t height, uint8_t radius) {
+function __attribute__((fastcall)) boxBlurT(Bitmap32 *source, Bitmap32 *target, uint16_t width, uint16_t height, uint8_t radius) {
 	double iarr = (double)1.0 / (radius + radius + 1);
 	for (uint16_t i = 0; i < width; i++) {
 		uint32_t ti = i;
@@ -110,7 +110,7 @@ void __attribute__((fastcall)) boxBlurT(Bitmap32 *source, Bitmap32 *target, uint
 	}
 }
 
-void __attribute__((fastcall)) boxBlurH(Bitmap32 *source, Bitmap32 *target, uint16_t width, uint16_t height, uint8_t radius) {
+function __attribute__((fastcall)) boxBlurH(Bitmap32 *source, Bitmap32 *target, uint16_t width, uint16_t height, uint8_t radius) {
 	double iarr = (double)1.0 / (radius + radius + 1);
 	for (uint16_t i = 0; i < height; i++) {
 		uint32_t ti = i * width;
@@ -171,7 +171,7 @@ void __attribute__((fastcall)) boxBlurH(Bitmap32 *source, Bitmap32 *target, uint
 	}
 }
 
-void __attribute__((fastcall)) boxBlur(Bitmap32* source, Bitmap32* target, uint16_t width, uint16_t height, uint8_t radius) {
+function __attribute__((fastcall)) boxBlur(Bitmap32* source, Bitmap32* target, uint16_t width, uint16_t height, uint8_t radius) {
 	for (uint32_t i = 0; i < source->width * source->height; i++)
 		target->pixels[i].color = source->pixels[i].color;
 	boxBlurH(target, source, width, height, radius);

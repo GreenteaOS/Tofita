@@ -15,11 +15,7 @@
 
 // Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
 
-#ifdef __cplusplus
 extern "C" {
-#else
-	#define nullptr ((void*)0)
-#endif
 
 #include <efi.h>
 #include <stddef.h>
@@ -27,8 +23,8 @@ extern "C" {
 #include <stdint.h>
 #include <stdarg.h>
 
-#include "../../devices/serial/init.c"
 #include "../shared/boot.h"
+#include "../../devices/serial/init.c"
 #include "memory.c"
 #include "ramdisk.c"
 #include "../../kernel/ramdisk.c"
@@ -56,7 +52,7 @@ void* tmemcpy(void* dest, const void* src, size_t count) {
 }
 
 // Loading animation, progress 0...2
-void drawLoading(Framebuffer* framebuffer, uint8_t progress) {
+function drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 	uint32_t* pixels = (uint32_t*)framebuffer->base;
 	for (uint8_t y = 0; y < 24; y++)
 		for (uint8_t x = 0; x < 24; x++)
@@ -183,6 +179,4 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 
 	return EFI_SUCCESS;
 }
-#ifdef __cplusplus
 }
-#endif

@@ -101,7 +101,7 @@ uint8_t readSerialRegister(uint16_t offset) {
 	return portInb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE);
 }
 
-void writeSerialRegister(uint16_t offset, uint8_t d) {
+function writeSerialRegister(uint16_t offset, uint8_t d) {
 	portOutb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE, d);
 }
 
@@ -173,16 +173,16 @@ uint64_t serialPortWrite(uint8_t *buffer, uint64_t size) {
 	return size;
 }
 
-void serialPrint(const char *print) {
+function serialPrint(const char *print) {
 	serialPortWrite((uint8_t *)print, kstrlen((uint8_t *)print));
 }
 
-void serialPrintln(const char *print) {
+function serialPrintln(const char *print) {
 	serialPrint(print);
 	serialPrint("\n");
 }
 
-void serialPrintInt(uint64_t n) {
+function serialPrintInt(uint64_t n) {
 	uint8_t buf[24];
 	for (uint8_t i = 0; i < 24; i++) buf[i] = 0;
 	uint8_t *bp = buf + 24;
@@ -194,7 +194,7 @@ void serialPrintInt(uint64_t n) {
 	serialPortWrite((uint8_t *)bp, buf - bp + 24);
 }
 
-void serialPrintHex(uint64_t n) {
+function serialPrintHex(uint64_t n) {
 	uint8_t buf[16], *bp = buf + 16;
 	for(int i = 0; i < 16; i++) buf[i] = '0';
 	do {
@@ -210,7 +210,7 @@ void serialPrintHex(uint64_t n) {
 	serialPortWrite((uint8_t *)buf, 16);
 }
 
-void serialPrintMem(const void *mem, int n)
+function serialPrintMem(const void *mem, int n)
 {
 	serialPrint("@");
 	serialPrintHex((uint64_t) mem);
@@ -222,12 +222,12 @@ void serialPrintMem(const void *mem, int n)
 	}
 }
 
-void serialPrintPtr(void *ptr)
+function serialPrintPtr(void *ptr)
 {
 	serialPrintHex((uint64_t) ptr);
 }
 
-void serialPrintBits(uint64_t value)
+function serialPrintBits(uint64_t value)
 {
 	for(int i = 0; i < 64; ++i) {
 		if(value & (1ull << i)) {
@@ -278,7 +278,7 @@ uint8_t* comItoA(int i, uint8_t b[]){
 	return b;
 }
 
-void serialPrintf(const char *c, ...) {
+function serialPrintf(const char *c, ...) {
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);
