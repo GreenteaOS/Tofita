@@ -1,0 +1,53 @@
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+module
+
+function loadBitMap24(buffer: Buffer) {
+	let bmp = {
+		width: buffer.readUInt32LE(18),
+		height: buffer.readUInt32LE(22),
+		pixels: buffer.slice(54)
+	}
+
+	// Fix BGR
+	var i = 0
+	while (i < bmp.pixels.length) {
+		let b = bmp.pixels[i + 0]
+		let r = bmp.pixels[i + 2]
+
+		bmp.pixels[i + 0] = r
+		bmp.pixels[i + 2] = b
+
+		i += 3
+	}
+
+	// Convert to 32 bit
+	// Mirror vertical
+	let pixels = Buffer.alloc(bmp.width * bmp.height * 4)
+
+	for (y in bmp.height)
+		for (x in bmp.width) {
+			let off1 = ((bmp.height - y - 1) * bmp.width + x) * 3
+			let off2 = (y * bmp.width + x) * 4
+			pixels[off2 + 0] = bmp.pixels[off1 + 0]
+			pixels[off2 + 1] = bmp.pixels[off1 + 1]
+			pixels[off2 + 2] = bmp.pixels[off1 + 2]
+			pixels[off2 + 3] = 0xFF
+		}
+
+	bmp.pixels = pixels
+	return bmp
+}
