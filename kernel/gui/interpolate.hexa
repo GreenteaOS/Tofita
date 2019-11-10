@@ -1,0 +1,59 @@
+// The Tofita Kernel
+// Copyright (C) 2019  Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+module
+
+/// Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
+function interpolatePixel(bitmap, x, y) {
+	let px = Math.floor(x) | 0 // Same as floor(x)
+	let py = Math.floor(y) | 0 // Same as floor(y)
+	let stride = bitmap.width
+	let pixels = bitmap.pixels
+
+	function p0(at) {
+		return {
+			r: pixels[(px + py * stride + at) * 4 + 0],
+			g: pixels[(px + py * stride + at) * 4 + 1],
+			b: pixels[(px + py * stride + at) * 4 + 2],
+			a: pixels[(px + py * stride + at) * 4 + 3]
+		}
+	}
+
+	// Calculate the weights
+	let fx0 = x - px
+	let fy0 = y - py
+	let fx1 = 1.0 - fx0
+	let fy1 = 1.0 - fy0
+
+	let w1 = fx1 * fy1 * 256.0
+	let w2 = fx0 * fy1 * 256.0
+	let w3 = fx1 * fy0 * 256.0
+	let w4 = fx0 * fy0 * 256.0
+
+	// Neighboring pixels
+	let p1 = p0(0         )
+	let p2 = p0(1         )
+	let p3 = p0(    stride)
+	let p4 = p0(1 + stride)
+
+	// Weighted sum of pixels
+	let result = {
+		r: (p1.r * w1 + p2.r * w2 + p3.r * w3 + p4.r * w4) >> 8,
+		g: (p1.g * w1 + p2.g * w2 + p3.g * w3 + p4.g * w4) >> 8,
+		b: (p1.b * w1 + p2.b * w2 + p3.b * w3 + p4.b * w4) >> 8,
+		a: (p1.a * w1 + p2.a * w2 + p3.a * w3 + p4.a * w4) >> 8
+	}
+	return result
+}
