@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module {
+module
 	function packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
@@ -115,4 +115,3 @@ module {
 
 		fs.writeFileSync(config.tempFolder + '\\tofita\\iso\\TOFITA.DAT', buffer, "binary")
 	}
-}
