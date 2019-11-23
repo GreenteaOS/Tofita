@@ -14,7 +14,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module
-	function packFonts(config: Config) {
+
+declare class Config {
+	let qemuFolder: String
+	let tempFolder: String
+	let versionMajor: Int
+	let versionMinor: Int
+	let versionName: String
+}
+
+function packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
 			JSON.parse(fs.readFileSync('assets/fonts/default.json').toString().trim())
@@ -33,9 +42,9 @@ module
 		}
 
 		fs.writeFileSync(config.tempFolder + '\\tofita\\ascii.tofita', buffer, "binary")
-	}
+}
 
-	function packAssets(config: Config) {
+function packAssets(config: Config) {
 
 		let fs = require('fs')
 
@@ -114,4 +123,4 @@ module
 		console.log('ramDiskChecksum is', ramDiskChecksum)
 
 		fs.writeFileSync(config.tempFolder + '\\tofita\\iso\\TOFITA.DAT', buffer, "binary")
-	}
+}
