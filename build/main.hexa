@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module {
+module
 	declare class Config {
 		let qemuFolder: String
 		let tempFolder: String
@@ -21,8 +21,8 @@ module {
 		let versionMinor: Int
 		let versionName: String
 	}
-}
 
+{
 let fs = require('fs')
 
 // Removes folder recursively
@@ -288,4 +288,5 @@ for (task in tasks) {
 		case _:
 			console.log('Unknown task', task)
 	}
+}
 }
