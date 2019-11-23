@@ -6,6 +6,7 @@ cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
+::node build.js clang-format
 node build.js build
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
