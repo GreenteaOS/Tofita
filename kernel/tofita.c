@@ -27,6 +27,8 @@ extern "C" {
 // This is not a best solution
 uint8_t haveToRender = 1;
 
+#include "util/Math.cpp"
+
 #include "../devices/cpu/amd64.cpp"
 #include "../devices/serial/log.c"
 #include "allocator.c"
@@ -95,9 +97,7 @@ function kernelMain(const KernelParams *params) {
 
 	CPUID cpuid = getCPUID();
 
-	#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-	uint32_t megs = round((double)params->ramBytes/(1024.0*1024.0));
-	#undef round
+	uint32_t megs = Math::round((double)params->ramBytes/(1024.0*1024.0));
 	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
 	if (!acpi::parse(params->acpiTable)) {
