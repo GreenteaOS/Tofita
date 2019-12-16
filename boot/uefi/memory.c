@@ -47,18 +47,19 @@ function initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
 	gop->SetMode(gop, gop->Mode->Mode);
 }
 
-EFI_STATUS uefiAllocate(EFI_BOOT_SERVICES *bootsvc, EFI_MEMORY_TYPE allocationType, size_t *bytes, void **destination)
+EFI_STATUS uefiAllocate(EFI_BOOT_SERVICES *bootsvc, size_t *bytes, void **destination)
 {
+	serialPrintf("[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes);
 	EFI_STATUS status;
+	EFI_MEMORY_TYPE allocationType = EfiLoaderCode;
 
 	// Round to page size
 	size_t pages = ((*bytes - 1) / PAGE_SIZE) + 1;
 	EFI_PHYSICAL_ADDRESS addr = (EFI_PHYSICAL_ADDRESS)*destination;
 
-	status = bootsvc->AllocatePages(AllocateAddress, allocationType, pages, &addr);
+	status = bootsvc->AllocatePages(AllocateAnyPages, allocationType, pages, &addr);
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
-		serialPrintf("[[[efi_main.uefiAllocate]]] failed (non-fatal): AllocateAddress status %d, using AllocateAnyPages %d bytes, rounded to %d pages\n", status, *bytes, pages);
-		status = bootsvc->AllocatePages(AllocateAnyPages, allocationType, pages, &addr);
+		serialPrintf("[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n", *bytes);
 	}
 
 	if (status != EFI_SUCCESS)

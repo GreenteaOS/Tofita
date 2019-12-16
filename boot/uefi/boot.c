@@ -121,11 +121,11 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	// Simple memory buffer for in-kernel allocations
 	serialPrintln("[[[efi_main]]] begin: uefiAllocate the buffer");
 	initParameters.bufferSize = 128 * 1024 * 1024;
-	void *address = (void*)342352128; // arbitary physical address to fit in RAM
+	initParameters.buffer = (void*)0;
+	void *address = (void*)0;
 	size_t size = initParameters.bufferSize;
 	status = uefiAllocate(
 			bootsvc,
-			EfiBootServicesCode,
 			&size,
 			&address);
 	if (status != EFI_SUCCESS) {
