@@ -258,7 +258,7 @@ function enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *
 	serialPrintln("[paging] buffer mapped");
 
 	uint64_t ram = getRAMSize(memoryMap);
-	serialPrintf("[paging] available RAM is %d megabytes\n", (uint32_t)(ram/(1024*1024)));
+	serialPrintf("[paging] available RAM is ~%d megabytes\n", (uint32_t)(ram/(1024*1024)));
 	params->ramBytes = ram;
 
 	serialPrint("[paging] CR3 points to: ");
