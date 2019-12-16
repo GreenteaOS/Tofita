@@ -91,7 +91,7 @@ function kernelMain(const KernelParams *params) {
 	initText();
 	initializeCompositor();
 
-	quakePrintf("GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational\n");
+	quakePrintf("GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
 	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, (uint32_t)(params->ramBytes/(1024*1024)));
