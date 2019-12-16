@@ -94,7 +94,11 @@ function kernelMain(const KernelParams *params) {
 	quakePrintf("GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
-	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, (uint32_t)(params->ramBytes/(1024*1024)));
+
+	#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+	uint32_t megs = round((double)params->ramBytes/(1024.0*1024.0));
+	#undef round
+	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
 	if (!acpi::parse(params->acpiTable)) {
 		quakePrintf("ACPI is *not* loaded\n");
