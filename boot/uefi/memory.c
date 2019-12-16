@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// TODO: should be dynamically guessed or copy to buffer
 #define MemoryMapBufferSize 512 * 1024 // 512 KiB
 uint8_t memoryMapBuffer[MemoryMapBufferSize];
 
@@ -30,6 +31,11 @@ function fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable
 	if (status != EFI_SUCCESS) {
 		serialPrint("[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n");
 	}
+
+	serialPrintf("[[[efi_main.fillMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
+		efiMemoryMap->memoryMapSize,
+		efiMemoryMap->descriptorSize
+	);
 }
 
 function initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
@@ -51,7 +57,8 @@ EFI_STATUS uefiAllocate(EFI_BOOT_SERVICES *bootsvc, size_t *bytes, void **destin
 {
 	serialPrintf("[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes);
 	EFI_STATUS status;
-	EFI_MEMORY_TYPE allocationType = EfiLoaderCode;
+	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
+	EFI_MEMORY_TYPE allocationType = EfiLoaderCode; // Use *Code not *Data to avoid NX-bit crash if data executed
 
 	// Round to page size
 	size_t pages = ((*bytes - 1) / PAGE_SIZE) + 1;
