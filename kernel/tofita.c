@@ -30,6 +30,8 @@ uint8_t haveToRender = 1;
 #include "util/Math.cpp"
 
 #include "../devices/cpu/amd64.cpp"
+#include "../devices/serial/log.c"
+#include "../boot/shared/paging.c"
 #include "allocator.c"
 #include "../devices/cpu/cpuid.cpp"
 #include "../devices/cpu/interrupts.c"
