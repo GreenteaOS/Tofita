@@ -63,6 +63,8 @@ function drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 			] = 0xFFFFFFFF;
 }
 
+#include "../shared/paging.c"
+
 // Entry point
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
@@ -79,7 +81,19 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 
 	EFI_BOOT_SERVICES *bootsvc = systemTable->BootServices;
-	KernelParams initParameters;
+	KernelParams* initParameters = (KernelParams*)(1024*1024*2 - 4096);
+
+	initParameters->efiMemoryMap.memoryMapSize = sizeof(EFI_MEMORY_DESCRIPTOR) * 512;
+	initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
+
+	{
+		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
+		buffa[0] = 0;
+		for (int i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
+		{
+			bb[i] = buffa[0];
+		}
+	}
 
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI");
@@ -101,41 +115,25 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 				serialPrintln("[[[efi_main]]] found: ACPI 1.0");
 			}
 		}
-		initParameters.acpiTable = acpiTable;
+
 		serialPrintln("[[[efi_main]]] done: ACPI");
 	}
 
-	initParameters.efiRuntimeServices = systemTable->RuntimeServices;
+	initParameters->efiRuntimeServices = systemTable->RuntimeServices;
 	EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer");
-	initializeFramebuffer(&initParameters.framebuffer, systemTable);
-	drawLoading(&initParameters.framebuffer, 0);
+	initializeFramebuffer(&initParameters->framebuffer, systemTable);
+	drawLoading(&initParameters->framebuffer, 0);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	serialPrintln("[[[efi_main]]] done: initializeFramebuffer");
 
 	// Initial RAM disk
-	findAndLoadRamDisk(systemTable->BootServices, &initParameters.ramdisk);
-	drawLoading(&initParameters.framebuffer, 1);
-
-	// Simple memory buffer for in-kernel allocations
-	serialPrintln("[[[efi_main]]] begin: uefiAllocate the buffer");
-	initParameters.bufferSize = 128 * 1024 * 1024;
-	initParameters.buffer = (void*)0;
-	void *address = (void*)0;
-	size_t size = initParameters.bufferSize;
-	status = uefiAllocate(
-			bootsvc,
-			&size,
-			&address);
-	if (status != EFI_SUCCESS) {
-		serialPrintf("[[[efi_main]]] <ERROR> failed uefiAllocate with status %d\n", status);
-	}
-	initParameters.buffer = address;
-	serialPrintf("[[[efi_main]]] done: uefiAllocate the buffer, size %d\n", size);
+	findAndLoadRamDisk(systemTable->BootServices, &initParameters->ramdisk);
+	drawLoading(&initParameters->framebuffer, 1);
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap");
-	fillMemoryMap(&initParameters.efiMemoryMap, systemTable);
+	fillMemoryMap(&initParameters->efiMemoryMap, systemTable);
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap");
 
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices");
@@ -152,7 +150,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 			oops++;
 		}
 		status = systemTable->BootServices->ExitBootServices(imageHandle,
-			initParameters.efiMemoryMap.mapKey);
+			initParameters->efiMemoryMap.mapKey);
 	}
 
 	if (status != EFI_SUCCESS) {
@@ -161,21 +159,22 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 	serialPrintln("[[[efi_main]]] done: ExitBootServices");
 
-	setRamDisk(&initParameters.ramdisk);
+	setRamDisk(&initParameters->ramdisk);
 	RamDiskAsset asset = getRamDiskAsset("loader.tofita");
 	serialPrintf("[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
 
 	void *kernelBase = (void *) KernelStart;
-	drawLoading(&initParameters.framebuffer, 2);
+	drawLoading(&initParameters->framebuffer, 2);
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader");
 
 	tmemcpy(kernelBase, asset.data, asset.size);
-	InitKernel startFunction = (InitKernel) kernelBase;
+	InitKernelTrampoline startFunction = (InitKernelTrampoline) kernelBase;
 
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader");
 
-	startFunction(&initParameters);
+	initParameters->pml4 = enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
+	startFunction(initParameters->pml4, initParameters);
 
 	return EFI_SUCCESS;
 }

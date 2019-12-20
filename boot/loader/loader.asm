@@ -14,6 +14,7 @@
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 section .head
+	mov cr3, rdi
 	cli ; Disable interrupts
 	mov rsp, stack_top
 	extern startTofitaKernelLoader

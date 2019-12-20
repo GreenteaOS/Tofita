@@ -50,19 +50,21 @@ struct RamDisk {
 #define FramebufferStart (EfiVirtualBase + 0x40000000)
 #define RamdiskStart (FramebufferStart + 0x45000000)
 #define ACPIStart (RamdiskStart + 0x45000000)
-#define PAGE_SIZE 4096  // 4 KiB
+#define PAGE_SIZE 4096 // 4 KiB
 
 struct KernelParams {
+	uint64_t pml4;
 	EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
-	EFI_RUNTIME_SERVICES *efiRuntimeServices;
+	EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
 	Framebuffer framebuffer;
 	RamDisk ramdisk;
-	uint64_t bufferSize;
 	void* acpiTable; // TODO = nullptr in C++
+	uint64_t bufferSize = 0;
 	void* buffer = null;
 	uint64_t ramBytes = 0;
 };
 
 typedef function (*InitKernel)(const KernelParams *);
+typedef function (*InitKernelTrampoline)(uint64_t pml4, const KernelParams *);
 

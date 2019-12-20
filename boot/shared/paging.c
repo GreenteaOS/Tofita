@@ -36,9 +36,6 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 
 #define PAGE_TABLE_SIZE 512
 
-// How many pages to allocate in order to assign them later to be used by paging
-#define PAGES_TO_ALLOCATE 32
-
 // Entry in a page table
 typedef struct {
 	// Is the page present in physical memory?
@@ -98,11 +95,12 @@ static inline function writeCr3(uint64_t value) {
 	__asm__("movq %0, %%cr3" :: "r"(value));
 }
 
-static uint8_t pages[PAGES_TO_ALLOCATE][PAGE_SIZE] PAGE_ALIGNED;
-static uint8_t lastPageIndex = 0;
+typedef uint8_t pagesArray[PAGE_SIZE];
+static pagesArray* pages PAGE_ALIGNED = null;
+static int32_t lastPageIndex = 0;
 
 static void *allocatePage() {
-	return (void *) pages[lastPageIndex++];
+	return (void *) pages[lastPageIndex--];
 }
 
 static LinearAddress getLinearAddress(uint64_t address) {
@@ -218,6 +216,30 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintln("[paging] efi mapped");
 }
 
+void* conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
+	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
+	const uint64_t descriptorSize = memoryMap->descriptorSize;
+	uint64_t maxPhysicalStart = 0;
+	uint64_t numberOfPages = 0;
+	uint64_t result = 0;
+
+	for (uint64_t i = 0; i < memoryMap->memoryMapSize; i++) {
+		if (descriptor->PhysicalStart > maxPhysicalStart) {
+			maxPhysicalStart = descriptor->PhysicalStart;
+			numberOfPages = descriptor->NumberOfPages;
+		}
+
+		if ((descriptor->Type == EfiConventionalMemory) && (descriptor->NumberOfPages >= (pages + 1))) {
+			serialPrintf("[paging] success allocate %d pages\n", pages);
+			result = ((descriptor->PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE);
+		}
+
+		descriptor = getNextDescriptor(descriptor, descriptorSize);
+	}
+
+	return (void*)result;
+}
+
 function mapFramebuffer(Framebuffer *fb) {
 	void *framebufferBase = fb->base;
 	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
@@ -232,14 +254,27 @@ function mapACPI(void *acpiTable) {
 	mapMemory(ACPIStart, (uint64_t) acpiTable, 1);
 }
 
-function enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
+uint8_t buffa[1] = {0};
+uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
+	params->bufferSize = 32 * 1024 * 1024;
+	uint32_t bufferPages = params->bufferSize / PAGE_SIZE;
+	params->buffer = conventionalAllocate(memoryMap, bufferPages);
+
+	uint8_t* bb = (uint8_t*)params->buffer;
+	buffa[0] = 0;
+	for (int i = 0; i < params->bufferSize; ++i)
+	{
+	}
+
+	pages = (pagesArray*)((uint64_t)params->buffer + bufferPages * PAGE_SIZE - PAGE_SIZE * 1);
+
 	mapMemory(KernelStart, KernelStart, 256);
 	serialPrintln("[paging] kernel loader mapped");
 
-	mapMemory(KernelVirtualBase, (uint64_t) tofitaKernel, 256);
+	mapMemory(KernelVirtualBase, KernelStart, 256);
 	serialPrintln("[paging] Tofita kernel mapped");
+	// TODO mapEfi crashes on real hardware
 
-	mapEfi(memoryMap);
 
 	mapFramebuffer(fb);
 	serialPrintln("[paging] framebuffer mapped");
@@ -247,8 +282,6 @@ function enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *
 	mapRamDisk(ramdisk);
 	serialPrintln("[paging] ramdisk mapped");
 
-	mapACPI(params->acpiTable);
-	serialPrintln("[paging] ACPI mapped");
 
 	// Round upto page size
 	uint64_t BUFFER_START = RamdiskStart / PAGE_SIZE + params->ramdisk.size / PAGE_SIZE + 1;
@@ -265,6 +298,5 @@ function enablePaging(void *tofitaKernel, EfiMemoryMap *memoryMap, Framebuffer *
 	serialPrintHex((uint64_t) pml4);
 	serialPrint("\n");
 
-	writeCr3((uint64_t) pml4);
-	serialPrint("[paging] CR3 written");
+	return (uint64_t) pml4;
 }
