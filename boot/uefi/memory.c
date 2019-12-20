@@ -13,14 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// TODO: should be dynamically guessed or copy to buffer
-#define MemoryMapBufferSize 512 * 1024 // 512 KiB
-uint8_t memoryMapBuffer[MemoryMapBufferSize];
-
 function fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
-	efiMemoryMap->memoryMap = (EFI_MEMORY_DESCRIPTOR *) memoryMapBuffer;
-	efiMemoryMap->memoryMapSize = MemoryMapBufferSize;
-
 	EFI_STATUS status = systemTable->BootServices->GetMemoryMap(
 		&efiMemoryMap->memoryMapSize,
 		efiMemoryMap->memoryMap,

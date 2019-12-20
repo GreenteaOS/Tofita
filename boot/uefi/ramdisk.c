@@ -78,7 +78,7 @@ EFI_STATUS findAndLoadRamDisk(EFI_BOOT_SERVICES *bootsvc, RamDisk* ramdisk) {
 
 	status = bootsvc->LocateHandleBuffer(ByProtocol, &simpleFileSystemProtocol, NULL, &handleCount, &handleBuffer);
 	if (status != EFI_SUCCESS) serialPrintf("[[[efi_main.findAndLoadRamDisk]]] <ERROR> failed: LocateHandleBuffer %d\n", status);
-	else serialPrintf("[[[efi_main.findAndLoadRamDisk]]] success: LocateHandleBuffer, got %d handleBuffer\n", handleCount);
+	else serialPrintf("[[[efi_main.findAndLoadRamDisk]]] success: LocateHandleBuffer, got %d handles\n", handleCount);
 
 	for (size_t i = 0; i < handleCount; ++i) {
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] loading handle #%d of %d handles\n", i, handleCount);

@@ -26,21 +26,17 @@ extern "C" {
 #include "../shared/paging.c"
 #include "../../kernel/tofita.c"
 
-function startTofitaKernelLoader(const KernelParams *params) {
-	serialPrintln("[[boot]] begin: paging");
 
-	uint8_t *kernelImage = (uint8_t *) 0;
+function startTofitaKernelLoader(uint64_t pml4, const KernelParams *params) {
 
 	// Copy to stack
 	KernelParams newParams = *params;
 
-	enablePaging(kernelImage, &newParams.efiMemoryMap, &newParams.framebuffer, &newParams.ramdisk, &newParams);
 	serialPrintln("[[boot]] done: paging enabled");
 
 	// Replace to virtual adresses
 	newParams.framebuffer.base = (void *) FramebufferStart;
 	newParams.ramdisk.base = (void *) RamdiskStart;
-	newParams.acpiTable = (void *) ACPIStart;
 
 	serialPrintln("[[boot]] entering Tofita");
 	kernelMain(&newParams);

@@ -17,8 +17,7 @@
 
 SECTIONS
 {
-	/* Start putting sections at 1MiB, conventional place for bootloaders */
-	. = 1M;
+	. = 0xffff800000000000;
 
 	.text :
 	{
