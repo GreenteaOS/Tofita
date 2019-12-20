@@ -174,6 +174,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader");
 
 	initParameters->pml4 = enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
+
 	startFunction(initParameters->pml4, initParameters);
 
 	return EFI_SUCCESS;

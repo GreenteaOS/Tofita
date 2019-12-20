@@ -91,10 +91,6 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 
 PageEntry pml4[PAGE_TABLE_SIZE] PAGE_ALIGNED;
 
-static inline function writeCr3(uint64_t value) {
-	__asm__("movq %0, %%cr3" :: "r"(value));
-}
-
 typedef uint8_t pagesArray[PAGE_SIZE];
 static pagesArray* pages PAGE_ALIGNED = null;
 static int32_t lastPageIndex = 0;
@@ -264,6 +260,7 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	buffa[0] = 0;
 	for (int i = 0; i < params->bufferSize; ++i)
 	{
+		bb[i] = buffa[0];
 	}
 
 	pages = (pagesArray*)((uint64_t)params->buffer + bufferPages * PAGE_SIZE - PAGE_SIZE * 1);
@@ -273,15 +270,15 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 
 	mapMemory(KernelVirtualBase, KernelStart, 256);
 	serialPrintln("[paging] Tofita kernel mapped");
-	// TODO mapEfi crashes on real hardware
 
+	// TODO mapEfi crashes on real hardware
+	//mapEfi(memoryMap);
 
 	mapFramebuffer(fb);
 	serialPrintln("[paging] framebuffer mapped");
 
 	mapRamDisk(ramdisk);
 	serialPrintln("[paging] ramdisk mapped");
-
 
 	// Round upto page size
 	uint64_t BUFFER_START = RamdiskStart / PAGE_SIZE + params->ramdisk.size / PAGE_SIZE + 1;

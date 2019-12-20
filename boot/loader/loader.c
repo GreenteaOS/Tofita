@@ -21,14 +21,9 @@ extern "C" {
 #include <stdint.h>
 #include <stdarg.h>
 
-#include "../shared/boot.h"
-#include "../../devices/serial/log.c"
-#include "../shared/paging.c"
 #include "../../kernel/tofita.c"
 
-
 function startTofitaKernelLoader(uint64_t pml4, const KernelParams *params) {
-
 	// Copy to stack
 	KernelParams newParams = *params;
 
