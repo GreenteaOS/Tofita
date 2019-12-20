@@ -13,17 +13,6 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-section .head
-	cli ; Disable interrupts
-	mov rsp, stack_top
-	extern startTofitaKernelLoader
-	call startTofitaKernelLoader
-.halt: ; Don't waste CPU
-	hlt
-	jmp .halt
-
-section .stack
-align 16
-stack_bottom:
-	resb 0x4000 ; 16 KiB stack space
-stack_top:
+%include "boot/loader/loader.asm"
+%include "kernel/tofita.asm"
+%include "devices/cpu/cpu.asm"

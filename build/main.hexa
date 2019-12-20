@@ -60,9 +60,7 @@ for (task in tasks) {
 				if (fs.existsSync(assets)) fs.unlinkSync(assets)
 				// Assembly
 				let asm = [
-					'kernel\\tofita.asm' : 'tofita.asm.o',
-					'devices\\cpu\\cpu.asm' : 'cpu.asm.o',
-					'boot\\loader\\loader.asm' : 'loader.asm.o'
+					'kernel\\all.asm' : 'tofita.asm.o'
 				]
 				for (a in asm.keys())
 					require('child_process').execSync(
@@ -109,9 +107,7 @@ for (task in tasks) {
 						'-T boot/loader/loader.ld ',
 						'-o ',
 						config.tempFolder + '/tofita/loader_kernel.elf.img ',
-						config.tempFolder + '/tofita/loader.asm.o ',
 						config.tempFolder + '/tofita/tofita.asm.o ',
-						config.tempFolder + '/tofita/cpu.asm.o ',
 						config.tempFolder + '/tofita/loader.o '
 					].join(''), { stdio: 'inherit' }
 				)
