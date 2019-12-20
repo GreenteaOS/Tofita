@@ -24,21 +24,12 @@ extern "C" {
 #include "../shared/boot.h"
 #include "../../devices/serial/log.c"
 #include "../shared/paging.c"
-
-extern uint8_t _binary_tofita_img_start;
-
-function startTofitaKernel(const KernelParams *params) {
-	InitKernel start = (InitKernel) KernelVirtualBase;
-	serialPrint("[[boot]] kernel start address = ");
-	serialPrintHex((uint64_t) (start));
-	serialPrint("\n");
-	start(params);
-}
+#include "../../kernel/tofita.c"
 
 function startTofitaKernelLoader(const KernelParams *params) {
 	serialPrintln("[[boot]] begin: paging");
 
-	uint8_t *kernelImage = (uint8_t *) &_binary_tofita_img_start;
+	uint8_t *kernelImage = (uint8_t *) 0;
 
 	// Copy to stack
 	KernelParams newParams = *params;
@@ -52,6 +43,6 @@ function startTofitaKernelLoader(const KernelParams *params) {
 	newParams.acpiTable = (void *) ACPIStart;
 
 	serialPrintln("[[boot]] entering Tofita");
-	startTofitaKernel(&newParams);
+	kernelMain(&newParams);
 }
 }
