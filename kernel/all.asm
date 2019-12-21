@@ -14,5 +14,4 @@
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 %include "boot/loader/loader.asm"
-%include "kernel/tofita.asm"
 %include "devices/cpu/cpu.asm"
