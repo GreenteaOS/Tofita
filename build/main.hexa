@@ -97,7 +97,7 @@ for (task in tasks) {
 						'-D versionMinor=' + config.versionMinor + ' ',
 						'-D versionName=\\"' + config.versionName + '\\" ',
 						'-c -o ',
-						config.tempFolder + '/tofita/loader.o boot/loader/loader.c'
+						config.tempFolder + '/tofita/loader.o kernel/tofita.c'
 					].join(''), { stdio: 'inherit' }
 				)
 

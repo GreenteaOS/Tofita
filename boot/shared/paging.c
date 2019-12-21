@@ -291,6 +291,10 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	serialPrintf("[paging] available RAM is ~%d megabytes\n", (uint32_t)(ram/(1024*1024)));
 	params->ramBytes = ram;
 
+	// Replace to virtual adresses
+	params->framebuffer.base = (void *) FramebufferStart;
+	params->ramdisk.base = (void *) RamdiskStart;
+
 	serialPrint("[paging] CR3 points to: ");
 	serialPrintHex((uint64_t) pml4);
 	serialPrint("\n");

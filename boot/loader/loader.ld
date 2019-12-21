@@ -34,7 +34,6 @@ SECTIONS
 
 	.bss :
 	{
-		*(.stack)
 		*(.bss)
 		_lower_kernel_end = .;
 	}

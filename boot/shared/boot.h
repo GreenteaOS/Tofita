@@ -53,6 +53,7 @@ struct RamDisk {
 
 struct KernelParams {
 	uint64_t pml4;
+	uint64_t stack;
 	EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
 	EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
@@ -61,9 +62,10 @@ struct KernelParams {
 	// Simple memory buffer for in-kernel allocations
 	uint64_t bufferSize = 0;
 	void* buffer = null;
+	uint64_t acpiTablePhysical = 0;
 	uint64_t ramBytes = 0;
 };
 
 typedef function (*InitKernel)(const KernelParams *);
-typedef function (*InitKernelTrampoline)(uint64_t pml4, const KernelParams *);
+typedef function (*InitKernelTrampoline)(const KernelParams *, uint64_t pml4, uint64_t stack);
 
