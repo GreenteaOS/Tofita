@@ -81,17 +81,42 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 
 	EFI_BOOT_SERVICES *bootsvc = systemTable->BootServices;
-	KernelParams* initParameters = (KernelParams*)(1024*1024*2 - 4096);
-
-	initParameters->efiMemoryMap.memoryMapSize = sizeof(EFI_MEMORY_DESCRIPTOR) * 512;
-	initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
+	const uint64_t lower = (uint64_t)1024*1024; // TODO Is this memory really-really allowed by UEFI?
+	// TODO Actually, no matter where lower is present, cause no lower-relative addressing done in kernel
+	// after calling cr3 at the first instruction
+	// so it is safe to allocate it at random position in conventional memory
+	const uint64_t loaderSize = (uint64_t)1024*1024;
+	// TODO Size should be guessed dynamically
 
 	{
 		buffa[0] = 0;
 
+		// Zero fill bootloader memory
+		uint8_t* bb = (uint8_t*)lower;
+		for (int i = 0; i < loaderSize; ++i)
+		{
+			// TODO faster with uint64_t
+			bb[i] = buffa[0];
+		}
+	}
+
+	const uint64_t upper = (uint64_t)0xffff800000000000;
+	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - lower + upper)
+	KernelParams* initParameters = (KernelParams*)(lower + loaderSize - (uint64_t)4096);
+
+	initParameters->efiMemoryMap.memoryMapSize = sizeof(EFI_MEMORY_DESCRIPTOR) * 512;
+	initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
+
+	// Note: stack grows from x to X-N, not X+N
+	uint64_t stack = (uint64_t)initParameters->efiMemoryMap.memoryMap;
+	// Align to page
+	stack = (uint64_t)(stack / 4096) * 4096 - 4096;
+
+	{
 		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
 		for (int i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
 		{
+			// TODO faster with uint64_t
 			bb[i] = buffa[0];
 		}
 	}
@@ -175,11 +200,19 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	tmemcpy(kernelBase, asset.data, asset.size);
 	InitKernelTrampoline startFunction = (InitKernelTrampoline) kernelBase;
 
+	serialPrintln("[[[efi_main]]] mapping pages for kernel loader");
+
+	const uint64_t pml4 = enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
+	initParameters->pml4 = pml4; // TODO set virtual address instead?
+	initParameters->stack = stack; // TODO set virtual address instead?
+
+	// Convert addresses to upper half
+	initParameters = (KernelParams*)LOWER_TO_UPPER(initParameters);
+	// TODO deep pointer conversion: initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *)LOWER_TO_UPPER(initParameters->efiMemoryMap.memoryMap);
+	stack = LOWER_TO_UPPER(stack);
+
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader");
-
-	initParameters->pml4 = enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
-
-	startFunction(initParameters->pml4, initParameters);
+	startFunction(initParameters, pml4, stack);
 
 	return EFI_SUCCESS;
 }

@@ -101,12 +101,13 @@ function kernelMain(const KernelParams *params) {
 	uint32_t megs = Math::round((double)params->ramBytes/(1024.0*1024.0));
 	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
+#if 0
 	if (!acpi::parse(params->acpiTable)) {
 		quakePrintf("ACPI is *not* loaded\n");
 	} else {
 		quakePrintf("ACPI 2.0 is loaded and ready\n");
 	}
-
+#endif
 	quakePrintf("Enter 'help' for commands\n");
 
 	{

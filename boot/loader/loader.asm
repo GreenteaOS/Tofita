@@ -14,17 +14,31 @@
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 section .head
-	mov cr3, rdi
+	; rdi - first argument
+	; rsi - second argument
+	; rdx - third argument
+	; rcx - fourth argument
+	; r8 - fifth argument
+	; r9 - sixth
+
+	; rdi is const KernelParams *
+	; kept as is
+	; rsi is uint64_t pml4
+	mov cr3, rsi
 	cli ; Disable interrupts
-	mov rsp, stack_top
-	extern startTofitaKernelLoader
-	call startTofitaKernelLoader
+	jmp upper
+	; Jump into upper half, cause lower half will be unmapped
+	; and when/if `call` is complete it will crash
+upper: ; I really hope it is global pointer
+	; rdx is uint64_t stack
+	mov rsp, rdx
+	push 0 ; Signal end of stack with 0 return address
+	push 0 ; and a few extra entries in case of stack
+	push 0 ; problems
+	push 0
+	mov rbp, rsp ; Frame
+	extern kernelMain
+	call kernelMain
 .halt: ; Don't waste CPU
 	hlt
 	jmp .halt
-
-section .stack
-align 16
-stack_bottom:
-	resb 0x4000 ; 16 KiB stack space
-stack_top:
