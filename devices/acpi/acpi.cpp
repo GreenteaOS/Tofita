@@ -16,6 +16,7 @@
 // ACPI 2.0 is required by Windows 7
 // So we don't need to support ACPI 1.0
 
+#if 0
 namespace acpi {
 	struct ACPI10 {
 		char signature[8];
@@ -93,3 +94,4 @@ namespace acpi {
 	}
 }
 
+#endif
