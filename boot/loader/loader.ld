@@ -17,6 +17,7 @@
 
 SECTIONS
 {
+	/* Higher Half */
 	. = 0xffff800000000000;
 
 	.text :

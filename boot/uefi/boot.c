@@ -87,8 +87,9 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
 
 	{
-		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
 		buffa[0] = 0;
+
+		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
 		for (int i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
 		{
 			bb[i] = buffa[0];
@@ -126,7 +127,9 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	initializeFramebuffer(&initParameters->framebuffer, systemTable);
 	drawLoading(&initParameters->framebuffer, 0);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
+	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
 	serialPrintln("[[[efi_main]]] done: initializeFramebuffer");
+	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
 	findAndLoadRamDisk(systemTable->BootServices, &initParameters->ramdisk);
@@ -154,6 +157,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 
 	if (status != EFI_SUCCESS) {
+		// TODO `status` to string
 		serialPrintln("[[[efi_main]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR");
 		return EFI_LOAD_ERROR;
 	}
