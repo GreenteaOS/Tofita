@@ -74,6 +74,7 @@ for (task in tasks) {
 						'-Os -x c++ -std=gnu++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-fno-rtti -fno-exceptions ',
 						'-Wimplicit-function-declaration -Werror ',
+						'-mtune=nocona ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
 						'-D versionMajor=' + config.versionMajor + ' ',
@@ -91,6 +92,8 @@ for (task in tasks) {
 						'-fno-rtti -fno-exceptions ',
 						'-Wimplicit-function-declaration -Werror ',
 						'-DTOFITA -mtune=nocona ',
+						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
+						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -msse4 ', // Unsupported
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC -mcmodel=large ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
 						'-D versionMajor=' + config.versionMajor + ' ',

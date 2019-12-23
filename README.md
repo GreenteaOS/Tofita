@@ -36,7 +36,34 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
  - Monolithic performance-oriented kernel
  - Very low on resources, just 1 GB RAM minimum required
+ - Isolation and containerization of everything
  - ACPI 2.0, CPUID
+ - Exclusively only multi-core CPUs
+
+## GreenteaOS (Tofita) system requirements
+
+- 1 GB RAM
+- Motherboard with UEFI, SATA (AHCI) or NVMe, PCIe and USB 2.0+
+- Multicore modern 64-bit CPU (most AMD and Intel CPUs from 2009 and newer)
+
+## Notes on CPU compatibility
+
+List of required features. Note: `wide support` means *both* AMD and Intel.
+
+- Greentea OS targets CPUs **at least** from 2009 and newer
+- `SSE2` is mandatory on AMD64
+- `NX` bit should be present on all AMD64, but may be disabled, does not affect system working
+- `SSE3` wide support since 2005
+- `CMPXCHG16B` wide support since 2006
+- `PrefetchW` wide support since 2006
+- `LAHF/SAHF` wide support since 2005
+- `POPCNT` wide support since 2008
+
+Not required features
+
+- `SSE4.1` wide support since 2011 and **not used by Greentea**
+- `SSSE3` wide support since 2011 and **not used by Greentea**
+- `SSE4a` seems like AMD-only and **not used by Greentea**
 
 [![Give a star](docs/star.png?raw=true)
 Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
