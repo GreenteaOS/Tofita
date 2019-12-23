@@ -24,9 +24,9 @@ extern "C" {
 #include <stdarg.h>
 
 #include "../shared/boot.h"
-#include "../../devices/serial/init.c"
-#include "memory.c"
-#include "ramdisk.c"
+#include "../../devices/serial/init.cpp"
+#include "memory.cpp"
+#include "ramdisk.cpp"
 #include "../../kernel/ramdisk.c"
 
 INTN CompareGuid (EFI_GUID *guid1, EFI_GUID *guid2) {

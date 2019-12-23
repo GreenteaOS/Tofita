@@ -40,7 +40,7 @@ uint8_t haveToRender = 1;
 #include "../devices/ps2/keyboard.c"
 #include "../devices/ps2/mouse.c"
 #include "../devices/ps2/polling.c"
-#include "../devices/cpu/fallback.c"
+#include "../devices/cpu/fallback.cpp"
 #include "../devices/acpi/acpi.cpp"
 #include "ramdisk.c"
 #include "formats/cur/cur.c"
@@ -57,7 +57,7 @@ uint8_t haveToRender = 1;
 #define STBI_ONLY_PNG
 #include "formats/stb_image/libc.c"
 #include "formats/stb_image/stb_image.h"
-#include "formats/stb_image/unlibc.c"
+#include "formats/stb_image/unlibc.cpp"
 
 function (*keyDownHandler)(uint8_t) = null;
 function handleKeyDown(uint8_t key) {
