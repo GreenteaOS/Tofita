@@ -246,10 +246,6 @@ function mapRamDisk(RamDisk *ramdisk) {
 	mapMemory(RamdiskStart, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
 }
 
-function mapACPI(void *acpiTable) {
-	mapMemory(ACPIStart, (uint64_t) acpiTable, 1);
-}
-
 uint8_t buffa[1] = {0};
 uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
 	params->bufferSize = 32 * 1024 * 1024;
