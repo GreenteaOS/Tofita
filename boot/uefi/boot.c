@@ -17,7 +17,7 @@
 
 extern "C" {
 
-#include <efi.h>
+#include <efi.hpp>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -80,7 +80,6 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\n", major, minor);
 	}
 
-	EFI_BOOT_SERVICES *bootsvc = systemTable->BootServices;
 	const uint64_t lower = (uint64_t)1024*1024; // TODO Is this memory really-really allowed by UEFI?
 	// TODO Actually, no matter where lower is present, cause no lower-relative addressing done in kernel
 	// after calling cr3 at the first instruction
@@ -103,6 +102,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	const uint64_t upper = (uint64_t)0xffff800000000000;
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - lower + upper)
 	KernelParams* initParameters = (KernelParams*)(lower + loaderSize - (uint64_t)4096);
+	initParameters->physical = lower;
 
 	initParameters->efiMemoryMap.memoryMapSize = sizeof(EFI_MEMORY_DESCRIPTOR) * 512;
 	initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
@@ -134,14 +134,14 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 				serialPrintln("[[[efi_main]]] found: ACPI 2.0");
 				break;
 			} else if (0 == CompareGuid(&efiTable->VendorGuid, &acpi)) {
-				acpiTable = (void *)((intptr_t)efiTable->VendorTable | 0x1); // LSB high
+				// acpiTable = (void *)((intptr_t)efiTable->VendorTable | 0x1); // LSB high
 				// ACPI 2.0 is required by Windows 7
 				// So we don't need to support ACPI 1.0
-				acpiTable = NULL;
-				serialPrintln("[[[efi_main]]] found: ACPI 1.0");
+				serialPrintln("[[[efi_main]]] found: ACPI 1.0, ignoring");
 			}
 		}
 
+		initParameters->acpiTablePhysical = (uint64_t)(acpiTable);
 		serialPrintln("[[[efi_main]]] done: ACPI");
 	}
 
@@ -192,7 +192,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	RamDiskAsset asset = getRamDiskAsset("loader.tofita");
 	serialPrintf("[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
 
-	void *kernelBase = (void *) KernelStart;
+	void *kernelBase = (void *) initParameters->physical;
 	drawLoading(&initParameters->framebuffer, 2);
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader");

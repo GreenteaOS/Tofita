@@ -62,7 +62,7 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 	if (checksum != uints[0])
 		serialPrintln("[[[efi_main.loadRamDiskFromVolume]]] <ERROR> checksum is incorrect, disk may be corrupted!");
 
-	ramdisk->base = address;
+	ramdisk->base = (uint64_t)address;
 	ramdisk->size = size;
 
 	return EFI_SUCCESS;

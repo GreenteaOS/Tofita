@@ -25,6 +25,7 @@ uint32_t toInt32(char a, char b, char c, char d) {
 	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFF;
 }
 
+// TODO png
 struct Cursor *loadCursor(const RamDiskAsset* asset) {
 	uint8_t* buffer = asset->data;
 

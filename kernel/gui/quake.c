@@ -57,7 +57,7 @@ function quakeHandleButtonDown(uint8_t key) {
     		extern const KernelParams *paramsCache;
     		quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n");
     		InitKernel start = (InitKernel) KernelVirtualBase;
-			start(paramsCache);
+			start(paramsCache); // TODO pml4, stack
     	} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
     		quakePrintf("Command 'reload' does quick kernel restart (without actual reboot) Note: this destroys all data!\n", quakeCommand);
     	} else {

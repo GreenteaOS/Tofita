@@ -126,16 +126,18 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 	initializePage(entry, physicalAddr);
 }
 
-#define CREATE_MAPPING(fromTable, toTable) \
+#define createMapping(fromTable, toTable)                                            \
 	static void map_ ## fromTable (PageEntry fromTable[],                            \
 			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
 		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
 		map_ ## toTable ((PageEntry *)toTable, virtualAddr, physicalAddr);           \
 	}
 
-CREATE_MAPPING(pd, pt)
-CREATE_MAPPING(pdpt, pd)
-CREATE_MAPPING(pml4, pdpt)
+createMapping(pd, pt)
+createMapping(pdpt, pd)
+createMapping(pml4, pdpt)
+
+#undef createMapping
 
 function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln("[paging] mapping memory range");
@@ -212,7 +214,7 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintln("[paging] efi mapped");
 }
 
-void* conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
+uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
 	uint64_t maxPhysicalStart = 0;
@@ -233,16 +235,16 @@ void* conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	return (void*)result;
+	return result;
 }
 
 function mapFramebuffer(Framebuffer *fb) {
-	void *framebufferBase = fb->base;
+	let framebufferBase = fb->base;
 	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
 }
 
 function mapRamDisk(RamDisk *ramdisk) {
-	void *ramdiskBase = ramdisk->base;
+	let ramdiskBase = ramdisk->base;
 	mapMemory(RamdiskStart, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
 }
 
@@ -261,10 +263,10 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 
 	pages = (pagesArray*)((uint64_t)params->buffer + bufferPages * PAGE_SIZE - PAGE_SIZE * 1);
 
-	mapMemory(KernelStart, KernelStart, 256);
+	mapMemory(params->physical, params->physical, 256);
 	serialPrintln("[paging] kernel loader mapped");
 
-	mapMemory(KernelVirtualBase, KernelStart, 256);
+	mapMemory(KernelVirtualBase, params->physical, 256);
 	serialPrintln("[paging] Tofita kernel mapped");
 
 	// TODO mapEfi crashes on real hardware
@@ -280,7 +282,7 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	uint64_t BUFFER_START = RamdiskStart / PAGE_SIZE + params->ramdisk.size / PAGE_SIZE + 1;
 	BUFFER_START *= PAGE_SIZE;
 	mapMemory(BUFFER_START, (uint64_t) params->buffer, params->bufferSize / PAGE_SIZE + 1);
-	params->buffer = (void*)BUFFER_START;
+	params->buffer = BUFFER_START;
 	serialPrintln("[paging] buffer mapped");
 
 	uint64_t ram = getRAMSize(memoryMap);
@@ -288,8 +290,11 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	params->ramBytes = ram;
 
 	// Replace to virtual adresses
-	params->framebuffer.base = (void *) FramebufferStart;
-	params->ramdisk.base = (void *) RamdiskStart;
+	params->framebuffer.physical = params->framebuffer.base;
+	params->framebuffer.base = FramebufferStart;
+
+	params->ramdisk.physical = params->ramdisk.base;
+	params->ramdisk.base = RamdiskStart;
 
 	serialPrint("[paging] CR3 points to: ");
 	serialPrintHex((uint64_t) pml4);
