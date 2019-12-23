@@ -23,7 +23,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdarg.h>
 
-#include "../shared/boot.h"
+#include "../shared/boot.hpp"
 #include "../../devices/serial/init.cpp"
 #include "memory.cpp"
 #include "ramdisk.cpp"

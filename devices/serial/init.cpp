@@ -15,7 +15,7 @@
 
 // Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
 
-#include "log.c"
+#include "log.cpp"
 
 uint8_t initSerial()
 {
