@@ -21,7 +21,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdarg.h>
 
-#include "../boot/shared/boot.h"
+#include "../boot/shared/boot.hpp"
 
 // Avoids PIT-triggered rendering
 // This is not a best solution
@@ -30,7 +30,7 @@ uint8_t haveToRender = 1;
 #include "util/Math.cpp"
 
 #include "../devices/cpu/amd64.cpp"
-#include "../devices/serial/log.c"
+#include "../devices/serial/log.cpp"
 #include "../boot/shared/paging.c"
 #include "allocator.c"
 #include "../devices/cpu/cpuid.cpp"
@@ -43,8 +43,8 @@ uint8_t haveToRender = 1;
 #include "../devices/cpu/fallback.cpp"
 #include "../devices/acpi/acpi.cpp"
 #include "ramdisk.c"
-#include "formats/cur/cur.c"
-#include "formats/bmp/bmp.c"
+#include "formats/cur/cur.cpp"
+#include "formats/bmp/bmp.cpp"
 #include "gui/blur.c"
 #include "gui/quake.c"
 #include "gui/text.cpp"
