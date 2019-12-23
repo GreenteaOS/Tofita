@@ -93,6 +93,8 @@ Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-la
 .\Tofita
 ```
 
+You should have extracted `Teapot-master` and have folders like this `.\Teapot\LLVM-9.0.0`.
+
 Teapot will take less space if cloned with limited depth of commit history:
 
 ```sh
@@ -100,14 +102,29 @@ git clone --recursive --depth 1 https://github.com/GreenteaOS/Tofita.git
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 ```
 
-#### Compile and generate disk image
-
-Install [node.js](https://nodejs.org/en/download/).
+#### Configure
 
 Create `R:` ram disk for faster builds and configure `config.json > tempFolder`.
 Otherwise `C:` is used to store builds by default.
 
+#### Install Hexa
+
 You also need to install [Hexa compiler](https://github.com/hexalang/hexa#unstable).
+
+Currently you will build Hexa manually too. Download [this](https://github.com/hexalang/hexa/archive/master.zip) and extract contents of `hexa-master` into `C:\Hexa`, so you have `C:\Hexa\hexa.cmd`.
+
+Install [node.js LTS](https://nodejs.org/en/download/).
+
+```sh
+cd C:\hexa
+node bootstrap.js hexa.json
+node hexa-node.js hexa.json
+node hexa-node.js hexa.json
+```
+
+Add `C:\Hexa` into your PATH.
+
+#### Compile and generate disk image
 
 ```sh
 cmd /c build
