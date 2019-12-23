@@ -55,8 +55,8 @@ uint8_t haveToRender = 1;
 #define STBI_NO_STDIO
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
-#include "formats/stb_image/libc.c"
-#include "formats/stb_image/stb_image.h"
+#include "formats/stb_image/libc.cpp"
+#include "formats/stb_image/stb_image.hpp"
 #include "formats/stb_image/unlibc.cpp"
 
 function (*keyDownHandler)(uint8_t) = null;
