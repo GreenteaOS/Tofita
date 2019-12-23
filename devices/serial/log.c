@@ -195,6 +195,7 @@ function serialPrintInt(uint64_t n) {
 }
 
 function serialPrintHex(uint64_t n) {
+	serialPrint("0x");
 	uint8_t buf[16], *bp = buf + 16;
 	for(int i = 0; i < 16; i++) buf[i] = '0';
 	do {
