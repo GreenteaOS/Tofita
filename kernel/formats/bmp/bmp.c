@@ -22,6 +22,8 @@ Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 	for (uint8_t i = 0; i < 54; i++) {
 		info[i] = buffer[i];
 	}
+
+	// TODO optimization: just load whole bmp, validate, fix, and just use as-is without reallocs
 	uint16_t width = *(uint32_t *)&info[18] & 0xFFFF;
 	uint16_t height = *(uint32_t *)&info[22] & 0xFFFF;
 

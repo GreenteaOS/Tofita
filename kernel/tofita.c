@@ -15,7 +15,7 @@
 
 extern "C" {
 
-#include <efi.h>
+#include <efi.hpp>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>

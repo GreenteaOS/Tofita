@@ -37,7 +37,7 @@ function initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
 
 	systemTable->BootServices->LocateProtocol(&gopGuid, NULL, (void **) &gop);
 
-	fb->base = (void *) gop->Mode->FrameBufferBase;
+	fb->base = gop->Mode->FrameBufferBase;
 	fb->size = gop->Mode->FrameBufferSize;
 
 	fb->width = gop->Mode->Info->HorizontalResolution;

@@ -20,8 +20,8 @@ uint64_t _allocatorSize = 0;
 uint64_t _allocatorOffset = 0;
 uint64_t _allocatorDoubleFreeProtector = 0;
 
-function initAllocatorForBuffer(uint64_t size, void* base) {
-	_allocatorBase = (uint64_t)base;
+function initAllocatorForBuffer(uint64_t size, uint64_t base) {
+	_allocatorBase = base;
 	_allocatorSize = size;
 }
 
