@@ -215,6 +215,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	const uint64_t pml4 = paging::enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
 	initParameters->pml4 = pml4; // TODO set virtual address instead?
 	initParameters->stack = stack; // TODO set virtual address instead?
+	initParameters->lastPageIndexCache = paging::lastPageIndex;
 
 	// Convert addresses to upper half
 	initParameters = (KernelParams*)LOWER_TO_UPPER(initParameters);
