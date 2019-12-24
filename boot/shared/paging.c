@@ -90,12 +90,12 @@ typedef struct {
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
 PageEntry pml4[PAGE_TABLE_SIZE] PAGE_ALIGNED;
-
 typedef uint8_t pagesArray[PAGE_SIZE];
 static pagesArray* pages PAGE_ALIGNED = null;
 static int32_t lastPageIndex = 0;
 
 static void *allocatePage() {
+	// TODO bounds check
 	return (void *) pages[lastPageIndex--];
 }
 
@@ -273,6 +273,7 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	mapMemory(params->physical + 1024*1024, params->physical + 1024*1024, 1);
 	serialPrintln("[paging] kernel loader mapped");
 
+	// TODO use actual kernel asset size
 	mapMemory(KernelVirtualBase, params->physical, 256);
 	serialPrintln("[paging] Tofita kernel mapped");
 
@@ -287,6 +288,7 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	// Round upto page size
 	uint64_t BUFFER_START = RamdiskStart / PAGE_SIZE + params->ramdisk.size / PAGE_SIZE + 1;
 	BUFFER_START *= PAGE_SIZE;
+	// TODO use largest conventional memory region as buffer!
 	mapMemory(BUFFER_START, (uint64_t) params->buffer, params->bufferSize / PAGE_SIZE + 1);
 	params->buffer = BUFFER_START;
 	serialPrintln("[paging] buffer mapped");
@@ -294,6 +296,9 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	uint64_t ram = getRAMSize(memoryMap);
 	serialPrintf("[paging] available RAM is ~%d megabytes\n", (uint32_t)(ram/(1024*1024)));
 	params->ramBytes = ram;
+
+	// TODO map whole memory with 2 MB huge pages
+	// otherwise would be really hard to operate on plm4 in kernel
 
 	// Replace to virtual adresses
 	params->framebuffer.physical = params->framebuffer.base;
