@@ -33,7 +33,7 @@
 // Data transferred from UEFI application into kernel loader
 
 struct EfiMemoryMap {
-	EFI_MEMORY_DESCRIPTOR *memoryMap;
+	efi::EFI_MEMORY_DESCRIPTOR *memoryMap;
 	uint64_t memoryMapSize;
 	uint64_t mapKey;
 	uint64_t descriptorSize;
@@ -74,9 +74,9 @@ struct KernelParams {
 	int32_t lastPageIndexCache;
 	uint64_t stack;
 	uint64_t physical; // physical address of where kernel loader placed
-	EFI_HANDLE imageHandle;
+	efi::EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
-	EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
+	efi::EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
 	Framebuffer framebuffer;
 	RamDisk ramdisk;
 	// Simple memory buffer for in-kernel allocations

@@ -175,13 +175,13 @@ function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCou
 	}
 }
 
-static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const EFI_MEMORY_DESCRIPTOR *descriptor, uint64_t descriptorSize) {
+static const efi::EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi::EFI_MEMORY_DESCRIPTOR *descriptor, uint64_t descriptorSize) {
 	const uint8_t *desc = ((const uint8_t *) descriptor) + descriptorSize;
-	return (const EFI_MEMORY_DESCRIPTOR *) desc;
+	return (const efi::EFI_MEMORY_DESCRIPTOR *) desc;
 }
 
 uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
-	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
+	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
 	uint64_t numberOfPages = 0;
 
@@ -202,7 +202,7 @@ uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 function mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintln("[paging] mapping efi");
 
-	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
+	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
 
 	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
@@ -223,7 +223,7 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 }
 
 uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
-	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
+	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
 	uint64_t result = 0;
 
@@ -233,7 +233,7 @@ uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 
 	while (offset < endOfMemoryMap) {
 
-		if ((descriptor->Type == EfiConventionalMemory) && (descriptor->NumberOfPages >= (pages + 1))) {
+		if ((descriptor->Type == efi::EfiConventionalMemory) && (descriptor->NumberOfPages >= (pages + 1))) {
 			serialPrintf("[paging] success allocate %d pages\n", pages);
 			result = ((descriptor->PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE);
 		}

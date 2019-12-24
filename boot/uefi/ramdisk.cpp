@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *root, RamDisk* ramdisk)
+efi::EFI_STATUS loadRamDiskFromVolume(efi::EFI_BOOT_SERVICES *bootsvc, efi::EFI_FILE_PROTOCOL *root, RamDisk* ramdisk)
 {
-	EFI_STATUS status;
-	static CHAR16 *name = (CHAR16 *)L"TOFITA.DAT";
+	efi::EFI_STATUS status;
+	static efi::CHAR16 *name = (efi::CHAR16 *)L"TOFITA.DAT";
 
-	EFI_FILE_PROTOCOL *file = NULL;
-	status = root->Open(root, &file, (CHAR16 *)name, EFI_FILE_MODE_READ,
+	efi::EFI_FILE_PROTOCOL *file = NULL;
+	status = root->Open(root, &file, (efi::CHAR16 *)name, EFI_FILE_MODE_READ,
 						EFI_FILE_READ_ONLY | EFI_FILE_HIDDEN | EFI_FILE_SYSTEM);
 
 	if (status == EFI_NOT_FOUND)
@@ -27,15 +27,15 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Open %d\n", status);
 
-	char info[sizeof(EFI_FILE_INFO) + 100];
+	char info[sizeof(efi::EFI_FILE_INFO) + 100];
 	size_t infoSize = sizeof(info);
 
-	EFI_GUID GenericFileInfo = EFI_FILE_INFO_ID;
+	efi::EFI_GUID GenericFileInfo = EFI_FILE_INFO_ID;
 
 	status = file->GetInfo(file, &GenericFileInfo, &infoSize, info);
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: GetInfo %d\n", status);
 
-	size_t size = ((EFI_FILE_INFO *)info)->FileSize;
+	size_t size = ((efi::EFI_FILE_INFO *)info)->FileSize;
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] FileSize %d\n", size);
 
 	void *address = (void*)0;
@@ -69,20 +69,20 @@ EFI_STATUS loadRamDiskFromVolume(EFI_BOOT_SERVICES *bootsvc, EFI_FILE_PROTOCOL *
 }
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
-EFI_STATUS findAndLoadRamDisk(EFI_BOOT_SERVICES *bootsvc, RamDisk* ramdisk) {
-	EFI_STATUS status = EFI_NOT_READY;
-	EFI_HANDLE *handleBuffer = NULL;
+efi::EFI_STATUS findAndLoadRamDisk(efi::EFI_BOOT_SERVICES *bootsvc, RamDisk* ramdisk) {
+	efi::EFI_STATUS status = EFI_NOT_READY;
+	efi::EFI_HANDLE *handleBuffer = NULL;
 	size_t handleCount = 0;
 
-	EFI_GUID simpleFileSystemProtocol = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
+	efi::EFI_GUID simpleFileSystemProtocol = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
 
-	status = bootsvc->LocateHandleBuffer(ByProtocol, &simpleFileSystemProtocol, NULL, &handleCount, &handleBuffer);
+	status = bootsvc->LocateHandleBuffer(efi::ByProtocol, &simpleFileSystemProtocol, NULL, &handleCount, &handleBuffer);
 	if (status != EFI_SUCCESS) serialPrintf("[[[efi_main.findAndLoadRamDisk]]] <ERROR> failed: LocateHandleBuffer %d\n", status);
 	else serialPrintf("[[[efi_main.findAndLoadRamDisk]]] success: LocateHandleBuffer, got %d handles\n", handleCount);
 
 	for (size_t i = 0; i < handleCount; ++i) {
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] loading handle #%d of %d handles\n", i, handleCount);
-		EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fileSystem = NULL;
+		efi::EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fileSystem = NULL;
 
 		status = bootsvc->HandleProtocol(handleBuffer[i], &simpleFileSystemProtocol, (void **)&fileSystem);
 
@@ -92,7 +92,7 @@ EFI_STATUS findAndLoadRamDisk(EFI_BOOT_SERVICES *bootsvc, RamDisk* ramdisk) {
 		}
 
 		serialPrintln("[[[efi_main.findAndLoadRamDisk]]] success: HandleProtocol found a file system");
-		EFI_FILE_PROTOCOL *root = NULL;
+		efi::EFI_FILE_PROTOCOL *root = NULL;
 		status = fileSystem->OpenVolume(fileSystem, &root);
 		if (status != EFI_SUCCESS) {
 			serialPrintf("[[[efi_main.findAndLoadRamDisk]]] failed: OpenVolume with status %d, continue to the next one\n", status);
