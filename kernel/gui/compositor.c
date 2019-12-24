@@ -23,7 +23,7 @@ Bitmap32* wallpaper; // Size of framebuffer
 Bitmap32* vibrance; // Size of framebuffer
 Bitmap32* leaves;
 Bitmap32* desktopIcon;
-struct Cursor *cur = null;
+cursor::Cursor *cur = null;
 
 typedef enum {
 	Center,
@@ -127,7 +127,7 @@ function initializeCompositor() {
 	desktopIcon = loadPng32(&b);
 
 	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
-	cur = loadCursor(&asset);
+	cur = cursor::loadCursor(&asset);
 
 	serialPrintln("[compositor.initializeCompositor] done");
 }
