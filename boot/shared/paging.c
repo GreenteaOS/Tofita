@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+namespace paging {
+
 #define ADDRESS_BITS 12
 #define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
 #define PACKED __attribute__((packed))
@@ -312,4 +314,5 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	serialPrint("\n");
 
 	return (uint64_t) pml4;
+}
 }
