@@ -73,7 +73,7 @@ void *tmemset(void *dest, int32_t e, uint64_t len) {
 #ifdef TOFITA
 void *memset(void *dest, int32_t e, uint64_t len) {
 	uint8_t *d = (uint8_t *)dest;
-	for(uint64_t i = 0; i < len; i++, d++) {
+	for (uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
 	}
 	return dest;
@@ -259,7 +259,7 @@ int32_t puts(const uint8_t *string)
 	return 1; //to meet spec.
 }
 
-uint8_t* comItoA(int i, uint8_t b[]){
+uint8_t* comItoA(int64_t i, uint8_t b[]){
 	uint8_t const digit[] = "0123456789";
 	uint8_t* p = b;
 	if (i<0) {
@@ -301,7 +301,19 @@ function serialPrintf(const char8_t *c, ...) {
 			case 's': puts(va_arg(lst, uint8_t *)); break;
 			case 'c': putchar(va_arg(lst, int32_t)); break;
 			case 'd': {
-				int value = va_arg(lst, int);
+				int32_t value = va_arg(lst, int32_t);
+				uint8_t buffer[16];
+				for (uint8_t i = 0; i < 16; i++) buffer[i] = 0;
+				comItoA(value, buffer);
+				uint8_t *c = buffer;
+				while (*c != '\0') {
+					putchar(*c);
+					c++;
+				}
+				break;
+			}
+			case 'u': {
+				uint32_t value = va_arg(lst, uint32_t);
 				uint8_t buffer[16];
 				for (uint8_t i = 0; i < 16; i++) buffer[i] = 0;
 				comItoA(value, buffer);
