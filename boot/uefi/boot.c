@@ -17,7 +17,10 @@
 
 extern "C" {
 
+namespace efi {
 #include <efi.hpp>
+}
+
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -29,10 +32,10 @@ extern "C" {
 #include "ramdisk.cpp"
 #include "../../kernel/ramdisk.c"
 
-INTN CompareGuid (EFI_GUID *guid1, EFI_GUID *guid2) {
-    INT32 *g1, *g2, r;
-    g1 = (INT32 *) guid1;
-    g2 = (INT32 *) guid2;
+efi::INTN CompareGuid (efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
+    efi::INT32 *g1, *g2, r;
+    g1 = (efi::INT32 *) guid1;
+    g2 = (efi::INT32 *) guid2;
     r  = g1[0] - g2[0];
     r |= g1[1] - g2[1];
     r |= g1[2] - g2[2];
@@ -66,7 +69,7 @@ function drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 #include "../shared/paging.cpp"
 
 // Entry point
-EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
+efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
 	serialPrint("\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(versionMinor) " " versionName " UEFI bootloader. Welcome!\n");
 
@@ -104,8 +107,8 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	KernelParams* initParameters = (KernelParams*)(lower + loaderSize - (uint64_t)4096);
 	initParameters->physical = lower;
 
-	initParameters->efiMemoryMap.memoryMapSize = sizeof(EFI_MEMORY_DESCRIPTOR) * 512;
-	initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
+	initParameters->efiMemoryMap.memoryMapSize = sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512;
+	initParameters->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
 
 	// Note: stack grows from x to X-N, not X+N
 	uint64_t stack = (uint64_t)initParameters->efiMemoryMap.memoryMap;
@@ -125,11 +128,11 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI");
 		void *acpiTable = NULL;
-		EFI_GUID acpi20 = ACPI_20_TABLE_GUID;
-		EFI_GUID acpi = ACPI_TABLE_GUID;
+		efi::EFI_GUID acpi20 = ACPI_20_TABLE_GUID;
+		efi::EFI_GUID acpi = ACPI_TABLE_GUID;
 
 		for (size_t i = 0; i < systemTable->NumberOfTableEntries; i++) {
-			EFI_CONFIGURATION_TABLE *efiTable = &systemTable->ConfigurationTable[i];
+			efi::EFI_CONFIGURATION_TABLE *efiTable = &systemTable->ConfigurationTable[i];
 			if (0 == CompareGuid(&efiTable->VendorGuid, &acpi20)) { // Prefer ACPI 2.0
 				acpiTable = efiTable->VendorTable;
 				serialPrintln("[[[efi_main]]] found: ACPI 2.0");
@@ -148,7 +151,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	}
 
 	initParameters->efiRuntimeServices = systemTable->RuntimeServices;
-	EFI_STATUS status = EFI_NOT_READY;
+	efi::EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer");
 	initializeFramebuffer(&initParameters->framebuffer, systemTable);

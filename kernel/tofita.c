@@ -15,7 +15,10 @@
 
 extern "C" {
 
+namespace efi {
 #include <efi.hpp>
+}
+
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>

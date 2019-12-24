@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-function fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable) {
-	EFI_STATUS status = systemTable->BootServices->GetMemoryMap(
+function fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi::EFI_SYSTEM_TABLE *systemTable) {
+	efi::EFI_STATUS status = systemTable->BootServices->GetMemoryMap(
 		&efiMemoryMap->memoryMapSize,
 		efiMemoryMap->memoryMap,
 		&efiMemoryMap->mapKey,
@@ -31,9 +31,9 @@ function fillMemoryMap(EfiMemoryMap *efiMemoryMap, EFI_SYSTEM_TABLE *systemTable
 	);
 }
 
-function initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
-	EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-	EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
+function initializeFramebuffer(Framebuffer *fb, efi::EFI_SYSTEM_TABLE *systemTable) {
+	efi::EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+	efi::EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
 
 	systemTable->BootServices->LocateProtocol(&gopGuid, NULL, (void **) &gop);
 
@@ -46,18 +46,18 @@ function initializeFramebuffer(Framebuffer *fb, EFI_SYSTEM_TABLE *systemTable) {
 	gop->SetMode(gop, gop->Mode->Mode);
 }
 
-EFI_STATUS uefiAllocate(EFI_BOOT_SERVICES *bootsvc, size_t *bytes, void **destination)
+efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, size_t *bytes, void **destination)
 {
 	serialPrintf("[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes);
-	EFI_STATUS status;
+	efi::EFI_STATUS status;
 	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
-	EFI_MEMORY_TYPE allocationType = EfiLoaderCode; // Use *Code not *Data to avoid NX-bit crash if data executed
+	efi::EFI_MEMORY_TYPE allocationType = efi::EfiLoaderCode; // Use *Code not *Data to avoid NX-bit crash if data executed
 
 	// Round to page size
 	size_t pages = ((*bytes - 1) / PAGE_SIZE) + 1;
-	EFI_PHYSICAL_ADDRESS addr = (EFI_PHYSICAL_ADDRESS)*destination;
+	efi::EFI_PHYSICAL_ADDRESS addr = (efi::EFI_PHYSICAL_ADDRESS)*destination;
 
-	status = bootsvc->AllocatePages(AllocateAnyPages, allocationType, pages, &addr);
+	status = bootsvc->AllocatePages(efi::AllocateAnyPages, allocationType, pages, &addr);
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
 		serialPrintf("[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n", *bytes);
 	}
