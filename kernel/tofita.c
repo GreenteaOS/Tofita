@@ -34,11 +34,11 @@ uint8_t haveToRender = 1;
 
 #include "../devices/cpu/amd64.cpp"
 #include "../devices/serial/log.cpp"
-#include "../boot/shared/paging.cpp"
 #include "allocator.c"
 #include "../devices/cpu/cpuid.cpp"
 #include "../devices/cpu/interrupts.c"
 #include "../devices/cpu/rdtsc.c"
+#include "../devices/cpu/pages.cpp"
 #include "../devices/screen/framebuffer.c"
 #include "../devices/ps2/keyboard.c"
 #include "../devices/ps2/mouse.c"
