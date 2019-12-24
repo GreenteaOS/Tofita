@@ -111,6 +111,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	uint64_t stack = (uint64_t)initParameters->efiMemoryMap.memoryMap;
 	// Align to page
 	stack = (uint64_t)(stack / 4096) * 4096 - 4096;
+	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
 
 	{
 		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
@@ -141,6 +142,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 			}
 		}
 
+		// TODO also transfer ACPI version to report SandyBridge
 		initParameters->acpiTablePhysical = (uint64_t)(acpiTable);
 		serialPrintln("[[[efi_main]]] done: ACPI");
 	}
