@@ -91,9 +91,9 @@ typedef struct {
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
-PageEntry pml4[PAGE_TABLE_SIZE] PAGE_ALIGNED;
-typedef uint8_t pagesArray[PAGE_SIZE];
-static pagesArray* pages PAGE_ALIGNED = null;
+static PageEntry* pml4entries PAGE_ALIGNED = null;
+typedef uint8_t PagesArray[PAGE_SIZE];
+static PagesArray* pages PAGE_ALIGNED = null;
 static int32_t lastPageIndex = 0;
 
 static void *allocatePage() {
@@ -168,7 +168,7 @@ function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCou
 	serialPrint("\n");
 
 	while (vAddress < virtualAddrEnd) {
-		map_pml4(pml4, vAddress, pAddress);
+		map_pml4(pml4entries, vAddress, pAddress);
 
 		vAddress += PAGE_SIZE;
 		pAddress += PAGE_SIZE;
@@ -269,7 +269,13 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 		bb[i] = buffa[0];
 	}
 
-	pages = (pagesArray*)((uint64_t)params->buffer + bufferPages * PAGE_SIZE - PAGE_SIZE * 1);
+	// Note: pagesArray grows I-N downwards
+	// TODO keep info about this allocation so data is not overwritten by kernel allocator
+	auto pml4Size = sizeof(PageEntry) * PAGE_TABLE_SIZE;
+	auto bufferTop = (uint64_t)params->buffer + bufferPages * PAGE_SIZE - PAGE_SIZE * 1;
+
+	pml4entries = (PageEntry*)bufferTop;
+	pages = (PagesArray*)(bufferTop - pml4Size);
 
 	// CR3 trampoline
 	mapMemory(params->physical + 1024*1024, params->physical + 1024*1024, 1);
@@ -310,9 +316,9 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	params->ramdisk.base = RamdiskStart;
 
 	serialPrint("[paging] CR3 points to: ");
-	serialPrintHex((uint64_t) pml4);
+	serialPrintHex((uint64_t) pml4entries);
 	serialPrint("\n");
 
-	return (uint64_t) pml4;
+	return (uint64_t) pml4entries;
 }
 }
