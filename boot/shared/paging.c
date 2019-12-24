@@ -203,12 +203,17 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
 
-	for (uint64_t i = 0; i < memoryMap->memoryMapSize; i++) {
+	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
+	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
+	uint64_t offset = startOfMemoryMap;
+
+	while (offset < endOfMemoryMap) {
 		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
 			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart,
 					descriptor->NumberOfPages);
 		}
 
+		offset += descriptorSize;
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
@@ -271,8 +276,7 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	mapMemory(KernelVirtualBase, params->physical, 256);
 	serialPrintln("[paging] Tofita kernel mapped");
 
-	// TODO mapEfi crashes on real hardware
-	//mapEfi(memoryMap);
+	mapEfi(memoryMap);
 
 	mapFramebuffer(fb);
 	serialPrintln("[paging] framebuffer mapped");
