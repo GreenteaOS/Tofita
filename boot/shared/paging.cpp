@@ -263,7 +263,7 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 
 	uint8_t* bb = (uint8_t*)params->buffer;
 	buffa[0] = 0;
-	for (int i = 0; i < params->bufferSize; ++i)
+	for (uint32_t i = 0; i < params->bufferSize; ++i)
 	{
 		// TODO faster with uint64_t
 		bb[i] = buffa[0];

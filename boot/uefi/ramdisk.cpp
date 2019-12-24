@@ -27,15 +27,15 @@ efi::EFI_STATUS loadRamDiskFromVolume(efi::EFI_BOOT_SERVICES *bootsvc, efi::EFI_
 
 	serialPrintf(u8"[[[efi_main.loadRamDiskFromVolume]]] status: Open %d\n", status);
 
-	char info[sizeof(efi::EFI_FILE_INFO) + 100];
-	size_t infoSize = sizeof(info);
+	uint8_t info[sizeof(efi::EFI_FILE_INFO) + 100];
+	uint64_t infoSize = sizeof(info);
 
 	efi::EFI_GUID GenericFileInfo = EFI_FILE_INFO_ID;
 
 	status = file->GetInfo(file, &GenericFileInfo, &infoSize, info);
 	serialPrintf(u8"[[[efi_main.loadRamDiskFromVolume]]] status: GetInfo %d\n", status);
 
-	size_t size = ((efi::EFI_FILE_INFO *)info)->FileSize;
+	uint64_t size = ((efi::EFI_FILE_INFO *)info)->FileSize;
 	serialPrintf(u8"[[[efi_main.loadRamDiskFromVolume]]] FileSize %d\n", size);
 
 	void *address = (void*)0;
@@ -72,7 +72,7 @@ efi::EFI_STATUS loadRamDiskFromVolume(efi::EFI_BOOT_SERVICES *bootsvc, efi::EFI_
 efi::EFI_STATUS findAndLoadRamDisk(efi::EFI_BOOT_SERVICES *bootsvc, RamDisk* ramdisk) {
 	efi::EFI_STATUS status = EFI_NOT_READY;
 	efi::EFI_HANDLE *handleBuffer = NULL;
-	size_t handleCount = 0;
+	uint64_t handleCount = 0;
 
 	efi::EFI_GUID simpleFileSystemProtocol = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
 
@@ -80,7 +80,7 @@ efi::EFI_STATUS findAndLoadRamDisk(efi::EFI_BOOT_SERVICES *bootsvc, RamDisk* ram
 	if (status != EFI_SUCCESS) serialPrintf(u8"[[[efi_main.findAndLoadRamDisk]]] <ERROR> failed: LocateHandleBuffer %d\n", status);
 	else serialPrintf(u8"[[[efi_main.findAndLoadRamDisk]]] success: LocateHandleBuffer, got %d handles\n", handleCount);
 
-	for (size_t i = 0; i < handleCount; ++i) {
+	for (uint64_t i = 0; i < handleCount; ++i) {
 		serialPrintf(u8"[[[efi_main.findAndLoadRamDisk]]] loading handle #%d of %d handles\n", i, handleCount);
 		efi::EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fileSystem = NULL;
 
