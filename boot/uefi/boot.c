@@ -88,14 +88,14 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	// TODO Size should be guessed dynamically
 
 	{
-		buffa[0] = 0;
+		paging::buffa[0] = 0;
 
 		// Zero fill bootloader memory
 		uint8_t* bb = (uint8_t*)lower;
 		for (int i = 0; i < loaderSize; ++i)
 		{
 			// TODO faster with uint64_t
-			bb[i] = buffa[0];
+			bb[i] = paging::buffa[0];
 		}
 	}
 
@@ -118,7 +118,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 		for (int i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
 		{
 			// TODO faster with uint64_t
-			bb[i] = buffa[0];
+			bb[i] = paging::buffa[0];
 		}
 	}
 
@@ -212,7 +212,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 
 	serialPrintln("[[[efi_main]]] mapping pages for kernel loader");
 
-	const uint64_t pml4 = enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
+	const uint64_t pml4 = paging::enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
 	initParameters->pml4 = pml4; // TODO set virtual address instead?
 	initParameters->stack = stack; // TODO set virtual address instead?
 
