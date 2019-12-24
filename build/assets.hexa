@@ -58,6 +58,9 @@ function packAssets(config: Config) {
 		assetName.push('loader.tofita')
 		assetPath.push(config.tempFolder + '\\tofita\\loader_kernel.img')
 
+		assetName.push('trampoline.tofita')
+		assetPath.push(config.tempFolder + '\\tofita\\trampoline.bin')
+
 		packFonts(config)
 		assetName.push('ascii.tofita')
 		assetPath.push(config.tempFolder + '\\tofita\\ascii.tofita')

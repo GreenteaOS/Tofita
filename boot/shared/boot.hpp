@@ -90,4 +90,4 @@ struct KernelParams {
 
 typedef function (*InitKernel)(const KernelParams *);
 // TODO ^ fix that in quake
-typedef function (*InitKernelTrampoline)(const KernelParams *, uint64_t pml4, uint64_t stack);
+typedef function (*InitKernelTrampoline)(uint64_t kernelParams, uint64_t pml4, uint64_t stack, uint64_t entry);
