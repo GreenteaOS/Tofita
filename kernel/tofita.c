@@ -45,7 +45,7 @@ uint8_t haveToRender = 1;
 #include "../devices/ps2/polling.c"
 #include "../devices/cpu/fallback.cpp"
 #include "../devices/acpi/acpi.cpp"
-#include "ramdisk.c"
+#include "ramdisk.cpp"
 #include "formats/cur/cur.cpp"
 #include "formats/bmp/bmp.cpp"
 #include "gui/blur.c"

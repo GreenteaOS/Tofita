@@ -30,7 +30,7 @@ namespace efi {
 #include "../../devices/serial/init.cpp"
 #include "memory.cpp"
 #include "ramdisk.cpp"
-#include "../../kernel/ramdisk.c"
+#include "../../kernel/ramdisk.cpp"
 
 efi::INTN CompareGuid (efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
     efi::INT32 *g1, *g2, r;
