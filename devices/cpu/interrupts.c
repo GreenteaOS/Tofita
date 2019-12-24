@@ -432,7 +432,7 @@ function enableInterrupts() {
 #endif
 
 function enablePS2Mouse() {
-	serialPrintln("[cpu] begin: setting PS/2 mouse");
+	serialPrintln(u8"[cpu] begin: setting PS/2 mouse");
 	uint8_t _status;
 	//Enable the auxiliary mouse device
 	mouseWait(1);
@@ -466,9 +466,9 @@ function enablePS2Mouse() {
 	mouseRead(); // Acknowledge
 	//Setup the mouse handler
 //    irq_install_handler(12, mouseHandler);
-	serialPrintln("[cpu] done: setting PS/2 mouse");
-	function quakePrintf(const char *c, ...);
-	quakePrintf("Enabled PS/2 mouse and keyboard\n");
+	serialPrintln(u8"[cpu] done: setting PS/2 mouse");
+	function quakePrintf(const char8_t *c, ...);
+	quakePrintf(u8"Enabled PS/2 mouse and keyboard\n");
 }
 
 function mouseWait(uint8_t aType)

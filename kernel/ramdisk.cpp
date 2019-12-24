@@ -35,7 +35,7 @@ typedef struct {
 	uint8_t *data;
 } RamDiskAsset;
 
-RamDiskAsset getRamDiskAsset(const char *path) {
+RamDiskAsset getRamDiskAsset(const char8_t *path) {
 	RamDiskAsset asset;
 	asset.size = 0;
 	asset.data = 0;
@@ -66,6 +66,6 @@ RamDiskAsset getRamDiskAsset(const char *path) {
 		}
 	}
 
-	serialPrintf("[ramdisk.getRamDiskAsset] asset '%s' not found in %d assets\n", path, ramDiskInfo->assetsCount);
+	serialPrintf(u8"[ramdisk.getRamDiskAsset] asset '%s' not found in %d assets\n", path, ramDiskInfo->assetsCount);
 	return asset;
 }

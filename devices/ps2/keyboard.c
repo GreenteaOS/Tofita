@@ -128,20 +128,20 @@ function handleKeyboard() {
 		}
 
 		if (keycode < 128) {
-			char buffer[] = {(char)keyboardMap[keycode], 0};
+			char8_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0) buffer[0] = '?';
-			serialPrint("[keyboard] [");
+			serialPrint(u8"[keyboard] [");
 			serialPrint(buffer);
-			serialPrintf(" down] %d keycode\n", keycode);
+			serialPrintf(u8" down] %d keycode\n", keycode);
 			keyboardPressedState[keycode] = 1;
 			handleKeyDown(keycode);
 		} else {
 			keycode = keycode - 128;
-			char buffer[] = {(char)keyboardMap[keycode], 0};
+			char8_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0) buffer[0] = '?';
-			serialPrint("[keyboard] [");
+			serialPrint(u8"[keyboard] [");
 			serialPrint(buffer);
-			serialPrintf(" up] %d keycode\n", keycode + 128);
+			serialPrintf(u8" up] %d keycode\n", keycode + 128);
 			keyboardPressedState[keycode] = 0;
 		}
 

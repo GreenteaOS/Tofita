@@ -142,30 +142,30 @@ createMapping(pml4, pdpt)
 #undef createMapping
 
 function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
-	serialPrintln("[paging] mapping memory range");
+	serialPrintln(u8"[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
 
 	uint64_t vAddress = virtualAddr;
 	uint64_t pAddress = physicalAddr;
 
-	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
+	serialPrintf(u8"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
-	serialPrint("[paging.range] virtual address = ");
+	serialPrint(u8"[paging.range] virtual address = ");
 	serialPrintHex((uint64_t) (virtualAddr));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
-	serialPrint("[paging.range] physical address = ");
+	serialPrint(u8"[paging.range] physical address = ");
 	serialPrintHex((uint64_t) (physicalAddr));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
-	serialPrint("[paging.range] page count = ");
+	serialPrint(u8"[paging.range] page count = ");
 	serialPrintHex((uint64_t) (pageCount));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
-	serialPrint("[paging.range] virtual address end = ");
+	serialPrint(u8"[paging.range] virtual address end = ");
 	serialPrintHex((uint64_t) (virtualAddrEnd));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
 	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4entries, vAddress, pAddress);
@@ -200,7 +200,7 @@ uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 }
 
 function mapEfi(EfiMemoryMap *memoryMap) {
-	serialPrintln("[paging] mapping efi");
+	serialPrintln(u8"[paging] mapping efi");
 
 	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
@@ -219,7 +219,7 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	serialPrintln("[paging] efi mapped");
+	serialPrintln(u8"[paging] efi mapped");
 }
 
 uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
@@ -234,7 +234,7 @@ uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 	while (offset < endOfMemoryMap) {
 
 		if ((descriptor->Type == efi::EfiConventionalMemory) && (descriptor->NumberOfPages >= (pages + 1))) {
-			serialPrintf("[paging] success allocate %d pages\n", pages);
+			serialPrintf(u8"[paging] success allocate %d pages\n", pages);
 			result = ((descriptor->PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE);
 		}
 
@@ -279,19 +279,19 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 
 	// CR3 trampoline
 	mapMemory(params->physical + 1024*1024, params->physical + 1024*1024, 1);
-	serialPrintln("[paging] kernel loader mapped");
+	serialPrintln(u8"[paging] kernel loader mapped");
 
 	// TODO use actual kernel asset size
 	mapMemory(KernelVirtualBase, params->physical, 256);
-	serialPrintln("[paging] Tofita kernel mapped");
+	serialPrintln(u8"[paging] Tofita kernel mapped");
 
 	mapEfi(memoryMap);
 
 	mapFramebuffer(fb);
-	serialPrintln("[paging] framebuffer mapped");
+	serialPrintln(u8"[paging] framebuffer mapped");
 
 	mapRamDisk(ramdisk);
-	serialPrintln("[paging] ramdisk mapped");
+	serialPrintln(u8"[paging] ramdisk mapped");
 
 	// Round upto page size
 	uint64_t BUFFER_START = RamdiskStart / PAGE_SIZE + params->ramdisk.size / PAGE_SIZE + 1;
@@ -299,10 +299,10 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	// TODO use largest conventional memory region as buffer!
 	mapMemory(BUFFER_START, (uint64_t) params->buffer, params->bufferSize / PAGE_SIZE + 1);
 	params->buffer = BUFFER_START;
-	serialPrintln("[paging] buffer mapped");
+	serialPrintln(u8"[paging] buffer mapped");
 
 	uint64_t ram = getRAMSize(memoryMap);
-	serialPrintf("[paging] available RAM is ~%d megabytes\n", (uint32_t)(ram/(1024*1024)));
+	serialPrintf(u8"[paging] available RAM is ~%d megabytes\n", (uint32_t)(ram/(1024*1024)));
 	params->ramBytes = ram;
 
 	// TODO map whole memory with 2 MB huge pages
@@ -315,9 +315,9 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	params->ramdisk.physical = params->ramdisk.base;
 	params->ramdisk.base = RamdiskStart;
 
-	serialPrint("[paging] CR3 points to: ");
+	serialPrint(u8"[paging] CR3 points to: ");
 	serialPrintHex((uint64_t) pml4entries);
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
 	return (uint64_t) pml4entries;
 }

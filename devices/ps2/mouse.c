@@ -50,9 +50,9 @@ function handleMouse() {
 		mouseX += mouseXd;
 		mouseY -= mouseYd;
 
-		if (getBit(mouseByte[0], 0) != 0) serialPrintln("[mouse] left button is down");
-		if (getBit(mouseByte[0], 1) != 0) serialPrintln("[mouse] right button is down");
-		if (getBit(mouseByte[0], 2) != 0) serialPrintln("[mouse] middle button is down");
+		if (getBit(mouseByte[0], 0) != 0) serialPrintln(u8"[mouse] left button is down");
+		if (getBit(mouseByte[0], 1) != 0) serialPrintln(u8"[mouse] right button is down");
+		if (getBit(mouseByte[0], 2) != 0) serialPrintln(u8"[mouse] middle button is down");
 
 		if ((getBit(mouseByte[0], 0) != 0) || (getBit(mouseByte[0], 1) != 0))
 			handleMouseDown(0);

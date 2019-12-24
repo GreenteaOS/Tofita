@@ -35,7 +35,7 @@ typedef enum {
 function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 
 	{
-		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size");
+		serialPrintln(u8"[compositor.setWallpaper] upscale wallpaper to screen size");
 		Bitmap32* upscale = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
 
 		float hReciprocal = 1.0f / (float)_framebuffer->height;
@@ -54,7 +54,7 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 		bitmap = wallpaper;
 	}
 
-	serialPrintln("[compositor.setWallpaper] downscale 8x");
+	serialPrintln(u8"[compositor.setWallpaper] downscale 8x");
 
 	uint8_t blurScale = 8;
 
@@ -71,11 +71,11 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 			downscale->pixels[y * downscale->width + x].color =
 				bitmap->pixels[bitmap->width * (bitmap->height - 1) + x * blurScale].color;
 
-	serialPrintln("[compositor.setWallpaper] blur");
+	serialPrintln(u8"[compositor.setWallpaper] blur");
 
 	Bitmap32* blur = gaussBlur(downscale, 4);
 
-	serialPrintln("[compositor.setWallpaper] upscale 8x");
+	serialPrintln(u8"[compositor.setWallpaper] upscale 8x");
 
 	// Upscale
 	Bitmap32* upscale = allocateBitmapFromBuffer(bitmap->width, bitmap->height);
@@ -115,21 +115,21 @@ function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t h
 
 Bitmap32* doublebuffer;
 function initializeCompositor() {
-	serialPrintln("[compositor.initializeCompositor] begin");
+	serialPrintln(u8"[compositor.initializeCompositor] begin");
 	doublebuffer = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
 	_pixels = doublebuffer->pixels;
 
 	Bitmap32* loadPng32(const RamDiskAsset* asset);
-	RamDiskAsset a = getRamDiskAsset("leaves.png");
+	RamDiskAsset a = getRamDiskAsset(u8"leaves.png");
 	leaves = loadPng32(&a);
 
-	RamDiskAsset b = getRamDiskAsset("trash-empty48.png");
+	RamDiskAsset b = getRamDiskAsset(u8"trash-empty48.png");
 	desktopIcon = loadPng32(&b);
 
-	RamDiskAsset asset = getRamDiskAsset("cursors\\normal.cur");
+	RamDiskAsset asset = getRamDiskAsset(u8"cursors\\normal.cur");
 	cur = cursor::loadCursor(&asset);
 
-	serialPrintln("[compositor.initializeCompositor] done");
+	serialPrintln(u8"[compositor.initializeCompositor] done");
 }
 
 var dragX = 255;
