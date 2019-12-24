@@ -13,26 +13,15 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-section .head
-	; rdi - first argument
-	; rsi - second argument
-	; rdx - third argument
-	; rcx - fourth argument
-	; r8 - fifth argument
-	; r9 - sixth
+bits 64
 
-	; rdi is const KernelParams *
-	; kept as is
-	; rsi is uint64_t pml4
-	; rdx is uint64_t stack
-	mov rsp, rdx
-	push 0 ; Signal end of stack with 0 return address
-	push 0 ; and a few extra entries in case of stack
-	push 0 ; problems
-	push 0
-	mov rbp, rsp ; Frame
-	extern kernelMain
-	call kernelMain
-.halt: ; Don't waste CPU
-	hlt
-	jmp .halt
+; rdi - first argument
+; rsi - second argument
+; rdx - third argument
+; rcx - fourth argument
+; r8 - fifth argument
+; r9 - sixth
+
+cli ; Disable interrupts
+mov cr3, rsi
+o64 jmp rcx

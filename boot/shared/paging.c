@@ -258,12 +258,14 @@ uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk
 	buffa[0] = 0;
 	for (int i = 0; i < params->bufferSize; ++i)
 	{
+		// TODO faster with uint64_t
 		bb[i] = buffa[0];
 	}
 
 	pages = (pagesArray*)((uint64_t)params->buffer + bufferPages * PAGE_SIZE - PAGE_SIZE * 1);
 
-	mapMemory(params->physical, params->physical, 256);
+	// CR3 trampoline
+	mapMemory(params->physical + 1024*1024, params->physical + 1024*1024, 1);
 	serialPrintln("[paging] kernel loader mapped");
 
 	mapMemory(KernelVirtualBase, params->physical, 256);

@@ -200,6 +200,14 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	tmemcpy(kernelBase, asset.data, asset.size);
 	InitKernelTrampoline startFunction = (InitKernelTrampoline) kernelBase;
 
+	serialPrintln("[[[efi_main]]] loading trump-o-line");
+
+	RamDiskAsset trampoline = getRamDiskAsset("trampoline.tofita");
+	serialPrintf("[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size, trampoline.data);
+
+	tmemcpy((void *)(initParameters->physical + 1024*1024), trampoline.data, trampoline.size);
+	startFunction = (InitKernelTrampoline) (initParameters->physical + 1024*1024);
+
 	serialPrintln("[[[efi_main]]] mapping pages for kernel loader");
 
 	const uint64_t pml4 = enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
@@ -212,7 +220,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
 	stack = LOWER_TO_UPPER(stack);
 
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader");
-	startFunction(initParameters, pml4, stack);
+	startFunction((uint64_t)initParameters, pml4, stack, upper);
 
 	return EFI_SUCCESS;
 }
