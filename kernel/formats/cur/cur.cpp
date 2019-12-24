@@ -13,13 +13,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+namespace cursor {
+
 struct Cursor {
 	uint16_t x;
 	uint16_t y;
 	uint8_t width;
 	uint8_t height;
 	uint8_t* bmp;
-} Cursor;
+};
 
 uint32_t toInt32(char a, char b, char c, char d) {
 	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFF;
@@ -103,4 +105,5 @@ function drawCursor(const struct Cursor *cur, uint16_t x, uint16_t y) {
 			pixel.color = bmp[xi + yy*cur->width];
 			blendPixel(x+xi-cur->x+1, y+yi-cur->y+1, pixel);
 		}
+}
 }
