@@ -28,11 +28,11 @@ typedef struct {
 TextFontList *textFontList = null;
 
 function initText() {
-	RamDiskAsset textFont = getRamDiskAsset("ascii.tofita");
+	RamDiskAsset textFont = getRamDiskAsset(u8"ascii.tofita");
 	textFontList = (TextFontList *)textFont.data;
 
 	Bitmap32 *loadPng32(const RamDiskAsset *asset);
-	RamDiskAsset a = getRamDiskAsset("fonts\\default.png");
+	RamDiskAsset a = getRamDiskAsset(u8"fonts\\default.png");
 	textFontBitmap = loadPng32(&a);
 }
 

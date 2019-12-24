@@ -144,30 +144,30 @@ createMapping(pml4, pdpt)
 #undef createMapping
 
 function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
-	serialPrintln("[paging] mapping memory range");
+	serialPrintln(u8"[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
 
 	uint64_t vAddress = virtualAddr;
 	uint64_t pAddress = physicalAddr;
 
-	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
+	serialPrintf(u8"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
-	serialPrint("[paging.range] virtual address = ");
+	serialPrint(u8"[paging.range] virtual address = ");
 	serialPrintHex((uint64_t) (virtualAddr));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
-	serialPrint("[paging.range] physical address = ");
+	serialPrint(u8"[paging.range] physical address = ");
 	serialPrintHex((uint64_t) (physicalAddr));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
-	serialPrint("[paging.range] page count = ");
+	serialPrint(u8"[paging.range] page count = ");
 	serialPrintHex((uint64_t) (pageCount));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
-	serialPrint("[paging.range] virtual address end = ");
+	serialPrint(u8"[paging.range] virtual address end = ");
 	serialPrintHex((uint64_t) (virtualAddrEnd));
-	serialPrint("\n");
+	serialPrint(u8"\n");
 
 	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4entries, vAddress, pAddress);

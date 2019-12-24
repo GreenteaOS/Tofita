@@ -24,7 +24,7 @@ uint8_t quakeRow = 0;
 double quakeAdvance = 0.0;
 uint8_t quakeCommandSize = 0;
 
-function quakePrintf(const char *c, ...);
+function quakePrintf(const char8_t *c, ...);
 
 function quake() {
 	if (haveToQuake == 0) {
@@ -45,7 +45,7 @@ function quake() {
 }
 
 function quakeHandleButtonDown(uint8_t key) {
-	serialPrintf("quakeHandleButtonDown %d\n", key);
+	serialPrintf(u8"quakeHandleButtonDown %d\n", key);
 
     if (keyboardMap[key] == '\b' && quakeCommandSize > 0) {
     	quakeCommand[quakeCommandSize - 1] = 0;
@@ -55,14 +55,15 @@ function quakeHandleButtonDown(uint8_t key) {
     if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
     	if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
     		extern const KernelParams *paramsCache;
-    		quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n");
+    		quakePrintf(u8"Doing hot reload. Note: this log may be persistent between hot reloads\n");
     		InitKernel start = (InitKernel) KernelVirtualBase;
 			start(paramsCache); // TODO pml4, stack
     	} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
-    		quakePrintf("Command 'reload' does quick kernel restart (without actual reboot) Note: this destroys all data!\n", quakeCommand);
+    		quakePrintf(u8"Hit `~` to show/hide this terminal\n", quakeCommand);
+    		quakePrintf(u8"Command 'reload' does quick kernel restart (without actual reboot) Note: this destroys all data!\n", quakeCommand);
     	} else {
-    		quakePrintf("Command '%s' not supported\n", quakeCommand);
-    		quakePrintf("Enter 'help' for commands\n");
+    		quakePrintf(u8"Command '%s' not supported\n", quakeCommand);
+    		quakePrintf(u8"Enter 'help' for commands\n");
     	}
     	for (uint8_t i = 0; i < 255; i++) quakeCommand[i] = 0;
     	quakeCommandSize = 0;
@@ -79,7 +80,7 @@ function quakeHandleButtonDown(uint8_t key) {
     	quakeCommandSize++;
     }
 
-	serialPrintf("quake command is %s\n", quakeCommand);
+	serialPrintf(u8"quake command is %s\n", quakeCommand);
 }
 
 uint8_t* _quakeItoA(int i, uint8_t b[]){
@@ -153,7 +154,7 @@ int _quake_puts(const uint8_t *string)
 	return 1;
 }
 
-function quakePrintf(const char *c, ...) {
+function quakePrintf(const char8_t *c, ...) {
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);

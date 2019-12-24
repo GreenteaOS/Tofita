@@ -69,27 +69,27 @@ function handleKeyDown(uint8_t key) {
 
 const KernelParams *paramsCache = null;
 function kernelMain(const KernelParams *params) {
-	serialPrintln("<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
+	serialPrintln(u8"<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
 	paramsCache = params;
 	initAllocatorForBuffer(params->bufferSize, params->buffer);
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
 
-	if (sizeof(uint8_t*) == 4) serialPrintln("<Tofita> void*: 4 bytes");
-	if (sizeof(uint8_t*) == 8) serialPrintln("<Tofita> void*: 8 bytes");
+	if (sizeof(uint8_t*) == 4) serialPrintln(u8"<Tofita> void*: 4 bytes");
+	if (sizeof(uint8_t*) == 8) serialPrintln(u8"<Tofita> void*: 8 bytes");
 
 	#ifdef __cplusplus
-		serialPrintln("<Tofita> __cplusplus");
+		serialPrintln(u8"<Tofita> __cplusplus");
 	#else
-		serialPrintln("<Tofita> !__cplusplus");
+		serialPrintln(u8"<Tofita> !__cplusplus");
 	#endif
 
 	#if defined(__clang__)
-		serialPrintln("<Tofita> __clang__");
+		serialPrintln(u8"<Tofita> __clang__");
 	#elif defined(__GNUC__) || defined(__GNUG__)
-		serialPrintln("<Tofita> __GNUC__");
+		serialPrintln(u8"<Tofita> __GNUC__");
 	#elif defined(_MSC_VER)
-		serialPrintln("<Tofita> _MSC_VER");
+		serialPrintln(u8"<Tofita> _MSC_VER");
 	#endif
 
 	enablePS2Mouse();
@@ -97,24 +97,24 @@ function kernelMain(const KernelParams *params) {
 	initText();
 	initializeCompositor();
 
-	quakePrintf("GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " loaded and operational\n");
+	quakePrintf(u8"GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
 
 	uint32_t megs = Math::round((double)params->ramBytes/(1024.0*1024.0));
-	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
+	quakePrintf(u8"[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
 #if 0
 	if (!acpi::parse(params->acpiTable)) {
-		quakePrintf("ACPI is *not* loaded\n");
+		quakePrintf(u8"ACPI is *not* loaded\n");
 	} else {
-		quakePrintf("ACPI 2.0 is loaded and ready\n");
+		quakePrintf(u8"ACPI 2.0 is loaded and ready\n");
 	}
 #endif
-	quakePrintf("Enter 'help' for commands\n");
+	quakePrintf(u8"Enter 'help' for commands\n");
 
 	{
-		RamDiskAsset a = getRamDiskAsset("hello.bmp");
+		RamDiskAsset a = getRamDiskAsset(u8"hello.bmp");
 		Bitmap32* bmp = bmp::loadBmp24(&a);
 		setWallpaper(bmp, Center);
 	}
