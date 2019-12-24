@@ -63,7 +63,7 @@ function drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 			] = 0xFFFFFFFF;
 }
 
-#include "../shared/paging.c"
+#include "../shared/paging.cpp"
 
 // Entry point
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE *systemTable) {
