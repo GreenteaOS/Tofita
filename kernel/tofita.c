@@ -115,7 +115,7 @@ function kernelMain(const KernelParams *params) {
 
 	{
 		RamDiskAsset a = getRamDiskAsset("hello.bmp");
-		Bitmap32* bmp = loadBmp24(&a);
+		Bitmap32* bmp = bmp::loadBmp24(&a);
 		setWallpaper(bmp, Center);
 	}
 

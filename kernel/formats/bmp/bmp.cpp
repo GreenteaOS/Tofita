@@ -15,6 +15,8 @@
 
 // Supports only 24-bit .bmp
 
+namespace bmp {
+
 Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 	uint8_t* buffer = asset->data;
 	uint8_t info[54];
@@ -43,4 +45,5 @@ Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 	serialPrintf("[bmp] Pixels filled\n");
 
 	return result;
+}
 }
