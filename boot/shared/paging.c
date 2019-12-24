@@ -181,19 +181,20 @@ static const EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const EFI_MEMORY_DESCRIPTO
 uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
-	uint64_t maxPhysicalStart = 0;
 	uint64_t numberOfPages = 0;
 
-	for (uint64_t i = 0; i < memoryMap->memoryMapSize; i++) {
-		if (descriptor->PhysicalStart > maxPhysicalStart) {
-			maxPhysicalStart = descriptor->PhysicalStart;
-			numberOfPages = descriptor->NumberOfPages;
-		}
+	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
+	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
+	uint64_t offset = startOfMemoryMap;
 
+	while (offset < endOfMemoryMap) {
+		numberOfPages += descriptor->NumberOfPages;
+
+		offset += descriptorSize;
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	return maxPhysicalStart + numberOfPages * PAGE_SIZE;
+	return numberOfPages * PAGE_SIZE;
 }
 
 function mapEfi(EfiMemoryMap *memoryMap) {
@@ -217,21 +218,20 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
-	uint64_t maxPhysicalStart = 0;
-	uint64_t numberOfPages = 0;
 	uint64_t result = 0;
 
-	for (uint64_t i = 0; i < memoryMap->memoryMapSize; i++) {
-		if (descriptor->PhysicalStart > maxPhysicalStart) {
-			maxPhysicalStart = descriptor->PhysicalStart;
-			numberOfPages = descriptor->NumberOfPages;
-		}
+	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
+	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
+	uint64_t offset = startOfMemoryMap;
+
+	while (offset < endOfMemoryMap) {
 
 		if ((descriptor->Type == EfiConventionalMemory) && (descriptor->NumberOfPages >= (pages + 1))) {
 			serialPrintf("[paging] success allocate %d pages\n", pages);
 			result = ((descriptor->PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE);
 		}
 
+		offset += descriptorSize;
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
