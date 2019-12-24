@@ -46,7 +46,7 @@ function initializeFramebuffer(Framebuffer *fb, efi::EFI_SYSTEM_TABLE *systemTab
 	gop->SetMode(gop, gop->Mode->Mode);
 }
 
-efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, size_t *bytes, void **destination)
+efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, uint64_t *bytes, void **destination)
 {
 	serialPrintf(u8"[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes);
 	efi::EFI_STATUS status;
@@ -54,7 +54,7 @@ efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, size_t *bytes, voi
 	efi::EFI_MEMORY_TYPE allocationType = efi::EfiLoaderCode; // Use *Code not *Data to avoid NX-bit crash if data executed
 
 	// Round to page size
-	size_t pages = ((*bytes - 1) / PAGE_SIZE) + 1;
+	uint64_t pages = ((*bytes - 1) / PAGE_SIZE) + 1;
 	efi::EFI_PHYSICAL_ADDRESS addr = (efi::EFI_PHYSICAL_ADDRESS)*destination;
 
 	status = bootsvc->AllocatePages(efi::AllocateAnyPages, allocationType, pages, &addr);

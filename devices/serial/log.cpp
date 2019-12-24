@@ -62,16 +62,16 @@ serialPrint("\n"); \
 #define   B_UART_MSR_RI       (1 << 7)
 #define   B_UART_MSR_DCD      (1 << 8)
 
-void *tmemset(void *dest, int e, size_t len) {
+void *tmemset(void *dest, int32_t e, uint64_t len) {
 	uint8_t *d = (uint8_t *)dest;
-	for(uint64_t i = 0; i < len; i++, d++) {
+	for (uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
 	}
 }
 
 // Solve conflict with gnu-efi
 #ifdef TOFITA
-void *memset(void *dest, int e, size_t len) {
+void *memset(void *dest, int32_t e, uint64_t len) {
 	uint8_t *d = (uint8_t *)dest;
 	for(uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
@@ -82,7 +82,7 @@ void *memset(void *dest, int e, size_t len) {
 
 uint64_t kstrlen(const uint8_t *data) {
 	uint64_t r;
-	for(r = 0; *data != 0; data++, r++);
+	for (r = 0; *data != 0; data++, r++);
 	return r;
 }
 
@@ -197,11 +197,11 @@ function serialPrintInt(uint64_t n) {
 function serialPrintHex(uint64_t n) {
 	serialPrint(u8"0x");
 	uint8_t buf[16], *bp = buf + 16;
-	for(int i = 0; i < 16; i++) buf[i] = '0';
+	for (int32_t i = 0; i < 16; i++) buf[i] = '0';
 	do {
 		bp--;
 		uint8_t mod = n % 16;
-		if(mod < 10) {
+		if (mod < 10) {
 			*bp = '0' + mod;
 		} else {
 			*bp = 'A' - 10 + mod;
@@ -211,7 +211,7 @@ function serialPrintHex(uint64_t n) {
 	serialPortWrite((uint8_t *)buf, 16);
 }
 
-function serialPrintMem(const void *mem, int n)
+function serialPrintMem(const void *mem, int32_t n)
 {
 	serialPrint(u8"@");
 	serialPrintHex((uint64_t) mem);
@@ -230,8 +230,8 @@ function serialPrintPtr(void *ptr)
 
 function serialPrintBits(uint64_t value)
 {
-	for(int i = 0; i < 64; ++i) {
-		if(value & (1ull << i)) {
+	for (int32_t i = 0; i < 64; ++i) {
+		if (value & (1ull << i)) {
 			serialPrintInt(i);
 			serialPrint(u8";");
 		}
@@ -245,9 +245,9 @@ int32_t __cdecl putchar(uint8_t c) {
 }
 
 #define EOF 0
-int puts(const uint8_t *string)
+int32_t puts(const uint8_t *string)
 {
-	int i = 0;
+	int32_t i = 0;
 	while (string[i]) //standard c idiom for looping through a null-terminated string
 	{
 		if (putchar(string[i]) == EOF) //if we got the EOF value from writing the uint8_t
@@ -266,16 +266,16 @@ uint8_t* comItoA(int i, uint8_t b[]){
 		*p++ = '-';
 		i *= -1;
 	}
-	int shifter = i;
+	int32_t shifter = i;
 	do { //Move to where representation ends
 		++p;
 		shifter = shifter/10;
-	} while(shifter);
+	} while (shifter);
 	*p = '\0';
 	do { //Move back, inserting digits as u go
 		*--p = digit[i%10];
 		i = i/10;
-	} while(i);
+	} while (i);
 	return b;
 }
 
@@ -299,7 +299,7 @@ function serialPrintf(const char8_t *c, ...) {
 		switch (*c)
 		{
 			case 's': puts(va_arg(lst, uint8_t *)); break;
-			case 'c': putchar(va_arg(lst, int)); break;
+			case 'c': putchar(va_arg(lst, int32_t)); break;
 			case 'd': {
 				int value = va_arg(lst, int);
 				uint8_t buffer[16];

@@ -43,7 +43,7 @@ efi::INTN CompareGuid (efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
     return r;
 }
 
-void* tmemcpy(void* dest, const void* src, size_t count) {
+void* tmemcpy(void* dest, const void* src, uint64_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
 	uint8_t* src8 = (uint8_t*)src;
 
@@ -95,7 +95,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 		// Zero fill bootloader memory
 		uint8_t* bb = (uint8_t*)lower;
-		for (int i = 0; i < loaderSize; ++i)
+		for (uint64_t i = 0; i < loaderSize; ++i)
 		{
 			// TODO faster with uint64_t
 			bb[i] = paging::buffa[0];
@@ -118,7 +118,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	{
 		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
-		for (int i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
+		for (uint64_t i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
 		{
 			// TODO faster with uint64_t
 			bb[i] = paging::buffa[0];
@@ -131,7 +131,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		efi::EFI_GUID acpi20 = ACPI_20_TABLE_GUID;
 		efi::EFI_GUID acpi = ACPI_TABLE_GUID;
 
-		for (size_t i = 0; i < systemTable->NumberOfTableEntries; i++) {
+		for (uint64_t i = 0; i < systemTable->NumberOfTableEntries; i++) {
 			efi::EFI_CONFIGURATION_TABLE *efiTable = &systemTable->ConfigurationTable[i];
 			if (0 == CompareGuid(&efiTable->VendorGuid, &acpi20)) { // Prefer ACPI 2.0
 				acpiTable = efiTable->VendorTable;
