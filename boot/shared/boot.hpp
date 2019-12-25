@@ -30,6 +30,18 @@
 #define Void void
 #define Pointer(to) to*
 
+// Use uint64_t, int32_t, char8_t, etc
+
+#define char do_not_use_such_types_please
+#define int do_not_use_such_types_please
+#define unsigned do_not_use_such_types_please
+#define long do_not_use_such_types_please
+#define signed do_not_use_such_types_please
+#define short do_not_use_such_types_please
+#define size_t do_not_use_such_types_please
+#define intptr_t do_not_use_such_types_please
+#define uintptr_t do_not_use_such_types_please
+
 // Data transferred from UEFI application into kernel loader
 
 struct EfiMemoryMap {
