@@ -17,8 +17,8 @@
 
 uint8_t haveToQuake = 0;
 uint8_t quakeHeight = 255;
-char quakeCommand[256] = {0};
-char quakeLines[17][256] = {0};
+char8_t quakeCommand[256] = {0};
+char8_t quakeLines[17][256] = {0};
 uint8_t quakeLine = 0;
 uint8_t quakeRow = 0;
 double quakeAdvance = 0.0;
@@ -33,11 +33,11 @@ function quake() {
 
 	function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height);
 	drawVibrancedRectangle(0, 0, _framebuffer->width, quakeHeight);
-	uint16_t drawAsciiText(const char* text, double x, uint16_t y, Pixel32 color);
+	uint16_t drawAsciiText(const char8_t* text, double x, uint16_t y, Pixel32 color);
 	Pixel32 color;
 	color.rgba.r = color.rgba.g = color.rgba.b = 48;
 	var x = drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
-	drawAsciiText("|", x + 2, quakeHeight - 15, color);
+	drawAsciiText(u8"|", x + 2, quakeHeight - 15, color);
 
 	for (var i = 0; i < 17; i++) {
 		drawAsciiText(quakeLines[i], 2, i * 14 + 2, color);
@@ -83,14 +83,14 @@ function quakeHandleButtonDown(uint8_t key) {
 	serialPrintf(u8"quake command is %s\n", quakeCommand);
 }
 
-uint8_t* _quakeItoA(int i, uint8_t b[]){
+uint8_t* _quakeItoA(int32_t i, uint8_t b[]){
 	uint8_t const digit[] = "0123456789";
 	uint8_t* p = b;
 	if (i<0) {
 		*p++ = '-';
 		i *= -1;
 	}
-	int shifter = i;
+	int32_t shifter = i;
 	do { //Move to where representation ends
 		++p;
 		shifter = shifter/10;
@@ -119,7 +119,7 @@ function _quake_newline() {
 }
 
 uint8_t __cdecl _quake_putchar(const uint8_t c) {
-	double getCharAdvance(const char c);
+	double getCharAdvance(const char8_t c);
 
 	if (c != 0) {
 		putchar(c); // Copy to serial log
@@ -140,9 +140,9 @@ uint8_t __cdecl _quake_putchar(const uint8_t c) {
 	return EOF;
 }
 
-int _quake_puts(const uint8_t *string)
+int32_t _quake_puts(const uint8_t *string)
 {
-	int i = 0;
+	int32_t i = 0;
 	while (string[i] != 0)
 	{
 		if (_quake_putchar(string[i]) == EOF)
@@ -174,9 +174,9 @@ function quakePrintf(const char8_t *c, ...) {
 		switch (*c)
 		{
 			case 's': _quake_puts(va_arg(lst, uint8_t *)); break;
-			case 'c': _quake_putchar(va_arg(lst, int)); break;
+			case 'c': _quake_putchar(va_arg(lst, int32_t)); break;
 			case 'd': {
-				int value = va_arg(lst, int);
+				int32_t value = va_arg(lst, int32_t);
 				uint8_t buffer[16];
 				for (uint8_t i = 0; i < 16; i++) buffer[i] = 0;
 				_quakeItoA(value, buffer);

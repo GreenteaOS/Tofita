@@ -15,11 +15,11 @@
 
 // Based on the http://blog.ivank.net/fastest-gaussian-blur.html
 
-int __attribute__((fastcall)) floor(float x) {
+int32_t __attribute__((fastcall)) floor(float x) {
 	if (x >= 0) {
-		return (int)x;
+		return (int32_t)x;
 	} else {
-		int y = (int)x;
+		int32_t y = (int32_t)x;
 		return ((float)y == x) ? y : y - 1;
 	}
 }

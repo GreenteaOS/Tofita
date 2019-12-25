@@ -27,7 +27,7 @@ function libc_free(void* addr) {
 	serialPrintf(u8"[libc] libc_free\n");
 }
 
-void* libc_malloc(size_t size) {
+void* libc_malloc(uint64_t size) {
 	serialPrintf(u8"[libc] libc_malloc\n");
 
 	void* result = allocateFromBuffer(size + 4);
@@ -40,7 +40,7 @@ void* libc_malloc(size_t size) {
 	return (void*)((uint64_t)result + 4);
 }
 
-void* libc_realloc(void* addr, size_t size) {
+void* libc_realloc(void* addr, uint64_t size) {
 	serialPrintf(u8"[libc] libc_realloc\n");
 
 	// Get old size information
@@ -63,9 +63,9 @@ void* libc_realloc(void* addr, size_t size) {
 	return result;
 }
 
-void *libc_memset(void *b, int c, int len) {
-	int i;
-	unsigned char *p = (unsigned char *)b;
+void *libc_memset(void *b, int32_t c, int32_t len) {
+	int32_t i;
+	uint8_t *p = (uint8_t *)b;
 	i = 0;
 	while (len > 0) {
 		*p = c;
@@ -76,12 +76,12 @@ void *libc_memset(void *b, int c, int len) {
 }
 
 
-int libc_abs(int v) {
+int32_t libc_abs(int32_t v) {
 	return v * ( (v<0) * (-1) + (v>0) );
 }
 
-int libc_pow(int a, int n) {
-	int r = 1;
+int32_t libc_pow(int32_t a, int32_t n) {
+	int32_t r = 1;
 	while (n > 0) {
 		if (n & 1)
 			r *= a;
@@ -91,12 +91,12 @@ int libc_pow(int a, int n) {
 	return r;
 }
 
-function libc_memcpy(void *dest, void *src, size_t n) {
-	const char *csrc = (char *)src;
-	char *cdest = (char *)dest;
-	for (int i = 0; i < n; i++) cdest[i] = csrc[i];
+function libc_memcpy(void *dest, void *src, uint64_t n) {
+	const uint8_t *csrc = (uint8_t *)src;
+	uint8_t *cdest = (uint8_t *)dest;
+	for (int32_t i = 0; i < n; i++) cdest[i] = csrc[i];
 }
 
-function memcpy(void *dest, void *src, size_t n) {
+function memcpy(void *dest, void *src, uint64_t n) {
 	libc_memcpy(dest, src, n);
 }

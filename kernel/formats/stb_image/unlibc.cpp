@@ -22,7 +22,7 @@
 #undef memcpy libc_memcpy
 
 Bitmap32* loadPng32(const RamDiskAsset* asset) {
-	int width, height, png_bpp;
+	int32_t width, height, png_bpp;
 	uint8_t* colors = stbi_load_from_memory(asset->data, asset->size, &width, &height, &png_bpp, 4);
 	Bitmap32* bitmap = allocateBitmapFromBuffer(width, height);
 
