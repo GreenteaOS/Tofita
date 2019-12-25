@@ -38,10 +38,13 @@ efi::EFI_STATUS loadRamDiskFromVolume(efi::EFI_BOOT_SERVICES *bootsvc, efi::EFI_
 	uint64_t size = ((efi::EFI_FILE_INFO *)info)->FileSize;
 	serialPrintf(u8"[[[efi_main.loadRamDiskFromVolume]]] FileSize %d\n", size);
 
+	uint64_t sizeAlloc = (size / PAGE_SIZE + 1) * PAGE_SIZE;
+	sizeAlloc += sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512; // Combined allocation for mem map
+
 	void *address = (void*)0;
 	status = uefiAllocate(
 			bootsvc,
-			&size,
+			&sizeAlloc,
 			&address);
 	serialPrintf(u8"[[[efi_main.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\n", status, size, address);
 

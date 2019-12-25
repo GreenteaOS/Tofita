@@ -166,6 +166,16 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	drawLoading(&initParameters->framebuffer, 1);
 
 	serialPrintln(u8"[[[efi_main]]] begin: fillMemoryMap");
+	uint64_t sizeAlloc = (initParameters->ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE;
+	initParameters->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(initParameters->ramdisk.base + sizeAlloc);
+	{
+		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
+		for (uint64_t i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
+		{
+			// TODO faster with uint64_t
+			bb[i] = paging::buffa[0];
+		}
+	}
 	fillMemoryMap(&initParameters->efiMemoryMap, systemTable);
 	serialPrintln(u8"[[[efi_main]]] done: fillMemoryMap");
 
@@ -215,14 +225,16 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] mapping pages for kernel loader");
 
+	initParameters->ramdisk.size += sizeAlloc;
 	const uint64_t pml4 = paging::enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
+	initParameters->ramdisk.size -= sizeAlloc;
 	initParameters->pml4 = pml4; // TODO set virtual address instead?
 	initParameters->stack = stack; // TODO set virtual address instead?
 	initParameters->lastPageIndexCache = paging::lastPageIndex;
 
 	// Convert addresses to upper half
+	initParameters->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(initParameters->ramdisk.base + sizeAlloc);
 	initParameters = (KernelParams*)LOWER_TO_UPPER(initParameters);
-	// TODO deep pointer conversion: initParameters->efiMemoryMap.memoryMap = (EFI_MEMORY_DESCRIPTOR *)LOWER_TO_UPPER(initParameters->efiMemoryMap.memoryMap);
 	stack = LOWER_TO_UPPER(stack);
 
 	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
