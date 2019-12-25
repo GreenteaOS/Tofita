@@ -541,9 +541,9 @@ STBIDEF int   stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const ch
 
 #ifdef _MSC_VER
 typedef uint16_t stbi__uint16;
-typedef   signed short stbi__int16;
+typedef   int16_t stbi__int16;
 typedef uint32_t   stbi__uint32;
-typedef   signed int   stbi__int32;
+typedef   int32_t   stbi__int32;
 #else
 //#includ e <stdint.h>
 typedef uint16_t stbi__uint16;
@@ -1913,7 +1913,7 @@ stbi_inline static int stbi__extend_receive(stbi__jpeg *j, int n)
    return k + (stbi__jbias[n] & ~sgn);
 }
 
-// get some unsigned bits
+// get some uint32_t bits
 stbi_inline static int stbi__jpeg_get_bits(stbi__jpeg *j, int n)
 {
    uint32_t k;
@@ -3381,9 +3381,9 @@ static void stbi__YCbCr_to_RGB_row(stbi_uc *out, const stbi_uc *y, const stbi_uc
       r >>= 20;
       g >>= 20;
       b >>= 20;
-      if ((unsigned) r > 255) { if (r < 0) r = 0; else r = 255; }
-      if ((unsigned) g > 255) { if (g < 0) g = 0; else g = 255; }
-      if ((unsigned) b > 255) { if (b < 0) b = 0; else b = 255; }
+      if ((uint32_t) r > 255) { if (r < 0) r = 0; else r = 255; }
+      if ((uint32_t) g > 255) { if (g < 0) g = 0; else g = 255; }
+      if ((uint32_t) b > 255) { if (b < 0) b = 0; else b = 255; }
       out[0] = (stbi_uc)r;
       out[1] = (stbi_uc)g;
       out[2] = (stbi_uc)b;
@@ -3515,9 +3515,9 @@ static void stbi__YCbCr_to_RGB_simd(stbi_uc *out, stbi_uc const *y, stbi_uc cons
       r >>= 20;
       g >>= 20;
       b >>= 20;
-      if ((unsigned) r > 255) { if (r < 0) r = 0; else r = 255; }
-      if ((unsigned) g > 255) { if (g < 0) g = 0; else g = 255; }
-      if ((unsigned) b > 255) { if (b < 0) b = 0; else b = 255; }
+      if ((uint32_t) r > 255) { if (r < 0) r = 0; else r = 255; }
+      if ((uint32_t) g > 255) { if (g < 0) g = 0; else g = 255; }
+      if ((uint32_t) b > 255) { if (b < 0) b = 0; else b = 255; }
       out[0] = (stbi_uc)r;
       out[1] = (stbi_uc)g;
       out[2] = (stbi_uc)b;
@@ -4728,7 +4728,7 @@ static void stbi__de_iphone(stbi__png *z)
    }
 }
 
-#define STBI__PNG_TYPE(a,b,c,d)  (((unsigned) (a) << 24) + ((unsigned) (b) << 16) + ((unsigned) (c) << 8) + (unsigned) (d))
+#define STBI__PNG_TYPE(a,b,c,d)  (((uint32_t) (a) << 24) + ((uint32_t) (b) << 16) + ((uint32_t) (c) << 8) + (uint32_t) (d))
 
 static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
 {
@@ -5049,7 +5049,7 @@ static int stbi__shiftsigned(int v, int shift, int bits)
    STBI_ASSERT(v >= 0 && v < 256);
    v >>= (8-bits);
    STBI_ASSERT(bits >= 0 && bits <= 8);
-   return (int) ((unsigned) v * mul_table[bits]) >> shift_table[bits];
+   return (int) ((uint32_t) v * mul_table[bits]) >> shift_table[bits];
 }
 
 typedef struct
@@ -7381,7 +7381,7 @@ STBIDEF int32_t stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *
       1.13    threadsafe
       1.12    const qualifiers in the API
       1.11    Support installable IDCT, colorspace conversion routines
-      1.10    Fixes for 64-bit (don't use "unsigned long")
+      1.10    Fixes for 64-bit (don't use "uint32_t long")
               optimized upsampling by Fabian "ryg" Giesen
       1.09    Fix format-conversion for PSD code (bad global variables!)
       1.08    Thatcher Ulrich's PSD code integrated by Nicolas Schulz
