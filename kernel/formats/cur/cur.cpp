@@ -23,7 +23,7 @@ struct Cursor {
 	uint8_t* bmp;
 };
 
-uint32_t toInt32(char a, char b, char c, char d) {
+uint32_t toInt32(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
 	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFF;
 }
 
@@ -88,7 +88,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 
 	uint32_t fsize = cur->width * cur->height * 4;
 	uint8_t* bmp = (uint8_t*)allocateFromBuffer(fsize);
-	for (int i = 0; i < fsize; i++) {
+	for (int32_t i = 0; i < fsize; i++) {
 		bmp[i] = buffer[offset + i + 20 + 16 + 4];
 	}
 	cur->bmp = bmp;

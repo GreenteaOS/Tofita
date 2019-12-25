@@ -36,7 +36,7 @@ function initText() {
 	textFontBitmap = loadPng32(&a);
 }
 
-int8_t getLigatureAdvance(const char left, const char right) {
+int8_t getLigatureAdvance(const char8_t left, const char8_t right) {
 	if (left == 0)
 		return 0;
 	if (right == 0)
@@ -44,18 +44,18 @@ int8_t getLigatureAdvance(const char left, const char right) {
 	return 8;
 }
 
-double getCharAdvance(const char c) {
+double getCharAdvance(const char8_t c) {
 	if (textFontList == null)
 		return 8;
-	TextFontList textChar = textFontList[(size_t)c];
+	TextFontList textChar = textFontList[(uint64_t)c];
 	return textChar.width;
 }
 
-double drawChar(const char c, double x, uint16_t y, Pixel32 color) {
-	TextFontList textChar = textFontList[(size_t)c];
+double drawChar(const char8_t c, double x, uint16_t y, Pixel32 color) {
+	TextFontList textChar = textFontList[(uint64_t)c];
 
-	uint16_t xx = (int)(x + 0.5);
-	uint8_t w = (int)(textChar.width + 0.5);
+	uint16_t xx = (int32_t)(x + 0.5);
+	uint8_t w = (int32_t)(textChar.width + 0.5);
 
 	for (uint8_t yi = 0; yi < 12; yi++)
 		for (uint8_t xi = 0; xi < w; xi++) {
@@ -75,7 +75,7 @@ double drawChar(const char c, double x, uint16_t y, Pixel32 color) {
 }
 
 /// Returns advance after last character
-uint16_t drawAsciiText(const char *text, double x, uint16_t y, Pixel32 color) {
+uint16_t drawAsciiText(const char8_t *text, double x, uint16_t y, Pixel32 color) {
 	uint16_t i = 0;
 	double xx = x;
 	while (text[i] != 0 && i < 255 * 255) {

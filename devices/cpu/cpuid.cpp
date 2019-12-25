@@ -14,8 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 struct CPUID {
-	char vendorID[13] = {0};
-	char brandName[48] = {0};
+	char8_t vendorID[13] = {0};
+	char8_t brandName[48] = {0};
 	uint32_t data = 0;
 	uint32_t extras = 0;
 };

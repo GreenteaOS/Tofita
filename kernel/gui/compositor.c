@@ -154,7 +154,7 @@ function composite() {
 	Pixel32 color;
 	color.color = 0x00000000;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
-	drawAsciiText("Recycle Bin", 8, 62, color);
+	drawAsciiText(u8"Recycle Bin", 8, 62, color);
 
 	var outlineX = mouseX < dragX? mouseX : dragX;
 	var outlineY = mouseY < dragY? mouseY : dragY;
@@ -186,7 +186,7 @@ function composite() {
 	drawRectangle(color, _framebuffer->width - 4, _framebuffer->height - 30, 1, 30);
 	var trayButtonX = _framebuffer->width - 20 - 16;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x11;
-	trayButtonX -= drawAsciiText("4:01 PM", _framebuffer->width - 60, _framebuffer->height - 20, color);
+	trayButtonX -= drawAsciiText(u8"4:01 PM", _framebuffer->width - 60, _framebuffer->height - 20, color);
 	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
 	drawCursor(cur, mouseX, mouseY);

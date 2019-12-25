@@ -29,7 +29,7 @@ uint8_t mouseRead();
 
 #define PACKED __attribute__((packed))
 
-void* tmemcpy(void* dest, const void* src, size_t count) {
+void* tmemcpy(void* dest, const void* src, uint64_t count) {
 	uint8_t* dst8 = (uint8_t*)dest;
 	uint8_t* src8 = (uint8_t*)src;
 
@@ -364,7 +364,7 @@ function enableInterrupts() {
 	gdtSetEntry(4, 0, 0xfffff,  true,  ring3 | read_write);
 	gdtSetEntry(5, 0, 0xfffff,  true,  ring3 | read_write | execute);
 
-	size_t sizeof_TssEntry = sizeof(g_tss);
+	uint64_t sizeof_TssEntry = sizeof(g_tss);
 
 	tmemset(&g_tss, 0, sizeof_TssEntry);
 	g_tss.iomap_offset = sizeof_TssEntry;

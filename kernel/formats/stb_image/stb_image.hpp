@@ -414,7 +414,7 @@ STBIDEF int32_t      stbi_is_hdr_from_file(FILE *f);
 
 // get a VERY brief reason for failure
 // NOT THREADSAFE
-STBIDEF const char *stbi_failure_reason  (void);
+STBIDEF const char8_t *stbi_failure_reason  (void);
 
 // free the loaded image -- this is just free()
 STBIDEF void     stbi_image_free      (void *retval_from_stbi_load);
@@ -843,14 +843,14 @@ static int      stbi__pnm_info(stbi__context *s, int *x, int *y, int *comp);
 #endif
 
 // this is not threadsafe
-static const char *stbi__g_failure_reason;
+static const char8_t *stbi__g_failure_reason;
 
-STBIDEF const char *stbi_failure_reason(void)
+STBIDEF const char8_t *stbi_failure_reason(void)
 {
    return stbi__g_failure_reason;
 }
 
-static int stbi__err(const char *str)
+static int stbi__err(const char8_t *str)
 {
    stbi__g_failure_reason = str;
    return 0;
@@ -2034,7 +2034,7 @@ static int stbi__jpeg_decode_block_prog_dc(stbi__jpeg *j, short data[64], stbi__
 // and only de-zigzag when dequantizing
 static int32_t stbi__jpeg_decode_block_prog_ac(stbi__jpeg *j, short data[64], stbi__huffman *hac, stbi__int16 *fac)
 {
-   if (j->spec_start == 0) return stbi__err("can't merge dc and ac", "Corrupt JPEG");
+   if (j->spec_start == 0) return stbi__err(u8"can't merge dc and ac", "Corrupt JPEG");
    int32_t k;
 
    if (j->succ_high == 0) {
@@ -2943,8 +2943,8 @@ static int32_t stbi__process_scan_header(stbi__jpeg *z)
    int32_t i;
    int32_t Ls = stbi__get16be(z->s);
    z->scan_n = stbi__get8(z->s);
-   if (z->scan_n < 1 || z->scan_n > 4 || z->scan_n > (int) z->s->img_n) return stbi__err("bad SOS component count","Corrupt JPEG");
-   if (Ls != 6+2*z->scan_n) return stbi__err("bad SOS len","Corrupt JPEG");
+   if (z->scan_n < 1 || z->scan_n > 4 || z->scan_n > (int) z->s->img_n) return stbi__err(u8"bad SOS component count",u8"Corrupt JPEG");
+   if (Ls != 6+2*z->scan_n) return stbi__err(u8"bad SOS len",u8"Corrupt JPEG");
    for (i=0; i < z->scan_n; ++i) {
       int32_t id = stbi__get8(z->s), which;
       int32_t q = stbi__get8(z->s);
@@ -3002,10 +3002,10 @@ static int stbi__free_jpeg_components(stbi__jpeg *z, int ncomp, int why)
 static int stbi__process_frame_header(stbi__jpeg *z, int scan)
 {
    stbi__context *s = z->s;
-   Lf = stbi__get16be(s);         if (Lf < 11) return stbi__err("bad SOF len","Corrupt JPEG"); // JPEG
-   p  = stbi__get8(s);            if (p != 8) return stbi__err("only 8-bit","JPEG format not supported: 8-bit only"); // JPEG baseline
-   s->img_y = stbi__get16be(s);   if (s->img_y == 0) return stbi__err("no header height", "JPEG format not supported: delayed height"); // Legal, but we don't handle it--but neither does IJG
-   s->img_x = stbi__get16be(s);   if (s->img_x == 0) return stbi__err("0 width","Corrupt JPEG"); // JPEG requires
+   Lf = stbi__get16be(s);         if (Lf < 11) return stbi__err(u8"bad SOF len",u8"Corrupt JPEG"); // JPEG
+   p  = stbi__get8(s);            if (p != 8) return stbi__err(u8"only 8-bit",u8"JPEG format not supported: 8-bit only"); // JPEG baseline
+   s->img_y = stbi__get16be(s);   if (s->img_y == 0) return stbi__err(u8"no header height", "JPEG format not supported: delayed height"); // Legal, but we don't handle it--but neither does IJG
+   s->img_x = stbi__get16be(s);   if (s->img_x == 0) return stbi__err(u8"0 width",u8"Corrupt JPEG"); // JPEG requires
    int32_t Lf,p,i,q, h_max=1,v_max=1,c;
    c = stbi__get8(s);
    if (c != 3 && c != 1 && c != 4) return stbi__err(u8"bad component count",u8"Corrupt JPEG");
@@ -4087,8 +4087,8 @@ static int32_t stbi__parse_uncompressed_block(stbi__zbuf *a)
       header[k++] = stbi__zget8(a);
    len  = header[1] * 256 + header[0];
    nlen = header[3] * 256 + header[2];
-   if (nlen != (len ^ 0xffff)) return stbi__err("zlib corrupt","Corrupt PNG");
-   if (a->zbuffer + len > a->zbuffer_end) return stbi__err("read past buffer","Corrupt PNG");
+   if (nlen != (len ^ 0xffff)) return stbi__err(u8"zlib corrupt",u8"Corrupt PNG");
+   if (a->zbuffer + len > a->zbuffer_end) return stbi__err(u8"read past buffer",u8"Corrupt PNG");
    if (a->zout + len > a->zout_end)
       if (!stbi__zexpand(a, a->zout, len)) return 0;
    memcpy(a->zout, a->zbuffer, len);
@@ -4103,9 +4103,9 @@ static int stbi__parse_zlib_header(stbi__zbuf *a)
    int cm    = cmf & 15;
    /* int cinfo = cmf >> 4; */
    int flg   = stbi__zget8(a);
-   if ((cmf*256+flg) % 31 != 0) return stbi__err("bad zlib header","Corrupt PNG"); // zlib spec
-   if (flg & 32) return stbi__err("no preset dict","Corrupt PNG"); // preset dictionary not allowed in png
-   if (cm != 8) return stbi__err("bad compression","Corrupt PNG"); // DEFLATE required for png
+   if ((cmf*256+flg) % 31 != 0) return stbi__err(u8"bad zlib header",u8"Corrupt PNG"); // zlib spec
+   if (flg & 32) return stbi__err(u8"no preset dict",u8"Corrupt PNG"); // preset dictionary not allowed in png
+   if (cm != 8) return stbi__err(u8"bad compression",u8"Corrupt PNG"); // DEFLATE required for png
    // window = 1 << (8 + cinfo)... but who cares, we fully buffer output
    return 1;
 }
@@ -4758,17 +4758,17 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
             int32_t comp,filter;
             if (!first) return stbi__err(u8"multiple IHDR",u8"Corrupt PNG");
             first = 0;
-            if (c.length != 13) return stbi__err("bad IHDR len","Corrupt PNG");
-            s->img_x = stbi__get32be(s); if (s->img_x > (1 << 24)) return stbi__err("too large","Very large image (corrupt?)");
-            s->img_y = stbi__get32be(s); if (s->img_y > (1 << 24)) return stbi__err("too large","Very large image (corrupt?)");
-            z->depth = stbi__get8(s);  if (z->depth != 1 && z->depth != 2 && z->depth != 4 && z->depth != 8 && z->depth != 16)  return stbi__err("1/2/4/8/16-bit only","PNG not supported: 1/2/4/8/16-bit only");
-            color = stbi__get8(s);  if (color > 6)         return stbi__err("bad ctype","Corrupt PNG");
-            if (color == 3 && z->depth == 16)                  return stbi__err("bad ctype","Corrupt PNG");
-            if (color == 3) pal_img_n = 3; else if (color & 1) return stbi__err("bad ctype","Corrupt PNG");
-            comp  = stbi__get8(s);  if (comp) return stbi__err("bad comp method","Corrupt PNG");
-            filter= stbi__get8(s);  if (filter) return stbi__err("bad filter method","Corrupt PNG");
-            interlace = stbi__get8(s); if (interlace>1) return stbi__err("bad interlace method","Corrupt PNG");
-            if (!s->img_x || !s->img_y) return stbi__err("0-pixel image","Corrupt PNG");
+            if (c.length != 13) return stbi__err(u8"bad IHDR len",u8"Corrupt PNG");
+            s->img_x = stbi__get32be(s); if (s->img_x > (1 << 24)) return stbi__err(u8"too large",u8"Very large image (corrupt?)");
+            s->img_y = stbi__get32be(s); if (s->img_y > (1 << 24)) return stbi__err(u8"too large",u8"Very large image (corrupt?)");
+            z->depth = stbi__get8(s);  if (z->depth != 1 && z->depth != 2 && z->depth != 4 && z->depth != 8 && z->depth != 16)  return stbi__err(u8"1/2/4/8/16-bit only",u8"PNG not supported: 1/2/4/8/16-bit only");
+            color = stbi__get8(s);  if (color > 6)         return stbi__err(u8"bad ctype",u8"Corrupt PNG");
+            if (color == 3 && z->depth == 16)                  return stbi__err(u8"bad ctype",u8"Corrupt PNG");
+            if (color == 3) pal_img_n = 3; else if (color & 1) return stbi__err(u8"bad ctype",u8"Corrupt PNG");
+            comp  = stbi__get8(s);  if (comp) return stbi__err(u8"bad comp method",u8"Corrupt PNG");
+            filter= stbi__get8(s);  if (filter) return stbi__err(u8"bad filter method",u8"Corrupt PNG");
+            interlace = stbi__get8(s); if (interlace>1) return stbi__err(u8"bad interlace method",u8"Corrupt PNG");
+            if (!s->img_x || !s->img_y) return stbi__err(u8"0-pixel image",u8"Corrupt PNG");
             if (!pal_img_n) {
                s->img_n = (color & 2 ? 3 : 1) + (color & 4 ? 1 : 0);
                if ((1 << 30) / s->img_x / s->img_n < s->img_y) return stbi__err(u8"too large", u8"Image too large to decode");
@@ -4892,7 +4892,7 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
                invalid_chunk[2] = STBI__BYTECAST(c.type >>  8);
                invalid_chunk[3] = STBI__BYTECAST(c.type >>  0);
                #endif
-               return stbi__err(invalid_chunk, "PNG not supported: unknown PNG chunk type");
+               return stbi__err((char8_t*)invalid_chunk, u8"PNG not supported: unknown PNG chunk type");
             }
             stbi__skip(s, c.length);
             break;
@@ -5506,7 +5506,7 @@ static void *stbi__tga_load(stbi__context *s, int *x, int *y, int *comp, int req
       return stbi__errpuc(u8"too large", u8"Corrupt TGA");
 
    tga_data = (unsigned char*)stbi__malloc_mad3(tga_width, tga_height, tga_comp, 0);
-   if (!tga_data) return stbi__errpuc("outofmem", "Out of memory");
+   if (!tga_data) return stbi__errpuc(u8"outofmem", "Out of memory");
 
    // skip to the data's starting position (offset usually = 0)
    stbi__skip(s, tga_offset );
@@ -5970,7 +5970,7 @@ static stbi_uc *stbi__pic_load_core(stbi__context *s,int width,int height,int *c
       stbi__pic_packet *packet;
 
       if (num_packets==sizeof(packets)/sizeof(packets[0]))
-         return stbi__errpuc("bad format","too many packets");
+         return stbi__errpuc(u8"bad format",u8"too many packets");
 
       packet = &packets[num_packets++];
 
@@ -5981,8 +5981,8 @@ static stbi_uc *stbi__pic_load_core(stbi__context *s,int width,int height,int *c
 
       act_comp |= packet->channel;
 
-      if (stbi__at_eof(s))          return stbi__errpuc("bad file","file too short (reading packets)");
-      if (packet->size != 8)  return stbi__errpuc("bad format","packet isn't 8bpp");
+      if (stbi__at_eof(s))          return stbi__errpuc(u8"bad file",u8"file too short (reading packets)");
+      if (packet->size != 8)  return stbi__errpuc(u8"bad format",u8"packet isn't 8bpp");
    } while (chained);
 
    *comp = (act_comp & 0x10 ? 4 : 3); // has alpha channel?
@@ -5996,7 +5996,7 @@ static stbi_uc *stbi__pic_load_core(stbi__context *s,int width,int height,int *c
 
          switch (packet->type) {
             default:
-               return stbi__errpuc("bad format","packet has bad compression type");
+               return stbi__errpuc(u8"bad format",u8"packet has bad compression type");
 
             case 0: {//uncompressed
                int32_t x;
@@ -6015,7 +6015,7 @@ static stbi_uc *stbi__pic_load_core(stbi__context *s,int width,int height,int *c
                      stbi_uc count,value[4];
 
                      count=stbi__get8(s);
-                     if (stbi__at_eof(s))   return stbi__errpuc("bad file","file too short (pure read count)");
+                     if (stbi__at_eof(s))   return stbi__errpuc(u8"bad file",u8"file too short (pure read count)");
 
                      if (count > left)
                         count = (stbi_uc) left;
@@ -6032,7 +6032,7 @@ static stbi_uc *stbi__pic_load_core(stbi__context *s,int width,int height,int *c
             case 2: {//Mixed RLE
                int32_t left=width;
                while (left>0) {
-                  if (stbi__at_eof(s))  return stbi__errpuc("bad file","file too short (mixed read count)");
+                  if (stbi__at_eof(s))  return stbi__errpuc(u8"bad file",u8"file too short (mixed read count)");
                   int32_t count = stbi__get8(s), i;
 
                   if (count >= 128) { // Repeated
@@ -6043,7 +6043,7 @@ static stbi_uc *stbi__pic_load_core(stbi__context *s,int width,int height,int *c
                      else
                         count -= 127;
                      if (count > left)
-                        return stbi__errpuc("bad file","scanline overrun");
+                        return stbi__errpuc(u8"bad file",u8"scanline overrun");
 
                      if (!stbi__readval(s,packet->channel,value))
                         return 0;
@@ -6052,7 +6052,7 @@ static stbi_uc *stbi__pic_load_core(stbi__context *s,int width,int height,int *c
                         stbi__copyval(packet->channel,dest,value);
                   } else { // Raw
                      ++count;
-                     if (count>left) return stbi__errpuc("bad file","scanline overrun");
+                     if (count>left) return stbi__errpuc(u8"bad file",u8"scanline overrun");
 
                      for(i=0;i<count;++i, dest+=4)
                         if (!stbi__readval(s,packet->channel,dest))
@@ -6082,8 +6082,8 @@ static void *stbi__pic_load(stbi__context *s,int *px,int *py,int *comp,int req_c
 
    x = stbi__get16be(s);
    y = stbi__get16be(s);
-   if (stbi__at_eof(s))  return stbi__errpuc("bad file","file too short (pic header)");
-   if (!stbi__mad3sizes_valid(x, y, 4, 0)) return stbi__errpuc("too large", "PIC image too large to decode");
+   if (stbi__at_eof(s))  return stbi__errpuc(u8"bad file",u8"file too short (pic header)");
+   if (!stbi__mad3sizes_valid(x, y, 4, 0)) return stbi__errpuc(u8"too large", "PIC image too large to decode");
 
    stbi__get32be(s); //skip `ratio'
    stbi__get16be(s); //skip `fields'
@@ -6176,11 +6176,11 @@ static int stbi__gif_header(stbi__context *s, stbi__gif *g, int *comp, int is_in
 {
    stbi_uc version;
    if (stbi__get8(s) != 'G' || stbi__get8(s) != 'I' || stbi__get8(s) != 'F' || stbi__get8(s) != '8')
-      return stbi__err("not GIF", "Corrupt GIF");
+      return stbi__err(u8"not GIF", "Corrupt GIF");
 
    version = stbi__get8(s);
-   if (version != '7' && version != '9')    return stbi__err("not GIF", "Corrupt GIF");
-   if (stbi__get8(s) != 'a')                return stbi__err("not GIF", "Corrupt GIF");
+   if (version != '7' && version != '9')    return stbi__err(u8"not GIF", "Corrupt GIF");
+   if (stbi__get8(s) != 'a')                return stbi__err(u8"not GIF", "Corrupt GIF");
 
    stbi__g_failure_reason = "";
    g->w = stbi__get16le(s);
@@ -6306,20 +6306,20 @@ static stbi_uc *stbi__process_gif_raster(stbi__context *s, stbi__gif *g)
             return g->out;
          } else if (code <= avail) {
             if (first) {
-               return stbi__errpuc("no clear code", "Corrupt GIF");
+               return stbi__errpuc(u8"no clear code", "Corrupt GIF");
             }
 
             if (oldcode >= 0) {
                p = &g->codes[avail++];
                if (avail > 8192) {
-                  return stbi__errpuc("too many codes", "Corrupt GIF");
+                  return stbi__errpuc(u8"too many codes", "Corrupt GIF");
                }
 
                p->prefix = (stbi__int16) oldcode;
                p->first = g->codes[oldcode].first;
                p->suffix = (code == avail) ? p->first : g->codes[code].first;
             } else if (code == avail)
-               return stbi__errpuc("illegal code in raster", "Corrupt GIF");
+               return stbi__errpuc(u8"illegal code in raster", "Corrupt GIF");
 
             stbi__out_gif_code(g, (stbi__uint16) code);
 
@@ -6330,7 +6330,7 @@ static stbi_uc *stbi__process_gif_raster(stbi__context *s, stbi__gif *g)
 
             oldcode = code;
          } else {
-            return stbi__errpuc("illegal code in raster", "Corrupt GIF");
+            return stbi__errpuc(u8"illegal code in raster", "Corrupt GIF");
          }
       }
    }
@@ -6352,7 +6352,7 @@ static stbi_uc *stbi__gif_load_next(stbi__context *s, stbi__gif *g, int *comp, i
       g->out = (stbi_uc *) stbi__malloc(4 * g->w * g->h);
       g->background = (stbi_uc *) stbi__malloc(4 * g->w * g->h);
       g->history = (stbi_uc *) stbi__malloc(g->w * g->h);
-      if (g->out == 0)                      return stbi__errpuc("outofmem", "Out of memory");
+      if (g->out == 0)                      return stbi__errpuc(u8"outofmem", "Out of memory");
 
       // image is treated as "tranparent" at the start - ie, nothing overwrites the current background;
       // background colour is only used for pixels that are not rendered first frame, after that "background"
@@ -6410,7 +6410,7 @@ static stbi_uc *stbi__gif_load_next(stbi__context *s, stbi__gif *g, int *comp, i
             w = stbi__get16le(s);
             h = stbi__get16le(s);
             if (((x + w) > (g->w)) || ((y + h) > (g->h)))
-               return stbi__errpuc("bad Image Descriptor", "Corrupt GIF");
+               return stbi__errpuc(u8"bad Image Descriptor", "Corrupt GIF");
 
             g->line_size = g->w * 4;
             g->start_x = x * 4;
@@ -6436,7 +6436,7 @@ static stbi_uc *stbi__gif_load_next(stbi__context *s, stbi__gif *g, int *comp, i
             } else if (g->flags & 0x80) {
                g->color_table = (stbi_uc *) g->pal;
             } else
-               return stbi__errpuc("missing color table", "Corrupt GIF");
+               return stbi__errpuc(u8"missing color table", "Corrupt GIF");
 
             o = stbi__process_gif_raster(s, g);
             if (o == NULL) return NULL;
@@ -6495,7 +6495,7 @@ static stbi_uc *stbi__gif_load_next(stbi__context *s, stbi__gif *g, int *comp, i
             return (stbi_uc *) s; // using '1' causes warning on some compilers
 
          default:
-            return stbi__errpuc("unknown code", "Corrupt GIF");
+            return stbi__errpuc(u8"unknown code", "Corrupt GIF");
       }
    }
 }
@@ -6558,7 +6558,7 @@ static void *stbi__load_gif_main(stbi__context *s, int **delays, int *x, int *y,
       *z = layers;
       return out;
    } else {
-      return stbi__errpuc("not GIF", "Image was not as a gif type.");
+      return stbi__errpuc(u8"not GIF", "Image was not as a gif type.");
    }
 }
 
@@ -6685,7 +6685,7 @@ static float *stbi__hdr_load(stbi__context *s, int *x, int *y, int *comp, int re
    // Check identifier
    headerToken = stbi__hdr_gettoken(s,buffer);
    if (strcmp(headerToken, "#?RADIANCE") != 0 && strcmp(headerToken, "#?RGBE") != 0)
-      return stbi__errpf("not HDR", "Corrupt HDR image");
+      return stbi__errpf(u8"not HDR", "Corrupt HDR image");
 
    // Parse header
    for(;;) {
@@ -6694,16 +6694,16 @@ static float *stbi__hdr_load(stbi__context *s, int *x, int *y, int *comp, int re
       if (strcmp(token, "FORMAT=32-bit_rle_rgbe") == 0) valid = 1;
    }
 
-   if (!valid)    return stbi__errpf("unsupported format", "Unsupported HDR format");
+   if (!valid)    return stbi__errpf(u8"unsupported format", "Unsupported HDR format");
 
    // Parse width and height
    // can't use sscanf() if we're not using stdio!
    token = stbi__hdr_gettoken(s,buffer);
-   if (strncmp(token, "-Y ", 3))  return stbi__errpf("unsupported data layout", "Unsupported HDR format");
+   if (strncmp(token, "-Y ", 3))  return stbi__errpf(u8"unsupported data layout", "Unsupported HDR format");
    token += 3;
    height = (int32_t) strtol(token, &token, 10);
    while (*token == ' ') ++token;
-   if (strncmp(token, "+X ", 3))  return stbi__errpf("unsupported data layout", "Unsupported HDR format");
+   if (strncmp(token, "+X ", 3))  return stbi__errpf(u8"unsupported data layout", "Unsupported HDR format");
    token += 3;
    width = (int32_t) strtol(token, NULL, 10);
 
@@ -6714,12 +6714,12 @@ static float *stbi__hdr_load(stbi__context *s, int *x, int *y, int *comp, int re
    if (req_comp == 0) req_comp = 3;
 
    if (!stbi__mad4sizes_valid(width, height, req_comp, sizeof(float), 0))
-      return stbi__errpf("too large", "HDR image is too large");
+      return stbi__errpf(u8"too large", "HDR image is too large");
 
    // Read data
    hdr_data = (float *) stbi__malloc_mad4(width, height, req_comp, sizeof(float), 0);
    if (!hdr_data)
-      return stbi__errpf("outofmem", "Out of memory");
+      return stbi__errpf(u8"outofmem", "Out of memory");
 
    // Load image data
    // image data is stored as some number of sca
@@ -6757,12 +6757,12 @@ static float *stbi__hdr_load(stbi__context *s, int *x, int *y, int *comp, int re
          }
          len <<= 8;
          len |= stbi__get8(s);
-         if (len != width) { STBI_FREE(hdr_data); STBI_FREE(scanline); return stbi__errpf("invalid decoded scanline length", "corrupt HDR"); }
+         if (len != width) { STBI_FREE(hdr_data); STBI_FREE(scanline); return stbi__errpf(u8"invalid decoded scanline length", "corrupt HDR"); }
          if (scanline == NULL) {
             scanline = (stbi_uc *) stbi__malloc_mad2(width, 4, 0);
             if (!scanline) {
                STBI_FREE(hdr_data);
-               return stbi__errpf("outofmem", "Out of memory");
+               return stbi__errpf(u8"outofmem", "Out of memory");
             }
          }
 
@@ -6775,12 +6775,12 @@ static float *stbi__hdr_load(stbi__context *s, int *x, int *y, int *comp, int re
                   // Run
                   value = stbi__get8(s);
                   count -= 128;
-                  if (count > nleft) { STBI_FREE(hdr_data); STBI_FREE(scanline); return stbi__errpf("corrupt", "bad RLE data in HDR"); }
+                  if (count > nleft) { STBI_FREE(hdr_data); STBI_FREE(scanline); return stbi__errpf(u8"corrupt", "bad RLE data in HDR"); }
                   for (z = 0; z < count; ++z)
                      scanline[i++ * 4 + k] = value;
                } else {
                   // Dump
-                  if (count > nleft) { STBI_FREE(hdr_data); STBI_FREE(scanline); return stbi__errpf("corrupt", "bad RLE data in HDR"); }
+                  if (count > nleft) { STBI_FREE(hdr_data); STBI_FREE(scanline); return stbi__errpf(u8"corrupt", "bad RLE data in HDR"); }
                   for (z = 0; z < count; ++z)
                      scanline[i++ * 4 + k] = stbi__get8(s);
                }
@@ -7021,10 +7021,10 @@ static void *stbi__pnm_load(stbi__context *s, int *x, int *y, int *comp, int req
    if (comp) *comp = s->img_n;
 
    if (!stbi__mad3sizes_valid(s->img_n, s->img_x, s->img_y, 0))
-      return stbi__errpuc("too large", "PNM too large");
+      return stbi__errpuc(u8"too large", "PNM too large");
 
    out = (stbi_uc *) stbi__malloc_mad3(s->img_n, s->img_x, s->img_y, 0);
-   if (!out) return stbi__errpuc("outofmem", "Out of memory");
+   if (!out) return stbi__errpuc(u8"outofmem", "Out of memory");
    stbi__getn(s, out, s->img_n * s->img_x * s->img_y);
 
    if (req_comp && req_comp != s->img_n) {
@@ -7103,7 +7103,7 @@ static int      stbi__pnm_info(stbi__context *s, int *x, int *y, int *comp)
    maxv = stbi__pnm_getinteger(s, &c);  // read max value
 
    if (maxv > 255)
-      return stbi__err("max value > 255", "PPM image not 8-bit");
+      return stbi__err(u8"max value > 255", "PPM image not 8-bit");
    else
       return 1;
 }
@@ -7148,7 +7148,7 @@ static int stbi__info_main(stbi__context *s, int *x, int *y, int *comp)
    if (stbi__tga_info(s, x, y, comp))
        return 1;
    #endif
-   return stbi__err("unknown image type", "Image not of any known type, or corrupt");
+   return stbi__err(u8"unknown image type", "Image not of any known type, or corrupt");
 }
 
 static int32_t stbi__is_16_main(stbi__context *s)
@@ -7168,7 +7168,7 @@ static int32_t stbi__is_16_main(stbi__context *s)
 STBIDEF int stbi_info(char const *filename, int *x, int *y, int *comp)
 {
     FILE *f = stbi__fopen(filename, "rb");
-    if (!f) return stbi__err("can't fopen", "Unable to open file");
+    if (!f) return stbi__err(u8"can't fopen", "Unable to open file");
     int32_t result;
     result = stbi_info_from_file(f, x, y, comp);
     fclose(f);
@@ -7189,7 +7189,7 @@ STBIDEF int stbi_info_from_file(FILE *f, int *x, int *y, int *comp)
 STBIDEF int stbi_is_16_bit(char const *filename)
 {
     FILE *f = stbi__fopen(filename, "rb");
-    if (!f) return stbi__err("can't fopen", "Unable to open file");
+    if (!f) return stbi__err(u8"can't fopen", "Unable to open file");
     int32_t result;
     result = stbi_is_16_bit_from_file(f);
     fclose(f);
