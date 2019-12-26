@@ -86,6 +86,8 @@ struct KernelParams {
 	int32_t lastPageIndexCache;
 	uint64_t stack;
 	uint64_t physical; // physical address of where kernel loader placed
+	uint64_t physicalRamBitMaskVirtual; // virtual address of where RAM usage bit-map stored
+	uint64_t physicalRamBitMaskSizeBytes; // RAM usage bit-map size in bytes
 	efi::EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
 	efi::EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
