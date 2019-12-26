@@ -221,8 +221,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	serialPrintln(u8"[[[efi_main]]] loading trump-o-line");
 	RamDiskAsset trampoline = getRamDiskAsset(u8"trampoline.tofita");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size, trampoline.data);
-	let startFunction = (InitKernelTrampoline) (1024 * 1024);
-	tmemcpy((void *)startFunction, trampoline.data, trampoline.size);
 
 	// RAM usage bit-map
 
@@ -258,8 +256,10 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	paging::mapFramebuffer(&params->framebuffer);
 	drawLoading(&framebuffer, 2);
 	paging::mapEfi(&params->efiMemoryMap);
-	// TODO also dynamically allocate trampoline at paging::conventionalOffset + PAGE_SIZE
 	paging::mapMemoryHuge(WholePhysicalStart, 0, ram / PAGE_SIZE);
+
+	let startFunction = (InitKernelTrampoline) (paging::conventionalOffset + PAGE_SIZE);
+	tmemcpy((void *)startFunction, trampoline.data, trampoline.size);
 	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1);
 
 	// Fix virtual addresses
