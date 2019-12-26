@@ -82,52 +82,16 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		uint16_t major = (uint16_t)(revision >> 16);
 		serialPrintf(u8"[[[efi_main]]] UEFI revision %d.%d\n", major, minor);
 	}
-
-	const uint64_t lower = (uint64_t)1024*1024; // TODO Is this memory really-really allowed by UEFI?
 	// TODO Actually, no matter where lower is present, cause no lower-relative addressing done in kernel
 	// after calling cr3 at the first instruction
 	// so it is safe to allocate it at random position in conventional memory
-	const uint64_t loaderSize = (uint64_t)1024*1024;
 	// TODO Size should be guessed dynamically
 
-	{
-		paging::buffa[0] = 0;
-
-		// Zero fill bootloader memory
-		uint8_t* bb = (uint8_t*)lower;
-		for (uint64_t i = 0; i < loaderSize; ++i)
-		{
-			// TODO faster with uint64_t
-			bb[i] = paging::buffa[0];
-		}
-	}
 
 	const uint64_t upper = (uint64_t)0xffff800000000000;
-	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - lower + upper)
-	KernelParams* initParameters = (KernelParams*)(lower + loaderSize - (uint64_t)4096);
-	initParameters->physical = lower;
-
-	initParameters->efiMemoryMap.memoryMapSize = sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512;
-	initParameters->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *) ((uint64_t)initParameters - initParameters->efiMemoryMap.memoryMapSize);
-
-	// Note: stack grows from x to X-N, not X+N
-	uint64_t stack = (uint64_t)initParameters->efiMemoryMap.memoryMap;
-	// Align to page
-	stack = (uint64_t)(stack / 4096) * 4096 - 4096;
-	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
-
-	{
-		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
-		for (uint64_t i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
-		{
-			// TODO faster with uint64_t
-			bb[i] = paging::buffa[0];
-		}
-	}
-
+	void *acpiTable = NULL;
 	{
 		serialPrintln(u8"[[[efi_main]]] begin: ACPI");
-		void *acpiTable = NULL;
 		efi::EFI_GUID acpi20 = ACPI_20_TABLE_GUID;
 		efi::EFI_GUID acpi = ACPI_TABLE_GUID;
 
@@ -146,37 +110,39 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		}
 
 		// TODO also transfer ACPI version to report SandyBridge
-		initParameters->acpiTablePhysical = (uint64_t)(acpiTable);
 		serialPrintln(u8"[[[efi_main]]] done: ACPI");
 	}
 
-	initParameters->efiRuntimeServices = systemTable->RuntimeServices;
 	efi::EFI_STATUS status = EFI_NOT_READY;
 
 	serialPrintln(u8"[[[efi_main]]] begin: initializeFramebuffer");
-	initializeFramebuffer(&initParameters->framebuffer, systemTable);
-	drawLoading(&initParameters->framebuffer, 0);
+	Framebuffer framebuffer;
+	initializeFramebuffer(&framebuffer, systemTable);
+	drawLoading(&framebuffer, 0);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
 	serialPrintln(u8"[[[efi_main]]] done: initializeFramebuffer");
 	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
-	findAndLoadRamDisk(systemTable->BootServices, &initParameters->ramdisk);
-	drawLoading(&initParameters->framebuffer, 1);
+	RamDisk ramdisk;
+	findAndLoadRamDisk(systemTable->BootServices, &ramdisk);
+	drawLoading(&framebuffer, 1);
 
 	serialPrintln(u8"[[[efi_main]]] begin: fillMemoryMap");
-	uint64_t sizeAlloc = (initParameters->ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE;
-	initParameters->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(initParameters->ramdisk.base + sizeAlloc);
+	uint64_t sizeAlloc = (ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE;
+	EfiMemoryMap efiMemoryMap;
+	efiMemoryMap.memoryMapSize = sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512;
+	efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(ramdisk.base + sizeAlloc);
 	{
-		uint8_t* bb = (uint8_t*)initParameters->efiMemoryMap.memoryMap;
-		for (uint64_t i = 0; i < initParameters->efiMemoryMap.memoryMapSize; ++i)
+		uint8_t* b = (uint8_t*)efiMemoryMap.memoryMap;
+		for (uint64_t i = 0; i < efiMemoryMap.memoryMapSize; ++i)
 		{
 			// TODO faster with uint64_t
-			bb[i] = paging::buffa[0];
+			b[i] = paging::buffa[0];
 		}
 	}
-	fillMemoryMap(&initParameters->efiMemoryMap, systemTable);
+	fillMemoryMap(&efiMemoryMap, systemTable);
 	serialPrintln(u8"[[[efi_main]]] done: fillMemoryMap");
 
 	serialPrintln(u8"[[[efi_main]]] begin: ExitBootServices");
@@ -193,7 +159,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 			oops++;
 		}
 		status = systemTable->BootServices->ExitBootServices(imageHandle,
-			initParameters->efiMemoryMap.mapKey);
+			efiMemoryMap.mapKey);
 	}
 
 	if (status != EFI_SUCCESS) {
@@ -203,18 +169,17 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	}
 	serialPrintln(u8"[[[efi_main]]] done: ExitBootServices");
 
-	setRamDisk(&initParameters->ramdisk);
+	setRamDisk(&ramdisk);
 
 	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
 
 	RamDiskAsset asset = getRamDiskAsset(u8"loader.tofita");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
 
-	uint64_t largeBuffer = paging::conventionalAllocateLargest(&initParameters->efiMemoryMap);
+	uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
 	if (largeBuffer == 1024*1024) largeBuffer += 4096; // TODO remove ASAP
 	serialPrintf(u8"[[[efi_main]]] large buffer allocated at %u\n", largeBuffer);
 	paging::conventionalOffset = largeBuffer;
-	#undef LOWER_TO_UPPER
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - largeBuffer + upper)
 
 	void *kernelBase = (void *) paging::conventionalAllocateNext(asset.size + PAGE_SIZE);
@@ -236,6 +201,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		}
 	}
 
+	// Note: stack grows from x to X-N, not X+N
+	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
 	var stack = paging::conventionalAllocateNext(1024 * 1024) + 1024 * 1024;
 	{
 		uint8_t* b = (uint8_t*)(stack - 1024 * 1024);
@@ -245,11 +212,9 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		}
 	}
 
-	EfiMemoryMap efiMemoryMap = initParameters->efiMemoryMap;
-
 	params->efiMemoryMap = efiMemoryMap;
-	params->ramdisk = initParameters->ramdisk;
-	params->framebuffer = initParameters->framebuffer;
+	params->ramdisk = ramdisk;
+	params->framebuffer = framebuffer;
 
 	params->bufferSize = 32 * 1024 * 1024;
 	params->buffer = paging::conventionalAllocateNext(params->bufferSize);
@@ -293,11 +258,10 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	);
 	paging::mapRamDisk(&params->ramdisk);
 	paging::mapFramebuffer(&params->framebuffer);
+	drawLoading(&framebuffer, 2);
 	paging::mapEfi(&params->efiMemoryMap);
 	// TODO also dynamically allocate trampoline at paging::conventionalOffset + PAGE_SIZE
 	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1);
-
-	drawLoading(&initParameters->framebuffer, 2);
 
 	// Fix virtual addresses
 
@@ -312,6 +276,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->stack = stack; // physical address for stack overflow detection
 	params->lastPageIndexCache = paging::lastPageIndex;
 	params->physical = largeBuffer;
+	params->efiRuntimeServices = systemTable->RuntimeServices;
+	params->acpiTablePhysical = (uint64_t)(acpiTable);
 
 	// Convert addresses to upper half
 
@@ -323,34 +289,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
 
 	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper);
-	return EFI_SUCCESS;
-	}
-
-	#undef LOWER_TO_UPPER
-	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - lower + upper)
-
-	void *kernelBase = (void *) initParameters->physical;
-
-	tmemcpy(kernelBase, asset.data, asset.size);
-	InitKernelTrampoline startFunction = (InitKernelTrampoline) kernelBase;
-
-	RamDiskAsset trampoline = getRamDiskAsset(u8"trampoline.tofita");
-	tmemcpy((void *)(initParameters->physical + 1024*1024), trampoline.data, trampoline.size);
-	startFunction = (InitKernelTrampoline) (initParameters->physical + 1024*1024);
-
-	initParameters->ramdisk.size += sizeAlloc;
-	const uint64_t pml4 = paging::enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
-	initParameters->ramdisk.size -= sizeAlloc;
-	initParameters->pml4 = pml4; // TODO set virtual address instead?
-	initParameters->stack = stack; // TODO set virtual address instead?
-	initParameters->lastPageIndexCache = paging::lastPageIndex;
-
-	// Convert addresses to upper half
-	initParameters->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(initParameters->ramdisk.base + sizeAlloc);
-	initParameters = (KernelParams*)LOWER_TO_UPPER(initParameters);
-	stack = LOWER_TO_UPPER(stack);
-
-	startFunction((uint64_t)initParameters, pml4, stack, upper);
 
 	return EFI_SUCCESS;
 }
