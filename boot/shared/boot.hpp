@@ -70,15 +70,16 @@ struct RamDisk {
 #define STR(x) STR_IMPL_(x)  // indirection to expand argument macros
 
 // Start of kernel sections in memory, see loader.ld
-#define KernelVirtualBase 0xffff800000000000
-#define EfiVirtualBase (KernelVirtualBase + 0x40000000)
-#define FramebufferStart (EfiVirtualBase + 0x40000000)
-#define RamdiskStart (FramebufferStart + 0x45000000)
+#define KernelVirtualBase (uint64_t)0xffff800000000000
+#define EfiVirtualBase (KernelVirtualBase + 1024*1024*1024) // 1 GB
+#define FramebufferStart (EfiVirtualBase + 1024*1024*1024) // 1 GB
+// TODO: no need for mapping FramebufferStart if WholePhysicalStart used
+#define RamdiskStart (FramebufferStart + 1024*1024*1024) // 1 GB
 // TODO proper dynamically computed numbers
 
 // Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-#define WholePhysicalStart (RamdiskStart + 0x15000000)
+#define WholePhysicalStart (RamdiskStart + 1024*1024*1024) // 1 GB
 #define PAGE_SIZE 4096 // 4 KiB
 
 struct KernelParams {
