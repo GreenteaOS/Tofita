@@ -98,7 +98,7 @@ static int32_t lastPageIndex = 0;
 
 static void *allocatePage() {
 	// TODO bounds check
-	return (void *) pages[lastPageIndex--];
+	return (void *) pages[lastPageIndex++];
 }
 
 static LinearAddress getLinearAddress(uint64_t address) {
@@ -245,6 +245,43 @@ uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 	return result;
 }
 
+uint8_t buffa[1] = {0};
+
+uint64_t conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
+	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
+	const uint64_t descriptorSize = memoryMap->descriptorSize;
+	uint64_t result = 0;
+	uint64_t largestPages = 0;
+
+	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
+	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
+	uint64_t offset = startOfMemoryMap;
+
+	while (offset < endOfMemoryMap) {
+		// Note: > not >= cause we should have some extra space next to this
+		if ((descriptor->Type == efi::EfiConventionalMemory) && (descriptor->NumberOfPages > largestPages)) {
+			largestPages = descriptor->NumberOfPages;
+			result = descriptor->PhysicalStart;
+		}
+
+		offset += descriptorSize;
+		descriptor = getNextDescriptor(descriptor, descriptorSize);
+	}
+
+	serialPrintf(u8"[paging] conventionalAllocateLargest is %u bytes, %d pages\n", (uint32_t)(largestPages * PAGE_SIZE), largestPages);
+
+	return result;
+}
+
+uint64_t conventionalOffset;
+uint64_t conventionalAllocateNext(uint64_t bytes) {
+	let result = conventionalOffset;
+	let pages = bytes / PAGE_SIZE; // Math.floor
+	conventionalOffset += pages * PAGE_SIZE;
+	if ((bytes - (pages * PAGE_SIZE)) > 0) conventionalOffset += PAGE_SIZE;
+	return result;
+}
+
 function mapFramebuffer(Framebuffer *fb) {
 	let framebufferBase = fb->base;
 	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
@@ -252,10 +289,13 @@ function mapFramebuffer(Framebuffer *fb) {
 
 function mapRamDisk(RamDisk *ramdisk) {
 	let ramdiskBase = ramdisk->base;
-	mapMemory(RamdiskStart, (uint64_t) ramdiskBase, ramdisk->size / PAGE_SIZE + 1);
+	mapMemory(RamdiskStart, (uint64_t) ramdiskBase,
+		ramdisk->size / PAGE_SIZE + 1
+		+
+		(sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512) / PAGE_SIZE + 1
+	);
 }
 
-uint8_t buffa[1] = {0};
 uint64_t enablePaging(EfiMemoryMap *memoryMap, Framebuffer *fb, RamDisk *ramdisk, KernelParams *params) {
 	params->bufferSize = 32 * 1024 * 1024;
 	uint32_t bufferPages = params->bufferSize / PAGE_SIZE;
