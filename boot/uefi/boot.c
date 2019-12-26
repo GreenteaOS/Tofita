@@ -252,7 +252,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		largeBuffer,
 		(paging::conventionalOffset - largeBuffer) / PAGE_SIZE + 1
 	);
-	paging::mapRamDisk(&params->ramdisk);
+	// Note: framebuffer is *not* within physical memory
 	paging::mapFramebuffer(&params->framebuffer);
 	drawLoading(&framebuffer, 2);
 	paging::mapEfi(&params->efiMemoryMap);
@@ -268,8 +268,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->framebuffer.base = FramebufferStart;
 
 	params->ramdisk.physical = params->ramdisk.base;
-	params->ramdisk.base = RamdiskStart;
-	params->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(RamdiskStart + sizeAlloc);
+	params->ramdisk.base = WholePhysicalStart + params->ramdisk.physical;
 
 	params->pml4 = (uint64_t)paging::pml4entries; // physical address for CPU
 	params->stack = stack; // physical address for stack overflow detection
@@ -277,6 +276,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->physical = largeBuffer;
 	params->efiRuntimeServices = systemTable->RuntimeServices;
 	params->acpiTablePhysical = (uint64_t)(acpiTable);
+	params->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(WholePhysicalStart + (uint64_t)params->efiMemoryMap.memoryMap);
 
 	// Convert addresses to upper half
 

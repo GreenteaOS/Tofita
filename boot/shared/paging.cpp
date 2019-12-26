@@ -235,11 +235,13 @@ uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 	return numberOfPages * PAGE_SIZE;
 }
 
+// TODO this should be reconsidered (i.e. pointer fixups)
 function mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintln(u8"[paging] mapping efi");
 
 	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
+	uint64_t sum = 0;
 
 	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
 	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
@@ -249,13 +251,14 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
 			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart,
 					descriptor->NumberOfPages);
+			sum += descriptor->NumberOfPages;
 		}
 
 		offset += descriptorSize;
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	serialPrintln(u8"[paging] efi mapped");
+	serialPrintf(u8"[paging] efi mapped %u pages\n", sum);
 }
 
 uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
@@ -318,17 +321,8 @@ uint64_t conventionalAllocateNext(uint64_t bytes) {
 	return result;
 }
 
-function mapFramebuffer(Framebuffer *fb) {
+function mapFramebuffer(const Framebuffer *fb) {
 	let framebufferBase = fb->base;
 	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
-}
-
-function mapRamDisk(RamDisk *ramdisk) {
-	let ramdiskBase = ramdisk->base;
-	mapMemory(RamdiskStart, (uint64_t) ramdiskBase,
-		ramdisk->size / PAGE_SIZE + 1
-		+
-		(sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512) / PAGE_SIZE + 1
-	);
 }
 }
