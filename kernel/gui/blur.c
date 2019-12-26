@@ -25,13 +25,13 @@ int32_t __attribute__((fastcall)) floor(float x) {
 }
 
 float __attribute__((fastcall)) sqrt(float number) {
-	long i;
+	int32_t i;
 	float x2, y;
 	const float threehalfs = 1.5F;
 
 	x2 = number * 0.5F;
 	y  = number;
-	i  = * ( long * ) &y;                     // floating point bit level hacking [sic]
+	i  = * ( int32_t * ) &y;                     // floating point bit level hacking [sic]
 	i  = 0x5f3759df - ( i >> 1 );             // Newton's approximation
 	y  = * ( float * ) &i;
 	y  = y * ( threehalfs - ( x2 * y * y ) ); // 1st iteration
@@ -185,7 +185,7 @@ uint8_t* boxesForGauss(double sigma, uint8_t n) {
 	uint8_t wu = wl + 2;
 
 	double mIdeal = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4);
-	#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+	#define round(x) ((x)>=0?(int64_t)((x)+0.5):(int64_t)((x)-0.5))
 	int8_t m = round(mIdeal);
 	#undef round
 
