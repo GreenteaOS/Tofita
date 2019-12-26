@@ -111,6 +111,13 @@ static function initializePage(PageEntry *entry, uint64_t address) {
 	entry->writeAllowed = 1;
 }
 
+static function initializePageHuge(PageEntry *entry, uint64_t address) {
+	entry->address = address >> ADDRESS_BITS;
+	entry->present = 1;
+	entry->writeAllowed = 1;
+	entry->largePage = 1;
+}
+
 static void *getPage(PageEntry *table, uint64_t entryId) {
 	PageEntry *entry = &table[entryId];
 
@@ -128,6 +135,11 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 	initializePage(entry, physicalAddr);
 }
 
+function map_p2huge(PageEntry pd[], uint64_t virtualAddr, uint64_t physicalAddr) {
+	PageEntry *entry = &pd[getLinearAddress(virtualAddr).pd];
+	initializePageHuge(entry, physicalAddr);
+}
+
 #define createMapping(fromTable, toTable)                                            \
 	static void map_ ## fromTable (PageEntry fromTable[],                            \
 			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
@@ -138,8 +150,18 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 createMapping(pd, pt)
 createMapping(pdpt, pd)
 createMapping(pml4, pdpt)
-
 #undef createMapping
+
+#define createHugeMapping(name, fromTable, calls, toTable)                           \
+	static void map_ ## name (PageEntry fromTable[],                                 \
+			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
+		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
+		map_ ## calls ((PageEntry *)toTable, virtualAddr, physicalAddr);             \
+	}
+
+createHugeMapping(p3huge, pdpt, p2huge, pd)
+createHugeMapping(p4huge, pml4, p3huge, pdpt)
+#undef createHugeMapping
 
 function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln(u8"[paging] mapping memory range");
@@ -172,6 +194,20 @@ function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCou
 
 		vAddress += PAGE_SIZE;
 		pAddress += PAGE_SIZE;
+	}
+}
+
+function mapMemoryHuge(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
+	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
+
+	uint64_t vAddress = virtualAddr;
+	uint64_t pAddress = physicalAddr;
+
+	while (vAddress < virtualAddrEnd) {
+		map_p4huge(pml4entries, vAddress, pAddress);
+
+		vAddress += PAGE_SIZE * 512;
+		pAddress += PAGE_SIZE * 512;
 	}
 }
 
