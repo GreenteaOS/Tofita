@@ -259,6 +259,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	drawLoading(&framebuffer, 2);
 	paging::mapEfi(&params->efiMemoryMap);
 	// TODO also dynamically allocate trampoline at paging::conventionalOffset + PAGE_SIZE
+	paging::mapMemoryHuge(WholePhysicalStart, 0, ram / PAGE_SIZE);
 	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1);
 
 	// Fix virtual addresses
