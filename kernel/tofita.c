@@ -39,6 +39,7 @@ uint8_t haveToRender = 1;
 #include "../devices/cpu/interrupts.c"
 #include "../devices/cpu/rdtsc.c"
 #include "../devices/cpu/pages.cpp"
+#include "../devices/cpu/physical.cpp"
 #include "../devices/screen/framebuffer.c"
 #include "../devices/ps2/keyboard.c"
 #include "../devices/ps2/mouse.c"
@@ -71,6 +72,7 @@ const KernelParams *paramsCache = null;
 function kernelMain(const KernelParams *params) {
 	serialPrintln(u8"<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
 	paramsCache = params;
+	PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual, params->ramBytes / 4096);
 	initAllocatorForBuffer(params->bufferSize, params->buffer);
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
