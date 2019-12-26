@@ -76,11 +76,12 @@ for (task in tasks) {
 				require('child_process').execSync(
 					[
 						'..\\Teapot\\LLVM-9.0.0\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
-						'-Os -x c++ -std=gnu++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
+						'-O2 -x c++ -std=gnu++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-fno-rtti -fno-exceptions ',
 						'-Wimplicit-function-declaration -Werror ',
 						'-mtune=nocona ',
 						'-fvisibility=hidden ',
+						'-ffreestanding ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
 						'-D versionMajor=' + config.versionMajor + ' ',
@@ -99,6 +100,7 @@ for (task in tasks) {
 						'-Wimplicit-function-declaration -Werror ',
 						'-DTOFITA -mtune=nocona ',
 						'-fvisibility=hidden ',
+						'-ffreestanding ',
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
 						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fno-pic -mcmodel=large ',
