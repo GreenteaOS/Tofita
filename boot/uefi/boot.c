@@ -204,6 +204,9 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	serialPrintln(u8"[[[efi_main]]] done: ExitBootServices");
 
 	setRamDisk(&initParameters->ramdisk);
+
+	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
+
 	RamDiskAsset asset = getRamDiskAsset(u8"loader.tofita");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
 
@@ -246,10 +249,10 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->bufferSize = 32 * 1024 * 1024;
 	params->buffer = paging::conventionalAllocateNext(params->bufferSize);
 
+	serialPrintln(u8"[[[efi_main]]] loading trump-o-line");
 	RamDiskAsset trampoline = getRamDiskAsset(u8"trampoline.tofita");
-
+	serialPrintf(u8"[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size, trampoline.data);
 	let startFunction = (InitKernelTrampoline) (1024 * 1024);
-
 	tmemcpy((void *)startFunction, trampoline.data, trampoline.size);
 
 	// RAM usage bit-map
@@ -275,6 +278,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	}
 
 	// Map memory
+
+	serialPrintln(u8"[[[efi_main]]] mapping pages for kernel loader");
 
 	paging::mapMemory(
 		upper,
@@ -302,7 +307,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->physicalRamBitMaskVirtual = LOWER_TO_UPPER(params->physicalRamBitMaskVirtual);
 	params = (KernelParams*)LOWER_TO_UPPER(params);
 
-	serialPrintf(u8"[[[efi_main]]] here!\n");
 
 	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper);
 	return EFI_SUCCESS;
@@ -314,20 +318,12 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	void *kernelBase = (void *) initParameters->physical;
 	drawLoading(&initParameters->framebuffer, 2);
 
-	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
-
 	tmemcpy(kernelBase, asset.data, asset.size);
 	InitKernelTrampoline startFunction = (InitKernelTrampoline) kernelBase;
 
-	serialPrintln(u8"[[[efi_main]]] loading trump-o-line");
-
 	RamDiskAsset trampoline = getRamDiskAsset(u8"trampoline.tofita");
-	serialPrintf(u8"[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size, trampoline.data);
-
 	tmemcpy((void *)(initParameters->physical + 1024*1024), trampoline.data, trampoline.size);
 	startFunction = (InitKernelTrampoline) (initParameters->physical + 1024*1024);
-
-	serialPrintln(u8"[[[efi_main]]] mapping pages for kernel loader");
 
 	initParameters->ramdisk.size += sizeAlloc;
 	const uint64_t pml4 = paging::enablePaging(&initParameters->efiMemoryMap, &initParameters->framebuffer, &initParameters->ramdisk, initParameters);
