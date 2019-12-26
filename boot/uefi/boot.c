@@ -210,19 +210,17 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	RamDiskAsset asset = getRamDiskAsset(u8"loader.tofita");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
 
-	{
-
 	uint64_t largeBuffer = paging::conventionalAllocateLargest(&initParameters->efiMemoryMap);
-	if (largeBuffer == 1024*1024) largeBuffer += 4096;
+	if (largeBuffer == 1024*1024) largeBuffer += 4096; // TODO remove ASAP
 	serialPrintf(u8"[[[efi_main]]] large buffer allocated at %u\n", largeBuffer);
 	paging::conventionalOffset = largeBuffer;
 	#undef LOWER_TO_UPPER
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - largeBuffer + upper)
 
-	void *kernelBase = (void *) paging::conventionalAllocateNext(1024 * 1024);
+	void *kernelBase = (void *) paging::conventionalAllocateNext(asset.size + PAGE_SIZE);
 	{
 		uint8_t* b = (uint8_t*)kernelBase;
-		for (uint64_t i = 0; i < 1024 * 1024; ++i)
+		for (uint64_t i = 0; i < asset.size + PAGE_SIZE; ++i)
 		{
 			b[i] = paging::buffa[0];
 		}
@@ -230,6 +228,13 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	tmemcpy(kernelBase, asset.data, asset.size);
 
 	KernelParams* params = (KernelParams*) paging::conventionalAllocateNext(sizeof(KernelParams));
+	{
+		uint8_t* b = (uint8_t*)params;
+		for (uint64_t i = 0; i < sizeof(KernelParams); ++i)
+		{
+			b[i] = paging::buffa[0];
+		}
+	}
 
 	var stack = paging::conventionalAllocateNext(1024 * 1024) + 1024 * 1024;
 	{
@@ -292,6 +297,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// TODO also dynamically allocate trampoline at paging::conventionalOffset + PAGE_SIZE
 	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1);
 
+	drawLoading(&initParameters->framebuffer, 2);
+
 	// Fix virtual addresses
 
 	params->framebuffer.physical = params->framebuffer.base;
@@ -301,12 +308,19 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->ramdisk.base = RamdiskStart;
 	params->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(RamdiskStart + sizeAlloc);
 
-	stack = (uint64_t)(stack / 4096) * 4096 - 4096;
+	params->pml4 = (uint64_t)paging::pml4entries; // physical address for CPU
+	params->stack = stack; // physical address for stack overflow detection
+	params->lastPageIndexCache = paging::lastPageIndex;
+	params->physical = largeBuffer;
+
+	// Convert addresses to upper half
+
 	stack = LOWER_TO_UPPER(stack);
 	params->buffer = LOWER_TO_UPPER(params->buffer);
 	params->physicalRamBitMaskVirtual = LOWER_TO_UPPER(params->physicalRamBitMaskVirtual);
 	params = (KernelParams*)LOWER_TO_UPPER(params);
 
+	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
 
 	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper);
 	return EFI_SUCCESS;
@@ -316,7 +330,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - lower + upper)
 
 	void *kernelBase = (void *) initParameters->physical;
-	drawLoading(&initParameters->framebuffer, 2);
 
 	tmemcpy(kernelBase, asset.data, asset.size);
 	InitKernelTrampoline startFunction = (InitKernelTrampoline) kernelBase;
@@ -337,7 +350,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	initParameters = (KernelParams*)LOWER_TO_UPPER(initParameters);
 	stack = LOWER_TO_UPPER(stack);
 
-	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
 	startFunction((uint64_t)initParameters, pml4, stack, upper);
 
 	return EFI_SUCCESS;
