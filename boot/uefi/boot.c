@@ -229,8 +229,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	uint64_t ram = paging::getRAMSize(&params->efiMemoryMap);
 	serialPrintf(u8"[paging] available RAM is ~%d megabytes\n", (uint32_t)(ram/(1024*1024)));
 	params->ramBytes = ram;
-	params->physicalRamBitMaskSizeBytes = ram / PAGE_SIZE;
-	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(params->physicalRamBitMaskSizeBytes);
+	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram / PAGE_SIZE);
 
 	// Note: paging::PagesArray allocated last
 

@@ -87,17 +87,16 @@ struct KernelParams {
 	uint64_t stack;
 	uint64_t physical; // physical address of where kernel loader placed
 	uint64_t physicalRamBitMaskVirtual; // virtual address of where RAM usage bit-map stored
-	uint64_t physicalRamBitMaskSizeBytes; // RAM usage bit-map size in bytes
 	efi::EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
 	efi::EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
 	Framebuffer framebuffer;
 	RamDisk ramdisk;
 	// Simple memory buffer for in-kernel allocations
-	uint64_t bufferSize = 0;
-	uint64_t buffer = 0;
-	uint64_t acpiTablePhysical = 0;
-	uint64_t ramBytes = 0;
+	uint64_t bufferSize;
+	uint64_t buffer;
+	uint64_t acpiTablePhysical;
+	uint64_t ramBytes;
 	// uint8_t isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and don't allow to login!
 	// in the sense that it looks like a security hole like "let it in without entering a login-password")
 };
