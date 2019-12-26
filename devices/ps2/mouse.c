@@ -59,16 +59,6 @@ function handleMouse() {
 		else
 			handleMouseUp(0);
 
-		serialPrintf("[mouseByte[0]] 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d 7:%d 8:%d bits are set\n",
-			getBit(mouseByte[0], 0),
-			getBit(mouseByte[0], 1),
-			getBit(mouseByte[0], 2),
-			getBit(mouseByte[0], 3),
-			getBit(mouseByte[0], 4),
-			getBit(mouseByte[0], 5),
-			getBit(mouseByte[0], 6),
-			getBit(mouseByte[0], 7)
-		);
 
 		break;
 	};
