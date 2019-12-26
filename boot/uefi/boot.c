@@ -82,11 +82,10 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		uint16_t major = (uint16_t)(revision >> 16);
 		serialPrintf(u8"[[[efi_main]]] UEFI revision %d.%d\n", major, minor);
 	}
-	// TODO Actually, no matter where lower is present, cause no lower-relative addressing done in kernel
+
+	// Actually, no matter where lower is present, cause no lower-relative addressing done in kernel
 	// after calling cr3 at the first instruction
 	// so it is safe to allocate it at random position in conventional memory
-	// TODO Size should be guessed dynamically
-
 
 	const uint64_t upper = (uint64_t)0xffff800000000000;
 	void *acpiTable = NULL;
@@ -287,6 +286,10 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params = (KernelParams*)LOWER_TO_UPPER(params);
 
 	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
+
+	serialPrint(u8"[[[efi_main]]] CR3 points to: ");
+	serialPrintHex((uint64_t) paging::pml4entries);
+	serialPrint(u8"\n");
 
 	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper);
 
