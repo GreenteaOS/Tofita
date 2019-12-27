@@ -26,11 +26,11 @@ constexpr uint32_t byteswap(uint32_t x) {
 		   ((x << 8) & 0x00ff0000) | ((x << 24) & 0xff000000);
 }
 
-#define TABLE_HEADER(signature)                                                \
-	static const uint32_t type_id = byteswap(signature);                       \
-	acpi_table_header header;
+#define TABLE_HEADER(signature)                                               \
+	static const uint32_t typeId = byteswap(signature);                       \
+	AcpiTableHeader header;
 
-struct acpi_table_header {
+struct AcpiTableHeader {
 	uint32_t type;
 	uint32_t length;
 	uint8_t revision;
@@ -41,47 +41,47 @@ struct acpi_table_header {
 	uint32_t creator_id;
 	uint32_t creator_revision;
 
-	bool validate(uint32_t expected_type = 0) const;
+	bool validate(uint32_t expectedType = 0) const;
 } __attribute__((packed));
 
-bool acpi_table_header::validate(uint32_t expected_type) const {
-	return !expected_type || (expected_type == type);
+bool AcpiTableHeader::validate(uint32_t expectedType) const {
+	return !expectedType || (expectedType == type);
 }
 
-struct acpi_mcfg_entry {
+struct AcpiMcfgEntry {
 	uint64_t base;
 	uint16_t group;
-	uint8_t bus_start;
-	uint8_t bus_end;
+	uint8_t busStart;
+	uint8_t busEnd;
 	uint32_t reserved;
 } __attribute__((packed));
 
-struct acpi_mcfg {
+struct AcpiMcfg {
 	TABLE_HEADER('MCFG');
 	uint64_t reserved;
-	acpi_mcfg_entry entries[0];
+	AcpiMcfgEntry entries[0];
 } __attribute__((packed));
 
-struct acpi_apic {
+struct AcpiApic {
 	TABLE_HEADER('APIC');
-	uint32_t local_address;
+	uint32_t localAddress;
 	uint32_t flags;
-	uint8_t controller_data[0];
+	uint8_t controllerData[0];
 } __attribute__((packed));
 
 struct XSDT {
 	TABLE_HEADER('XSDT');
-	acpi_table_header *headers[0];
+	AcpiTableHeader *headers[0];
 } __attribute__((packed));
 
-struct ACPI20 {
+struct Acpi20 {
 	uint32_t length;
 	XSDT *xsdtAddress;
 	uint8_t checksum;
 	uint8_t reserved[3];
 } __attribute__((packed));
 
-struct ACPI10 {
+struct Acpi10 {
 	char8_t signature[8];
 	uint8_t checksum;
 	char8_t oemID[6];
@@ -90,23 +90,47 @@ struct ACPI10 {
 } __attribute__((packed));
 
 struct ACPI {
-	ACPI10 acpi10;
-	ACPI20 acpi20;
+	Acpi10 acpi10;
+	Acpi20 acpi20;
 } __attribute__((packed));
 
 extern "C++" template <typename T>
-uint64_t acpi_table_entries(const T *t, uint64_t size) {
+uint64_t acpiTableEntries(const T *t, uint64_t size) {
 	return (t->header.length - sizeof(T)) / size;
 }
 
-extern "C++" template <typename T> bool acpi_validate(const T *t) {
-	return t->header.validate(T::type_id);
+extern "C++" template <typename T> bool acpiValidate(const T *t) {
+	return t->header.validate(T::typeId);
 }
 
 static void put_sig(char8_t *into, uint32_t type) {
 	for (int32_t j = 0; j < 4; ++j)
 		into[j] = reinterpret_cast<char8_t *>(&type)[j];
 }
+
+extern "C++" template <typename T> inline T *offset_pointer(T *p, uint64_t n) {
+	return reinterpret_cast<T *>(reinterpret_cast<uint64_t>(p) + n);
+}
+
+static inline uint16_t busAddr(uint8_t bus, uint8_t device, uint8_t func) {
+	return bus << 8 | device << 3 | func;
+}
+
+struct PciGroup {
+	uint16_t group;
+	uint16_t busStart;
+	uint16_t busEnd;
+	uint32_t *base;
+
+	uint32_t *baseFor(uint8_t bus, uint8_t device, uint8_t func) {
+		return offset_pointer(base, busAddr(bus, device, func) << 12);
+	}
+
+	bool hasDevice(uint8_t bus, uint8_t device, uint8_t func) {
+		return (*baseFor(bus, device, func) & 0xffff) != 0xffff;
+	}
+};
+
 }
 
 class ACPIParser {
@@ -141,17 +165,17 @@ public:
 			}
 
 		uint8_t checksum = 0;
-		for (int32_t i = 0; i < sizeof(acpi::ACPI10); i++)
+		for (int32_t i = 0; i < sizeof(acpi::Acpi10); i++)
 			checksum += ((uint8_t *)acpi10)[i];
 		if (checksum != 0) {
 			serialPrintln(u8"[ACPI] checksum ACPI 1.0 failed");
 			return false;
 		}
 
-		let acpi20data = (const acpi::ACPI20 *)(&acpiTable->acpi20);
+		let acpi20data = (const acpi::Acpi20 *)(&acpiTable->acpi20);
 		let acpi20raw = (const uint8_t *)acpi20data;
 		checksum = 0;
-		for (int32_t i = 0; i < sizeof(acpi::ACPI20); i++)
+		for (int32_t i = 0; i < sizeof(acpi::Acpi20); i++)
 			checksum += (acpi20raw)[i];
 		if (checksum != 0) {
 			serialPrintln(u8"[ACPI] checksum ACPI 2.0 failed");
@@ -172,7 +196,7 @@ private:
 		return result;
 	}
 
-	static void dump32(const char8_t *msg, const void *virtualAddress) {
+	static function dump32(const char8_t *msg, const void *virtualAddress) {
 		serialPrintf(u8"\n[DUMP] %s: ", msg);
 		const char8_t *x = (char8_t *)((uint64_t)(virtualAddress));
 		const uint8_t *y = (uint8_t *)((uint64_t)(virtualAddress));
@@ -189,7 +213,7 @@ private:
 		if (xsdt == null)
 			return;
 
-		serialPrintf(u8"[ACPI] acpi_validate(xsdt) %d\n", acpi_validate(xsdt));
+		serialPrintf(u8"[ACPI] acpiValidate(xsdt) %d\n", acpiValidate(xsdt));
 
 		char8_t sig[5] = {0, 0, 0, 0, 0};
 		serialPrintf(u8"[ACPI] ACPI 2.0+ tables loading\n");
@@ -197,24 +221,26 @@ private:
 		serialPrintf(u8"[ACPI] Found table %s\n", sig);
 		quakePrintf(u8"[ACPI] Found table %s, ", sig);
 
-		uint64_t num_tables = acpi_table_entries(xsdt, sizeof(void *));
-		serialPrintf(u8"[ACPI] acpi_table_entries %d\n", num_tables);
+		uint64_t numTables = acpiTableEntries(xsdt, sizeof(void *));
+		serialPrintf(u8"[ACPI] acpiTableEntries %d\n", numTables);
 
-		for (uint64_t i = 0; i < num_tables; ++i) {
+		for (uint64_t i = 0; i < numTables; ++i) {
 			auto header =
-				(const acpi::acpi_table_header *)physicalToVirtual((uint64_t)xsdt->headers[i]);
+				(const acpi::AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt->headers[i]);
 
 			acpi::put_sig(sig, header->type);
 			serialPrintf(u8"[ACPI] Found table %s\n", sig);
 			quakePrintf(u8"found table %s, ", sig);
 
-			serialPrintf(u8"[ACPI] acpi_validate(header) %d\n", header->validate());
+			serialPrintf(u8"[ACPI] acpiValidate(header) %d\n", header->validate());
 
 			switch (header->type) {
-			case acpi::acpi_apic::type_id:
+			case acpi::AcpiApic::typeId:
+				loadApic((const acpi::AcpiApic *)(header));
 				break;
 
-			case acpi::acpi_mcfg::type_id:
+			case acpi::AcpiMcfg::typeId:
+				loadMcfg((const acpi::AcpiMcfg *)(header));
 				break;
 
 			default:
@@ -224,10 +250,49 @@ private:
 
 		quakePrintf(u8"done.\n");
 	}
+
+	static function loadApic(const acpi::AcpiApic *apic) {
+		serialPrintf(u8"loadApic\n");
+		uint32_t *local = reinterpret_cast<uint32_t *>(apic->localAddress);
 	}
 
+	static function loadMcfg(const acpi::AcpiMcfg *mcfg) {
+		serialPrintf(u8"loadMcfg\n");
+		uint64_t count = acpiTableEntries(mcfg, sizeof(acpi::AcpiMcfgEntry));
+		acpi::PciGroup mPci[count];
+
+		for (uint32_t i = 0; i < count; ++i) {
+			const acpi::AcpiMcfgEntry &mcfge = mcfg->entries[i];
+
+			mPci[i].group = mcfge.group;
+			mPci[i].busStart = mcfge.busStart;
+			mPci[i].busEnd = mcfge.busEnd;
+			mPci[i].base = reinterpret_cast<uint32_t *>(mcfge.base);
+
+			int32_t num_busses = mPci[i].busEnd - mPci[i].busStart + 1;
+		}
+
+		probePci(mPci, count);
 	}
 
+	static bool multi(acpi::PciGroup *group, uint8_t bus, uint8_t device, uint8_t func) {
+		uint32_t *mBase = group->baseFor(bus, device, func);
+		auto mMulti = ((mBase[3] >> 16) & 0x80) == 0x80;
+		return mMulti;
+	}
+
+	static function probePci(acpi::PciGroup *mPci, uint64_t count) {
+		serialPrintf(u8"[PCI] probePci\n");
+		for (uint32_t i = 0; i < count; ++i) {
+			acpi::PciGroup* pci = &mPci[i];
+			for (int32_t bus = pci->busStart; bus <= pci->busEnd; ++bus) {
+				for (int32_t dev = 0; dev < 32; ++dev) {
+					// TODO
+				}
+			}
+		}
+	}
+};
 
 // Management
 
