@@ -18,6 +18,9 @@
 // TODO check if more generic table ST->ConfigurationTable viable
 
 namespace acpi {
+
+// Types
+
 constexpr uint32_t byteswap(uint32_t x) {
 	return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) |
 		   ((x << 8) & 0x00ff0000) | ((x << 24) & 0xff000000);
@@ -145,6 +148,16 @@ public:
 			return false;
 		}
 
+		let acpi20data = (const acpi::ACPI20 *)(&acpiTable->acpi20);
+		let acpi20raw = (const uint8_t *)acpi20data;
+		checksum = 0;
+		for (int32_t i = 0; i < sizeof(acpi::ACPI20); i++)
+			checksum += (acpi20raw)[i];
+		if (checksum != 0) {
+			serialPrintln(u8"[ACPI] checksum ACPI 2.0 failed");
+			return false;
+		}
+
 		auto xsdt = (const acpi::XSDT *)physicalToVirtual((uint64_t)acpiTable->acpi20.xsdtAddress);
 
 		loadXsdt(xsdt);
@@ -211,15 +224,17 @@ private:
 
 		quakePrintf(u8"done.\n");
 	}
-};
-		return false;
 	}
 
-	/// `false` if failed to do so
-	/// TODO `reboot` quake command
-	bool rebootComputer() {
-		return false;
 	}
-}
 
-#endif
+
+// Management
+
+/// `false` if failed to do so
+/// TODO `poweroff` quake command
+bool shutdownComputer() { return false; }
+
+/// `false` if failed to do so
+/// TODO `reboot` quake command
+bool rebootComputer() { return false; }
