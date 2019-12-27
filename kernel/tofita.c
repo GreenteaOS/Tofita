@@ -30,6 +30,9 @@ namespace efi {
 // This is not a best solution
 uint8_t haveToRender = 1;
 
+// Forward for global usage
+function quakePrintf(const char8_t *c, ...);
+
 #include "util/Math.cpp"
 
 #include "../devices/cpu/amd64.cpp"
@@ -106,13 +109,12 @@ function kernelMain(const KernelParams *params) {
 	uint32_t megs = Math::round((double)params->ramBytes/(1024.0*1024.0));
 	quakePrintf(u8"[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
-#if 0
-	if (!acpi::parse(params->acpiTable)) {
+	if (!ACPIParser::parse(params->acpiTablePhysical)) {
 		quakePrintf(u8"ACPI is *not* loaded\n");
 	} else {
 		quakePrintf(u8"ACPI 2.0 is loaded and ready\n");
 	}
-#endif
+
 	quakePrintf(u8"Enter 'help' for commands\n");
 
 	{
