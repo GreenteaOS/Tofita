@@ -106,7 +106,7 @@ git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 
 #### Configure
 
-Create `R:` ram disk for faster builds and configure `config.json > tempFolder`.
+Create `R:` ram disk about 1 GB (you may download a free [AMD Radeon™ RAMDisk](http://radeonramdisk.com/files/Radeon_RAMDisk_4_4_0_RC36.msi)) for faster builds and configure `config.json > tempFolder`.
 Otherwise `C:` is used to store builds by default.
 
 #### Install Hexa
