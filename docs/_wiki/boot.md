@@ -1,4 +1,5 @@
 ---
+layout: wiki
 title: Boot sequence
 ---
 
