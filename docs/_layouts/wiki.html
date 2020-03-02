@@ -19,7 +19,7 @@
 
         <div class="sidebar">
             <div style="margin-block-start: 7px; padding-inline-start: 15px; margin-block-end: 4px;">
-                <a href="/">Tofita</a><strong><a href="/Tofita/wiki">Wiki</a></strong>
+                <a href="https://github.com/GreenteaOS/Tofita">Tofita</a><strong><a href="/Tofita/wiki">Wiki</a></strong>
             </div>
             <ul>
 	    {% assign sorted = site.wiki | sort: 'title' %}
@@ -29,9 +29,9 @@
 	    {% for p in introSorted %}
                 <li>
                 {% if p.path == page.path %}
-                    <a href="{{p.url}}"><strong>{{ p.title }}</strong></a>
+                    <a href="/Tofita{{p.url}}"><strong>{{ p.title }}</strong></a>
                 {% else %}
-                    <a href="{{p.url}}">{{ p.title }}</a>
+                    <a href="/Tofita{{p.url}}">{{ p.title }}</a>
                 {% endif %}
                 </li>
             {% endfor %}
@@ -42,9 +42,9 @@
 	    {% if p.into == %}
                 <li>
                 {% if p.path == page.path %}
-                    <a href="{{p.url}}"><strong>{{ p.title }}</strong></a>
+                    <a href="/Tofita{{p.url}}"><strong>{{ p.title }}</strong></a>
                 {% else %}
-                    <a href="{{p.url}}">{{ p.title }}</a>
+                    <a href="/Tofita{{p.url}}">{{ p.title }}</a>
                 {% endif %}
                 </li>
 	    {% endif %}
