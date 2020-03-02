@@ -2,7 +2,7 @@
 
 ![Tofita Logo](docs/logo.png?raw=true)
 
-All-new kernel for [Greentea OS](https://github.com/GreenteaOS) — [read Tofita wiki](https://greenteaos.github.io/Tofita/)
+All-new kernel for [Greentea OS](https://github.com/GreenteaOS) — [read Tofita wiki](https://greenteaos.github.io/Tofita/wiki/index.html)
 
 [![Telegram Channel](https://img.shields.io/badge/Telegram-Greentea%20NEWS-blue.svg)](https://telegram.me/greenteaos_news)
 [![Telegram Chatroom](https://img.shields.io/badge/Telegram-Greentea%20OS-blue.svg)](https://telegram.me/greenteaos)
@@ -44,27 +44,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
 - 1 GB RAM
 - Motherboard with UEFI, SATA (AHCI) or NVMe, PCIe and USB 2.0+
 - Multicore modern 64-bit CPU (most AMD and Intel CPUs from 2009 and newer)
-
-## Notes on CPU compatibility
-
-List of required features. Note: `wide support` means *both* AMD and Intel.
-
-- Greentea OS targets CPUs **at least** from 2009 and newer
-- `SSE2` is mandatory on AMD64
-- `NX` bit should be present on all AMD64, but may be disabled, does not affect system working
-- `SSE3` wide support since 2005
-- `CMPXCHG16B` wide support since 2006
-- `PrefetchW` wide support since 2006
-- `LAHF/SAHF` wide support since 2005
-- `POPCNT` wide support since 2008
-- `2 MB` huge pages seems to be mandatory on AMD64
-
-Not required features
-
-- `SSE4.1` wide support since 2011 and **not used by Greentea**
-- `SSSE3` wide support since 2011 and **not used by Greentea**
-- `SSE4a` seems like AMD-only and **not used by Greentea**
-- `1 GB` huge pages (aka `PDPE1GB`) wide support since 2010 and **not used by Greentea**
+- [Read more](https://greenteaos.github.io/Tofita/wiki/cpus.html)
 
 [![Give a star](docs/star.png?raw=true)
 Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
