@@ -6,16 +6,16 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Tofita Kernel Documentation</title>
+	<title>Tofita Kernel Wiki</title>
 </head>
 
 <body>
 	<!-- Some really simple markup for now, to make SEO working -->
-	<h3>Tofita Kernel Documentation</h3>
+	<h3>Tofita Kernel Wiki</h3>
 	<br>
 	{% assign sorted = site.wiki | reverse %}
 	{% for page in sorted %}
-	<a href="{{ page.url | absolute_url }}">{{ page.title }}</a>
+	<a href="/Tofita/wiki/{{ page.url}}">{{ page.title }}</a>
 	<br>
 	{% endfor %}
 </body>
