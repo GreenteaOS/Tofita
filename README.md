@@ -29,7 +29,6 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - COM-port debug output
  - Initial RAM disk for LiveCD/LiveUSB and installer
  - Tested on:
-   - QEMU 3.0.0+ `(use OVMF to emulate UEFI)`
    - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
    - Intel Sandy Bridge `(socket 1155)`
    - AMD APU A10

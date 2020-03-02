@@ -1,6 +1,5 @@
 # Tofita
 
-/OVMF*
 build.js
 node_modules
 
