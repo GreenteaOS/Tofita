@@ -1,0 +1,21 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Tofita Kernel Documentation</title>
+</head>
+
+<body>
+	<!-- Some really simple markup for now, to make SEO working -->
+	{% assign sorted = site.tofita | reverse %}
+	{% for page in sorted %}
+	<a href="{{ page.url | absolute_url }}">{{ page.title }}</a>
+	<br>
+	{% endfor %}
+</body>
+
+</html>
