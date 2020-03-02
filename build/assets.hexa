@@ -16,7 +16,6 @@
 module
 
 declare class Config {
-	let qemuFolder: String
 	let tempFolder: String
 	let versionMajor: Int
 	let versionMinor: Int
