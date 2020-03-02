@@ -19,10 +19,10 @@
 
         <div class="sidebar">
             <div style="margin-block-start: 7px; padding-inline-start: 15px; margin-block-end: 4px;">
-                <a href="/">Tofita</a><strong><a href="/book">Wiki</a></strong>
+                <a href="/">Tofita</a><strong><a href="/Tofita/wiki">Wiki</a></strong>
             </div>
             <ul>
-	    {% assign sorted = site.book | sort: 'title' %}
+	    {% assign sorted = site.wiki | sort: 'title' %}
 	    {% assign otherSorted = (sorted | where: "into" , nil) %} <!-- not works -->
 	    {% assign introSorted = (sorted | where: "into" , "intro" | reverse) %}
 
