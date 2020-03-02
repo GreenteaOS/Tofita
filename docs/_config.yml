@@ -1,0 +1,38 @@
+# Site settings
+
+baseurl: ""
+available: "en, de, fr, es, ru, it, ch, jp"
+
+# SEO related
+
+title: "Greentea OS"
+twitter: "@greenteaos"
+author: "Greentea OS"
+description: "Greentea OS is a free operating system aimed to run .exe files natively"
+image: "https://greenteaos.github.io/assets/images/opengraph.png"
+url: "https://greenteaos.github.io"
+theme-color: "#528a3f"
+
+# Structure
+
+collections:
+  wiki:
+    output: true
+social:
+  name: Greentea OS
+  links:
+    - https://twitter.com/greenteaos
+    - https://github.com/greenteaos
+
+# Build settings
+
+markdown: kramdown
+highlighter: rouge
+plugins:
+   - jemoji
+   - jekyll-seo-tag
+   - jekyll-sitemap
+kramdown:
+  autolink: true
+  input: GFM
+  syntax_highlighter: rouge
