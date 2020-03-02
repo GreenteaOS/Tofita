@@ -15,7 +15,7 @@
 	<br>
 	{% assign sorted = site.wiki | reverse %}
 	{% for page in sorted %}
-	<a href="/Tofita/wiki/{{ page.url}}">{{ page.title }}</a>
+	<a href="/Tofita{{ page.url}}">{{ page.title }}</a>
 	<br>
 	{% endfor %}
 </body>
