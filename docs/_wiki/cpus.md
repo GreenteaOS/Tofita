@@ -15,7 +15,7 @@ List of required features. Note: `wide support` means *both* AMD and Intel.
 - `POPCNT` wide support since 2008
 - `2 MB` huge pages seems to be mandatory on AMD64
 
-Not required features
+Not required features:
 
 - `SSE4.1` wide support since 2011 and **not used by Greentea**
 - `SSSE3` wide support since 2011 and **not used by Greentea**
