@@ -14,6 +14,7 @@ IF %ERRORLEVEL% NEQ 0 (
 color 0A
 echo [Success]
 ::node build.js vbox
+::node tools\vbox.js
 ::node tools\listen.js
 ::node tools\pipe.js
 goto done
