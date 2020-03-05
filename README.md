@@ -54,6 +54,7 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 - [`listen.js`](tools/listen.js) - listen to VirtualBox COM port in TCP socket mode
 - [`pipe.js`](tools/pipe.js) - listen to VirtualBox\Hyper-V COM port in pipe mode
 - [`vbox.js`](tools/vbox.js) - starts VirtualBox Tofita VM and exits
+- [`webui.bat`](tools/webui/webui.bat) - web-based UI for COM port
 - [`gos-devlist.bat`](tools/gos-devlist.bat) - show useful device names and PCI IDs to gather user hardware stats
 
 ## Build

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Tofita Web UI</title>
+</head>
+
+<body>
+	<style type="text/css">
+	* {
+		font-family: sans-serif;
+	}
+
+	</style>
+	<div id="log">Check Chrome Developer tools Console</div>
+	<script type="text/javascript">
+	;
+	(async function() {
+		console.log('[Welcome to the Tofita Web UI!]')
+
+		var busy = false
+		setInterval(function() {
+			if (busy) return
+			busy = true
+
+			fetch('/buffer.json')
+				.then((response) => {
+					return response.json();
+				})
+				.catch((error) => {
+					//console.error('Error:', error);
+					busy = false
+				})
+				.then((data) => {
+					console.log(data);
+					busy = false
+				})
+				.catch((error) => {
+					//console.error('Error:', error);
+					busy = false
+				})
+
+		}, 111);
+
+	})();
+
+	</script>
+</body>
+
+</html>
