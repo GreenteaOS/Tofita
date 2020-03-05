@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2019  Oleg Petrenko
+// Copyright (C) 2020  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,7 +18,6 @@
 // General -> Name `Tofita` or set vmname var
 // Serial Ports -> Port 1
 //                        -> Enable "Enable Serial Port"
-//                        -> Port Mode "TCP"
 //                        -> Port Mode "TCP"
 //                        -> Enable "Connect to existing pipe/socket"
 //                        -> Path localhost:1234 or edit host/port vars
