@@ -1,0 +1,90 @@
+---
+---
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>404 — Page Not Yet Programmed</title>
+	{% seo title=false %}
+</head>
+
+<body>
+	<style>
+	body,
+	html {
+		height: 100%;
+	}
+
+	body {
+		margin: 0;
+		padding: 0;
+		user-select: none;
+		background: #222;
+		color: #fff;
+		text-align: center;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	}
+
+	h2 {
+		font-weight: 700;
+		font-size: 25vh;
+		margin: 0;
+		line-height: 1;
+		animation: light 4s ease infinite;
+	}
+
+	h2+p {
+		font-size: 3vh;
+	}
+
+	.patreon {
+		font-size: 3vh;
+		color: white;
+		background-color: rgb(253, 61, 36);
+		background-color: #e85b46;
+		border-radius: 8px;
+		cursor: pointer;
+		text-decoration: none;
+		transition: .2s ease-out;
+		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.16), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+		border: 0;
+		padding: 4px 10px;
+	}
+
+	.patreon:hover {
+		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.28), 0 2px 7px 0 rgba(0, 0, 0, 0.25);
+	}
+
+	@keyframes light {
+		0% {
+			text-shadow: 0 0 20px #e900fe;
+		}
+
+		33% {
+			text-shadow: 0 0 20px #6de33c;
+		}
+
+		66% {
+			text-shadow: 0 0 20px #e85b46;
+		}
+
+		100% {
+			text-shadow: 0 0 20px #e900fe;
+		}
+	}
+
+	</style>
+	<div class="box">
+		<h2>404</h2>
+		<p>Page Not Yet Programmed</p>
+		<p>Want more code?</p>
+		<p><a href="https://www.patreon.com/PeyTy" class="patreon">Patreon</a></p>
+	</div>
+</body>
+
+</html>
