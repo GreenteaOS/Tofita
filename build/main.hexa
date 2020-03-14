@@ -169,14 +169,14 @@ for (task in tasks) {
 				// Create floppy image
 				fs.copyFileSync(
 					'..\\Teapot\\mtools\\disk-template.img',
-					config.tempFolder + '\\tofita\\disk.img')
+					config.tempFolder + '\\tofita\\DISK.IMG')
 				for (cmd in [
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI',
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI/BOOT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
-					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\autorun.ico ::/autorun.ico',
-					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\autorun.inf ::/autorun.inf'
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.ico ::/autorun.ico',
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.inf ::/autorun.inf'
 				]) require('child_process').execSync(
 					cmd, { stdio: 'inherit' }
 				)
@@ -187,13 +187,10 @@ for (task in tasks) {
 				let path = config.tempFolder.split(':').join('')
 				require('child_process').execSync(
 					[
-						'..\\Teapot\\xorriso-1.3.4\\xorriso.exe',
-						'-as mkisofs -R -f -e',
-						'disk.img',
-						'-no-emul-boot -o',
-						'/cygdrive/\(path)/tofita/greenteaos-uefi64.iso',
-						'-V GreenteaOS',
-						'/cygdrive/\(path)/tofita/iso'
+						'..\\Teapot\\xorriso-1.5.2\\xorriso.exe',
+						'-as mkisofs -o /cygdrive/\(path)/tofita/greenteaos-uefi64.iso -iso-level 3',
+						'-V GreenteaOS /cygdrive/\(path)/tofita/iso -append_partition 2 0xef /cygdrive/\(path)/tofita/DISK.IMG',
+						'-e --interval:appended_partition_2:all:: -no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
 				)
 			}
