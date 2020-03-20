@@ -1,3 +1,4 @@
 Use exactly "Mac OS X (64-bit)" preset (it enables UEFI and other stuff)
 Ensure VT-x (Intel) or SVM (AMD) is enabled in your BIOS
+Install VirtualBox Extension Pack - https://www.virtualbox.org/wiki/Downloads
 Set 2 Gb RAM or more
