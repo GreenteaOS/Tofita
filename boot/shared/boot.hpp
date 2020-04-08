@@ -42,6 +42,45 @@
 #define intptr_t do_not_use_such_types_please
 #define uintptr_t do_not_use_such_types_please
 
+#define STR_IMPL_(x) #x      // stringify argument
+#define STR(x) STR_IMPL_(x)  // indirection to expand argument macros
+
+// Constants
+
+// Start of kernel sections in memory, see loader.ld
+#define KernelVirtualBase (uint64_t)0xffff800000000000
+#define FramebufferStart (KernelVirtualBase + 1024*1024*1024) // 1 GB
+// TODO: no need for mapping FramebufferStart if WholePhysicalStart used
+// TODO proper dynamically computed numbers
+
+// Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
+// Note: Mapping is done on-demand per-page for faster loading
+#define WholePhysicalStart (FramebufferStart + 1024*1024*1024) // 1 GB
+#define PAGE_SIZE 4096 // 4 KiB
+
+// Helpers
+
+extern "C++" template <typename T>
+struct Physical {
+	uint64_t physical;
+
+	static Physical<T> toPhysical(uint64_t physical) {
+		return (Physical<T>)physical;
+	};
+
+	T* toVirtual() const {
+		uint64_t result = (uint64_t)WholePhysicalStart + physical;
+		return (T*)result;
+	};
+
+	T* toVirtualOffset(uint64_t offset) const {
+		uint64_t result = (uint64_t)WholePhysicalStart + physical + offset;
+		return (T*)result;
+	};
+};
+
+_Static_assert(sizeof(Physical<char8_t>) == sizeof(uint64_t), "physical address has to have 64 bits");
+
 // Data transferred from UEFI application into kernel loader
 
 struct EfiMemoryMap {
@@ -65,20 +104,6 @@ struct RamDisk {
 	uint64_t physical; // physical address
 	uint32_t size; // in bytes
 };
-
-#define STR_IMPL_(x) #x      // stringify argument
-#define STR(x) STR_IMPL_(x)  // indirection to expand argument macros
-
-// Start of kernel sections in memory, see loader.ld
-#define KernelVirtualBase (uint64_t)0xffff800000000000
-#define FramebufferStart (KernelVirtualBase + 1024*1024*1024) // 1 GB
-// TODO: no need for mapping FramebufferStart if WholePhysicalStart used
-// TODO proper dynamically computed numbers
-
-// Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
-// Note: Mapping is done on-demand per-page for faster loading
-#define WholePhysicalStart (FramebufferStart + 1024*1024*1024) // 1 GB
-#define PAGE_SIZE 4096 // 4 KiB
 
 struct KernelParams {
 	uint64_t pml4;
