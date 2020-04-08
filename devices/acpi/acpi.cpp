@@ -76,7 +76,7 @@ struct XSDT {
 
 struct Acpi20 {
 	uint32_t length;
-	XSDT *xsdtAddress;
+	Physical<XSDT> xsdtAddress;
 	uint8_t checksum;
 	uint8_t reserved[3];
 } __attribute__((packed));
@@ -182,7 +182,7 @@ public:
 			return false;
 		}
 
-		auto xsdt = (const acpi::XSDT *)physicalToVirtual((uint64_t)acpiTable->acpi20.xsdtAddress);
+		auto xsdt = acpiTable->acpi20.xsdtAddress.toVirtual();
 
 		loadXsdt(xsdt);
 
