@@ -187,6 +187,18 @@ function quakePrintf(const char8_t *c, ...) {
 				}
 				break;
 			}
+			case 'u': {
+				uint32_t value = va_arg(lst, uint32_t);
+				uint8_t buffer[16];
+				for (uint8_t i = 0; i < 16; i++) buffer[i] = 0;
+				_quakeItoA(value, buffer);
+				uint8_t *c = buffer;
+				while (*c != '\0') {
+					_quake_putchar(*c);
+					c++;
+				}
+				break;
+			}
 		}
 		c++;
 	}
