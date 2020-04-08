@@ -73,9 +73,11 @@ for (task in tasks) {
 					config.tempFolder + '\\tofita\\trampoline.bin boot\\loader\\trampoline.asm', { stdio: 'inherit' }
 				)
 
+				let llvm = 'LLVM-10.0.0'
+
 				require('child_process').execSync(
 					[
-						'..\\Teapot\\LLVM-9.0.0\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
+						'..\\Teapot\\\(llvm)\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
 						'-O2 -x c++ -std=gnu++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-fno-rtti -fno-exceptions ',
 						'-Wimplicit-function-declaration -Werror ',
@@ -94,7 +96,7 @@ for (task in tasks) {
 
 				require('child_process').execSync(
 					[
-						'..\\Teapot\\LLVM-9.0.0\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
+						'..\\Teapot\\\(llvm)\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
 						'-O2 -x c++ -std=gnu++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-fno-rtti -fno-exceptions ',
 						'-Wimplicit-function-declaration -Werror ',
@@ -126,7 +128,7 @@ for (task in tasks) {
 
 				require('child_process').execSync(
 					[
-						'..\\Teapot\\LLVM-9.0.0\\bin\\llvm-objcopy.exe -O binary ',
+						'..\\Teapot\\\(llvm)\\bin\\llvm-objcopy.exe -O binary ',
 						config.tempFolder + '/tofita/loader_kernel.elf.img ',
 						config.tempFolder + '/tofita/loader_kernel.img'
 					].join(''), { stdio: 'inherit' }

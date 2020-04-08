@@ -76,7 +76,7 @@ Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-la
 .\Tofita
 ```
 
-You should have extracted `Teapot-master` and have folders like this `.\Teapot\LLVM-9.0.0`.
+You should have extracted `Teapot-master` and have folders like this `.\Teapot\LLVM-*.*.*`.
 
 Teapot will take less space if cloned with limited depth of commit history:
 
