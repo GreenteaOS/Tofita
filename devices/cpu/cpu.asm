@@ -13,6 +13,16 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+global selectSegment
+; TODO set COMPAT_SEL as func agrument
+; TODO set also SS
+%define COMPAT_SEL 16
+%define retfq o64 retf
+selectSegment:
+	push COMPAT_SEL ; push GDT selector
+	push rdi
+	retfq
+
 ; exports
 global keyboardHandler
 global mouseHandler

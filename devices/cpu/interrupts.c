@@ -74,6 +74,12 @@ static inline function loadIdt(Idtr *idtr) {
 	__asm__ volatile("sti");
 }
 
+extern "C" void selectSegment(void* func);
+
+void stub() {
+	serialPrintln(u8"[cpu] welp selectSegment succeded!");
+}
+
 // http://wiki.osdev.org/Inline_Assembly/Examples#I.2FO_access
 static inline function ioWait(void) {
 	// TODO: reinvestigate
@@ -410,6 +416,8 @@ function enableInterrupts() {
 	remapPic(0x20, 0x28);
 
 
+	serialPrintln(u8"[cpu] selectSegment of value 16");
+	selectSegment((void*)&stub);
 
 	// Masking IRQ to only support IRQ1 (keyboard)
 	serialPrintln("[cpu] masking IRQ");
