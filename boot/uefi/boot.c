@@ -76,6 +76,7 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	}
 	return dest;
 }
+#endif
 
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
