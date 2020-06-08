@@ -68,6 +68,8 @@ for (task in tasks) {
 						config.tempFolder + '\\tofita\\' + asm.get(a) + ' ' + a, { stdio: 'inherit' }
 					)
 
+				// CR3 TRAMPOLINE
+
 				require('child_process').execSync(
 					'..\\Teapot\\nasm-2.14.02\\nasm  -o ' +
 					config.tempFolder + '\\tofita\\trampoline.bin boot\\loader\\trampoline.asm', { stdio: 'inherit' }
@@ -75,24 +77,7 @@ for (task in tasks) {
 
 				let llvm = 'LLVM-10.0.0'
 
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\\(llvm)\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
-						'-O2 -x c++ -std=gnu++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
-						'-fno-rtti -fno-exceptions ',
-						'-Wimplicit-function-declaration -Werror ',
-						'-mtune=nocona ',
-						'-fvisibility=hidden ',
-						'-ffreestanding ',
-						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fPIC ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-D versionMajor=' + config.versionMajor + ' ',
-						'-D versionMinor=' + config.versionMinor + ' ',
-						'-D versionName=\\"' + config.versionName + '\\" ',
-						'-c -o ',
-						config.tempFolder + '/tofita/boot.o boot/uefi/boot.c'
-					].join(''), { stdio: 'inherit' }
-				)
+				// KERNEL
 
 				require('child_process').execSync(
 					[
@@ -134,28 +119,7 @@ for (task in tasks) {
 					].join(''), { stdio: 'inherit' }
 				)
 
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\linux-ubuntu-natty_x86_64-bin_x86_64-mingw_20101218_vityan\\bin\\x86_64-vityan-linux-gnu-ld.exe -m elf_x86_64 ',
-						'-nostdlib -znocombreloc -T external/gnuefi/elf_x86_64_efi.lds -shared -Bsymbolic -L external/gnuefi ',
-						'-L /usr/lib ',
-						'external/gnuefi/crt0-efi-x86_64.o ',
-						config.tempFolder + '/tofita/boot.o ',
-						'-o ',
-						config.tempFolder + '/tofita/loader.so -lgnuefi'
-					].join(''), { stdio: 'inherit' }
-				)
-
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\x86_64-w64-mingw32\\objcopy.exe ',
-						'-j .text -j .sdata -j .data -j .dynamic ',
-						'-j .dynsym  -j .rel -j .rela -j .reloc ',
-						'--target=efi-app-x86_64 ',
-						config.tempFolder + '/tofita/loader.so ',
-						config.tempFolder + '/tofita/loader.efi'
-					].join(''), { stdio: 'inherit' }
-				)
+				// UEFI
 
 				require('child_process').execSync(
 					[
