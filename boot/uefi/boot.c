@@ -30,6 +30,7 @@ namespace efi {
 #include "../../devices/serial/init.cpp"
 #include "memory.cpp"
 #include "ramdisk.cpp"
+#include "pe.cpp"
 #include "../../kernel/ramdisk.cpp"
 
 efi::INTN CompareGuid (efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
@@ -182,15 +183,22 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
 
+	#if 0
 	RamDiskAsset asset = getRamDiskAsset(u8"loader.tofita");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
+	#else
+	RamDiskAsset asset = getRamDiskAsset(u8"tofita.exe");
+	serialPrintf(u8"[[[efi_main]]] loaded asset 'tofita.exe' %d bytes at %d\n", asset.size, asset.data);
+	#endif
 
 	uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
 	if (largeBuffer == 1024*1024) largeBuffer += 4096; // TODO remove ASAP
 	serialPrintf(u8"[[[efi_main]]] large buffer allocated at %u\n", largeBuffer);
 	paging::conventionalOffset = largeBuffer;
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - largeBuffer + upper)
+	uint64_t mAddressOfEntryPoint = 0;
 
+	#if 0
 	void *kernelBase = (void *) paging::conventionalAllocateNext(asset.size + PAGE_SIZE);
 	{
 		uint8_t* b = (uint8_t*)kernelBase;
@@ -200,6 +208,32 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		}
 	}
 	tmemcpy(kernelBase, asset.data, asset.size);
+	#else
+	{
+		auto ptr = (uint8_t*)asset.data;
+		auto peHeader = (const PeHeader*)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
+		serialPrintf(u8"PE header signature 'PE' == '%s'\n", peHeader);
+		auto peOptionalHeader = (const Pe32OptionalHeader*)((uint64_t)peHeader + sizeof(PeHeader));
+		serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic, 0x020B);
+		void *kernelBase = (void *) paging::conventionalAllocateNext(peOptionalHeader->mSizeOfImage + PAGE_SIZE);
+		memset(kernelBase, 0, peOptionalHeader->mSizeOfImage); // Zeroing
+
+		// Copy sections
+		auto imageSectionHeader = (const ImageSectionHeader*)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
+		for (int i = 0; i < peHeader->mNumberOfSections; ++i) {
+			serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName, imageSectionHeader[i].mSizeOfRawData);
+			uint64_t where = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress;
+
+			tmemcpy(
+				(void *)where,
+				(void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].mPointerToRawData),
+				imageSectionHeader[i].mSizeOfRawData
+			);
+		}
+
+		mAddressOfEntryPoint = peOptionalHeader->mAddressOfEntryPoint;
+	}
+	#endif
 
 	KernelParams* params = (KernelParams*) paging::conventionalAllocateNext(sizeof(KernelParams));
 	{
@@ -301,7 +335,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	serialPrintHex((uint64_t) paging::pml4entries);
 	serialPrint(u8"\n");
 
-	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper);
+	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper + mAddressOfEntryPoint);
 
 	return EFI_SUCCESS;
 }
