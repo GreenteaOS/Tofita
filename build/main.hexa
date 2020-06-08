@@ -119,6 +119,38 @@ for (task in tasks) {
 					].join(''), { stdio: 'inherit' }
 				)
 
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
+						'-D versionMajor=' + config.versionMajor + ' ',
+						'-D versionMinor=' + config.versionMinor + ' ',
+						'-D versionName=\\"' + config.versionName + '\\" ',
+						'-DMEMSET ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
+						'-m64 -target x86_64-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
+						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w -Wimplicit-function-declaration ',
+						'-O2 -x c++ -std=c++2a -c kernel/tofita.c -o ',
+						config.tempFolder + '/tofita/tofita.obj '
+					].join(''), { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
+					config.tempFolder + '\\tofita\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
+						'/verbose /WX /MACHINE:X64 /entry:kernelMain /SUBSYSTEM:CONSOLE ',
+						'/BASE:0xffff800000000000 ',
+						config.tempFolder + '/tofita/tofita.asm.obj ',
+						config.tempFolder + '/tofita/tofita.obj ',
+						'/out:',
+						config.tempFolder + '/tofita/tofita.exe'
+					].join(''), { stdio: 'inherit' }
+				)
+
 				// UEFI
 
 				require('child_process').execSync(
@@ -144,10 +176,10 @@ for (task in tasks) {
 				require('child_process').execSync(
 					[
 						'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
-				 		'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
-				 		config.tempFolder + '/tofita/miniefi.o',
-				 		' -out:',
-				 		config.tempFolder + '/tofita/loader.efi'
+						'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
+						config.tempFolder + '/tofita/miniefi.o',
+						' -out:',
+						config.tempFolder + '/tofita/loader.efi'
 					].join(''), { stdio: 'inherit' }
 				)
 
