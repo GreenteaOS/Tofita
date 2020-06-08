@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2019  Oleg Petrenko
+// Copyright (C) 2020  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -40,10 +40,14 @@ void* tmemcpy(void* dest, const void* src, uint64_t count) {
 	return dest;
 }
 
+#pragma pack(1)
 typedef struct {
 	uint16_t limit;
 	uint64_t offset;
 } PACKED Idtr;
+#pragma pack()
+
+_Static_assert(sizeof(Idtr) == 10, "IDTR register has to be 80 bits long");
 
 typedef struct {
 	uint16_t offsetLowerbits : 16;
@@ -56,8 +60,6 @@ typedef struct {
 	uint64_t offsetHigherbits : 48;
 	uint32_t zero : 32;
 } PACKED IdtEntry;
-
-_Static_assert(sizeof(Idtr) == 10, "IDTR register has to be 40 bits long");
 
 uint8_t readPort(uint16_t port) {
 	uint8_t data;
@@ -233,17 +235,21 @@ uint8_t mouseRead();
 #define IRQ14 46
 #define IRQ15 47
 
+#pragma pack(1)
 struct TablePtr
 {
 	uint16_t limit;
 	uint64_t base;
 } __attribute__ ((packed));
+#pragma pack()
+
+_Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
 static inline function lgdt(const struct TablePtr *gdt) {
 	asm volatile ("lgdt (%0)" : : "r" (gdt) : "memory");
 }
 
-enum GdtType //: uint8_t
+enum GdtType : uint8_t
 {
 	accessed	= 0x01,
 	read_write	= 0x02,
@@ -262,10 +268,12 @@ struct GdtDescriptor
 	uint16_t limitLow;
 	uint16_t baseLow;
 	uint8_t baseMid;
-	enum GdtType type;
+	enum GdtType type; // Access
 	uint8_t size;
 	uint8_t baseHigh;
 } __attribute__ ((packed));
+
+_Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect");
 
 struct TssDescriptor
 {
