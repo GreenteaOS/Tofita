@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2019  Oleg Petrenko
+// Copyright (C) 2020  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -154,6 +154,36 @@ for (task in tasks) {
 						'--target=efi-app-x86_64 ',
 						config.tempFolder + '/tofita/loader.so ',
 						config.tempFolder + '/tofita/loader.efi'
+					].join(''), { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
+						'-target x86_64-pc-win32-coff -fno-stack-protector ',
+						'-Os -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
+						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG ',
+						'-DMEMSET ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
+						'-D versionMajor=' + config.versionMajor + ' ',
+						'-D versionMinor=' + config.versionMinor + ' ',
+						'-D versionName=\\"' + config.versionName + '\\" ',
+
+						'-fshort-wchar -mno-red-zone -Os',
+						' -c ',
+						'boot/uefi/boot.c',
+						' -o ',
+						config.tempFolder + '/tofita/miniefi.o'
+					].join(''), { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
+				 		'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
+				 		config.tempFolder + '/tofita/miniefi.o',
+				 		' -out:',
+				 		config.tempFolder + '/tofita/loader.efi'
 					].join(''), { stdio: 'inherit' }
 				)
 

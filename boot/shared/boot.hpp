@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2019  Oleg Petrenko
+// Copyright (C) 2020  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -34,8 +34,6 @@
 
 #define char do_not_use_such_types_please
 #define int do_not_use_such_types_please
-#define unsigned do_not_use_such_types_please
-#define long do_not_use_such_types_please
 #define signed do_not_use_such_types_please
 #define short do_not_use_such_types_please
 #define size_t do_not_use_such_types_please
@@ -125,6 +123,6 @@ struct KernelParams {
 	// in the sense that it looks like a security hole like "let it in without entering a login-password")
 };
 
-typedef function (*InitKernel)(const KernelParams *);
+typedef function (__fastcall *InitKernel)(const KernelParams *);
 // TODO ^ fix that in quake
-typedef function (*InitKernelTrampoline)(uint64_t kernelParams, uint64_t pml4, uint64_t stack, uint64_t entry);
+typedef function (__fastcall *InitKernelTrampoline)(uint64_t kernelParams, uint64_t pml4, uint64_t stack, uint64_t entry);

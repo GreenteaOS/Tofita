@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2019  Oleg Petrenko
+// Copyright (C) 2020  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -17,18 +17,19 @@ namespace paging {
 
 #define ADDRESS_BITS 12
 #define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
-#define PACKED __attribute__((packed))
+#define PACKED __attribute__((gcc_struct, packed))
 
-typedef struct {
-	uint16_t offset: 12;
-	uint16_t pt: 9;
-	uint16_t pd: 9;
-	uint16_t pdpt: 9;
-	uint16_t pml4: 9;
-	uint16_t reserved: 16;
-} PACKED LinearAddress;
+struct LinearAddress {
+	unsigned long long offset: 12;
+	unsigned long long pt: 9;
+	unsigned long long pd: 9;
+	unsigned long long pdpt: 9;
+	unsigned long long pml4: 9;
+	unsigned long long reserved: 16;
+} __attribute__((gcc_struct, packed));
 
-_Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to have 64 bits");
+_Static_assert(sizeof(uint64_t) == 8, "uint64_t has to have 64 bits");
+_Static_assert(sizeof(paging::LinearAddress) == 8, "linear address has to have 64 bits");
 
 // 512 entries * 8 bytes = 4 KiB
 // PML4 size = PDP size = PD size = PT size
@@ -41,28 +42,28 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 // Entry in a page table
 typedef struct {
 	// Is the page present in physical memory?
-	uint8_t present : 1;
+	unsigned long long present : 1;
 
 	// Pages are read-only by default
-	uint8_t writeAllowed : 1;
+	unsigned long long writeAllowed : 1;
 
 	// Pages are only accessible by supervisor by default
-	uint8_t accessibleByAll : 1;
+	unsigned long long accessibleByAll : 1;
 
 	// Write through abilities of the page
-	uint8_t writeThrough : 1;
+	unsigned long long writeThrough : 1;
 
 	// If set, the page will not be cached
-	uint8_t cacheDisabled : 1;
+	unsigned long long cacheDisabled : 1;
 
 	// Was the page accessed?
-	uint8_t accessed : 1;
+	unsigned long long accessed : 1;
 
 	// Has the page been written to? Only applicable for PTE.
-	uint8_t dirty : 1;
+	unsigned long long dirty : 1;
 
 	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
-	uint8_t largePage : 1;
+	unsigned long long largePage : 1;
 
 	// Prevent the translations cache from updating
 	// the address in cache if CR3 is reset.
@@ -71,22 +72,22 @@ typedef struct {
 	// enable this feature.
 	//
 	// Only applicable for PTE
-	uint8_t global : 1;
+	unsigned long long global : 1;
 
 	// Not used by the processor
-	uint8_t metadata : 3;
+	unsigned long long metadata : 3;
 
 	// Physical address of the child table/page
-	uint64_t address  : 40;
+	unsigned long long address  : 40;
 
 	// Not used by the processor
-	uint8_t metadata2 : 7;
+	unsigned long long metadata2 : 7;
 
 	// Only applicable for PTE
-	uint8_t protectionKey : 4;
+	unsigned long long protectionKey : 4;
 
 	// Disable execution of code from this page
-	uint8_t disableExecution : 1;
+	unsigned long long disableExecution : 1;
 } PACKED PageEntry;
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2019  Oleg Petrenko
+// Copyright (C) 2020  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -67,6 +67,15 @@ function drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 }
 
 #include "../shared/paging.cpp"
+
+#ifdef MEMSET
+void *memset(void *dest, int32_t e, uint64_t len) {
+	uint8_t *d = (uint8_t *)dest;
+	for (uint64_t i = 0; i < len; i++, d++) {
+		*d = e;
+	}
+	return dest;
+}
 
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
