@@ -1,5 +1,5 @@
 @echo off
 color 0B
 echo [Welcome to the Tofita Web UI!]
-cd %~dp0
+cd /d %~dp0
 node webui.js
