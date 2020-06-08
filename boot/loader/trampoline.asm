@@ -36,4 +36,12 @@ cli ; Disable interrupts
 mov cr3, rdx ; NT
 mov rdi, rcx ; NT -> UNIX
 mov rdx, r8 ; NT -> UNIX
-o64 jmp r9 ; NT
+
+mov rsp, rdx
+push 0 ; Signal end of stack with 0 return address
+push 0 ; and a few extra entries in case of stack
+push 0 ; problems
+push 0
+mov rbp, rsp ; Frame
+
+o64 call r9

@@ -1,5 +1,5 @@
 ; The Tofita Kernel
-; Copyright (C) 2019  Oleg Petrenko
+; Copyright (C) 2020  Oleg Petrenko
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU Lesser General Public License as published by
@@ -25,14 +25,5 @@ section .head
 	; kept as is
 	; rsi is uint64_t pml4
 	; rdx is uint64_t stack
-	mov rsp, rdx
-	push 0 ; Signal end of stack with 0 return address
-	push 0 ; and a few extra entries in case of stack
-	push 0 ; problems
-	push 0
-	mov rbp, rsp ; Frame
 	extern kernelMain
-	call kernelMain
-.halt: ; Don't waste CPU
-	hlt
-	jmp .halt
+	o64 jmp kernelMain
