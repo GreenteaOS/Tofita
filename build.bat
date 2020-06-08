@@ -1,7 +1,7 @@
 @echo off
 color 0B
 echo [Welcome to Tofita!]
-cd %~dp0
+cd /d %~dp0
 cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
