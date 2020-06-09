@@ -78,6 +78,8 @@ static inline function loadIdt(Idtr *idtr) {
 
 extern "C" void selectSegment(void* func);
 
+// This function is used to avoid linker problems
+// It cannot link with stub from .asm
 void stub() {
 	serialPrintln(u8"[cpu] welp selectSegment succeded!");
 }
@@ -91,9 +93,8 @@ static inline function ioWait(void) {
 }
 
 // Handling IDT
-//#define IDT_SIZE 256
 #define IDT_SIZE 256
-#define SYS_CODE64_SEL 0x38 // https://github.com/tianocore/edk/blob/master/Sample/Universal/DxeIpl/Pei/x64/LongMode.asm#L281
+#define SYS_CODE64_SEL 16
 IdtEntry IDT[IDT_SIZE];
 
 // Handling keyboard
@@ -125,11 +126,11 @@ function initializeMouse(IdtEntry *entry) {
 	entry->gateType = 0xe; // Interrupt gate
 }
 
-function initializeFallback(IdtEntry *entry, uint64_t fallback_handler_) {
-	uint64_t address = ((uint64_t) fallback_handler_);
+function initializeFallback(IdtEntry *entry, uint64_t fallbackHandler) {
+	uint64_t address = ((uint64_t) fallbackHandler);
 	entry->offsetLowerbits = address & 0xffff;
 	entry->offsetHigherbits = (address & 0xffffffffffff0000) >> 16;
-	entry->selector = 16; //2; //0x02; //SYS_CODE64_SEL;
+	entry->selector = SYS_CODE64_SEL;
 	entry->zero = 0;
 	entry->ist = 0;
 	entry->z = 0;
@@ -290,7 +291,6 @@ enum GdtType : uint8_t
 	ring3		= 0x60,
 	present		= 0x80
 };
-//IS_BITFIELD(GdtType);
 
 struct GdtDescriptor
 {
@@ -371,7 +371,7 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struc
 	serialPrintHex((uint64_t) frame->sp);
 	serialPrint(u8"\n");
 
-	frame->cs = 16;
+	frame->cs = SYS_CODE64_SEL;
 	frame->ss = 0x18;
 
 	// Enable interrupts
@@ -386,16 +386,16 @@ int32_t timer_called = 0;
 __attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(struct interrupt_frame *frame) {
 	serialPrintf(u8"[cpu] happened timer_interrupt <<<<<<<<<<<<<<<<<<<<<<<<<<<<< !!!!!!!!!!!!!! #%d\n", timer_called++);
 
-	frame->cs = 16;
+	frame->cs = SYS_CODE64_SEL;
 	frame->ss = 0x18;
 
 	// Enable interrupts
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
-void set_tsr(uint16_t tsr_data)
+void setTsr(uint16_t tsr_data)
 {
-  asm volatile("ltr %[src]"
+	asm volatile("ltr %[src]"
 		   : // No outputs
 		   : [src] "m" (tsr_data) // Inputs
 		   : // No clobbers
@@ -425,7 +425,6 @@ __attribute__((aligned(64))) static uint32_t gdtTemplate[32] = {
 #define PS2_DATA_PORT 0x60
 #define PS2_CONTROL_PORT 0x64
 
-#if 1
 function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType typed)
 {
 	g_gdt_table[i].limitLow = limit & 0xffff;
@@ -441,25 +440,7 @@ function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum G
 	g_gdt_table[i].type = (enum GdtType)(typed | system | present);
 }
 
-//global gdt_write
-//gdt_write:
-//	lgdt [rel g_gdtr]
-//	mov ax, si ; second arg is data segment
-//	mov ds, ax
-//	mov es, ax
-//	mov fs, ax
-//	mov gs, ax
-//	mov ss, ax
-//	push qword rdi ; first arg is code segment
-//	lea rax, [rel .next]
-//	push rax
-//	o64 retf
-//.next:
-//	ltr dx
-//	ret
-
-void
-tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
+function tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 {
 	struct TssDescriptor tssd;
 	tssd.limitLow = limit & 0xffff;
@@ -480,8 +461,7 @@ tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 	tmemcpy((void*)&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
 }
 
-void
-tssSetEntry_w7(uint8_t i, uint64_t base, uint64_t limit)
+function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit)
 {
 	struct TssDescriptor tssd;
 	tssd.limitLow = limit & 0xffff;
@@ -526,6 +506,7 @@ function enableInterrupts() {
 	gdtSetEntry(5, 0, 0xfffff,  true,  (enum GdtType)(ring3 | read_write | execute));
 
 	uint64_t sizeof_TssEntry = sizeof(g_tss);
+	serialPrintf(u8"[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(struct TssEntry));
 
 	tmemset((void*)&g_tss, 0, sizeof_TssEntry);
 	g_tss.iomap_offset = sizeof_TssEntry;
@@ -559,15 +540,13 @@ function enableInterrupts() {
 	{
 		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
 		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
-		tssSetEntry_w7(8, tssBase, sizeof_TssEntry);
+		tssSetEntryNT(8, tssBase, sizeof_TssEntry);
 		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
 		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
 	}
 
 	// Note that this takes TWO GDT entries
 	//tssSetEntry(6, tssBase, sizeof_TssEntry);
-
-	//gdt_write(1 << 3, 2 << 3, 6 << 3);
 
 	g_gdtr.limit = sizeof(gdtTemplate) - 1;
 	g_gdtr.base = (uint64_t)(&gdtTemplate[0]);
@@ -582,17 +561,19 @@ function enableInterrupts() {
 	lgdt(&g_gdtr);
 	serialPrintln(u8"[cpu] calling ltr");
 	{
-		set_tsr(64);
+		setTsr(64);
 	}
 	//initializeMouse(&IDT[IRQ4]);
 
 	serialPrintln(u8"[cpu] initializing foo_interrupt");
+
 	for (uint32_t i = 0; i < 286; ++i)
 	{
 		initializeFallback( &IDT[i], (uint64_t)&foo_interrupt);
 	}
 
 	initializeFallback( &IDT[IRQ0], (uint64_t)(&timer_interrupt));
+
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
 	cacheIdtr.offset = (uint64_t) IDT;
 
@@ -609,8 +590,7 @@ function enableInterrupts() {
 	serialPrintln(u8"[cpu] calling lidtq");
 	loadIdt(&cacheIdtr);
 
-
-	serialPrintln(u8"[cpu] selectSegment of value 16");
+	serialPrintln(u8"[cpu] selectSegment of value SYS_CODE64_SEL");
 	selectSegment((void*)&stub);
 
 	// Masking IRQ to only support IRQ1 (keyboard)
@@ -623,7 +603,6 @@ function enableInterrupts() {
 
 	//writePort(IRQ1, 0xFD);
 }
-#endif
 
 function enablePS2Mouse() {
 	serialPrintln(u8"[cpu] begin: setting PS/2 mouse");
@@ -659,7 +638,7 @@ function enablePS2Mouse() {
 	mouseWrite(0xF4);
 	mouseRead(); // Acknowledge
 	//Setup the mouse handler
-//    irq_install_handler(12, mouseHandler);
+	// irq_install_handler(12, mouseHandler);
 	serialPrintln(u8"[cpu] done: setting PS/2 mouse");
 	function quakePrintf(const char8_t *c, ...);
 	quakePrintf(u8"Enabled PS/2 mouse and keyboard\n");
@@ -667,46 +646,46 @@ function enablePS2Mouse() {
 
 function mouseWait(uint8_t aType)
 {
-  uint32_t _timeOut=100000;
-  if(aType==0)
-  {
-	while(_timeOut--) //Data
+	uint32_t _timeOut=100000;
+	if (aType==0)
 	{
-	  if((readPort(PS2_CONTROL_PORT) & 1)==1)
-	  {
+		while (_timeOut--) //Data
+		{
+			if ((readPort(PS2_CONTROL_PORT) & 1) == 1)
+			{
+				return;
+			}
+		}
 		return;
-	  }
 	}
-	return;
-  }
-  else
-  {
-	while(_timeOut--) //Signal
+	else
 	{
-	  if((readPort(PS2_CONTROL_PORT) & 2)==0)
-	  {
+		while (_timeOut--) //Signal
+		{
+			if ((readPort(PS2_CONTROL_PORT) & 2) == 0)
+			{
+				return;
+			}
+		}
 		return;
-	  }
 	}
-	return;
-  }
 }
 
 function mouseWrite(uint8_t aWrite)
 {
-  //Wait to be able to send a command
-  mouseWait(1);
-  //Tell the mouse we are sending a command
-  writePort(PS2_CONTROL_PORT, 0xD4);
-  //Wait for the final part
-  mouseWait(1);
-  //Finally write
-  writePort(PS2_DATA_PORT, aWrite);
+	//Wait to be able to send a command
+	mouseWait(1);
+	//Tell the mouse we are sending a command
+	writePort(PS2_CONTROL_PORT, 0xD4);
+	//Wait for the final part
+	mouseWait(1);
+	//Finally write
+	writePort(PS2_DATA_PORT, aWrite);
 }
 
 uint8_t mouseRead()
 {
-  //Get's response from mouse
-  mouseWait(0);
-  return readPort(PS2_DATA_PORT);
+	//Get's response from mouse
+	mouseWait(0);
+	return readPort(PS2_DATA_PORT);
 }
