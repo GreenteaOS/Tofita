@@ -493,17 +493,14 @@ function enableInterrupts() {
 	g_gdtr.base = (uint64_t)(&g_gdt_table[0]);
 	serialPrintf(u8"[cpu] lgdt limit %u base %u\n", g_gdtr.limit, g_gdtr.base);
 
-	#define true 1
-	#define false 0
-
 	// Kernel CS/SS - always 64bit
-	gdtSetEntry(1, 0, 0xfffff,  true, (enum GdtType)(read_write | execute));
-	gdtSetEntry(2, 0, 0xfffff,  true, read_write);
+	gdtSetEntry(1, 0, 0xfffff,  1, (enum GdtType)(read_write | execute));
+	gdtSetEntry(2, 0, 0xfffff,  1, read_write);
 
 	// User CS32/SS/CS64 - layout expected by SYSRET
-	gdtSetEntry(3, 0, 0xfffff,  false, (enum GdtType)(ring3 | read_write | execute));
-	gdtSetEntry(4, 0, 0xfffff,  true,  (enum GdtType)(ring3 | read_write));
-	gdtSetEntry(5, 0, 0xfffff,  true,  (enum GdtType)(ring3 | read_write | execute));
+	gdtSetEntry(3, 0, 0xfffff,  0, (enum GdtType)(ring3 | read_write | execute));
+	gdtSetEntry(4, 0, 0xfffff,  1,  (enum GdtType)(ring3 | read_write));
+	gdtSetEntry(5, 0, 0xfffff,  1,  (enum GdtType)(ring3 | read_write | execute));
 
 	uint64_t sizeof_TssEntry = sizeof(g_tss);
 	serialPrintf(u8"[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(struct TssEntry));
