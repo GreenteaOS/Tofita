@@ -67,6 +67,7 @@ void *tmemset(void *dest, int32_t e, uint64_t len) {
 	for (uint64_t i = 0; i < len; i++, d++) {
 		*d = e;
 	}
+	return dest;
 }
 
 // Solve conflict with gnu-efi
