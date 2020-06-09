@@ -113,6 +113,8 @@ function kernelMain(const KernelParams *params) {
 		serialPrintln(u8"<Tofita> _MSC_VER");
 	#endif
 
+	disablePic();
+	enableInterrupts();
 	enablePS2Mouse();
 
 	initText();

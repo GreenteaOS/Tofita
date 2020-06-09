@@ -92,7 +92,7 @@ static inline function ioWait(void) {
 
 // Handling IDT
 //#define IDT_SIZE 256
-#define IDT_SIZE 286
+#define IDT_SIZE 256
 #define SYS_CODE64_SEL 0x38 // https://github.com/tianocore/edk/blob/master/Sample/Universal/DxeIpl/Pei/x64/LongMode.asm#L281
 IdtEntry IDT[IDT_SIZE];
 
@@ -125,27 +125,11 @@ function initializeMouse(IdtEntry *entry) {
 	entry->gateType = 0xe; // Interrupt gate
 }
 
-extern function fallback_handler0();
-extern function fallback_handler1();
-extern function fallback_handler2();
-extern function fallback_handler3();
-extern function fallback_handler4();
-extern function fallback_handler5();
-extern function fallback_handler6();
-extern function fallback_handler7();
-extern function fallback_handler8();
-extern function fallback_handler9();
-extern function fallback_handler10();
-extern function fallback_handler11();
-extern function fallback_handler12();
-extern function fallback_handler13();
-extern function fallback_handler14();
-extern function fallback_handler15();
-function initializeFallback(IdtEntry *entry, void* fallback_handler_) {
+function initializeFallback(IdtEntry *entry, uint64_t fallback_handler_) {
 	uint64_t address = ((uint64_t) fallback_handler_);
 	entry->offsetLowerbits = address & 0xffff;
 	entry->offsetHigherbits = (address & 0xffffffffffff0000) >> 16;
-	entry->selector = SYS_CODE64_SEL;
+	entry->selector = 16; //2; //0x02; //SYS_CODE64_SEL;
 	entry->zero = 0;
 	entry->ist = 0;
 	entry->z = 0;
@@ -175,6 +159,8 @@ arguments:
 Taken from http://wiki.osdev.org/8259_PIC
 */
 function remapPic(uint8_t offset1, uint8_t offset2) {
+	serialPrintln(u8"[cpu] begin: remap PIC");
+
 	writePort(0x20, 0x11);
 	writePort(0xA0, 0x11);
 	writePort(0x21, 0x20);
@@ -185,6 +171,8 @@ function remapPic(uint8_t offset1, uint8_t offset2) {
 	writePort(0xA1, 0x01);
 	writePort(0x21, 0x0);
 	writePort(0xA1, 0x0);
+
+	serialPrintln(u8"[cpu] done: remap PIC");
 
 	return;
 
@@ -213,6 +201,47 @@ function remapPic(uint8_t offset1, uint8_t offset2) {
 
 	writePort(PIC1_DATA, a1);   // restore saved masks.
 	writePort(PIC2_DATA, a2);
+
+	serialPrintln(u8"[cpu] done: remap PIC");
+}
+
+// Sets up the legacy PIC and then disables it
+void disablePic(void) {
+	/* Set ICW1 */
+	writePort(0x20, 0x11);
+	writePort(0xa0, 0x11);
+
+	/* Set ICW2 (IRQ base offsets) */
+	writePort(0x21, 0xe0);
+	writePort(0xa1, 0xe8);
+
+	/* Set ICW3 */
+	writePort(0x21, 4);
+	writePort(0xa1, 2);
+
+	/* Set ICW4 */
+	writePort(0x21, 1);
+	writePort(0xa1, 1);
+
+	/* Set OCW1 (interrupt masks) */
+	writePort(0x21, 0xff);
+	writePort(0xa1, 0xff);
+}
+
+uint64_t physicalToVirtual(uint64_t physical) {
+	uint64_t result = (uint64_t)WholePhysicalStart + (uint64_t)physical;
+	return result;
+}
+
+// TODO check for CPU feature
+function enableLocalApic() {
+	serialPrintln(u8"[cpu] begin: enableLocalApic");
+
+	auto ptr = (uint32_t*)physicalToVirtual(0xfee000f0);
+	uint32_t val = *ptr;
+	quakePrintf(u8"APIC value is %u\n", val);
+
+	serialPrintln(u8"[cpu] done: enableLocalApic");
 }
 
 function mouseWait(uint8_t aType);
@@ -245,7 +274,7 @@ struct TablePtr
 
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
-static inline function lgdt(const struct TablePtr *gdt) {
+static inline function lgdt(volatile const struct TablePtr *gdt) {
 	asm volatile ("lgdt (%0)" : : "r" (gdt) : "memory");
 }
 
@@ -299,25 +328,117 @@ struct TssEntry
 	uint16_t iomap_offset;
 } __attribute__ ((packed));
 
-struct GdtDescriptor g_gdt_table[10];
-struct TablePtr g_gdtr;
-struct TssEntry g_tss;
+__attribute__((aligned(64))) static volatile struct TablePtr g_gdtr;
+__attribute__((aligned(64))) static volatile struct TssEntry g_tss;
+__attribute__((aligned(64))) static volatile struct GdtDescriptor g_gdt_table[10];
+
+// rsp0stack = exp0 in TSS
+// Stack used by kernel to handle syscalls/interrupts
+__attribute__((aligned(64))) uint8_t rsp0stack[4096 * 32] = {0};
+__attribute__((aligned(64))) uint8_t rsp1stack[4096 * 32] = {0};
+__attribute__((aligned(64))) uint8_t rsp2stack[4096 * 32] = {0};
+
+typedef uint64_t uword_t;
+struct interrupt_frame
+{
+	uword_t ip; // Instruction Pointer
+	uword_t cs; // Code Segment
+	uword_t flags;
+	uword_t sp; // Stack Pointer
+	uword_t ss; // Stack Segment
+};
+
+// LLVM did the magic expected of it. It only saved registers that are clobbered by your function (hence rax). All other register are left unchanged hence there’s no need of saving and restoring them.
+// https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
+
+// TODO: errcode is `extra` here:
+//__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struct interrupt_frame *frame, uint64_t extra) {
+// https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
+__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struct interrupt_frame *frame) {
+	serialPrintf(u8"[cpu] happened foo_interrupt %u ip~=%u cs=%u flags=%u sp=%u ss=%u\n",
+		frame,
+		frame->ip,
+		frame->cs,
+		frame->flags,
+		frame->sp,
+		frame->ss
+	);
+	serialPrint(u8"[cpu] frame->ip points to: ");
+	serialPrintHex((uint64_t) frame->ip);
+	serialPrint(u8"\n");
+
+	serialPrint(u8"[cpu] frame->sp points to: ");
+	serialPrintHex((uint64_t) frame->sp);
+	serialPrint(u8"\n");
+
+	frame->cs = 16;
+	frame->ss = 0x18;
+
+	// Enable interrupts
+	writePort(0xA0, 0x20);
+	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
+
+	// Several operating systems such as Windows and Linux, use some of the segments for internal usage. for instance Windows x64 uses the GS register to access the TLS (thread local storage) and in Linux it's for accessing cpu specific memory
+}
+
+// ~100 times per second
+int32_t timer_called = 0;
+__attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(struct interrupt_frame *frame) {
+	serialPrintf(u8"[cpu] happened timer_interrupt <<<<<<<<<<<<<<<<<<<<<<<<<<<<< !!!!!!!!!!!!!! #%d\n", timer_called++);
+
+	frame->cs = 16;
+	frame->ss = 0x18;
+
+	// Enable interrupts
+	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
+}
+
+void set_tsr(uint16_t tsr_data)
+{
+  asm volatile("ltr %[src]"
+		   : // No outputs
+		   : [src] "m" (tsr_data) // Inputs
+		   : // No clobbers
+		 );
+}
+
+// 16 records
+__attribute__((aligned(64))) static uint32_t gdtTemplate[32] = {
+	0x00000000, 0x00000000,
+	0x00000000, 0x00000000,
+	0x00000000, 0x00209b00,
+	0x0000ffff, 0x00cf9300,
+	0x0000ffff, 0x00cffa00,
+	0x0000ffff, 0x00cff300,
+	0x00000000, 0x0020fb00,
+	0x00000000, 0x00000000,
+	0x60800067, 0x00008bb9,
+	0xfffff800, 0x00000000,
+	0xe0003c00, 0xff40f3fa,
+	0x00000000, 0x00000000,
+	0x0000ffff, 0x00cf9a00,
+	0x00000000, 0x00000000,
+	0x00000000, 0x00000000,
+	0x00000000, 0x00000000
+};
 
 #define PS2_DATA_PORT 0x60
 #define PS2_CONTROL_PORT 0x64
 
-#if 0
-function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType type)
+#if 1
+function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType typed)
 {
 	g_gdt_table[i].limitLow = limit & 0xffff;
 	g_gdt_table[i].size = (limit >> 16) & 0xf;
-	g_gdt_table[i].size |= (is64 ? 0xa0 : 0xc0);
+	//g_gdt_table[i].size |= (is64 ? 0xa0 : 0xc0);
+	g_gdt_table[i].size |= 0xa0;
+	g_gdt_table[i].size <<= 0x0D; // Long mode
 
 	g_gdt_table[i].baseLow = base & 0xffff;
 	g_gdt_table[i].baseMid = (base >> 16) & 0xff;
 	g_gdt_table[i].baseHigh = (base >> 24) & 0xff;
 
-	g_gdt_table[i].type = type | system | present;
+	g_gdt_table[i].type = (enum GdtType)(typed | system | present);
 }
 
 //global gdt_write
@@ -350,85 +471,149 @@ tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 	tssd.base_32 = (base >> 32) & 0xffffffff;
 	tssd.reserved = 0;
 
-	tssd.type =
+	tssd.type = (enum GdtType)(
 		accessed |
 		execute |
 		ring3 |
-		present;
-	tmemcpy(&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
+		present
+	);
+	tmemcpy((void*)&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
+}
+
+void
+tssSetEntry_w7(uint8_t i, uint64_t base, uint64_t limit)
+{
+	struct TssDescriptor tssd;
+	tssd.limitLow = limit & 0xffff;
+	tssd.size = (limit >> 16) & 0xf;
+
+	tssd.base_00 = base & 0xffff;
+	tssd.base_16 = (base >> 16) & 0xff;
+	tssd.base_24 = (base >> 24) & 0xff;
+	tssd.base_32 = (base >> 32) & 0xffffffff;
+	tssd.reserved = 0;
+
+	tssd.type = (enum GdtType)(
+		accessed |
+		execute |
+		ring3 |
+		present
+	);
+	tmemcpy((void*)&gdtTemplate[i * 2], &tssd, sizeof(/*TssDescriptor*/tssd));
 }
 
 function gdt_write(uint16_t cs, uint16_t ds, uint16_t tr);
-function enableInterrupts() {
-	serialPrintln("[cpu] initializing lgdt");
+__attribute__((aligned(64))) Idtr cacheIdtr;
 
-	tmemset(&g_gdt_table, 0, sizeof(g_gdt_table));
+function enableInterrupts() {
+	serialPrintln(u8"[cpu] initializing lgdt");
+
+	tmemset((void*)&g_gdt_table, 0, sizeof(g_gdt_table));
 	g_gdtr.limit = sizeof(g_gdt_table) - 1;
-	g_gdtr.base = (uint64_t)(&g_gdt_table);
+	g_gdtr.base = (uint64_t)(&g_gdt_table[0]);
+	serialPrintf(u8"[cpu] lgdt limit %u base %u\n", g_gdtr.limit, g_gdtr.base);
 
 	#define true 1
 	#define false 0
 
 	// Kernel CS/SS - always 64bit
-	gdtSetEntry(1, 0, 0xfffff,  true, read_write | execute);
+	gdtSetEntry(1, 0, 0xfffff,  true, (enum GdtType)(read_write | execute));
 	gdtSetEntry(2, 0, 0xfffff,  true, read_write);
 
 	// User CS32/SS/CS64 - layout expected by SYSRET
-	gdtSetEntry(3, 0, 0xfffff,  false, ring3 | read_write | execute);
-	gdtSetEntry(4, 0, 0xfffff,  true,  ring3 | read_write);
-	gdtSetEntry(5, 0, 0xfffff,  true,  ring3 | read_write | execute);
+	gdtSetEntry(3, 0, 0xfffff,  false, (enum GdtType)(ring3 | read_write | execute));
+	gdtSetEntry(4, 0, 0xfffff,  true,  (enum GdtType)(ring3 | read_write));
+	gdtSetEntry(5, 0, 0xfffff,  true,  (enum GdtType)(ring3 | read_write | execute));
 
 	uint64_t sizeof_TssEntry = sizeof(g_tss);
 
-	tmemset(&g_tss, 0, sizeof_TssEntry);
+	tmemset((void*)&g_tss, 0, sizeof_TssEntry);
 	g_tss.iomap_offset = sizeof_TssEntry;
+	g_tss.rsp[0] = (uint64_t)&rsp0stack;
+	g_tss.rsp[1] = (uint64_t)&rsp1stack;
+	g_tss.rsp[2] = (uint64_t)&rsp2stack;
+	// TODO zero out stacks
+	g_tss.ist[0] = (uint64_t)&rsp1stack;
+	g_tss.ist[1] = (uint64_t)&rsp1stack;
+	g_tss.ist[2] = (uint64_t)&rsp1stack;
+	g_tss.ist[3] = (uint64_t)&rsp1stack;
+	g_tss.ist[4] = (uint64_t)&rsp1stack;
+	g_tss.ist[5] = (uint64_t)&rsp1stack;
+	g_tss.ist[6] = (uint64_t)&rsp1stack;
+	g_tss.ist[7] = (uint64_t)&rsp1stack;
 
-	uintptr_t tssBase = (uintptr_t)(&g_tss);
+	serialPrint(u8"[cpu] RSP[0] points to: ");
+	serialPrintHex((uint64_t) g_tss.rsp[0]);
+	serialPrint(u8"\n");
+
+	serialPrint(u8"[cpu] RSP[1] points to: ");
+	serialPrintHex((uint64_t) g_tss.rsp[1]);
+	serialPrint(u8"\n");
+
+	serialPrint(u8"[cpu] RSP[2] points to: ");
+	serialPrintHex((uint64_t) g_tss.rsp[2]);
+	serialPrint(u8"\n");
+
+	uint64_t tssBase = (uint64_t)(&g_tss);
+	// upload
+	{
+		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
+		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
+		tssSetEntry_w7(8, tssBase, sizeof_TssEntry);
+		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
+		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
+	}
 
 	// Note that this takes TWO GDT entries
-	tssSetEntry(6, tssBase, sizeof_TssEntry);
+	//tssSetEntry(6, tssBase, sizeof_TssEntry);
 
 	//gdt_write(1 << 3, 2 << 3, 6 << 3);
-	//lgdt(&g_gdtr);
 
-	serialPrintln("[cpu] initializing PS/2 keyboard");
-	initializeKeyboard(&IDT[IRQ1]);
-	initializeMouse(&IDT[IRQ12]);
+	g_gdtr.limit = sizeof(gdtTemplate) - 1;
+	g_gdtr.base = (uint64_t)(&gdtTemplate[0]);
+	serialPrint(u8"[cpu] GDTR points to: ");
+	serialPrintHex((uint64_t) &g_gdtr);
+	serialPrint(u8"\n");
+	serialPrint(u8"[cpu] GDT points to: ");
+	serialPrintHex((uint64_t) g_gdtr.base);
+	serialPrint(u8"\n");
+	serialPrintf(u8"[cpu] GDT size is %u\n", g_gdtr.limit);
+	serialPrintln(u8"[cpu] calling lgdt");
+	lgdt(&g_gdtr);
+	serialPrintln(u8"[cpu] calling ltr");
+	{
+		set_tsr(64);
+	}
 	//initializeMouse(&IDT[IRQ4]);
 
-	initializeFallback( &IDT[IRQ0], fallback_handler0);
-	//initializeFallback( &IDT[IRQ1], fallback_handler1);
-	initializeFallback( &IDT[IRQ2], fallback_handler2);
-	initializeFallback( &IDT[IRQ3], fallback_handler3);
-	initializeFallback( &IDT[IRQ4], fallback_handler4);
-	initializeFallback( &IDT[IRQ5], fallback_handler5);
-	initializeFallback( &IDT[IRQ6], fallback_handler6);
-	initializeFallback( &IDT[IRQ7], fallback_handler7);
-	initializeFallback( &IDT[IRQ8], fallback_handler8);
-	initializeFallback( &IDT[IRQ9], fallback_handler9);
-	initializeFallback(&IDT[IRQ10], fallback_handler10);
-	initializeFallback(&IDT[IRQ11], fallback_handler11);
-	//initializeFallback(&IDT[IRQ12], fallback_handler12);
-	initializeFallback(&IDT[IRQ13], fallback_handler13);
-	initializeFallback(&IDT[IRQ14], fallback_handler14);
-	initializeFallback(&IDT[IRQ15], fallback_handler15);
+	serialPrintln(u8"[cpu] initializing foo_interrupt");
+	for (uint32_t i = 0; i < 286; ++i)
+	{
+		initializeFallback( &IDT[i], (uint64_t)&foo_interrupt);
+	}
 
-	Idtr Idtr;
-	Idtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
-	Idtr.offset = (uint64_t) IDT;
+	initializeFallback( &IDT[IRQ0], (uint64_t)(&timer_interrupt));
+	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
+	cacheIdtr.offset = (uint64_t) IDT;
 
-	serialPrintln("[cpu] loading IDTR");
-	loadIdt(&Idtr);
-
-	serialPrintln("[cpu] reprogramming PIC");
+	serialPrint(u8"[cpu] IDTR points to: ");
+	serialPrintHex((uint64_t) &cacheIdtr);
+	serialPrint(u8"\n");
+	serialPrint(u8"[cpu] IDT points to: ");
+	serialPrintHex((uint64_t) &IDT);
+	serialPrint(u8"\n");
+	serialPrintf(u8"[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, IDT_SIZE, sizeof(IdtEntry));
+	serialPrintln(u8"[cpu] loading IDTR");
+	// Before you implement the IDT, make sure you have a working GDT
 	remapPic(0x20, 0x28);
+	serialPrintln(u8"[cpu] calling lidtq");
+	loadIdt(&cacheIdtr);
 
 
 	serialPrintln(u8"[cpu] selectSegment of value 16");
 	selectSegment((void*)&stub);
 
 	// Masking IRQ to only support IRQ1 (keyboard)
-	serialPrintln("[cpu] masking IRQ");
 	//writePort(IRQ1, 0xFC);
 	// 0xFA - timer
 	// 0xFC - timer and kb
@@ -437,13 +622,6 @@ function enableInterrupts() {
 	// 0xFF - none
 
 	//writePort(IRQ1, 0xFD);
-	writePort(IRQ12, 0xFD);
-	writePort(IRQ4, 0xFD);
-
-	serialPrintln("[cpu] begin: setting PS/2 mouse");
-
-
-	uint8_t _status;
 }
 #endif
 

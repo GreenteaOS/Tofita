@@ -16,6 +16,7 @@
 global selectSegment
 ; TODO set COMPAT_SEL as func agrument
 ; TODO set also SS
+; TODO move this into C code inline asm
 %define COMPAT_SEL 16
 %define retfq o64 retf
 selectSegment:
@@ -103,40 +104,12 @@ global fallback_handler15
 
 %macro fallback 1
 	fallback_handler%1:
-		save_regs
-		extern handle_fallback%1
-		call handle_fallback%1
-		restore_regs
 		iretq
 %endmacro
 
 keyboardHandler:
-	save_regs
-	extern handleKeyboard
-	call handleKeyboard
-	restore_regs
 	iretq
 
 mouseHandler:
-	save_regs
-	extern handleMouse
-	call handleMouse
-	restore_regs
 	iretq
 
-fallback 0
-fallback 1
-fallback 2
-fallback 3
-fallback 4
-fallback 5
-fallback 6
-fallback 7
-fallback 8
-fallback 9
-fallback 10
-fallback 11
-fallback 12
-fallback 13
-fallback 14
-fallback 15
