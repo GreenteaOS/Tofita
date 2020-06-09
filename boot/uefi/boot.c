@@ -183,7 +183,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
 
-	#if 0
+	#if 1
 	RamDiskAsset asset = getRamDiskAsset(u8"loader.tofita");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
 	#else
@@ -198,7 +198,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - largeBuffer + upper)
 	uint64_t mAddressOfEntryPoint = 0;
 
-	#if 0
+	#if 1
 	void *kernelBase = (void *) paging::conventionalAllocateNext(asset.size + PAGE_SIZE);
 	{
 		uint8_t* b = (uint8_t*)kernelBase;
@@ -215,6 +215,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		serialPrintf(u8"PE header signature 'PE' == '%s'\n", peHeader);
 		auto peOptionalHeader = (const Pe32OptionalHeader*)((uint64_t)peHeader + sizeof(PeHeader));
 		serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic, 0x020B);
+		serialPrintf(u8"PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
 		void *kernelBase = (void *) paging::conventionalAllocateNext(peOptionalHeader->mSizeOfImage + PAGE_SIZE);
 		memset(kernelBase, 0, peOptionalHeader->mSizeOfImage); // Zeroing
 

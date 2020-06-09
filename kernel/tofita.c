@@ -33,6 +33,19 @@ uint8_t haveToRender = 1;
 // Forward for global usage
 function quakePrintf(const char8_t *c, ...);
 
+#ifdef MEMSET
+void *memset(void *dest, int32_t e, uint64_t len) {
+	uint8_t *d = (uint8_t *)dest;
+	for (uint64_t i = 0; i < len; i++, d++) {
+		*d = e;
+	}
+	return dest;
+}
+
+extern "C" int _fltused = 1;
+void __chkstk() {};
+#endif
+
 #include "util/Math.cpp"
 
 #include "../devices/cpu/amd64.cpp"
@@ -74,6 +87,9 @@ function handleKeyDown(uint8_t key) {
 const KernelParams *paramsCache = null;
 function kernelMain(const KernelParams *params) {
 	serialPrintln(u8"<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
+	serialPrint(u8"<Tofita> CR3 points to: ");
+	serialPrintHex((uint64_t) params->pml4);
+	serialPrint(u8"\n");
 	paramsCache = params;
 	PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual, params->ramBytes / 4096);
 	initAllocatorForBuffer(params->bufferSize, params->buffer);
