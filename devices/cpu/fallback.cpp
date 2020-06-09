@@ -16,8 +16,8 @@
 // Interruptions fallbacks if no interruption handler defined
 
 function handle_fallback0() {
-	// Commented because annoying
-	//serialPrintln("<Interruption fallback 0 Programmable Interrupt Timer Interrupt>");
+	// Comment if you want because it is pretty annoying
+	serialPrintln(u8"<Interruption fallback 0 Programmable Interrupt Timer Interrupt>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
