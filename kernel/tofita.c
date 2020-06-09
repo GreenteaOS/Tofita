@@ -63,6 +63,7 @@ void __chkstk() {};
 #include "../devices/cpu/fallback.cpp"
 #include "../devices/acpi/acpi.cpp"
 #include "ramdisk.cpp"
+#include "formats/exe/exe.cpp"
 #include "formats/cur/cur.cpp"
 #include "formats/bmp/bmp.cpp"
 #include "gui/blur.c"
