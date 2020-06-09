@@ -167,7 +167,7 @@ for (task in tasks) {
 
 						'-fshort-wchar -mno-red-zone -Os',
 						' -c ',
-						'boot/uefi/boot.c',
+						'boot/uefi/boot.cpp',
 						' -o ',
 						config.tempFolder + '/tofita/miniefi.o'
 					].join(''), { stdio: 'inherit' }
