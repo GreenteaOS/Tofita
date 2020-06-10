@@ -13,14 +13,30 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+%define SYS_CODE64_SEL 0x10
+%define SYS_DATA32_SEL 0x18
+
+global enterUserMode
+enterUserMode:
+	;cli
+	mov rax, rsp
+	push SYS_DATA32_SEL; ss
+    push rax; rsp
+    pushfq; rflags
+    push SYS_CODE64_SEL; cs
+    mov     rax, qword .ret; rip
+    push    rax
+    iretq
+.ret:
+	ret
+
 global selectSegment
 ; TODO set COMPAT_SEL as func agrument
 ; TODO set also SS
 ; TODO move this into C code inline asm
-%define COMPAT_SEL 16
 %define retfq o64 retf
 selectSegment:
-	push COMPAT_SEL ; push GDT selector
+	push SYS_CODE64_SEL ; push GDT selector
 	push rdi
 	retfq
 
