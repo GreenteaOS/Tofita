@@ -15,6 +15,10 @@
 
 %define SYS_CODE64_SEL 0x10
 %define SYS_DATA32_SEL 0x18
+%define USER_CODE32_SEL 0x20
+%define USER_DATA32_SEL 0x28
+%define USER_CODE64_SEL 0x30
+%define SYS_CODE32_SEL 0x60
 
 global enterUserMode
 enterUserMode:
