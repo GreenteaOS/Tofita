@@ -94,7 +94,24 @@ static inline function ioWait(void) {
 
 // Handling IDT
 #define IDT_SIZE 256
-#define SYS_CODE64_SEL 16
+// Records of the GDT - 16 items
+#define NULL_SEL 0x00
+//#define EMPTY_SEL 0x08
+#define SYS_CODE64_SEL 0x10 // Execute/Read
+#define SYS_DATA32_SEL 0x18 // Read/Write
+#define USER_CODE32_SEL 0x20 // Execute/Read
+#define USER_DATA32_SEL 0x28 // Read/Write
+#define USER_CODE64_SEL 0x30 // Execute/Read
+//#define EMPTY_SEL 0x38
+//#define TSS_SEL 0x40 // Index = 8
+//#define TSS_SEL 0x48
+//#define USER_DATA32_SEL 0x50 // Read/Write
+//#define EMPTY_SEL 0x58
+#define SYS_CODE32_SEL 0x60 // Execute/Read
+//#define EMPTY_SEL 0x68
+//#define EMPTY_SEL 0x70
+//#define EMPTY_SEL 0x78
+
 IdtEntry IDT[IDT_SIZE];
 
 // Handling keyboard
@@ -372,7 +389,7 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struc
 	serialPrint(u8"\n");
 
 	frame->cs = SYS_CODE64_SEL;
-	frame->ss = 0x18;
+	frame->ss = SYS_DATA32_SEL;
 
 	// Enable interrupts
 	writePort(0xA0, 0x20);
@@ -387,7 +404,7 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(str
 	serialPrintf(u8"[cpu] happened timer_interrupt <<<<<<<<<<<<<<<<<<<<<<<<<<<<< !!!!!!!!!!!!!! #%d\n", timer_called++);
 
 	frame->cs = SYS_CODE64_SEL;
-	frame->ss = 0x18;
+	frame->ss = SYS_DATA32_SEL;
 
 	// Enable interrupts
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
