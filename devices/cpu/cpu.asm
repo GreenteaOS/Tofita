@@ -18,7 +18,7 @@
 
 global enterUserMode
 enterUserMode:
-	;cli
+	cli
 	mov rax, rsp
 	push SYS_DATA32_SEL; ss
     push rax; rsp
@@ -28,6 +28,7 @@ enterUserMode:
     push    rax
     iretq
 .ret:
+	sti; TODO AFAIK should be set in rflags
 	ret
 
 global selectSegment
