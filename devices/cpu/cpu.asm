@@ -23,12 +23,12 @@ enterUserMode:
 	push SYS_DATA32_SEL; ss
     push rax; rsp
     pushfq; rflags
+    or dword [rsp], 0b1000000000; IF - interrupt enable flag
     push SYS_CODE64_SEL; cs
     mov     rax, qword .ret; rip
     push    rax
     iretq
 .ret:
-	sti; TODO AFAIK should be set in rflags
 	ret
 
 global selectSegment
