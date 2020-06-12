@@ -309,8 +309,7 @@ enum GdtType : uint8_t
 	present		= 0x80
 };
 
-struct GdtDescriptor
-{
+struct GdtDescriptor {
 	uint16_t limitLow;
 	uint16_t baseLow;
 	uint8_t baseMid;
@@ -320,6 +319,32 @@ struct GdtDescriptor
 } __attribute__ ((packed));
 
 _Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect");
+
+#pragma pack(1)
+struct GdtDescriptorEx {
+	unsigned long long limitLow : 16;
+	unsigned long long baseLow : 16;
+	unsigned long long baseMid : 8;
+	// Access
+	unsigned long long accessed : 1;
+	unsigned long long rw : 1; // 0 - read, 1 - read/write
+	unsigned long long direction : 1; // or conform
+	// If 1 code in this segment can be executed from an equal or lower privilege level
+	// If 0 code in this segment can only be executed from the ring set in "privilege"
+	unsigned long long execute : 1; // 1 = code, 0 = data
+	unsigned long long one : 1;
+	unsigned long long privilege : 2; // 0 = ring0/kernel, 3 = ring3
+	unsigned long long present : 1;
+	// Flags
+	unsigned long long limit : 4;
+	unsigned long long reserved : 2;
+	unsigned long long zero16one32 : 1;
+	unsigned long long blocks : 1;
+	unsigned long long baseHigh : 8;
+} __attribute__ ((packed));
+#pragma pack()
+
+_Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect");
 
 struct TssDescriptor
 {
@@ -395,7 +420,9 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struc
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 
-	// Several operating systems such as Windows and Linux, use some of the segments for internal usage. for instance Windows x64 uses the GS register to access the TLS (thread local storage) and in Linux it's for accessing cpu specific memory
+	// Several operating systems such as Windows and Linux, use some of the segments for internal usage.
+	// For instance Windows x64 uses the GS register to access the TLS (thread local storage)
+	// and in Linux it's for accessing cpu specific memory
 }
 
 // ~100 times per second
@@ -478,6 +505,7 @@ function tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 	tmemcpy((void*)&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
 }
 
+// Takes 2 GDT entries
 function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit)
 {
 	struct TssDescriptor tssd;
@@ -499,8 +527,28 @@ function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit)
 	tmemcpy((void*)&gdtTemplate[i * 2], &tssd, sizeof(/*TssDescriptor*/tssd));
 }
 
-function gdt_write(uint16_t cs, uint16_t ds, uint16_t tr);
 __attribute__((aligned(64))) Idtr cacheIdtr;
+
+function dumpGDT(GdtDescriptorEx* desc) {
+	serialPrintf(u8"[dumpGDT]");
+
+	if (desc->accessed) serialPrintf(u8" accessed");
+	if (desc->rw) serialPrintf(u8" rw");
+	if (desc->direction) serialPrintf(u8" direction");
+	if (desc->execute) serialPrintf(u8" execute");
+	if (desc->one) serialPrintf(u8" one");
+
+	if (desc->privilege == 0) serialPrintf(u8" privilege=ring0");
+	if (desc->privilege == 1) serialPrintf(u8" privilege=ring1");
+	if (desc->privilege == 2) serialPrintf(u8" privilege=ring2");
+	if (desc->privilege == 3) serialPrintf(u8" privilege=ring3");
+
+	if (desc->present) serialPrintf(u8" present");
+	if (desc->zero16one32) serialPrintf(u8" zero16one32");
+	if (desc->blocks) serialPrintf(u8" pages");
+
+	serialPrintf(u8"\n");
+}
 
 function enableInterrupts() {
 	serialPrintln(u8"[cpu] initializing lgdt");
@@ -559,8 +607,6 @@ function enableInterrupts() {
 		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
 	}
 
-	// Note that this takes TWO GDT entries
-	//tssSetEntry(6, tssBase, sizeof_TssEntry);
 
 	g_gdtr.limit = sizeof(gdtTemplate) - 1;
 	g_gdtr.base = (uint64_t)(&gdtTemplate[0]);
