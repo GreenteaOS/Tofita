@@ -22,6 +22,9 @@
 
 global enterUserMode
 enterUserMode:
+%define DATA (USER_DATA32_SEL + 3)
+%define CODE (USER_CODE64_SEL + 3)
+
 	cli
 	mov rax, rsp
 	push SYS_DATA32_SEL; ss
