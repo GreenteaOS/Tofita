@@ -35,7 +35,8 @@ function quake() {
 	drawVibrancedRectangle(0, 0, _framebuffer->width, quakeHeight);
 	uint16_t drawAsciiText(const char8_t* text, double x, uint16_t y, Pixel32 color);
 	Pixel32 color;
-	color.rgba.r = color.rgba.g = color.rgba.b = 48;
+	//color.rgba.r = color.rgba.g = color.rgba.b = 48;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0xDD;
 	var x = drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
 	drawAsciiText(u8"|", x + 2, quakeHeight - 15, color);
 
