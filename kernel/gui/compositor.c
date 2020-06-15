@@ -91,9 +91,12 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 			);
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
-				rgba.r = Blend255(rgba.r, 255, 168);
-				rgba.g = Blend255(rgba.g, 255, 168);
-				rgba.b = Blend255(rgba.b, 255, 168);
+			//rgba.r = Blend255(rgba.r, 255, 168);
+			//rgba.g = Blend255(rgba.g, 255, 168);
+			//rgba.b = Blend255(rgba.b, 255, 168);
+			rgba.r = Blend255(rgba.r, 0, 168);
+			rgba.g = Blend255(rgba.g, 0, 168);
+			rgba.b = Blend255(rgba.b, 0, 168);
 			upscale->pixels[y * upscale->width + x].rgba = rgba;
 		}
 
@@ -153,8 +156,10 @@ function composite() {
 	drawBitmap32WithAlpha(desktopIcon, 12, 10);
 	Pixel32 color;
 	color.color = 0x00000000;
-	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0x88;
 	drawAsciiText(u8"Recycle Bin", 8, 62, color);
+	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
+	drawAsciiText(u8"Recycle Bin", 8, 61, color);
 
 	var outlineX = mouseX < dragX? mouseX : dragX;
 	var outlineY = mouseY < dragY? mouseY : dragY;
@@ -182,13 +187,19 @@ function composite() {
 	if (mouseX < 40 && mouseY > (_framebuffer->height - 30))
 		drawRectangleWithAlpha(color, 0, _framebuffer->height - 30, 40, 30);
 	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
+
+	// tray | line
 	color.color = 0x00000000;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0x66;
 	drawRectangle(color, _framebuffer->width - 4, _framebuffer->height - 30, 1, 30);
+
 	var trayButtonX = _framebuffer->width - 20 - 16;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x11;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 	trayButtonX -= drawAsciiText(u8"4:01 PM", _framebuffer->width - 60, _framebuffer->height - 20, color);
 	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
+
 	drawCursor(cur, mouseX, mouseY);
 	quake();
 }
