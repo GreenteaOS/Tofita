@@ -73,15 +73,6 @@ function writePort(uint16_t port, uint8_t value) {
 
 static inline function loadIdt(Idtr *idtr) {
 	__asm__ volatile("lidtq %0" : : "m" (*idtr));
-	__asm__ volatile("sti");
-}
-
-extern "C" void selectSegment(void* func);
-
-// This function is used to avoid linker problems
-// It cannot link with stub from .asm
-void stub() {
-	serialPrintln(u8"[cpu] welp selectSegment succeded!");
 }
 
 // http://wiki.osdev.org/Inline_Assembly/Examples#I.2FO_access
@@ -413,9 +404,6 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struc
 	serialPrintHex((uint64_t) frame->sp);
 	serialPrint(u8"\n");
 
-	frame->cs = SYS_CODE64_SEL;
-	frame->ss = SYS_DATA32_SEL;
-
 	// Enable interrupts
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
@@ -430,8 +418,6 @@ int32_t timer_called = 0;
 __attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(struct interrupt_frame *frame) {
 	serialPrintf(u8"[cpu] happened timer_interrupt <<<<<<<<<<<<<<<<<<<<<<<<<<<<< !!!!!!!!!!!!!! #%d\n", timer_called++);
 
-	frame->cs = SYS_CODE64_SEL;
-	frame->ss = SYS_DATA32_SEL;
 
 	// Enable interrupts
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
@@ -650,8 +636,8 @@ function enableInterrupts() {
 	serialPrintln(u8"[cpu] calling lidtq");
 	loadIdt(&cacheIdtr);
 
-	serialPrintln(u8"[cpu] selectSegment of value SYS_CODE64_SEL");
-	selectSegment((void*)&stub);
+	serialPrintln(u8"[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL");
+	enterKernelMode();
 
 	// Masking IRQ to only support IRQ1 (keyboard)
 	//writePort(IRQ1, 0xFC);
