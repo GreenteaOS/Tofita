@@ -380,6 +380,19 @@ struct interrupt_frame
 	uword_t sp; // Stack Pointer
 	uword_t ss; // Stack Segment
 };
+struct InterruptStack {
+	uint64_t xmm[25 - 7];
+
+	uint64_t rcx;
+	uint64_t rdx;
+	uint64_t r8;
+	uint64_t r9;
+	uint64_t r10;
+	uint64_t r11;
+	uint64_t rax;
+} __attribute__ ((packed));
+
+_Static_assert(sizeof(InterruptStack) == 200, "sizeof is incorrect");
 
 // LLVM did the magic expected of it. It only saved registers that are clobbered by your function (hence rax). All other register are left unchanged hence there’s no need of saving and restoring them.
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
@@ -396,6 +409,15 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struc
 		frame->sp,
 		frame->ss
 	);
+
+	let stack = (InterruptStack*)((uint64_t)frame - 200);
+	serialPrintf(u8"[cpu] rcx=%u", stack->rcx);
+	serialPrintf(u8" rdx=%u", stack->rdx);
+	serialPrintf(u8" r8=%u", stack->r8);
+	serialPrintf(u8" r9=%u", stack->r9);
+	serialPrintf(u8" r10=%u", stack->r10);
+	serialPrintf(u8" r11=%u", stack->r11);
+	serialPrintf(u8" rax=%u\n", stack->rax);
 	serialPrint(u8"[cpu] frame->ip points to: ");
 	serialPrintHex((uint64_t) frame->ip);
 	serialPrint(u8"\n");
