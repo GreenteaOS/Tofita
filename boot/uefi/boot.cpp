@@ -183,13 +183,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
 
-	#if 1
-	RamDiskAsset asset = getRamDiskAsset(u8"loader.tofita");
-	serialPrintf(u8"[[[efi_main]]] loaded asset 'loader.tofita' %d bytes at %d\n", asset.size, asset.data);
-	#else
-	RamDiskAsset asset = getRamDiskAsset(u8"tofita.exe");
-	serialPrintf(u8"[[[efi_main]]] loaded asset 'tofita.exe' %d bytes at %d\n", asset.size, asset.data);
-	#endif
+	RamDiskAsset asset = getRamDiskAsset(u8"tofita.gnu");
+	serialPrintf(u8"[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data);
 
 	uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
 	if (largeBuffer == 1024*1024) largeBuffer += 4096; // TODO remove ASAP
@@ -198,17 +193,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - largeBuffer + upper)
 	uint64_t mAddressOfEntryPoint = 0;
 
-	#if 1
-	void *kernelBase = (void *) paging::conventionalAllocateNext(asset.size + PAGE_SIZE);
-	{
-		uint8_t* b = (uint8_t*)kernelBase;
-		for (uint64_t i = 0; i < asset.size; ++i)
-		{
-			b[i] = paging::buffa[0];
-		}
-	}
-	tmemcpy(kernelBase, asset.data, asset.size);
-	#else
 	{
 		auto ptr = (uint8_t*)asset.data;
 		auto peHeader = (const PeHeader*)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
@@ -234,7 +218,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 		mAddressOfEntryPoint = peOptionalHeader->mAddressOfEntryPoint;
 	}
-	#endif
 
 	KernelParams* params = (KernelParams*) paging::conventionalAllocateNext(sizeof(KernelParams));
 	{

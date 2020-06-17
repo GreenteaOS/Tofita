@@ -54,10 +54,7 @@ function packAssets(config: Config) {
 			assetPath[i] = 'assets\\' + assetName[i]
 		}
 
-		assetName.push('loader.tofita')
-		assetPath.push(config.tempFolder + '\\tofita\\loader_kernel.img')
-
-		assetName.push('tofita.exe')
+		assetName.push('tofita.gnu')
 		assetPath.push(config.tempFolder + '\\tofita\\tofita.exe')
 
 		assetName.push('trampoline.tofita')
