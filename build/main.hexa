@@ -71,7 +71,7 @@ for (task in tasks) {
 				// CR3 TRAMPOLINE
 
 				require('child_process').execSync(
-					'..\\Teapot\\nasm-2.14.02\\nasm  -o ' +
+					'..\\Teapot\\nasm-2.14.02\\nasm -o ' +
 					config.tempFolder + '\\tofita\\trampoline.bin boot\\loader\\trampoline.asm', { stdio: 'inherit' }
 				)
 
@@ -126,8 +126,13 @@ for (task in tasks) {
 						'-D versionMinor=' + config.versionMinor + ' ',
 						'-D versionName=\\"' + config.versionName + '\\" ',
 						'-DMEMSET ',
+						'-mtune=nocona -fno-stack-protector -fshort-wchar -w -mno-red-zone ',
+						'-fvisibility=hidden ',
+						'-ffreestanding ',
+						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
+						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-m64 -target x86_64-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
+						'-m64 -target x86_64-pc-windows-gnu -nostdlib -nodefaultlibs -nostartfiles ',
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w -Wimplicit-function-declaration ',
 						'-O2 -x c++ -std=c++2a -c kernel/tofita.c -o ',
 						config.tempFolder + '/tofita/tofita.obj '
