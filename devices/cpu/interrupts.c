@@ -371,15 +371,14 @@ __attribute__((aligned(64))) uint8_t rsp0stack[4096 * 32] = {0};
 __attribute__((aligned(64))) uint8_t rsp1stack[4096 * 32] = {0};
 __attribute__((aligned(64))) uint8_t rsp2stack[4096 * 32] = {0};
 
-typedef uint64_t uword_t;
-struct interrupt_frame
-{
-	uword_t ip; // Instruction Pointer
-	uword_t cs; // Code Segment
-	uword_t flags;
-	uword_t sp; // Stack Pointer
-	uword_t ss; // Stack Segment
-};
+struct InterruptFrame {
+	uint64_t ip; // Instruction pointer
+	uint64_t cs; // Code segment
+	uint64_t flags;
+	uint64_t sp; // Stack pointer
+	uint64_t ss; // Stack segment
+} __attribute__ ((packed));
+
 struct InterruptStack {
 	uint64_t xmm[25 - 7];
 
@@ -398,9 +397,16 @@ _Static_assert(sizeof(InterruptStack) == 200, "sizeof is incorrect");
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
 
 // TODO: errcode is `extra` here:
-//__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struct interrupt_frame *frame, uint64_t extra) {
+//__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struct InterruptFrame *frame, uint64_t extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
-__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struct interrupt_frame *frame) {
+void foo_interrupt_handler(InterruptFrame *frame);
+
+__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(InterruptFrame *frame) {
+	// TODO Find a better way to avoid LLVM bugs
+	foo_interrupt_handler(frame);
+}
+
+void foo_interrupt_handler(InterruptFrame *frame) {
 	serialPrintf(u8"[cpu] happened foo_interrupt %u ip~=%u cs=%u flags=%u sp=%u ss=%u\n",
 		frame,
 		frame->ip,
@@ -437,9 +443,15 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struc
 
 // ~100 times per second
 int32_t timer_called = 0;
-__attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(struct interrupt_frame *frame) {
-	serialPrintf(u8"[cpu] happened timer_interrupt <<<<<<<<<<<<<<<<<<<<<<<<<<<<< !!!!!!!!!!!!!! #%d\n", timer_called++);
 
+void timer_interrupt_hadler(InterruptFrame *frame);
+
+__attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(InterruptFrame *frame) {
+	timer_interrupt_hadler(frame);
+}
+
+void timer_interrupt_hadler(InterruptFrame *frame) {
+	serialPrintf(u8"[cpu] happened timer_interrupt <<<<<<<<<<<<<<<<<<<<<<<<<<<<< !!!!!!!!!!!!!! #%d\n", timer_called++);
 
 	// Enable interrupts
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
@@ -516,23 +528,22 @@ function tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
 // Takes 2 GDT entries
 function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit)
 {
-	struct TssDescriptor tssd;
-	tssd.limitLow = limit & 0xffff;
-	tssd.size = (limit >> 16) & 0xf;
+	struct TssDescriptor* tssd = (TssDescriptor*)&gdtTemplate[i * 2];
+	tssd->limitLow = limit & 0xffff;
+	tssd->size = (limit >> 16) & 0xf;
 
-	tssd.base_00 = base & 0xffff;
-	tssd.base_16 = (base >> 16) & 0xff;
-	tssd.base_24 = (base >> 24) & 0xff;
-	tssd.base_32 = (base >> 32) & 0xffffffff;
-	tssd.reserved = 0;
+	tssd->base_00 = base & 0xffff;
+	tssd->base_16 = (base >> 16) & 0xff;
+	tssd->base_24 = (base >> 24) & 0xff;
+	tssd->base_32 = (base >> 32) & 0xffffffff;
+	tssd->reserved = 0;
 
-	tssd.type = (enum GdtType)(
+	tssd->type = (enum GdtType)(
 		accessed |
 		execute |
 		ring3 |
 		present
 	);
-	tmemcpy((void*)&gdtTemplate[i * 2], &tssd, sizeof(/*TssDescriptor*/tssd));
 }
 
 __attribute__((aligned(64))) Idtr cacheIdtr;
@@ -606,6 +617,7 @@ function enableInterrupts() {
 	serialPrint(u8"\n");
 
 	uint64_t tssBase = (uint64_t)(&g_tss);
+
 	// upload
 	{
 		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
@@ -624,12 +636,13 @@ function enableInterrupts() {
 	serialPrint(u8"[cpu] GDT points to: ");
 	serialPrintHex((uint64_t) g_gdtr.base);
 	serialPrint(u8"\n");
-	serialPrintf(u8"[cpu] GDT size is %u\n", g_gdtr.limit);
+	serialPrintf(u8"[cpu] GDT size is %u == %u\n", g_gdtr.limit, 0x7F);
 	serialPrintln(u8"[cpu] calling lgdt");
 	lgdt(&g_gdtr);
 	serialPrintln(u8"[cpu] calling ltr");
 	{
 		setTsr(64);
+		//setTsr(64 + 3);
 	}
 	//initializeMouse(&IDT[IRQ4]);
 
