@@ -50,13 +50,13 @@ enterKernelMode:
 
 	mov rcx, rsp
 	push SYS_DATA32_SEL; ss
-    push rcx; rsp
-    pushfq; rflags
-    or dword [rsp], 0b1000000000; IF - interrupt enable flag
-    push SYS_CODE64_SEL; cs
-    mov     rcx, qword .ret; rip
-    push    rcx
-    iretq
+	push rcx; rsp
+	pushfq; rflags
+	or dword [rsp], 0b1000000000; IF - interrupt enable flag
+	push SYS_CODE64_SEL; cs
+	mov     rcx, qword .ret; rip
+	push    rcx
+	iretq
 .ret:
 	ret
 
