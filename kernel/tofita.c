@@ -48,6 +48,7 @@ void __chkstk() {};
 
 #include "util/Math.cpp"
 
+#include "../devices/cpu/cpu.hpp"
 #include "../devices/cpu/amd64.cpp"
 #include "../devices/serial/log.cpp"
 #include "allocator.c"

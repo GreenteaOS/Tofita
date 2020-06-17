@@ -1,0 +1,2 @@
+void enterKernelMode();
+void selectSegment();

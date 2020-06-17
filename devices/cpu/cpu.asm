@@ -20,11 +20,11 @@
 %define USER_CODE64_SEL 0x30
 %define SYS_CODE32_SEL 0x60
 
-global enterUserMode
-enterUserMode:
 %define DATA (USER_DATA32_SEL + 3)
 %define CODE (USER_CODE64_SEL + 3)
 
+global enterUserMode
+enterUserMode:
 	cli
 	mov rax, rsp
 	push SYS_DATA32_SEL; ss
@@ -38,6 +38,28 @@ enterUserMode:
 .ret:
 	ret
 
+global enterKernelMode
+enterKernelMode:
+	cli
+
+	mov ax, SYS_DATA32_SEL
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	mov rcx, rsp
+	push SYS_DATA32_SEL; ss
+    push rcx; rsp
+    pushfq; rflags
+    or dword [rsp], 0b1000000000; IF - interrupt enable flag
+    push SYS_CODE64_SEL; cs
+    mov     rcx, qword .ret; rip
+    push    rcx
+    iretq
+.ret:
+	ret
+
 global selectSegment
 ; TODO set COMPAT_SEL as func agrument
 ; TODO set also SS
@@ -45,8 +67,11 @@ global selectSegment
 %define retfq o64 retf
 selectSegment:
 	push SYS_CODE64_SEL ; push GDT selector
-	push rdi
+	mov rcx, qword .ret; rip
+	push rcx
 	retfq
+.ret:
+	ret
 
 ; exports
 global keyboardHandler
