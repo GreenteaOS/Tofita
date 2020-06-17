@@ -13,5 +13,6 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-%include "boot/loader/loader.asm"
+bits 64
+section .head
 %include "devices/cpu/cpu.asm"

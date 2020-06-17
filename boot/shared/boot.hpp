@@ -43,7 +43,7 @@
 
 // Constants
 
-// Start of kernel sections in memory, see loader.ld
+// Start of kernel sections in memory
 #define KernelVirtualBase (uint64_t)0xffff800000000000
 #define FramebufferStart (KernelVirtualBase + 1024*1024*1024) // 1 GB
 // TODO: no need for mapping FramebufferStart if WholePhysicalStart used

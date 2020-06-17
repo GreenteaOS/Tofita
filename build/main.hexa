@@ -58,15 +58,6 @@ for (task in tasks) {
 				// Assets
 				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
 				if (fs.existsSync(assets)) fs.unlinkSync(assets)
-				// Assembly
-				let asm = [
-					'kernel\\all.asm' : 'tofita.asm.o'
-				]
-				for (a in asm.keys())
-					require('child_process').execSync(
-						'..\\Teapot\\nasm-2.14.02\\nasm -f elf64 -o ' +
-						config.tempFolder + '\\tofita\\' + asm.get(a) + ' ' + a, { stdio: 'inherit' }
-					)
 
 				// CR3 TRAMPOLINE
 
@@ -78,46 +69,6 @@ for (task in tasks) {
 				let llvm = 'LLVM-10.0.0'
 
 				// KERNEL
-
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\\(llvm)\\bin\\clang.exe -target x86_64-pc-linux-gnu ',
-						'-O2 -x c++ -std=gnu++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
-						'-fno-rtti -fno-exceptions ',
-						'-Wimplicit-function-declaration -Werror ',
-						'-DTOFITA -mtune=nocona ',
-						'-fvisibility=hidden ',
-						'-ffreestanding ',
-						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
-						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
-						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fno-pic -mcmodel=large ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-D versionMajor=' + config.versionMajor + ' ',
-						'-D versionMinor=' + config.versionMinor + ' ',
-						'-D versionName=\\"' + config.versionName + '\\" ',
-						'-c -o ',
-						config.tempFolder + '/tofita/loader.o kernel/tofita.c'
-					].join(''), { stdio: 'inherit' }
-				)
-
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\linux-ubuntu-natty_x86_64-bin_x86_64-mingw_20101218_vityan\\bin\\x86_64-vityan-linux-gnu-ld.exe -m elf_x86_64 ',
-						'-T boot/loader/loader.ld ',
-						'-o ',
-						config.tempFolder + '/tofita/loader_kernel.elf.img ',
-						config.tempFolder + '/tofita/tofita.asm.o ',
-						config.tempFolder + '/tofita/loader.o '
-					].join(''), { stdio: 'inherit' }
-				)
-
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\\(llvm)\\bin\\llvm-objcopy.exe -O binary ',
-						config.tempFolder + '/tofita/loader_kernel.elf.img ',
-						config.tempFolder + '/tofita/loader_kernel.img'
-					].join(''), { stdio: 'inherit' }
-				)
 
 				require('child_process').execSync(
 					[
