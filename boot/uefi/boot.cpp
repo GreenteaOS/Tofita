@@ -202,7 +202,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	void *kernelBase = (void *) paging::conventionalAllocateNext(asset.size + PAGE_SIZE);
 	{
 		uint8_t* b = (uint8_t*)kernelBase;
-		for (uint64_t i = 0; i < asset.size + PAGE_SIZE; ++i)
+		for (uint64_t i = 0; i < asset.size; ++i)
 		{
 			b[i] = paging::buffa[0];
 		}
@@ -216,7 +216,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		auto peOptionalHeader = (const Pe32OptionalHeader*)((uint64_t)peHeader + sizeof(PeHeader));
 		serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic, 0x020B);
 		serialPrintf(u8"PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
-		void *kernelBase = (void *) paging::conventionalAllocateNext(peOptionalHeader->mSizeOfImage + PAGE_SIZE);
+		void *kernelBase = (void *) paging::conventionalAllocateNext(peOptionalHeader->mSizeOfImage);
 		memset(kernelBase, 0, peOptionalHeader->mSizeOfImage); // Zeroing
 
 		// Copy sections

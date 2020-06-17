@@ -42,8 +42,7 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	return dest;
 }
 
-extern "C" int _fltused = 1;
-void __chkstk() {};
+void ___chkstk_ms() {};
 #endif
 
 #include "util/Math.cpp"
