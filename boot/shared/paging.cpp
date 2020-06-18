@@ -93,13 +93,11 @@ typedef struct {
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
 static PageEntry* pml4entries PAGE_ALIGNED = null;
-typedef uint8_t PagesArray[PAGE_SIZE];
-static PagesArray* pages PAGE_ALIGNED = null;
-static int32_t lastPageIndex = 0;
 
+uint64_t conventionalAllocateNext(uint64_t bytes);
 static void *allocatePage() {
 	// TODO bounds check
-	return (void *) pages[lastPageIndex++];
+	return (void *) conventionalAllocateNext(PAGE_SIZE);
 }
 
 static LinearAddress getLinearAddress(uint64_t address) {
@@ -262,6 +260,7 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintf(u8"[paging] efi mapped %u pages\n", sum);
 }
 
+#if 0
 uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
@@ -284,6 +283,7 @@ uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 
 	return result;
 }
+#endif
 
 uint8_t buffa[1] = {0};
 
