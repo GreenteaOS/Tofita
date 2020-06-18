@@ -141,9 +141,9 @@ function initializeFallback(IdtEntry *entry, uint64_t fallbackHandler) {
 	entry->offsetHigherbits = (address & 0xffffffffffff0000) >> 16;
 	entry->selector = SYS_CODE64_SEL;
 	entry->zero = 0;
-	entry->ist = 0;
+	entry->ist = 1; // Stack
 	entry->z = 0;
-	entry->dpl = 0;
+	entry->dpl = 3; // Ring 3
 	entry->present = 1;
 	entry->gateType = 0xe; // Interrupt gate
 }
@@ -485,11 +485,11 @@ __attribute__((aligned(64))) static uint32_t gdtTemplate[32] = {
 #define PS2_DATA_PORT 0x60
 #define PS2_CONTROL_PORT 0x64
 
-	//g_gdt_table[i].size |= (is64 ? 0xa0 : 0xc0);
 function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType typed) {
 	GdtDescriptor* gdtd = (GdtDescriptor*)&gdtTemplate[i * 2];
 	gdtd->limitLow = limit & 0xffff;
 	gdtd->size = (limit >> 16) & 0xf;
+	//gdtd->size |= (is64 ? 0xa0 : 0xc0);
 	gdtd->size |= 0xa0;
 	gdtd->size <<= 0x0D; // Long mode
 
@@ -515,7 +515,7 @@ function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit) {
 	tssd->type = (enum GdtType)(
 		accessed |
 		execute |
-		ring3 |
+		ring3 | // TODO
 		present
 	);
 }
@@ -583,8 +583,6 @@ function enableInterrupts() {
 	{
 		tssSetEntryNT(8, tssBase, sizeof_TssEntry);
 		//tssSetEntryNT(8, tssBase, sizeof_TssEntry - 1); TODO
-		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
-		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
 	}
 
 
@@ -685,11 +683,9 @@ function enablePS2Mouse() {
 	quakePrintf(u8"Enabled PS/2 mouse and keyboard\n");
 }
 
-function mouseWait(uint8_t aType)
-{
+function mouseWait(uint8_t aType) {
 	uint32_t _timeOut=100000;
-	if (aType==0)
-	{
+	if (aType==0) {
 		while (_timeOut--) //Data
 		{
 			if ((readPort(PS2_CONTROL_PORT) & 1) == 1)
@@ -712,8 +708,7 @@ function mouseWait(uint8_t aType)
 	}
 }
 
-function mouseWrite(uint8_t aWrite)
-{
+function mouseWrite(uint8_t aWrite) {
 	//Wait to be able to send a command
 	mouseWait(1);
 	//Tell the mouse we are sending a command
@@ -724,8 +719,7 @@ function mouseWrite(uint8_t aWrite)
 	writePort(PS2_DATA_PORT, aWrite);
 }
 
-uint8_t mouseRead()
-{
+uint8_t mouseRead() {
 	//Get's response from mouse
 	mouseWait(0);
 	return readPort(PS2_DATA_PORT);
