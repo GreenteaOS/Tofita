@@ -421,6 +421,7 @@ void foo_interrupt_handler(InterruptFrame *frame) {
 	serialPrintf(u8" r10=%u", stack->r10);
 	serialPrintf(u8" r11=%u", stack->r11);
 	serialPrintf(u8" rax=%u\n", stack->rax);
+
 	serialPrint(u8"[cpu] frame->ip points to: ");
 	serialPrintHex((uint64_t) frame->ip);
 	serialPrint(u8"\n");
@@ -585,6 +586,17 @@ function enableInterrupts() {
 		//tssSetEntryNT(8, tssBase, sizeof_TssEntry - 1); TODO
 	}
 
+	if (false) {
+		let gdt = (GdtDescriptorEx*)gdtTemplate;
+		for (uint32_t i = 0; i < 16; ++i) {
+			if (i == 0) continue; // Empty
+			if (i == 8) continue; // TSS
+			if (i == 9) continue; // TSS
+			if (gdt[i].present == 0) continue;
+			serialPrintf(u8"[dumpGDT] #%u\n", i);
+			dumpGDT(&gdt[i]);
+		}
+	}
 
 	globalGdtr.limit = sizeof(gdtTemplate) - 1;
 	globalGdtr.base = (uint64_t)(&gdtTemplate[0]);
@@ -602,7 +614,6 @@ function enableInterrupts() {
 		setTsr(64);
 		//setTsr(64 + 3);
 	}
-	//initializeMouse(&IDT[IRQ4]);
 
 	serialPrintln(u8"[cpu] initializing unknownInterrupt");
 
@@ -631,16 +642,6 @@ function enableInterrupts() {
 
 	serialPrintln(u8"[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL");
 	enterKernelMode();
-
-	// Masking IRQ to only support IRQ1 (keyboard)
-	//writePort(IRQ1, 0xFC);
-	// 0xFA - timer
-	// 0xFC - timer and kb
-	// 0xFD - kb
-	// 0xFE - timer
-	// 0xFF - none
-
-	//writePort(IRQ1, 0xFD);
 }
 
 function enablePS2Mouse() {
