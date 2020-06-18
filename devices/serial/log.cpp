@@ -89,12 +89,12 @@ uint64_t kstrlen(const uint8_t *data) {
 
 static inline uint8_t portInb(uint16_t port) {
 	uint8_t data;
-	__asm__ volatile("inb %w1,%b0" : "=a" (data) : "d"(port));
+	asm volatile("inb %w1,%b0" : "=a" (data) : "d"(port));
 	return data;
 }
 
 static inline uint8_t portOutb(uint16_t port, uint8_t value) {
-	__asm__ volatile("outb %b0,%w1" : : "a" (value), "d"(port));
+	asm volatile("outb %b0,%w1" : : "a" (value), "d"(port));
 	return value;
 }
 
@@ -212,8 +212,7 @@ function serialPrintHex(uint64_t n) {
 	serialPortWrite((uint8_t *)buf, 16);
 }
 
-function serialPrintMem(const void *mem, int32_t n)
-{
+function serialPrintMem(const void *mem, int32_t n) {
 	serialPrint(u8"@");
 	serialPrintHex((uint64_t) mem);
 	serialPrint(u8"\n");
@@ -224,13 +223,11 @@ function serialPrintMem(const void *mem, int32_t n)
 	}
 }
 
-function serialPrintPtr(void *ptr)
-{
+function serialPrintPtr(void *ptr) {
 	serialPrintHex((uint64_t) ptr);
 }
 
-function serialPrintBits(uint64_t value)
-{
+function serialPrintBits(uint64_t value) {
 	for (int32_t i = 0; i < 64; ++i) {
 		if (value & (1ull << i)) {
 			serialPrintInt(i);
@@ -246,8 +243,7 @@ int32_t __cdecl putchar(uint8_t c) {
 }
 
 #define EOF 0
-int32_t puts(const uint8_t *string)
-{
+int32_t puts(const uint8_t *string) {
 	int32_t i = 0;
 	while (string[i]) //standard c idiom for looping through a null-terminated string
 	{

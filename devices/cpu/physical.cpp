@@ -17,9 +17,13 @@
 #define PHYSICAL_NOT_FOUND 0
 #define BUSY 31
 #define FREE 0
-#define POS_TO_PAGE(pos) (pos / PAGE_SIZE)
+#define POS_TO_PAGE(pos) ((pos) / PAGE_SIZE)
 // POS_TO_PAGE(123) == 0 (.floor)
-// TODO use that << 12 magic to compute amount of pages
+#define DOWN_BYTES_TO_PAGES(bytes) ((bytes) >> 12)
+// 4095 >> 12 == 0
+// 4096 >> 12 == 1
+// 8191 >> 12 == 1
+// 8192 >> 12 == 2
 
 class PhysicalAllocator {
 private:
@@ -43,7 +47,7 @@ public:
 
 			while (offset < endOfMemoryMap) {
 				let kind = (descriptor->Type == efi::EfiConventionalMemory)? FREE : BUSY;
-				let where = POS_TO_PAGE(descriptor->PhysicalStart);
+				let where = DOWN_BYTES_TO_PAGES(descriptor->PhysicalStart);
 				let steps = descriptor->NumberOfPages;
 
 				uint64_t i = where;
@@ -63,7 +67,7 @@ public:
 	}
 
 	static function reserveOnePage(uint64_t physical) {
-		let where = POS_TO_PAGE(physical);
+		let where = DOWN_BYTES_TO_PAGES(physical);
 		buffer[where] = BUSY;
 		if (last == where) last = PHYSICAL_NOT_FOUND;
 	}
@@ -92,7 +96,7 @@ public:
 	}
 
 	static function freeOnePage(uint64_t physical) {
-		let where = POS_TO_PAGE(physical);
+		let where = DOWN_BYTES_TO_PAGES(physical);
 		buffer[where] = FREE;
 		last = where;
 	}
