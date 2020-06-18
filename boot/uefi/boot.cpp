@@ -303,7 +303,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	// Convert addresses to upper half
 
-	stack = LOWER_TO_UPPER(stack);
+	stack = (uint64_t)WholePhysicalStart + stack;
 	params->physicalRamBitMaskVirtual = LOWER_TO_UPPER(params->physicalRamBitMaskVirtual);
 	params = (KernelParams*)LOWER_TO_UPPER(params);
 
