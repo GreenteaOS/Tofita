@@ -113,8 +113,6 @@ struct KernelParams {
 	Framebuffer framebuffer;
 	RamDisk ramdisk;
 	// Simple memory buffer for in-kernel allocations
-	uint64_t bufferSize;
-	uint64_t buffer;
 	uint64_t acpiTablePhysical;
 	uint64_t ramBytes;
 	// uint8_t isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and don't allow to login!
