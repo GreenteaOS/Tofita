@@ -189,7 +189,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	const uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
 	serialPrintf(u8"[[[efi_main]]] large buffer allocated at %u\n", largeBuffer);
 	paging::conventionalOffset = largeBuffer;
-	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - largeBuffer + upper)
 	uint64_t mAddressOfEntryPoint = 0;
 
 	{
@@ -304,8 +303,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// Convert addresses to upper half
 
 	stack = (uint64_t)WholePhysicalStart + stack;
-	params->physicalRamBitMaskVirtual = LOWER_TO_UPPER(params->physicalRamBitMaskVirtual);
-	params = (KernelParams*)LOWER_TO_UPPER(params);
+	params->physicalRamBitMaskVirtual = (uint64_t)WholePhysicalStart + params->physicalRamBitMaskVirtual;
+	params = (KernelParams*)((uint64_t)WholePhysicalStart + (uint64_t)params);
 
 	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
 

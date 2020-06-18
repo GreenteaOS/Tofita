@@ -52,8 +52,9 @@ void ___chkstk_ms() {};
 #include "../devices/cpu/spinlock.cpp"
 #include "../devices/cpu/interrupts.cpp"
 #include "../devices/cpu/rdtsc.cpp"
-#include "../devices/cpu/pages.cpp"
+#include "../devices/efi/efi.cpp"
 #include "../devices/cpu/physical.cpp"
+#include "../devices/cpu/pages.cpp"
 #include "../devices/screen/framebuffer.cpp"
 #include "../devices/ps2/keyboard.cpp"
 #include "../devices/ps2/mouse.cpp"
@@ -91,6 +92,7 @@ function kernelMain(const KernelParams *params) {
 	serialPrint(u8"\n");
 	paramsCache = params;
 	PhysicalAllocator::init(params);
+	pages::pml4entries = (pages::PageEntry*)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
 

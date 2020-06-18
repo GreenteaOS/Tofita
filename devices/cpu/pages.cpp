@@ -94,17 +94,14 @@ typedef struct {
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
 static PageEntry* pml4entries PAGE_ALIGNED = null;
-typedef uint8_t PagesArray[PAGE_SIZE];
-static PagesArray* pages PAGE_ALIGNED = null;
-static int32_t lastPageIndex = 0;
 
 static void *allocatePage() {
+	return (void*)PhysicalAllocator::allocateOnePagePreZeroed();
 	// TODO bounds check
-	return (void *) pages[lastPageIndex--];
 }
 
-static LinearAddress getLinearAddress(uint64_t address) {
-	return *((LinearAddress *) &address);
+static LinearAddress getLinearAddress(uint64_t virtualAddr) {
+	return *((LinearAddress *) &virtualAddr);
 }
 
 static function initializePage(PageEntry *entry, uint64_t address) {
@@ -117,10 +114,10 @@ static void *getPage(PageEntry *table, uint64_t entryId) {
 	PageEntry *entry = &table[entryId];
 
 	if (entry->present == 1) {
-		return (void *) (entry->address << ADDRESS_BITS);
+		return (void *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	} else {
 		void *newPage = allocatePage();
-		initializePage(entry, (uint64_t) newPage);
+		initializePage(entry, (uint64_t) newPage - (uint64_t)WholePhysicalStart);
 		return newPage;
 	}
 }
@@ -131,8 +128,10 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 }
 
 #define createMapping(fromTable, toTable)                                            \
-	static void map_ ## fromTable (PageEntry fromTable[],                            \
-			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
+	static void map_ ## fromTable (                                                  \
+			PageEntry fromTable[],                                                   \
+			uint64_t virtualAddr,                                                    \
+			uint64_t physicalAddr) {                                                 \
 		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
 		map_ ## toTable ((PageEntry *)toTable, virtualAddr, physicalAddr);           \
 	}
@@ -142,6 +141,25 @@ createMapping(pdpt, pd)
 createMapping(pml4, pdpt)
 
 #undef createMapping
+
+uint64_t resolveAddr(uint64_t virtualAddr) {
+	// pml4
+	PageEntry *entry = &pml4entries[getLinearAddress(virtualAddr).pml4];
+	if (entry->present == 0) return 0;
+	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	// pdpt
+	entry = &entry[getLinearAddress(virtualAddr).pdpt];
+	if (entry->present == 0) return 0;
+	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	// pd
+	entry = &entry[getLinearAddress(virtualAddr).pd];
+	if (entry->present == 0) return 0;
+	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	// pt
+	entry = &entry[getLinearAddress(virtualAddr).pt];
+	if (entry->present == 0) return 0;
+	return entry->address << ADDRESS_BITS;
+}
 
 function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln(u8"[paging] mapping memory range");
@@ -175,10 +193,5 @@ function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCou
 		vAddress += PAGE_SIZE;
 		pAddress += PAGE_SIZE;
 	}
-}
-
-static const efi::EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi::EFI_MEMORY_DESCRIPTOR *descriptor, uint64_t descriptorSize) {
-	const uint8_t *desc = ((const uint8_t *) descriptor) + descriptorSize;
-	return (const efi::EFI_MEMORY_DESCRIPTOR *) desc;
 }
 }

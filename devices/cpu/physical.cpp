@@ -63,7 +63,7 @@ public:
 				}
 
 				offset += descriptorSize;
-				descriptor = pages::getNextDescriptor(descriptor, descriptorSize);
+				descriptor = efi::getNextDescriptor(descriptor, descriptorSize);
 			}
 		}
 
@@ -121,6 +121,12 @@ public:
 
 		serialPrintf(u8"[physical] allocateOnePage == PHYSICAL_NOT_FOUND\n");
 		return PHYSICAL_NOT_FOUND;
+	}
+
+	static uint64_t allocateOnePagePreZeroed() {
+		var result = allocateOnePage();
+		if (result != PHYSICAL_NOT_FOUND) memset((void*)result, 0, PAGE_SIZE);
+		return result;
 	}
 
 	// TODO faster
