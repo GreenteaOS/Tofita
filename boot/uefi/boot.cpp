@@ -186,8 +186,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	RamDiskAsset asset = getRamDiskAsset(u8"tofita.gnu");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data);
 
-	uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
-	if (largeBuffer == 1024*1024) largeBuffer += 4096; // TODO remove ASAP
+	const uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
 	serialPrintf(u8"[[[efi_main]]] large buffer allocated at %u\n", largeBuffer);
 	paging::conventionalOffset = largeBuffer;
 	#define LOWER_TO_UPPER(at) ((uint64_t)(at) - largeBuffer + upper)
@@ -260,7 +259,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// Note: paging::PagesArray allocated last
 
 	paging::pml4entries = (paging::PageEntry*) paging::conventionalAllocateNext(sizeof(paging::PageEntry) * PAGE_TABLE_SIZE);
-	paging::pages = (paging::PagesArray*) paging::conventionalAllocateNext(1024*1024*8);
 
 	{
 		uint8_t* b = (uint8_t*)paging::pml4entries;
