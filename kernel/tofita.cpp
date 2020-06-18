@@ -51,7 +51,7 @@ void ___chkstk_ms() {};
 #include "allocator.cpp"
 #include "../devices/cpu/cpuid.cpp"
 #include "../devices/cpu/spinlock.cpp"
-#include "../devices/cpu/interrupts.c"
+#include "../devices/cpu/interrupts.cpp"
 #include "../devices/cpu/rdtsc.cpp"
 #include "../devices/cpu/pages.cpp"
 #include "../devices/cpu/physical.cpp"
