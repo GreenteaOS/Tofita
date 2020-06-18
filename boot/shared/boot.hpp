@@ -45,13 +45,13 @@ typedef void function;
 
 // Start of kernel sections in memory
 #define KernelVirtualBase (uint64_t)0xffff800000000000
-#define FramebufferStart (KernelVirtualBase + 1024*1024*1024) // 1 GB
+#define FramebufferStart (KernelVirtualBase + 768*1024*1024)
 // TODO: no need for mapping FramebufferStart if WholePhysicalStart used
 // TODO proper dynamically computed numbers
 
 // Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-#define WholePhysicalStart (FramebufferStart + 1024*1024*1024) // 1 GB
+#define WholePhysicalStart (FramebufferStart + 256*1024*1024)
 #define PAGE_SIZE 4096 // 4 KiB
 
 // Helpers
