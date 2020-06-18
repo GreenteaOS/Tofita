@@ -56,10 +56,10 @@ void ___chkstk_ms() {};
 #include "../devices/cpu/rdtsc.cpp"
 #include "../devices/cpu/pages.cpp"
 #include "../devices/cpu/physical.cpp"
-#include "../devices/screen/framebuffer.c"
+#include "../devices/screen/framebuffer.cpp"
 #include "../devices/ps2/keyboard.cpp"
 #include "../devices/ps2/mouse.cpp"
-#include "../devices/ps2/polling.c"
+#include "../devices/ps2/polling.cpp"
 #include "../devices/cpu/fallback.cpp"
 #include "../devices/acpi/acpi.cpp"
 #include "ramdisk.cpp"
@@ -69,7 +69,7 @@ void ___chkstk_ms() {};
 #include "gui/blur.cpp"
 #include "gui/quake.cpp"
 #include "gui/text.cpp"
-#include "gui/compositor.c"
+#include "gui/compositor.cpp"
 
 // STB library
 #define STBI_NO_SIMD
