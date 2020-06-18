@@ -29,40 +29,16 @@ function libc_free(void* addr) {
 
 void* libc_malloc(uint64_t size) {
 	serialPrintf(u8"[libc] libc_malloc of size %u\n", size);
-	return (void*)allocateFromBuffer(size);
-
-	void* result = allocateFromBuffer(size + 4);
-
-	// Save size information for realloc
-	uint32_t* sizes = (uint32_t*)result;
-	sizes[0] = size;
-
-	serialPrintf(u8"[libc] libc_malloc done\n");
-	return (void*)((uint64_t)result + 4);
+	return (void*)PhysicalAllocator::allocateBytes(size);
 }
 
 void* libc_realloc(void* addr, uint64_t size) {
 	serialPrintf(u8"[libc] libc_realloc %u of size %u\n", addr, size);
-	return (void*)allocateFromBuffer(size);
 
-	// Get old size information
-	uint32_t* sizes = (uint32_t*)addr;
-	//uint32_t old = sizes[-1];
-
-	// Alloc
-	uint8_t* result = (uint8_t*)allocateFromBuffer(size + 4);
-
-	// Copy
-	//uint8_t* source = addr;
-	//if (size < old) old = size;
-	//for (uint32_t i = 0; i < old; i++) result[i + 4] = source[i];
-
-	// Save size
-	sizes = (uint32_t*)result;
-	sizes[0] = size;
-
-	serialPrintf(u8"[libc] libc_realloc done\n");
-	return result;
+	{
+		var result = PhysicalAllocator::allocateBytes(size);
+		return (void*)result;
+	}
 }
 
 void *libc_memset(void *b, int32_t c, int32_t len) {
