@@ -51,7 +51,7 @@ typedef void function;
 
 // Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-#define WholePhysicalStart (FramebufferStart + 256*1024*1024)
+#define WholePhysicalStart (FramebufferStart + 128*1024*1024)
 #define PAGE_SIZE 4096 // 4 KiB
 
 // Helpers
