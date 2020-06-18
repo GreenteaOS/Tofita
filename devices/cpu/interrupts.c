@@ -63,22 +63,22 @@ typedef struct {
 
 uint8_t readPort(uint16_t port) {
 	uint8_t data;
-	__asm__ volatile("inb %w1,%b0" : "=a" (data) : "d"(port));
+	asm volatile("inb %w1,%b0" : "=a" (data) : "d"(port));
 	return data;
 }
 
 function writePort(uint16_t port, uint8_t value) {
-	__asm__ volatile("outb %b0,%w1" : : "a" (value), "d"(port));
+	asm volatile("outb %b0,%w1" : : "a" (value), "d"(port));
 }
 
 static inline function loadIdt(Idtr *idtr) {
-	__asm__ volatile("lidtq %0" : : "m" (*idtr));
+	asm volatile("lidtq %0" : : "m" (*idtr));
 }
 
 // http://wiki.osdev.org/Inline_Assembly/Examples#I.2FO_access
 static inline function ioWait(void) {
 	// TODO: reinvestigate
-	__asm__ volatile ( "jmp 1f\n\t"
+	asm volatile ( "jmp 1f\n\t"
 					 "1:jmp 2f\n\t"
 					 "2:" );
 }
@@ -90,6 +90,7 @@ static inline function ioWait(void) {
 //#define EMPTY_SEL 0x08
 #define SYS_CODE64_SEL 0x10 // Execute/Read
 #define SYS_DATA32_SEL 0x18 // Read/Write
+// Layout expected by SYSRET
 #define USER_CODE32_SEL 0x20 // Execute/Read
 #define USER_DATA32_SEL 0x28 // Read/Write
 #define USER_CODE64_SEL 0x30 // Execute/Read
@@ -274,8 +275,7 @@ uint8_t mouseRead();
 #define IRQ15 47
 
 #pragma pack(1)
-struct TablePtr
-{
+struct TablePtr {
 	uint16_t limit;
 	uint64_t base;
 } __attribute__ ((packed));
@@ -283,12 +283,11 @@ struct TablePtr
 
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
-static inline function lgdt(volatile const struct TablePtr *gdt) {
+static inline function lgdt(volatile const TablePtr *gdt) {
 	asm volatile ("lgdt (%0)" : : "r" (gdt) : "memory");
 }
 
-enum GdtType : uint8_t
-{
+enum GdtType : uint8_t {
 	accessed	= 0x01,
 	read_write	= 0x02,
 	conforming	= 0x04,
@@ -331,14 +330,14 @@ struct GdtDescriptorEx {
 	unsigned long long reserved : 2;
 	unsigned long long zero16one32 : 1;
 	unsigned long long blocks : 1;
+
 	unsigned long long baseHigh : 8;
 } __attribute__ ((packed));
 #pragma pack()
 
 _Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect");
 
-struct TssDescriptor
-{
+struct TssDescriptor {
 	uint16_t limitLow;
 	uint16_t base_00;
 	uint8_t base_16;
@@ -349,8 +348,7 @@ struct TssDescriptor
 	uint32_t reserved;
 } __attribute__ ((packed));
 
-struct TssEntry
-{
+struct TssEntry {
 	uint32_t reserved0;
 
 	uint64_t rsp[3]; // stack pointers for CPL 0-2
@@ -361,9 +359,8 @@ struct TssEntry
 	uint16_t iomap_offset;
 } __attribute__ ((packed));
 
-__attribute__((aligned(64))) static volatile struct TablePtr g_gdtr;
-__attribute__((aligned(64))) static volatile struct TssEntry g_tss;
-__attribute__((aligned(64))) static volatile struct GdtDescriptor g_gdt_table[10];
+__attribute__((aligned(64))) static volatile TablePtr globalGdtr;
+__attribute__((aligned(64))) static volatile TssEntry globalTss;
 
 // rsp0stack = exp0 in TSS
 // Stack used by kernel to handle syscalls/interrupts
@@ -397,17 +394,17 @@ _Static_assert(sizeof(InterruptStack) == 200, "sizeof is incorrect");
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
 
 // TODO: errcode is `extra` here:
-//__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(struct InterruptFrame *frame, uint64_t extra) {
+//__attribute__((aligned(64))) __attribute__((interrupt)) void unknownInterrupt(struct InterruptFrame *frame, uint64_t extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
 void foo_interrupt_handler(InterruptFrame *frame);
 
-__attribute__((aligned(64))) __attribute__((interrupt)) void foo_interrupt(InterruptFrame *frame) {
+__attribute__((aligned(64))) __attribute__((interrupt)) void unknownInterrupt(InterruptFrame *frame) {
 	// TODO Find a better way to avoid LLVM bugs
 	foo_interrupt_handler(frame);
 }
 
 void foo_interrupt_handler(InterruptFrame *frame) {
-	serialPrintf(u8"[cpu] happened foo_interrupt %u ip~=%u cs=%u flags=%u sp=%u ss=%u\n",
+	serialPrintf(u8"[cpu] happened unknownInterrupt %u ip~=%u cs=%u flags=%u sp=%u ss=%u\n",
 		frame,
 		frame->ip,
 		frame->cs,
@@ -457,8 +454,7 @@ void timer_interrupt_hadler(InterruptFrame *frame) {
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
-void setTsr(uint16_t tsr_data)
-{
+void setTsr(uint16_t tsr_data) {
 	asm volatile("ltr %[src]"
 		   : // No outputs
 		   : [src] "m" (tsr_data) // Inputs
@@ -489,46 +485,24 @@ __attribute__((aligned(64))) static uint32_t gdtTemplate[32] = {
 #define PS2_DATA_PORT 0x60
 #define PS2_CONTROL_PORT 0x64
 
-function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType typed)
-{
-	g_gdt_table[i].limitLow = limit & 0xffff;
-	g_gdt_table[i].size = (limit >> 16) & 0xf;
 	//g_gdt_table[i].size |= (is64 ? 0xa0 : 0xc0);
-	g_gdt_table[i].size |= 0xa0;
-	g_gdt_table[i].size <<= 0x0D; // Long mode
+function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum GdtType typed) {
+	GdtDescriptor* gdtd = (GdtDescriptor*)&gdtTemplate[i * 2];
+	gdtd->limitLow = limit & 0xffff;
+	gdtd->size = (limit >> 16) & 0xf;
+	gdtd->size |= 0xa0;
+	gdtd->size <<= 0x0D; // Long mode
 
-	g_gdt_table[i].baseLow = base & 0xffff;
-	g_gdt_table[i].baseMid = (base >> 16) & 0xff;
-	g_gdt_table[i].baseHigh = (base >> 24) & 0xff;
+	gdtd->baseLow = base & 0xffff;
+	gdtd->baseMid = (base >> 16) & 0xff;
+	gdtd->baseHigh = (base >> 24) & 0xff;
 
-	g_gdt_table[i].type = (enum GdtType)(typed | system | present);
-}
-
-function tssSetEntry(uint8_t i, uint64_t base, uint64_t limit)
-{
-	struct TssDescriptor tssd;
-	tssd.limitLow = limit & 0xffff;
-	tssd.size = (limit >> 16) & 0xf;
-
-	tssd.base_00 = base & 0xffff;
-	tssd.base_16 = (base >> 16) & 0xff;
-	tssd.base_24 = (base >> 24) & 0xff;
-	tssd.base_32 = (base >> 32) & 0xffffffff;
-	tssd.reserved = 0;
-
-	tssd.type = (enum GdtType)(
-		accessed |
-		execute |
-		ring3 |
-		present
-	);
-	tmemcpy((void*)&g_gdt_table[i], &tssd, sizeof(/*TssDescriptor*/tssd));
+	gdtd->type = (enum GdtType)(typed | system | present);
 }
 
 // Takes 2 GDT entries
-function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit)
-{
-	struct TssDescriptor* tssd = (TssDescriptor*)&gdtTemplate[i * 2];
+function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit) {
+	TssDescriptor* tssd = (TssDescriptor*)&gdtTemplate[i * 2];
 	tssd->limitLow = limit & 0xffff;
 	tssd->size = (limit >> 16) & 0xf;
 
@@ -572,73 +546,59 @@ function dumpGDT(GdtDescriptorEx* desc) {
 function enableInterrupts() {
 	serialPrintln(u8"[cpu] initializing lgdt");
 
-	tmemset((void*)&g_gdt_table, 0, sizeof(g_gdt_table));
-	g_gdtr.limit = sizeof(g_gdt_table) - 1;
-	g_gdtr.base = (uint64_t)(&g_gdt_table[0]);
-	serialPrintf(u8"[cpu] lgdt limit %u base %u\n", g_gdtr.limit, g_gdtr.base);
+	uint64_t sizeof_TssEntry = sizeof(globalTss);
+	serialPrintf(u8"[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry));
 
-	// Kernel CS/SS - always 64bit
-	gdtSetEntry(1, 0, 0xfffff,  1, (enum GdtType)(read_write | execute));
-	gdtSetEntry(2, 0, 0xfffff,  1, read_write);
-
-	// User CS32/SS/CS64 - layout expected by SYSRET
-	gdtSetEntry(3, 0, 0xfffff,  0, (enum GdtType)(ring3 | read_write | execute));
-	gdtSetEntry(4, 0, 0xfffff,  1,  (enum GdtType)(ring3 | read_write));
-	gdtSetEntry(5, 0, 0xfffff,  1,  (enum GdtType)(ring3 | read_write | execute));
-
-	uint64_t sizeof_TssEntry = sizeof(g_tss);
-	serialPrintf(u8"[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(struct TssEntry));
-
-	tmemset((void*)&g_tss, 0, sizeof_TssEntry);
-	g_tss.iomap_offset = sizeof_TssEntry;
-	g_tss.rsp[0] = (uint64_t)&rsp0stack;
-	g_tss.rsp[1] = (uint64_t)&rsp1stack;
-	g_tss.rsp[2] = (uint64_t)&rsp2stack;
+	tmemset((void*)&globalTss, 0, sizeof_TssEntry);
+	globalTss.iomap_offset = sizeof_TssEntry;
+	globalTss.rsp[0] = (uint64_t)&rsp0stack;
+	globalTss.rsp[1] = (uint64_t)&rsp1stack;
+	globalTss.rsp[2] = (uint64_t)&rsp2stack;
 	// TODO zero out stacks
-	g_tss.ist[0] = (uint64_t)&rsp1stack;
-	g_tss.ist[1] = (uint64_t)&rsp1stack;
-	g_tss.ist[2] = (uint64_t)&rsp1stack;
-	g_tss.ist[3] = (uint64_t)&rsp1stack;
-	g_tss.ist[4] = (uint64_t)&rsp1stack;
-	g_tss.ist[5] = (uint64_t)&rsp1stack;
-	g_tss.ist[6] = (uint64_t)&rsp1stack;
-	g_tss.ist[7] = (uint64_t)&rsp1stack;
+	// TODO more stacks
+	globalTss.ist[0] = (uint64_t)&rsp1stack;
+	globalTss.ist[1] = (uint64_t)&rsp1stack;
+	globalTss.ist[2] = (uint64_t)&rsp1stack;
+	globalTss.ist[3] = (uint64_t)&rsp1stack;
+	globalTss.ist[4] = (uint64_t)&rsp1stack;
+	globalTss.ist[5] = (uint64_t)&rsp1stack;
+	globalTss.ist[6] = (uint64_t)&rsp1stack;
+	globalTss.ist[7] = (uint64_t)&rsp1stack;
 
 	serialPrint(u8"[cpu] RSP[0] points to: ");
-	serialPrintHex((uint64_t) g_tss.rsp[0]);
+	serialPrintHex((uint64_t) globalTss.rsp[0]);
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[cpu] RSP[1] points to: ");
-	serialPrintHex((uint64_t) g_tss.rsp[1]);
+	serialPrintHex((uint64_t) globalTss.rsp[1]);
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[cpu] RSP[2] points to: ");
-	serialPrintHex((uint64_t) g_tss.rsp[2]);
+	serialPrintHex((uint64_t) globalTss.rsp[2]);
 	serialPrint(u8"\n");
 
-	uint64_t tssBase = (uint64_t)(&g_tss);
+	uint64_t tssBase = (uint64_t)(&globalTss);
 
 	// upload
 	{
-		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
-		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
 		tssSetEntryNT(8, tssBase, sizeof_TssEntry);
+		//tssSetEntryNT(8, tssBase, sizeof_TssEntry - 1); TODO
 		serialPrintf(u8"[cpu] gdtTemplate[9 * 2] == %u\n", gdtTemplate[9 * 2]);
 		serialPrintf(u8"[cpu] gdtTemplate[10 * 2] == %u\n", gdtTemplate[10 * 2]);
 	}
 
 
-	g_gdtr.limit = sizeof(gdtTemplate) - 1;
-	g_gdtr.base = (uint64_t)(&gdtTemplate[0]);
+	globalGdtr.limit = sizeof(gdtTemplate) - 1;
+	globalGdtr.base = (uint64_t)(&gdtTemplate[0]);
 	serialPrint(u8"[cpu] GDTR points to: ");
-	serialPrintHex((uint64_t) &g_gdtr);
+	serialPrintHex((uint64_t) &globalGdtr);
 	serialPrint(u8"\n");
 	serialPrint(u8"[cpu] GDT points to: ");
-	serialPrintHex((uint64_t) g_gdtr.base);
+	serialPrintHex((uint64_t) globalGdtr.base);
 	serialPrint(u8"\n");
-	serialPrintf(u8"[cpu] GDT size is %u == %u\n", g_gdtr.limit, 0x7F);
+	serialPrintf(u8"[cpu] GDT size is %u == %u\n", globalGdtr.limit, 0x7F);
 	serialPrintln(u8"[cpu] calling lgdt");
-	lgdt(&g_gdtr);
+	lgdt(&globalGdtr);
 	serialPrintln(u8"[cpu] calling ltr");
 	{
 		setTsr(64);
@@ -646,11 +606,11 @@ function enableInterrupts() {
 	}
 	//initializeMouse(&IDT[IRQ4]);
 
-	serialPrintln(u8"[cpu] initializing foo_interrupt");
+	serialPrintln(u8"[cpu] initializing unknownInterrupt");
 
 	for (uint32_t i = 0; i < 286; ++i)
 	{
-		initializeFallback( &IDT[i], (uint64_t)&foo_interrupt);
+		initializeFallback( &IDT[i], (uint64_t)&unknownInterrupt);
 	}
 
 	initializeFallback( &IDT[IRQ0], (uint64_t)(&timer_interrupt));

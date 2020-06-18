@@ -20,7 +20,7 @@
 #define null nullptr
 #define let const auto
 #define var auto
-#define function void
+typedef void function;
 #define UInt64 uint64_t
 #define Int64 int64_t
 #define UInt32 uint32_t
