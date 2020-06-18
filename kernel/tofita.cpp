@@ -33,7 +33,6 @@ uint8_t haveToRender = 1;
 // Forward for global usage
 function quakePrintf(const char8_t *c, ...);
 
-#ifdef MEMSET
 void *memset(void *dest, int32_t e, uint64_t len) {
 	uint8_t *d = (uint8_t *)dest;
 	for (uint64_t i = 0; i < len; i++, d++) {
@@ -43,7 +42,6 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 }
 
 void ___chkstk_ms() {};
-#endif
 
 #include "util/Math.cpp"
 
