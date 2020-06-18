@@ -48,7 +48,6 @@ void ___chkstk_ms() {};
 #include "../devices/cpu/cpu.hpp"
 #include "../devices/cpu/amd64.cpp"
 #include "../devices/serial/log.cpp"
-#include "allocator.cpp"
 #include "../devices/cpu/cpuid.cpp"
 #include "../devices/cpu/spinlock.cpp"
 #include "../devices/cpu/interrupts.cpp"
@@ -91,8 +90,7 @@ function kernelMain(const KernelParams *params) {
 	serialPrintHex((uint64_t) params->pml4);
 	serialPrint(u8"\n");
 	paramsCache = params;
-	PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual, params->ramBytes / 4096);
-	initAllocatorForBuffer();
+	PhysicalAllocator::init(params);
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
 

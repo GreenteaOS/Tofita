@@ -295,8 +295,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	params->pml4 = (uint64_t)paging::pml4entries; // physical address for CPU
 	params->stack = stack; // physical address for stack overflow detection
-	params->lastPageIndexCache = paging::lastPageIndex;
-	params->physical = largeBuffer;
+	params->physicalBuffer = largeBuffer;
+	params->physicalBytes = paging::conventionalOffset - largeBuffer;
 	params->efiRuntimeServices = systemTable->RuntimeServices;
 	params->acpiTablePhysical = (uint64_t)(acpiTable);
 	params->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(WholePhysicalStart + (uint64_t)params->efiMemoryMap.memoryMap);

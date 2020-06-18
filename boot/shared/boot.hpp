@@ -103,9 +103,9 @@ struct RamDisk {
 
 struct KernelParams {
 	uint64_t pml4;
-	int32_t lastPageIndexCache;
 	uint64_t stack;
-	uint64_t physical; // physical address of where kernel loader placed
+	uint64_t physicalBuffer; // physical address of where kernel loader placed
+	uint64_t physicalBytes;
 	uint64_t physicalRamBitMaskVirtual; // virtual address of where RAM usage bit-map stored
 	efi::EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;

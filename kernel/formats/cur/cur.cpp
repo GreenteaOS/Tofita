@@ -65,7 +65,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 
 	serialPrintf(u8"[cur] The best image is %dx%d\n", buffer[best], buffer[best + 1]);
 
-	struct Cursor *cur = (struct Cursor *)allocateFromBuffer(sizeof(struct Cursor));
+	Cursor *cur = (Cursor *)PhysicalAllocator::allocateBytes(sizeof(Cursor));
 	// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
 	cur->width = buffer[best];
 	// Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
@@ -87,7 +87,7 @@ struct Cursor *loadCursor(const RamDiskAsset* asset) {
 	serialPrintf(u8"[cur] Header at %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15]);
 
 	uint32_t fsize = cur->width * cur->height * 4;
-	uint8_t* bmp = (uint8_t*)allocateFromBuffer(fsize);
+	uint8_t* bmp = (uint8_t*)PhysicalAllocator::allocateBytes(fsize);
 	for (int32_t i = 0; i < fsize; i++) {
 		bmp[i] = buffer[offset + i + 20 + 16 + 4];
 	}
