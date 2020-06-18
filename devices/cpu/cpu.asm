@@ -22,20 +22,38 @@
 
 %define DATA (USER_DATA32_SEL + 3)
 %define CODE (USER_CODE64_SEL + 3)
+%define CODEWoW (USER_CODE32_SEL + 3)
 
-global enterUserMode
+global enterUserModeWoW; 32-bit mode TODO CODEWoW
+global enterUserMode; 64-bit mode
 enterUserMode:
 	cli
+
+	mov ax, DATA
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
 	mov rax, rsp
-	push SYS_DATA32_SEL; ss
-    push rax; rsp
-    pushfq; rflags
-    or dword [rsp], 0b1000000000; IF - interrupt enable flag
-    push SYS_CODE64_SEL; cs
-    mov     rax, qword .ret; rip
-    push    rax
-    iretq
+	push DATA; ss
+	push rax; rsp
+	pushfq; rflags
+	or dword [rsp], 0b1000000000; IF - interrupt enable flag
+	push CODE; cs
+	mov rax, qword .ret; rip
+	push rax
+	iretq
 .ret:
+	mov rax, 101
+	mov r11, 102
+	mov r10, 103
+	mov r9, 104
+	mov r8, 105
+	mov rdx, 106
+	mov rcx, 107
+	int3
+	jmp $
 	ret
 
 global enterKernelMode

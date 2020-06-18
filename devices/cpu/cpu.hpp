@@ -1,2 +1,3 @@
-void enterKernelMode();
-void selectSegment();
+function enterKernelMode();
+function selectSegment();
+function enterUserMode();
