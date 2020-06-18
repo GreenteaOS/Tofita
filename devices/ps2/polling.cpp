@@ -15,6 +15,12 @@
 
 // Passively check for PS/2 updates
 
+// TODO set xchng flag in IDT PS/2 interrupt, for avoiding polling in this case
+// ^ clean that flag at the pollPS2Devices end to avoid racing
+
+// ^ this may draw polling mechanism useless (poll for flag only in scheduler)
+// ^ use hlt in scheduler
+
 extern uint8_t haveToRender;
 extern uint8_t haveToQuake;
 function handleKeyDown(uint8_t key);
