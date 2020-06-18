@@ -14,5 +14,6 @@
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 bits 64
+default rel
 section .head
 %include "devices/cpu/cpu.asm"
