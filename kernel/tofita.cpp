@@ -50,6 +50,7 @@ void ___chkstk_ms() {};
 #include "../devices/serial/log.cpp"
 #include "allocator.cpp"
 #include "../devices/cpu/cpuid.cpp"
+#include "../devices/cpu/spinlock.cpp"
 #include "../devices/cpu/interrupts.c"
 #include "../devices/cpu/rdtsc.cpp"
 #include "../devices/cpu/pages.cpp"
