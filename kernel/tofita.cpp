@@ -92,7 +92,7 @@ function kernelMain(const KernelParams *params) {
 	serialPrint(u8"\n");
 	paramsCache = params;
 	PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual, params->ramBytes / 4096);
-	initAllocatorForBuffer(params->bufferSize, params->buffer);
+	initAllocatorForBuffer();
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
 

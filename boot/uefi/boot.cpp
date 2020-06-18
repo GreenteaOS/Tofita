@@ -242,9 +242,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->ramdisk = ramdisk;
 	params->framebuffer = framebuffer;
 
-	params->bufferSize = 32 * 1024 * 1024;
-	params->buffer = paging::conventionalAllocateNext(params->bufferSize);
-
 	serialPrintln(u8"[[[efi_main]]] loading trump-o-line");
 	RamDiskAsset trampoline = getRamDiskAsset(u8"trampoline.tofita");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size, trampoline.data);
@@ -307,7 +304,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// Convert addresses to upper half
 
 	stack = LOWER_TO_UPPER(stack);
-	params->buffer = LOWER_TO_UPPER(params->buffer);
 	params->physicalRamBitMaskVirtual = LOWER_TO_UPPER(params->physicalRamBitMaskVirtual);
 	params = (KernelParams*)LOWER_TO_UPPER(params);
 

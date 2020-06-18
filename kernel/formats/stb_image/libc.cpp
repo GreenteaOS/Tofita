@@ -28,7 +28,8 @@ function libc_free(void* addr) {
 }
 
 void* libc_malloc(uint64_t size) {
-	serialPrintf(u8"[libc] libc_malloc\n");
+	serialPrintf(u8"[libc] libc_malloc of size %u\n", size);
+	return (void*)allocateFromBuffer(size);
 
 	void* result = allocateFromBuffer(size + 4);
 
@@ -41,7 +42,8 @@ void* libc_malloc(uint64_t size) {
 }
 
 void* libc_realloc(void* addr, uint64_t size) {
-	serialPrintf(u8"[libc] libc_realloc\n");
+	serialPrintf(u8"[libc] libc_realloc %u of size %u\n", addr, size);
+	return (void*)allocateFromBuffer(size);
 
 	// Get old size information
 	uint32_t* sizes = (uint32_t*)addr;

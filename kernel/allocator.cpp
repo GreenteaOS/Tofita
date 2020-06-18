@@ -15,37 +15,21 @@
 
 // Very basic allocator within pre-defined buffer, single heap for all kernel memory
 
-uint64_t _allocatorBase = 0;
-uint64_t _allocatorSize = 0;
-uint64_t _allocatorOffset = 0;
-uint64_t _allocatorDoubleFreeProtector = 0;
+volatile uint64_t _allocatorBase = 0;
+volatile uint64_t _allocatorOffset = 0;
+uint8_t _allocatorBuffer[32 * 1024 * 1024] = {0};
 
-function initAllocatorForBuffer(uint64_t size, uint64_t base) {
-	_allocatorBase = base;
-	_allocatorSize = size;
+function initAllocatorForBuffer() {
+	uint8_t* base = _allocatorBuffer;
+	_allocatorBase = (uint64_t)base;
+	_allocatorOffset = 0;
+	tmemset((void*)_allocatorBase, 0, sizeof(_allocatorBuffer));
 }
 
 void* allocateFromBuffer(uint64_t size) {
+	serialPrintf(u8"[allocator] allocateFromBuffer of size %u\n", size);
 	uint64_t result = _allocatorBase + _allocatorOffset;
 	_allocatorOffset += size;
 
-	// Invalidate protector
-	if (_allocatorDoubleFreeProtector == result) _allocatorDoubleFreeProtector = 0;
 	return (void*)result;
-}
-
-// Currently deallocates only latest (if possible) allocation
-function freeFromBuffer(uint64_t size, void* base) {
-	uint64_t address = (uint64_t)base;
-	if (_allocatorDoubleFreeProtector == address) {
-		serialPrintln(
-			u8"[allocator.freeFromBuffer] <ERROR> (non-fatal, but code is surely broken): "
-			"double-free detected and avoided, no memory ruined, report to the kernel developer!"
-		);
-		return ; // Phew!!!
-	}
-
-	if (address == (_allocatorBase + _allocatorOffset - size)) {
-		_allocatorOffset -= size;
-	}
 }
