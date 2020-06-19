@@ -127,6 +127,7 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 	initializePage(entry, physicalAddr);
 }
 
+// TODO handle huge pages returned from bootloader
 #define createMapping(fromTable, toTable)                                            \
 	static void map_ ## fromTable (                                                  \
 			PageEntry fromTable[],                                                   \
@@ -142,26 +143,26 @@ createMapping(pml4, pdpt)
 
 #undef createMapping
 
-// TODO should take pml4 as argument
-uint64_t resolveAddr(uint64_t virtualAddr) {
+// Returns actual physical address from virtual address
+uint64_t resolveAddr(const PageEntry* pml4entries, uint64_t virtualAddr) {
 	auto linear = getLinearAddress(virtualAddr);
 	// pml4
-	PageEntry *entry = &pml4entries[linear.pml4];
-	if (entry->present == 0) return 0;
-	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	const PageEntry *entry = &pml4entries[linear.pml4];
+	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
+	entry = (const PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pdpt
 	entry = &entry[linear.pdpt];
-	if (entry->present == 0) return 0;
+	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
 	// TODO handle mega pages
-	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	entry = (const PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pd
 	entry = &entry[linear.pd];
-	if (entry->present == 0) return 0;
-	// TODO handle huge pages
-	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
+	if (entry->largePage == 1) return (entry->address << ADDRESS_BITS) + linear.pt * 4096 + linear.offset;
+	entry = (const PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pt
 	entry = &entry[linear.pt];
-	if (entry->present == 0) return 0;
+	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
 	return (entry->address << ADDRESS_BITS) + linear.offset;
 }
 
