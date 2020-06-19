@@ -59,8 +59,6 @@ Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/
 
 ## Build
 
-> **We are working to port this project to Hexa, so this repo currently has outdated code, don't build it**
-
 Windows or [WHQ on Linux/macOS](https://www.winehq.org/) is required to run build scripts and tools
 
 #### Nightly builds
