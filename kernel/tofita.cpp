@@ -91,7 +91,7 @@ function handleKeyDown(uint8_t key) {
 
 const KernelParams *paramsCache = null;
 function kernelMain(const KernelParams *params) {
-	serialPrintln(u8"<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
+	serialPrintln(u8"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag " kernel loaded and operational");
 	serialPrintf(u8"<Tofita> CR3 points to: %8\n", (uint64_t) params->pml4);
 	paramsCache = params;
 	PhysicalAllocator::init(params);
@@ -123,7 +123,7 @@ function kernelMain(const KernelParams *params) {
 	initText();
 	initializeCompositor();
 
-	quakePrintf(u8"GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " loaded and operational\n");
+	quakePrintf(u8"GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag " loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
 

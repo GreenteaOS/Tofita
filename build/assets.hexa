@@ -20,6 +20,7 @@ declare class Config {
 	let versionMajor: Int
 	let versionMinor: Int
 	let versionName: String
+	let versionTag: String
 }
 
 function packFonts(config: Config) {

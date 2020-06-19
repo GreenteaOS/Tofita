@@ -76,6 +76,7 @@ for (task in tasks) {
 						'-D versionMajor=' + config.versionMajor + ' ',
 						'-D versionMinor=' + config.versionMinor + ' ',
 						'-D versionName=\\"' + config.versionName + '\\" ',
+						'-D versionTag=\\"' + config.versionTag + '\\" ',
 						'-mtune=nocona -fno-stack-protector -fshort-wchar -w -mno-red-zone ',
 						'-fvisibility=hidden ',
 						'-ffreestanding ',
@@ -119,6 +120,7 @@ for (task in tasks) {
 						'-D versionMajor=' + config.versionMajor + ' ',
 						'-D versionMinor=' + config.versionMinor + ' ',
 						'-D versionName=\\"' + config.versionName + '\\" ',
+						'-D versionTag=\\"' + config.versionTag + '\\" ',
 
 						'-fshort-wchar -mno-red-zone -Os',
 						' -c ',
