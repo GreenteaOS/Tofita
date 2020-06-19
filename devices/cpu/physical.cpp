@@ -13,13 +13,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// 31 is 0b11111 which is a lot of non-zero bits
-// i.e. good in case of cosmic rays or something
 #define PHYSICAL_NOT_FOUND 0
-#define BUSY 31
-#define FREE 0
-#define POS_TO_PAGE(pos) ((pos) / PAGE_SIZE)
-// POS_TO_PAGE(123) == 0 (.floor)
+// A lot of non-zero bits
+// i.e. good in case of cosmic rays or something
+// Completely reserved by hardware and kernel executable image
+// Anything that is not defined considered to be PAGE_RESERVED
+#define PAGE_RESERVED 0xFF
+#define PAGE_FREE 0b1010
+#define PAGE_FULL 0b0101
+#define PAGE_MASK 0b1111
+// TODO #define GRANULAR_PARTIAL 0b1010
+// TODO #define GRANULAR_FULL 0b1001
 #define DOWN_BYTES_TO_PAGES(bytes) ((bytes) >> 12)
 // 4095 >> 12 == 0
 // 4096 >> 12 == 1
@@ -28,6 +32,7 @@
 
 class PhysicalAllocator {
 private:
+	// Approx. 1 megabyte per each 4 gygabyte of RAM
 	static uint8_t* buffer; // TODO use bits, not bytes
 	static uint64_t count;
 	static uint64_t last;
@@ -37,6 +42,8 @@ public:
 		const EfiMemoryMap *memoryMap = &params->efiMemoryMap;
 		count = DOWN_BYTES_TO_PAGES(params->ramBytes);
 		last = PHYSICAL_NOT_FOUND;
+
+		memset((void*)buffer, PAGE_RESERVED, count);
 
 		// Reserve UEFI memory map
 		{
@@ -49,11 +56,11 @@ public:
 			uint64_t offset = startOfMemoryMap;
 
 			while (offset < endOfMemoryMap) {
-				let kind = (descriptor->Type == efi::EfiConventionalMemory)? FREE : BUSY;
+				let kind = (descriptor->Type == efi::EfiConventionalMemory)? PAGE_FREE : PAGE_RESERVED;
 				let where = DOWN_BYTES_TO_PAGES(descriptor->PhysicalStart);
 				let steps = descriptor->NumberOfPages;
 
-				if (kind == BUSY)
+				if (kind == PAGE_RESERVED)
 					serialPrintf(u8"[physical] Reserve %u pages from %u page\n", steps, where);
 
 				uint64_t i = where;
@@ -85,7 +92,7 @@ public:
 			uint64_t i = count;
 			while (i > 0) {
 				i--;
-				if (buffer[i] == FREE) available++;
+				if (buffer[i] == PAGE_FREE) available++;
 			}
 
 			serialPrintf(u8"[physical] Available %u of %u physical pages\n", available, count);
@@ -95,9 +102,12 @@ public:
 	// Note: takes real physical address, without mapped offset
 	static function reserveOnePage(uint64_t physical) {
 		let where = DOWN_BYTES_TO_PAGES(physical);
-		buffer[where] = BUSY;
+		buffer[where] = PAGE_RESERVED;
 		if (last == where) last = PHYSICAL_NOT_FOUND;
 	}
+
+	// Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
+	#undef PAGE_RESERVED
 
 	// Returns physical 64-bit address, not page number
 	static uint64_t allocateOnePage() {
@@ -111,8 +121,8 @@ public:
 		// TODO fast large-step outer search with uint64_t
 		uint64_t steps = count; // Avoid non-register access
 		while (i < steps) {
-			if (buffer[i] == FREE) {
-				buffer[i] = BUSY;
+			if (buffer[i] == PAGE_FREE) {
+				buffer[i] = PAGE_FULL;
 				return i * PAGE_SIZE + (uint64_t)WholePhysicalStart;
 			}
 
@@ -147,7 +157,7 @@ public:
 			// TODO ^ same for buffer[]
 			// TODO probably uint32_t is completely enough to represent pages
 			while (i < steps) {
-				if (buffer[i] == FREE) {
+				if (buffer[i] == PAGE_FREE) {
 					if (current == 0) currentAt = i;
 					current++;
 				}
@@ -158,7 +168,7 @@ public:
 					break;
 				}
 
-				if (buffer[i] != FREE) {
+				if (buffer[i] != PAGE_FREE) {
 					current = 0;
 				}
 
@@ -170,7 +180,7 @@ public:
 			uint64_t i = pages;
 			while (i > 0) {
 				i--;
-				buffer[largestAt + i] = BUSY;
+				buffer[largestAt + i] = PAGE_FULL;
 			}
 			return largestAt * PAGE_SIZE + (uint64_t)WholePhysicalStart;
 		}
@@ -188,7 +198,7 @@ public:
 	static function freeOnePage(uint64_t physical) {
 		physical -= (uint64_t)WholePhysicalStart;
 		let where = DOWN_BYTES_TO_PAGES(physical);
-		buffer[where] = FREE;
+		buffer[where] = PAGE_FREE;
 		last = where;
 	}
 
@@ -203,9 +213,9 @@ public:
 	}
 };
 
-#undef BUSY
-#undef FREE
-#undef POS_TO_PAGE
+#undef PAGE_FULL
+#undef PAGE_FREE
+#undef PAGE_MASK
 uint8_t* PhysicalAllocator::buffer;
 uint64_t PhysicalAllocator::count;
 uint64_t PhysicalAllocator::last;
