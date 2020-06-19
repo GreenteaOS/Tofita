@@ -142,6 +142,8 @@ createMapping(pml4, pdpt)
 
 #undef createMapping
 
+// TODO align to byte, not page (like result+=addr-DOWN(addr))
+// TODO should take pml4 as argument
 uint64_t resolveAddr(uint64_t virtualAddr) {
 	// pml4
 	PageEntry *entry = &pml4entries[getLinearAddress(virtualAddr).pml4];
@@ -161,7 +163,10 @@ uint64_t resolveAddr(uint64_t virtualAddr) {
 	return entry->address << ADDRESS_BITS;
 }
 
-function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
+// TODO return error code (as enum)
+// TODO ^ hexa @mustCheckReturn for return values (like Golang)
+// TODO ^ same clang warning
+function mapMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln(u8"[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
@@ -193,5 +198,38 @@ function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCou
 		vAddress += PAGE_SIZE;
 		pAddress += PAGE_SIZE;
 	}
+}
+
+// Upper half
+// Just makes a copy of upper half's PML4,
+// because it is always the same between processes
+function copyKernelMemory(const PageEntry* pml4source, PageEntry* pml4destination) {
+}
+
+// Creates new PML4 for new process
+PageEntry* newCR3(const PageEntry* pml4source) {
+	PageEntry* pml4result;
+	copyKernelMemory(pml4source, pml4result);
+	return pml4result;
+}
+
+PageEntry* freeCR3(PageEntry* pml4) {
+	// TODO deallocate full lower half
+}
+
+// Lower half
+// TODO protection ring
+// TODO lower half limit bounds check (it is less than upper starting range)
+function mapUserspaceMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
+}
+
+// Same as VirtualAlloc
+// TODO protection ring
+// TODO respect WoW limits
+// TODO VirtualAllocEx-like behavior (i.e. alloc for other processes, not only current)
+// Decides automatically where to allocate
+// if virtualAddr == 0
+// Note: also allocates physical pages, i.e consumes extra memory
+function allocUserspaceMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint32_t pageCount) {
 }
 }
