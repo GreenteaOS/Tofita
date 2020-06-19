@@ -21,7 +21,7 @@ function simpleExeTest() {
 
 	// Copy sections
 	auto imageSectionHeader = (const ImageSectionHeader*)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
-	for (int i = 0; i < peHeader->mNumberOfSections; ++i) {
+	for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
 		serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName, imageSectionHeader[i].mSizeOfRawData);
 		uint64_t where = (uint64_t)base + imageSectionHeader[i].mVirtualAddress;
 

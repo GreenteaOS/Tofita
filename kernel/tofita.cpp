@@ -26,6 +26,11 @@ namespace efi {
 
 #include "../boot/shared/boot.hpp"
 
+#define int do_not_use_such_types_please
+#define unsigned do_not_use_such_types_please
+#define long do_not_use_such_types_please
+#define short do_not_use_such_types_please
+
 // Avoids PIT-triggered rendering
 // This is not a best solution
 uint8_t haveToRender = 1;

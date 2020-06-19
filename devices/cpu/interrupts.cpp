@@ -312,26 +312,26 @@ _Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect");
 
 #pragma pack(1)
 struct GdtDescriptorEx {
-	unsigned long long limitLow : 16;
-	unsigned long long baseLow : 16;
-	unsigned long long baseMid : 8;
+	uint16_t limitLow : 16;
+	uint16_t baseLow : 16;
+	uint8_t baseMid : 8;
 	// Access
-	unsigned long long accessed : 1;
-	unsigned long long rw : 1; // 0 - read, 1 - read/write
-	unsigned long long direction : 1; // or conform
+	uint8_t accessed : 1;
+	uint8_t rw : 1; // 0 - read, 1 - read/write
+	uint8_t direction : 1; // or conform
 	// If 1 code in this segment can be executed from an equal or lower privilege level
 	// If 0 code in this segment can only be executed from the ring set in "privilege"
-	unsigned long long execute : 1; // 1 = code, 0 = data
-	unsigned long long one : 1;
-	unsigned long long privilege : 2; // 0 = ring0/kernel, 3 = ring3
-	unsigned long long present : 1;
+	uint8_t execute : 1; // 1 = code, 0 = data
+	uint8_t one : 1;
+	uint8_t privilege : 2; // 0 = ring0/kernel, 3 = ring3
+	uint8_t present : 1;
 	// Flags
-	unsigned long long limit : 4;
-	unsigned long long reserved : 2;
-	unsigned long long zero16one32 : 1;
-	unsigned long long blocks : 1;
+	uint8_t limit : 4;
+	uint8_t reserved : 2;
+	uint8_t zero16one32 : 1;
+	uint8_t blocks : 1;
 
-	unsigned long long baseHigh : 8;
+	uint8_t baseHigh : 8;
 } __attribute__ ((packed));
 #pragma pack()
 
@@ -550,7 +550,7 @@ function enableInterrupts() {
 	uint64_t sizeof_TssEntry = sizeof(globalTss);
 	serialPrintf(u8"[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry));
 
-	tmemset((void*)&globalTss, 0, sizeof_TssEntry);
+	memset((void*)&globalTss, 0, sizeof_TssEntry);
 	globalTss.iomap_offset = sizeof_TssEntry;
 	globalTss.rsp[0] = (uint64_t)&rsp0stack;
 	globalTss.rsp[1] = (uint64_t)&rsp1stack;
