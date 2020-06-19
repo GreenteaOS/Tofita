@@ -69,7 +69,6 @@ function drawLoading(Framebuffer* framebuffer, uint8_t progress) {
 
 #include "../shared/paging.cpp"
 
-#ifdef MEMSET
 void *memset(void *dest, int32_t e, uint64_t len) {
 	uint8_t *d = (uint8_t *)dest;
 	for (uint64_t i = 0; i < len; i++, d++) {
@@ -77,7 +76,6 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	}
 	return dest;
 }
-#endif
 
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
@@ -248,7 +246,11 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// RAM usage bit-map
 
 	uint64_t ram = paging::getRAMSize(&params->efiMemoryMap);
-	serialPrintf(u8"[paging] available RAM is ~%d megabytes\n", (uint32_t)(ram/(1024*1024)));
+	uint32_t megs = (uint32_t)(ram/(1024*1024));
+	serialPrintf(u8"[paging] available RAM is ~%u megabytes\n", megs);
+	while (megs < 768) {
+		serialPrintf(u8"Tofita requires at least 1 GB of memory\n");
+	}
 	params->ramBytes = ram;
 	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram / PAGE_SIZE);
 
