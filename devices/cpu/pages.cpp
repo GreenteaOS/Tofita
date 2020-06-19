@@ -142,25 +142,27 @@ createMapping(pml4, pdpt)
 
 #undef createMapping
 
-// TODO align to byte, not page (like result+=addr-DOWN(addr))
 // TODO should take pml4 as argument
 uint64_t resolveAddr(uint64_t virtualAddr) {
+	auto linear = getLinearAddress(virtualAddr);
 	// pml4
-	PageEntry *entry = &pml4entries[getLinearAddress(virtualAddr).pml4];
+	PageEntry *entry = &pml4entries[linear.pml4];
 	if (entry->present == 0) return 0;
 	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pdpt
-	entry = &entry[getLinearAddress(virtualAddr).pdpt];
+	entry = &entry[linear.pdpt];
 	if (entry->present == 0) return 0;
+	// TODO handle mega pages
 	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pd
-	entry = &entry[getLinearAddress(virtualAddr).pd];
+	entry = &entry[linear.pd];
 	if (entry->present == 0) return 0;
+	// TODO handle huge pages
 	entry = (PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pt
-	entry = &entry[getLinearAddress(virtualAddr).pt];
+	entry = &entry[linear.pt];
 	if (entry->present == 0) return 0;
-	return entry->address << ADDRESS_BITS;
+	return (entry->address << ADDRESS_BITS) + linear.offset;
 }
 
 // TODO return error code (as enum)
