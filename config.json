@@ -1,6 +1,7 @@
 {
 	"versionMajor": 2020,
-	"versionMinor": 12,
+	"versionMinor": 1,
 	"versionName": "Spyro",
+	"versionTag": "Alpha",
 	"tempFolder": "C:"
 }
