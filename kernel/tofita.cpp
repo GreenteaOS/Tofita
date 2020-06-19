@@ -87,9 +87,7 @@ function handleKeyDown(uint8_t key) {
 const KernelParams *paramsCache = null;
 function kernelMain(const KernelParams *params) {
 	serialPrintln(u8"<Tofita> GreenteaOS " STR(versionMajor) "." STR(versionMinor) " " versionName " kernel loaded and operational");
-	serialPrint(u8"<Tofita> CR3 points to: ");
-	serialPrintHex((uint64_t) params->pml4);
-	serialPrint(u8"\n");
+	serialPrintf(u8"<Tofita> CR3 points to: %8\n", (uint64_t) params->pml4);
 	paramsCache = params;
 	PhysicalAllocator::init(params);
 	pages::pml4entries = (pages::PageEntry*)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));

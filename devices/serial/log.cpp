@@ -14,20 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
-
-#define SERIAL_DUMP_HEX(expr) \
-serialPrint(#expr " = "); \
-serialPrintHex((uint64_t) (expr)); \
-serialPrint("\n");
-
-#define SERIAL_DUMP_HEX0(expr) \
-serialPrint(#expr " = "); \
-serialPrintHex((uint64_t) (expr));
-
-#define SERIAL_DUMP_BITS(expr) \
-serialPrint(#expr " -> "); \
-serialPrintBits((uint64_t) (expr)); \
-serialPrint("\n"); \
+// Check `serialPrintf` to see supported features
 
 #define SERIAL_REGISTER_BASE 0x03F8
 #define SERIAL_BAUD_RATE 115200
@@ -61,25 +48,6 @@ serialPrint("\n"); \
 #define   B_UART_MSR_DSR      (1 << 6)
 #define   B_UART_MSR_RI       (1 << 7)
 #define   B_UART_MSR_DCD      (1 << 8)
-
-void *tmemset(void *dest, int32_t e, uint64_t len) {
-	uint8_t *d = (uint8_t *)dest;
-	for (uint64_t i = 0; i < len; i++, d++) {
-		*d = e;
-	}
-	return dest;
-}
-
-// Solve conflict with gnu-efi
-#ifdef TOFITA
-void *memset(void *dest, int32_t e, uint64_t len) {
-	uint8_t *d = (uint8_t *)dest;
-	for (uint64_t i = 0; i < len; i++, d++) {
-		*d = e;
-	}
-	return dest;
-}
-#endif
 
 uint64_t kstrlen(const uint8_t *data) {
 	uint64_t r;
@@ -212,21 +180,6 @@ function serialPrintHex(uint64_t n) {
 	serialPortWrite((uint8_t *)buf, 16);
 }
 
-function serialPrintMem(const void *mem, int32_t n) {
-	serialPrint(u8"@");
-	serialPrintHex((uint64_t) mem);
-	serialPrint(u8"\n");
-	const uint8_t *memc = (const uint8_t *) mem;
-	for (int32_t i = 0; i < n; ++i) {
-		if (i) serialPrint(u8":");
-		serialPrintHex(memc[i]);
-	}
-}
-
-function serialPrintPtr(void *ptr) {
-	serialPrintHex((uint64_t) ptr);
-}
-
 function serialPrintBits(uint64_t value) {
 	for (int32_t i = 0; i < 64; ++i) {
 		if (value & (1ull << i)) {
@@ -319,6 +272,11 @@ function serialPrintf(const char8_t *c, ...) {
 					putchar(*c);
 					c++;
 				}
+				break;
+			}
+			case '8': {
+				uint64_t value = va_arg(lst, uint64_t);
+				serialPrintHex(value);
 				break;
 			}
 		}
