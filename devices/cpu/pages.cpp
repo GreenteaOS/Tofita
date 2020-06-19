@@ -22,12 +22,12 @@ namespace pages {
 #define PACKED __attribute__((gcc_struct, packed))
 
 typedef struct {
-	unsigned long long offset: 12;
-	unsigned long long pt: 9;
-	unsigned long long pd: 9;
-	unsigned long long pdpt: 9;
-	unsigned long long pml4: 9;
-	unsigned long long reserved: 16;
+	uint16_t offset: 12;
+	uint16_t pt: 9;
+	uint16_t pd: 9;
+	uint16_t pdpt: 9;
+	uint16_t pml4: 9;
+	uint16_t reserved: 16;
 } PACKED LinearAddress;
 
 _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to have 64 bits");
@@ -43,28 +43,28 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 // Entry in a page table
 typedef struct {
 	// Is the page present in physical memory?
-	unsigned long long present : 1;
+	uint8_t present : 1;
 
 	// Pages are read-only by default
-	unsigned long long writeAllowed : 1;
+	uint8_t writeAllowed : 1;
 
 	// Pages are only accessible by supervisor by default
-	unsigned long long accessibleByAll : 1;
+	uint8_t accessibleByAll : 1;
 
 	// Write through abilities of the page
-	unsigned long long writeThrough : 1;
+	uint8_t writeThrough : 1;
 
 	// If set, the page will not be cached
-	unsigned long long cacheDisabled : 1;
+	uint8_t cacheDisabled : 1;
 
 	// Was the page accessed?
-	unsigned long long accessed : 1;
+	uint8_t accessed : 1;
 
 	// Has the page been written to? Only applicable for PTE.
-	unsigned long long dirty : 1;
+	uint8_t dirty : 1;
 
 	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
-	unsigned long long largePage : 1;
+	uint8_t largePage : 1;
 
 	// Prevent the translations cache from updating
 	// the address in cache if CR3 is reset.
@@ -73,22 +73,22 @@ typedef struct {
 	// enable this feature.
 	//
 	// Only applicable for PTE
-	unsigned long long global : 1;
+	uint8_t global : 1;
 
 	// Not used by the processor
-	unsigned long long metadata : 3;
+	uint8_t metadata : 3;
 
 	// Physical address of the child table/page
-	unsigned long long address  : 40;
+	uint64_t address  : 40;
 
 	// Not used by the processor
-	unsigned long long metadata2 : 7;
+	uint8_t metadata2 : 7;
 
 	// Only applicable for PTE
-	unsigned long long protectionKey : 4;
+	uint8_t protectionKey : 4;
 
 	// Disable execution of code from this page
-	unsigned long long disableExecution : 1;
+	uint8_t disableExecution : 1;
 } PACKED PageEntry;
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
