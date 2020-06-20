@@ -22,8 +22,10 @@
 #ifndef _EFI_POINT_H
 #define _EFI_POINT_H
 
-#define EFI_SIMPLE_POINTER_PROTOCOL_GUID \
-	{ 0x31878c87, 0xb75, 0x11d5, { 0x9a, 0x4f, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } }
+#define EFI_SIMPLE_POINTER_PROTOCOL_GUID                                                                               \
+	{                                                                                                                  \
+		0x31878c87, 0xb75, 0x11d5, { 0x9a, 0x4f, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                                   \
+	}
 
 INTERFACE_DECL(_EFI_SIMPLE_POINTER);
 
@@ -43,19 +45,11 @@ typedef struct {
 	BOOLEAN RightButton;
 } EFI_SIMPLE_POINTER_MODE;
 
-typedef
-EFI_STATUS
-(EFIAPI *EFI_SIMPLE_POINTER_RESET) (
-	IN struct _EFI_SIMPLE_POINTER *This,
-	IN BOOLEAN ExtendedVerification
-);
+typedef EFI_STATUS(EFIAPI *EFI_SIMPLE_POINTER_RESET)(IN struct _EFI_SIMPLE_POINTER *This,
+													 IN BOOLEAN ExtendedVerification);
 
-typedef
-EFI_STATUS
-(EFIAPI *EFI_SIMPLE_POINTER_GET_STATE) (
-	IN struct _EFI_SIMPLE_POINTER *This,
-	IN OUT EFI_SIMPLE_POINTER_STATE *State
-);
+typedef EFI_STATUS(EFIAPI *EFI_SIMPLE_POINTER_GET_STATE)(IN struct _EFI_SIMPLE_POINTER *This,
+														 IN OUT EFI_SIMPLE_POINTER_STATE *State);
 
 typedef struct _EFI_SIMPLE_POINTER {
 	EFI_SIMPLE_POINTER_RESET Reset;
@@ -64,8 +58,10 @@ typedef struct _EFI_SIMPLE_POINTER {
 	EFI_SIMPLE_POINTER_MODE *Mode;
 } EFI_SIMPLE_POINTER_PROTOCOL;
 
-#define EFI_ABSOLUTE_POINTER_PROTOCOL_GUID \
-	{ 0x8D59D32B, 0xC655, 0x4AE9, { 0x9B, 0x15, 0xF2, 0x59, 0x04, 0x99, 0x2A, 0x43 } }
+#define EFI_ABSOLUTE_POINTER_PROTOCOL_GUID                                                                             \
+	{                                                                                                                  \
+		0x8D59D32B, 0xC655, 0x4AE9, { 0x9B, 0x15, 0xF2, 0x59, 0x04, 0x99, 0x2A, 0x43 }                                 \
+	}
 
 INTERFACE_DECL(_EFI_ABSOLUTE_POINTER_PROTOCOL);
 
@@ -91,19 +87,11 @@ typedef struct {
 #define EFI_ABSP_TouchActive 0x00000001
 #define EFI_ABS_AltActive 0x00000002
 
-typedef
-EFI_STATUS
-(EFIAPI *EFI_ABSOLUTE_POINTER_RESET) (
-	IN struct _EFI_ABSOLUTE_POINTER_PROTOCOL *This,
-	IN BOOLEAN ExtendedVerification
-);
+typedef EFI_STATUS(EFIAPI *EFI_ABSOLUTE_POINTER_RESET)(IN struct _EFI_ABSOLUTE_POINTER_PROTOCOL *This,
+													   IN BOOLEAN ExtendedVerification);
 
-typedef
-EFI_STATUS
-(EFIAPI *EFI_ABSOLUTE_POINTER_GET_STATE) (
-	IN struct _EFI_ABSOLUTE_POINTER_PROTOCOL *This,
-	IN OUT EFI_ABSOLUTE_POINTER_STATE *State
-);
+typedef EFI_STATUS(EFIAPI *EFI_ABSOLUTE_POINTER_GET_STATE)(IN struct _EFI_ABSOLUTE_POINTER_PROTOCOL *This,
+														   IN OUT EFI_ABSOLUTE_POINTER_STATE *State);
 
 typedef struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
 	EFI_ABSOLUTE_POINTER_RESET Reset;
