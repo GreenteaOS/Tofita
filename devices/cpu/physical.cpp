@@ -31,19 +31,20 @@
 // 8192 >> 12 == 2
 
 class PhysicalAllocator {
-private:
+  private:
 	// Approx. 1 megabyte per each 4 gygabyte of RAM
-	static uint8_t* buffer; // TODO use bits, not bytes
+	static uint8_t *buffer; // TODO use bits, not bytes
 	static uint64_t count;
 	static uint64_t last;
-public:
+
+  public:
 	static function init(const KernelParams *params) {
-		buffer = (uint8_t*)params->physicalRamBitMaskVirtual;
+		buffer = (uint8_t *)params->physicalRamBitMaskVirtual;
 		const EfiMemoryMap *memoryMap = &params->efiMemoryMap;
 		count = DOWN_BYTES_TO_PAGES(params->ramBytes);
 		last = PHYSICAL_NOT_FOUND;
 
-		memset((void*)buffer, PAGE_RESERVED, count);
+		memset((void *)buffer, PAGE_RESERVED, count);
 
 		// Reserve UEFI memory map
 		{
@@ -56,7 +57,7 @@ public:
 			uint64_t offset = startOfMemoryMap;
 
 			while (offset < endOfMemoryMap) {
-				let kind = (descriptor->Type == efi::EfiConventionalMemory)? PAGE_FREE : PAGE_RESERVED;
+				let kind = (descriptor->Type == efi::EfiConventionalMemory) ? PAGE_FREE : PAGE_RESERVED;
 				let where = DOWN_BYTES_TO_PAGES(descriptor->PhysicalStart);
 				let steps = descriptor->NumberOfPages;
 
@@ -79,7 +80,8 @@ public:
 		// Reserve bootloader buffer
 		{
 			uint64_t physical = params->physicalBuffer;
-			serialPrintf(u8"[physical] Reserve %u bytes at %u of bootloader buffer\n", params->physicalBytes, physical);
+			serialPrintf(u8"[physical] Reserve %u bytes at %u of bootloader buffer\n", params->physicalBytes,
+						 physical);
 			uint64_t i = DOWN_BYTES_TO_PAGES(params->physicalBytes) + 1;
 			while (i > 0) {
 				i--;
@@ -92,7 +94,8 @@ public:
 			uint64_t i = count;
 			while (i > 0) {
 				i--;
-				if (buffer[i] == PAGE_FREE) available++;
+				if (buffer[i] == PAGE_FREE)
+					available++;
 			}
 
 			serialPrintf(u8"[physical] Available %u of %u physical pages\n", available, count);
@@ -103,7 +106,8 @@ public:
 	static function reserveOnePage(uint64_t physical) {
 		let where = DOWN_BYTES_TO_PAGES(physical);
 		buffer[where] = PAGE_RESERVED;
-		if (last == where) last = PHYSICAL_NOT_FOUND;
+		if (last == where)
+			last = PHYSICAL_NOT_FOUND;
 	}
 
 	// Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED

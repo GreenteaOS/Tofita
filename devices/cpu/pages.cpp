@@ -22,12 +22,12 @@ namespace pages {
 #define PACKED __attribute__((gcc_struct, packed))
 
 typedef struct {
-	uint16_t offset: 12;
-	uint16_t pt: 9;
-	uint16_t pd: 9;
-	uint16_t pdpt: 9;
-	uint16_t pml4: 9;
-	uint16_t reserved: 16;
+	uint16_t offset : 12;
+	uint16_t pt : 9;
+	uint16_t pd : 9;
+	uint16_t pdpt : 9;
+	uint16_t pml4 : 9;
+	uint16_t reserved : 16;
 } PACKED LinearAddress;
 
 _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to have 64 bits");
@@ -79,7 +79,7 @@ typedef struct {
 	uint8_t metadata : 3;
 
 	// Physical address of the child table/page
-	uint64_t address  : 40;
+	uint64_t address : 40;
 
 	// Not used by the processor
 	uint8_t metadata2 : 7;
@@ -93,15 +93,15 @@ typedef struct {
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
-static PageEntry* pml4entries PAGE_ALIGNED = null;
+static PageEntry *pml4entries PAGE_ALIGNED = null;
 
 static void *allocatePage() {
-	return (void*)PhysicalAllocator::allocateOnePagePreZeroed();
+	return (void *)PhysicalAllocator::allocateOnePagePreZeroed();
 	// TODO bounds check
 }
 
 static LinearAddress getLinearAddress(uint64_t virtualAddr) {
-	return *((LinearAddress *) &virtualAddr);
+	return *((LinearAddress *)&virtualAddr);
 }
 
 static function initializePage(PageEntry *entry, uint64_t address) {
@@ -114,10 +114,10 @@ static void *getPage(PageEntry *table, uint64_t entryId) {
 	PageEntry *entry = &table[entryId];
 
 	if (entry->present == 1) {
-		return (void *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+		return (void *)((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	} else {
 		void *newPage = allocatePage();
-		initializePage(entry, (uint64_t) newPage - (uint64_t)WholePhysicalStart);
+		initializePage(entry, (uint64_t)newPage - (uint64_t)WholePhysicalStart);
 		return newPage;
 	}
 }
@@ -169,7 +169,7 @@ uint64_t resolveAddr(const PageEntry* pml4entries, uint64_t virtualAddr) {
 // TODO return error code (as enum)
 // TODO ^ hexa @mustCheckReturn for return values (like Golang)
 // TODO ^ same clang warning
-function mapMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
+function mapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln(u8"[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
@@ -180,19 +180,19 @@ function mapMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint64_t physic
 	serialPrintf(u8"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
 	serialPrint(u8"[paging.range] virtual address = ");
-	serialPrintHex((uint64_t) (virtualAddr));
+	serialPrintHex((uint64_t)(virtualAddr));
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[paging.range] physical address = ");
-	serialPrintHex((uint64_t) (physicalAddr));
+	serialPrintHex((uint64_t)(physicalAddr));
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[paging.range] page count = ");
-	serialPrintHex((uint64_t) (pageCount));
+	serialPrintHex((uint64_t)(pageCount));
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[paging.range] virtual address end = ");
-	serialPrintHex((uint64_t) (virtualAddrEnd));
+	serialPrintHex((uint64_t)(virtualAddrEnd));
 	serialPrint(u8"\n");
 
 	while (vAddress < virtualAddrEnd) {
@@ -206,25 +206,24 @@ function mapMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint64_t physic
 // Upper half
 // Just makes a copy of upper half's PML4,
 // because it is always the same between processes
-function copyKernelMemory(const PageEntry* pml4source, PageEntry* pml4destination) {
-}
+function copyKernelMemory(const PageEntry *pml4source, PageEntry *pml4destination) {}
 
 // Creates new PML4 for new process
-PageEntry* newCR3(const PageEntry* pml4source) {
-	PageEntry* pml4result;
+PageEntry *newCR3(const PageEntry *pml4source) {
+	PageEntry *pml4result;
 	copyKernelMemory(pml4source, pml4result);
 	return pml4result;
 }
 
-PageEntry* freeCR3(PageEntry* pml4) {
+PageEntry *freeCR3(PageEntry *pml4) {
 	// TODO deallocate full lower half
 }
 
 // Lower half
 // TODO protection ring
 // TODO lower half limit bounds check (it is less than upper starting range)
-function mapUserspaceMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
-}
+function mapUserspaceMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr,
+							uint32_t pageCount) {}
 
 // Same as VirtualAlloc
 // TODO protection ring
@@ -233,6 +232,5 @@ function mapUserspaceMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint64
 // Decides automatically where to allocate
 // if virtualAddr == 0
 // Note: also allocates physical pages, i.e consumes extra memory
-function allocUserspaceMemory(PageEntry* pml4entries, uint64_t virtualAddr, uint32_t pageCount) {
-}
-}
+function allocUserspaceMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint32_t pageCount) {}
+} // namespace pages
