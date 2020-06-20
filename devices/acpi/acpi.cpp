@@ -22,12 +22,12 @@ namespace acpi {
 // Types
 
 constexpr uint32_t byteswap(uint32_t x) {
-	return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) |
-		   ((x << 8) & 0x00ff0000) | ((x << 24) & 0xff000000);
+	return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) | ((x << 8) & 0x00ff0000) |
+		   ((x << 24) & 0xff000000);
 }
 
-#define TABLE_HEADER(signature)                                               \
-	static const uint32_t typeId = byteswap(signature);                       \
+#define TABLE_HEADER(signature)                                                                              \
+	static const uint32_t typeId = byteswap(signature);                                                      \
 	AcpiTableHeader header;
 
 struct AcpiTableHeader {
@@ -94,8 +94,7 @@ struct ACPI {
 	Acpi20 acpi20;
 } __attribute__((packed));
 
-extern "C++" template <typename T>
-uint64_t acpiTableEntries(const T *t, uint64_t size) {
+extern "C++" template <typename T> uint64_t acpiTableEntries(const T *t, uint64_t size) {
 	return (t->header.length - sizeof(T)) / size;
 }
 
@@ -131,10 +130,10 @@ struct PciGroup {
 	}
 };
 
-}
+} // namespace acpi
 
 class ACPIParser {
-public:
+  public:
 	static bool parse(uint64_t acpiVendorTable) {
 		serialPrint(u8"[ACPI] parsing started at physical ");
 		serialPrintHex((uint64_t)(acpiVendorTable));
@@ -190,7 +189,7 @@ public:
 		return true;
 	}
 
-private:
+  private:
 	static uint64_t physicalToVirtual(uint64_t physical) {
 		uint64_t result = (uint64_t)WholePhysicalStart + (uint64_t)physical;
 		return result;
@@ -225,8 +224,7 @@ private:
 		serialPrintf(u8"[ACPI] acpiTableEntries %d\n", numTables);
 
 		for (uint64_t i = 0; i < numTables; ++i) {
-			auto header =
-				(const acpi::AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt->headers[i]);
+			auto header = (const acpi::AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt->headers[i]);
 
 			acpi::put_sig(sig, header->type);
 			serialPrintf(u8"[ACPI] Found table %s\n", sig);
@@ -284,7 +282,7 @@ private:
 	static function probePci(acpi::PciGroup *mPci, uint64_t count) {
 		serialPrintf(u8"[PCI] probePci\n");
 		for (uint32_t i = 0; i < count; ++i) {
-			acpi::PciGroup* pci = &mPci[i];
+			acpi::PciGroup *pci = &mPci[i];
 			for (int32_t bus = pci->busStart; bus <= pci->busEnd; ++bus) {
 				for (int32_t dev = 0; dev < 32; ++dev) {
 					// TODO
@@ -298,8 +296,12 @@ private:
 
 /// `false` if failed to do so
 /// TODO `poweroff` quake command
-bool shutdownComputer() { return false; }
+bool shutdownComputer() {
+	return false;
+}
 
 /// `false` if failed to do so
 /// TODO `reboot` quake command
-bool rebootComputer() { return false; }
+bool rebootComputer() {
+	return false;
+}

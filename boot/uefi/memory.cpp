@@ -15,27 +15,22 @@
 
 function fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi::EFI_SYSTEM_TABLE *systemTable) {
 	efi::EFI_STATUS status = systemTable->BootServices->GetMemoryMap(
-		&efiMemoryMap->memoryMapSize,
-		efiMemoryMap->memoryMap,
-		&efiMemoryMap->mapKey,
-		&efiMemoryMap->descriptorSize,
-		&efiMemoryMap->descriptorVersion);
+		&efiMemoryMap->memoryMapSize, efiMemoryMap->memoryMap, &efiMemoryMap->mapKey,
+		&efiMemoryMap->descriptorSize, &efiMemoryMap->descriptorVersion);
 
 	if (status != EFI_SUCCESS) {
 		serialPrint(u8"[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n");
 	}
 
 	serialPrintf(u8"[[[efi_main.fillMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
-		efiMemoryMap->memoryMapSize,
-		efiMemoryMap->descriptorSize
-	);
+				 efiMemoryMap->memoryMapSize, efiMemoryMap->descriptorSize);
 }
 
 function initializeFramebuffer(Framebuffer *fb, efi::EFI_SYSTEM_TABLE *systemTable) {
 	efi::EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 	efi::EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
 
-	systemTable->BootServices->LocateProtocol(&gopGuid, NULL, (void **) &gop);
+	systemTable->BootServices->LocateProtocol(&gopGuid, NULL, (void **)&gop);
 
 	fb->base = gop->Mode->FrameBufferBase;
 	fb->size = gop->Mode->FrameBufferSize;
@@ -46,12 +41,12 @@ function initializeFramebuffer(Framebuffer *fb, efi::EFI_SYSTEM_TABLE *systemTab
 	gop->SetMode(gop, gop->Mode->Mode);
 }
 
-efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, uint64_t *bytes, void **destination)
-{
+efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, uint64_t *bytes, void **destination) {
 	serialPrintf(u8"[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes);
 	efi::EFI_STATUS status;
 	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
-	efi::EFI_MEMORY_TYPE allocationType = efi::EfiLoaderCode; // Use *Code not *Data to avoid NX-bit crash if data executed
+	efi::EFI_MEMORY_TYPE allocationType =
+		efi::EfiLoaderCode; // Use *Code not *Data to avoid NX-bit crash if data executed
 
 	// Round to page size
 	uint64_t pages = ((*bytes - 1) / PAGE_SIZE) + 1;
@@ -59,11 +54,15 @@ efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, uint64_t *bytes, v
 
 	status = bootsvc->AllocatePages(efi::AllocateAnyPages, allocationType, pages, &addr);
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
-		serialPrintf(u8"[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n", *bytes);
+		serialPrintf(
+			u8"[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
+			*bytes);
 	}
 
 	if (status != EFI_SUCCESS)
-		serialPrintf(u8"[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, status %d\n", *bytes, pages, allocationType, status);
+		serialPrintf(u8"[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, "
+					 u8"status %d\n",
+					 *bytes, pages, allocationType, status);
 
 	*bytes = pages * PAGE_SIZE;
 	*destination = (void *)addr;

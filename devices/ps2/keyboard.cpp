@@ -17,69 +17,31 @@
 
 function handleKeyDown(uint8_t key);
 uint8_t keyboardPressedState[128] = {0};
-uint8_t keyboardMap[128] =
-{
-	0,
-	27,
-	'1',
-	'2',
-	'3',
-	'4',
-	'5',
-	'6',
-	'7',
+uint8_t keyboardMap[128] = {
+	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
-	'9',
-	'0',
-	'-',
-	'=',
+	'9',  '0', '-', '=',
 	'\b', // Backspace
 	'\t', // Tab
-	'q',
-	'w',
-	'e',
+	'q',  'w', 'e',
 	'r', // 19
-	't',
-	'y',
-	'u',
-	'i',
-	'o',
-	'p',
-	'[',
-	']',
+	't',  'y', 'u', 'i', 'o', 'p', '[', ']',
 	'\n', // Enter key
-	0, // 29 - Control
-	'a',
-	's',
-	'd',
-	'f',
-	'g',
-	'h',
-	'j',
-	'k',
-	'l',
+	0,	  // 29 - Control
+	'a',  's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
 	';', // 39
-	'\'',
-	'`',
+	'\'', '`',
 	0, // Left shift
-	'\\',
-	'z',
-	'x',
-	'c',
-	'v',
-	'b',
+	'\\', 'z', 'x', 'c', 'v', 'b',
 	'n', // 49
-	'm',
-	',',
-	'.',
-	'/',
+	'm',  ',', '.', '/',
 	0, // Right shift
 	'*',
-	0, // Alt
+	0,	 // Alt
 	' ', // Space bar
-	0, // Caps lock
-	0, // 59 - F1 key ... >
-	0, 0, 0, 0, 0, 0, 0, 0,
+	0,	 // Caps lock
+	0,	 // 59 - F1 key ... >
+	0,	  0,   0,	0,	 0,	  0,   0,	0,
 	0, // < ... F10
 	0, // 69 - Num lock
 	0, // Scroll Lock
@@ -96,28 +58,28 @@ uint8_t keyboardMap[128] =
 	0, // Page Down
 	0, // Insert Key
 	0, // Delete Key
-	0, 0, 0,
+	0,	  0,   0,
 	0, // F11 Key
 	0, // F12 Key
 	0, // All other keys are undefined
 };
 
 #define STATUS_REGISTER 0x64
-#define DATA_PORT       0x60
+#define DATA_PORT 0x60
 
 function handleKeyboard() {
 	uint8_t status = readPort(STATUS_REGISTER);
 
 	// PS2 Mouse
 	if (status & 0x20) {
-	//    uint8_t keycode = readPort(DATA_PORT);
-	//    //if (keycode < 0) {
-			return;
-	//    //}
-	//    //uint8_t buffer[] = {keyboardMap[keycode], 0};
-	//    uint8_t buffer[] = {'M','o','u','s','e',':', 0};
-	//    serialPrint(buffer);
-	//    serialPrint(buffer);
+		//    uint8_t keycode = readPort(DATA_PORT);
+		//    //if (keycode < 0) {
+		return;
+		//    //}
+		//    //uint8_t buffer[] = {keyboardMap[keycode], 0};
+		//    uint8_t buffer[] = {'M','o','u','s','e',':', 0};
+		//    serialPrint(buffer);
+		//    serialPrint(buffer);
 	}
 
 	if (status & 0x1) {
@@ -129,7 +91,8 @@ function handleKeyboard() {
 
 		if (keycode < 128) {
 			char8_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
-			if (buffer[0] == 0) buffer[0] = '?';
+			if (buffer[0] == 0)
+				buffer[0] = '?';
 			serialPrint(u8"[keyboard] [");
 			serialPrint(buffer);
 			serialPrintf(u8" down] %d keycode\n", keycode);
@@ -138,14 +101,15 @@ function handleKeyboard() {
 		} else {
 			keycode = keycode - 128;
 			char8_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
-			if (buffer[0] == 0) buffer[0] = '?';
+			if (buffer[0] == 0)
+				buffer[0] = '?';
 			serialPrint(u8"[keyboard] [");
 			serialPrint(buffer);
 			serialPrintf(u8" up] %d keycode\n", keycode + 128);
 			keyboardPressedState[keycode] = 0;
 		}
 
-		//if (status & 0x20) {
+		// if (status & 0x20) {
 		//    uint8_t buffer[] = {'M', 0};
 		//    serialPrint(buffer);
 		//}
@@ -153,5 +117,5 @@ function handleKeyboard() {
 
 	// EOI
 	// Disabled cause polling is used
-	//writePort(PIC1_COMMAND, PIC_EOI);
+	// writePort(PIC1_COMMAND, PIC_EOI);
 }

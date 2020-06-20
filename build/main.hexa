@@ -186,6 +186,9 @@ for (task in tasks) {
 			}
 		case 'clang-format':
 			{
+				let clang = '..\\Teapot\\\(llvm)\\bin\\clang-format'
+				let files: [String] = []
+
 				function formatFolderRecursive(path) {
 					if (fs.existsSync(path)) {
 						fs.readdirSync(path).forEach(function(file, index) {
@@ -193,13 +196,8 @@ for (task in tasks) {
 							if (fs.lstatSync(curPath).isDirectory()) {
 								formatFolderRecursive(curPath)
 							} else {
-								if (!curPath.startsWith('./external'))
-								if (curPath.endsWith('.hpp') || curPath.endsWith('.hpp')) {
-									console.log('clang-format: ' + curPath)
-									let clang = '..\\Teapot\\\(llvm)\\bin\\clang-format'
-									require('child_process').execSync(
-										clang + ` -style=file -i ` + curPath, { stdio: 'inherit' }
-									)
+								if (curPath.endsWith('.cpp') || curPath.endsWith('.hpp')) {
+									files.push(curPath)
 								}
 							}
 						})
@@ -207,6 +205,12 @@ for (task in tasks) {
 				}
 
 				formatFolderRecursive('.')
+
+				require('child_process').execSync(
+					clang + ` -i -style=file ` + files.join(' '), { stdio: 'inherit' }
+				)
+
+				console.log('clang-format ' + files.length + ' files')
 			}
 		case _:
 			console.log('Unknown task', task)
