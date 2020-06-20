@@ -36,4 +36,12 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax,
 inline function writeCr3(uint64_t value) {
 	asm volatile("movq %0, %%cr3" :: "r"(value));
 }
+
+inline function halt() {
+	asm volatile("hlt" ::);
+}
+
+inline function enableAllInterrupts() {
+	asm volatile("sti" ::);
+}
 } // namespace amd64

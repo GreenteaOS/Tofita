@@ -20,6 +20,7 @@
 %define USER_CODE64_SEL 0x30
 %define SYS_CODE32_SEL 0x60
 
+; Note in this case | 3 same as + 3
 %define DATA (USER_DATA32_SEL + 3)
 %define CODE (USER_CODE64_SEL + 3)
 %define CODEWoW (USER_CODE32_SEL + 3)

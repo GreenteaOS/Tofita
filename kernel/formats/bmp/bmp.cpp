@@ -29,7 +29,7 @@ Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 	uint16_t width = *(uint32_t *)&info[18] & 0xFFFF;
 	uint16_t height = *(uint32_t *)&info[22] & 0xFFFF;
 
-	Bitmap32* result = allocateBitmapFromBuffer(width, height);
+	Bitmap32* result = allocateBitmap(width, height);
 
 	serialPrintf(u8"[bmp] The bitmap image is %dx%d at %d\n", width, height, result);
 

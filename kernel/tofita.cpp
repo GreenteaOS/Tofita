@@ -26,10 +26,8 @@ namespace efi {
 
 #include "../boot/shared/boot.hpp"
 
-#define int do_not_use_such_types_please
 #define unsigned do_not_use_such_types_please
 #define long do_not_use_such_types_please
-#define short do_not_use_such_types_please
 
 // Avoids PIT-triggered rendering
 // This is not a best solution
@@ -90,7 +88,7 @@ function handleKeyDown(uint8_t key) {
 }
 
 const KernelParams *paramsCache = null;
-function kernelMain(const KernelParams *params) {
+function kernelInit(const KernelParams *params) {
 	serialPrintln(u8"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag " kernel loaded and operational");
 	serialPrintf(u8"<Tofita> CR3 points to: %8\n", (uint64_t) params->pml4);
 	paramsCache = params;
@@ -163,6 +161,11 @@ function kernelMain(const KernelParams *params) {
 		composite();
 
 		copyToScreen();
+	}
+}
+
+function kernelMain(const KernelParams *params) {
+	kernelInit(params);
 	}
 }
 }

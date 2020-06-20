@@ -33,7 +33,9 @@ typedef void function;
 // Use uint64_t, int32_t, char8_t, etc
 
 #define char do_not_use_such_types_please
+#define int do_not_use_such_types_please
 #define signed do_not_use_such_types_please
+#define short do_not_use_such_types_please
 #define size_t do_not_use_such_types_please
 #define intptr_t do_not_use_such_types_please
 #define uintptr_t do_not_use_such_types_please
@@ -112,7 +114,6 @@ struct KernelParams {
 	efi::EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
 	Framebuffer framebuffer;
 	RamDisk ramdisk;
-	// Simple memory buffer for in-kernel allocations
 	uint64_t acpiTablePhysical;
 	uint64_t ramBytes;
 	// uint8_t isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and don't allow to login!
