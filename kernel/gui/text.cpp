@@ -60,9 +60,7 @@ double drawChar(const char8_t c, double x, uint16_t y, Pixel32 color) {
 	for (uint8_t yi = 0; yi < 12; yi++)
 		for (uint8_t xi = 0; xi < w; xi++) {
 			Pixel32 font =
-				textFontBitmap
-					->pixels[(textChar.y + yi) * textFontBitmap->width +
-							 (textChar.x + xi)];
+				textFontBitmap->pixels[(textChar.y + yi) * textFontBitmap->width + (textChar.x + xi)];
 
 			Pixel32 p = _pixels[(y + yi) * _framebuffer->width + (xx + xi)];
 			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r);

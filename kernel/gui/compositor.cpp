@@ -19,10 +19,10 @@
 
 // Differential composition is not yet supported, performance with large amount of apps may be low
 
-Bitmap32* wallpaper; // Size of framebuffer
-Bitmap32* vibrance; // Size of framebuffer
-Bitmap32* leaves;
-Bitmap32* desktopIcon;
+Bitmap32 *wallpaper; // Size of framebuffer
+Bitmap32 *vibrance;	 // Size of framebuffer
+Bitmap32 *leaves;
+Bitmap32 *desktopIcon;
 cursor::Cursor *cur = null;
 
 typedef enum {
@@ -32,11 +32,11 @@ typedef enum {
 	// TODO more options
 } WallpaperStyle;
 
-function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
+function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 
 	{
 		serialPrintln(u8"[compositor.setWallpaper] upscale wallpaper to screen size");
-		Bitmap32* upscale = allocateBitmap(_framebuffer->width, _framebuffer->height);
+		Bitmap32 *upscale = allocateBitmap(_framebuffer->width, _framebuffer->height);
 
 		float hReciprocal = 1.0f / (float)_framebuffer->height;
 		float wReciprocal = 1.0f / (float)_framebuffer->width;
@@ -58,7 +58,7 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 
 	uint8_t blurScale = 8;
 
-	Bitmap32* downscale = allocateBitmap(bitmap->width / blurScale - 1, bitmap->height / blurScale - 1 + 8);
+	Bitmap32 *downscale = allocateBitmap(bitmap->width / blurScale - 1, bitmap->height / blurScale - 1 + 8);
 
 	for (uint32_t y = 0; y < downscale->height - 8; y++)
 		for (uint32_t x = 0; x < downscale->width; x++)
@@ -73,12 +73,12 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 
 	serialPrintln(u8"[compositor.setWallpaper] blur");
 
-	Bitmap32* blur = gaussBlur(downscale, 4);
+	Bitmap32 *blur = gaussBlur(downscale, 4);
 
 	serialPrintln(u8"[compositor.setWallpaper] upscale 8x");
 
 	// Upscale
-	Bitmap32* upscale = allocateBitmap(bitmap->width, bitmap->height);
+	Bitmap32 *upscale = allocateBitmap(bitmap->width, bitmap->height);
 
 	float hReciprocal = 1.0f / (float)upscale->height;
 	float wReciprocal = 1.0f / (float)upscale->width;
@@ -91,9 +91,9 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 			);
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
-			//rgba.r = Blend255(rgba.r, 255, 168);
-			//rgba.g = Blend255(rgba.g, 255, 168);
-			//rgba.b = Blend255(rgba.b, 255, 168);
+			// rgba.r = Blend255(rgba.r, 255, 168);
+			// rgba.g = Blend255(rgba.g, 255, 168);
+			// rgba.b = Blend255(rgba.b, 255, 168);
 			rgba.r = Blend255(rgba.r, 0, 168);
 			rgba.g = Blend255(rgba.g, 0, 168);
 			rgba.b = Blend255(rgba.b, 0, 168);
@@ -106,23 +106,27 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
-			if (x + xx < 0) continue ;
-			if (x + xx > vibrance->width) continue ;
-			if (y + yy < 0) continue ;
-			if (y + yy > vibrance->height) continue ;
+			if (x + xx < 0)
+				continue;
+			if (x + xx > vibrance->width)
+				continue;
+			if (y + yy < 0)
+				continue;
+			if (y + yy > vibrance->height)
+				continue;
 			uint32_t pixel = (y + yy) * vibrance->width + xx + x;
 			setPixel(x + xx, y + yy, vibrance->pixels[pixel]);
 		}
 	}
 }
 
-Bitmap32* doublebuffer;
+Bitmap32 *doublebuffer;
 function initializeCompositor() {
 	serialPrintln(u8"[compositor.initializeCompositor] begin");
 	doublebuffer = allocateBitmap(_framebuffer->width, _framebuffer->height);
 	_pixels = doublebuffer->pixels;
 
-	Bitmap32* loadPng32(const RamDiskAsset* asset);
+	Bitmap32 *loadPng32(const RamDiskAsset *asset);
 	RamDiskAsset a = getRamDiskAsset(u8"leaves.png");
 	leaves = loadPng32(&a);
 
@@ -147,9 +151,7 @@ function handleMouseDown(uint8_t key) {
 	drag = true;
 }
 
-function handleMouseUp(uint8_t key) {
-	drag = false;
-}
+function handleMouseUp(uint8_t key) { drag = false; }
 
 function composite() {
 	drawBitmap32(wallpaper, 0, 0);
@@ -161,14 +163,12 @@ function composite() {
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 	drawAsciiText(u8"Recycle Bin", 8, 61, color);
 
-	var outlineX = mouseX < dragX? mouseX : dragX;
-	var outlineY = mouseY < dragY? mouseY : dragY;
-	var outlineW = mouseX < dragX? dragX - mouseX : mouseX - dragX;
-	var outlineH = mouseY < dragY? dragY - mouseY : mouseY - dragY;
+	var outlineX = mouseX < dragX ? mouseX : dragX;
+	var outlineY = mouseY < dragY ? mouseY : dragY;
+	var outlineW = mouseX < dragX ? dragX - mouseX : mouseX - dragX;
+	var outlineH = mouseY < dragY ? dragY - mouseY : mouseY - dragY;
 	color.rgba.a = 64;
-	if (
-		(mouseX > 20 && mouseX < (20 + 32) && mouseY > 12 && mouseY < (12 + 60))
-	) {
+	if ((mouseX > 20 && mouseX < (20 + 32) && mouseY > 12 && mouseY < (12 + 60))) {
 		let outlineX = 1;
 		let outlineY = 10;
 		let outlineW = 72;

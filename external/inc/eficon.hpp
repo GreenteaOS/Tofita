@@ -23,9 +23,9 @@ Revision History
 // Text output protocol
 //
 
-#define EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID                                                                           \
-	{                                                                                                                  \
-		0x387477c2, 0x69c7, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                                  \
+#define EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID                                                                 \
+	{                                                                                                        \
+		0x387477c2, 0x69c7, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                        \
 	}
 #define SIMPLE_TEXT_OUTPUT_PROTOCOL EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID
 
@@ -34,16 +34,20 @@ INTERFACE_DECL(_SIMPLE_TEXT_OUTPUT_INTERFACE);
 typedef EFI_STATUS(EFIAPI *EFI_TEXT_RESET)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
 										   IN BOOLEAN ExtendedVerification);
 
-typedef EFI_STATUS(EFIAPI *EFI_TEXT_OUTPUT_STRING)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This, IN CHAR16 *String);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_OUTPUT_STRING)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
+												   IN CHAR16 *String);
 
-typedef EFI_STATUS(EFIAPI *EFI_TEXT_TEST_STRING)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This, IN CHAR16 *String);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_TEST_STRING)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
+												 IN CHAR16 *String);
 
-typedef EFI_STATUS(EFIAPI *EFI_TEXT_QUERY_MODE)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This, IN UINTN ModeNumber,
-												OUT UINTN *Columns, OUT UINTN *Rows);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_QUERY_MODE)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
+												IN UINTN ModeNumber, OUT UINTN *Columns, OUT UINTN *Rows);
 
-typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_MODE)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This, IN UINTN ModeNumber);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_MODE)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
+											  IN UINTN ModeNumber);
 
-typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_ATTRIBUTE)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This, IN UINTN Attribute);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_ATTRIBUTE)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
+												   IN UINTN Attribute);
 
 #define EFI_BLACK 0x00
 #define EFI_BLUE 0x01
@@ -76,10 +80,11 @@ typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_ATTRIBUTE)(IN struct _SIMPLE_TEXT_OUTPUT
 
 typedef EFI_STATUS(EFIAPI *EFI_TEXT_CLEAR_SCREEN)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This);
 
-typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_CURSOR_POSITION)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This, IN UINTN Column,
-														 IN UINTN Row);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_CURSOR_POSITION)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
+														 IN UINTN Column, IN UINTN Row);
 
-typedef EFI_STATUS(EFIAPI *EFI_TEXT_ENABLE_CURSOR)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This, IN BOOLEAN Enable);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_ENABLE_CURSOR)(IN struct _SIMPLE_TEXT_OUTPUT_INTERFACE *This,
+												   IN BOOLEAN Enable);
 
 typedef struct {
 	INT32 MaxMode;
@@ -189,9 +194,9 @@ typedef struct _SIMPLE_TEXT_OUTPUT_INTERFACE {
 // Text input protocol
 //
 
-#define EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID                                                                            \
-	{                                                                                                                  \
-		0x387477c1, 0x69c7, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                                  \
+#define EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID                                                                  \
+	{                                                                                                        \
+		0x387477c1, 0x69c7, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                        \
 	}
 #define SIMPLE_TEXT_INPUT_PROTOCOL EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID
 
@@ -241,9 +246,11 @@ typedef struct {
 #define SCAN_F12 0x0016
 #define SCAN_ESC 0x0017
 
-typedef EFI_STATUS(EFIAPI *EFI_INPUT_RESET)(IN struct _SIMPLE_INPUT_INTERFACE *This, IN BOOLEAN ExtendedVerification);
+typedef EFI_STATUS(EFIAPI *EFI_INPUT_RESET)(IN struct _SIMPLE_INPUT_INTERFACE *This,
+											IN BOOLEAN ExtendedVerification);
 
-typedef EFI_STATUS(EFIAPI *EFI_INPUT_READ_KEY)(IN struct _SIMPLE_INPUT_INTERFACE *This, OUT EFI_INPUT_KEY *Key);
+typedef EFI_STATUS(EFIAPI *EFI_INPUT_READ_KEY)(IN struct _SIMPLE_INPUT_INTERFACE *This,
+											   OUT EFI_INPUT_KEY *Key);
 
 typedef struct _SIMPLE_INPUT_INTERFACE {
 	EFI_INPUT_RESET Reset;

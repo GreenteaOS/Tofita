@@ -26,9 +26,7 @@ typedef struct {
 } RamDiskAssetInfo;
 
 static const RamDisk *_ramdisk;
-function setRamDisk(const RamDisk *ramdisk) {
-	_ramdisk = ramdisk;
-}
+function setRamDisk(const RamDisk *ramdisk) { _ramdisk = ramdisk; }
 
 typedef struct {
 	uint32_t size;
@@ -40,15 +38,13 @@ const RamDiskAsset getRamDiskAsset(const char8_t *path) {
 	asset.size = 0;
 	asset.data = 0;
 
-	const RamDiskInfo* ramDiskInfo = (const RamDiskInfo*)_ramdisk->base;
+	const RamDiskInfo *ramDiskInfo = (const RamDiskInfo *)_ramdisk->base;
 
 	for (uint32_t id = 0; id < ramDiskInfo->assetsCount; id++) {
 		// Pointer arithmetic like a boss
 		const uint64_t ramDiskAssetInfoPtr =
-			(uint64_t)_ramdisk->base
-			+ sizeof(RamDiskInfo)
-			+ sizeof(RamDiskAssetInfo) * id;
-		const RamDiskAssetInfo* ramDiskAssetInfo = (const RamDiskAssetInfo*)ramDiskAssetInfoPtr;
+			(uint64_t)_ramdisk->base + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id;
+		const RamDiskAssetInfo *ramDiskAssetInfo = (const RamDiskAssetInfo *)ramDiskAssetInfoPtr;
 		uint8_t found = 1;
 
 		for (uint8_t at = 0; at < 255; at++) {
@@ -56,7 +52,8 @@ const RamDiskAsset getRamDiskAsset(const char8_t *path) {
 				found = 0;
 				break;
 			}
-			if (ramDiskAssetInfo->path[at] == 0) break ;
+			if (ramDiskAssetInfo->path[at] == 0)
+				break;
 		}
 
 		if (found) {
@@ -66,6 +63,7 @@ const RamDiskAsset getRamDiskAsset(const char8_t *path) {
 		}
 	}
 
-	serialPrintf(u8"[ramdisk.getRamDiskAsset] asset '%s' not found in %d assets\n", path, ramDiskInfo->assetsCount);
+	serialPrintf(u8"[ramdisk.getRamDiskAsset] asset '%s' not found in %d assets\n", path,
+				 ramDiskInfo->assetsCount);
 	return asset;
 }

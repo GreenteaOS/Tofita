@@ -28,9 +28,9 @@ Revision History
 
 --*/
 
-#define EFI_UI_INTERFACE_PROTOCOL_GUID                                                                                 \
-	{                                                                                                                  \
-		0x32dd7981, 0x2d27, 0x11d4, { 0xbc, 0x8b, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 }                                  \
+#define EFI_UI_INTERFACE_PROTOCOL_GUID                                                                       \
+	{                                                                                                        \
+		0x32dd7981, 0x2d27, 0x11d4, { 0xbc, 0x8b, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 }                        \
 	}
 #define EFI_UI_PROTOCOL EFI_UI_INTERFACE_PROTOCOL_GUID
 

@@ -33,15 +33,15 @@ _Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect");
 #pragma pack(1)
 struct Pe32OptionalHeader {
 	uint16_t mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	uint8_t  mMajorLinkerVersion;
-	uint8_t  mMinorLinkerVersion;
+	uint8_t mMajorLinkerVersion;
+	uint8_t mMinorLinkerVersion;
 	uint32_t mSizeOfCode;
 	uint32_t mSizeOfInitializedData;
 	uint32_t mSizeOfUninitializedData;
 	uint32_t mAddressOfEntryPoint;
 	uint32_t mBaseOfCode;
-	//uint32_t mBaseOfData;// present only in 32-bit
-	uint64_t mImageBase;//uint32_t mImageBase;
+	// uint32_t mBaseOfData; // present only in 32-bit
+	uint64_t mImageBase; // uint32_t mImageBase;
 	uint32_t mSectionAlignment;
 	uint32_t mFileAlignment;
 	uint16_t mMajorOperatingSystemVersion;
@@ -56,10 +56,10 @@ struct Pe32OptionalHeader {
 	uint32_t mCheckSum;
 	uint16_t mSubsystem;
 	uint16_t mDllCharacteristics;
-	uint64_t mSizeOfStackReserve;//uint32_t mSizeOfStackReserve;
-	uint64_t mSizeOfStackCommit;//uint32_t mSizeOfStackCommit;
-	uint64_t mSizeOfHeapReserve;//uint32_t mSizeOfHeapReserve;
-	uint64_t mSizeOfHeapCommit;//uint32_t mSizeOfHeapCommit;
+	uint64_t mSizeOfStackReserve; // uint32_t mSizeOfStackReserve;
+	uint64_t mSizeOfStackCommit;  // uint32_t mSizeOfStackCommit;
+	uint64_t mSizeOfHeapReserve;  // uint32_t mSizeOfHeapReserve;
+	uint64_t mSizeOfHeapCommit;	  // uint32_t mSizeOfHeapCommit;
 	uint32_t mLoaderFlags;
 	uint32_t mNumberOfRvaAndSizes;
 } __attribute__((packed));
