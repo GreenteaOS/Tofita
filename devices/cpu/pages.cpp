@@ -134,14 +134,14 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr);                                      \
 	}
 
-createMapping(pd, pt)
-createMapping(pdpt, pd)
-createMapping(pml4, pdpt)
+createMapping(pd, pt);
+createMapping(pdpt, pd);
+createMapping(pml4, pdpt);
 
 #undef createMapping
 
 // Returns actual physical address from virtual address
-uint64_t resolveAddr(const PageEntry* pml4entries, uint64_t virtualAddr) {
+uint64_t resolveAddr(const PageEntry *pml4entries, uint64_t virtualAddr) {
 	auto linear = getLinearAddress(virtualAddr);
 	// pml4
 	const PageEntry *entry = &pml4entries[linear.pml4];

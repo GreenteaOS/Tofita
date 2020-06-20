@@ -61,7 +61,9 @@ typedef void function;
 extern "C++" template <typename T> struct Physical {
 	uint64_t physical;
 
-	static Physical<T> toPhysical(uint64_t physical) { return (Physical<T>)physical; };
+	static Physical<T> toPhysical(uint64_t physical) {
+		return (Physical<T>)physical;
+	};
 
 	T *toVirtual() const {
 		uint64_t result = (uint64_t)WholePhysicalStart + physical;

@@ -145,9 +145,9 @@ function map_p2huge(PageEntry pd[], uint64_t virtualAddr, uint64_t physicalAddr)
 		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr);                                      \
 	}
 
-createMapping(pd, pt)
-createMapping(pdpt, pd)
-createMapping(pml4, pdpt)
+createMapping(pd, pt);
+createMapping(pdpt, pd);
+createMapping(pml4, pdpt);
 #undef createMapping
 
 #define createHugeMapping(name, fromTable, calls, toTable)                                                   \
@@ -156,8 +156,8 @@ createMapping(pml4, pdpt)
 		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr);                                        \
 	}
 
-createHugeMapping(p3huge, pdpt, p2huge, pd)
-createHugeMapping(p4huge, pml4, p3huge, pdpt)
+createHugeMapping(p3huge, pdpt, p2huge, pd);
+createHugeMapping(p4huge, pml4, p3huge, pdpt);
 #undef createHugeMapping
 
 function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
