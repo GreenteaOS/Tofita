@@ -8,22 +8,30 @@ Copyright (c) 2013  Intel Corporation
 
 #define EFI_IP4_SERVICE_BINDING_PROTOCOL                                                                     \
 	{                                                                                                        \
-		0xc51711e7, 0xb4bf, 0x404a, { 0xbf, 0xb8, 0x0a, 0x04, 0x8e, 0xf1, 0xff, 0xe4 }                       \
+		0xc51711e7, 0xb4bf, 0x404a, {                                                                        \
+			0xbf, 0xb8, 0x0a, 0x04, 0x8e, 0xf1, 0xff, 0xe4                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_IP4_PROTOCOL                                                                                     \
 	{                                                                                                        \
-		0x41d94cd2, 0x35b6, 0x455a, { 0x82, 0x58, 0xd4, 0xe5, 0x13, 0x34, 0xaa, 0xdd }                       \
+		0x41d94cd2, 0x35b6, 0x455a, {                                                                        \
+			0x82, 0x58, 0xd4, 0xe5, 0x13, 0x34, 0xaa, 0xdd                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_IP6_SERVICE_BINDING_PROTOCOL                                                                     \
 	{                                                                                                        \
-		0xec835dd3, 0xfe0f, 0x617b, { 0xa6, 0x21, 0xb3, 0x50, 0xc3, 0xe1, 0x33, 0x88 }                       \
+		0xec835dd3, 0xfe0f, 0x617b, {                                                                        \
+			0xa6, 0x21, 0xb3, 0x50, 0xc3, 0xe1, 0x33, 0x88                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_IP6_PROTOCOL                                                                                     \
 	{                                                                                                        \
-		0x2c8759d5, 0x5c2d, 0x66ef, { 0x92, 0x5f, 0xb6, 0x6c, 0x10, 0x19, 0x57, 0xe2 }                       \
+		0x2c8759d5, 0x5c2d, 0x66ef, {                                                                        \
+			0x92, 0x5f, 0xb6, 0x6c, 0x10, 0x19, 0x57, 0xe2                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_IP4);

@@ -215,7 +215,9 @@ typedef uint64_t UINTN;
 
 #define EFI_DRIVER_ENTRY_POINT(InitFunction)                                                                 \
 	UINTN                                                                                                    \
-	__stdcall _DllMainCRTStartup(UINTN Inst, UINTN reason_for_call, VOID *rserved) { return 1; }             \
+	__stdcall _DllMainCRTStartup(UINTN Inst, UINTN reason_for_call, VOID *rserved) {                         \
+		return 1;                                                                                            \
+	}                                                                                                        \
                                                                                                              \
 	int EXPORTAPI __cdecl InitializeDriver(void *ImageHandle, void *SystemTable) {                           \
 		return InitFunction(ImageHandle, SystemTable);                                                       \

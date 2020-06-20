@@ -28,14 +28,14 @@ function quakePrintf(const char8_t *c, ...);
 
 function quake() {
 	if (haveToQuake == 0) {
-		return ;
+		return;
 	}
 
 	function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height);
 	drawVibrancedRectangle(0, 0, _framebuffer->width, quakeHeight);
-	uint16_t drawAsciiText(const char8_t* text, double x, uint16_t y, Pixel32 color);
+	uint16_t drawAsciiText(const char8_t *text, double x, uint16_t y, Pixel32 color);
 	Pixel32 color;
-	//color.rgba.r = color.rgba.g = color.rgba.b = 48;
+	// color.rgba.r = color.rgba.g = color.rgba.b = 48;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xDD;
 	var x = drawAsciiText(quakeCommand, 2, quakeHeight - 14, color);
 	drawAsciiText(u8"|", x + 2, quakeHeight - 15, color);
@@ -48,59 +48,58 @@ function quake() {
 function quakeHandleButtonDown(uint8_t key) {
 	serialPrintf(u8"quakeHandleButtonDown %d\n", key);
 
-    if (keyboardMap[key] == '\b' && quakeCommandSize > 0) {
-    	quakeCommand[quakeCommandSize - 1] = 0;
-    	quakeCommandSize--;
-    }
+	if (keyboardMap[key] == '\b' && quakeCommandSize > 0) {
+		quakeCommand[quakeCommandSize - 1] = 0;
+		quakeCommandSize--;
+	}
 
-    if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
-    	if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
-    		extern const KernelParams *paramsCache;
-    		quakePrintf(u8"Doing hot reload. Note: this log may be persistent between hot reloads\n");
-    		InitKernel start = (InitKernel) KernelVirtualBase;
+	if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
+		if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
+			extern const KernelParams *paramsCache;
+			quakePrintf(u8"Doing hot reload. Note: this log may be persistent between hot reloads\n");
+			InitKernel start = (InitKernel)KernelVirtualBase;
 			start(paramsCache); // TODO pml4, stack
-    	} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
-    		quakePrintf(u8"Hit `~` to show/hide this terminal\n", quakeCommand);
-    		quakePrintf(u8"Command 'reload' does quick kernel restart (without actual reboot) Note: this destroys all data!\n", quakeCommand);
-    	} else {
-    		quakePrintf(u8"Command '%s' not supported\n", quakeCommand);
-    		quakePrintf(u8"Enter 'help' for commands\n");
-    	}
-    	for (uint8_t i = 0; i < 255; i++) quakeCommand[i] = 0;
-    	quakeCommandSize = 0;
-    }
+		} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
+			quakePrintf(u8"Hit `~` to show/hide this terminal\n", quakeCommand);
+			quakePrintf(u8"Command 'reload' does quick kernel restart (without actual reboot) Note: this "
+						u8"destroys all data!\n",
+						quakeCommand);
+		} else {
+			quakePrintf(u8"Command '%s' not supported\n", quakeCommand);
+			quakePrintf(u8"Enter 'help' for commands\n");
+		}
+		for (uint8_t i = 0; i < 255; i++)
+			quakeCommand[i] = 0;
+		quakeCommandSize = 0;
+	}
 
-    // TODO 123 etc
-    if (
-    	(keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z')
-    	||
-    	(keyboardMap[key] == ' ')
-    )
-    if (quakeCommandSize < 255) {
-    	quakeCommand[quakeCommandSize] = keyboardMap[key];
-    	quakeCommandSize++;
-    }
+	// TODO 123 etc
+	if ((keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z') || (keyboardMap[key] == ' '))
+		if (quakeCommandSize < 255) {
+			quakeCommand[quakeCommandSize] = keyboardMap[key];
+			quakeCommandSize++;
+		}
 
 	serialPrintf(u8"quake command is %s\n", quakeCommand);
 }
 
-uint8_t* _quakeItoA(int32_t i, uint8_t b[]){
+uint8_t *_quakeItoA(int32_t i, uint8_t b[]) {
 	uint8_t const digit[] = "0123456789";
-	uint8_t* p = b;
-	if (i<0) {
+	uint8_t *p = b;
+	if (i < 0) {
 		*p++ = '-';
 		i *= -1;
 	}
 	int32_t shifter = i;
-	do { //Move to where representation ends
+	do { // Move to where representation ends
 		++p;
-		shifter = shifter/10;
-	} while(shifter);
+		shifter = shifter / 10;
+	} while (shifter);
 	*p = '\0';
-	do { //Move back, inserting digits as u go
-		*--p = digit[i%10];
-		i = i/10;
-	} while(i);
+	do { // Move back, inserting digits as u go
+		*--p = digit[i % 10];
+		i = i / 10;
+	} while (i);
 	return b;
 }
 
@@ -112,10 +111,13 @@ function _quake_newline() {
 		// Move all lines upper
 		quakeLine = 16;
 		for (var i = 0; i < 16; i++) {
-			for (var k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = 0;
-			for (var k = 0; k < sizeof(quakeLines[i]); k++) quakeLines[i][k] = quakeLines[i + 1][k];
+			for (var k = 0; k < sizeof(quakeLines[i]); k++)
+				quakeLines[i][k] = 0;
+			for (var k = 0; k < sizeof(quakeLines[i]); k++)
+				quakeLines[i][k] = quakeLines[i + 1][k];
 		}
-		for (var i = 0; i < sizeof(quakeLines[16]); i++) quakeLines[16][i] = 0;
+		for (var i = 0; i < sizeof(quakeLines[16]); i++)
+			quakeLines[16][i] = 0;
 	}
 }
 
@@ -135,19 +137,17 @@ uint8_t __cdecl _quake_putchar(const uint8_t c) {
 		}
 		quakeLines[quakeLine][quakeRow] = c;
 		quakeRow++;
-		if (quakeRow > 255) _quake_newline();
+		if (quakeRow > 255)
+			_quake_newline();
 		return c;
 	}
 	return EOF;
 }
 
-int32_t _quake_puts(const uint8_t *string)
-{
+int32_t _quake_puts(const uint8_t *string) {
 	int32_t i = 0;
-	while (string[i] != 0)
-	{
-		if (_quake_putchar(string[i]) == EOF)
-		{
+	while (string[i] != 0) {
+		if (_quake_putchar(string[i]) == EOF) {
 			return EOF;
 		}
 		i++;
@@ -172,34 +172,39 @@ function quakePrintf(const char8_t *c, ...) {
 			break;
 		}
 
-		switch (*c)
-		{
-			case 's': _quake_puts(va_arg(lst, uint8_t *)); break;
-			case 'c': _quake_putchar(va_arg(lst, int32_t)); break;
-			case 'd': {
-				int32_t value = va_arg(lst, int32_t);
-				uint8_t buffer[16];
-				for (uint8_t i = 0; i < 16; i++) buffer[i] = 0;
-				_quakeItoA(value, buffer);
-				uint8_t *c = buffer;
-				while (*c != '\0') {
-					_quake_putchar(*c);
-					c++;
-				}
-				break;
+		switch (*c) {
+		case 's':
+			_quake_puts(va_arg(lst, uint8_t *));
+			break;
+		case 'c':
+			_quake_putchar(va_arg(lst, int32_t));
+			break;
+		case 'd': {
+			int32_t value = va_arg(lst, int32_t);
+			uint8_t buffer[16];
+			for (uint8_t i = 0; i < 16; i++)
+				buffer[i] = 0;
+			_quakeItoA(value, buffer);
+			uint8_t *c = buffer;
+			while (*c != '\0') {
+				_quake_putchar(*c);
+				c++;
 			}
-			case 'u': {
-				uint32_t value = va_arg(lst, uint32_t);
-				uint8_t buffer[16];
-				for (uint8_t i = 0; i < 16; i++) buffer[i] = 0;
-				_quakeItoA(value, buffer);
-				uint8_t *c = buffer;
-				while (*c != '\0') {
-					_quake_putchar(*c);
-					c++;
-				}
-				break;
+			break;
+		}
+		case 'u': {
+			uint32_t value = va_arg(lst, uint32_t);
+			uint8_t buffer[16];
+			for (uint8_t i = 0; i < 16; i++)
+				buffer[i] = 0;
+			_quakeItoA(value, buffer);
+			uint8_t *c = buffer;
+			while (*c != '\0') {
+				_quake_putchar(*c);
+				c++;
 			}
+			break;
+		}
 		}
 		c++;
 	}

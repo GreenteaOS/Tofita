@@ -24,7 +24,9 @@
 
 #define EFI_SIMPLE_POINTER_PROTOCOL_GUID                                                                     \
 	{                                                                                                        \
-		0x31878c87, 0xb75, 0x11d5, { 0x9a, 0x4f, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                         \
+		0x31878c87, 0xb75, 0x11d5, {                                                                         \
+			0x9a, 0x4f, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d                                                    \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_SIMPLE_POINTER);
@@ -60,7 +62,9 @@ typedef struct _EFI_SIMPLE_POINTER {
 
 #define EFI_ABSOLUTE_POINTER_PROTOCOL_GUID                                                                   \
 	{                                                                                                        \
-		0x8D59D32B, 0xC655, 0x4AE9, { 0x9B, 0x15, 0xF2, 0x59, 0x04, 0x99, 0x2A, 0x43 }                       \
+		0x8D59D32B, 0xC655, 0x4AE9, {                                                                        \
+			0x9B, 0x15, 0xF2, 0x59, 0x04, 0x99, 0x2A, 0x43                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_ABSOLUTE_POINTER_PROTOCOL);

@@ -25,7 +25,9 @@ Revision History
 
 #define EFI_PXE_BASE_CODE_PROTOCOL_GUID                                                                      \
 	{                                                                                                        \
-		0x03c4e603, 0xac28, 0x11d3, { 0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                       \
+		0x03c4e603, 0xac28, 0x11d3, {                                                                        \
+			0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_PXE_BASE_CODE_PROTOCOL);
@@ -356,7 +358,9 @@ typedef struct _EFI_PXE_BASE_CODE_PROTOCOL EFI_PXE_BASE_CODE;
 
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_GUID                                                             \
 	{                                                                                                        \
-		0x245dca21, 0xfb7b, 0x11d3, { 0x8f, 0x01, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                       \
+		0x245dca21, 0xfb7b, 0x11d3, {                                                                        \
+			0x8f, 0x01, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                   \
+		}                                                                                                    \
 	}
 
 //

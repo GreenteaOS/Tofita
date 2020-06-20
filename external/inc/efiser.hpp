@@ -23,7 +23,9 @@ Revision History
 
 #define EFI_SERIAL_IO_PROTOCOL_GUID                                                                          \
 	{                                                                                                        \
-		0xBB25CF6F, 0xF1D4, 0x11D2, { 0x9A, 0x0C, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0xFD }                       \
+		0xBB25CF6F, 0xF1D4, 0x11D2, {                                                                        \
+			0x9A, 0x0C, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0xFD                                                   \
+		}                                                                                                    \
 	}
 #define SERIAL_IO_PROTOCOL EFI_SERIAL_IO_PROTOCOL_GUID
 

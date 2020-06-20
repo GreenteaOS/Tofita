@@ -43,10 +43,8 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 
 		for (uint16_t y = 0; y < upscale->height; y++)
 			for (uint16_t x = 0; x < upscale->width; x++) {
-				PixelRGBAData rgba = interpolatePixel(bitmap,
-					((float)x * wReciprocal) * bitmap->width,
-					((float)y * hReciprocal) * (bitmap->height - 8)
-				);
+				PixelRGBAData rgba = interpolatePixel(bitmap, ((float)x * wReciprocal) * bitmap->width,
+													  ((float)y * hReciprocal) * (bitmap->height - 8));
 				upscale->pixels[y * upscale->width + x].rgba = rgba;
 			}
 
@@ -85,10 +83,8 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 
 	for (uint16_t y = 0; y < upscale->height; y++)
 		for (uint16_t x = 0; x < upscale->width; x++) {
-			PixelRGBAData rgba = interpolatePixel(downscale,
-				((float)x * wReciprocal) * downscale->width,
-				((float)y * hReciprocal) * (downscale->height - 8)
-			);
+			PixelRGBAData rgba = interpolatePixel(downscale, ((float)x * wReciprocal) * downscale->width,
+												  ((float)y * hReciprocal) * (downscale->height - 8));
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
 			// rgba.r = Blend255(rgba.r, 255, 168);
@@ -151,7 +147,9 @@ function handleMouseDown(uint8_t key) {
 	drag = true;
 }
 
-function handleMouseUp(uint8_t key) { drag = false; }
+function handleMouseUp(uint8_t key) {
+	drag = false;
+}
 
 function composite() {
 	drawBitmap32(wallpaper, 0, 0);

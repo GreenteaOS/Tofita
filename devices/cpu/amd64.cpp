@@ -16,13 +16,10 @@
 // AMD64 assembly instructions wrapper
 
 namespace amd64 {
-inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax,
-					  uint32_t *ebx = null, uint32_t *ecx = null,
-					  uint32_t *edx = null) {
+inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *ebx = null,
+					  uint32_t *ecx = null, uint32_t *edx = null) {
 	uint32_t a, b, c, d;
-	asm volatile("cpuid"
-				 : "=a"(a), "=b"(b), "=c"(c), "=d"(d)
-				 : "a"(leaf), "c"(subleaf));
+	asm volatile("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf));
 	if (eax)
 		*eax = a;
 	if (ebx)
@@ -34,7 +31,7 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax,
 }
 
 inline function writeCr3(uint64_t value) {
-	asm volatile("movq %0, %%cr3" :: "r"(value));
+	asm volatile("movq %0, %%cr3" ::"r"(value));
 }
 
 inline function halt() {

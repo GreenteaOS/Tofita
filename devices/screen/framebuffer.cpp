@@ -43,8 +43,9 @@ typedef struct {
 // Avoid one level of pointer indirection
 Pixel32 *_pixels;
 
-Bitmap32* allocateBitmap(uint16_t width, uint16_t height) {
-	Bitmap32* result = (Bitmap32*)PhysicalAllocator::allocateBytes(sizeof(uint16_t) * 2 + sizeof(Pixel32) * width * height);
+Bitmap32 *allocateBitmap(uint16_t width, uint16_t height) {
+	Bitmap32 *result =
+		(Bitmap32 *)PhysicalAllocator::allocateBytes(sizeof(uint16_t) * 2 + sizeof(Pixel32) * width * height);
 	result->width = width;
 	result->height = height;
 	return result;
@@ -60,7 +61,8 @@ function setFramebuffer(const Framebuffer *framebuffer) {
 #define Blend255(target, color, alpha) (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
 function __attribute__((fastcall)) blendPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
-	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1)) return ;
+	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1))
+		return;
 	Pixel32 p = _pixels[y * _framebuffer->width + x];
 
 	p.rgba.r = Mul255(pixel.rgba.a, pixel.rgba.r) + Mul255(255 - pixel.rgba.a, p.rgba.r);
@@ -71,11 +73,12 @@ function __attribute__((fastcall)) blendPixel(uint16_t x, uint16_t y, Pixel32 pi
 }
 
 function __attribute__((fastcall)) setPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
-	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1)) return ;
+	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1))
+		return;
 	_pixels[y * _framebuffer->width + x] = pixel;
 }
 
-function drawBitmap32WithAlpha(Bitmap32* bitmap, uint16_t x, uint16_t y) {
+function drawBitmap32WithAlpha(Bitmap32 *bitmap, uint16_t x, uint16_t y) {
 	for (int32_t yy = 0; yy < bitmap->height; yy++) {
 		for (int32_t xx = 0; xx < bitmap->width; xx++) {
 			blendPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
@@ -83,7 +86,7 @@ function drawBitmap32WithAlpha(Bitmap32* bitmap, uint16_t x, uint16_t y) {
 	}
 }
 
-function drawBitmap32(Bitmap32* bitmap, uint16_t x, uint16_t y) {
+function drawBitmap32(Bitmap32 *bitmap, uint16_t x, uint16_t y) {
 	for (int32_t yy = 0; yy < bitmap->height; yy++) {
 		for (int32_t xx = 0; xx < bitmap->width; xx++) {
 			setPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
@@ -113,7 +116,8 @@ function drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t wi
 			// Rendering left and far right points sequentally should be
 			// better for cache-locality than vertical lines
 			// At least this is true for small rectangles (like buttons)
-			if (yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1) setPixel(x + xx, y + yy, color);
+			if (yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1)
+				setPixel(x + xx, y + yy, color);
 		}
 	}
 }
@@ -130,4 +134,3 @@ function line45smooth(Pixel32 color, int32_t x, int32_t y, int32_t width, int32_
 	xx += mod;
 	setPixel(xx + x, y + width - 1, color);
 }
-

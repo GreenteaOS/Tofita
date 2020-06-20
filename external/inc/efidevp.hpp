@@ -105,7 +105,9 @@ typedef struct _VENDOR_DEVICE_PATH {
 
 #define UNKNOWN_DEVICE_GUID                                                                                  \
 	{                                                                                                        \
-		0xcf31fac5, 0xc24e, 0x11d2, { 0x85, 0xf3, 0x0, 0xa0, 0xc9, 0x3e, 0xc9, 0x3b }                        \
+		0xcf31fac5, 0xc24e, 0x11d2, {                                                                        \
+			0x85, 0xf3, 0x0, 0xa0, 0xc9, 0x3e, 0xc9, 0x3b                                                    \
+		}                                                                                                    \
 	}
 
 typedef struct _UKNOWN_DEVICE_VENDOR_DP {
@@ -345,25 +347,33 @@ typedef struct _UART_DEVICE_PATH {
 
 #define EFI_PC_ANSI_GUID                                                                                     \
 	{                                                                                                        \
-		0xe0c14753, 0xf9be, 0x11d2, { 0x9a, 0x0c, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                       \
+		0xe0c14753, 0xf9be, 0x11d2, {                                                                        \
+			0x9a, 0x0c, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d                                                   \
+		}                                                                                                    \
 	}
 #define DEVICE_PATH_MESSAGING_PC_ANSI EFI_PC_ANSI_GUID
 
 #define EFI_VT_100_GUID                                                                                      \
 	{                                                                                                        \
-		0xdfa66065, 0xb419, 0x11d3, { 0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                       \
+		0xdfa66065, 0xb419, 0x11d3, {                                                                        \
+			0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d                                                   \
+		}                                                                                                    \
 	}
 #define DEVICE_PATH_MESSAGING_VT_100 EFI_VT_100_GUID
 
 #define EFI_VT_100_PLUS_GUID                                                                                 \
 	{                                                                                                        \
-		0x7baec70b, 0x57e0, 0x4c76, { 0x8e, 0x87, 0x2f, 0x9e, 0x28, 0x08, 0x83, 0x43 }                       \
+		0x7baec70b, 0x57e0, 0x4c76, {                                                                        \
+			0x8e, 0x87, 0x2f, 0x9e, 0x28, 0x08, 0x83, 0x43                                                   \
+		}                                                                                                    \
 	}
 #define DEVICE_PATH_MESSAGING_VT_100_PLUS EFI_VT_100_PLUS_GUID
 
 #define EFI_VT_UTF8_GUID                                                                                     \
 	{                                                                                                        \
-		0xad15a0d6, 0x8bec, 0x4acf, { 0xa0, 0x73, 0xd0, 0x1d, 0xe7, 0x7e, 0x2d, 0x88 }                       \
+		0xad15a0d6, 0x8bec, 0x4acf, {                                                                        \
+			0xa0, 0x73, 0xd0, 0x1d, 0xe7, 0x7e, 0x2d, 0x88                                                   \
+		}                                                                                                    \
 	}
 #define DEVICE_PATH_MESSAGING_VT_UTF8 EFI_VT_UTF8_GUID
 
@@ -541,7 +551,9 @@ typedef union {
 
 #define EFI_DEVICE_PATH_TO_TEXT_PROTOCOL_GUID                                                                \
 	{                                                                                                        \
-		0x8b843e20, 0x8132, 0x4852, { 0x90, 0xcc, 0x55, 0x1a, 0x4e, 0x4a, 0x7f, 0x1c }                       \
+		0x8b843e20, 0x8132, 0x4852, {                                                                        \
+			0x90, 0xcc, 0x55, 0x1a, 0x4e, 0x4a, 0x7f, 0x1c                                                   \
+		}                                                                                                    \
 	}
 
 typedef CHAR16 *(EFIAPI *EFI_DEVICE_PATH_TO_TEXT_NODE)(IN CONST EFI_DEVICE_PATH_PROTOCOL *DeviceNode,
@@ -557,7 +569,9 @@ typedef struct _EFI_DEVICE_PATH_TO_TEXT_PROTOCOL {
 
 #define EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL_GUID                                                              \
 	{                                                                                                        \
-		0x5c99a21, 0xc70f, 0x4ad2, { 0x8a, 0x5f, 0x35, 0xdf, 0x33, 0x43, 0xf5, 0x1e }                        \
+		0x5c99a21, 0xc70f, 0x4ad2, {                                                                         \
+			0x8a, 0x5f, 0x35, 0xdf, 0x33, 0x43, 0xf5, 0x1e                                                   \
+		}                                                                                                    \
 	}
 
 typedef EFI_DEVICE_PATH_PROTOCOL *(EFIAPI *EFI_DEVICE_PATH_FROM_TEXT_NODE)(IN CONST CHAR16 *TextDeviceNode);

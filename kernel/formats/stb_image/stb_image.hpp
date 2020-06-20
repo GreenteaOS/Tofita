@@ -747,9 +747,13 @@ static int32_t stbi__stdio_read(void *user, char8_t *data, int32_t size) {
 	return (int32_t)fread(data, 1, size, (FILE *)user);
 }
 
-static void stbi__stdio_skip(void *user, int32_t n) { fseek((FILE *)user, n, SEEK_CUR); }
+static void stbi__stdio_skip(void *user, int32_t n) {
+	fseek((FILE *)user, n, SEEK_CUR);
+}
 
-static int32_t stbi__stdio_eof(void *user) { return feof((FILE *)user); }
+static int32_t stbi__stdio_eof(void *user) {
+	return feof((FILE *)user);
+}
 
 static stbi_io_callbacks stbi__stdio_callbacks = {
 	stbi__stdio_read,
@@ -852,14 +856,18 @@ static int32_t stbi__pnm_info(stbi__context *s, int32_t *x, int32_t *y, int32_t 
 // this is not threadsafe
 static const char8_t *stbi__g_failure_reason;
 
-STBIDEF const char8_t *stbi_failure_reason(void) { return stbi__g_failure_reason; }
+STBIDEF const char8_t *stbi_failure_reason(void) {
+	return stbi__g_failure_reason;
+}
 
 static int32_t stbi__err(const char8_t *str) {
 	stbi__g_failure_reason = str;
 	return 0;
 }
 
-static void *stbi__malloc(uint64_t size) { return STBI_MALLOC(size); }
+static void *stbi__malloc(uint64_t size) {
+	return STBI_MALLOC(size);
+}
 
 // stb_image uses ints pervasively, including for offset calculations.
 // therefore the largest decoded image size we can support with the
@@ -950,7 +958,9 @@ static void *stbi__malloc_mad4(int32_t a, int32_t b, int32_t c, int32_t d, int32
 #define stbi__errpf(x, y) ((float *)(uint64_t)(stbi__err(x, y) ? NULL : NULL))
 #define stbi__errpuc(x, y) ((uint8_t *)(uint64_t)(stbi__err(x, y) ? NULL : NULL))
 
-STBIDEF void stbi_image_free(void *retval_from_stbi_load) { STBI_FREE(retval_from_stbi_load); }
+STBIDEF void stbi_image_free(void *retval_from_stbi_load) {
+	STBI_FREE(retval_from_stbi_load);
+}
 
 #ifndef STBI_NO_LINEAR
 static float *stbi__ldr_to_hdr(stbi_uc *data, int32_t x, int32_t y, int32_t comp);
@@ -1364,14 +1374,22 @@ STBIDEF int32_t stbi_is_hdr_from_callbacks(stbi_io_callbacks const *clbk, void *
 #ifndef STBI_NO_LINEAR
 static float stbi__l2h_gamma = 2.2f, stbi__l2h_scale = 1.0f;
 
-STBIDEF void stbi_ldr_to_hdr_gamma(float gamma) { stbi__l2h_gamma = gamma; }
-STBIDEF void stbi_ldr_to_hdr_scale(float scale) { stbi__l2h_scale = scale; }
+STBIDEF void stbi_ldr_to_hdr_gamma(float gamma) {
+	stbi__l2h_gamma = gamma;
+}
+STBIDEF void stbi_ldr_to_hdr_scale(float scale) {
+	stbi__l2h_scale = scale;
+}
 #endif
 
 static float stbi__h2l_gamma_i = 1.0f / 2.2f, stbi__h2l_scale_i = 1.0f;
 
-STBIDEF void stbi_hdr_to_ldr_gamma(float gamma) { stbi__h2l_gamma_i = 1 / gamma; }
-STBIDEF void stbi_hdr_to_ldr_scale(float scale) { stbi__h2l_scale_i = 1 / scale; }
+STBIDEF void stbi_hdr_to_ldr_gamma(float gamma) {
+	stbi__h2l_gamma_i = 1 / gamma;
+}
+STBIDEF void stbi_hdr_to_ldr_scale(float scale) {
+	stbi__h2l_scale_i = 1 / scale;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1526,29 +1544,53 @@ static uint8_t *stbi__convert_format(uint8_t *data, int32_t img_n, int32_t req_c
 		// components; avoid switch per pixel, so use switch per scanline and
 		// massive macros
 		switch (STBI__COMBO(img_n, req_comp)) {
-			STBI__CASE(1, 2) { dest[0] = src[0], dest[1] = 255; }
+			STBI__CASE(1, 2) {
+				dest[0] = src[0], dest[1] = 255;
+			}
 			break;
-			STBI__CASE(1, 3) { dest[0] = dest[1] = dest[2] = src[0]; }
+			STBI__CASE(1, 3) {
+				dest[0] = dest[1] = dest[2] = src[0];
+			}
 			break;
-			STBI__CASE(1, 4) { dest[0] = dest[1] = dest[2] = src[0], dest[3] = 255; }
+			STBI__CASE(1, 4) {
+				dest[0] = dest[1] = dest[2] = src[0], dest[3] = 255;
+			}
 			break;
-			STBI__CASE(2, 1) { dest[0] = src[0]; }
+			STBI__CASE(2, 1) {
+				dest[0] = src[0];
+			}
 			break;
-			STBI__CASE(2, 3) { dest[0] = dest[1] = dest[2] = src[0]; }
+			STBI__CASE(2, 3) {
+				dest[0] = dest[1] = dest[2] = src[0];
+			}
 			break;
-			STBI__CASE(2, 4) { dest[0] = dest[1] = dest[2] = src[0], dest[3] = src[1]; }
+			STBI__CASE(2, 4) {
+				dest[0] = dest[1] = dest[2] = src[0], dest[3] = src[1];
+			}
 			break;
-			STBI__CASE(3, 4) { dest[0] = src[0], dest[1] = src[1], dest[2] = src[2], dest[3] = 255; }
+			STBI__CASE(3, 4) {
+				dest[0] = src[0], dest[1] = src[1], dest[2] = src[2], dest[3] = 255;
+			}
 			break;
-			STBI__CASE(3, 1) { dest[0] = stbi__compute_y(src[0], src[1], src[2]); }
+			STBI__CASE(3, 1) {
+				dest[0] = stbi__compute_y(src[0], src[1], src[2]);
+			}
 			break;
-			STBI__CASE(3, 2) { dest[0] = stbi__compute_y(src[0], src[1], src[2]), dest[1] = 255; }
+			STBI__CASE(3, 2) {
+				dest[0] = stbi__compute_y(src[0], src[1], src[2]), dest[1] = 255;
+			}
 			break;
-			STBI__CASE(4, 1) { dest[0] = stbi__compute_y(src[0], src[1], src[2]); }
+			STBI__CASE(4, 1) {
+				dest[0] = stbi__compute_y(src[0], src[1], src[2]);
+			}
 			break;
-			STBI__CASE(4, 2) { dest[0] = stbi__compute_y(src[0], src[1], src[2]), dest[1] = src[3]; }
+			STBI__CASE(4, 2) {
+				dest[0] = stbi__compute_y(src[0], src[1], src[2]), dest[1] = src[3];
+			}
 			break;
-			STBI__CASE(4, 3) { dest[0] = src[0], dest[1] = src[1], dest[2] = src[2]; }
+			STBI__CASE(4, 3) {
+				dest[0] = src[0], dest[1] = src[1], dest[2] = src[2];
+			}
 			break;
 		default:
 			STBI_ASSERT(0);
@@ -1591,29 +1633,53 @@ static stbi__uint16 *stbi__convert_format16(stbi__uint16 *data, int32_t img_n, i
 		// components; avoid switch per pixel, so use switch per scanline and
 		// massive macros
 		switch (STBI__COMBO(img_n, req_comp)) {
-			STBI__CASE(1, 2) { dest[0] = src[0], dest[1] = 0xffff; }
+			STBI__CASE(1, 2) {
+				dest[0] = src[0], dest[1] = 0xffff;
+			}
 			break;
-			STBI__CASE(1, 3) { dest[0] = dest[1] = dest[2] = src[0]; }
+			STBI__CASE(1, 3) {
+				dest[0] = dest[1] = dest[2] = src[0];
+			}
 			break;
-			STBI__CASE(1, 4) { dest[0] = dest[1] = dest[2] = src[0], dest[3] = 0xffff; }
+			STBI__CASE(1, 4) {
+				dest[0] = dest[1] = dest[2] = src[0], dest[3] = 0xffff;
+			}
 			break;
-			STBI__CASE(2, 1) { dest[0] = src[0]; }
+			STBI__CASE(2, 1) {
+				dest[0] = src[0];
+			}
 			break;
-			STBI__CASE(2, 3) { dest[0] = dest[1] = dest[2] = src[0]; }
+			STBI__CASE(2, 3) {
+				dest[0] = dest[1] = dest[2] = src[0];
+			}
 			break;
-			STBI__CASE(2, 4) { dest[0] = dest[1] = dest[2] = src[0], dest[3] = src[1]; }
+			STBI__CASE(2, 4) {
+				dest[0] = dest[1] = dest[2] = src[0], dest[3] = src[1];
+			}
 			break;
-			STBI__CASE(3, 4) { dest[0] = src[0], dest[1] = src[1], dest[2] = src[2], dest[3] = 0xffff; }
+			STBI__CASE(3, 4) {
+				dest[0] = src[0], dest[1] = src[1], dest[2] = src[2], dest[3] = 0xffff;
+			}
 			break;
-			STBI__CASE(3, 1) { dest[0] = stbi__compute_y_16(src[0], src[1], src[2]); }
+			STBI__CASE(3, 1) {
+				dest[0] = stbi__compute_y_16(src[0], src[1], src[2]);
+			}
 			break;
-			STBI__CASE(3, 2) { dest[0] = stbi__compute_y_16(src[0], src[1], src[2]), dest[1] = 0xffff; }
+			STBI__CASE(3, 2) {
+				dest[0] = stbi__compute_y_16(src[0], src[1], src[2]), dest[1] = 0xffff;
+			}
 			break;
-			STBI__CASE(4, 1) { dest[0] = stbi__compute_y_16(src[0], src[1], src[2]); }
+			STBI__CASE(4, 1) {
+				dest[0] = stbi__compute_y_16(src[0], src[1], src[2]);
+			}
 			break;
-			STBI__CASE(4, 2) { dest[0] = stbi__compute_y_16(src[0], src[1], src[2]), dest[1] = src[3]; }
+			STBI__CASE(4, 2) {
+				dest[0] = stbi__compute_y_16(src[0], src[1], src[2]), dest[1] = src[3];
+			}
 			break;
-			STBI__CASE(4, 3) { dest[0] = src[0], dest[1] = src[1], dest[2] = src[2]; }
+			STBI__CASE(4, 3) {
+				dest[0] = src[0], dest[1] = src[1], dest[2] = src[2];
+			}
 			break;
 		default:
 			STBI_ASSERT(0);
@@ -3739,7 +3805,9 @@ static void stbi__setup_jpeg(stbi__jpeg *j) {
 }
 
 // clean up the temporary component buffers
-static void stbi__cleanup_jpeg(stbi__jpeg *j) { stbi__free_jpeg_components(j, j->s->img_n, 0); }
+static void stbi__cleanup_jpeg(stbi__jpeg *j) {
+	stbi__free_jpeg_components(j, j->s->img_n, 0);
+}
 
 typedef struct {
 	resample_row_func resample;
@@ -4665,9 +4733,13 @@ static int32_t stbi__create_png_image_raw(stbi__png *a, stbi_uc *raw, stbi__uint
 			case STBI__F_none:
 				memcpy(cur, raw, nk);
 				break;
-				STBI__CASE(STBI__F_sub) { cur[k] = STBI__BYTECAST(raw[k] + cur[k - filter_bytes]); }
+				STBI__CASE(STBI__F_sub) {
+					cur[k] = STBI__BYTECAST(raw[k] + cur[k - filter_bytes]);
+				}
 				break;
-				STBI__CASE(STBI__F_up) { cur[k] = STBI__BYTECAST(raw[k] + prior[k]); }
+				STBI__CASE(STBI__F_up) {
+					cur[k] = STBI__BYTECAST(raw[k] + prior[k]);
+				}
 				break;
 				STBI__CASE(STBI__F_avg) {
 					cur[k] = STBI__BYTECAST(raw[k] + ((prior[k] + cur[k - filter_bytes]) >> 1));
@@ -4697,11 +4769,17 @@ static int32_t stbi__create_png_image_raw(stbi__png *a, stbi_uc *raw, stbi__uint
 			 --i, cur[filter_bytes] = 255, raw += filter_bytes, cur += output_bytes, prior += output_bytes)  \
 			for (k = 0; k < filter_bytes; ++k)
 			switch (filter) {
-				STBI__CASE(STBI__F_none) { cur[k] = raw[k]; }
+				STBI__CASE(STBI__F_none) {
+					cur[k] = raw[k];
+				}
 				break;
-				STBI__CASE(STBI__F_sub) { cur[k] = STBI__BYTECAST(raw[k] + cur[k - output_bytes]); }
+				STBI__CASE(STBI__F_sub) {
+					cur[k] = STBI__BYTECAST(raw[k] + cur[k - output_bytes]);
+				}
 				break;
-				STBI__CASE(STBI__F_up) { cur[k] = STBI__BYTECAST(raw[k] + prior[k]); }
+				STBI__CASE(STBI__F_up) {
+					cur[k] = STBI__BYTECAST(raw[k] + prior[k]);
+				}
 				break;
 				STBI__CASE(STBI__F_avg) {
 					cur[k] = STBI__BYTECAST(raw[k] + ((prior[k] + cur[k - output_bytes]) >> 1));
@@ -7531,7 +7609,9 @@ static void stbi__pnm_skip_whitespace(stbi__context *s, char8_t *c) {
 	}
 }
 
-static int32_t stbi__pnm_isdigit(char8_t c) { return c >= '0' && c <= '9'; }
+static int32_t stbi__pnm_isdigit(char8_t c) {
+	return c >= '0' && c <= '9';
+}
 
 static int32_t stbi__pnm_getinteger(stbi__context *s, char8_t *c) {
 	int32_t value = 0;

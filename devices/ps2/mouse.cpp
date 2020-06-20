@@ -24,17 +24,17 @@ function handleMouseDown(uint8_t key);
 function handleMouseUp(uint8_t key);
 
 uint8_t getBit(uint8_t byte, uint8_t bit) {
-	return (byte & ( 1 << bit )) >> bit;
+	return (byte & (1 << bit)) >> bit;
 }
 
 function handleMouse() {
-	switch(mouseCycle) {
+	switch (mouseCycle) {
 	case 0: {
 		mouseByte[0] = mouseRead();
-		if((mouseByte[0] & 0x08) != 0) {
+		if ((mouseByte[0] & 0x08) != 0) {
 			mouseCycle++; // Only accept this as the first byte if the "must be 1" bit is set
 		}
-		//mouseCycle++;
+		// mouseCycle++;
 		break;
 	};
 	case 1: {
@@ -50,15 +50,17 @@ function handleMouse() {
 		mouseX += mouseXd;
 		mouseY -= mouseYd;
 
-		if (getBit(mouseByte[0], 0) != 0) serialPrintln(u8"[mouse] left button is down");
-		if (getBit(mouseByte[0], 1) != 0) serialPrintln(u8"[mouse] right button is down");
-		if (getBit(mouseByte[0], 2) != 0) serialPrintln(u8"[mouse] middle button is down");
+		if (getBit(mouseByte[0], 0) != 0)
+			serialPrintln(u8"[mouse] left button is down");
+		if (getBit(mouseByte[0], 1) != 0)
+			serialPrintln(u8"[mouse] right button is down");
+		if (getBit(mouseByte[0], 2) != 0)
+			serialPrintln(u8"[mouse] middle button is down");
 
 		if ((getBit(mouseByte[0], 0) != 0) || (getBit(mouseByte[0], 1) != 0))
 			handleMouseDown(0);
 		else
 			handleMouseUp(0);
-
 
 		break;
 	};
@@ -66,6 +68,6 @@ function handleMouse() {
 
 	// EOI
 	// Disabled cause polling is used
-	//writePort(0xA0, 0x20);
-	//writePort(0x20, 0x20);
+	// writePort(0xA0, 0x20);
+	// writePort(0x20, 0x20);
 }

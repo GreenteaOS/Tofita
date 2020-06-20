@@ -5,3 +5,6 @@ TabWidth:        4
 UseTab:          Always
 ColumnLimit: 110
 SortIncludes: false
+AllowShortLambdasOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Empty
