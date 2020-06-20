@@ -22,7 +22,10 @@
 Bitmap32 *wallpaper; // Size of framebuffer
 Bitmap32 *vibrance;	 // Size of framebuffer
 Bitmap32 *leaves;
-Bitmap32 *desktopIcon;
+Bitmap32 *trashCan;
+Bitmap32 *notepad16;
+Bitmap32 *notepad48;
+Bitmap32 *link;
 cursor::Cursor *cur = null;
 
 typedef enum {
@@ -123,13 +126,23 @@ function initializeCompositor() {
 	_pixels = doublebuffer->pixels;
 
 	Bitmap32 *loadPng32(const RamDiskAsset *asset);
-	RamDiskAsset a = getRamDiskAsset(u8"leaves.png");
+
+	let a = getRamDiskAsset(u8"leaves.png");
 	leaves = loadPng32(&a);
 
-	RamDiskAsset b = getRamDiskAsset(u8"trash-empty48.png");
-	desktopIcon = loadPng32(&b);
+	let b = getRamDiskAsset(u8"icons\\trash-empty48.png");
+	trashCan = loadPng32(&b);
 
-	RamDiskAsset asset = getRamDiskAsset(u8"cursors\\normal.cur");
+	let c = getRamDiskAsset(u8"icons\\notepad.ico_48x48.png");
+	notepad48 = loadPng32(&c);
+
+	let d = getRamDiskAsset(u8"icons\\notepad.ico_16x16.png");
+	notepad16 = loadPng32(&d);
+
+	let e = getRamDiskAsset(u8"icons\\link.png");
+	link = loadPng32(&e);
+
+	let asset = getRamDiskAsset(u8"cursors\\normal.cur");
 	cur = cursor::loadCursor(&asset);
 
 	serialPrintln(u8"[compositor.initializeCompositor] done");
@@ -153,7 +166,7 @@ function handleMouseUp(uint8_t key) {
 
 function composite() {
 	drawBitmap32(wallpaper, 0, 0);
-	drawBitmap32WithAlpha(desktopIcon, 12, 10);
+	drawBitmap32WithAlpha(trashCan, 12, 10);
 	Pixel32 color;
 	color.color = 0x00000000;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x88;
@@ -181,10 +194,16 @@ function composite() {
 
 	drawVibrancedRectangle(0, _framebuffer->height - 30, _framebuffer->width, 30);
 	color.rgba.a = 128;
+	color.rgba.a = 100;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
+	color.rgba.r = color.rgba.g = color.rgba.b = 0x61;
 	if (mouseX < 40 && mouseY > (_framebuffer->height - 30))
 		drawRectangleWithAlpha(color, 0, _framebuffer->height - 30, 40, 30);
 	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
+
+	// taskbar shortcuts
+	let shortcutsStart = 5 + 36 + 4;
+	drawBitmap32WithAlpha(notepad16, shortcutsStart, _framebuffer->height - 30 + 7);
 
 	// tray | line
 	color.color = 0x00000000;
