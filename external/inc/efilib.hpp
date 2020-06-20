@@ -310,8 +310,8 @@ VOID Output(IN CHAR16 *Str);
 
 VOID Input(IN CHAR16 *Prompt OPTIONAL, OUT CHAR16 *InStr, IN UINTN StrLen);
 
-VOID IInput(IN SIMPLE_TEXT_OUTPUT_INTERFACE *ConOut, IN SIMPLE_INPUT_INTERFACE *ConIn, IN CHAR16 *Prompt OPTIONAL,
-			OUT CHAR16 *InStr, IN UINTN StrLen);
+VOID IInput(IN SIMPLE_TEXT_OUTPUT_INTERFACE *ConOut, IN SIMPLE_INPUT_INTERFACE *ConIn,
+			IN CHAR16 *Prompt OPTIONAL, OUT CHAR16 *InStr, IN UINTN StrLen);
 
 UINTN
 Print(IN CONST CHAR16 *fmt, ...);
@@ -388,12 +388,12 @@ EFI_STATUS
 LibLocateProtocol(IN EFI_GUID *ProtocolGuid, OUT VOID **Interface);
 
 EFI_STATUS
-LibLocateHandle(IN EFI_LOCATE_SEARCH_TYPE SearchType, IN EFI_GUID *Protocol OPTIONAL, IN VOID *SearchKey OPTIONAL,
-				IN OUT UINTN *NoHandles, OUT EFI_HANDLE **Buffer);
+LibLocateHandle(IN EFI_LOCATE_SEARCH_TYPE SearchType, IN EFI_GUID *Protocol OPTIONAL,
+				IN VOID *SearchKey OPTIONAL, IN OUT UINTN *NoHandles, OUT EFI_HANDLE **Buffer);
 
 EFI_STATUS
-LibLocateHandleByDiskSignature(IN UINT8 MBRType, IN UINT8 SignatureType, IN VOID *Signature, IN OUT UINTN *NoHandles,
-							   OUT EFI_HANDLE **Buffer);
+LibLocateHandleByDiskSignature(IN UINT8 MBRType, IN UINT8 SignatureType, IN VOID *Signature,
+							   IN OUT UINTN *NoHandles, OUT EFI_HANDLE **Buffer);
 
 EFI_STATUS
 LibInstallProtocolInterfaces(IN OUT EFI_HANDLE *Handle, ...);
@@ -404,14 +404,15 @@ EFI_STATUS
 LibReinstallProtocolInterfaces(IN OUT EFI_HANDLE *Handle, ...);
 
 EFI_EVENT
-LibCreateProtocolNotifyEvent(IN EFI_GUID *ProtocolGuid, IN EFI_TPL NotifyTpl, IN EFI_EVENT_NOTIFY NotifyFunction,
-							 IN VOID *NotifyContext, OUT VOID *Registration);
+LibCreateProtocolNotifyEvent(IN EFI_GUID *ProtocolGuid, IN EFI_TPL NotifyTpl,
+							 IN EFI_EVENT_NOTIFY NotifyFunction, IN VOID *NotifyContext,
+							 OUT VOID *Registration);
 
 EFI_STATUS
 WaitForSingleEvent(IN EFI_EVENT Event, IN UINT64 Timeout OPTIONAL);
 
-VOID WaitForEventWithTimeout(IN EFI_EVENT Event, IN UINTN Timeout, IN UINTN Row, IN UINTN Column, IN CHAR16 *String,
-							 IN EFI_INPUT_KEY TimeoutKey, OUT EFI_INPUT_KEY *Key);
+VOID WaitForEventWithTimeout(IN EFI_EVENT Event, IN UINTN Timeout, IN UINTN Row, IN UINTN Column,
+							 IN CHAR16 *String, IN EFI_INPUT_KEY TimeoutKey, OUT EFI_INPUT_KEY *Key);
 
 EFI_FILE_HANDLE
 LibOpenRoot(IN EFI_HANDLE DeviceHandle);
@@ -492,7 +493,8 @@ OpenSimpleReadFile(IN BOOLEAN BootPolicy, IN VOID *SourceBuffer OPTIONAL, IN UIN
 				   OUT SIMPLE_READ_FILE *SimpleReadHandle);
 
 EFI_STATUS
-ReadSimpleReadFile(IN SIMPLE_READ_FILE SimpleReadHandle, IN UINTN Offset, IN OUT UINTN *ReadSize, OUT VOID *Buffer);
+ReadSimpleReadFile(IN SIMPLE_READ_FILE SimpleReadHandle, IN UINTN Offset, IN OUT UINTN *ReadSize,
+				   OUT VOID *Buffer);
 
 VOID CloseSimpleReadFile(IN SIMPLE_READ_FILE SimpleReadHandle);
 
@@ -549,11 +551,14 @@ extern EFI_DEVICE_IO_INTERFACE *GlobalIoFncs;
 #define outpd(_Port, _DataByte) (UINT32) WritePort(GlobalIoFncs, IO_UINT32, (UINTN)_Port, (UINTN)_DataByte)
 #define inpd(_Port) (UINT32) ReadPort(GlobalIoFncs, IO_UINT32, (UINTN)_Port)
 
-#define writepci8(_Addr, _DataByte) (UINT8) WritePciConfig(GlobalIoFncs, IO_UINT8, (UINTN)_Addr, (UINTN)_DataByte)
+#define writepci8(_Addr, _DataByte)                                                                          \
+	(UINT8) WritePciConfig(GlobalIoFncs, IO_UINT8, (UINTN)_Addr, (UINTN)_DataByte)
 #define readpci8(_Addr) (UINT8) ReadPciConfig(GlobalIoFncs, IO_UINT8, (UINTN)_Addr)
-#define writepci16(_Addr, _DataByte) (UINT16) WritePciConfig(GlobalIoFncs, IO_UINT16, (UINTN)_Addr, (UINTN)_DataByte)
+#define writepci16(_Addr, _DataByte)                                                                         \
+	(UINT16) WritePciConfig(GlobalIoFncs, IO_UINT16, (UINTN)_Addr, (UINTN)_DataByte)
 #define readpci16(_Addr) (UINT16) ReadPciConfig(GlobalIoFncs, IO_UINT16, (UINTN)_Addr)
-#define writepci32(_Addr, _DataByte) (UINT32) WritePciConfig(GlobalIoFncs, IO_UINT32, (UINTN)_Addr, (UINTN)_DataByte)
+#define writepci32(_Addr, _DataByte)                                                                         \
+	(UINT32) WritePciConfig(GlobalIoFncs, IO_UINT32, (UINTN)_Addr, (UINTN)_DataByte)
 #define readpci32(_Addr) (UINT32) ReadPciConfig(GlobalIoFncs, IO_UINT32, (UINTN)_Addr)
 
 #define Pause() WaitForSingleEvent(ST->ConIn->WaitForKey, 0)

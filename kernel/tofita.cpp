@@ -44,7 +44,7 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	return dest;
 }
 
-void ___chkstk_ms() {};
+void ___chkstk_ms(){};
 
 #include "util/Math.cpp"
 
@@ -84,7 +84,8 @@ void ___chkstk_ms() {};
 
 function (*keyDownHandler)(uint8_t) = null;
 function handleKeyDown(uint8_t key) {
-	if (keyDownHandler) keyDownHandler(key);
+	if (keyDownHandler)
+		keyDownHandler(key);
 }
 
 const KernelParams *paramsCache = null;
@@ -93,7 +94,7 @@ function kernelInit(const KernelParams *params) {
 	serialPrintf(u8"<Tofita> CR3 points to: %8\n", (uint64_t) params->pml4);
 	paramsCache = params;
 	PhysicalAllocator::init(params);
-	pages::pml4entries = (pages::PageEntry*)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
+	pages::pml4entries = (pages::PageEntry *)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
 
@@ -121,11 +122,12 @@ function kernelInit(const KernelParams *params) {
 	initText();
 	initializeCompositor();
 
-	quakePrintf(u8"GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag " loaded and operational\n");
+	quakePrintf(u8"GreenteaOS " versionName
+				" " STR(versionMajor) "." STR(versionMinor) " " versionTag " loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
 
-	uint32_t megs = Math::round((double)params->ramBytes/(1024.0*1024.0));
+	uint32_t megs = Math::round((double)params->ramBytes / (1024.0 * 1024.0));
 	quakePrintf(u8"[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
 	if (!ACPIParser::parse(params->acpiTablePhysical)) {
@@ -138,10 +140,9 @@ function kernelInit(const KernelParams *params) {
 
 	{
 		RamDiskAsset a = getRamDiskAsset(u8"hello.bmp");
-		Bitmap32* bmp = bmp::loadBmp24(&a);
+		Bitmap32 *bmp = bmp::loadBmp24(&a);
 		setWallpaper(bmp, Center);
 	}
-
 
 	mouseX = _framebuffer->width / 2;
 	mouseY = _framebuffer->height / 2;
@@ -176,7 +177,7 @@ function kernelMain(const KernelParams *params) {
 	amd64::enableAllInterrupts();
 	while (true) {
 		while (false) { // TODO atomic
-			// iterate over wakeUpReasons
+						// iterate over wakeUpReasons
 		}
 		amd64::halt();
 	}

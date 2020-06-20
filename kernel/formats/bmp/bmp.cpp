@@ -17,8 +17,8 @@
 
 namespace bmp {
 
-Bitmap32* loadBmp24(const RamDiskAsset* asset) {
-	uint8_t* buffer = asset->data;
+Bitmap32 *loadBmp24(const RamDiskAsset *asset) {
+	uint8_t *buffer = asset->data;
 	uint8_t info[54];
 
 	for (uint8_t i = 0; i < 54; i++) {
@@ -29,11 +29,11 @@ Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 	uint16_t width = *(uint32_t *)&info[18] & 0xFFFF;
 	uint16_t height = *(uint32_t *)&info[22] & 0xFFFF;
 
-	Bitmap32* result = allocateBitmap(width, height);
+	Bitmap32 *result = allocateBitmap(width, height);
 
 	serialPrintf(u8"[bmp] The bitmap image is %dx%d at %d\n", width, height, result);
 
-	uint8_t* colors = (uint8_t*)(buffer + 54);
+	uint8_t *colors = (uint8_t *)(buffer + 54);
 	for (uint16_t y = 0; y < height; y++)
 		for (uint16_t x = 0; x < width; x++) {
 			result->pixels[y * width + x].rgba.a = 255; // transparency
@@ -46,4 +46,4 @@ Bitmap32* loadBmp24(const RamDiskAsset* asset) {
 
 	return result;
 }
-}
+} // namespace bmp

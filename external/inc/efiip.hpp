@@ -6,24 +6,24 @@ Copyright (c) 2013  Intel Corporation
 
 --*/
 
-#define EFI_IP4_SERVICE_BINDING_PROTOCOL                                                                               \
-	{                                                                                                                  \
-		0xc51711e7, 0xb4bf, 0x404a, { 0xbf, 0xb8, 0x0a, 0x04, 0x8e, 0xf1, 0xff, 0xe4 }                                 \
+#define EFI_IP4_SERVICE_BINDING_PROTOCOL                                                                     \
+	{                                                                                                        \
+		0xc51711e7, 0xb4bf, 0x404a, { 0xbf, 0xb8, 0x0a, 0x04, 0x8e, 0xf1, 0xff, 0xe4 }                       \
 	}
 
-#define EFI_IP4_PROTOCOL                                                                                               \
-	{                                                                                                                  \
-		0x41d94cd2, 0x35b6, 0x455a, { 0x82, 0x58, 0xd4, 0xe5, 0x13, 0x34, 0xaa, 0xdd }                                 \
+#define EFI_IP4_PROTOCOL                                                                                     \
+	{                                                                                                        \
+		0x41d94cd2, 0x35b6, 0x455a, { 0x82, 0x58, 0xd4, 0xe5, 0x13, 0x34, 0xaa, 0xdd }                       \
 	}
 
-#define EFI_IP6_SERVICE_BINDING_PROTOCOL                                                                               \
-	{                                                                                                                  \
-		0xec835dd3, 0xfe0f, 0x617b, { 0xa6, 0x21, 0xb3, 0x50, 0xc3, 0xe1, 0x33, 0x88 }                                 \
+#define EFI_IP6_SERVICE_BINDING_PROTOCOL                                                                     \
+	{                                                                                                        \
+		0xec835dd3, 0xfe0f, 0x617b, { 0xa6, 0x21, 0xb3, 0x50, 0xc3, 0xe1, 0x33, 0x88 }                       \
 	}
 
-#define EFI_IP6_PROTOCOL                                                                                               \
-	{                                                                                                                  \
-		0x2c8759d5, 0x5c2d, 0x66ef, { 0x92, 0x5f, 0xb6, 0x6c, 0x10, 0x19, 0x57, 0xe2 }                                 \
+#define EFI_IP6_PROTOCOL                                                                                     \
+	{                                                                                                        \
+		0x2c8759d5, 0x5c2d, 0x66ef, { 0x92, 0x5f, 0xb6, 0x6c, 0x10, 0x19, 0x57, 0xe2 }                       \
 	}
 
 INTERFACE_DECL(_EFI_IP4);
@@ -82,17 +82,20 @@ typedef struct {
 	EFI_IP4_ICMP_TYPE *IcmpTypeList;
 } EFI_IP4_MODE_DATA;
 
-typedef EFI_STATUS(EFIAPI *EFI_IP4_GET_MODE_DATA)(IN struct _EFI_IP4 *This, OUT EFI_IP4_MODE_DATA *Ip4ModeData OPTIONAL,
+typedef EFI_STATUS(EFIAPI *EFI_IP4_GET_MODE_DATA)(IN struct _EFI_IP4 *This,
+												  OUT EFI_IP4_MODE_DATA *Ip4ModeData OPTIONAL,
 												  OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
 												  OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
 
-typedef EFI_STATUS(EFIAPI *EFI_IP4_CONFIGURE)(IN struct _EFI_IP4 *This, IN EFI_IP4_CONFIG_DATA *IpConfigData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_IP4_CONFIGURE)(IN struct _EFI_IP4 *This,
+											  IN EFI_IP4_CONFIG_DATA *IpConfigData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_IP4_GROUPS)(IN struct _EFI_IP4 *This, IN BOOLEAN JoinFlag,
 										   IN EFI_IPv4_ADDRESS *GroupAddress OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_IP4_ROUTES)(IN struct _EFI_IP4 *This, IN BOOLEAN DeleteRoute,
-										   IN EFI_IPv4_ADDRESS *SubnetAddress, IN EFI_IPv4_ADDRESS *SubnetMask,
+										   IN EFI_IPv4_ADDRESS *SubnetAddress,
+										   IN EFI_IPv4_ADDRESS *SubnetMask,
 										   IN EFI_IPv4_ADDRESS *GatewayAddress);
 
 #pragma pack(1)
@@ -160,7 +163,8 @@ typedef EFI_STATUS(EFIAPI *EFI_IP4_TRANSMIT)(IN struct _EFI_IP4 *This, IN EFI_IP
 
 typedef EFI_STATUS(EFIAPI *EFI_IP4_RECEIVE)(IN struct _EFI_IP4 *This, IN EFI_IP4_COMPLETION_TOKEN *Token);
 
-typedef EFI_STATUS(EFIAPI *EFI_IP4_CANCEL)(IN struct _EFI_IP4 *This, IN EFI_IP4_COMPLETION_TOKEN *Token OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_IP4_CANCEL)(IN struct _EFI_IP4 *This,
+										   IN EFI_IP4_COMPLETION_TOKEN *Token OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_IP4_POLL)(IN struct _EFI_IP4 *This);
 
@@ -285,11 +289,13 @@ typedef struct {
 	EFI_IP6_ICMP_TYPE *IcmpTypeList;
 } EFI_IP6_MODE_DATA;
 
-typedef EFI_STATUS(EFIAPI *EFI_IP6_GET_MODE_DATA)(IN struct _EFI_IP6 *This, OUT EFI_IP6_MODE_DATA *Ip6ModeData OPTIONAL,
+typedef EFI_STATUS(EFIAPI *EFI_IP6_GET_MODE_DATA)(IN struct _EFI_IP6 *This,
+												  OUT EFI_IP6_MODE_DATA *Ip6ModeData OPTIONAL,
 												  OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
 												  OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
 
-typedef EFI_STATUS(EFIAPI *EFI_IP6_CONFIGURE)(IN struct _EFI_IP6 *This, IN EFI_IP6_CONFIG_DATA *Ip6ConfigData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_IP6_CONFIGURE)(IN struct _EFI_IP6 *This,
+											  IN EFI_IP6_CONFIG_DATA *Ip6ConfigData OPTIONAL);
 typedef EFI_STATUS(EFIAPI *EFI_IP6_GROUPS)(IN struct _EFI_IP6 *This, IN BOOLEAN JoinFlag,
 										   IN EFI_IPv6_ADDRESS *GroupAddress OPTIONAL);
 
@@ -299,8 +305,8 @@ typedef EFI_STATUS(EFIAPI *EFI_IP6_ROUTES)(IN struct _EFI_IP6 *This, IN BOOLEAN 
 
 typedef EFI_STATUS(EFIAPI *EFI_IP6_NEIGHBORS)(IN struct _EFI_IP6 *This, IN BOOLEAN DeleteFlag,
 											  IN EFI_IPv6_ADDRESS *TargetIp6Address,
-											  IN EFI_MAC_ADDRESS *TargetLinkAddress OPTIONAL, IN UINT32 Timeout,
-											  IN BOOLEAN Override);
+											  IN EFI_MAC_ADDRESS *TargetLinkAddress OPTIONAL,
+											  IN UINT32 Timeout, IN BOOLEAN Override);
 
 typedef struct _EFI_IP6_FRAGMENT_DATA {
 	UINT32 FragmentLength;
@@ -362,7 +368,8 @@ typedef EFI_STATUS(EFIAPI *EFI_IP6_TRANSMIT)(IN struct _EFI_IP6 *This, IN EFI_IP
 
 typedef EFI_STATUS(EFIAPI *EFI_IP6_RECEIVE)(IN struct _EFI_IP6 *This, IN EFI_IP6_COMPLETION_TOKEN *Token);
 
-typedef EFI_STATUS(EFIAPI *EFI_IP6_CANCEL)(IN struct _EFI_IP6 *This, IN EFI_IP6_COMPLETION_TOKEN *Token OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_IP6_CANCEL)(IN struct _EFI_IP6 *This,
+										   IN EFI_IP6_COMPLETION_TOKEN *Token OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_IP6_POLL)(IN struct _EFI_IP6 *This);
 

@@ -195,8 +195,8 @@ typedef struct _IMAGE_ROM_HEADERS {
 	IMAGE_ROM_OPTIONAL_HEADER OptionalHeader;
 } IMAGE_ROM_HEADERS, *PIMAGE_ROM_HEADERS;
 
-#define IMAGE_FIRST_SECTION(ntheader)                                                                                  \
-	((PIMAGE_SECTION_HEADER)((UINT32)ntheader + FIELD_OFFSET(IMAGE_NT_HEADERS, OptionalHeader) +                       \
+#define IMAGE_FIRST_SECTION(ntheader)                                                                        \
+	((PIMAGE_SECTION_HEADER)((UINT32)ntheader + FIELD_OFFSET(IMAGE_NT_HEADERS, OptionalHeader) +             \
 							 ((PIMAGE_NT_HEADERS)(ntheader))->FileHeader.SizeOfOptionalHeader))
 
 // Subsystem Values
@@ -398,7 +398,8 @@ typedef struct _IMAGE_RELOCATION {
 #define IMAGE_REL_I386_REL16 02	  // PC-relative 16-bit reference to the symbols virtual address
 #define IMAGE_REL_I386_DIR32 06	  // Direct 32-bit reference to the symbols virtual address
 #define IMAGE_REL_I386_DIR32NB 07 // Direct 32-bit reference to the symbols virtual address, base not included
-#define IMAGE_REL_I386_SEG12 011  // Direct 16-bit reference to the segment-selector bits of a 32-bit virtual address
+#define IMAGE_REL_I386_SEG12                                                                                 \
+	011 // Direct 16-bit reference to the segment-selector bits of a 32-bit virtual address
 #define IMAGE_REL_I386_SECTION 012
 #define IMAGE_REL_I386_SECREL 013
 #define IMAGE_REL_I386_REL32 024 // PC-relative 32-bit reference to the symbols virtual address

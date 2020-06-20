@@ -6,24 +6,24 @@ Copyright (c) 2013  Intel Corporation
 
 --*/
 
-#define EFI_TCP4_SERVICE_BINDING_PROTOCOL                                                                              \
-	{                                                                                                                  \
-		0x00720665, 0x67eb, 0x4a99, { 0xba, 0xf7, 0xd3, 0xc3, 0x3a, 0x1c, 0x7c, 0xc9 }                                 \
+#define EFI_TCP4_SERVICE_BINDING_PROTOCOL                                                                    \
+	{                                                                                                        \
+		0x00720665, 0x67eb, 0x4a99, { 0xba, 0xf7, 0xd3, 0xc3, 0x3a, 0x1c, 0x7c, 0xc9 }                       \
 	}
 
-#define EFI_TCP4_PROTOCOL                                                                                              \
-	{                                                                                                                  \
-		0x65530bc7, 0xa359, 0x410f, { 0xb0, 0x10, 0x5a, 0xad, 0xc7, 0xec, 0x2b, 0x62 }                                 \
+#define EFI_TCP4_PROTOCOL                                                                                    \
+	{                                                                                                        \
+		0x65530bc7, 0xa359, 0x410f, { 0xb0, 0x10, 0x5a, 0xad, 0xc7, 0xec, 0x2b, 0x62 }                       \
 	}
 
-#define EFI_TCP6_SERVICE_BINDING_PROTOCOL                                                                              \
-	{                                                                                                                  \
-		0xec20eb79, 0x6c1a, 0x4664, { 0x9a, 0xd, 0xd2, 0xe4, 0xcc, 0x16, 0xd6, 0x64 }                                  \
+#define EFI_TCP6_SERVICE_BINDING_PROTOCOL                                                                    \
+	{                                                                                                        \
+		0xec20eb79, 0x6c1a, 0x4664, { 0x9a, 0xd, 0xd2, 0xe4, 0xcc, 0x16, 0xd6, 0x64 }                        \
 	}
 
-#define EFI_TCP6_PROTOCOL                                                                                              \
-	{                                                                                                                  \
-		0x46e44855, 0xbd60, 0x4ab7, { 0xab, 0xd, 0xa6, 0x79, 0xb9, 0x44, 0x7d, 0x77 }                                  \
+#define EFI_TCP6_PROTOCOL                                                                                    \
+	{                                                                                                        \
+		0x46e44855, 0xbd60, 0x4ab7, { 0xab, 0xd, 0xa6, 0x79, 0xb9, 0x44, 0x7d, 0x77 }                        \
 	}
 
 INTERFACE_DECL(_EFI_TCP4);
@@ -84,18 +84,18 @@ typedef enum {
 	Tcp4StateLastAck = 10
 } EFI_TCP4_CONNECTION_STATE;
 
-typedef EFI_STATUS(EFIAPI *EFI_TCP4_GET_MODE_DATA)(IN struct _EFI_TCP4 *This,
-												   OUT EFI_TCP4_CONNECTION_STATE *Tcp4State OPTIONAL,
-												   OUT EFI_TCP4_CONFIG_DATA *Tcp4ConfigData OPTIONAL,
-												   OUT EFI_IP4_MODE_DATA *Ip4ModeData OPTIONAL,
-												   OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
-												   OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_TCP4_GET_MODE_DATA)(
+	IN struct _EFI_TCP4 *This, OUT EFI_TCP4_CONNECTION_STATE *Tcp4State OPTIONAL,
+	OUT EFI_TCP4_CONFIG_DATA *Tcp4ConfigData OPTIONAL, OUT EFI_IP4_MODE_DATA *Ip4ModeData OPTIONAL,
+	OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
+	OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_TCP4_CONFIGURE)(IN struct _EFI_TCP4 *This,
 											   IN EFI_TCP4_CONFIG_DATA *TcpConfigData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_TCP4_ROUTES)(IN struct _EFI_TCP4 *This, IN BOOLEAN DeleteRoute,
-											IN EFI_IPv4_ADDRESS *SubnetAddress, IN EFI_IPv4_ADDRESS *SubnetMask,
+											IN EFI_IPv4_ADDRESS *SubnetAddress,
+											IN EFI_IPv4_ADDRESS *SubnetMask,
 											IN EFI_IPv4_ADDRESS *GatewayAddress);
 
 typedef struct {
@@ -107,7 +107,8 @@ typedef struct {
 	EFI_TCP4_COMPLETION_TOKEN CompletionToken;
 } EFI_TCP4_CONNECTION_TOKEN;
 
-typedef EFI_STATUS(EFIAPI *EFI_TCP4_CONNECT)(IN struct _EFI_TCP4 *This, IN EFI_TCP4_CONNECTION_TOKEN *ConnectionToken);
+typedef EFI_STATUS(EFIAPI *EFI_TCP4_CONNECT)(IN struct _EFI_TCP4 *This,
+											 IN EFI_TCP4_CONNECTION_TOKEN *ConnectionToken);
 
 typedef struct {
 	EFI_TCP4_COMPLETION_TOKEN CompletionToken;
@@ -159,7 +160,8 @@ typedef struct {
 
 typedef EFI_STATUS(EFIAPI *EFI_TCP4_CLOSE)(IN struct _EFI_TCP4 *This, IN EFI_TCP4_CLOSE_TOKEN *CloseToken);
 
-typedef EFI_STATUS(EFIAPI *EFI_TCP4_CANCEL)(IN struct _EFI_TCP4 *This, IN EFI_TCP4_COMPLETION_TOKEN *Token OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_TCP4_CANCEL)(IN struct _EFI_TCP4 *This,
+											IN EFI_TCP4_COMPLETION_TOKEN *Token OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_TCP4_POLL)(IN struct _EFI_TCP4 *This);
 
@@ -223,12 +225,11 @@ typedef struct {
 	EFI_TCP6_OPTION *ControlOption;
 } EFI_TCP6_CONFIG_DATA;
 
-typedef EFI_STATUS(EFIAPI *EFI_TCP6_GET_MODE_DATA)(IN struct _EFI_TCP6 *This,
-												   OUT EFI_TCP6_CONNECTION_STATE *Tcp6State OPTIONAL,
-												   OUT EFI_TCP6_CONFIG_DATA *Tcp6ConfigData OPTIONAL,
-												   OUT EFI_IP6_MODE_DATA *Ip6ModeData OPTIONAL,
-												   OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
-												   OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_TCP6_GET_MODE_DATA)(
+	IN struct _EFI_TCP6 *This, OUT EFI_TCP6_CONNECTION_STATE *Tcp6State OPTIONAL,
+	OUT EFI_TCP6_CONFIG_DATA *Tcp6ConfigData OPTIONAL, OUT EFI_IP6_MODE_DATA *Ip6ModeData OPTIONAL,
+	OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
+	OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_TCP6_CONFIGURE)(IN struct _EFI_TCP6 *This,
 											   IN EFI_TCP6_CONFIG_DATA *Tcp6ConfigData OPTIONAL);
@@ -242,7 +243,8 @@ typedef struct {
 	EFI_TCP6_COMPLETION_TOKEN CompletionToken;
 } EFI_TCP6_CONNECTION_TOKEN;
 
-typedef EFI_STATUS(EFIAPI *EFI_TCP6_CONNECT)(IN struct _EFI_TCP6 *This, IN EFI_TCP6_CONNECTION_TOKEN *ConnectionToken);
+typedef EFI_STATUS(EFIAPI *EFI_TCP6_CONNECT)(IN struct _EFI_TCP6 *This,
+											 IN EFI_TCP6_CONNECTION_TOKEN *ConnectionToken);
 
 typedef struct {
 	EFI_TCP6_COMPLETION_TOKEN CompletionToken;
@@ -290,7 +292,8 @@ typedef struct {
 
 typedef EFI_STATUS(EFIAPI *EFI_TCP6_CLOSE)(IN struct _EFI_TCP6 *This, IN EFI_TCP6_CLOSE_TOKEN *CloseToken);
 
-typedef EFI_STATUS(EFIAPI *EFI_TCP6_CANCEL)(IN struct _EFI_TCP6 *This, IN EFI_TCP6_COMPLETION_TOKEN *Token OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_TCP6_CANCEL)(IN struct _EFI_TCP6 *This,
+											IN EFI_TCP6_COMPLETION_TOKEN *Token OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_TCP6_POLL)(IN struct _EFI_TCP6 *This);
 

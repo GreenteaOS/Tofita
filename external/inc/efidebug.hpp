@@ -76,11 +76,11 @@ extern UINTN EFIDebug;
 
 #if EFI_DEBUG
 
-#define ASSERT(a)                                                                                                      \
-	if (!(a))                                                                                                          \
+#define ASSERT(a)                                                                                            \
+	if (!(a))                                                                                                \
 	DBGASSERT(a)
-#define ASSERT_LOCKED(l)                                                                                               \
-	if (!(l)->Lock)                                                                                                    \
+#define ASSERT_LOCKED(l)                                                                                     \
+	if (!(l)->Lock)                                                                                          \
 	DBGASSERT(l not locked)
 #define ASSERT_STRUCT(p, t) DBGASSERT(t not structure), p
 
@@ -527,9 +527,9 @@ typedef enum {
 // DEBUG_IMAGE_INFO
 //
 
-#define EFI_DEBUG_IMAGE_INFO_TABLE_GUID                                                                                \
-	{                                                                                                                  \
-		0x49152e77, 0x1ada, 0x4764, { 0xb7, 0xa2, 0x7a, 0xfe, 0xfe, 0xd9, 0x5e, 0x8b }                                 \
+#define EFI_DEBUG_IMAGE_INFO_TABLE_GUID                                                                      \
+	{                                                                                                        \
+		0x49152e77, 0x1ada, 0x4764, { 0xb7, 0xa2, 0x7a, 0xfe, 0xfe, 0xd9, 0x5e, 0x8b }                       \
 	}
 
 #define EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS 0x01
@@ -564,9 +564,9 @@ typedef struct {
 // EFI_DEBUGGER_PROTOCOL
 //
 
-#define EFI_DEBUG_SUPPORT_PROTOCOL_GUID                                                                                \
-	{                                                                                                                  \
-		0x2755590c, 0x6f3c, 0x42fa, { 0x9e, 0xa4, 0xa3, 0xba, 0x54, 0x3c, 0xda, 0x25 }                                 \
+#define EFI_DEBUG_SUPPORT_PROTOCOL_GUID                                                                      \
+	{                                                                                                        \
+		0x2755590c, 0x6f3c, 0x42fa, { 0x9e, 0xa4, 0xa3, 0xba, 0x54, 0x3c, 0xda, 0x25 }                       \
 	}
 
 INTERFACE_DECL(_EFI_DEBUG_SUPPORT_PROTOCOL);
@@ -584,7 +584,8 @@ typedef EFI_STATUS(EFIAPI *EFI_REGISTER_EXCEPTION_CALLBACK)(IN struct _EFI_DEBUG
 															IN EFI_EXCEPTION_TYPE ExceptionType);
 
 typedef EFI_STATUS(EFIAPI *EFI_INVALIDATE_INSTRUCTION_CACHE)(IN struct _EFI_DEBUG_SUPPORT_PROTOCOL *This,
-															 IN UINTN ProcessorIndex, IN VOID *Start, IN UINT64 Length);
+															 IN UINTN ProcessorIndex, IN VOID *Start,
+															 IN UINT64 Length);
 
 typedef struct _EFI_DEBUG_SUPPORT_PROTOCOL {
 	EFI_INSTRUCTION_SET_ARCHITECTURE Isa;

@@ -14,8 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class Math {
-public:
+  public:
 	static int32_t round(double value) {
-		return ((value)>=0 ? (int32_t)((value)+0.5) : (int32_t)((value)-0.5));
+		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5));
 	}
 };

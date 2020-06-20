@@ -6,24 +6,24 @@ Copyright (c) 2013  Intel Corporation
 
 --*/
 
-#define EFI_UDP4_SERVICE_BINDING_PROTOCOL                                                                              \
-	{                                                                                                                  \
-		0x83f01464, 0x99bd, 0x45e5, { 0xb3, 0x83, 0xaf, 0x63, 0x05, 0xd8, 0xe9, 0xe6 }                                 \
+#define EFI_UDP4_SERVICE_BINDING_PROTOCOL                                                                    \
+	{                                                                                                        \
+		0x83f01464, 0x99bd, 0x45e5, { 0xb3, 0x83, 0xaf, 0x63, 0x05, 0xd8, 0xe9, 0xe6 }                       \
 	}
 
-#define EFI_UDP4_PROTOCOL                                                                                              \
-	{                                                                                                                  \
-		0x3ad9df29, 0x4501, 0x478d, { 0xb1, 0xf8, 0x7f, 0x7f, 0xe7, 0x0e, 0x50, 0xf3 }                                 \
+#define EFI_UDP4_PROTOCOL                                                                                    \
+	{                                                                                                        \
+		0x3ad9df29, 0x4501, 0x478d, { 0xb1, 0xf8, 0x7f, 0x7f, 0xe7, 0x0e, 0x50, 0xf3 }                       \
 	}
 
-#define EFI_UDP6_SERVICE_BINDING_PROTOCOL                                                                              \
-	{                                                                                                                  \
-		0x66ed4721, 0x3c98, 0x4d3e, { 0x81, 0xe3, 0xd0, 0x3d, 0xd3, 0x9a, 0x72, 0x54 }                                 \
+#define EFI_UDP6_SERVICE_BINDING_PROTOCOL                                                                    \
+	{                                                                                                        \
+		0x66ed4721, 0x3c98, 0x4d3e, { 0x81, 0xe3, 0xd0, 0x3d, 0xd3, 0x9a, 0x72, 0x54 }                       \
 	}
 
-#define EFI_UDP6_PROTOCOL                                                                                              \
-	{                                                                                                                  \
-		0x4f948815, 0xb4b9, 0x43cb, { 0x8a, 0x33, 0x90, 0xe0, 0x60, 0xb3, 0x49, 0x55 }                                 \
+#define EFI_UDP6_PROTOCOL                                                                                    \
+	{                                                                                                        \
+		0x4f948815, 0xb4b9, 0x43cb, { 0x8a, 0x33, 0x90, 0xe0, 0x60, 0xb3, 0x49, 0x55 }                       \
 	}
 
 INTERFACE_DECL(_EFI_UDP4);
@@ -47,11 +47,10 @@ typedef struct {
 	UINT16 RemotePort;
 } EFI_UDP4_CONFIG_DATA;
 
-typedef EFI_STATUS(EFIAPI *EFI_UDP4_GET_MODE_DATA)(IN struct _EFI_UDP4 *This,
-												   OUT EFI_UDP4_CONFIG_DATA *Udp4ConfigData OPTIONAL,
-												   OUT EFI_IP4_MODE_DATA *Ip4ModeData OPTIONAL,
-												   OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
-												   OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_UDP4_GET_MODE_DATA)(
+	IN struct _EFI_UDP4 *This, OUT EFI_UDP4_CONFIG_DATA *Udp4ConfigData OPTIONAL,
+	OUT EFI_IP4_MODE_DATA *Ip4ModeData OPTIONAL, OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
+	OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_UDP4_CONFIGURE)(IN struct _EFI_UDP4 *This,
 											   IN EFI_UDP4_CONFIG_DATA *UdpConfigData OPTIONAL);
@@ -60,7 +59,8 @@ typedef EFI_STATUS(EFIAPI *EFI_UDP4_GROUPS)(IN struct _EFI_UDP4 *This, IN BOOLEA
 											IN EFI_IPv4_ADDRESS *MulticastAddress OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_UDP4_ROUTES)(IN struct _EFI_UDP4 *This, IN BOOLEAN DeleteRoute,
-											IN EFI_IPv4_ADDRESS *SubnetAddress, IN EFI_IPv4_ADDRESS *SubnetMask,
+											IN EFI_IPv4_ADDRESS *SubnetAddress,
+											IN EFI_IPv4_ADDRESS *SubnetMask,
 											IN EFI_IPv4_ADDRESS *GatewayAddress);
 
 #define EFI_NETWORK_UNREACHABLE EFIERR(100)
@@ -110,7 +110,8 @@ typedef EFI_STATUS(EFIAPI *EFI_UDP4_TRANSMIT)(IN struct _EFI_UDP4 *This, IN EFI_
 
 typedef EFI_STATUS(EFIAPI *EFI_UDP4_RECEIVE)(IN struct _EFI_UDP4 *This, IN EFI_UDP4_COMPLETION_TOKEN *Token);
 
-typedef EFI_STATUS(EFIAPI *EFI_UDP4_CANCEL)(IN struct _EFI_UDP4 *This, IN EFI_UDP4_COMPLETION_TOKEN *Token OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_UDP4_CANCEL)(IN struct _EFI_UDP4 *This,
+											IN EFI_UDP4_COMPLETION_TOKEN *Token OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_UDP4_POLL)(IN struct _EFI_UDP4 *This);
 
@@ -139,11 +140,10 @@ typedef struct {
 	UINT16 RemotePort;
 } EFI_UDP6_CONFIG_DATA;
 
-typedef EFI_STATUS(EFIAPI *EFI_UDP6_GET_MODE_DATA)(IN struct _EFI_UDP6 *This,
-												   OUT EFI_UDP6_CONFIG_DATA *Udp6ConfigData OPTIONAL,
-												   OUT EFI_IP6_MODE_DATA *Ip6ModeData OPTIONAL,
-												   OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
-												   OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_UDP6_GET_MODE_DATA)(
+	IN struct _EFI_UDP6 *This, OUT EFI_UDP6_CONFIG_DATA *Udp6ConfigData OPTIONAL,
+	OUT EFI_IP6_MODE_DATA *Ip6ModeData OPTIONAL, OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData OPTIONAL,
+	OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_UDP6_CONFIGURE)(IN struct _EFI_UDP6 *This,
 											   IN EFI_UDP6_CONFIG_DATA *UdpConfigData OPTIONAL);
@@ -192,7 +192,8 @@ typedef EFI_STATUS(EFIAPI *EFI_UDP6_TRANSMIT)(IN struct _EFI_UDP6 *This, IN EFI_
 
 typedef EFI_STATUS(EFIAPI *EFI_UDP6_RECEIVE)(IN struct _EFI_UDP6 *This, IN EFI_UDP6_COMPLETION_TOKEN *Token);
 
-typedef EFI_STATUS(EFIAPI *EFI_UDP6_CANCEL)(IN struct _EFI_UDP6 *This, IN EFI_UDP6_COMPLETION_TOKEN *Token OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_UDP6_CANCEL)(IN struct _EFI_UDP6 *This,
+											IN EFI_UDP6_COMPLETION_TOKEN *Token OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_UDP6_POLL)(IN struct _EFI_UDP6 *This);
 

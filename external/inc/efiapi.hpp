@@ -42,9 +42,9 @@ typedef EFI_STATUS(EFIAPI *EFI_ALLOCATE_PAGES)(IN EFI_ALLOCATE_TYPE Type, IN EFI
 
 typedef EFI_STATUS(EFIAPI *EFI_FREE_PAGES)(IN EFI_PHYSICAL_ADDRESS Memory, IN UINTN NoPages);
 
-typedef EFI_STATUS(EFIAPI *EFI_GET_MEMORY_MAP)(IN OUT UINTN *MemoryMapSize, IN OUT EFI_MEMORY_DESCRIPTOR *MemoryMap,
-											   OUT UINTN *MapKey, OUT UINTN *DescriptorSize,
-											   OUT UINT32 *DescriptorVersion);
+typedef EFI_STATUS(EFIAPI *EFI_GET_MEMORY_MAP)(IN OUT UINTN *MemoryMapSize,
+											   IN OUT EFI_MEMORY_DESCRIPTOR *MemoryMap, OUT UINTN *MapKey,
+											   OUT UINTN *DescriptorSize, OUT UINT32 *DescriptorVersion);
 
 #define NextMemoryDescriptor(Ptr, Size) ((EFI_MEMORY_DESCRIPTOR *)(((UINT8 *)Ptr) + Size))
 
@@ -91,8 +91,9 @@ typedef EFI_STATUS(EFIAPI *EFI_CONVERT_POINTER)(IN UINTN DebugDisposition, IN OU
 
 typedef VOID(EFIAPI *EFI_EVENT_NOTIFY)(IN EFI_EVENT Event, IN VOID *Context);
 
-typedef EFI_STATUS(EFIAPI *EFI_CREATE_EVENT)(IN UINT32 Type, IN EFI_TPL NotifyTpl, IN EFI_EVENT_NOTIFY NotifyFunction,
-											 IN VOID *NotifyContext, OUT EFI_EVENT *Event);
+typedef EFI_STATUS(EFIAPI *EFI_CREATE_EVENT)(IN UINT32 Type, IN EFI_TPL NotifyTpl,
+											 IN EFI_EVENT_NOTIFY NotifyFunction, IN VOID *NotifyContext,
+											 OUT EFI_EVENT *Event);
 
 typedef enum { TimerCancel, TimerPeriodic, TimerRelative, TimerTypeMax } EFI_TIMER_DELAY;
 
@@ -100,7 +101,8 @@ typedef EFI_STATUS(EFIAPI *EFI_SET_TIMER)(IN EFI_EVENT Event, IN EFI_TIMER_DELAY
 
 typedef EFI_STATUS(EFIAPI *EFI_SIGNAL_EVENT)(IN EFI_EVENT Event);
 
-typedef EFI_STATUS(EFIAPI *EFI_WAIT_FOR_EVENT)(IN UINTN NumberOfEvents, IN EFI_EVENT *Event, OUT UINTN *Index);
+typedef EFI_STATUS(EFIAPI *EFI_WAIT_FOR_EVENT)(IN UINTN NumberOfEvents, IN EFI_EVENT *Event,
+											   OUT UINTN *Index);
 
 typedef EFI_STATUS(EFIAPI *EFI_CLOSE_EVENT)(IN EFI_EVENT Event);
 
@@ -126,9 +128,9 @@ typedef VOID(EFIAPI *EFI_RESTORE_TPL)(IN EFI_TPL OldTpl);
 // EFI platform varibles
 //
 
-#define EFI_GLOBAL_VARIABLE                                                                                            \
-	{                                                                                                                  \
-		0x8BE4DF61, 0x93CA, 0x11d2, { 0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C }                                 \
+#define EFI_GLOBAL_VARIABLE                                                                                  \
+	{                                                                                                        \
+		0x8BE4DF61, 0x93CA, 0x11d2, { 0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C }                       \
 	}
 
 // Variable attributes
@@ -144,13 +146,15 @@ typedef VOID(EFIAPI *EFI_RESTORE_TPL)(IN EFI_TPL OldTpl);
 #define EFI_MAXIMUM_VARIABLE_SIZE 1024
 
 typedef EFI_STATUS(EFIAPI *EFI_GET_VARIABLE)(IN CHAR16 *VariableName, IN EFI_GUID *VendorGuid,
-											 OUT UINT32 *Attributes OPTIONAL, IN OUT UINTN *DataSize, OUT VOID *Data);
+											 OUT UINT32 *Attributes OPTIONAL, IN OUT UINTN *DataSize,
+											 OUT VOID *Data);
 
-typedef EFI_STATUS(EFIAPI *EFI_GET_NEXT_VARIABLE_NAME)(IN OUT UINTN *VariableNameSize, IN OUT CHAR16 *VariableName,
+typedef EFI_STATUS(EFIAPI *EFI_GET_NEXT_VARIABLE_NAME)(IN OUT UINTN *VariableNameSize,
+													   IN OUT CHAR16 *VariableName,
 													   IN OUT EFI_GUID *VendorGuid);
 
-typedef EFI_STATUS(EFIAPI *EFI_SET_VARIABLE)(IN CHAR16 *VariableName, IN EFI_GUID *VendorGuid, IN UINT32 Attributes,
-											 IN UINTN DataSize, IN VOID *Data);
+typedef EFI_STATUS(EFIAPI *EFI_SET_VARIABLE)(IN CHAR16 *VariableName, IN EFI_GUID *VendorGuid,
+											 IN UINT32 Attributes, IN UINTN DataSize, IN VOID *Data);
 
 //
 // EFI Time
@@ -162,11 +166,13 @@ typedef struct {
 	BOOLEAN SetsToZero; // Set clears sub-second time
 } EFI_TIME_CAPABILITIES;
 
-typedef EFI_STATUS(EFIAPI *EFI_GET_TIME)(OUT EFI_TIME *Time, OUT EFI_TIME_CAPABILITIES *Capabilities OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_GET_TIME)(OUT EFI_TIME *Time,
+										 OUT EFI_TIME_CAPABILITIES *Capabilities OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_SET_TIME)(IN EFI_TIME *Time);
 
-typedef EFI_STATUS(EFIAPI *EFI_GET_WAKEUP_TIME)(OUT BOOLEAN *Enabled, OUT BOOLEAN *Pending, OUT EFI_TIME *Time);
+typedef EFI_STATUS(EFIAPI *EFI_GET_WAKEUP_TIME)(OUT BOOLEAN *Enabled, OUT BOOLEAN *Pending,
+												OUT EFI_TIME *Time);
 
 typedef EFI_STATUS(EFIAPI *EFI_SET_WAKEUP_TIME)(IN BOOLEAN Enable, IN EFI_TIME *Time OPTIONAL);
 
@@ -210,7 +216,8 @@ typedef EFI_STATUS(EFIAPI *EFI_SET_WAKEUP_TIME)(IN BOOLEAN Enable, IN EFI_TIME *
 
 // Image Entry prototype
 
-typedef EFI_STATUS(EFIAPI *EFI_IMAGE_ENTRY_POINT)(IN EFI_HANDLE ImageHandle, IN struct _EFI_SYSTEM_TABLE *SystemTable);
+typedef EFI_STATUS(EFIAPI *EFI_IMAGE_ENTRY_POINT)(IN EFI_HANDLE ImageHandle,
+												  IN struct _EFI_SYSTEM_TABLE *SystemTable);
 
 typedef EFI_STATUS(EFIAPI *EFI_IMAGE_LOAD)(IN BOOLEAN BootPolicy, IN EFI_HANDLE ParentImageHandle,
 										   IN EFI_DEVICE_PATH *FilePath, IN VOID *SourceBuffer OPTIONAL,
@@ -219,8 +226,8 @@ typedef EFI_STATUS(EFIAPI *EFI_IMAGE_LOAD)(IN BOOLEAN BootPolicy, IN EFI_HANDLE 
 typedef EFI_STATUS(EFIAPI *EFI_IMAGE_START)(IN EFI_HANDLE ImageHandle, OUT UINTN *ExitDataSize,
 											OUT CHAR16 **ExitData OPTIONAL);
 
-typedef EFI_STATUS(EFIAPI *EFI_EXIT)(IN EFI_HANDLE ImageHandle, IN EFI_STATUS ExitStatus, IN UINTN ExitDataSize,
-									 IN CHAR16 *ExitData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_EXIT)(IN EFI_HANDLE ImageHandle, IN EFI_STATUS ExitStatus,
+									 IN UINTN ExitDataSize, IN CHAR16 *ExitData OPTIONAL);
 
 // Image handle
 /*#define LOADED_IMAGE_PROTOCOL      \
@@ -260,8 +267,8 @@ typedef EFI_STATUS(EFIAPI *EFI_EXIT_BOOT_SERVICES)(IN EFI_HANDLE ImageHandle, IN
 
 typedef EFI_STATUS(EFIAPI *EFI_STALL)(IN UINTN Microseconds);
 
-typedef EFI_STATUS(EFIAPI *EFI_SET_WATCHDOG_TIMER)(IN UINTN Timeout, IN UINT64 WatchdogCode, IN UINTN DataSize,
-												   IN CHAR16 *WatchdogData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_SET_WATCHDOG_TIMER)(IN UINTN Timeout, IN UINT64 WatchdogCode,
+												   IN UINTN DataSize, IN CHAR16 *WatchdogData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_CONNECT_CONTROLLER)(IN EFI_HANDLE ControllerHandle,
 												   IN EFI_HANDLE *DriverImageHandle OPTIONAL,
@@ -283,8 +290,8 @@ typedef EFI_STATUS(EFIAPI *EFI_OPEN_PROTOCOL)(IN EFI_HANDLE Handle, IN EFI_GUID 
 											  OUT VOID **Interface OPTIONAL, IN EFI_HANDLE AgentHandle,
 											  IN EFI_HANDLE ControllerHandle, IN UINT32 Attributes);
 
-typedef EFI_STATUS(EFIAPI *EFI_CLOSE_PROTOCOL)(IN EFI_HANDLE Handle, IN EFI_GUID *Protocol, IN EFI_HANDLE AgentHandle,
-											   IN EFI_HANDLE ControllerHandle);
+typedef EFI_STATUS(EFIAPI *EFI_CLOSE_PROTOCOL)(IN EFI_HANDLE Handle, IN EFI_GUID *Protocol,
+											   IN EFI_HANDLE AgentHandle, IN EFI_HANDLE ControllerHandle);
 
 typedef struct {
 	EFI_HANDLE AgentHandle;
@@ -293,9 +300,9 @@ typedef struct {
 	UINT32 OpenCount;
 } EFI_OPEN_PROTOCOL_INFORMATION_ENTRY;
 
-typedef EFI_STATUS(EFIAPI *EFI_OPEN_PROTOCOL_INFORMATION)(IN EFI_HANDLE Handle, IN EFI_GUID *Protocol,
-														  OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer,
-														  OUT UINTN *EntryCount);
+typedef EFI_STATUS(EFIAPI *EFI_OPEN_PROTOCOL_INFORMATION)(
+	IN EFI_HANDLE Handle, IN EFI_GUID *Protocol, OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer,
+	OUT UINTN *EntryCount);
 
 typedef EFI_STATUS(EFIAPI *EFI_PROTOCOLS_PER_HANDLE)(IN EFI_HANDLE Handle, OUT EFI_GUID ***ProtocolBuffer,
 													 OUT UINTN *ProtocolBufferCount);
@@ -303,8 +310,9 @@ typedef EFI_STATUS(EFIAPI *EFI_PROTOCOLS_PER_HANDLE)(IN EFI_HANDLE Handle, OUT E
 typedef enum { AllHandles, ByRegisterNotify, ByProtocol } EFI_LOCATE_SEARCH_TYPE;
 
 typedef EFI_STATUS(EFIAPI *EFI_LOCATE_HANDLE_BUFFER)(IN EFI_LOCATE_SEARCH_TYPE SearchType,
-													 IN EFI_GUID *Protocol OPTIONAL, IN VOID *SearchKey OPTIONAL,
-													 IN OUT UINTN *NoHandles, OUT EFI_HANDLE **Buffer);
+													 IN EFI_GUID *Protocol OPTIONAL,
+													 IN VOID *SearchKey OPTIONAL, IN OUT UINTN *NoHandles,
+													 OUT EFI_HANDLE **Buffer);
 
 typedef EFI_STATUS(EFIAPI *EFI_LOCATE_PROTOCOL)(IN EFI_GUID *Protocol, IN VOID *Registration OPTIONAL,
 												OUT VOID **Interface);
@@ -326,8 +334,8 @@ typedef EFI_STATUS(EFIAPI *EFI_CREATE_EVENT_EX)(IN UINT32 Type, IN EFI_TPL Notif
 
 typedef enum { EfiResetCold, EfiResetWarm, EfiResetShutdown } EFI_RESET_TYPE;
 
-typedef EFI_STATUS(EFIAPI *EFI_RESET_SYSTEM)(IN EFI_RESET_TYPE ResetType, IN EFI_STATUS ResetStatus, IN UINTN DataSize,
-											 IN CHAR16 *ResetData OPTIONAL);
+typedef EFI_STATUS(EFIAPI *EFI_RESET_SYSTEM)(IN EFI_RESET_TYPE ResetType, IN EFI_STATUS ResetStatus,
+											 IN UINTN DataSize, IN CHAR16 *ResetData OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_GET_NEXT_MONOTONIC_COUNT)(OUT UINT64 *Count);
 
@@ -352,14 +360,17 @@ typedef struct {
 #define CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE 0x00020000
 #define CAPSULE_FLAGS_INITIATE_RESET 0x00040000
 
-typedef EFI_STATUS(EFIAPI *EFI_UPDATE_CAPSULE)(IN EFI_CAPSULE_HEADER **CapsuleHeaderArray, IN UINTN CapsuleCount,
+typedef EFI_STATUS(EFIAPI *EFI_UPDATE_CAPSULE)(IN EFI_CAPSULE_HEADER **CapsuleHeaderArray,
+											   IN UINTN CapsuleCount,
 											   IN EFI_PHYSICAL_ADDRESS ScatterGatherList OPTIONAL);
 
 typedef EFI_STATUS(EFIAPI *EFI_QUERY_CAPSULE_CAPABILITIES)(IN EFI_CAPSULE_HEADER **CapsuleHeaderArray,
-														   IN UINTN CapsuleCount, OUT UINT64 *MaximumCapsuleSize,
+														   IN UINTN CapsuleCount,
+														   OUT UINT64 *MaximumCapsuleSize,
 														   OUT EFI_RESET_TYPE *ResetType);
 
-typedef EFI_STATUS(EFIAPI *EFI_QUERY_VARIABLE_INFO)(IN UINT32 Attributes, OUT UINT64 *MaximumVariableStorageSize,
+typedef EFI_STATUS(EFIAPI *EFI_QUERY_VARIABLE_INFO)(IN UINT32 Attributes,
+													OUT UINT64 *MaximumVariableStorageSize,
 													OUT UINT64 *RemainingVariableStorageSize,
 													OUT UINT64 *MaximumVariableSize);
 
@@ -370,7 +381,8 @@ typedef EFI_STATUS(EFIAPI *EFI_QUERY_VARIABLE_INFO)(IN UINT32 Attributes, OUT UI
 typedef enum { EFI_NATIVE_INTERFACE, EFI_PCODE_INTERFACE } EFI_INTERFACE_TYPE;
 
 typedef EFI_STATUS(EFIAPI *EFI_INSTALL_PROTOCOL_INTERFACE)(IN OUT EFI_HANDLE *Handle, IN EFI_GUID *Protocol,
-														   IN EFI_INTERFACE_TYPE InterfaceType, IN VOID *Interface);
+														   IN EFI_INTERFACE_TYPE InterfaceType,
+														   IN VOID *Interface);
 
 typedef EFI_STATUS(EFIAPI *EFI_REINSTALL_PROTOCOL_INTERFACE)(IN EFI_HANDLE Handle, IN EFI_GUID *Protocol,
 															 IN VOID *OldInterface, IN VOID *NewInterface);
@@ -378,14 +390,15 @@ typedef EFI_STATUS(EFIAPI *EFI_REINSTALL_PROTOCOL_INTERFACE)(IN EFI_HANDLE Handl
 typedef EFI_STATUS(EFIAPI *EFI_UNINSTALL_PROTOCOL_INTERFACE)(IN EFI_HANDLE Handle, IN EFI_GUID *Protocol,
 															 IN VOID *Interface);
 
-typedef EFI_STATUS(EFIAPI *EFI_HANDLE_PROTOCOL)(IN EFI_HANDLE Handle, IN EFI_GUID *Protocol, OUT VOID **Interface);
+typedef EFI_STATUS(EFIAPI *EFI_HANDLE_PROTOCOL)(IN EFI_HANDLE Handle, IN EFI_GUID *Protocol,
+												OUT VOID **Interface);
 
 typedef EFI_STATUS(EFIAPI *EFI_REGISTER_PROTOCOL_NOTIFY)(IN EFI_GUID *Protocol, IN EFI_EVENT Event,
 														 OUT VOID **Registration);
 
-typedef EFI_STATUS(EFIAPI *EFI_LOCATE_HANDLE)(IN EFI_LOCATE_SEARCH_TYPE SearchType, IN EFI_GUID *Protocol OPTIONAL,
-											  IN VOID *SearchKey OPTIONAL, IN OUT UINTN *BufferSize,
-											  OUT EFI_HANDLE *Buffer);
+typedef EFI_STATUS(EFIAPI *EFI_LOCATE_HANDLE)(IN EFI_LOCATE_SEARCH_TYPE SearchType,
+											  IN EFI_GUID *Protocol OPTIONAL, IN VOID *SearchKey OPTIONAL,
+											  IN OUT UINTN *BufferSize, OUT EFI_HANDLE *Buffer);
 
 typedef EFI_STATUS(EFIAPI *EFI_LOCATE_DEVICE_PATH)(IN EFI_GUID *Protocol, IN OUT EFI_DEVICE_PATH **DevicePath,
 												   OUT EFI_HANDLE *Device);
@@ -411,7 +424,8 @@ typedef struct _EFI_TABLE_HEADER {
 //
 
 #define EFI_RUNTIME_SERVICES_SIGNATURE 0x56524553544e5552
-#define EFI_RUNTIME_SERVICES_REVISION (EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION)
+#define EFI_RUNTIME_SERVICES_REVISION                                                                        \
+	(EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION)
 
 typedef struct {
 	EFI_TABLE_HEADER Hdr;
@@ -457,7 +471,8 @@ typedef struct {
 //
 
 #define EFI_BOOT_SERVICES_SIGNATURE 0x56524553544f4f42
-#define EFI_BOOT_SERVICES_REVISION (EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION)
+#define EFI_BOOT_SERVICES_REVISION                                                                           \
+	(EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION)
 
 typedef struct _EFI_BOOT_SERVICES {
 
@@ -563,34 +578,34 @@ typedef struct _EFI_BOOT_SERVICES {
 // EFI Configuration Table and GUID definitions
 //
 
-#define MPS_TABLE_GUID                                                                                                 \
-	{                                                                                                                  \
-		0xeb9d2d2f, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                                  \
+#define MPS_TABLE_GUID                                                                                       \
+	{                                                                                                        \
+		0xeb9d2d2f, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                        \
 	}
 
-#define ACPI_TABLE_GUID                                                                                                \
-	{                                                                                                                  \
-		0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                                  \
+#define ACPI_TABLE_GUID                                                                                      \
+	{                                                                                                        \
+		0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                        \
 	}
 
-#define ACPI_20_TABLE_GUID                                                                                             \
-	{                                                                                                                  \
-		0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 }                                  \
+#define ACPI_20_TABLE_GUID                                                                                   \
+	{                                                                                                        \
+		0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 }                        \
 	}
 
-#define SMBIOS_TABLE_GUID                                                                                              \
-	{                                                                                                                  \
-		0xeb9d2d31, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                                  \
+#define SMBIOS_TABLE_GUID                                                                                    \
+	{                                                                                                        \
+		0xeb9d2d31, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                        \
 	}
 
-#define SMBIOS3_TABLE_GUID                                                                                             \
-	{                                                                                                                  \
-		0xf2fd1544, 0x9794, 0x4a2c, { 0x99, 0x2e, 0xe5, 0xbb, 0xcf, 0x20, 0xe3, 0x94 }                                 \
+#define SMBIOS3_TABLE_GUID                                                                                   \
+	{                                                                                                        \
+		0xf2fd1544, 0x9794, 0x4a2c, { 0x99, 0x2e, 0xe5, 0xbb, 0xcf, 0x20, 0xe3, 0x94 }                       \
 	}
 
-#define SAL_SYSTEM_TABLE_GUID                                                                                          \
-	{                                                                                                                  \
-		0xeb9d2d32, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                                  \
+#define SAL_SYSTEM_TABLE_GUID                                                                                \
+	{                                                                                                        \
+		0xeb9d2d32, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                        \
 	}
 
 typedef struct _EFI_CONFIGURATION_TABLE {
@@ -603,7 +618,8 @@ typedef struct _EFI_CONFIGURATION_TABLE {
 //
 
 #define EFI_SYSTEM_TABLE_SIGNATURE 0x5453595320494249
-#define EFI_SYSTEM_TABLE_REVISION (EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION)
+#define EFI_SYSTEM_TABLE_REVISION                                                                            \
+	(EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION)
 
 typedef struct _EFI_SYSTEM_TABLE {
 	EFI_TABLE_HEADER Hdr;
