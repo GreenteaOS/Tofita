@@ -105,7 +105,7 @@ Bitmap32 *loadIcon(const RamDiskAsset *asset, uint8_t widthToExtract) {
 	if (buffer[offset] == 0x89 && buffer[offset + 1] == 0x50 && buffer[offset + 2] == 0x4E &&
 		buffer[offset + 3] == 0x47) {
 		serialPrintf(u8"[ico] Decoding as PNG\n");
-		return loadPng32FromBuffer((uint8_t *)&buffer[offset], width * height * 4);
+		return loadPng32FromBuffer((uint8_t *)&buffer[offset], imageSize);
 	}
 
 	uint32_t fsize = width * height * 4;

@@ -28,7 +28,7 @@ uint32_t toInt32(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
 }
 
 // TODO png
-struct Cursor *loadCursor(const RamDiskAsset *asset) {
+Cursor *loadCursor(const RamDiskAsset *asset) {
 	uint8_t *buffer = asset->data;
 
 	// Reserved. Must always be 0.
@@ -108,7 +108,7 @@ struct Cursor *loadCursor(const RamDiskAsset *asset) {
 	return cur;
 }
 
-function drawCursor(const struct Cursor *cur, uint16_t x, uint16_t y) {
+function drawCursor(const Cursor *cur, uint16_t x, uint16_t y) {
 	Pixel32 pixel;
 	for (uint8_t yi = 0; yi < cur->height; yi++)
 		for (uint8_t xi = 0; xi < cur->width; xi++) {
