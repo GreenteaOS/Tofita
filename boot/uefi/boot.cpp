@@ -266,7 +266,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] mapping pages for kernel loader");
 
-	paging::mapMemory(upper, largeBuffer, (paging::conventionalOffset - largeBuffer) / PAGE_SIZE + 1);
+	paging::mapMemory(upper, largeBuffer, (paging::conventionalOffset - largeBuffer) / PAGE_SIZE + 1, 1);
 
 	// Note: framebuffer is *not* within physical memory
 	paging::mapFramebuffer(&params->framebuffer);
@@ -276,7 +276,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	let startFunction = (InitKernelTrampoline)(paging::conventionalOffset + PAGE_SIZE);
 	tmemcpy((void *)startFunction, trampoline.data, trampoline.size);
-	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1);
+	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1, 0);
 
 	// Fix virtual addresses
 
