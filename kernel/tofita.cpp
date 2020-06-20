@@ -65,14 +65,6 @@ void ___chkstk_ms(){};
 #include "../devices/cpu/fallback.cpp"
 #include "../devices/acpi/acpi.cpp"
 #include "ramdisk.cpp"
-#include "formats/exe/exe.cpp"
-#include "formats/cur/cur.cpp"
-#include "formats/bmp/bmp.cpp"
-#include "gui/blur.cpp"
-#include "gui/quake.cpp"
-#include "gui/text.cpp"
-#include "gui/compositor.cpp"
-
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO
@@ -81,6 +73,14 @@ void ___chkstk_ms(){};
 #include "formats/stb_image/libc.cpp"
 #include "formats/stb_image/stb_image.hpp"
 #include "formats/stb_image/unlibc.cpp"
+#include "formats/exe/exe.cpp"
+#include "formats/cur/cur.cpp"
+#include "formats/ico/ico.cpp"
+#include "formats/bmp/bmp.cpp"
+#include "gui/blur.cpp"
+#include "gui/quake.cpp"
+#include "gui/text.cpp"
+#include "gui/compositor.cpp"
 
 function (*keyDownHandler)(uint8_t) = null;
 function handleKeyDown(uint8_t key) {
