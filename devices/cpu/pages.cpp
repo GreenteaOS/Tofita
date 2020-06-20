@@ -128,13 +128,10 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 }
 
 // TODO handle huge pages returned from bootloader
-#define createMapping(fromTable, toTable)                                            \
-	static void map_ ## fromTable (                                                  \
-			PageEntry fromTable[],                                                   \
-			uint64_t virtualAddr,                                                    \
-			uint64_t physicalAddr) {                                                 \
-		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
-		map_ ## toTable ((PageEntry *)toTable, virtualAddr, physicalAddr);           \
+#define createMapping(fromTable, toTable)                                                                    \
+	static void map_##fromTable(PageEntry fromTable[], uint64_t virtualAddr, uint64_t physicalAddr) {        \
+		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                         \
+		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr);                                      \
 	}
 
 createMapping(pd, pt)
@@ -148,21 +145,26 @@ uint64_t resolveAddr(const PageEntry* pml4entries, uint64_t virtualAddr) {
 	auto linear = getLinearAddress(virtualAddr);
 	// pml4
 	const PageEntry *entry = &pml4entries[linear.pml4];
-	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
-	entry = (const PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	if (entry->present == 0)
+		return PHYSICAL_NOT_FOUND;
+	entry = (const PageEntry *)((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pdpt
 	entry = &entry[linear.pdpt];
-	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
+	if (entry->present == 0)
+		return PHYSICAL_NOT_FOUND;
 	// TODO handle mega pages
-	entry = (const PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	entry = (const PageEntry *)((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pd
 	entry = &entry[linear.pd];
-	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
-	if (entry->largePage == 1) return (entry->address << ADDRESS_BITS) + linear.pt * 4096 + linear.offset;
-	entry = (const PageEntry *) ((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	if (entry->present == 0)
+		return PHYSICAL_NOT_FOUND;
+	if (entry->largePage == 1)
+		return (entry->address << ADDRESS_BITS) + linear.pt * 4096 + linear.offset;
+	entry = (const PageEntry *)((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	// pt
 	entry = &entry[linear.pt];
-	if (entry->present == 0) return PHYSICAL_NOT_FOUND;
+	if (entry->present == 0)
+		return PHYSICAL_NOT_FOUND;
 	return (entry->address << ADDRESS_BITS) + linear.offset;
 }
 
