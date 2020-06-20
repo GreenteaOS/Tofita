@@ -26,7 +26,7 @@ declare class Config {
 function packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
-			JSON.parse(fs.readFileSync('assets/fonts/default.json').toString().trim())
+			JSON.parse(fs.readFileSync('assets/root/Windows/Fonts/default.json').toString().trim())
 
 		let charSize = 2 + 2 + 8
 		let size = 256 * charSize // Just ASCII for now
@@ -48,12 +48,8 @@ function packAssets(config: Config) {
 
 		let fs = require('fs')
 
-		let assetName: [String] = JSON.parse(fs.readFileSync('assets/assets.json').toString()).sort()
+		let assetName: [String] = []
 		let assetPath: [String] = []
-
-		for (i in assetName.length) {
-			assetPath[i] = 'assets\\' + assetName[i]
-		}
 
 		assetName.push('tofita.gnu')
 		assetPath.push(config.tempFolder + '\\tofita\\tofita.exe')
@@ -64,6 +60,50 @@ function packAssets(config: Config) {
 		packFonts(config)
 		assetName.push('ascii.tofita')
 		assetPath.push(config.tempFolder + '\\tofita\\ascii.tofita')
+
+		assetName.push('cursors\\normal.cur')
+		assetPath.push('assets/root/Windows/Cursors/aero_arrow.cur')
+
+		assetName.push('hello.bmp')
+		assetPath.push('assets/root/Windows/Web/Wallpaper/Tofita/default.bmp')
+
+		assetName.push('fonts\\default.png')
+		assetPath.push('assets/root/Windows/Fonts/default.png')
+
+		assetName.push('icons\\link.png')
+		assetPath.push('assets/root/Windows/Resources/Icons/link.png')
+
+		assetName.push('icons\\notepad.ico_16x16.png')
+		assetPath.push('assets/root/Windows/Resources/Icons/notepad.ico_16x16.png')
+
+		assetName.push('icons\\notepad.ico_48x48.png')
+		assetPath.push('assets/root/Windows/Resources/Icons/notepad.ico_48x48.png')
+
+		assetName.push('icons\\trash-empty48.png')
+		assetPath.push('assets/root/Windows/Resources/Icons/trash-empty48.png')
+
+		assetName.push('leaves.png')
+		assetPath.push('assets/root/Windows/Resources/Icons/leaves.png')
+
+		assetName.push('heart.ico')
+		assetPath.push('assets/root/Windows/Resources/Icons/256_application-community.ico')
+
+		function addFolderRecursive(path) {
+			if (fs.existsSync(path)) {
+				fs.readdirSync(path).forEach(function(file, index) {
+					let curPath = path + "/" + file
+					if (fs.lstatSync(curPath).isDirectory()) {
+						addFolderRecursive(curPath)
+					} else {
+						assetName.push(curPath.substr('assets/'.length))
+						assetPath.push(curPath)
+					}
+				})
+			}
+		}
+
+		addFolderRecursive('assets/root')
+		addFolderRecursive('assets/desktop')
 
 		// Compute RAM disk size
 		var ramDiskSize = 0

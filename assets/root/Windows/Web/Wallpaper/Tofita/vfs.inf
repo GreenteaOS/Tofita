@@ -1,4 +1,5 @@
 ; Virtual file system description for the current folder
 ; This is a comment
-[fontCharsToCode]
-default.json = ascii.tofita
+[example section]
+key = value
+key = value
