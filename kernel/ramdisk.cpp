@@ -35,12 +35,12 @@ typedef struct {
 	uint8_t *data;
 } RamDiskAsset;
 
-RamDiskAsset getRamDiskAsset(const char8_t *path) {
+const RamDiskAsset getRamDiskAsset(const char8_t *path) {
 	RamDiskAsset asset;
 	asset.size = 0;
 	asset.data = 0;
 
-	const RamDiskInfo* ramDiskInfo = (RamDiskInfo*)_ramdisk->base;
+	const RamDiskInfo* ramDiskInfo = (const RamDiskInfo*)_ramdisk->base;
 
 	for (uint32_t id = 0; id < ramDiskInfo->assetsCount; id++) {
 		// Pointer arithmetic like a boss
@@ -48,7 +48,7 @@ RamDiskAsset getRamDiskAsset(const char8_t *path) {
 			(uint64_t)_ramdisk->base
 			+ sizeof(RamDiskInfo)
 			+ sizeof(RamDiskAssetInfo) * id;
-		const RamDiskAssetInfo* ramDiskAssetInfo = (RamDiskAssetInfo*)ramDiskAssetInfoPtr;
+		const RamDiskAssetInfo* ramDiskAssetInfo = (const RamDiskAssetInfo*)ramDiskAssetInfoPtr;
 		uint8_t found = 1;
 
 		for (uint8_t at = 0; at < 255; at++) {

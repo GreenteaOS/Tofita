@@ -201,7 +201,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 		// Copy sections
 		auto imageSectionHeader = (const ImageSectionHeader*)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
-		for (int i = 0; i < peHeader->mNumberOfSections; ++i) {
+		for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
 			serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName, imageSectionHeader[i].mSizeOfRawData);
 			uint64_t where = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress;
 
@@ -252,9 +252,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		serialPrintf(u8"Tofita requires at least 1 GB of memory\n");
 	}
 	params->ramBytes = ram;
-	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram / PAGE_SIZE);
-
-	// Note: paging::PagesArray allocated last
+	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram  >> 12);
 
 	paging::pml4entries = (paging::PageEntry*) paging::conventionalAllocateNext(sizeof(paging::PageEntry) * PAGE_TABLE_SIZE);
 
@@ -276,6 +274,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		largeBuffer,
 		(paging::conventionalOffset - largeBuffer) / PAGE_SIZE + 1
 	);
+
 	// Note: framebuffer is *not* within physical memory
 	paging::mapFramebuffer(&params->framebuffer);
 	drawLoading(&framebuffer, 2);

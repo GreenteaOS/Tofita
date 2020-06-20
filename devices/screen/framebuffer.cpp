@@ -43,7 +43,7 @@ typedef struct {
 // Avoid one level of pointer indirection
 Pixel32 *_pixels;
 
-Bitmap32* allocateBitmapFromBuffer(uint16_t width, uint16_t height) {
+Bitmap32* allocateBitmap(uint16_t width, uint16_t height) {
 	Bitmap32* result = (Bitmap32*)PhysicalAllocator::allocateBytes(sizeof(uint16_t) * 2 + sizeof(Pixel32) * width * height);
 	result->width = width;
 	result->height = height;

@@ -198,7 +198,8 @@ public:
 	static function freeOnePage(uint64_t physical) {
 		physical -= (uint64_t)WholePhysicalStart;
 		let where = DOWN_BYTES_TO_PAGES(physical);
-		buffer[where] = PAGE_FREE;
+		// Cosmic rays
+		if (buffer[where] == PAGE_FULL) buffer[where] = PAGE_FREE;
 		last = where;
 	}
 

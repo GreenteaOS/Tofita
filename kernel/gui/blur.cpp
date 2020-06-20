@@ -197,13 +197,14 @@ uint8_t* boxesForGauss(double sigma, uint8_t n) {
 }
 
 Bitmap32 *gaussBlur(Bitmap32* bitmap, double radius) {
-	Bitmap32* target = (Bitmap32*)allocateBitmapFromBuffer(bitmap->width, bitmap->height);
+	Bitmap32* target = allocateBitmap(bitmap->width, bitmap->height);
 
 	uint8_t* boxes = boxesForGauss(radius, 3);
 	boxBlur(bitmap, target, bitmap->width, bitmap->height, (boxes[0] - 1) / 2);
 	boxBlur(target, bitmap, bitmap->width, bitmap->height, (boxes[1] - 1) / 2);
 	boxBlur(bitmap, target, bitmap->width, bitmap->height, (boxes[2] - 1) / 2);
 
+	// TODO freeFromBuffer(3, boxes);
 	return target;
 }
 

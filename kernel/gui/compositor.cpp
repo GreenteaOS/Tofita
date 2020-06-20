@@ -36,7 +36,7 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 
 	{
 		serialPrintln(u8"[compositor.setWallpaper] upscale wallpaper to screen size");
-		Bitmap32* upscale = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
+		Bitmap32* upscale = allocateBitmap(_framebuffer->width, _framebuffer->height);
 
 		float hReciprocal = 1.0f / (float)_framebuffer->height;
 		float wReciprocal = 1.0f / (float)_framebuffer->width;
@@ -58,7 +58,7 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 
 	uint8_t blurScale = 8;
 
-	Bitmap32* downscale = allocateBitmapFromBuffer(bitmap->width / blurScale - 1, bitmap->height / blurScale - 1 + 8);
+	Bitmap32* downscale = allocateBitmap(bitmap->width / blurScale - 1, bitmap->height / blurScale - 1 + 8);
 
 	for (uint32_t y = 0; y < downscale->height - 8; y++)
 		for (uint32_t x = 0; x < downscale->width; x++)
@@ -78,7 +78,7 @@ function setWallpaper(Bitmap32* bitmap, WallpaperStyle style) {
 	serialPrintln(u8"[compositor.setWallpaper] upscale 8x");
 
 	// Upscale
-	Bitmap32* upscale = allocateBitmapFromBuffer(bitmap->width, bitmap->height);
+	Bitmap32* upscale = allocateBitmap(bitmap->width, bitmap->height);
 
 	float hReciprocal = 1.0f / (float)upscale->height;
 	float wReciprocal = 1.0f / (float)upscale->width;
@@ -119,7 +119,7 @@ function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t h
 Bitmap32* doublebuffer;
 function initializeCompositor() {
 	serialPrintln(u8"[compositor.initializeCompositor] begin");
-	doublebuffer = allocateBitmapFromBuffer(_framebuffer->width, _framebuffer->height);
+	doublebuffer = allocateBitmap(_framebuffer->width, _framebuffer->height);
 	_pixels = doublebuffer->pixels;
 
 	Bitmap32* loadPng32(const RamDiskAsset* asset);
