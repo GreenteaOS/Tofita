@@ -10,6 +10,8 @@
 *.s text eol=crlf
 *.bat text eol=crlf
 *.js text eol=crlf
+*.inf text eol=crlf
+*.ini text eol=crlf
 
 *.tofita binary
 *.ttf binary
