@@ -49,6 +49,9 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
 [![Give a star](docs/star.png?raw=true)
 Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
 
+[![Become a patron](docs/patreon.png?raw=true)
+Help to hire developers and buy hardware](https://www.patreon.com/PeyTy)
+
 ## Tools
 
 - [`listen.js`](tools/listen.js) - listen to VirtualBox COM port in TCP socket mode

@@ -12,6 +12,8 @@
 *.js text eol=crlf
 
 *.tofita binary
+*.ttf binary
+*.webp binary
 *.exe binary
 *.dll binary
 *.img binary
