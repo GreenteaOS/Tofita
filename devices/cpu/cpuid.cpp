@@ -24,27 +24,20 @@ const uint32_t cpuidExtendedLevels = 0x80000000;
 
 CPUID getCPUID() {
 	CPUID result;
-	amd64::cpuid(0, 0, &result.data, (uint32_t *)(&result.vendorID[0]),
-				 (uint32_t *)(&result.vendorID[8]),
+	amd64::cpuid(0, 0, &result.data, (uint32_t *)(&result.vendorID[0]), (uint32_t *)(&result.vendorID[8]),
 				 (uint32_t *)(&result.vendorID[4]));
 
 	amd64::cpuid(cpuidExtendedLevels, 0, &result.extras);
 
 	if (result.extras >= cpuidExtendedLevels + 4) {
-		amd64::cpuid(cpuidExtendedLevels + 2, 0,
-					 (uint32_t *)(&result.brandName[0]),
-					 (uint32_t *)(&result.brandName[4]),
-					 (uint32_t *)(&result.brandName[8]),
+		amd64::cpuid(cpuidExtendedLevels + 2, 0, (uint32_t *)(&result.brandName[0]),
+					 (uint32_t *)(&result.brandName[4]), (uint32_t *)(&result.brandName[8]),
 					 (uint32_t *)(&result.brandName[12]));
-		amd64::cpuid(cpuidExtendedLevels + 3, 0,
-					 (uint32_t *)(&result.brandName[16]),
-					 (uint32_t *)(&result.brandName[20]),
-					 (uint32_t *)(&result.brandName[24]),
+		amd64::cpuid(cpuidExtendedLevels + 3, 0, (uint32_t *)(&result.brandName[16]),
+					 (uint32_t *)(&result.brandName[20]), (uint32_t *)(&result.brandName[24]),
 					 (uint32_t *)(&result.brandName[28]));
-		amd64::cpuid(cpuidExtendedLevels + 4, 0,
-					 (uint32_t *)(&result.brandName[32]),
-					 (uint32_t *)(&result.brandName[36]),
-					 (uint32_t *)(&result.brandName[40]),
+		amd64::cpuid(cpuidExtendedLevels + 4, 0, (uint32_t *)(&result.brandName[32]),
+					 (uint32_t *)(&result.brandName[36]), (uint32_t *)(&result.brandName[40]),
 					 (uint32_t *)(&result.brandName[44]));
 	}
 

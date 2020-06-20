@@ -19,7 +19,9 @@ Revision history:
 
 #define EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_GUID                                                       \
 	{                                                                                                        \
-		0xE18541CD, 0xF755, 0x4f73, { 0x92, 0x8D, 0x64, 0x3C, 0x8A, 0x79, 0xB2, 0x29 }                       \
+		0xE18541CD, 0xF755, 0x4f73, {                                                                        \
+			0x92, 0x8D, 0x64, 0x3C, 0x8A, 0x79, 0xB2, 0x29                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION 0x00010000

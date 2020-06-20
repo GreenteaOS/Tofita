@@ -16,11 +16,11 @@
 // Based on https://forum.osdev.org/viewtopic.php?f=8&t=30052
 
 struct Spinlock {
-private:
+  private:
 	// TODO is it faster to use uint8_t?
 	volatile uint32_t value;
 
-public:
+  public:
 	function inline lock() {
 		while (!__sync_bool_compare_and_swap(&value, 0, 1)) {
 			while (value) {

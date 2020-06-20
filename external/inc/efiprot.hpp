@@ -24,7 +24,9 @@ Revision History
 //
 #define EFI_FPSWA_PROTOCOL_GUID                                                                              \
 	{                                                                                                        \
-		0xc41b6531, 0x97b9, 0x11d3, { 0x9a, 0x29, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                        \
+		0xc41b6531, 0x97b9, 0x11d3, {                                                                        \
+			0x9a, 0x29, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d                                                    \
+		}                                                                                                    \
 	}
 #define FPSWA_PROTOCOL EFI_FPSWA_PROTOCOL_GUID
 
@@ -34,7 +36,9 @@ Revision History
 
 #define EFI_DEVICE_PATH_PROTOCOL_GUID                                                                        \
 	{                                                                                                        \
-		0x9576e91, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                         \
+		0x9576e91, 0x6d3f, 0x11d2, {                                                                         \
+			0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                    \
+		}                                                                                                    \
 	}
 #define DEVICE_PATH_PROTOCOL EFI_DEVICE_PATH_PROTOCOL_GUID
 
@@ -44,7 +48,9 @@ Revision History
 
 #define EFI_BLOCK_IO_PROTOCOL_GUID                                                                           \
 	{                                                                                                        \
-		0x964e5b21, 0x6459, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                        \
+		0x964e5b21, 0x6459, 0x11d2, {                                                                        \
+			0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                    \
+		}                                                                                                    \
 	}
 #define BLOCK_IO_PROTOCOL EFI_BLOCK_IO_PROTOCOL_GUID
 
@@ -106,7 +112,9 @@ typedef EFI_BLOCK_IO_PROTOCOL EFI_BLOCK_IO;
 
 #define EFI_BLOCK_IO2_PROTOCOL_GUID                                                                          \
 	{                                                                                                        \
-		0xa77b2472, 0xe282, 0x4e9f, { 0xa2, 0x45, 0xc2, 0xc0, 0xe2, 0x7b, 0xbc, 0xc1 }                       \
+		0xa77b2472, 0xe282, 0x4e9f, {                                                                        \
+			0xa2, 0x45, 0xc2, 0xc0, 0xe2, 0x7b, 0xbc, 0xc1                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_BLOCK_IO2_PROTOCOL);
@@ -144,7 +152,9 @@ typedef struct _EFI_BLOCK_IO2_PROTOCOL {
 
 #define EFI_DISK_IO_PROTOCOL_GUID                                                                            \
 	{                                                                                                        \
-		0xce345171, 0xba0b, 0x11d2, { 0x8e, 0x4f, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                        \
+		0xce345171, 0xba0b, 0x11d2, {                                                                        \
+			0x8e, 0x4f, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                    \
+		}                                                                                                    \
 	}
 #define DISK_IO_PROTOCOL EFI_DISK_IO_PROTOCOL_GUID
 
@@ -170,7 +180,9 @@ typedef EFI_DISK_IO_PROTOCOL EFI_DISK_IO;
 
 #define EFI_DISK_IO2_PROTOCOL_GUID                                                                           \
 	{                                                                                                        \
-		0x151c8eae, 0x7f2c, 0x472c, { 0x9e, 0x54, 0x98, 0x28, 0x19, 0x4f, 0x6a, 0x88 }                       \
+		0x151c8eae, 0x7f2c, 0x472c, {                                                                        \
+			0x9e, 0x54, 0x98, 0x28, 0x19, 0x4f, 0x6a, 0x88                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_DISK_IO2_PROTOCOL_REVISION 0x00020000
@@ -209,7 +221,9 @@ typedef struct _EFI_DISK_IO2_PROTOCOL {
 
 #define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID                                                                 \
 	{                                                                                                        \
-		0x964e5b22, 0x6459, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                        \
+		0x964e5b22, 0x6459, 0x11d2, {                                                                        \
+			0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                    \
+		}                                                                                                    \
 	}
 #define SIMPLE_FILE_SYSTEM_PROTOCOL EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 
@@ -326,7 +340,9 @@ typedef EFI_FILE_PROTOCOL EFI_FILE;
 
 #define EFI_FILE_INFO_ID                                                                                     \
 	{                                                                                                        \
-		0x9576e92, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                         \
+		0x9576e92, 0x6d3f, 0x11d2, {                                                                         \
+			0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                    \
+		}                                                                                                    \
 	}
 
 typedef struct {
@@ -352,7 +368,9 @@ typedef struct {
 
 #define EFI_FILE_SYSTEM_INFO_ID                                                                              \
 	{                                                                                                        \
-		0x9576e93, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                         \
+		0x9576e93, 0x6d3f, 0x11d2, {                                                                         \
+			0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                    \
+		}                                                                                                    \
 	}
 
 typedef struct {
@@ -376,7 +394,9 @@ typedef struct {
 
 #define EFI_FILE_SYSTEM_VOLUME_LABEL_INFO_ID                                                                 \
 	{                                                                                                        \
-		0xDB47D7D3, 0xFE81, 0x11d3, { 0x9A, 0x35, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }                       \
+		0xDB47D7D3, 0xFE81, 0x11d3, {                                                                        \
+			0x9A, 0x35, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D                                                   \
+		}                                                                                                    \
 	}
 
 typedef struct {
@@ -392,7 +412,9 @@ typedef struct {
 
 #define EFI_LOAD_FILE_PROTOCOL_GUID                                                                          \
 	{                                                                                                        \
-		0x56EC3091, 0x954C, 0x11d2, { 0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B }                       \
+		0x56EC3091, 0x954C, 0x11d2, {                                                                        \
+			0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B                                                   \
+		}                                                                                                    \
 	}
 #define LOAD_FILE_PROTOCOL EFI_LOAD_FILE_PROTOCOL_GUID
 
@@ -415,7 +437,9 @@ typedef EFI_LOAD_FILE_PROTOCOL EFI_LOAD_FILE_INTERFACE;
 
 #define EFI_DEVICE_IO_PROTOCOL_GUID                                                                          \
 	{                                                                                                        \
-		0xaf6ac311, 0x84c3, 0x11d2, { 0x8e, 0x3c, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b }                       \
+		0xaf6ac311, 0x84c3, 0x11d2, {                                                                        \
+			0x8e, 0x3c, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b                                                   \
+		}                                                                                                    \
 	}
 #define DEVICE_IO_PROTOCOL EFI_DEVICE_IO_PROTOCOL_GUID
 
@@ -488,7 +512,9 @@ typedef EFI_DEVICE_IO_PROTOCOL EFI_DEVICE_IO_INTERFACE;
 
 #define EFI_UNICODE_COLLATION_PROTOCOL_GUID                                                                  \
 	{                                                                                                        \
-		0x1d85cd7f, 0xf43d, 0x11d2, { 0x9a, 0xc, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                         \
+		0x1d85cd7f, 0xf43d, 0x11d2, {                                                                        \
+			0x9a, 0xc, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d                                                     \
+		}                                                                                                    \
 	}
 #define UNICODE_COLLATION_PROTOCOL EFI_UNICODE_COLLATION_PROTOCOL_GUID
 
@@ -518,55 +544,73 @@ typedef BOOLEAN(EFIAPI *EFI_UNICODE_STRTOFAT)(IN struct _EFI_UNICODE_COLLATION_P
 //
 #define EFI_HASH_PROTOCOL_GUID                                                                               \
 	{                                                                                                        \
-		0xC5184932, 0xDBA5, 0x46DB, { 0xA5, 0xBA, 0xCC, 0x0B, 0xDA, 0x9C, 0x14, 0x35 }                       \
+		0xC5184932, 0xDBA5, 0x46DB, {                                                                        \
+			0xA5, 0xBA, 0xCC, 0x0B, 0xDA, 0x9C, 0x14, 0x35                                                   \
+		}                                                                                                    \
 	}
 #define HASH_PROTOCOL EFI_HASH_PROTOCOL_GUID
 
 #define EFI_HASH_ALGORITHM_SHA1_GUID                                                                         \
 	{                                                                                                        \
-		0x2AE9D80F, 0x3FB2, 0x4095, { 0xB7, 0xB1, 0xE9, 0x31, 0x57, 0xB9, 0x46, 0xB6 }                       \
+		0x2AE9D80F, 0x3FB2, 0x4095, {                                                                        \
+			0xB7, 0xB1, 0xE9, 0x31, 0x57, 0xB9, 0x46, 0xB6                                                   \
+		}                                                                                                    \
 	} // Deprecated
 #define EFI_HASH_ALGORITHM_SHA1 EFI_HASH_ALGORITHM_SHA1_GUID
 
 #define EFI_HASH_ALGORITHM_SHA224_GUID                                                                       \
 	{                                                                                                        \
-		0x8DF01A06, 0x9BD5, 0x4BF7, { 0xB0, 0x21, 0xDB, 0x4F, 0xD9, 0xCC, 0xF4, 0x5B }                       \
+		0x8DF01A06, 0x9BD5, 0x4BF7, {                                                                        \
+			0xB0, 0x21, 0xDB, 0x4F, 0xD9, 0xCC, 0xF4, 0x5B                                                   \
+		}                                                                                                    \
 	} // Deprecated
 #define EFI_HASH_ALGORITHM_SHA224 EFI_HASH_ALGORITHM_SHA224_GUID
 
 #define EFI_HASH_ALGORITHM_SHA256_GUID                                                                       \
 	{                                                                                                        \
-		0x51AA59DE, 0xFDF2, 0x4EA3, { 0xBC, 0x63, 0x87, 0x5F, 0xB7, 0x84, 0x2E, 0xE9 }                       \
+		0x51AA59DE, 0xFDF2, 0x4EA3, {                                                                        \
+			0xBC, 0x63, 0x87, 0x5F, 0xB7, 0x84, 0x2E, 0xE9                                                   \
+		}                                                                                                    \
 	} // Deprecated
 #define EFI_HASH_ALGORITHM_SHA256 EFI_HASH_ALGORITHM_SHA256_GUID
 
 #define EFI_HASH_ALGORITHM_SHA384_GUID                                                                       \
 	{                                                                                                        \
-		0xEFA96432, 0xDE33, 0x4DD2, { 0xAE, 0xE6, 0x32, 0x8C, 0x33, 0xDF, 0x77, 0x7A }                       \
+		0xEFA96432, 0xDE33, 0x4DD2, {                                                                        \
+			0xAE, 0xE6, 0x32, 0x8C, 0x33, 0xDF, 0x77, 0x7A                                                   \
+		}                                                                                                    \
 	} // Deprecated
 #define EFI_HASH_ALGORITHM_SHA384 EFI_HASH_ALGORITHM_SHA384_GUID
 
 #define EFI_HASH_ALGORITHM_SHA512_GUID                                                                       \
 	{                                                                                                        \
-		0xCAA4381E, 0x750C, 0x4770, { 0xB8, 0x70, 0x7A, 0x23, 0xB4, 0xE4, 0x21, 0x30 }                       \
+		0xCAA4381E, 0x750C, 0x4770, {                                                                        \
+			0xB8, 0x70, 0x7A, 0x23, 0xB4, 0xE4, 0x21, 0x30                                                   \
+		}                                                                                                    \
 	} // Deprecated
 #define EFI_HASH_ALGORITHM_SHA512 EFI_HASH_ALGORITHM_SHA512_GUID
 
 #define EFI_HASH_ALGORITHM_MD5_GUID                                                                          \
 	{                                                                                                        \
-		0x0AF7C79C, 0x65B5, 0x4319, { 0xB0, 0xAE, 0x44, 0xEC, 0x48, 0x4E, 0x4A, 0xD7 }                       \
+		0x0AF7C79C, 0x65B5, 0x4319, {                                                                        \
+			0xB0, 0xAE, 0x44, 0xEC, 0x48, 0x4E, 0x4A, 0xD7                                                   \
+		}                                                                                                    \
 	} // Deprecated
 #define EFI_HASH_ALGORITHM_MD5 EFI_HASH_ALGORITHM_MD5_GUID
 
 #define EFI_HASH_ALGORITHM_SHA1_NOPAD_GUID                                                                   \
 	{                                                                                                        \
-		0x24C5DC2F, 0x53E2, 0x40CA, { 0x9E, 0xD6, 0xA5, 0xD9, 0xA4, 0x9F, 0x46, 0x3B }                       \
+		0x24C5DC2F, 0x53E2, 0x40CA, {                                                                        \
+			0x9E, 0xD6, 0xA5, 0xD9, 0xA4, 0x9F, 0x46, 0x3B                                                   \
+		}                                                                                                    \
 	}
 #define EFI_HASH_ALGORITHM_SHA1_NOPAD EFI_HASH_ALGORITHM_SHA1_NOPAD_GUID
 
 #define EFI_HASH_ALGORITHM_SHA256_NOPAD_GUID                                                                 \
 	{                                                                                                        \
-		0x8628752A, 0x6CB7, 0x4814, { 0x96, 0xFC, 0x24, 0xA8, 0x15, 0xAC, 0x22, 0x26 }                       \
+		0x8628752A, 0x6CB7, 0x4814, {                                                                        \
+			0x96, 0xFC, 0x24, 0xA8, 0x15, 0xAC, 0x22, 0x26                                                   \
+		}                                                                                                    \
 	}
 #define EFI_HASH_ALGORITHM_SHA256_NOPAD EFI_HASH_ALGORITHM_SHA256_NOPAD_GUID
 
@@ -623,7 +667,9 @@ typedef EFI_UNICODE_COLLATION_PROTOCOL EFI_UNICODE_COLLATION_INTERFACE;
 /* Graphics output protocol */
 #define EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID                                                                    \
 	{                                                                                                        \
-		0x9042a9de, 0x23dc, 0x4a38, { 0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a }                       \
+		0x9042a9de, 0x23dc, 0x4a38, {                                                                        \
+			0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a                                                   \
+		}                                                                                                    \
 	}
 typedef struct _EFI_GRAPHICS_OUTPUT_PROTOCOL EFI_GRAPHICS_OUTPUT_PROTOCOL;
 
@@ -775,7 +821,9 @@ struct _EFI_GRAPHICS_OUTPUT_PROTOCOL {
  */
 #define EFI_EDID_DISCOVERED_PROTOCOL_GUID                                                                    \
 	{                                                                                                        \
-		0x1C0C34F6, 0xD380, 0x41FA, { 0xA0, 0x49, 0x8a, 0xD0, 0x6C, 0x1A, 0x66, 0xAA }                       \
+		0x1C0C34F6, 0xD380, 0x41FA, {                                                                        \
+			0xA0, 0x49, 0x8a, 0xD0, 0x6C, 0x1A, 0x66, 0xAA                                                   \
+		}                                                                                                    \
 	}
 
 typedef struct _EFI_EDID_DISCOVERED_PROTOCOL {
@@ -789,7 +837,9 @@ typedef struct _EFI_EDID_DISCOVERED_PROTOCOL {
  */
 #define EFI_EDID_ACTIVE_PROTOCOL_GUID                                                                        \
 	{                                                                                                        \
-		0xBD8C1056, 0x9F36, 0x44EC, { 0x92, 0xA8, 0xA6, 0x33, 0x7F, 0x81, 0x79, 0x86 }                       \
+		0xBD8C1056, 0x9F36, 0x44EC, {                                                                        \
+			0x92, 0xA8, 0xA6, 0x33, 0x7F, 0x81, 0x79, 0x86                                                   \
+		}                                                                                                    \
 	}
 
 typedef struct _EFI_EDID_ACTIVE_PROTOCOL {
@@ -803,7 +853,9 @@ typedef struct _EFI_EDID_ACTIVE_PROTOCOL {
  */
 #define EFI_EDID_OVERRIDE_PROTOCOL_GUID                                                                      \
 	{                                                                                                        \
-		0x48ECB431, 0xFB72, 0x45C0, { 0xA9, 0x22, 0xF4, 0x58, 0xFE, 0x04, 0x0B, 0xD5 }                       \
+		0x48ECB431, 0xFB72, 0x45C0, {                                                                        \
+			0xA9, 0x22, 0xF4, 0x58, 0xFE, 0x04, 0x0B, 0xD5                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_EDID_OVERRIDE_PROTOCOL);
@@ -836,7 +888,9 @@ typedef struct _EFI_SERVICE_BINDING {
  */
 #define EFI_DRIVER_BINDING_PROTOCOL_GUID                                                                     \
 	{                                                                                                        \
-		0x18A031AB, 0xB443, 0x4D1A, { 0xA5, 0xC0, 0x0C, 0x09, 0x26, 0x1E, 0x9F, 0x71 }                       \
+		0x18A031AB, 0xB443, 0x4D1A, {                                                                        \
+			0xA5, 0xC0, 0x0C, 0x09, 0x26, 0x1E, 0x9F, 0x71                                                   \
+		}                                                                                                    \
 	}
 #define DRIVER_BINDING_PROTOCOL EFI_DRIVER_BINDING_PROTOCOL_GUID
 
@@ -880,7 +934,9 @@ typedef EFI_DRIVER_BINDING_PROTOCOL EFI_DRIVER_BINDING;
  */
 #define EFI_COMPONENT_NAME_PROTOCOL_GUID                                                                     \
 	{                                                                                                        \
-		0x107A772C, 0xD5E1, 0x11D4, { 0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }                       \
+		0x107A772C, 0xD5E1, 0x11D4, {                                                                        \
+			0x9A, 0x46, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D                                                   \
+		}                                                                                                    \
 	}
 #define COMPONENT_NAME_PROTOCOL EFI_COMPONENT_NAME_PROTOCOL_GUID
 
@@ -908,7 +964,9 @@ typedef EFI_COMPONENT_NAME_PROTOCOL EFI_COMPONENT_NAME;
  */
 #define EFI_COMPONENT_NAME2_PROTOCOL_GUID                                                                    \
 	{                                                                                                        \
-		0x6A7A5CFF, 0xE8D9, 0x4F70, { 0xBA, 0xDA, 0x75, 0xAB, 0x30, 0x25, 0xCE, 0x14 }                       \
+		0x6A7A5CFF, 0xE8D9, 0x4F70, {                                                                        \
+			0xBA, 0xDA, 0x75, 0xAB, 0x30, 0x25, 0xCE, 0x14                                                   \
+		}                                                                                                    \
 	}
 #define COMPONENT_NAME2_PROTOCOL EFI_COMPONENT_NAME2_PROTOCOL_GUID
 
@@ -936,7 +994,9 @@ typedef EFI_COMPONENT_NAME2_PROTOCOL EFI_COMPONENT_NAME2;
  */
 #define EFI_LOADED_IMAGE_PROTOCOL_GUID                                                                       \
 	{                                                                                                        \
-		0x5B1B31A1, 0x9562, 0x11d2, { 0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B }                       \
+		0x5B1B31A1, 0x9562, 0x11d2, {                                                                        \
+			0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B                                                   \
+		}                                                                                                    \
 	}
 #define LOADED_IMAGE_PROTOCOL EFI_LOADED_IMAGE_PROTOCOL_GUID
 
@@ -977,39 +1037,53 @@ typedef EFI_LOADED_IMAGE_PROTOCOL EFI_LOADED_IMAGE;
  */
 #define EFI_RNG_PROTOCOL_GUID                                                                                \
 	{                                                                                                        \
-		0x3152bca5, 0xeade, 0x433d, { 0x86, 0x2e, 0xc0, 0x1c, 0xdc, 0x29, 0x1f, 0x44 }                       \
+		0x3152bca5, 0xeade, 0x433d, {                                                                        \
+			0x86, 0x2e, 0xc0, 0x1c, 0xdc, 0x29, 0x1f, 0x44                                                   \
+		}                                                                                                    \
 	}
 
 typedef EFI_GUID EFI_RNG_ALGORITHM;
 
 #define EFI_RNG_ALGORITHM_SP800_90_HASH_256_GUID                                                             \
 	{                                                                                                        \
-		0xa7af67cb, 0x603b, 0x4d42, { 0xba, 0x21, 0x70, 0xbf, 0xb6, 0x29, 0x3f, 0x96 }                       \
+		0xa7af67cb, 0x603b, 0x4d42, {                                                                        \
+			0xba, 0x21, 0x70, 0xbf, 0xb6, 0x29, 0x3f, 0x96                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_RNG_ALGORITHM_SP800_90_HMAC_256_GUID                                                             \
 	{                                                                                                        \
-		0xc5149b43, 0xae85, 0x4f53, { 0x99, 0x82, 0xb9, 0x43, 0x35, 0xd3, 0xa9, 0xe7 }                       \
+		0xc5149b43, 0xae85, 0x4f53, {                                                                        \
+			0x99, 0x82, 0xb9, 0x43, 0x35, 0xd3, 0xa9, 0xe7                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_RNG_ALGORITHM_SP800_90_CTR_256_GUID                                                              \
 	{                                                                                                        \
-		0x44f0de6e, 0x4d8c, 0x4045, { 0xa8, 0xc7, 0x4d, 0xd1, 0x68, 0x85, 0x6b, 0x9e }                       \
+		0x44f0de6e, 0x4d8c, 0x4045, {                                                                        \
+			0xa8, 0xc7, 0x4d, 0xd1, 0x68, 0x85, 0x6b, 0x9e                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_RNG_ALGORITHM_X9_31_3DES_GUID                                                                    \
 	{                                                                                                        \
-		0x63c4785a, 0xca34, 0x4012, { 0xa3, 0xc8, 0x0b, 0x6a, 0x32, 0x4f, 0x55, 0x46 }                       \
+		0x63c4785a, 0xca34, 0x4012, {                                                                        \
+			0xa3, 0xc8, 0x0b, 0x6a, 0x32, 0x4f, 0x55, 0x46                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_RNG_ALGORITHM_X9_31_AES_GUID                                                                     \
 	{                                                                                                        \
-		0xacd03321, 0x777e, 0x4d3d, { 0xb1, 0xc8, 0x20, 0xcf, 0xd8, 0x88, 0x20, 0xc9 }                       \
+		0xacd03321, 0x777e, 0x4d3d, {                                                                        \
+			0xb1, 0xc8, 0x20, 0xcf, 0xd8, 0x88, 0x20, 0xc9                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_RNG_ALGORITHM_RAW                                                                                \
 	{                                                                                                        \
-		0xe43176d7, 0xb6e8, 0x4827, { 0xb7, 0x84, 0x7f, 0xfd, 0xc4, 0xb6, 0x85, 0x61 }                       \
+		0xe43176d7, 0xb6e8, 0x4827, {                                                                        \
+			0xb7, 0x84, 0x7f, 0xfd, 0xc4, 0xb6, 0x85, 0x61                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_RNG_PROTOCOL);
@@ -1033,7 +1107,9 @@ typedef struct _EFI_RNG_PROTOCOL {
 
 #define EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL_GUID                                                           \
 	{                                                                                                        \
-		0x6b30c738, 0xa391, 0x11d4, { 0x9a, 0x3b, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d }                       \
+		0x6b30c738, 0xa391, 0x11d4, {                                                                        \
+			0x9a, 0x3b, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL);
@@ -1062,7 +1138,9 @@ typedef struct _EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL {
 
 #define EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL_GUID                                                       \
 	{                                                                                                        \
-		0x3bc1b285, 0x8a15, 0x4a82, { 0xaa, 0xbf, 0x4d, 0x7d, 0x13, 0xfb, 0x32, 0x65 }                       \
+		0x3bc1b285, 0x8a15, 0x4a82, {                                                                        \
+			0xaa, 0xbf, 0x4d, 0x7d, 0x13, 0xfb, 0x32, 0x65                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL);
@@ -1080,7 +1158,9 @@ typedef struct _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL {
 
 #define EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL_GUID                                                             \
 	{                                                                                                        \
-		0xb1ee129e, 0xda36, 0x4181, { 0x91, 0xf8, 0x04, 0xa4, 0x92, 0x37, 0x66, 0xa7 }                       \
+		0xb1ee129e, 0xda36, 0x4181, {                                                                        \
+			0x91, 0xf8, 0x04, 0xa4, 0x92, 0x37, 0x66, 0xa7                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL);
@@ -1098,7 +1178,9 @@ typedef struct _EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL {
 
 #define EFI_EBC_INTERPRETER_PROTOCOL_GUID                                                                    \
 	{                                                                                                        \
-		0x13ac6dd1, 0x73d0, 0x11d4, { 0xb0, 0x6b, 0x00, 0xaa, 0x00, 0xbd, 0x6d, 0xe7 }                       \
+		0x13ac6dd1, 0x73d0, 0x11d4, {                                                                        \
+			0xb0, 0x6b, 0x00, 0xaa, 0x00, 0xbd, 0x6d, 0xe7                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_EBC_PROTOCOL_GUID EFI_EBC_INTERPRETER_PROTOCOL_GUID

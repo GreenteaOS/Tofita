@@ -529,7 +529,9 @@ typedef enum {
 
 #define EFI_DEBUG_IMAGE_INFO_TABLE_GUID                                                                      \
 	{                                                                                                        \
-		0x49152e77, 0x1ada, 0x4764, { 0xb7, 0xa2, 0x7a, 0xfe, 0xfe, 0xd9, 0x5e, 0x8b }                       \
+		0x49152e77, 0x1ada, 0x4764, {                                                                        \
+			0xb7, 0xa2, 0x7a, 0xfe, 0xfe, 0xd9, 0x5e, 0x8b                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS 0x01
@@ -566,7 +568,9 @@ typedef struct {
 
 #define EFI_DEBUG_SUPPORT_PROTOCOL_GUID                                                                      \
 	{                                                                                                        \
-		0x2755590c, 0x6f3c, 0x42fa, { 0x9e, 0xa4, 0xa3, 0xba, 0x54, 0x3c, 0xda, 0x25 }                       \
+		0x2755590c, 0x6f3c, 0x42fa, {                                                                        \
+			0x9e, 0xa4, 0xa3, 0xba, 0x54, 0x3c, 0xda, 0x25                                                   \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_DEBUG_SUPPORT_PROTOCOL);

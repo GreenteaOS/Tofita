@@ -8,22 +8,30 @@ Copyright (c) 2013  Intel Corporation
 
 #define EFI_TCP4_SERVICE_BINDING_PROTOCOL                                                                    \
 	{                                                                                                        \
-		0x00720665, 0x67eb, 0x4a99, { 0xba, 0xf7, 0xd3, 0xc3, 0x3a, 0x1c, 0x7c, 0xc9 }                       \
+		0x00720665, 0x67eb, 0x4a99, {                                                                        \
+			0xba, 0xf7, 0xd3, 0xc3, 0x3a, 0x1c, 0x7c, 0xc9                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_TCP4_PROTOCOL                                                                                    \
 	{                                                                                                        \
-		0x65530bc7, 0xa359, 0x410f, { 0xb0, 0x10, 0x5a, 0xad, 0xc7, 0xec, 0x2b, 0x62 }                       \
+		0x65530bc7, 0xa359, 0x410f, {                                                                        \
+			0xb0, 0x10, 0x5a, 0xad, 0xc7, 0xec, 0x2b, 0x62                                                   \
+		}                                                                                                    \
 	}
 
 #define EFI_TCP6_SERVICE_BINDING_PROTOCOL                                                                    \
 	{                                                                                                        \
-		0xec20eb79, 0x6c1a, 0x4664, { 0x9a, 0xd, 0xd2, 0xe4, 0xcc, 0x16, 0xd6, 0x64 }                        \
+		0xec20eb79, 0x6c1a, 0x4664, {                                                                        \
+			0x9a, 0xd, 0xd2, 0xe4, 0xcc, 0x16, 0xd6, 0x64                                                    \
+		}                                                                                                    \
 	}
 
 #define EFI_TCP6_PROTOCOL                                                                                    \
 	{                                                                                                        \
-		0x46e44855, 0xbd60, 0x4ab7, { 0xab, 0xd, 0xa6, 0x79, 0xb9, 0x44, 0x7d, 0x77 }                        \
+		0x46e44855, 0xbd60, 0x4ab7, {                                                                        \
+			0xab, 0xd, 0xa6, 0x79, 0xb9, 0x44, 0x7d, 0x77                                                    \
+		}                                                                                                    \
 	}
 
 INTERFACE_DECL(_EFI_TCP4);

@@ -90,30 +90,33 @@ function handleKeyDown(uint8_t key) {
 
 const KernelParams *paramsCache = null;
 function kernelInit(const KernelParams *params) {
-	serialPrintln(u8"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag " kernel loaded and operational");
-	serialPrintf(u8"<Tofita> CR3 points to: %8\n", (uint64_t) params->pml4);
+	serialPrintln(u8"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
+		versionMinor) " " versionTag " kernel loaded and operational");
+	serialPrintf(u8"<Tofita> CR3 points to: %8\n", (uint64_t)params->pml4);
 	paramsCache = params;
 	PhysicalAllocator::init(params);
 	pages::pml4entries = (pages::PageEntry *)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
 	setFramebuffer(&params->framebuffer);
 	setRamDisk(&params->ramdisk);
 
-	if (sizeof(uint8_t*) == 4) serialPrintln(u8"<Tofita> void*: 4 bytes");
-	if (sizeof(uint8_t*) == 8) serialPrintln(u8"<Tofita> void*: 8 bytes");
+	if (sizeof(uint8_t *) == 4)
+		serialPrintln(u8"<Tofita> void*: 4 bytes");
+	if (sizeof(uint8_t *) == 8)
+		serialPrintln(u8"<Tofita> void*: 8 bytes");
 
-	#ifdef __cplusplus
-		serialPrintln(u8"<Tofita> __cplusplus");
-	#else
-		serialPrintln(u8"<Tofita> !__cplusplus");
-	#endif
+#ifdef __cplusplus
+	serialPrintln(u8"<Tofita> __cplusplus");
+#else
+	serialPrintln(u8"<Tofita> !__cplusplus");
+#endif
 
-	#if defined(__clang__)
-		serialPrintln(u8"<Tofita> __clang__");
-	#elif defined(__GNUC__) || defined(__GNUG__)
-		serialPrintln(u8"<Tofita> __GNUC__");
-	#elif defined(_MSC_VER)
-		serialPrintln(u8"<Tofita> _MSC_VER");
-	#endif
+#if defined(__clang__)
+	serialPrintln(u8"<Tofita> __clang__");
+#elif defined(__GNUC__) || defined(__GNUG__)
+	serialPrintln(u8"<Tofita> __GNUC__");
+#elif defined(_MSC_VER)
+	serialPrintln(u8"<Tofita> _MSC_VER");
+#endif
 
 	disablePic();
 	enableInterrupts();
@@ -151,12 +154,17 @@ function kernelInit(const KernelParams *params) {
 		// Poll PS/2 devices
 		haveToRender = haveToRender || (pollPS2Devices() == PollingPS2SomethingHappened);
 
-		if (mouseX > _framebuffer->width) mouseX = _framebuffer->width;
-		if (mouseY > _framebuffer->height) mouseY = _framebuffer->height;
-		if (mouseY < 0) mouseY = 0;
-		if (mouseX < 0) mouseX = 0;
+		if (mouseX > _framebuffer->width)
+			mouseX = _framebuffer->width;
+		if (mouseY > _framebuffer->height)
+			mouseY = _framebuffer->height;
+		if (mouseY < 0)
+			mouseY = 0;
+		if (mouseX < 0)
+			mouseX = 0;
 
-		if (haveToRender == 0) continue ;
+		if (haveToRender == 0)
+			continue;
 		haveToRender = 0;
 
 		composite();

@@ -37,13 +37,19 @@ uint8_t pollPS2Devices() {
 		result = PollingPS2SomethingHappened;
 		if (getBit(poll, 5) == 0) {
 			handleKeyboard();
-			if (keyboardPressedState[72]) mouseY -= 4;
-			if (keyboardPressedState[80]) mouseY += 4;
-			if (keyboardPressedState[77]) mouseX += 4;
-			if (keyboardPressedState[75]) mouseX -= 4;
-			if (keyboardPressedState[41]) haveToQuake = !haveToQuake;
+			if (keyboardPressedState[72])
+				mouseY -= 4;
+			if (keyboardPressedState[80])
+				mouseY += 4;
+			if (keyboardPressedState[77])
+				mouseX += 4;
+			if (keyboardPressedState[75])
+				mouseX -= 4;
+			if (keyboardPressedState[41])
+				haveToQuake = !haveToQuake;
 			keyDownHandler = null;
-			if (haveToQuake) keyDownHandler = quakeHandleButtonDown;
+			if (haveToQuake)
+				keyDownHandler = quakeHandleButtonDown;
 			haveToRender = 1;
 		} else if (getBit(poll, 5) == 1) {
 			handleMouse();
