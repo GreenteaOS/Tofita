@@ -33,38 +33,35 @@ namespace efi {
 #include "pe.cpp"
 #include "../../kernel/ramdisk.cpp"
 
-efi::INTN CompareGuid (efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
-    efi::INT32 *g1, *g2, r;
-    g1 = (efi::INT32 *) guid1;
-    g2 = (efi::INT32 *) guid2;
-    r  = g1[0] - g2[0];
-    r |= g1[1] - g2[1];
-    r |= g1[2] - g2[2];
-    r |= g1[3] - g2[3];
-    return r;
+efi::INTN CompareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
+	efi::INT32 *g1, *g2, r;
+	g1 = (efi::INT32 *)guid1;
+	g2 = (efi::INT32 *)guid2;
+	r = g1[0] - g2[0];
+	r |= g1[1] - g2[1];
+	r |= g1[2] - g2[2];
+	r |= g1[3] - g2[3];
+	return r;
 }
 
-void* tmemcpy(void* dest, const void* src, uint64_t count) {
-	uint8_t* dst8 = (uint8_t*)dest;
-	uint8_t* src8 = (uint8_t*)src;
+void *tmemcpy(void *dest, const void *src, uint64_t count) {
+	uint8_t *dst8 = (uint8_t *)dest;
+	uint8_t *src8 = (uint8_t *)src;
 
 	while (count--) {
-			*dst8++ = *src8++;
+		*dst8++ = *src8++;
 	}
 
 	return dest;
 }
 
 // Loading animation, progress 0...2
-function drawLoading(Framebuffer* framebuffer, uint8_t progress) {
-	uint32_t* pixels = (uint32_t*)framebuffer->base;
+function drawLoading(Framebuffer *framebuffer, uint8_t progress) {
+	uint32_t *pixels = (uint32_t *)framebuffer->base;
 	for (uint8_t y = 0; y < 24; y++)
 		for (uint8_t x = 0; x < 24; x++)
-			pixels[
-				((y + (framebuffer->height/4) * 3) * framebuffer->width)
-				+ x + framebuffer->width/2
-				- 12 + progress*24*2 - 48
-			] = 0xFFFFFFFF;
+			pixels[((y + (framebuffer->height / 4) * 3) * framebuffer->width) + x + framebuffer->width / 2 -
+				   12 + progress * 24 * 2 - 48] = 0xFFFFFFFF;
 }
 
 #include "../shared/paging.cpp"
@@ -80,7 +77,8 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
-	serialPrint(u8"\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(versionMinor) " " versionName " UEFI bootloader. Welcome!\n");
+	serialPrint(u8"\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(
+		versionMinor) " " versionName " UEFI bootloader. Welcome!\n");
 
 	// Disable watchdog timer
 	systemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
@@ -143,9 +141,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	efiMemoryMap.memoryMapSize = sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512;
 	efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(ramdisk.base + sizeAlloc);
 	{
-		uint8_t* b = (uint8_t*)efiMemoryMap.memoryMap;
-		for (uint64_t i = 0; i < efiMemoryMap.memoryMapSize; ++i)
-		{
+		uint8_t *b = (uint8_t *)efiMemoryMap.memoryMap;
+		for (uint64_t i = 0; i < efiMemoryMap.memoryMapSize; ++i) {
 			// TODO faster with uint64_t
 			b[i] = paging::buffa[0];
 		}
@@ -157,7 +154,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	uint8_t oops = 0;
 	status = EFI_NOT_READY;
 	while (status != EFI_SUCCESS) {
-		if (oops < 10) serialPrintln(u8"[[[efi_main]]] try: ExitBootServices");
+		if (oops < 10)
+			serialPrintln(u8"[[[efi_main]]] try: ExitBootServices");
 		if (oops == 100) {
 			serialPrintln(u8"[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices");
 			serialPrintln(u8"[[[efi_main]]] <ERROR?> system may or may not start");
@@ -166,8 +164,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		if (oops < 100) {
 			oops++;
 		}
-		status = systemTable->BootServices->ExitBootServices(imageHandle,
-			efiMemoryMap.mapKey);
+		status = systemTable->BootServices->ExitBootServices(imageHandle, efiMemoryMap.mapKey);
 	}
 
 	if (status != EFI_SUCCESS) {
@@ -190,36 +187,36 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	uint64_t mAddressOfEntryPoint = 0;
 
 	{
-		auto ptr = (uint8_t*)asset.data;
-		auto peHeader = (const PeHeader*)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
+		auto ptr = (uint8_t *)asset.data;
+		auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
 		serialPrintf(u8"PE header signature 'PE' == '%s'\n", peHeader);
-		auto peOptionalHeader = (const Pe32OptionalHeader*)((uint64_t)peHeader + sizeof(PeHeader));
-		serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic, 0x020B);
+		auto peOptionalHeader = (const Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader));
+		serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic,
+					 0x020B);
 		serialPrintf(u8"PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
-		void *kernelBase = (void *) paging::conventionalAllocateNext(peOptionalHeader->mSizeOfImage);
+		void *kernelBase = (void *)paging::conventionalAllocateNext(peOptionalHeader->mSizeOfImage);
 		memset(kernelBase, 0, peOptionalHeader->mSizeOfImage); // Zeroing
 
 		// Copy sections
-		auto imageSectionHeader = (const ImageSectionHeader*)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
+		auto imageSectionHeader =
+			(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
 		for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
-			serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName, imageSectionHeader[i].mSizeOfRawData);
+			serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
+						 imageSectionHeader[i].mSizeOfRawData);
 			uint64_t where = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress;
 
-			tmemcpy(
-				(void *)where,
-				(void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].mPointerToRawData),
-				imageSectionHeader[i].mSizeOfRawData
-			);
+			tmemcpy((void *)where,
+					(void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].mPointerToRawData),
+					imageSectionHeader[i].mSizeOfRawData);
 		}
 
 		mAddressOfEntryPoint = peOptionalHeader->mAddressOfEntryPoint;
 	}
 
-	KernelParams* params = (KernelParams*) paging::conventionalAllocateNext(sizeof(KernelParams));
+	KernelParams *params = (KernelParams *)paging::conventionalAllocateNext(sizeof(KernelParams));
 	{
-		uint8_t* b = (uint8_t*)params;
-		for (uint64_t i = 0; i < sizeof(KernelParams); ++i)
-		{
+		uint8_t *b = (uint8_t *)params;
+		for (uint64_t i = 0; i < sizeof(KernelParams); ++i) {
 			b[i] = paging::buffa[0];
 		}
 	}
@@ -228,9 +225,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
 	var stack = paging::conventionalAllocateNext(1024 * 1024) + 1024 * 1024;
 	{
-		uint8_t* b = (uint8_t*)(stack - 1024 * 1024);
-		for (uint64_t i = 0; i < 1024 * 1024; ++i)
-		{
+		uint8_t *b = (uint8_t *)(stack - 1024 * 1024);
+		for (uint64_t i = 0; i < 1024 * 1024; ++i) {
 			b[i] = paging::buffa[0];
 		}
 	}
@@ -241,25 +237,26 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] loading trump-o-line");
 	RamDiskAsset trampoline = getRamDiskAsset(u8"trampoline.tofita");
-	serialPrintf(u8"[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size, trampoline.data);
+	serialPrintf(u8"[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size,
+				 trampoline.data);
 
 	// RAM usage bit-map
 
 	uint64_t ram = paging::getRAMSize(&params->efiMemoryMap);
-	uint32_t megs = (uint32_t)(ram/(1024*1024));
+	uint32_t megs = (uint32_t)(ram / (1024 * 1024));
 	serialPrintf(u8"[paging] available RAM is ~%u megabytes\n", megs);
 	while (megs < 768) {
 		serialPrintf(u8"Tofita requires at least 1 GB of memory\n");
 	}
 	params->ramBytes = ram;
-	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram  >> 12);
+	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram >> 12);
 
-	paging::pml4entries = (paging::PageEntry*) paging::conventionalAllocateNext(sizeof(paging::PageEntry) * PAGE_TABLE_SIZE);
+	paging::pml4entries =
+		(paging::PageEntry *)paging::conventionalAllocateNext(sizeof(paging::PageEntry) * PAGE_TABLE_SIZE);
 
 	{
-		uint8_t* b = (uint8_t*)paging::pml4entries;
-		for (uint64_t i = 0; i < paging::conventionalOffset; ++i)
-		{
+		uint8_t *b = (uint8_t *)paging::pml4entries;
+		for (uint64_t i = 0; i < paging::conventionalOffset; ++i) {
 			// TODO faster with uint64_t
 			b[i] = paging::buffa[0];
 		}
@@ -269,11 +266,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] mapping pages for kernel loader");
 
-	paging::mapMemory(
-		upper,
-		largeBuffer,
-		(paging::conventionalOffset - largeBuffer) / PAGE_SIZE + 1
-	);
+	paging::mapMemory(upper, largeBuffer, (paging::conventionalOffset - largeBuffer) / PAGE_SIZE + 1);
 
 	// Note: framebuffer is *not* within physical memory
 	paging::mapFramebuffer(&params->framebuffer);
@@ -281,7 +274,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	paging::mapEfi(&params->efiMemoryMap);
 	paging::mapMemoryHuge(WholePhysicalStart, 0, ram / PAGE_SIZE);
 
-	let startFunction = (InitKernelTrampoline) (paging::conventionalOffset + PAGE_SIZE);
+	let startFunction = (InitKernelTrampoline)(paging::conventionalOffset + PAGE_SIZE);
 	tmemcpy((void *)startFunction, trampoline.data, trampoline.size);
 	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1);
 
@@ -294,23 +287,24 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->ramdisk.base = WholePhysicalStart + params->ramdisk.physical;
 
 	params->pml4 = (uint64_t)paging::pml4entries; // physical address for CPU
-	params->stack = stack; // physical address for stack overflow detection
+	params->stack = stack;						  // physical address for stack overflow detection
 	params->physicalBuffer = largeBuffer;
 	params->physicalBytes = paging::conventionalOffset - largeBuffer;
 	params->efiRuntimeServices = systemTable->RuntimeServices;
 	params->acpiTablePhysical = (uint64_t)(acpiTable);
-	params->efiMemoryMap.memoryMap = (efi::EFI_MEMORY_DESCRIPTOR *)(WholePhysicalStart + (uint64_t)params->efiMemoryMap.memoryMap);
+	params->efiMemoryMap.memoryMap =
+		(efi::EFI_MEMORY_DESCRIPTOR *)(WholePhysicalStart + (uint64_t)params->efiMemoryMap.memoryMap);
 
 	// Convert addresses to upper half
 
 	stack = (uint64_t)WholePhysicalStart + stack;
 	params->physicalRamBitMaskVirtual = (uint64_t)WholePhysicalStart + params->physicalRamBitMaskVirtual;
-	params = (KernelParams*)((uint64_t)WholePhysicalStart + (uint64_t)params);
+	params = (KernelParams *)((uint64_t)WholePhysicalStart + (uint64_t)params);
 
 	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
 
 	serialPrint(u8"[[[efi_main]]] CR3 points to: ");
-	serialPrintHex((uint64_t) paging::pml4entries);
+	serialPrintHex((uint64_t)paging::pml4entries);
 	serialPrint(u8"\n");
 
 	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper + mAddressOfEntryPoint);

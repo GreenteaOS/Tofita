@@ -20,12 +20,12 @@ namespace paging {
 #define PACKED __attribute__((gcc_struct, packed))
 
 struct LinearAddress {
-	unsigned long long offset: 12;
-	unsigned long long pt: 9;
-	unsigned long long pd: 9;
-	unsigned long long pdpt: 9;
-	unsigned long long pml4: 9;
-	unsigned long long reserved: 16;
+	unsigned long long offset : 12;
+	unsigned long long pt : 9;
+	unsigned long long pd : 9;
+	unsigned long long pdpt : 9;
+	unsigned long long pml4 : 9;
+	unsigned long long reserved : 16;
 } __attribute__((gcc_struct, packed));
 
 _Static_assert(sizeof(uint64_t) == 8, "uint64_t has to have 64 bits");
@@ -78,7 +78,7 @@ typedef struct {
 	unsigned long long metadata : 3;
 
 	// Physical address of the child table/page
-	unsigned long long address  : 40;
+	unsigned long long address : 40;
 
 	// Not used by the processor
 	unsigned long long metadata2 : 7;
@@ -92,16 +92,16 @@ typedef struct {
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
-static PageEntry* pml4entries PAGE_ALIGNED = null;
+static PageEntry *pml4entries PAGE_ALIGNED = null;
 
 uint64_t conventionalAllocateNext(uint64_t bytes);
 static void *allocatePage() {
 	// TODO bounds check
-	return (void *) conventionalAllocateNext(PAGE_SIZE);
+	return (void *)conventionalAllocateNext(PAGE_SIZE);
 }
 
 static LinearAddress getLinearAddress(uint64_t address) {
-	return *((LinearAddress *) &address);
+	return *((LinearAddress *)&address);
 }
 
 static function initializePage(PageEntry *entry, uint64_t address) {
@@ -121,10 +121,10 @@ static void *getPage(PageEntry *table, uint64_t entryId) {
 	PageEntry *entry = &table[entryId];
 
 	if (entry->present == 1) {
-		return (void *) (entry->address << ADDRESS_BITS);
+		return (void *)(entry->address << ADDRESS_BITS);
 	} else {
 		void *newPage = allocatePage();
-		initializePage(entry, (uint64_t) newPage);
+		initializePage(entry, (uint64_t)newPage);
 		return newPage;
 	}
 }
@@ -139,11 +139,10 @@ function map_p2huge(PageEntry pd[], uint64_t virtualAddr, uint64_t physicalAddr)
 	initializePageHuge(entry, physicalAddr);
 }
 
-#define createMapping(fromTable, toTable)                                            \
-	static void map_ ## fromTable (PageEntry fromTable[],                            \
-			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
-		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
-		map_ ## toTable ((PageEntry *)toTable, virtualAddr, physicalAddr);           \
+#define createMapping(fromTable, toTable)                                                                    \
+	static void map_##fromTable(PageEntry fromTable[], uint64_t virtualAddr, uint64_t physicalAddr) {        \
+		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                         \
+		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr);                                      \
 	}
 
 createMapping(pd, pt)
@@ -151,11 +150,10 @@ createMapping(pdpt, pd)
 createMapping(pml4, pdpt)
 #undef createMapping
 
-#define createHugeMapping(name, fromTable, calls, toTable)                           \
-	static void map_ ## name (PageEntry fromTable[],                                 \
-			uint64_t virtualAddr, uint64_t physicalAddr) {                           \
-		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable); \
-		map_ ## calls ((PageEntry *)toTable, virtualAddr, physicalAddr);             \
+#define createHugeMapping(name, fromTable, calls, toTable)                                                   \
+	static void map_##name(PageEntry fromTable[], uint64_t virtualAddr, uint64_t physicalAddr) {             \
+		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                         \
+		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr);                                        \
 	}
 
 createHugeMapping(p3huge, pdpt, p2huge, pd)
@@ -173,19 +171,19 @@ function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCou
 	serialPrintf(u8"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
 	serialPrint(u8"[paging.range] virtual address = ");
-	serialPrintHex((uint64_t) (virtualAddr));
+	serialPrintHex((uint64_t)(virtualAddr));
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[paging.range] physical address = ");
-	serialPrintHex((uint64_t) (physicalAddr));
+	serialPrintHex((uint64_t)(physicalAddr));
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[paging.range] page count = ");
-	serialPrintHex((uint64_t) (pageCount));
+	serialPrintHex((uint64_t)(pageCount));
 	serialPrint(u8"\n");
 
 	serialPrint(u8"[paging.range] virtual address end = ");
-	serialPrintHex((uint64_t) (virtualAddrEnd));
+	serialPrintHex((uint64_t)(virtualAddrEnd));
 	serialPrint(u8"\n");
 
 	while (vAddress < virtualAddrEnd) {
@@ -210,9 +208,10 @@ function mapMemoryHuge(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pag
 	}
 }
 
-static const efi::EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi::EFI_MEMORY_DESCRIPTOR *descriptor, uint64_t descriptorSize) {
-	const uint8_t *desc = ((const uint8_t *) descriptor) + descriptorSize;
-	return (const efi::EFI_MEMORY_DESCRIPTOR *) desc;
+static const efi::EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi::EFI_MEMORY_DESCRIPTOR *descriptor,
+														   uint64_t descriptorSize) {
+	const uint8_t *desc = ((const uint8_t *)descriptor) + descriptorSize;
+	return (const efi::EFI_MEMORY_DESCRIPTOR *)desc;
 }
 
 uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
@@ -248,8 +247,7 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 
 	while (offset < endOfMemoryMap) {
 		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
-			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart,
-					descriptor->NumberOfPages);
+			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart, descriptor->NumberOfPages);
 			sum += descriptor->NumberOfPages;
 		}
 
@@ -308,7 +306,8 @@ uint64_t conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	serialPrintf(u8"[paging] conventionalAllocateLargest is %u bytes, %d pages\n", (uint32_t)(largestPages * PAGE_SIZE), largestPages);
+	serialPrintf(u8"[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
+				 (uint32_t)(largestPages * PAGE_SIZE), largestPages);
 
 	return result;
 }
@@ -318,12 +317,13 @@ uint64_t conventionalAllocateNext(uint64_t bytes) {
 	let result = conventionalOffset;
 	let pages = bytes / PAGE_SIZE; // Math.floor
 	conventionalOffset += pages * PAGE_SIZE;
-	if ((bytes - (pages * PAGE_SIZE)) > 0) conventionalOffset += PAGE_SIZE;
+	if ((bytes - (pages * PAGE_SIZE)) > 0)
+		conventionalOffset += PAGE_SIZE;
 	return result;
 }
 
 function mapFramebuffer(const Framebuffer *fb) {
 	let framebufferBase = fb->base;
-	mapMemory(FramebufferStart, (uint64_t) framebufferBase, fb->size / PAGE_SIZE + 1);
+	mapMemory(FramebufferStart, (uint64_t)framebufferBase, fb->size / PAGE_SIZE + 1);
 }
-}
+} // namespace paging

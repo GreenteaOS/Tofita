@@ -110,8 +110,8 @@ class PhysicalAllocator {
 			last = PHYSICAL_NOT_FOUND;
 	}
 
-	// Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
-	#undef PAGE_RESERVED
+// Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
+#undef PAGE_RESERVED
 
 	// Returns physical 64-bit address, not page number
 	static uint64_t allocateOnePage() {
@@ -139,14 +139,16 @@ class PhysicalAllocator {
 
 	static uint64_t allocateOnePagePreZeroed() {
 		var result = allocateOnePage();
-		if (result != PHYSICAL_NOT_FOUND) memset((void*)result, 0, PAGE_SIZE);
+		if (result != PHYSICAL_NOT_FOUND)
+			memset((void *)result, 0, PAGE_SIZE);
 		return result;
 	}
 
 	// TODO faster
 	static uint64_t allocatePages(uint64_t pages) {
 		// 0 or 1 == 1 page anyway
-		if (pages < 2) return allocateOnePage();
+		if (pages < 2)
+			return allocateOnePage();
 		last = PHYSICAL_NOT_FOUND;
 
 		// Find largest free block
@@ -162,7 +164,8 @@ class PhysicalAllocator {
 			// TODO probably uint32_t is completely enough to represent pages
 			while (i < steps) {
 				if (buffer[i] == PAGE_FREE) {
-					if (current == 0) currentAt = i;
+					if (current == 0)
+						currentAt = i;
 					current++;
 				}
 
@@ -203,7 +206,8 @@ class PhysicalAllocator {
 		physical -= (uint64_t)WholePhysicalStart;
 		let where = DOWN_BYTES_TO_PAGES(physical);
 		// Cosmic rays
-		if (buffer[where] == PAGE_FULL) buffer[where] = PAGE_FREE;
+		if (buffer[where] == PAGE_FULL)
+			buffer[where] = PAGE_FREE;
 		last = where;
 	}
 
@@ -221,6 +225,6 @@ class PhysicalAllocator {
 #undef PAGE_FULL
 #undef PAGE_FREE
 #undef PAGE_MASK
-uint8_t* PhysicalAllocator::buffer;
+uint8_t *PhysicalAllocator::buffer;
 uint64_t PhysicalAllocator::count;
 uint64_t PhysicalAllocator::last;
