@@ -1,0 +1,5 @@
+; Virtual file system description for the current folder
+; This is a comment
+[example section]
+key = value
+key = value
