@@ -28,7 +28,7 @@ typedef void function;
 #define UInt8 uint8_t
 #define Int8 int8_t
 #define Void void
-#define Pointer(to) to*
+#define Pointer(to) to *
 
 // Use uint64_t, int32_t, char8_t, etc
 
@@ -40,40 +40,37 @@ typedef void function;
 #define intptr_t do_not_use_such_types_please
 #define uintptr_t do_not_use_such_types_please
 
-#define STR_IMPL_(x) #x      // stringify argument
-#define STR(x) STR_IMPL_(x)  // indirection to expand argument macros
+#define STR_IMPL_(x) #x		// stringify argument
+#define STR(x) STR_IMPL_(x) // indirection to expand argument macros
 
 // Constants
 
 // Start of kernel sections in memory
 #define KernelVirtualBase (uint64_t)0xffff800000000000
-#define FramebufferStart (KernelVirtualBase + 768*1024*1024)
+#define FramebufferStart (KernelVirtualBase + 768 * 1024 * 1024)
 // TODO: no need for mapping FramebufferStart if WholePhysicalStart used
 // TODO proper dynamically computed numbers
 
 // Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-#define WholePhysicalStart (FramebufferStart + 128*1024*1024)
+#define WholePhysicalStart (FramebufferStart + 128 * 1024 * 1024)
 #define PAGE_SIZE 4096 // 4 KiB
 
 // Helpers
 
-extern "C++" template <typename T>
-struct Physical {
+extern "C++" template <typename T> struct Physical {
 	uint64_t physical;
 
-	static Physical<T> toPhysical(uint64_t physical) {
-		return (Physical<T>)physical;
-	};
+	static Physical<T> toPhysical(uint64_t physical) { return (Physical<T>)physical; };
 
-	T* toVirtual() const {
+	T *toVirtual() const {
 		uint64_t result = (uint64_t)WholePhysicalStart + physical;
-		return (T*)result;
+		return (T *)result;
 	};
 
-	T* toVirtualOffset(uint64_t offset) const {
+	T *toVirtualOffset(uint64_t offset) const {
 		uint64_t result = (uint64_t)WholePhysicalStart + physical + offset;
-		return (T*)result;
+		return (T *)result;
 	};
 };
 
@@ -90,17 +87,17 @@ struct EfiMemoryMap {
 };
 
 struct Framebuffer {
-	uint64_t base; // virtual address
+	uint64_t base;	   // virtual address
 	uint64_t physical; // physical address
-	uint32_t size; // in bytes
+	uint32_t size;	   // in bytes
 	uint16_t width;
 	uint16_t height;
 };
 
 struct RamDisk {
-	uint64_t base; // virtual address
+	uint64_t base;	   // virtual address
 	uint64_t physical; // physical address
-	uint32_t size; // in bytes
+	uint32_t size;	   // in bytes
 };
 
 struct KernelParams {
@@ -108,7 +105,8 @@ struct KernelParams {
 	uint64_t stack;
 	uint64_t physicalBuffer; // physical address of where kernel loader placed
 	uint64_t physicalBytes;
-	uint64_t physicalRamBitMaskVirtual; // virtual address of where RAM usage bit-map stored
+	uint64_t physicalRamBitMaskVirtual; // virtual address of where RAM usage
+										// bit-map stored
 	efi::EFI_HANDLE imageHandle;
 	EfiMemoryMap efiMemoryMap;
 	efi::EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
@@ -116,10 +114,12 @@ struct KernelParams {
 	RamDisk ramdisk;
 	uint64_t acpiTablePhysical;
 	uint64_t ramBytes;
-	// uint8_t isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and don't allow to login!
-	// in the sense that it looks like a security hole like "let it in without entering a login-password")
+	// uint8_t isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and
+	// don't allow to login! in the sense that it looks like a security hole
+	// like "let it in without entering a login-password")
 };
 
-typedef function (__fastcall *InitKernel)(const KernelParams *);
+typedef function(__fastcall *InitKernel)(const KernelParams *);
 // TODO ^ fix that in quake
-typedef function (__fastcall *InitKernelTrampoline)(uint64_t kernelParams, uint64_t pml4, uint64_t stack, uint64_t entry);
+typedef function(__fastcall *InitKernelTrampoline)(uint64_t kernelParams, uint64_t pml4, uint64_t stack,
+												   uint64_t entry);

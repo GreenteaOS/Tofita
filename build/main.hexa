@@ -33,6 +33,7 @@ function deleteFolderRecursive(path, noRemoveSelf) {
 
 let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
 let tasks = process.argv.slice()
+let llvm = 'LLVM-10.0.0'
 tasks.shift()
 tasks.shift()
 
@@ -65,8 +66,6 @@ for (task in tasks) {
 					'..\\Teapot\\nasm-2.14.02\\nasm -o ' +
 					config.tempFolder + '\\tofita\\trampoline.bin boot\\loader\\trampoline.asm', { stdio: 'inherit' }
 				)
-
-				let llvm = 'LLVM-10.0.0'
 
 				// KERNEL
 
@@ -194,9 +193,10 @@ for (task in tasks) {
 							if (fs.lstatSync(curPath).isDirectory()) {
 								formatFolderRecursive(curPath)
 							} else {
-								if (curPath.endsWith('.cpp')) {
+								if (!curPath.startsWith('./external'))
+								if (curPath.endsWith('.hpp') || curPath.endsWith('.hpp')) {
 									console.log('clang-format: ' + curPath)
-									let clang = `clang-format`
+									let clang = '..\\Teapot\\\(llvm)\\bin\\clang-format'
 									require('child_process').execSync(
 										clang + ` -style=file -i ` + curPath, { stdio: 'inherit' }
 									)

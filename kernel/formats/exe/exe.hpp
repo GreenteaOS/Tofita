@@ -35,8 +35,8 @@ _Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect");
 #pragma pack(1)
 struct Pe64OptionalHeader {
 	uint16_t mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	uint8_t  mMajorLinkerVersion;
-	uint8_t  mMinorLinkerVersion;
+	uint8_t mMajorLinkerVersion;
+	uint8_t mMinorLinkerVersion;
 	uint32_t mSizeOfCode;
 	uint32_t mSizeOfInitializedData;
 	uint32_t mSizeOfUninitializedData;
@@ -70,8 +70,8 @@ struct Pe64OptionalHeader {
 #pragma pack(1)
 struct Pe32OptionalHeader {
 	uint16_t mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	uint8_t  mMajorLinkerVersion;
-	uint8_t  mMinorLinkerVersion;
+	uint8_t mMajorLinkerVersion;
+	uint8_t mMinorLinkerVersion;
 	uint32_t mSizeOfCode;
 	uint32_t mSizeOfInitializedData;
 	uint32_t mSizeOfUninitializedData;
@@ -119,4 +119,4 @@ struct ImageSectionHeader { // size 40 bytes
 
 _Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect");
 
-}
+} // namespace exe
