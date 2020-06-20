@@ -166,6 +166,19 @@ function kernelInit(const KernelParams *params) {
 
 function kernelMain(const KernelParams *params) {
 	kernelInit(params);
+	__sync_synchronize();
+	// sti -> start sheduling here
+	// It will erase whole stack on next sheduling
+	// and only continue if already in kernel mode
+	// and kernel is busy
+	// TODO also wakeUpReasons[]
+	// TOOD kernel `yield`/`await`
+	amd64::enableAllInterrupts();
+	while (true) {
+		while (false) { // TODO atomic
+			// iterate over wakeUpReasons
+		}
+		amd64::halt();
 	}
 }
 }
