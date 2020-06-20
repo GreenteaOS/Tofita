@@ -12,6 +12,7 @@
 *.js text eol=crlf
 *.inf text eol=crlf
 *.ini text eol=crlf
+*.reg text eol=crlf
 
 *.tofita binary
 *.ttf binary
