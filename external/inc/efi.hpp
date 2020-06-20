@@ -4,18 +4,17 @@ Copyright (c) 1998  Intel Corporation
 
 Module Name:
 
-    efi.h
+	efi.h
 
 Abstract:
 
-    Public EFI header files
+	Public EFI header files
 
 
 
 Revision History
 
 --*/
-
 
 // Add a predefined macro to detect usage of the library
 #ifndef _GNU_EFI
@@ -29,14 +28,13 @@ Revision History
 //  EFI_NT_EMULATOR         - Building for running under NT
 //
 
-
 #ifndef _EFI_INCLUDE_
 #define _EFI_INCLUDE_
 
-#define EFI_FIRMWARE_VENDOR         L"INTEL"
+#define EFI_FIRMWARE_VENDOR L"INTEL"
 #define EFI_FIRMWARE_MAJOR_REVISION 12
 #define EFI_FIRMWARE_MINOR_REVISION 33
-#define EFI_FIRMWARE_REVISION ((EFI_FIRMWARE_MAJOR_REVISION <<16) | (EFI_FIRMWARE_MINOR_REVISION))
+#define EFI_FIRMWARE_REVISION ((EFI_FIRMWARE_MAJOR_REVISION << 16) | (EFI_FIRMWARE_MINOR_REVISION))
 
 #include "efibind.hpp"
 #include "eficompiler.hpp"
