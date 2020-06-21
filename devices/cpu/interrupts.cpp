@@ -446,7 +446,9 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(Int
 }
 
 void timer_interrupt_hadler(InterruptFrame *frame) {
-	serialPrintf(u8"[cpu] happened timer_interrupt <<<<<<<<<<<<<<<<<<<<<<<<<<<<< !!!!!!!!!!!!!! #%d\n", timer_called++);
+	if (timer_called % 57 == 0)
+		serialPrintf(u8"[cpu] happened timer_interrupt < ! #%d\n", timer_called);
+	timer_called++;
 
 	// Enable interrupts
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
@@ -638,6 +640,12 @@ function enableInterrupts() {
 
 	serialPrintln(u8"[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL");
 	enterKernelMode();
+
+	// Set PIT to 57 Hz
+	writePort(0x43, 0x36);
+	let frequency = 1193181 / 57;
+	writePort(0x40, frequency & 0xFF);
+	writePort(0x40, (frequency >> 8) & 0xFF);
 }
 
 function enablePS2Mouse() {
