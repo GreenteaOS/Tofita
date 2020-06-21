@@ -248,7 +248,9 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 
 	while (offset < endOfMemoryMap) {
 		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
-			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart, descriptor->NumberOfPages, 0);
+			// TODO pointer fixups
+			// TODO should be RW or RO?
+			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart, descriptor->NumberOfPages, 1);
 			sum += descriptor->NumberOfPages;
 		}
 
