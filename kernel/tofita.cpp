@@ -32,6 +32,7 @@ namespace efi {
 // Avoids PIT-triggered rendering
 // This is not a best solution
 uint8_t haveToRender = 1;
+uint64_t uptimeMilliseconds = 0;
 
 // Forward for global usage
 function quakePrintf(const char8_t *c, ...);
@@ -172,8 +173,6 @@ function kernelInit(const KernelParams *params) {
 		composite();
 
 		copyToScreen();
-
-		amd64::enableAllInterruptsAndHalt();
 	}
 }
 
