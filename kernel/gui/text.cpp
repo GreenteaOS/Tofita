@@ -82,3 +82,24 @@ uint16_t drawAsciiText(const char8_t *text, double x, uint16_t y, Pixel32 color)
 	}
 	return xx - x;
 }
+
+uint16_t drawIntegerText(int64_t value, double x, uint16_t y, Pixel32 color) {
+	double xx = x;
+	if (value < 0) {
+		xx += drawAsciiText(u8"-", xx, y, color);
+		value = -value;
+	}
+	const char8_t *digits[] = {u8"0", u8"1", u8"2", u8"3", u8"4", u8"5", u8"6", u8"7", u8"8", u8"9"};
+	const char8_t *chars[24] = {0};
+	uint8_t count = 0;
+	do {
+		chars[23 - count] = digits[value % 10];
+		value = (int64_t)(value / 10);
+		count++;
+	} while (value > 0);
+	for (uint8_t i = 0; i < 24; ++i) {
+		if (chars[i] != 0)
+			xx += drawAsciiText(chars[i], xx, y, color);
+	}
+	return xx - x;
+}
