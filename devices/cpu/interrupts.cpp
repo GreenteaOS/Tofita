@@ -446,7 +446,7 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(Int
 }
 
 void timer_interrupt_hadler(InterruptFrame *frame) {
-	if (timer_called % 57 == 0)
+	if (timer_called % 121 == 0)
 		serialPrintf(u8"[cpu] happened timer_interrupt < ! #%d\n", timer_called);
 	timer_called++;
 
@@ -641,9 +641,11 @@ function enableInterrupts() {
 	serialPrintln(u8"[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL");
 	enterKernelMode();
 
-	// Set PIT to 57 Hz
+	// Set PIT frequency
+	// Valid values: 57 Hz, 121 Hz, 173 Hz
+	// Next valid: `i = 174; while (Math.round(1193181 / i) != (1193181 / i)) {i++;}; console.log(i)`
 	writePort(0x43, 0x36);
-	let frequency = 1193181 / 57;
+	let frequency = 1193181 / 121;
 	writePort(0x40, frequency & 0xFF);
 	writePort(0x40, (frequency >> 8) & 0xFF);
 }
