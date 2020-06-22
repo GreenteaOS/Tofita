@@ -163,13 +163,17 @@ function kernelInit(const KernelParams *params) {
 		if (mouseX < 0)
 			mouseX = 0;
 
-		if (haveToRender == 0)
+		if (haveToRender == 0) {
+			amd64::enableAllInterruptsAndHalt();
 			continue;
+		}
 		haveToRender = 0;
 
 		composite();
 
 		copyToScreen();
+
+		amd64::enableAllInterruptsAndHalt();
 	}
 }
 

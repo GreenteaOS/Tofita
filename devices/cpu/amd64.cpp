@@ -41,4 +41,8 @@ inline function halt() {
 inline function enableAllInterrupts() {
 	asm volatile("sti" ::);
 }
+
+inline function enableAllInterruptsAndHalt() {
+	asm volatile("sti\n\thlt" ::);
+}
 } // namespace amd64
