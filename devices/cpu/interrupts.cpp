@@ -446,8 +446,10 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(Int
 }
 
 void timer_interrupt_hadler(InterruptFrame *frame) {
-	if (timer_called % 121 == 0)
-		serialPrintf(u8"[cpu] happened timer_interrupt < ! #%d\n", timer_called);
+	if (timer_called % 121 == 0) {
+		serialPrintf(u8"[cpu] happened timer_interrupt (one second passed) < ! #%d\n", timer_called);
+		uptimeMilliseconds += 1000;
+	}
 	timer_called++;
 
 	// Enable interrupts

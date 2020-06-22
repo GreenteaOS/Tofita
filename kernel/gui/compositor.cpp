@@ -211,9 +211,21 @@ function composite() {
 	drawRectangle(color, _framebuffer->width - 4, _framebuffer->height - 30, 1, 30);
 
 	var trayButtonX = _framebuffer->width - 20 - 16;
+	trayButtonX = _framebuffer->width - 80;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x11;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
-	trayButtonX -= drawAsciiText(u8"4:01 PM", _framebuffer->width - 60, _framebuffer->height - 20, color);
+
+	let uptimeHours = (uint8_t)(uptimeMilliseconds / (60 * 60 * 1000));
+	let uptimeMinutes = (uint8_t)((uptimeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000));
+
+	var trayTimeX = trayButtonX + 20;
+	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, _framebuffer->height - 20, color);
+	trayTimeX += drawAsciiText(u8":", trayTimeX, _framebuffer->height - 20, color);
+	if (uptimeMinutes < 10)
+		trayTimeX += drawAsciiText(u8"0", trayTimeX, _framebuffer->height - 20, color);
+	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, _framebuffer->height - 20, color);
+	trayTimeX += drawAsciiText(u8" AM", trayTimeX, _framebuffer->height - 20, color);
+
 	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
 
