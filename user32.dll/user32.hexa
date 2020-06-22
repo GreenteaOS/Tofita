@@ -18,635 +18,635 @@ module exports
 
 @draft
 @dllExport('_UserTestTokenForInteractive')
-function _UserTestTokenForInteractive() {}
+function _UserTestTokenForInteractive() { return 0 }
 
 @draft
 @dllExport('ActivateKeyboardLayout')
-function activateKeyboardLayout() {}
+function activateKeyboardLayout() { return 0 }
 
 @draft
 @dllExport('AddClipboardFormatListener')
-function addClipboardFormatListener() {}
+function addClipboardFormatListener() { return 0 }
 
 @draft
 @dllExport('AdjustWindowRect')
-function adjustWindowRect() {}
+function adjustWindowRect() { return 0 }
 
 @draft
 @dllExport('AdjustWindowRectEx')
-function adjustWindowRectEx() {}
+function adjustWindowRectEx() { return 0 }
 
 @draft
 @dllExport('AdjustWindowRectExForDpi')
-function adjustWindowRectExForDpi() {}
+function adjustWindowRectExForDpi() { return 0 }
 
 @draft
 @dllExport('AlignRects')
-function alignRects() {}
+function alignRects() { return 0 }
 
 @draft
 @dllExport('AllowForegroundActivation')
-function allowForegroundActivation() {}
+function allowForegroundActivation() { return 0 }
 
 @draft
 @dllExport('AllowSetForegroundWindow')
-function allowSetForegroundWindow() {}
+function allowSetForegroundWindow() { return 0 }
 
 @draft
 @dllExport('AnimateWindow')
-function animateWindow() {}
+function animateWindow() { return 0 }
 
 @draft
 @dllExport('AnyPopup')
-function anyPopup() {}
+function anyPopup() { return 0 }
 
 @draft
 @dllExport('AppendMenuA')
-function appendMenuA() {}
+function appendMenuA() { return 0 }
 
 @draft
 @dllExport('AppendMenuW')
-function appendMenuW() {}
+function appendMenuW() { return 0 }
 
 @draft
 @dllExport('AreDpiAwarenessContextsEqual')
-function areDpiAwarenessContextsEqual() {}
+function areDpiAwarenessContextsEqual() { return 0 }
 
 @draft
 @dllExport('ArrangeIconicWindows')
-function arrangeIconicWindows() {}
+function arrangeIconicWindows() { return 0 }
 
 @draft
 @dllExport('AttachThreadInput')
-function attachThreadInput() {}
+function attachThreadInput() { return 0 }
 
 @draft
 @dllExport('BeginDeferWindowPos')
-function beginDeferWindowPos() {}
+function beginDeferWindowPos() { return 0 }
 
 @draft
 @dllExport('BeginPaint')
-function beginPaint() {}
+function beginPaint() { return 0 }
 
 @draft
 @dllExport('BlockInput')
-function blockInput() {}
+function blockInput() { return 0 }
 
 @draft
 @dllExport('BringWindowToTop')
-function bringWindowToTop() {}
+function bringWindowToTop() { return 0 }
 
 @draft
 @dllExport('BroadcastSystemMessage')
-function broadcastSystemMessage() {}
+function broadcastSystemMessage() { return 0 }
 
 @draft
 @dllExport('BroadcastSystemMessageA')
-function broadcastSystemMessageA() {}
+function broadcastSystemMessageA() { return 0 }
 
 @draft
 @dllExport('BroadcastSystemMessageExA')
-function broadcastSystemMessageExA() {}
+function broadcastSystemMessageExA() { return 0 }
 
 @draft
 @dllExport('BroadcastSystemMessageExW')
-function broadcastSystemMessageExW() {}
+function broadcastSystemMessageExW() { return 0 }
 
 @draft
 @dllExport('BroadcastSystemMessageW')
-function broadcastSystemMessageW() {}
+function broadcastSystemMessageW() { return 0 }
 
 @draft
 @dllExport('BuildReasonArray')
-function buildReasonArray() {}
+function buildReasonArray() { return 0 }
 
 @draft
 @dllExport('CalcMenuBar')
-function calcMenuBar() {}
+function calcMenuBar() { return 0 }
 
 @draft
 @dllExport('CalculatePopupWindowPosition')
-function calculatePopupWindowPosition() {}
+function calculatePopupWindowPosition() { return 0 }
 
 @draft
 @dllExport('CallMsgFilter')
-function callMsgFilter() {}
+function callMsgFilter() { return 0 }
 
 @draft
 @dllExport('CallMsgFilterA')
-function callMsgFilterA() {}
+function callMsgFilterA() { return 0 }
 
 @draft
 @dllExport('CallMsgFilterW')
-function callMsgFilterW() {}
+function callMsgFilterW() { return 0 }
 
 @draft
 @dllExport('CallNextHookEx')
-function callNextHookEx() {}
+function callNextHookEx() { return 0 }
 
 @draft
 @dllExport('CallWindowProcA')
-function callWindowProcA() {}
+function callWindowProcA() { return 0 }
 
 @draft
 @dllExport('CallWindowProcW')
-function callWindowProcW() {}
+function callWindowProcW() { return 0 }
 
 @draft
 @dllExport('CancelShutdown')
-function cancelShutdown() {}
+function cancelShutdown() { return 0 }
 
 @draft
 @dllExport('CascadeChildWindows')
-function cascadeChildWindows() {}
+function cascadeChildWindows() { return 0 }
 
 @draft
 @dllExport('CascadeWindows')
-function cascadeWindows() {}
+function cascadeWindows() { return 0 }
 
 @draft
 @dllExport('ChangeClipboardChain')
-function changeClipboardChain() {}
+function changeClipboardChain() { return 0 }
 
 @draft
 @dllExport('ChangeDisplaySettingsA')
-function changeDisplaySettingsA() {}
+function changeDisplaySettingsA() { return 0 }
 
 @draft
 @dllExport('ChangeDisplaySettingsExA')
-function changeDisplaySettingsExA() {}
+function changeDisplaySettingsExA() { return 0 }
 
 @draft
 @dllExport('ChangeDisplaySettingsExW')
-function changeDisplaySettingsExW() {}
+function changeDisplaySettingsExW() { return 0 }
 
 @draft
 @dllExport('ChangeDisplaySettingsW')
-function changeDisplaySettingsW() {}
+function changeDisplaySettingsW() { return 0 }
 
 @draft
 @dllExport('ChangeMenuA')
-function changeMenuA() {}
+function changeMenuA() { return 0 }
 
 @draft
 @dllExport('ChangeMenuW')
-function changeMenuW() {}
+function changeMenuW() { return 0 }
 
 @draft
 @dllExport('ChangeWindowMessageFilter')
-function changeWindowMessageFilter() {}
+function changeWindowMessageFilter() { return 0 }
 
 @draft
 @dllExport('ChangeWindowMessageFilterEx')
-function changeWindowMessageFilterEx() {}
+function changeWindowMessageFilterEx() { return 0 }
 
 @draft
 @dllExport('CharLowerA')
-function charLowerA() {}
+function charLowerA() { return 0 }
 
 @draft
 @dllExport('CharLowerBuffA')
-function charLowerBuffA() {}
+function charLowerBuffA() { return 0 }
 
 @draft
 @dllExport('CharLowerBuffW')
-function charLowerBuffW() {}
+function charLowerBuffW() { return 0 }
 
 @draft
 @dllExport('CharLowerW')
-function charLowerW() {}
+function charLowerW() { return 0 }
 
 @draft
 @dllExport('CharNextA')
-function charNextA() {}
+function charNextA() { return 0 }
 
 @draft
 @dllExport('CharNextExA')
-function charNextExA() {}
+function charNextExA() { return 0 }
 
 @draft
 @dllExport('CharNextW')
-function charNextW() {}
+function charNextW() { return 0 }
 
 @draft
 @dllExport('CharPrevA')
-function charPrevA() {}
+function charPrevA() { return 0 }
 
 @draft
 @dllExport('CharPrevExA')
-function charPrevExA() {}
+function charPrevExA() { return 0 }
 
 @draft
 @dllExport('CharPrevW')
-function charPrevW() {}
+function charPrevW() { return 0 }
 
 @draft
 @dllExport('CharToOemA')
-function charToOemA() {}
+function charToOemA() { return 0 }
 
 @draft
 @dllExport('CharToOemBuffA')
-function charToOemBuffA() {}
+function charToOemBuffA() { return 0 }
 
 @draft
 @dllExport('CharToOemBuffW')
-function charToOemBuffW() {}
+function charToOemBuffW() { return 0 }
 
 @draft
 @dllExport('CharToOemW')
-function charToOemW() {}
+function charToOemW() { return 0 }
 
 @draft
 @dllExport('CharUpperA')
-function charUpperA() {}
+function charUpperA() { return 0 }
 
 @draft
 @dllExport('CharUpperBuffA')
-function charUpperBuffA() {}
+function charUpperBuffA() { return 0 }
 
 @draft
 @dllExport('CharUpperBuffW')
-function charUpperBuffW() {}
+function charUpperBuffW() { return 0 }
 
 @draft
 @dllExport('CharUpperW')
-function charUpperW() {}
+function charUpperW() { return 0 }
 
 @draft
 @dllExport('CheckDBCSEnabledExt')
-function checkDBCSEnabledExt() {}
+function checkDBCSEnabledExt() { return 0 }
 
 @draft
 @dllExport('CheckDlgButton')
-function checkDlgButton() {}
+function checkDlgButton() { return 0 }
 
 @draft
 @dllExport('CheckMenuItem')
-function checkMenuItem() {}
+function checkMenuItem() { return 0 }
 
 @draft
 @dllExport('CheckMenuRadioItem')
-function checkMenuRadioItem() {}
+function checkMenuRadioItem() { return 0 }
 
 @draft
 @dllExport('CheckProcessForClipboardAccess')
-function checkProcessForClipboardAccess() {}
+function checkProcessForClipboardAccess() { return 0 }
 
 @draft
 @dllExport('CheckProcessSession')
-function checkProcessSession() {}
+function checkProcessSession() { return 0 }
 
 @draft
 @dllExport('CheckRadioButton')
-function checkRadioButton() {}
+function checkRadioButton() { return 0 }
 
 @draft
 @dllExport('CheckWindowThreadDesktop')
-function checkWindowThreadDesktop() {}
+function checkWindowThreadDesktop() { return 0 }
 
 @draft
 @dllExport('ChildWindowFromPoint')
-function childWindowFromPoint() {}
+function childWindowFromPoint() { return 0 }
 
 @draft
 @dllExport('ChildWindowFromPointEx')
-function childWindowFromPointEx() {}
+function childWindowFromPointEx() { return 0 }
 
 @draft
 @dllExport('ClientThreadSetup')
-function clientThreadSetup() {}
+function clientThreadSetup() { return 0 }
 
 @draft
 @dllExport('ClientToScreen')
-function clientToScreen() {}
+function clientToScreen() { return 0 }
 
 @draft
 @dllExport('CliImmSetHotKey')
-function cliImmSetHotKey() {}
+function cliImmSetHotKey() { return 0 }
 
 @draft
 @dllExport('ClipCursor')
-function clipCursor() {}
+function clipCursor() { return 0 }
 
 @draft
 @dllExport('CloseClipboard')
-function closeClipboard() {}
+function closeClipboard() { return 0 }
 
 @draft
 @dllExport('CloseDesktop')
-function closeDesktop() {}
+function closeDesktop() { return 0 }
 
 @draft
 @dllExport('CloseGestureInfoHandle')
-function closeGestureInfoHandle() {}
+function closeGestureInfoHandle() { return 0 }
 
 @draft
 @dllExport('CloseTouchInputHandle')
-function closeTouchInputHandle() {}
+function closeTouchInputHandle() { return 0 }
 
 @draft
 @dllExport('CloseWindow')
-function closeWindow() {}
+function closeWindow() { return 0 }
 
 @draft
 @dllExport('CloseWindowStation')
-function closeWindowStation() {}
+function closeWindowStation() { return 0 }
 
 @draft
 @dllExport('ConsoleControl')
-function consoleControl() {}
+function consoleControl() { return 0 }
 
 @draft
 @dllExport('ControlMagnification')
-function controlMagnification() {}
+function controlMagnification() { return 0 }
 
 @draft
 @dllExport('CopyAcceleratorTableA')
-function copyAcceleratorTableA() {}
+function copyAcceleratorTableA() { return 0 }
 
 @draft
 @dllExport('CopyAcceleratorTableW')
-function copyAcceleratorTableW() {}
+function copyAcceleratorTableW() { return 0 }
 
 @draft
 @dllExport('CopyIcon')
-function copyIcon() {}
+function copyIcon() { return 0 }
 
 @draft
 @dllExport('CopyImage')
-function copyImage() {}
+function copyImage() { return 0 }
 
 @draft
 @dllExport('CopyRect')
-function copyRect() {}
+function copyRect() { return 0 }
 
 @draft
 @dllExport('CountClipboardFormats')
-function countClipboardFormats() {}
+function countClipboardFormats() { return 0 }
 
 @draft
 @dllExport('CreateAcceleratorTableA')
-function createAcceleratorTableA() {}
+function createAcceleratorTableA() { return 0 }
 
 @draft
 @dllExport('CreateAcceleratorTableW')
-function createAcceleratorTableW() {}
+function createAcceleratorTableW() { return 0 }
 
 @draft
 @dllExport('CreateCaret')
-function createCaret() {}
+function createCaret() { return 0 }
 
 @draft
 @dllExport('CreateCursor')
-function createCursor() {}
+function createCursor() { return 0 }
 
 @draft
 @dllExport('CreateDCompositionHwndTarget')
-function createDCompositionHwndTarget() {}
+function createDCompositionHwndTarget() { return 0 }
 
 @draft
 @dllExport('CreateDesktopA')
-function createDesktopA() {}
+function createDesktopA() { return 0 }
 
 @draft
 @dllExport('CreateDesktopExA')
-function createDesktopExA() {}
+function createDesktopExA() { return 0 }
 
 @draft
 @dllExport('CreateDesktopExW')
-function createDesktopExW() {}
+function createDesktopExW() { return 0 }
 
 @draft
 @dllExport('CreateDesktopW')
-function createDesktopW() {}
+function createDesktopW() { return 0 }
 
 @draft
 @dllExport('CreateDialogIndirectParamA')
-function createDialogIndirectParamA() {}
+function createDialogIndirectParamA() { return 0 }
 
 @draft
 @dllExport('CreateDialogIndirectParamAorW')
-function createDialogIndirectParamAorW() {}
+function createDialogIndirectParamAorW() { return 0 }
 
 @draft
 @dllExport('CreateDialogIndirectParamW')
-function createDialogIndirectParamW() {}
+function createDialogIndirectParamW() { return 0 }
 
 @draft
 @dllExport('CreateDialogParamA')
-function createDialogParamA() {}
+function createDialogParamA() { return 0 }
 
 @draft
 @dllExport('CreateDialogParamW')
-function createDialogParamW() {}
+function createDialogParamW() { return 0 }
 
 @draft
 @dllExport('CreateIcon')
-function createIcon() {}
+function createIcon() { return 0 }
 
 @draft
 @dllExport('CreateIconFromResource')
-function createIconFromResource() {}
+function createIconFromResource() { return 0 }
 
 @draft
 @dllExport('CreateIconFromResourceEx')
-function createIconFromResourceEx() {}
+function createIconFromResourceEx() { return 0 }
 
 @draft
 @dllExport('CreateIconIndirect')
-function createIconIndirect() {}
+function createIconIndirect() { return 0 }
 
 @draft
 @dllExport('CreateMDIWindowA')
-function createMDIWindowA() {}
+function createMDIWindowA() { return 0 }
 
 @draft
 @dllExport('CreateMDIWindowW')
-function createMDIWindowW() {}
+function createMDIWindowW() { return 0 }
 
 @draft
 @dllExport('CreateMenu')
-function createMenu() {}
+function createMenu() { return 0 }
 
 @draft
 @dllExport('CreatePalmRejectionDelayZone')
-function createPalmRejectionDelayZone() {}
+function createPalmRejectionDelayZone() { return 0 }
 
 @draft
 @dllExport('CreatePopupMenu')
-function createPopupMenu() {}
+function createPopupMenu() { return 0 }
 
 @draft
 @dllExport('CreateSystemThreads')
-function createSystemThreads() {}
+function createSystemThreads() { return 0 }
 
 @draft
 @dllExport('CreateWindowExA')
-function createWindowExA() {}
+function createWindowExA() { return 0 }
 
 @draft
 @dllExport('CreateWindowExW')
-function createWindowExW() {}
+function createWindowExW() { return 0 }
 
 @draft
 @dllExport('CreateWindowInBand')
-function createWindowInBand() {}
+function createWindowInBand() { return 0 }
 
 @draft
 @dllExport('CreateWindowInBandEx')
-function createWindowInBandEx() {}
+function createWindowInBandEx() { return 0 }
 
 @draft
 @dllExport('CreateWindowIndirect')
-function createWindowIndirect() {}
+function createWindowIndirect() { return 0 }
 
 @draft
 @dllExport('CreateWindowStationA')
-function createWindowStationA() {}
+function createWindowStationA() { return 0 }
 
 @draft
 @dllExport('CreateWindowStationW')
-function createWindowStationW() {}
+function createWindowStationW() { return 0 }
 
 @draft
 @dllExport('CsrBroadcastSystemMessageExW')
-function csrBroadcastSystemMessageExW() {}
+function csrBroadcastSystemMessageExW() { return 0 }
 
 @draft
 @dllExport('CtxInitUser32')
-function ctxInitUser32() {}
+function ctxInitUser32() { return 0 }
 
 @draft
 @dllExport('DdeAbandonTransaction')
-function ddeAbandonTransaction() {}
+function ddeAbandonTransaction() { return 0 }
 
 @draft
 @dllExport('DdeAccessData')
-function ddeAccessData() {}
+function ddeAccessData() { return 0 }
 
 @draft
 @dllExport('DdeAddData')
-function ddeAddData() {}
+function ddeAddData() { return 0 }
 
 @draft
 @dllExport('DdeClientTransaction')
-function ddeClientTransaction() {}
+function ddeClientTransaction() { return 0 }
 
 @draft
 @dllExport('DdeCmpStringHandles')
-function ddeCmpStringHandles() {}
+function ddeCmpStringHandles() { return 0 }
 
 @draft
 @dllExport('DdeConnect')
-function ddeConnect() {}
+function ddeConnect() { return 0 }
 
 @draft
 @dllExport('DdeConnectList')
-function ddeConnectList() {}
+function ddeConnectList() { return 0 }
 
 @draft
 @dllExport('DdeCreateDataHandle')
-function ddeCreateDataHandle() {}
+function ddeCreateDataHandle() { return 0 }
 
 @draft
 @dllExport('DdeCreateStringHandleA')
-function ddeCreateStringHandleA() {}
+function ddeCreateStringHandleA() { return 0 }
 
 @draft
 @dllExport('DdeCreateStringHandleW')
-function ddeCreateStringHandleW() {}
+function ddeCreateStringHandleW() { return 0 }
 
 @draft
 @dllExport('DdeDisconnect')
-function ddeDisconnect() {}
+function ddeDisconnect() { return 0 }
 
 @draft
 @dllExport('DdeDisconnectList')
-function ddeDisconnectList() {}
+function ddeDisconnectList() { return 0 }
 
 @draft
 @dllExport('DdeEnableCallback')
-function ddeEnableCallback() {}
+function ddeEnableCallback() { return 0 }
 
 @draft
 @dllExport('DdeFreeDataHandle')
-function ddeFreeDataHandle() {}
+function ddeFreeDataHandle() { return 0 }
 
 @draft
 @dllExport('DdeFreeStringHandle')
-function ddeFreeStringHandle() {}
+function ddeFreeStringHandle() { return 0 }
 
 @draft
 @dllExport('DdeGetData')
-function ddeGetData() {}
+function ddeGetData() { return 0 }
 
 @draft
 @dllExport('DdeGetLastError')
-function ddeGetLastError() {}
+function ddeGetLastError() { return 0 }
 
 @draft
 @dllExport('DdeGetQualityOfService')
-function ddeGetQualityOfService() {}
+function ddeGetQualityOfService() { return 0 }
 
 @draft
 @dllExport('DdeImpersonateClient')
-function ddeImpersonateClient() {}
+function ddeImpersonateClient() { return 0 }
 
 @draft
 @dllExport('DdeInitializeA')
-function ddeInitializeA() {}
+function ddeInitializeA() { return 0 }
 
 @draft
 @dllExport('DdeInitializeW')
-function ddeInitializeW() {}
+function ddeInitializeW() { return 0 }
 
 @draft
 @dllExport('DdeKeepStringHandle')
-function ddeKeepStringHandle() {}
+function ddeKeepStringHandle() { return 0 }
 
 @draft
 @dllExport('DdeNameService')
-function ddeNameService() {}
+function ddeNameService() { return 0 }
 
 @draft
 @dllExport('DdePostAdvise')
-function ddePostAdvise() {}
+function ddePostAdvise() { return 0 }
 
 @draft
 @dllExport('DdeQueryConvInfo')
-function ddeQueryConvInfo() {}
+function ddeQueryConvInfo() { return 0 }
 
 @draft
 @dllExport('DdeQueryNextServer')
-function ddeQueryNextServer() {}
+function ddeQueryNextServer() { return 0 }
 
 @draft
 @dllExport('DdeQueryStringA')
-function ddeQueryStringA() {}
+function ddeQueryStringA() { return 0 }
 
 @draft
 @dllExport('DdeQueryStringW')
-function ddeQueryStringW() {}
+function ddeQueryStringW() { return 0 }
 
 @draft
 @dllExport('DdeReconnect')
-function ddeReconnect() {}
+function ddeReconnect() { return 0 }
 
 @draft
 @dllExport('DdeSetQualityOfService')
-function ddeSetQualityOfService() {}
+function ddeSetQualityOfService() { return 0 }
 
 @draft
 @dllExport('DdeSetUserHandle')
-function ddeSetUserHandle() {}
+function ddeSetUserHandle() { return 0 }
 
 @draft
 @dllExport('DdeUnaccessData')
-function ddeUnaccessData() {}
+function ddeUnaccessData() { return 0 }
 
 @draft
 @dllExport('DdeUninitialize')
-function ddeUninitialize() {}
+function ddeUninitialize() { return 0 }
 
 @draft
 @dllExport('DefDlgProcA')
@@ -658,31 +658,31 @@ function defDlgProcW() return ntdll.ntdllDialogWndProc_W()
 
 @draft
 @dllExport('DeferWindowPos')
-function deferWindowPos() {}
+function deferWindowPos() { return 0 }
 
 @draft
 @dllExport('DeferWindowPosAndBand')
-function deferWindowPosAndBand() {}
+function deferWindowPosAndBand() { return 0 }
 
 @draft
 @dllExport('DefFrameProcA')
-function defFrameProcA() {}
+function defFrameProcA() { return 0 }
 
 @draft
 @dllExport('DefFrameProcW')
-function defFrameProcW() {}
+function defFrameProcW() { return 0 }
 
 @draft
 @dllExport('DefMDIChildProcA')
-function defMDIChildProcA() {}
+function defMDIChildProcA() { return 0 }
 
 @draft
 @dllExport('DefMDIChildProcW')
-function defMDIChildProcW() {}
+function defMDIChildProcW() { return 0 }
 
 @draft
 @dllExport('DefRawInputProc')
-function defRawInputProc() {}
+function defRawInputProc() { return 0 }
 
 @draft
 @dllExport('DefWindowProcA')
@@ -694,3357 +694,3357 @@ function defWindowProcW() return ntdll.ntdllDefWindowProc_W()
 
 @draft
 @dllExport('DelegateInput')
-function delegateInput() {}
+function delegateInput() { return 0 }
 
 @draft
 @dllExport('DeleteMenu')
-function deleteMenu() {}
+function deleteMenu() { return 0 }
 
 @draft
 @dllExport('DeregisterShellHookWindow')
-function deregisterShellHookWindow() {}
+function deregisterShellHookWindow() { return 0 }
 
 @draft
 @dllExport('DestroyAcceleratorTable')
-function destroyAcceleratorTable() {}
+function destroyAcceleratorTable() { return 0 }
 
 @draft
 @dllExport('DestroyCaret')
-function destroyCaret() {}
+function destroyCaret() { return 0 }
 
 @draft
 @dllExport('DestroyCursor')
-function destroyCursor() {}
+function destroyCursor() { return 0 }
 
 @draft
 @dllExport('DestroyDCompositionHwndTarget')
-function destroyDCompositionHwndTarget() {}
+function destroyDCompositionHwndTarget() { return 0 }
 
 @draft
 @dllExport('DestroyIcon')
-function destroyIcon() {}
+function destroyIcon() { return 0 }
 
 @draft
 @dllExport('DestroyMenu')
-function destroyMenu() {}
+function destroyMenu() { return 0 }
 
 @draft
 @dllExport('DestroyPalmRejectionDelayZone')
-function destroyPalmRejectionDelayZone() {}
+function destroyPalmRejectionDelayZone() { return 0 }
 
 @draft
 @dllExport('DestroyReasons')
-function destroyReasons() {}
+function destroyReasons() { return 0 }
 
 @draft
 @dllExport('DestroyWindow')
-function destroyWindow() {}
+function destroyWindow() { return 0 }
 
 @draft
 @dllExport('DialogBoxIndirectParamA')
-function dialogBoxIndirectParamA() {}
+function dialogBoxIndirectParamA() { return 0 }
 
 @draft
 @dllExport('DialogBoxIndirectParamAorW')
-function dialogBoxIndirectParamAorW() {}
+function dialogBoxIndirectParamAorW() { return 0 }
 
 @draft
 @dllExport('DialogBoxIndirectParamW')
-function dialogBoxIndirectParamW() {}
+function dialogBoxIndirectParamW() { return 0 }
 
 @draft
 @dllExport('DialogBoxParamA')
-function dialogBoxParamA() {}
+function dialogBoxParamA() { return 0 }
 
 @draft
 @dllExport('DialogBoxParamW')
-function dialogBoxParamW() {}
+function dialogBoxParamW() { return 0 }
 
 @draft
 @dllExport('DisableProcessWindowsGhosting')
-function disableProcessWindowsGhosting() {}
+function disableProcessWindowsGhosting() { return 0 }
 
 @draft
 @dllExport('DispatchMessageA')
-function dispatchMessageA() {}
+function dispatchMessageA() { return 0 }
 
 @draft
 @dllExport('DispatchMessageW')
-function dispatchMessageW() {}
+function dispatchMessageW() { return 0 }
 
 @draft
 @dllExport('DisplayConfigGetDeviceInfo')
-function displayConfigGetDeviceInfo() {}
+function displayConfigGetDeviceInfo() { return 0 }
 
 @draft
 @dllExport('DisplayConfigSetDeviceInfo')
-function displayConfigSetDeviceInfo() {}
+function displayConfigSetDeviceInfo() { return 0 }
 
 @draft
 @dllExport('DisplayExitWindowsWarnings')
-function displayExitWindowsWarnings() {}
+function displayExitWindowsWarnings() { return 0 }
 
 @draft
 @dllExport('DlgDirListA')
-function dlgDirListA() {}
+function dlgDirListA() { return 0 }
 
 @draft
 @dllExport('DlgDirListComboBoxA')
-function dlgDirListComboBoxA() {}
+function dlgDirListComboBoxA() { return 0 }
 
 @draft
 @dllExport('DlgDirListComboBoxW')
-function dlgDirListComboBoxW() {}
+function dlgDirListComboBoxW() { return 0 }
 
 @draft
 @dllExport('DlgDirListW')
-function dlgDirListW() {}
+function dlgDirListW() { return 0 }
 
 @draft
 @dllExport('DlgDirSelectComboBoxExA')
-function dlgDirSelectComboBoxExA() {}
+function dlgDirSelectComboBoxExA() { return 0 }
 
 @draft
 @dllExport('DlgDirSelectComboBoxExW')
-function dlgDirSelectComboBoxExW() {}
+function dlgDirSelectComboBoxExW() { return 0 }
 
 @draft
 @dllExport('DlgDirSelectExA')
-function dlgDirSelectExA() {}
+function dlgDirSelectExA() { return 0 }
 
 @draft
 @dllExport('DlgDirSelectExW')
-function dlgDirSelectExW() {}
+function dlgDirSelectExW() { return 0 }
 
 @draft
 @dllExport('DoSoundConnect')
-function doSoundConnect() {}
+function doSoundConnect() { return 0 }
 
 @draft
 @dllExport('DoSoundDisconnect')
-function doSoundDisconnect() {}
+function doSoundDisconnect() { return 0 }
 
 @draft
 @dllExport('DragDetect')
-function dragDetect() {}
+function dragDetect() { return 0 }
 
 @draft
 @dllExport('DragObject')
-function dragObject() {}
+function dragObject() { return 0 }
 
 @draft
 @dllExport('DrawAnimatedRects')
-function drawAnimatedRects() {}
+function drawAnimatedRects() { return 0 }
 
 @draft
 @dllExport('DrawCaption')
-function drawCaption() {}
+function drawCaption() { return 0 }
 
 @draft
 @dllExport('DrawCaptionTempA')
-function drawCaptionTempA() {}
+function drawCaptionTempA() { return 0 }
 
 @draft
 @dllExport('DrawCaptionTempW')
-function drawCaptionTempW() {}
+function drawCaptionTempW() { return 0 }
 
 @draft
 @dllExport('DrawEdge')
-function drawEdge() {}
+function drawEdge() { return 0 }
 
 @draft
 @dllExport('DrawFocusRect')
-function drawFocusRect() {}
+function drawFocusRect() { return 0 }
 
 @draft
 @dllExport('DrawFrame')
-function drawFrame() {}
+function drawFrame() { return 0 }
 
 @draft
 @dllExport('DrawFrameControl')
-function drawFrameControl() {}
+function drawFrameControl() { return 0 }
 
 @draft
 @dllExport('DrawIcon')
-function drawIcon() {}
+function drawIcon() { return 0 }
 
 @draft
 @dllExport('DrawIconEx')
-function drawIconEx() {}
+function drawIconEx() { return 0 }
 
 @draft
 @dllExport('DrawMenuBar')
-function drawMenuBar() {}
+function drawMenuBar() { return 0 }
 
 @draft
 @dllExport('DrawMenuBarTemp')
-function drawMenuBarTemp() {}
+function drawMenuBarTemp() { return 0 }
 
 @draft
 @dllExport('DrawStateA')
-function drawStateA() {}
+function drawStateA() { return 0 }
 
 @draft
 @dllExport('DrawStateW')
-function drawStateW() {}
+function drawStateW() { return 0 }
 
 @draft
 @dllExport('DrawTextA')
-function drawTextA() {}
+function drawTextA() { return 0 }
 
 @draft
 @dllExport('DrawTextExA')
-function drawTextExA() {}
+function drawTextExA() { return 0 }
 
 @draft
 @dllExport('DrawTextExW')
-function drawTextExW() {}
+function drawTextExW() { return 0 }
 
 @draft
 @dllExport('DrawTextW')
-function drawTextW() {}
+function drawTextW() { return 0 }
 
 @draft
 @dllExport('DWMBindCursorToOutputConfig')
-function dWMBindCursorToOutputConfig() {}
+function dWMBindCursorToOutputConfig() { return 0 }
 
 @draft
 @dllExport('DWMCommitInputSystemOutputConfig')
-function dWMCommitInputSystemOutputConfig() {}
+function dWMCommitInputSystemOutputConfig() { return 0 }
 
 @draft
 @dllExport('DwmGetDxRgn')
-function dwmGetDxRgn() {}
+function dwmGetDxRgn() { return 0 }
 
 @draft
 @dllExport('DwmGetDxSharedSurface')
-function dwmGetDxSharedSurface() {}
+function dwmGetDxSharedSurface() { return 0 }
 
 @draft
 @dllExport('DwmGetRemoteSessionOcclusionEvent')
-function dwmGetRemoteSessionOcclusionEvent() {}
+function dwmGetRemoteSessionOcclusionEvent() { return 0 }
 
 @draft
 @dllExport('DwmGetRemoteSessionOcclusionState')
-function dwmGetRemoteSessionOcclusionState() {}
+function dwmGetRemoteSessionOcclusionState() { return 0 }
 
 @draft
 @dllExport('DwmKernelShutdown')
-function dwmKernelShutdown() {}
+function dwmKernelShutdown() { return 0 }
 
 @draft
 @dllExport('DwmKernelStartup')
-function dwmKernelStartup() {}
+function dwmKernelStartup() { return 0 }
 
 @draft
 @dllExport('DwmLockScreenUpdates')
-function dwmLockScreenUpdates() {}
+function dwmLockScreenUpdates() { return 0 }
 
 @draft
 @dllExport('DWMSetCursorOrientation')
-function dWMSetCursorOrientation() {}
+function dWMSetCursorOrientation() { return 0 }
 
 @draft
 @dllExport('DWMSetInputSystemOutputConfig')
-function dWMSetInputSystemOutputConfig() {}
+function dWMSetInputSystemOutputConfig() { return 0 }
 
 @draft
 @dllExport('DwmValidateWindow')
-function dwmValidateWindow() {}
+function dwmValidateWindow() { return 0 }
 
 @draft
 @dllExport('EditWndProc')
-function editWndProc() {}
+function editWndProc() { return 0 }
 
 @draft
 @dllExport('EmptyClipboard')
-function emptyClipboard() {}
+function emptyClipboard() { return 0 }
 
 @draft
 @dllExport('EnableMenuItem')
-function enableMenuItem() {}
+function enableMenuItem() { return 0 }
 
 @draft
 @dllExport('EnableMouseInPointer')
-function enableMouseInPointer() {}
+function enableMouseInPointer() { return 0 }
 
 @draft
 @dllExport('EnableNonClientDpiScaling')
-function enableNonClientDpiScaling() {}
+function enableNonClientDpiScaling() { return 0 }
 
 @draft
 @dllExport('EnableOneCoreTransformMode')
-function enableOneCoreTransformMode() {}
+function enableOneCoreTransformMode() { return 0 }
 
 @draft
 @dllExport('EnableScrollBar')
-function enableScrollBar() {}
+function enableScrollBar() { return 0 }
 
 @draft
 @dllExport('EnableSessionForMMCSS')
-function enableSessionForMMCSS() {}
+function enableSessionForMMCSS() { return 0 }
 
 @draft
 @dllExport('EnableWindow')
-function enableWindow() {}
+function enableWindow() { return 0 }
 
 @draft
 @dllExport('EndDeferWindowPos')
-function endDeferWindowPos() {}
+function endDeferWindowPos() { return 0 }
 
 @draft
 @dllExport('EndDeferWindowPosEx')
-function endDeferWindowPosEx() {}
+function endDeferWindowPosEx() { return 0 }
 
 @draft
 @dllExport('EndDialog')
-function endDialog() {}
+function endDialog() { return 0 }
 
 @draft
 @dllExport('EndMenu')
-function endMenu() {}
+function endMenu() { return 0 }
 
 @draft
 @dllExport('EndPaint')
-function endPaint() {}
+function endPaint() { return 0 }
 
 @draft
 @dllExport('EndTask')
-function endTask() {}
+function endTask() { return 0 }
 
 @draft
 @dllExport('EnterReaderModeHelper')
-function enterReaderModeHelper() {}
+function enterReaderModeHelper() { return 0 }
 
 @draft
 @dllExport('EnumChildWindows')
-function enumChildWindows() {}
+function enumChildWindows() { return 0 }
 
 @draft
 @dllExport('EnumClipboardFormats')
-function enumClipboardFormats() {}
+function enumClipboardFormats() { return 0 }
 
 @draft
 @dllExport('EnumDesktopsA')
-function enumDesktopsA() {}
+function enumDesktopsA() { return 0 }
 
 @draft
 @dllExport('EnumDesktopsW')
-function enumDesktopsW() {}
+function enumDesktopsW() { return 0 }
 
 @draft
 @dllExport('EnumDesktopWindows')
-function enumDesktopWindows() {}
+function enumDesktopWindows() { return 0 }
 
 @draft
 @dllExport('EnumDisplayDevicesA')
-function enumDisplayDevicesA() {}
+function enumDisplayDevicesA() { return 0 }
 
 @draft
 @dllExport('EnumDisplayDevicesW')
-function enumDisplayDevicesW() {}
+function enumDisplayDevicesW() { return 0 }
 
 @draft
 @dllExport('EnumDisplayMonitors')
-function enumDisplayMonitors() {}
+function enumDisplayMonitors() { return 0 }
 
 @draft
 @dllExport('EnumDisplaySettingsA')
-function enumDisplaySettingsA() {}
+function enumDisplaySettingsA() { return 0 }
 
 @draft
 @dllExport('EnumDisplaySettingsExA')
-function enumDisplaySettingsExA() {}
+function enumDisplaySettingsExA() { return 0 }
 
 @draft
 @dllExport('EnumDisplaySettingsExW')
-function enumDisplaySettingsExW() {}
+function enumDisplaySettingsExW() { return 0 }
 
 @draft
 @dllExport('EnumDisplaySettingsW')
-function enumDisplaySettingsW() {}
+function enumDisplaySettingsW() { return 0 }
 
 @draft
 @dllExport('EnumPropsA')
-function enumPropsA() {}
+function enumPropsA() { return 0 }
 
 @draft
 @dllExport('EnumPropsExA')
-function enumPropsExA() {}
+function enumPropsExA() { return 0 }
 
 @draft
 @dllExport('EnumPropsExW')
-function enumPropsExW() {}
+function enumPropsExW() { return 0 }
 
 @draft
 @dllExport('EnumPropsW')
-function enumPropsW() {}
+function enumPropsW() { return 0 }
 
 @draft
 @dllExport('EnumThreadWindows')
-function enumThreadWindows() {}
+function enumThreadWindows() { return 0 }
 
 @draft
 @dllExport('EnumWindows')
-function enumWindows() {}
+function enumWindows() { return 0 }
 
 @draft
 @dllExport('EnumWindowStationsA')
-function enumWindowStationsA() {}
+function enumWindowStationsA() { return 0 }
 
 @draft
 @dllExport('EnumWindowStationsW')
-function enumWindowStationsW() {}
+function enumWindowStationsW() { return 0 }
 
 @draft
 @dllExport('EqualRect')
-function equalRect() {}
+function equalRect() { return 0 }
 
 @draft
 @dllExport('EvaluateProximityToPolygon')
-function evaluateProximityToPolygon() {}
+function evaluateProximityToPolygon() { return 0 }
 
 @draft
 @dllExport('EvaluateProximityToRect')
-function evaluateProximityToRect() {}
+function evaluateProximityToRect() { return 0 }
 
 @draft
 @dllExport('ExcludeUpdateRgn')
-function excludeUpdateRgn() {}
+function excludeUpdateRgn() { return 0 }
 
 @draft
 @dllExport('ExitWindowsEx')
-function exitWindowsEx() {}
+function exitWindowsEx() { return 0 }
 
 @draft
 @dllExport('FillRect')
-function fillRect() {}
+function fillRect() { return 0 }
 
 @draft
 @dllExport('FindWindowA')
-function findWindowA() {}
+function findWindowA() { return 0 }
 
 @draft
 @dllExport('FindWindowExA')
-function findWindowExA() {}
+function findWindowExA() { return 0 }
 
 @draft
 @dllExport('FindWindowExW')
-function findWindowExW() {}
+function findWindowExW() { return 0 }
 
 @draft
 @dllExport('FindWindowW')
-function findWindowW() {}
+function findWindowW() { return 0 }
 
 @draft
 @dllExport('FlashWindow')
-function flashWindow() {}
+function flashWindow() { return 0 }
 
 @draft
 @dllExport('FlashWindowEx')
-function flashWindowEx() {}
+function flashWindowEx() { return 0 }
 
 @draft
 @dllExport('FrameRect')
-function frameRect() {}
+function frameRect() { return 0 }
 
 @draft
 @dllExport('FreeDDElParam')
-function freeDDElParam() {}
+function freeDDElParam() { return 0 }
 
 @draft
 @dllExport('FrostCrashedWindow')
-function frostCrashedWindow() {}
+function frostCrashedWindow() { return 0 }
 
 @draft
 @dllExport('gapfnScSendMessage')
-function gapfnScSendMessage() {}
+function gapfnScSendMessage() { return 0 }
 
 @draft
 @dllExport('GetActiveWindow')
-function getActiveWindow() {}
+function getActiveWindow() { return 0 }
 
 @draft
 @dllExport('GetAltTabInfo')
-function getAltTabInfo() {}
+function getAltTabInfo() { return 0 }
 
 @draft
 @dllExport('GetAltTabInfoA')
-function getAltTabInfoA() {}
+function getAltTabInfoA() { return 0 }
 
 @draft
 @dllExport('GetAltTabInfoW')
-function getAltTabInfoW() {}
+function getAltTabInfoW() { return 0 }
 
 @draft
 @dllExport('GetAncestor')
-function getAncestor() {}
+function getAncestor() { return 0 }
 
 @draft
 @dllExport('GetAppCompatFlags')
-function getAppCompatFlags() {}
+function getAppCompatFlags() { return 0 }
 
 @draft
 @dllExport('GetAppCompatFlags2')
-function getAppCompatFlags2() {}
+function getAppCompatFlags2() { return 0 }
 
 @draft
 @dllExport('GetAsyncKeyState')
-function getAsyncKeyState() {}
+function getAsyncKeyState() { return 0 }
 
 @draft
 @dllExport('GetAutoRotationState')
-function getAutoRotationState() {}
+function getAutoRotationState() { return 0 }
 
 @draft
 @dllExport('GetAwarenessFromDpiAwarenessContext')
-function getAwarenessFromDpiAwarenessContext() {}
+function getAwarenessFromDpiAwarenessContext() { return 0 }
 
 @draft
 @dllExport('GetCapture')
-function getCapture() {}
+function getCapture() { return 0 }
 
 @draft
 @dllExport('GetCaretBlinkTime')
-function getCaretBlinkTime() {}
+function getCaretBlinkTime() { return 0 }
 
 @draft
 @dllExport('GetCaretPos')
-function getCaretPos() {}
+function getCaretPos() { return 0 }
 
 @draft
 @dllExport('GetCIMSSM')
-function getCIMSSM() {}
+function getCIMSSM() { return 0 }
 
 @draft
 @dllExport('GetClassInfoA')
-function getClassInfoA() {}
+function getClassInfoA() { return 0 }
 
 @draft
 @dllExport('GetClassInfoExA')
-function getClassInfoExA() {}
+function getClassInfoExA() { return 0 }
 
 @draft
 @dllExport('GetClassInfoExW')
-function getClassInfoExW() {}
+function getClassInfoExW() { return 0 }
 
 @draft
 @dllExport('GetClassInfoW')
-function getClassInfoW() {}
+function getClassInfoW() { return 0 }
 
 @draft
 @dllExport('GetClassLongA')
-function getClassLongA() {}
+function getClassLongA() { return 0 }
 
 @draft
 @dllExport('GetClassLongPtrA')
-function getClassLongPtrA() {}
+function getClassLongPtrA() { return 0 }
 
 @draft
 @dllExport('GetClassLongPtrW')
-function getClassLongPtrW() {}
+function getClassLongPtrW() { return 0 }
 
 @draft
 @dllExport('GetClassLongW')
-function getClassLongW() {}
+function getClassLongW() { return 0 }
 
 @draft
 @dllExport('GetClassNameA')
-function getClassNameA() {}
+function getClassNameA() { return 0 }
 
 @draft
 @dllExport('GetClassNameW')
-function getClassNameW() {}
+function getClassNameW() { return 0 }
 
 @draft
 @dllExport('GetClassWord')
-function getClassWord() {}
+function getClassWord() { return 0 }
 
 @draft
 @dllExport('GetClientRect')
-function getClientRect() {}
+function getClientRect() { return 0 }
 
 @draft
 @dllExport('GetClipboardAccessToken')
-function getClipboardAccessToken() {}
+function getClipboardAccessToken() { return 0 }
 
 @draft
 @dllExport('GetClipboardData')
-function getClipboardData() {}
+function getClipboardData() { return 0 }
 
 @draft
 @dllExport('GetClipboardFormatNameA')
-function getClipboardFormatNameA() {}
+function getClipboardFormatNameA() { return 0 }
 
 @draft
 @dllExport('GetClipboardFormatNameW')
-function getClipboardFormatNameW() {}
+function getClipboardFormatNameW() { return 0 }
 
 @draft
 @dllExport('GetClipboardOwner')
-function getClipboardOwner() {}
+function getClipboardOwner() { return 0 }
 
 @draft
 @dllExport('GetClipboardSequenceNumber')
-function getClipboardSequenceNumber() {}
+function getClipboardSequenceNumber() { return 0 }
 
 @draft
 @dllExport('GetClipboardViewer')
-function getClipboardViewer() {}
+function getClipboardViewer() { return 0 }
 
 @draft
 @dllExport('GetClipCursor')
-function getClipCursor() {}
+function getClipCursor() { return 0 }
 
 @draft
 @dllExport('GetComboBoxInfo')
-function getComboBoxInfo() {}
+function getComboBoxInfo() { return 0 }
 
 @draft
 @dllExport('GetCurrentInputMessageSource')
-function getCurrentInputMessageSource() {}
+function getCurrentInputMessageSource() { return 0 }
 
 @draft
 @dllExport('GetCursor')
-function getCursor() {}
+function getCursor() { return 0 }
 
 @draft
 @dllExport('GetCursorFrameInfo')
-function getCursorFrameInfo() {}
+function getCursorFrameInfo() { return 0 }
 
 @draft
 @dllExport('GetCursorInfo')
-function getCursorInfo() {}
+function getCursorInfo() { return 0 }
 
 @draft
 @dllExport('GetCursorPos')
-function getCursorPos() {}
+function getCursorPos() { return 0 }
 
 @draft
 @dllExport('GetDC')
-function getDC() {}
+function getDC() { return 0 }
 
 @draft
 @dllExport('GetDCEx')
-function getDCEx() {}
+function getDCEx() { return 0 }
 
 @draft
 @dllExport('GetDesktopID')
-function getDesktopID() {}
+function getDesktopID() { return 0 }
 
 @draft
 @dllExport('GetDesktopWindow')
-function getDesktopWindow() {}
+function getDesktopWindow() { return 0 }
 
 @draft
 @dllExport('GetDialogBaseUnits')
-function getDialogBaseUnits() {}
+function getDialogBaseUnits() { return 0 }
 
 @draft
 @dllExport('GetDialogControlDpiChangeBehavior')
-function getDialogControlDpiChangeBehavior() {}
+function getDialogControlDpiChangeBehavior() { return 0 }
 
 @draft
 @dllExport('GetDialogDpiChangeBehavior')
-function getDialogDpiChangeBehavior() {}
+function getDialogDpiChangeBehavior() { return 0 }
 
 @draft
 @dllExport('GetDisplayAutoRotationPreferences')
-function getDisplayAutoRotationPreferences() {}
+function getDisplayAutoRotationPreferences() { return 0 }
 
 @draft
 @dllExport('GetDisplayConfigBufferSizes')
-function getDisplayConfigBufferSizes() {}
+function getDisplayConfigBufferSizes() { return 0 }
 
 @draft
 @dllExport('GetDlgCtrlID')
-function getDlgCtrlID() {}
+function getDlgCtrlID() { return 0 }
 
 @draft
 @dllExport('GetDlgItem')
-function getDlgItem() {}
+function getDlgItem() { return 0 }
 
 @draft
 @dllExport('GetDlgItemInt')
-function getDlgItemInt() {}
+function getDlgItemInt() { return 0 }
 
 @draft
 @dllExport('GetDlgItemTextA')
-function getDlgItemTextA() {}
+function getDlgItemTextA() { return 0 }
 
 @draft
 @dllExport('GetDlgItemTextW')
-function getDlgItemTextW() {}
+function getDlgItemTextW() { return 0 }
 
 @draft
 @dllExport('GetDoubleClickTime')
-function getDoubleClickTime() {}
+function getDoubleClickTime() { return 0 }
 
 @draft
 @dllExport('GetDpiForMonitorInternal')
-function getDpiForMonitorInternal() {}
+function getDpiForMonitorInternal() { return 0 }
 
 @draft
 @dllExport('GetDpiForSystem')
-function getDpiForSystem() {}
+function getDpiForSystem() { return 0 }
 
 @draft
 @dllExport('GetDpiForWindow')
-function getDpiForWindow() {}
+function getDpiForWindow() { return 0 }
 
 @draft
 @dllExport('GetDpiFromDpiAwarenessContext')
-function getDpiFromDpiAwarenessContext() {}
+function getDpiFromDpiAwarenessContext() { return 0 }
 
 @draft
 @dllExport('GetFocus')
-function getFocus() {}
+function getFocus() { return 0 }
 
 @draft
 @dllExport('GetForegroundWindow')
-function getForegroundWindow() {}
+function getForegroundWindow() { return 0 }
 
 @draft
 @dllExport('GetGestureConfig')
-function getGestureConfig() {}
+function getGestureConfig() { return 0 }
 
 @draft
 @dllExport('GetGestureExtraArgs')
-function getGestureExtraArgs() {}
+function getGestureExtraArgs() { return 0 }
 
 @draft
 @dllExport('GetGestureInfo')
-function getGestureInfo() {}
+function getGestureInfo() { return 0 }
 
 @draft
 @dllExport('GetGuiResources')
-function getGuiResources() {}
+function getGuiResources() { return 0 }
 
 @draft
 @dllExport('GetGUIThreadInfo')
-function getGUIThreadInfo() {}
+function getGUIThreadInfo() { return 0 }
 
 @draft
 @dllExport('GetIconInfo')
-function getIconInfo() {}
+function getIconInfo() { return 0 }
 
 @draft
 @dllExport('GetIconInfoExA')
-function getIconInfoExA() {}
+function getIconInfoExA() { return 0 }
 
 @draft
 @dllExport('GetIconInfoExW')
-function getIconInfoExW() {}
+function getIconInfoExW() { return 0 }
 
 @draft
 @dllExport('GetInputDesktop')
-function getInputDesktop() {}
+function getInputDesktop() { return 0 }
 
 @draft
 @dllExport('GetInputLocaleInfo')
-function getInputLocaleInfo() {}
+function getInputLocaleInfo() { return 0 }
 
 @draft
 @dllExport('GetInputState')
-function getInputState() {}
+function getInputState() { return 0 }
 
 @draft
 @dllExport('GetInternalWindowPos')
-function getInternalWindowPos() {}
+function getInternalWindowPos() { return 0 }
 
 @draft
 @dllExport('GetKBCodePage')
-function getKBCodePage() {}
+function getKBCodePage() { return 0 }
 
 @draft
 @dllExport('GetKeyboardLayout')
-function getKeyboardLayout() {}
+function getKeyboardLayout() { return 0 }
 
 @draft
 @dllExport('GetKeyboardLayoutList')
-function getKeyboardLayoutList() {}
+function getKeyboardLayoutList() { return 0 }
 
 @draft
 @dllExport('GetKeyboardLayoutNameA')
-function getKeyboardLayoutNameA() {}
+function getKeyboardLayoutNameA() { return 0 }
 
 @draft
 @dllExport('GetKeyboardLayoutNameW')
-function getKeyboardLayoutNameW() {}
+function getKeyboardLayoutNameW() { return 0 }
 
 @draft
 @dllExport('GetKeyboardState')
-function getKeyboardState() {}
+function getKeyboardState() { return 0 }
 
 @draft
 @dllExport('GetKeyboardType')
-function getKeyboardType() {}
+function getKeyboardType() { return 0 }
 
 @draft
 @dllExport('GetKeyNameTextA')
-function getKeyNameTextA() {}
+function getKeyNameTextA() { return 0 }
 
 @draft
 @dllExport('GetKeyNameTextW')
-function getKeyNameTextW() {}
+function getKeyNameTextW() { return 0 }
 
 @draft
 @dllExport('GetKeyState')
-function getKeyState() {}
+function getKeyState() { return 0 }
 
 @draft
 @dllExport('GetLastActivePopup')
-function getLastActivePopup() {}
+function getLastActivePopup() { return 0 }
 
 @draft
 @dllExport('GetLastInputInfo')
-function getLastInputInfo() {}
+function getLastInputInfo() { return 0 }
 
 @draft
 @dllExport('GetLayeredWindowAttributes')
-function getLayeredWindowAttributes() {}
+function getLayeredWindowAttributes() { return 0 }
 
 @draft
 @dllExport('GetListBoxInfo')
-function getListBoxInfo() {}
+function getListBoxInfo() { return 0 }
 
 @draft
 @dllExport('GetMagnificationDesktopColorEffect')
-function getMagnificationDesktopColorEffect() {}
+function getMagnificationDesktopColorEffect() { return 0 }
 
 @draft
 @dllExport('GetMagnificationDesktopMagnification')
-function getMagnificationDesktopMagnification() {}
+function getMagnificationDesktopMagnification() { return 0 }
 
 @draft
 @dllExport('GetMagnificationDesktopSamplingMode')
-function getMagnificationDesktopSamplingMode() {}
+function getMagnificationDesktopSamplingMode() { return 0 }
 
 @draft
 @dllExport('GetMagnificationLensCtxInformation')
-function getMagnificationLensCtxInformation() {}
+function getMagnificationLensCtxInformation() { return 0 }
 
 @draft
 @dllExport('GetMenu')
-function getMenu() {}
+function getMenu() { return 0 }
 
 @draft
 @dllExport('GetMenuBarInfo')
-function getMenuBarInfo() {}
+function getMenuBarInfo() { return 0 }
 
 @draft
 @dllExport('GetMenuCheckMarkDimensions')
-function getMenuCheckMarkDimensions() {}
+function getMenuCheckMarkDimensions() { return 0 }
 
 @draft
 @dllExport('GetMenuContextHelpId')
-function getMenuContextHelpId() {}
+function getMenuContextHelpId() { return 0 }
 
 @draft
 @dllExport('GetMenuDefaultItem')
-function getMenuDefaultItem() {}
+function getMenuDefaultItem() { return 0 }
 
 @draft
 @dllExport('GetMenuInfo')
-function getMenuInfo() {}
+function getMenuInfo() { return 0 }
 
 @draft
 @dllExport('GetMenuItemCount')
-function getMenuItemCount() {}
+function getMenuItemCount() { return 0 }
 
 @draft
 @dllExport('GetMenuItemID')
-function getMenuItemID() {}
+function getMenuItemID() { return 0 }
 
 @draft
 @dllExport('GetMenuItemInfoA')
-function getMenuItemInfoA() {}
+function getMenuItemInfoA() { return 0 }
 
 @draft
 @dllExport('GetMenuItemInfoW')
-function getMenuItemInfoW() {}
+function getMenuItemInfoW() { return 0 }
 
 @draft
 @dllExport('GetMenuItemRect')
-function getMenuItemRect() {}
+function getMenuItemRect() { return 0 }
 
 @draft
 @dllExport('GetMenuState')
-function getMenuState() {}
+function getMenuState() { return 0 }
 
 @draft
 @dllExport('GetMenuStringA')
-function getMenuStringA() {}
+function getMenuStringA() { return 0 }
 
 @draft
 @dllExport('GetMenuStringW')
-function getMenuStringW() {}
+function getMenuStringW() { return 0 }
 
 @draft
 @dllExport('GetMessageA')
-function getMessageA() {}
+function getMessageA() { return 0 }
 
 @draft
 @dllExport('GetMessageExtraInfo')
-function getMessageExtraInfo() {}
+function getMessageExtraInfo() { return 0 }
 
 @draft
 @dllExport('GetMessagePos')
-function getMessagePos() {}
+function getMessagePos() { return 0 }
 
 @draft
 @dllExport('GetMessageTime')
-function getMessageTime() {}
+function getMessageTime() { return 0 }
 
 @draft
 @dllExport('GetMessageW')
-function getMessageW() {}
+function getMessageW() { return 0 }
 
 @draft
 @dllExport('GetMonitorInfoA')
-function getMonitorInfoA() {}
+function getMonitorInfoA() { return 0 }
 
 @draft
 @dllExport('GetMonitorInfoW')
-function getMonitorInfoW() {}
+function getMonitorInfoW() { return 0 }
 
 @draft
 @dllExport('GetMouseMovePointsEx')
-function getMouseMovePointsEx() {}
+function getMouseMovePointsEx() { return 0 }
 
 @draft
 @dllExport('GetNextDlgGroupItem')
-function getNextDlgGroupItem() {}
+function getNextDlgGroupItem() { return 0 }
 
 @draft
 @dllExport('GetNextDlgTabItem')
-function getNextDlgTabItem() {}
+function getNextDlgTabItem() { return 0 }
 
 @draft
 @dllExport('GetOpenClipboardWindow')
-function getOpenClipboardWindow() {}
+function getOpenClipboardWindow() { return 0 }
 
 @draft
 @dllExport('GetParent')
-function getParent() {}
+function getParent() { return 0 }
 
 @draft
 @dllExport('GetPhysicalCursorPos')
-function getPhysicalCursorPos() {}
+function getPhysicalCursorPos() { return 0 }
 
 @draft
 @dllExport('GetPointerCursorId')
-function getPointerCursorId() {}
+function getPointerCursorId() { return 0 }
 
 @draft
 @dllExport('GetPointerDevice')
-function getPointerDevice() {}
+function getPointerDevice() { return 0 }
 
 @draft
 @dllExport('GetPointerDeviceCursors')
-function getPointerDeviceCursors() {}
+function getPointerDeviceCursors() { return 0 }
 
 @draft
 @dllExport('GetPointerDeviceProperties')
-function getPointerDeviceProperties() {}
+function getPointerDeviceProperties() { return 0 }
 
 @draft
 @dllExport('GetPointerDeviceRects')
-function getPointerDeviceRects() {}
+function getPointerDeviceRects() { return 0 }
 
 @draft
 @dllExport('GetPointerDevices')
-function getPointerDevices() {}
+function getPointerDevices() { return 0 }
 
 @draft
 @dllExport('GetPointerFrameArrivalTimes')
-function getPointerFrameArrivalTimes() {}
+function getPointerFrameArrivalTimes() { return 0 }
 
 @draft
 @dllExport('GetPointerFrameInfo')
-function getPointerFrameInfo() {}
+function getPointerFrameInfo() { return 0 }
 
 @draft
 @dllExport('GetPointerFrameInfoHistory')
-function getPointerFrameInfoHistory() {}
+function getPointerFrameInfoHistory() { return 0 }
 
 @draft
 @dllExport('GetPointerFramePenInfo')
-function getPointerFramePenInfo() {}
+function getPointerFramePenInfo() { return 0 }
 
 @draft
 @dllExport('GetPointerFramePenInfoHistory')
-function getPointerFramePenInfoHistory() {}
+function getPointerFramePenInfoHistory() { return 0 }
 
 @draft
 @dllExport('GetPointerFrameTouchInfo')
-function getPointerFrameTouchInfo() {}
+function getPointerFrameTouchInfo() { return 0 }
 
 @draft
 @dllExport('GetPointerFrameTouchInfoHistory')
-function getPointerFrameTouchInfoHistory() {}
+function getPointerFrameTouchInfoHistory() { return 0 }
 
 @draft
 @dllExport('GetPointerInfo')
-function getPointerInfo() {}
+function getPointerInfo() { return 0 }
 
 @draft
 @dllExport('GetPointerInfoHistory')
-function getPointerInfoHistory() {}
+function getPointerInfoHistory() { return 0 }
 
 @draft
 @dllExport('GetPointerInputTransform')
-function getPointerInputTransform() {}
+function getPointerInputTransform() { return 0 }
 
 @draft
 @dllExport('GetPointerPenInfo')
-function getPointerPenInfo() {}
+function getPointerPenInfo() { return 0 }
 
 @draft
 @dllExport('GetPointerPenInfoHistory')
-function getPointerPenInfoHistory() {}
+function getPointerPenInfoHistory() { return 0 }
 
 @draft
 @dllExport('GetPointerTouchInfo')
-function getPointerTouchInfo() {}
+function getPointerTouchInfo() { return 0 }
 
 @draft
 @dllExport('GetPointerTouchInfoHistory')
-function getPointerTouchInfoHistory() {}
+function getPointerTouchInfoHistory() { return 0 }
 
 @draft
 @dllExport('GetPointerType')
-function getPointerType() {}
+function getPointerType() { return 0 }
 
 @draft
 @dllExport('GetPriorityClipboardFormat')
-function getPriorityClipboardFormat() {}
+function getPriorityClipboardFormat() { return 0 }
 
 @draft
 @dllExport('GetProcessDefaultLayout')
-function getProcessDefaultLayout() {}
+function getProcessDefaultLayout() { return 0 }
 
 @draft
 @dllExport('GetProcessDpiAwarenessInternal')
-function getProcessDpiAwarenessInternal() {}
+function getProcessDpiAwarenessInternal() { return 0 }
 
 @draft
 @dllExport('GetProcessUIContextInformation')
-function getProcessUIContextInformation() {}
+function getProcessUIContextInformation() { return 0 }
 
 @draft
 @dllExport('GetProcessWindowStation')
-function getProcessWindowStation() {}
+function getProcessWindowStation() { return 0 }
 
 @draft
 @dllExport('GetProgmanWindow')
-function getProgmanWindow() {}
+function getProgmanWindow() { return 0 }
 
 @draft
 @dllExport('GetPropA')
-function getPropA() {}
+function getPropA() { return 0 }
 
 @draft
 @dllExport('GetPropW')
-function getPropW() {}
+function getPropW() { return 0 }
 
 @draft
 @dllExport('GetQueueStatus')
-function getQueueStatus() {}
+function getQueueStatus() { return 0 }
 
 @draft
 @dllExport('GetRawInputBuffer')
-function getRawInputBuffer() {}
+function getRawInputBuffer() { return 0 }
 
 @draft
 @dllExport('GetRawInputData')
-function getRawInputData() {}
+function getRawInputData() { return 0 }
 
 @draft
 @dllExport('GetRawInputDeviceInfoA')
-function getRawInputDeviceInfoA() {}
+function getRawInputDeviceInfoA() { return 0 }
 
 @draft
 @dllExport('GetRawInputDeviceInfoW')
-function getRawInputDeviceInfoW() {}
+function getRawInputDeviceInfoW() { return 0 }
 
 @draft
 @dllExport('GetRawInputDeviceList')
-function getRawInputDeviceList() {}
+function getRawInputDeviceList() { return 0 }
 
 @draft
 @dllExport('GetRawPointerDeviceData')
-function getRawPointerDeviceData() {}
+function getRawPointerDeviceData() { return 0 }
 
 @draft
 @dllExport('GetReasonTitleFromReasonCode')
-function getReasonTitleFromReasonCode() {}
+function getReasonTitleFromReasonCode() { return 0 }
 
 @draft
 @dllExport('GetRegisteredRawInputDevices')
-function getRegisteredRawInputDevices() {}
+function getRegisteredRawInputDevices() { return 0 }
 
 @draft
 @dllExport('GetScrollBarInfo')
-function getScrollBarInfo() {}
+function getScrollBarInfo() { return 0 }
 
 @draft
 @dllExport('GetScrollInfo')
-function getScrollInfo() {}
+function getScrollInfo() { return 0 }
 
 @draft
 @dllExport('GetScrollPos')
-function getScrollPos() {}
+function getScrollPos() { return 0 }
 
 @draft
 @dllExport('GetScrollRange')
-function getScrollRange() {}
+function getScrollRange() { return 0 }
 
 @draft
 @dllExport('GetSendMessageReceiver')
-function getSendMessageReceiver() {}
+function getSendMessageReceiver() { return 0 }
 
 @draft
 @dllExport('GetShellWindow')
-function getShellWindow() {}
+function getShellWindow() { return 0 }
 
 @draft
 @dllExport('GetSubMenu')
-function getSubMenu() {}
+function getSubMenu() { return 0 }
 
 @draft
 @dllExport('GetSysColor')
-function getSysColor() {}
+function getSysColor() { return 0 }
 
 @draft
 @dllExport('GetSysColorBrush')
-function getSysColorBrush() {}
+function getSysColorBrush() { return 0 }
 
 @draft
 @dllExport('GetSystemDpiForProcess')
-function getSystemDpiForProcess() {}
+function getSystemDpiForProcess() { return 0 }
 
 @draft
 @dllExport('GetSystemMenu')
-function getSystemMenu() {}
+function getSystemMenu() { return 0 }
 
 @draft
 @dllExport('GetSystemMetrics')
-function getSystemMetrics() {}
+function getSystemMetrics() { return 0 }
 
 @draft
 @dllExport('GetSystemMetricsForDpi')
-function getSystemMetricsForDpi() {}
+function getSystemMetricsForDpi() { return 0 }
 
 @draft
 @dllExport('GetTabbedTextExtentA')
-function getTabbedTextExtentA() {}
+function getTabbedTextExtentA() { return 0 }
 
 @draft
 @dllExport('GetTabbedTextExtentW')
-function getTabbedTextExtentW() {}
+function getTabbedTextExtentW() { return 0 }
 
 @draft
 @dllExport('GetTaskmanWindow')
-function getTaskmanWindow() {}
+function getTaskmanWindow() { return 0 }
 
 @draft
 @dllExport('GetThreadDesktop')
-function getThreadDesktop() {}
+function getThreadDesktop() { return 0 }
 
 @draft
 @dllExport('GetThreadDpiAwarenessContext')
-function getThreadDpiAwarenessContext() {}
+function getThreadDpiAwarenessContext() { return 0 }
 
 @draft
 @dllExport('GetThreadDpiHostingBehavior')
-function getThreadDpiHostingBehavior() {}
+function getThreadDpiHostingBehavior() { return 0 }
 
 @draft
 @dllExport('GetTitleBarInfo')
-function getTitleBarInfo() {}
+function getTitleBarInfo() { return 0 }
 
 @draft
 @dllExport('GetTopLevelWindow')
-function getTopLevelWindow() {}
+function getTopLevelWindow() { return 0 }
 
 @draft
 @dllExport('GetTopWindow')
-function getTopWindow() {}
+function getTopWindow() { return 0 }
 
 @draft
 @dllExport('GetTouchInputInfo')
-function getTouchInputInfo() {}
+function getTouchInputInfo() { return 0 }
 
 @draft
 @dllExport('GetUnpredictedMessagePos')
-function getUnpredictedMessagePos() {}
+function getUnpredictedMessagePos() { return 0 }
 
 @draft
 @dllExport('GetUpdatedClipboardFormats')
-function getUpdatedClipboardFormats() {}
+function getUpdatedClipboardFormats() { return 0 }
 
 @draft
 @dllExport('GetUpdateRect')
-function getUpdateRect() {}
+function getUpdateRect() { return 0 }
 
 @draft
 @dllExport('GetUpdateRgn')
-function getUpdateRgn() {}
+function getUpdateRgn() { return 0 }
 
 @draft
 @dllExport('GetUserObjectInformationA')
-function getUserObjectInformationA() {}
+function getUserObjectInformationA() { return 0 }
 
 @draft
 @dllExport('GetUserObjectInformationW')
-function getUserObjectInformationW() {}
+function getUserObjectInformationW() { return 0 }
 
 @draft
 @dllExport('GetUserObjectSecurity')
-function getUserObjectSecurity() {}
+function getUserObjectSecurity() { return 0 }
 
 @draft
 @dllExport('GetWindow')
-function getWindow() {}
+function getWindow() { return 0 }
 
 @draft
 @dllExport('GetWindowBand')
-function getWindowBand() {}
+function getWindowBand() { return 0 }
 
 @draft
 @dllExport('GetWindowCompositionAttribute')
-function getWindowCompositionAttribute() {}
+function getWindowCompositionAttribute() { return 0 }
 
 @draft
 @dllExport('GetWindowCompositionInfo')
-function getWindowCompositionInfo() {}
+function getWindowCompositionInfo() { return 0 }
 
 @draft
 @dllExport('GetWindowContextHelpId')
-function getWindowContextHelpId() {}
+function getWindowContextHelpId() { return 0 }
 
 @draft
 @dllExport('GetWindowDC')
-function getWindowDC() {}
+function getWindowDC() { return 0 }
 
 @draft
 @dllExport('GetWindowDisplayAffinity')
-function getWindowDisplayAffinity() {}
+function getWindowDisplayAffinity() { return 0 }
 
 @draft
 @dllExport('GetWindowDpiAwarenessContext')
-function getWindowDpiAwarenessContext() {}
+function getWindowDpiAwarenessContext() { return 0 }
 
 @draft
 @dllExport('GetWindowDpiHostingBehavior')
-function getWindowDpiHostingBehavior() {}
+function getWindowDpiHostingBehavior() { return 0 }
 
 @draft
 @dllExport('GetWindowFeedbackSetting')
-function getWindowFeedbackSetting() {}
+function getWindowFeedbackSetting() { return 0 }
 
 @draft
 @dllExport('GetWindowInfo')
-function getWindowInfo() {}
+function getWindowInfo() { return 0 }
 
 @draft
 @dllExport('GetWindowLongA')
-function getWindowLongA() {}
+function getWindowLongA() { return 0 }
 
 @draft
 @dllExport('GetWindowLongPtrA')
-function getWindowLongPtrA() {}
+function getWindowLongPtrA() { return 0 }
 
 @draft
 @dllExport('GetWindowLongPtrW')
-function getWindowLongPtrW() {}
+function getWindowLongPtrW() { return 0 }
 
 @draft
 @dllExport('GetWindowLongW')
-function getWindowLongW() {}
+function getWindowLongW() { return 0 }
 
 @draft
 @dllExport('GetWindowMinimizeRect')
-function getWindowMinimizeRect() {}
+function getWindowMinimizeRect() { return 0 }
 
 @draft
 @dllExport('GetWindowModuleFileName')
-function getWindowModuleFileName() {}
+function getWindowModuleFileName() { return 0 }
 
 @draft
 @dllExport('GetWindowModuleFileNameA')
-function getWindowModuleFileNameA() {}
+function getWindowModuleFileNameA() { return 0 }
 
 @draft
 @dllExport('GetWindowModuleFileNameW')
-function getWindowModuleFileNameW() {}
+function getWindowModuleFileNameW() { return 0 }
 
 @draft
 @dllExport('GetWindowPlacement')
-function getWindowPlacement() {}
+function getWindowPlacement() { return 0 }
 
 @draft
 @dllExport('GetWindowProcessHandle')
-function getWindowProcessHandle() {}
+function getWindowProcessHandle() { return 0 }
 
 @draft
 @dllExport('GetWindowRect')
-function getWindowRect() {}
+function getWindowRect() { return 0 }
 
 @draft
 @dllExport('GetWindowRgn')
-function getWindowRgn() {}
+function getWindowRgn() { return 0 }
 
 @draft
 @dllExport('GetWindowRgnBox')
-function getWindowRgnBox() {}
+function getWindowRgnBox() { return 0 }
 
 @draft
 @dllExport('GetWindowRgnEx')
-function getWindowRgnEx() {}
+function getWindowRgnEx() { return 0 }
 
 @draft
 @dllExport('GetWindowTextA')
-function getWindowTextA() {}
+function getWindowTextA() { return 0 }
 
 @draft
 @dllExport('GetWindowTextLengthA')
-function getWindowTextLengthA() {}
+function getWindowTextLengthA() { return 0 }
 
 @draft
 @dllExport('GetWindowTextLengthW')
-function getWindowTextLengthW() {}
+function getWindowTextLengthW() { return 0 }
 
 @draft
 @dllExport('GetWindowTextW')
-function getWindowTextW() {}
+function getWindowTextW() { return 0 }
 
 @draft
 @dllExport('GetWindowThreadProcessId')
-function getWindowThreadProcessId() {}
+function getWindowThreadProcessId() { return 0 }
 
 @draft
 @dllExport('GetWindowWord')
-function getWindowWord() {}
+function getWindowWord() { return 0 }
 
 @draft
 @dllExport('GetWinStationInfo')
-function getWinStationInfo() {}
+function getWinStationInfo() { return 0 }
 
 @draft
 @dllExport('GhostWindowFromHungWindow')
-function ghostWindowFromHungWindow() {}
+function ghostWindowFromHungWindow() { return 0 }
 
 @draft
 @dllExport('GrayStringA')
-function grayStringA() {}
+function grayStringA() { return 0 }
 
 @draft
 @dllExport('GrayStringW')
-function grayStringW() {}
+function grayStringW() { return 0 }
 
 @draft
 @dllExport('gSharedInfo')
-function gSharedInfo() {}
+function gSharedInfo() { return 0 }
 
 @draft
 @dllExport('HandleDelegatedInput')
-function handleDelegatedInput() {}
+function handleDelegatedInput() { return 0 }
 
 @draft
 @dllExport('HideCaret')
-function hideCaret() {}
+function hideCaret() { return 0 }
 
 @draft
 @dllExport('HiliteMenuItem')
-function hiliteMenuItem() {}
+function hiliteMenuItem() { return 0 }
 
 @draft
 @dllExport('HungWindowFromGhostWindow')
-function hungWindowFromGhostWindow() {}
+function hungWindowFromGhostWindow() { return 0 }
 
 @draft
 @dllExport('ImpersonateDdeClientWindow')
-function impersonateDdeClientWindow() {}
+function impersonateDdeClientWindow() { return 0 }
 
 @draft
 @dllExport('IMPGetIMEA')
-function iMPGetIMEA() {}
+function iMPGetIMEA() { return 0 }
 
 @draft
 @dllExport('IMPGetIMEW')
-function iMPGetIMEW() {}
+function iMPGetIMEW() { return 0 }
 
 @draft
 @dllExport('IMPQueryIMEA')
-function iMPQueryIMEA() {}
+function iMPQueryIMEA() { return 0 }
 
 @draft
 @dllExport('IMPQueryIMEW')
-function iMPQueryIMEW() {}
+function iMPQueryIMEW() { return 0 }
 
 @draft
 @dllExport('IMPSetIMEA')
-function iMPSetIMEA() {}
+function iMPSetIMEA() { return 0 }
 
 @draft
 @dllExport('IMPSetIMEW')
-function iMPSetIMEW() {}
+function iMPSetIMEW() { return 0 }
 
 @draft
 @dllExport('InflateRect')
-function inflateRect() {}
+function inflateRect() { return 0 }
 
 @draft
 @dllExport('InheritWindowMonitor')
-function inheritWindowMonitor() {}
+function inheritWindowMonitor() { return 0 }
 
 @draft
 @dllExport('InitDManipHook')
-function initDManipHook() {}
+function initDManipHook() { return 0 }
 
 @draft
 @dllExport('InitializeGenericHidInjection')
-function initializeGenericHidInjection() {}
+function initializeGenericHidInjection() { return 0 }
 
 @draft
 @dllExport('InitializeInputDeviceInjection')
-function initializeInputDeviceInjection() {}
+function initializeInputDeviceInjection() { return 0 }
 
 @draft
 @dllExport('InitializeLpkHooks')
-function initializeLpkHooks() {}
+function initializeLpkHooks() { return 0 }
 
 @draft
 @dllExport('InitializePointerDeviceInjection')
-function initializePointerDeviceInjection() {}
+function initializePointerDeviceInjection() { return 0 }
 
 @draft
 @dllExport('InitializePointerDeviceInjectionEx')
-function initializePointerDeviceInjectionEx() {}
+function initializePointerDeviceInjectionEx() { return 0 }
 
 @draft
 @dllExport('InitializeTouchInjection')
-function initializeTouchInjection() {}
+function initializeTouchInjection() { return 0 }
 
 @draft
 @dllExport('InjectDeviceInput')
-function injectDeviceInput() {}
+function injectDeviceInput() { return 0 }
 
 @draft
 @dllExport('InjectGenericHidInput')
-function injectGenericHidInput() {}
+function injectGenericHidInput() { return 0 }
 
 @draft
 @dllExport('InjectKeyboardInput')
-function injectKeyboardInput() {}
+function injectKeyboardInput() { return 0 }
 
 @draft
 @dllExport('InjectMouseInput')
-function injectMouseInput() {}
+function injectMouseInput() { return 0 }
 
 @draft
 @dllExport('InjectPointerInput')
-function injectPointerInput() {}
+function injectPointerInput() { return 0 }
 
 @draft
 @dllExport('InjectTouchInput')
-function injectTouchInput() {}
+function injectTouchInput() { return 0 }
 
 @draft
 @dllExport('InSendMessage')
-function inSendMessage() {}
+function inSendMessage() { return 0 }
 
 @draft
 @dllExport('InSendMessageEx')
-function inSendMessageEx() {}
+function inSendMessageEx() { return 0 }
 
 @draft
 @dllExport('InsertMenuA')
-function insertMenuA() {}
+function insertMenuA() { return 0 }
 
 @draft
 @dllExport('InsertMenuItemA')
-function insertMenuItemA() {}
+function insertMenuItemA() { return 0 }
 
 @draft
 @dllExport('InsertMenuItemW')
-function insertMenuItemW() {}
+function insertMenuItemW() { return 0 }
 
 @draft
 @dllExport('InsertMenuW')
-function insertMenuW() {}
+function insertMenuW() { return 0 }
 
 @draft
 @dllExport('InternalGetWindowIcon')
-function internalGetWindowIcon() {}
+function internalGetWindowIcon() { return 0 }
 
 @draft
 @dllExport('InternalGetWindowText')
-function internalGetWindowText() {}
+function internalGetWindowText() { return 0 }
 
 @draft
 @dllExport('IntersectRect')
-function intersectRect() {}
+function intersectRect() { return 0 }
 
 @draft
 @dllExport('InvalidateRect')
-function invalidateRect() {}
+function invalidateRect() { return 0 }
 
 @draft
 @dllExport('InvalidateRgn')
-function invalidateRgn() {}
+function invalidateRgn() { return 0 }
 
 @draft
 @dllExport('InvertRect')
-function invertRect() {}
+function invertRect() { return 0 }
 
 @draft
 @dllExport('IsCharAlphaA')
-function isCharAlphaA() {}
+function isCharAlphaA() { return 0 }
 
 @draft
 @dllExport('IsCharAlphaNumericA')
-function isCharAlphaNumericA() {}
+function isCharAlphaNumericA() { return 0 }
 
 @draft
 @dllExport('IsCharAlphaNumericW')
-function isCharAlphaNumericW() {}
+function isCharAlphaNumericW() { return 0 }
 
 @draft
 @dllExport('IsCharAlphaW')
-function isCharAlphaW() {}
+function isCharAlphaW() { return 0 }
 
 @draft
 @dllExport('IsCharLowerA')
-function isCharLowerA() {}
+function isCharLowerA() { return 0 }
 
 @draft
 @dllExport('IsCharLowerW')
-function isCharLowerW() {}
+function isCharLowerW() { return 0 }
 
 @draft
 @dllExport('IsCharUpperA')
-function isCharUpperA() {}
+function isCharUpperA() { return 0 }
 
 @draft
 @dllExport('IsCharUpperW')
-function isCharUpperW() {}
+function isCharUpperW() { return 0 }
 
 @draft
 @dllExport('IsChild')
-function isChild() {}
+function isChild() { return 0 }
 
 @draft
 @dllExport('IsClipboardFormatAvailable')
-function isClipboardFormatAvailable() {}
+function isClipboardFormatAvailable() { return 0 }
 
 @draft
 @dllExport('IsDialogMessage')
-function isDialogMessage() {}
+function isDialogMessage() { return 0 }
 
 @draft
 @dllExport('IsDialogMessageA')
-function isDialogMessageA() {}
+function isDialogMessageA() { return 0 }
 
 @draft
 @dllExport('IsDialogMessageW')
-function isDialogMessageW() {}
+function isDialogMessageW() { return 0 }
 
 @draft
 @dllExport('IsDlgButtonChecked')
-function isDlgButtonChecked() {}
+function isDlgButtonChecked() { return 0 }
 
 @draft
 @dllExport('IsGUIThread')
-function isGUIThread() {}
+function isGUIThread() { return 0 }
 
 @draft
 @dllExport('IsHungAppWindow')
-function isHungAppWindow() {}
+function isHungAppWindow() { return 0 }
 
 @draft
 @dllExport('IsIconic')
-function isIconic() {}
+function isIconic() { return 0 }
 
 @draft
 @dllExport('IsImmersiveProcess')
-function isImmersiveProcess() {}
+function isImmersiveProcess() { return 0 }
 
 @draft
 @dllExport('IsInDesktopWindowBand')
-function isInDesktopWindowBand() {}
+function isInDesktopWindowBand() { return 0 }
 
 @draft
 @dllExport('IsMenu')
-function isMenu() {}
+function isMenu() { return 0 }
 
 @draft
 @dllExport('IsMouseInPointerEnabled')
-function isMouseInPointerEnabled() {}
+function isMouseInPointerEnabled() { return 0 }
 
 @draft
 @dllExport('IsOneCoreTransformMode')
-function isOneCoreTransformMode() {}
+function isOneCoreTransformMode() { return 0 }
 
 @draft
 @dllExport('IsProcessDPIAware')
-function isProcessDPIAware() {}
+function isProcessDPIAware() { return 0 }
 
 @draft
 @dllExport('IsQueueAttached')
-function isQueueAttached() {}
+function isQueueAttached() { return 0 }
 
 @draft
 @dllExport('IsRectEmpty')
-function isRectEmpty() {}
+function isRectEmpty() { return 0 }
 
 @draft
 @dllExport('IsServerSideWindow')
-function isServerSideWindow() {}
+function isServerSideWindow() { return 0 }
 
 @draft
 @dllExport('IsSETEnabled')
-function isSETEnabled() {}
+function isSETEnabled() { return 0 }
 
 @draft
 @dllExport('IsThreadDesktopComposited')
-function isThreadDesktopComposited() {}
+function isThreadDesktopComposited() { return 0 }
 
 @draft
 @dllExport('IsThreadMessageQueueAttached')
-function isThreadMessageQueueAttached() {}
+function isThreadMessageQueueAttached() { return 0 }
 
 @draft
 @dllExport('IsThreadTSFEventAware')
-function isThreadTSFEventAware() {}
+function isThreadTSFEventAware() { return 0 }
 
 @draft
 @dllExport('IsTopLevelWindow')
-function isTopLevelWindow() {}
+function isTopLevelWindow() { return 0 }
 
 @draft
 @dllExport('IsTouchWindow')
-function isTouchWindow() {}
+function isTouchWindow() { return 0 }
 
 @draft
 @dllExport('IsValidDpiAwarenessContext')
-function isValidDpiAwarenessContext() {}
+function isValidDpiAwarenessContext() { return 0 }
 
 @draft
 @dllExport('IsWindow')
-function isWindow() {}
+function isWindow() { return 0 }
 
 @draft
 @dllExport('IsWindowArranged')
-function isWindowArranged() {}
+function isWindowArranged() { return 0 }
 
 @draft
 @dllExport('IsWindowEnabled')
-function isWindowEnabled() {}
+function isWindowEnabled() { return 0 }
 
 @draft
 @dllExport('IsWindowInDestroy')
-function isWindowInDestroy() {}
+function isWindowInDestroy() { return 0 }
 
 @draft
 @dllExport('IsWindowRedirectedForPrint')
-function isWindowRedirectedForPrint() {}
+function isWindowRedirectedForPrint() { return 0 }
 
 @draft
 @dllExport('IsWindowUnicode')
-function isWindowUnicode() {}
+function isWindowUnicode() { return 0 }
 
 @draft
 @dllExport('IsWindowVisible')
-function isWindowVisible() {}
+function isWindowVisible() { return 0 }
 
 @draft
 @dllExport('IsWinEventHookInstalled')
-function isWinEventHookInstalled() {}
+function isWinEventHookInstalled() { return 0 }
 
 @draft
 @dllExport('IsWow64Message')
-function isWow64Message() {}
+function isWow64Message() { return 0 }
 
 @draft
 @dllExport('IsZoomed')
-function isZoomed() {}
+function isZoomed() { return 0 }
 
 @draft
 @dllExport('keybd_event')
-function keybd_event() {}
+function keybd_event() { return 0 }
 
 @draft
 @dllExport('KillTimer')
-function killTimer() {}
+function killTimer() { return 0 }
 
 @draft
 @dllExport('LoadAcceleratorsA')
-function loadAcceleratorsA() {}
+function loadAcceleratorsA() { return 0 }
 
 @draft
 @dllExport('LoadAcceleratorsW')
-function loadAcceleratorsW() {}
+function loadAcceleratorsW() { return 0 }
 
 @draft
 @dllExport('LoadBitmapA')
-function loadBitmapA() {}
+function loadBitmapA() { return 0 }
 
 @draft
 @dllExport('LoadBitmapW')
-function loadBitmapW() {}
+function loadBitmapW() { return 0 }
 
 @draft
 @dllExport('LoadCursorA')
-function loadCursorA() {}
+function loadCursorA() { return 0 }
 
 @draft
 @dllExport('LoadCursorFromFileA')
-function loadCursorFromFileA() {}
+function loadCursorFromFileA() { return 0 }
 
 @draft
 @dllExport('LoadCursorFromFileW')
-function loadCursorFromFileW() {}
+function loadCursorFromFileW() { return 0 }
 
 @draft
 @dllExport('LoadCursorW')
-function loadCursorW() {}
+function loadCursorW() { return 0 }
 
 @draft
 @dllExport('LoadIconA')
-function loadIconA() {}
+function loadIconA() { return 0 }
 
 @draft
 @dllExport('LoadIconW')
-function loadIconW() {}
+function loadIconW() { return 0 }
 
 @draft
 @dllExport('LoadImageA')
-function loadImageA() {}
+function loadImageA() { return 0 }
 
 @draft
 @dllExport('LoadImageW')
-function loadImageW() {}
+function loadImageW() { return 0 }
 
 @draft
 @dllExport('LoadKeyboardLayoutA')
-function loadKeyboardLayoutA() {}
+function loadKeyboardLayoutA() { return 0 }
 
 @draft
 @dllExport('LoadKeyboardLayoutEx')
-function loadKeyboardLayoutEx() {}
+function loadKeyboardLayoutEx() { return 0 }
 
 @draft
 @dllExport('LoadKeyboardLayoutW')
-function loadKeyboardLayoutW() {}
+function loadKeyboardLayoutW() { return 0 }
 
 @draft
 @dllExport('LoadLocalFonts')
-function loadLocalFonts() {}
+function loadLocalFonts() { return 0 }
 
 @draft
 @dllExport('LoadMenuA')
-function loadMenuA() {}
+function loadMenuA() { return 0 }
 
 @draft
 @dllExport('LoadMenuIndirectA')
-function loadMenuIndirectA() {}
+function loadMenuIndirectA() { return 0 }
 
 @draft
 @dllExport('LoadMenuIndirectW')
-function loadMenuIndirectW() {}
+function loadMenuIndirectW() { return 0 }
 
 @draft
 @dllExport('LoadMenuW')
-function loadMenuW() {}
+function loadMenuW() { return 0 }
 
 @draft
 @dllExport('LoadRemoteFonts')
-function loadRemoteFonts() {}
+function loadRemoteFonts() { return 0 }
 
 @draft
 @dllExport('LoadStringA')
-function loadStringA() {}
+function loadStringA() { return 0 }
 
 @draft
 @dllExport('LoadStringW')
-function loadStringW() {}
+function loadStringW() { return 0 }
 
 @draft
 @dllExport('LockSetForegroundWindow')
-function lockSetForegroundWindow() {}
+function lockSetForegroundWindow() { return 0 }
 
 @draft
 @dllExport('LockWindowStation')
-function lockWindowStation() {}
+function lockWindowStation() { return 0 }
 
 @draft
 @dllExport('LockWindowUpdate')
-function lockWindowUpdate() {}
+function lockWindowUpdate() { return 0 }
 
 @draft
 @dllExport('LockWorkStation')
-function lockWorkStation() {}
+function lockWorkStation() { return 0 }
 
 @draft
 @dllExport('LogicalToPhysicalPoint')
-function logicalToPhysicalPoint() {}
+function logicalToPhysicalPoint() { return 0 }
 
 @draft
 @dllExport('LogicalToPhysicalPointForPerMonitorDPI')
-function logicalToPhysicalPointForPerMonitorDPI() {}
+function logicalToPhysicalPointForPerMonitorDPI() { return 0 }
 
 @draft
 @dllExport('LookupIconIdFromDirectory')
-function lookupIconIdFromDirectory() {}
+function lookupIconIdFromDirectory() { return 0 }
 
 @draft
 @dllExport('LookupIconIdFromDirectoryEx')
-function lookupIconIdFromDirectoryEx() {}
+function lookupIconIdFromDirectoryEx() { return 0 }
 
 @draft
 @dllExport('MakeThreadTSFEventAware')
-function makeThreadTSFEventAware() {}
+function makeThreadTSFEventAware() { return 0 }
 
 @draft
 @dllExport('MapDialogRect')
-function mapDialogRect() {}
+function mapDialogRect() { return 0 }
 
 @draft
 @dllExport('MapVirtualKeyA')
-function mapVirtualKeyA() {}
+function mapVirtualKeyA() { return 0 }
 
 @draft
 @dllExport('MapVirtualKeyExA')
-function mapVirtualKeyExA() {}
+function mapVirtualKeyExA() { return 0 }
 
 @draft
 @dllExport('MapVirtualKeyExW')
-function mapVirtualKeyExW() {}
+function mapVirtualKeyExW() { return 0 }
 
 @draft
 @dllExport('MapVirtualKeyW')
-function mapVirtualKeyW() {}
+function mapVirtualKeyW() { return 0 }
 
 @draft
 @dllExport('MapVisualRelativePoints')
-function mapVisualRelativePoints() {}
+function mapVisualRelativePoints() { return 0 }
 
 @draft
 @dllExport('MapWindowPoints')
-function mapWindowPoints() {}
+function mapWindowPoints() { return 0 }
 
 @draft
 @dllExport('MB_GetString')
-function mB_GetString() {}
+function mB_GetString() { return 0 }
 
 @draft
 @dllExport('MBToWCSEx')
-function mBToWCSEx() {}
+function mBToWCSEx() { return 0 }
 
 @draft
 @dllExport('MBToWCSExt')
-function mBToWCSExt() {}
+function mBToWCSExt() { return 0 }
 
 @draft
 @dllExport('MenuItemFromPoint')
-function menuItemFromPoint() {}
+function menuItemFromPoint() { return 0 }
 
 @draft
 @dllExport('MenuWindowProcA')
-function menuWindowProcA() {}
+function menuWindowProcA() { return 0 }
 
 @draft
 @dllExport('MenuWindowProcW')
-function menuWindowProcW() {}
+function menuWindowProcW() { return 0 }
 
 @draft
 @dllExport('MessageBeep')
-function messageBeep() {}
+function messageBeep() { return 0 }
 
 @draft
 @dllExport('MessageBoxA')
-function messageBoxA() {}
+function messageBoxA() { return 0 }
 
 @draft
 @dllExport('MessageBoxExA')
-function messageBoxExA() {}
+function messageBoxExA() { return 0 }
 
 @draft
 @dllExport('MessageBoxExW')
-function messageBoxExW() {}
+function messageBoxExW() { return 0 }
 
 @draft
 @dllExport('MessageBoxIndirectA')
-function messageBoxIndirectA() {}
+function messageBoxIndirectA() { return 0 }
 
 @draft
 @dllExport('MessageBoxIndirectW')
-function messageBoxIndirectW() {}
+function messageBoxIndirectW() { return 0 }
 
 @draft
 @dllExport('MessageBoxTimeoutA')
-function messageBoxTimeoutA() {}
+function messageBoxTimeoutA() { return 0 }
 
 @draft
 @dllExport('MessageBoxTimeoutW')
-function messageBoxTimeoutW() {}
+function messageBoxTimeoutW() { return 0 }
 
 @draft
 @dllExport('MessageBoxW')
-function messageBoxW() {}
+function messageBoxW() { return 0 }
 
 @draft
 @dllExport('MITActivateInputProcessing')
-function mITActivateInputProcessing() {}
+function mITActivateInputProcessing() { return 0 }
 
 @draft
 @dllExport('MITBindInputTypeToMonitors')
-function mITBindInputTypeToMonitors() {}
+function mITBindInputTypeToMonitors() { return 0 }
 
 @draft
 @dllExport('MITCoreMsgKGetConnectionHandle')
-function mITCoreMsgKGetConnectionHandle() {}
+function mITCoreMsgKGetConnectionHandle() { return 0 }
 
 @draft
 @dllExport('MITCoreMsgKOpenConnectionTo')
-function mITCoreMsgKOpenConnectionTo() {}
+function mITCoreMsgKOpenConnectionTo() { return 0 }
 
 @draft
 @dllExport('MITCoreMsgKSend')
-function mITCoreMsgKSend() {}
+function mITCoreMsgKSend() { return 0 }
 
 @draft
 @dllExport('MITDeactivateInputProcessing')
-function mITDeactivateInputProcessing() {}
+function mITDeactivateInputProcessing() { return 0 }
 
 @draft
 @dllExport('MITDisableMouseIntercept')
-function mITDisableMouseIntercept() {}
+function mITDisableMouseIntercept() { return 0 }
 
 @draft
 @dllExport('MITDispatchCompletion')
-function mITDispatchCompletion() {}
+function mITDispatchCompletion() { return 0 }
 
 @draft
 @dllExport('MITEnableMouseIntercept')
-function mITEnableMouseIntercept() {}
+function mITEnableMouseIntercept() { return 0 }
 
 @draft
 @dllExport('MITGetCursorUpdateHandle')
-function mITGetCursorUpdateHandle() {}
+function mITGetCursorUpdateHandle() { return 0 }
 
 @draft
 @dllExport('MITInjectLegacyISMTouchFrame')
-function mITInjectLegacyISMTouchFrame() {}
+function mITInjectLegacyISMTouchFrame() { return 0 }
 
 @draft
 @dllExport('MITRegisterManipulationThread')
-function mITRegisterManipulationThread() {}
+function mITRegisterManipulationThread() { return 0 }
 
 @draft
 @dllExport('MITSetForegroundRoutingInfo')
-function mITSetForegroundRoutingInfo() {}
+function mITSetForegroundRoutingInfo() { return 0 }
 
 @draft
 @dllExport('MITSetInputCallbacks')
-function mITSetInputCallbacks() {}
+function mITSetInputCallbacks() { return 0 }
 
 @draft
 @dllExport('MITSetInputDelegationMode')
-function mITSetInputDelegationMode() {}
+function mITSetInputDelegationMode() { return 0 }
 
 @draft
 @dllExport('MITSetLastInputRecipient')
-function mITSetLastInputRecipient() {}
+function mITSetLastInputRecipient() { return 0 }
 
 @draft
 @dllExport('MITSetManipulationInputTarget')
-function mITSetManipulationInputTarget() {}
+function mITSetManipulationInputTarget() { return 0 }
 
 @draft
 @dllExport('MITStopAndEndInertia')
-function mITStopAndEndInertia() {}
+function mITStopAndEndInertia() { return 0 }
 
 @draft
 @dllExport('MITSynthesizeMouseInput')
-function mITSynthesizeMouseInput() {}
+function mITSynthesizeMouseInput() { return 0 }
 
 @draft
 @dllExport('MITSynthesizeMouseWheel')
-function mITSynthesizeMouseWheel() {}
+function mITSynthesizeMouseWheel() { return 0 }
 
 @draft
 @dllExport('MITSynthesizeTouchInput')
-function mITSynthesizeTouchInput() {}
+function mITSynthesizeTouchInput() { return 0 }
 
 @draft
 @dllExport('MITUpdateInputGlobals')
-function mITUpdateInputGlobals() {}
+function mITUpdateInputGlobals() { return 0 }
 
 @draft
 @dllExport('MITWaitForMultipleObjectsEx')
-function mITWaitForMultipleObjectsEx() {}
+function mITWaitForMultipleObjectsEx() { return 0 }
 
 @draft
 @dllExport('ModifyMenuA')
-function modifyMenuA() {}
+function modifyMenuA() { return 0 }
 
 @draft
 @dllExport('ModifyMenuW')
-function modifyMenuW() {}
+function modifyMenuW() { return 0 }
 
 @draft
 @dllExport('MonitorFromPoint')
-function monitorFromPoint() {}
+function monitorFromPoint() { return 0 }
 
 @draft
 @dllExport('MonitorFromRect')
-function monitorFromRect() {}
+function monitorFromRect() { return 0 }
 
 @draft
 @dllExport('MonitorFromWindow')
-function monitorFromWindow() {}
+function monitorFromWindow() { return 0 }
 
 @draft
 @dllExport('mouse_event')
-function mouse_event() {}
+function mouse_event() { return 0 }
 
 @draft
 @dllExport('MoveWindow')
-function moveWindow() {}
+function moveWindow() { return 0 }
 
 @draft
 @dllExport('MsgWaitForMultipleObjects')
-function msgWaitForMultipleObjects() {}
+function msgWaitForMultipleObjects() { return 0 }
 
 @draft
 @dllExport('MsgWaitForMultipleObjectsEx')
-function msgWaitForMultipleObjectsEx() {}
+function msgWaitForMultipleObjectsEx() { return 0 }
 
 @draft
 @dllExport('NotifyOverlayWindow')
-function notifyOverlayWindow() {}
+function notifyOverlayWindow() { return 0 }
 
 @draft
 @dllExport('NotifyWinEvent')
-function notifyWinEvent() {}
+function notifyWinEvent() { return 0 }
 
 @draft
 @dllExport('OemKeyScan')
-function oemKeyScan() {}
+function oemKeyScan() { return 0 }
 
 @draft
 @dllExport('OemToCharA')
-function oemToCharA() {}
+function oemToCharA() { return 0 }
 
 @draft
 @dllExport('OemToCharBuffA')
-function oemToCharBuffA() {}
+function oemToCharBuffA() { return 0 }
 
 @draft
 @dllExport('OemToCharBuffW')
-function oemToCharBuffW() {}
+function oemToCharBuffW() { return 0 }
 
 @draft
 @dllExport('OemToCharW')
-function oemToCharW() {}
+function oemToCharW() { return 0 }
 
 @draft
 @dllExport('OffsetRect')
-function offsetRect() {}
+function offsetRect() { return 0 }
 
 @draft
 @dllExport('OpenClipboard')
-function openClipboard() {}
+function openClipboard() { return 0 }
 
 @draft
 @dllExport('OpenDesktopA')
-function openDesktopA() {}
+function openDesktopA() { return 0 }
 
 @draft
 @dllExport('OpenDesktopW')
-function openDesktopW() {}
+function openDesktopW() { return 0 }
 
 @draft
 @dllExport('OpenIcon')
-function openIcon() {}
+function openIcon() { return 0 }
 
 @draft
 @dllExport('OpenInputDesktop')
-function openInputDesktop() {}
+function openInputDesktop() { return 0 }
 
 @draft
 @dllExport('OpenThreadDesktop')
-function openThreadDesktop() {}
+function openThreadDesktop() { return 0 }
 
 @draft
 @dllExport('OpenWindowStationA')
-function openWindowStationA() {}
+function openWindowStationA() { return 0 }
 
 @draft
 @dllExport('OpenWindowStationW')
-function openWindowStationW() {}
+function openWindowStationW() { return 0 }
 
 @draft
 @dllExport('PackDDElParam')
-function packDDElParam() {}
+function packDDElParam() { return 0 }
 
 @draft
 @dllExport('PackTouchHitTestingProximityEvaluation')
-function packTouchHitTestingProximityEvaluation() {}
+function packTouchHitTestingProximityEvaluation() { return 0 }
 
 @draft
 @dllExport('PaintDesktop')
-function paintDesktop() {}
+function paintDesktop() { return 0 }
 
 @draft
 @dllExport('PaintMenuBar')
-function paintMenuBar() {}
+function paintMenuBar() { return 0 }
 
 @draft
 @dllExport('PaintMonitor')
-function paintMonitor() {}
+function paintMonitor() { return 0 }
 
 @draft
 @dllExport('PeekMessageA')
-function peekMessageA() {}
+function peekMessageA() { return 0 }
 
 @draft
 @dllExport('PeekMessageW')
-function peekMessageW() {}
+function peekMessageW() { return 0 }
 
 @draft
 @dllExport('PhysicalToLogicalPoint')
-function physicalToLogicalPoint() {}
+function physicalToLogicalPoint() { return 0 }
 
 @draft
 @dllExport('PhysicalToLogicalPointForPerMonitorDPI')
-function physicalToLogicalPointForPerMonitorDPI() {}
+function physicalToLogicalPointForPerMonitorDPI() { return 0 }
 
 @draft
 @dllExport('PostMessageA')
-function postMessageA() {}
+function postMessageA() { return 0 }
 
 @draft
 @dllExport('PostMessageW')
-function postMessageW() {}
+function postMessageW() { return 0 }
 
 @draft
 @dllExport('PostQuitMessage')
-function postQuitMessage() {}
+function postQuitMessage() { return 0 }
 
 @draft
 @dllExport('PostThreadMessageA')
-function postThreadMessageA() {}
+function postThreadMessageA() { return 0 }
 
 @draft
 @dllExport('PostThreadMessageW')
-function postThreadMessageW() {}
+function postThreadMessageW() { return 0 }
 
 @draft
 @dllExport('PrintWindow')
-function printWindow() {}
+function printWindow() { return 0 }
 
 @draft
 @dllExport('PrivateExtractIconExA')
-function privateExtractIconExA() {}
+function privateExtractIconExA() { return 0 }
 
 @draft
 @dllExport('PrivateExtractIconExW')
-function privateExtractIconExW() {}
+function privateExtractIconExW() { return 0 }
 
 @draft
 @dllExport('PrivateExtractIconsA')
-function privateExtractIconsA() {}
+function privateExtractIconsA() { return 0 }
 
 @draft
 @dllExport('PrivateExtractIconsW')
-function privateExtractIconsW() {}
+function privateExtractIconsW() { return 0 }
 
 @draft
 @dllExport('PrivateRegisterICSProc')
-function privateRegisterICSProc() {}
+function privateRegisterICSProc() { return 0 }
 
 @draft
 @dllExport('PtInRect')
-function ptInRect() {}
+function ptInRect() { return 0 }
 
 @draft
 @dllExport('QueryBSDRWindow')
-function queryBSDRWindow() {}
+function queryBSDRWindow() { return 0 }
 
 @draft
 @dllExport('QueryDisplayConfig')
-function queryDisplayConfig() {}
+function queryDisplayConfig() { return 0 }
 
 @draft
 @dllExport('QuerySendMessage')
-function querySendMessage() {}
+function querySendMessage() { return 0 }
 
 @draft
 @dllExport('RealChildWindowFromPoint')
-function realChildWindowFromPoint() {}
+function realChildWindowFromPoint() { return 0 }
 
 @draft
 @dllExport('RealGetWindowClass')
-function realGetWindowClass() {}
+function realGetWindowClass() { return 0 }
 
 @draft
 @dllExport('RealGetWindowClassA')
-function realGetWindowClassA() {}
+function realGetWindowClassA() { return 0 }
 
 @draft
 @dllExport('RealGetWindowClassW')
-function realGetWindowClassW() {}
+function realGetWindowClassW() { return 0 }
 
 @draft
 @dllExport('ReasonCodeNeedsBugID')
-function reasonCodeNeedsBugID() {}
+function reasonCodeNeedsBugID() { return 0 }
 
 @draft
 @dllExport('ReasonCodeNeedsComment')
-function reasonCodeNeedsComment() {}
+function reasonCodeNeedsComment() { return 0 }
 
 @draft
 @dllExport('RecordShutdownReason')
-function recordShutdownReason() {}
+function recordShutdownReason() { return 0 }
 
 @draft
 @dllExport('RedrawWindow')
-function redrawWindow() {}
+function redrawWindow() { return 0 }
 
 @draft
 @dllExport('RegisterBSDRWindow')
-function registerBSDRWindow() {}
+function registerBSDRWindow() { return 0 }
 
 @draft
 @dllExport('RegisterClassA')
-function registerClassA() {}
+function registerClassA() { return 0 }
 
 @draft
 @dllExport('RegisterClassExA')
-function registerClassExA() {}
+function registerClassExA() { return 0 }
 
 @draft
 @dllExport('RegisterClassExW')
-function registerClassExW() {}
+function registerClassExW() { return 0 }
 
 @draft
 @dllExport('RegisterClassW')
-function registerClassW() {}
+function registerClassW() { return 0 }
 
 @draft
 @dllExport('RegisterClipboardFormatA')
-function registerClipboardFormatA() {}
+function registerClipboardFormatA() { return 0 }
 
 @draft
 @dllExport('RegisterClipboardFormatW')
-function registerClipboardFormatW() {}
+function registerClipboardFormatW() { return 0 }
 
 @draft
 @dllExport('RegisterDeviceNotificationA')
-function registerDeviceNotificationA() {}
+function registerDeviceNotificationA() { return 0 }
 
 @draft
 @dllExport('RegisterDeviceNotificationW')
-function registerDeviceNotificationW() {}
+function registerDeviceNotificationW() { return 0 }
 
 @draft
 @dllExport('RegisterDManipHook')
-function registerDManipHook() {}
+function registerDManipHook() { return 0 }
 
 @draft
 @dllExport('RegisterErrorReportingDialog')
-function registerErrorReportingDialog() {}
+function registerErrorReportingDialog() { return 0 }
 
 @draft
 @dllExport('RegisterFrostWindow')
-function registerFrostWindow() {}
+function registerFrostWindow() { return 0 }
 
 @draft
 @dllExport('RegisterGhostWindow')
-function registerGhostWindow() {}
+function registerGhostWindow() { return 0 }
 
 @draft
 @dllExport('RegisterHotKey')
-function registerHotKey() {}
+function registerHotKey() { return 0 }
 
 @draft
 @dllExport('RegisterLogonProcess')
-function registerLogonProcess() {}
+function registerLogonProcess() { return 0 }
 
 @draft
 @dllExport('RegisterMessagePumpHook')
-function registerMessagePumpHook() {}
+function registerMessagePumpHook() { return 0 }
 
 @draft
 @dllExport('RegisterPointerDeviceNotifications')
-function registerPointerDeviceNotifications() {}
+function registerPointerDeviceNotifications() { return 0 }
 
 @draft
 @dllExport('RegisterPointerInputTarget')
-function registerPointerInputTarget() {}
+function registerPointerInputTarget() { return 0 }
 
 @draft
 @dllExport('RegisterPointerInputTargetEx')
-function registerPointerInputTargetEx() {}
+function registerPointerInputTargetEx() { return 0 }
 
 @draft
 @dllExport('RegisterPowerSettingNotification')
-function registerPowerSettingNotification() {}
+function registerPowerSettingNotification() { return 0 }
 
 @draft
 @dllExport('RegisterRawInputDevices')
-function registerRawInputDevices() {}
+function registerRawInputDevices() { return 0 }
 
 @draft
 @dllExport('RegisterServicesProcess')
-function registerServicesProcess() {}
+function registerServicesProcess() { return 0 }
 
 @draft
 @dllExport('RegisterSessionPort')
-function registerSessionPort() {}
+function registerSessionPort() { return 0 }
 
 @draft
 @dllExport('RegisterShellHookWindow')
-function registerShellHookWindow() {}
+function registerShellHookWindow() { return 0 }
 
 @draft
 @dllExport('RegisterSuspendResumeNotification')
-function registerSuspendResumeNotification() {}
+function registerSuspendResumeNotification() { return 0 }
 
 @draft
 @dllExport('RegisterSystemThread')
-function registerSystemThread() {}
+function registerSystemThread() { return 0 }
 
 @draft
 @dllExport('RegisterTasklist')
-function registerTasklist() {}
+function registerTasklist() { return 0 }
 
 @draft
 @dllExport('RegisterTouchHitTestingWindow')
-function registerTouchHitTestingWindow() {}
+function registerTouchHitTestingWindow() { return 0 }
 
 @draft
 @dllExport('RegisterTouchWindow')
-function registerTouchWindow() {}
+function registerTouchWindow() { return 0 }
 
 @draft
 @dllExport('RegisterUserApiHook')
-function registerUserApiHook() {}
+function registerUserApiHook() { return 0 }
 
 @draft
 @dllExport('RegisterWindowMessageA')
-function registerWindowMessageA() {}
+function registerWindowMessageA() { return 0 }
 
 @draft
 @dllExport('RegisterWindowMessageW')
-function registerWindowMessageW() {}
+function registerWindowMessageW() { return 0 }
 
 @draft
 @dllExport('ReleaseCapture')
-function releaseCapture() {}
+function releaseCapture() { return 0 }
 
 @draft
 @dllExport('ReleaseDC')
-function releaseDC() {}
+function releaseDC() { return 0 }
 
 @draft
 @dllExport('ReleaseDwmHitTestWaiters')
-function releaseDwmHitTestWaiters() {}
+function releaseDwmHitTestWaiters() { return 0 }
 
 @draft
 @dllExport('RemoveClipboardFormatListener')
-function removeClipboardFormatListener() {}
+function removeClipboardFormatListener() { return 0 }
 
 @draft
 @dllExport('RemoveInjectionDevice')
-function removeInjectionDevice() {}
+function removeInjectionDevice() { return 0 }
 
 @draft
 @dllExport('RemoveMenu')
-function removeMenu() {}
+function removeMenu() { return 0 }
 
 @draft
 @dllExport('RemovePropA')
-function removePropA() {}
+function removePropA() { return 0 }
 
 @draft
 @dllExport('RemovePropW')
-function removePropW() {}
+function removePropW() { return 0 }
 
 @draft
 @dllExport('RemoveThreadTSFEventAwareness')
-function removeThreadTSFEventAwareness() {}
+function removeThreadTSFEventAwareness() { return 0 }
 
 @draft
 @dllExport('ReplyMessage')
-function replyMessage() {}
+function replyMessage() { return 0 }
 
 @draft
 @dllExport('ReportInertia')
-function reportInertia() {}
+function reportInertia() { return 0 }
 
 @draft
 @dllExport('ResolveDesktopForWOW')
-function resolveDesktopForWOW() {}
+function resolveDesktopForWOW() { return 0 }
 
 @draft
 @dllExport('ReuseDDElParam')
-function reuseDDElParam() {}
+function reuseDDElParam() { return 0 }
 
 @draft
 @dllExport('RIMAddInputObserver')
-function rIMAddInputObserver() {}
+function rIMAddInputObserver() { return 0 }
 
 @draft
 @dllExport('RIMAreSiblingDevices')
-function rIMAreSiblingDevices() {}
+function rIMAreSiblingDevices() { return 0 }
 
 @draft
 @dllExport('RIMDeviceIoControl')
-function rIMDeviceIoControl() {}
+function rIMDeviceIoControl() { return 0 }
 
 @draft
 @dllExport('RIMEnableMonitorMappingForDevice')
-function rIMEnableMonitorMappingForDevice() {}
+function rIMEnableMonitorMappingForDevice() { return 0 }
 
 @draft
 @dllExport('RIMFreeInputBuffer')
-function rIMFreeInputBuffer() {}
+function rIMFreeInputBuffer() { return 0 }
 
 @draft
 @dllExport('RIMGetDevicePreparsedData')
-function rIMGetDevicePreparsedData() {}
+function rIMGetDevicePreparsedData() { return 0 }
 
 @draft
 @dllExport('RIMGetDevicePreparsedDataLockfree')
-function rIMGetDevicePreparsedDataLockfree() {}
+function rIMGetDevicePreparsedDataLockfree() { return 0 }
 
 @draft
 @dllExport('RIMGetDeviceProperties')
-function rIMGetDeviceProperties() {}
+function rIMGetDeviceProperties() { return 0 }
 
 @draft
 @dllExport('RIMGetDevicePropertiesLockfree')
-function rIMGetDevicePropertiesLockfree() {}
+function rIMGetDevicePropertiesLockfree() { return 0 }
 
 @draft
 @dllExport('RIMGetPhysicalDeviceRect')
-function rIMGetPhysicalDeviceRect() {}
+function rIMGetPhysicalDeviceRect() { return 0 }
 
 @draft
 @dllExport('RIMGetSourceProcessId')
-function rIMGetSourceProcessId() {}
+function rIMGetSourceProcessId() { return 0 }
 
 @draft
 @dllExport('RIMObserveNextInput')
-function rIMObserveNextInput() {}
+function rIMObserveNextInput() { return 0 }
 
 @draft
 @dllExport('RIMOnPnpNotification')
-function rIMOnPnpNotification() {}
+function rIMOnPnpNotification() { return 0 }
 
 @draft
 @dllExport('RIMOnTimerNotification')
-function rIMOnTimerNotification() {}
+function rIMOnTimerNotification() { return 0 }
 
 @draft
 @dllExport('RIMReadInput')
-function rIMReadInput() {}
+function rIMReadInput() { return 0 }
 
 @draft
 @dllExport('RIMRegisterForInput')
-function rIMRegisterForInput() {}
+function rIMRegisterForInput() { return 0 }
 
 @draft
 @dllExport('RIMRemoveInputObserver')
-function rIMRemoveInputObserver() {}
+function rIMRemoveInputObserver() { return 0 }
 
 @draft
 @dllExport('RIMSetTestModeStatus')
-function rIMSetTestModeStatus() {}
+function rIMSetTestModeStatus() { return 0 }
 
 @draft
 @dllExport('RIMUnregisterForInput')
-function rIMUnregisterForInput() {}
+function rIMUnregisterForInput() { return 0 }
 
 @draft
 @dllExport('RIMUpdateInputObserverRegistration')
-function rIMUpdateInputObserverRegistration() {}
+function rIMUpdateInputObserverRegistration() { return 0 }
 
 @draft
 @dllExport('ScreenToClient')
-function screenToClient() {}
+function screenToClient() { return 0 }
 
 @draft
 @dllExport('ScrollChildren')
-function scrollChildren() {}
+function scrollChildren() { return 0 }
 
 @draft
 @dllExport('ScrollDC')
-function scrollDC() {}
+function scrollDC() { return 0 }
 
 @draft
 @dllExport('ScrollWindow')
-function scrollWindow() {}
+function scrollWindow() { return 0 }
 
 @draft
 @dllExport('ScrollWindowEx')
-function scrollWindowEx() {}
+function scrollWindowEx() { return 0 }
 
 @draft
 @dllExport('SendDlgItemMessageA')
-function sendDlgItemMessageA() {}
+function sendDlgItemMessageA() { return 0 }
 
 @draft
 @dllExport('SendDlgItemMessageW')
-function sendDlgItemMessageW() {}
+function sendDlgItemMessageW() { return 0 }
 
 @draft
 @dllExport('SendIMEMessageExA')
-function sendIMEMessageExA() {}
+function sendIMEMessageExA() { return 0 }
 
 @draft
 @dllExport('SendIMEMessageExW')
-function sendIMEMessageExW() {}
+function sendIMEMessageExW() { return 0 }
 
 @draft
 @dllExport('SendInput')
-function sendInput() {}
+function sendInput() { return 0 }
 
 @draft
 @dllExport('SendMessageA')
-function sendMessageA() {}
+function sendMessageA() { return 0 }
 
 @draft
 @dllExport('SendMessageCallbackA')
-function sendMessageCallbackA() {}
+function sendMessageCallbackA() { return 0 }
 
 @draft
 @dllExport('SendMessageCallbackW')
-function sendMessageCallbackW() {}
+function sendMessageCallbackW() { return 0 }
 
 @draft
 @dllExport('SendMessageTimeoutA')
-function sendMessageTimeoutA() {}
+function sendMessageTimeoutA() { return 0 }
 
 @draft
 @dllExport('SendMessageTimeoutW')
-function sendMessageTimeoutW() {}
+function sendMessageTimeoutW() { return 0 }
 
 @draft
 @dllExport('SendMessageW')
-function sendMessageW() {}
+function sendMessageW() { return 0 }
 
 @draft
 @dllExport('SendNotifyMessageA')
-function sendNotifyMessageA() {}
+function sendNotifyMessageA() { return 0 }
 
 @draft
 @dllExport('SendNotifyMessageW')
-function sendNotifyMessageW() {}
+function sendNotifyMessageW() { return 0 }
 
 @draft
 @dllExport('SetActiveWindow')
-function setActiveWindow() {}
+function setActiveWindow() { return 0 }
 
 @draft
 @dllExport('SetCapture')
-function setCapture() {}
+function setCapture() { return 0 }
 
 @draft
 @dllExport('SetCaretBlinkTime')
-function setCaretBlinkTime() {}
+function setCaretBlinkTime() { return 0 }
 
 @draft
 @dllExport('SetCaretPos')
-function setCaretPos() {}
+function setCaretPos() { return 0 }
 
 @draft
 @dllExport('SetClassLongA')
-function setClassLongA() {}
+function setClassLongA() { return 0 }
 
 @draft
 @dllExport('SetClassLongPtrA')
-function setClassLongPtrA() {}
+function setClassLongPtrA() { return 0 }
 
 @draft
 @dllExport('SetClassLongPtrW')
-function setClassLongPtrW() {}
+function setClassLongPtrW() { return 0 }
 
 @draft
 @dllExport('SetClassLongW')
-function setClassLongW() {}
+function setClassLongW() { return 0 }
 
 @draft
 @dllExport('SetClassWord')
-function setClassWord() {}
+function setClassWord() { return 0 }
 
 @draft
 @dllExport('SetClipboardData')
-function setClipboardData() {}
+function setClipboardData() { return 0 }
 
 @draft
 @dllExport('SetClipboardViewer')
-function setClipboardViewer() {}
+function setClipboardViewer() { return 0 }
 
 @draft
 @dllExport('SetCoalescableTimer')
-function setCoalescableTimer() {}
+function setCoalescableTimer() { return 0 }
 
 @draft
 @dllExport('SetCoreWindow')
-function setCoreWindow() {}
+function setCoreWindow() { return 0 }
 
 @draft
 @dllExport('SetCursor')
-function setCursor() {}
+function setCursor() { return 0 }
 
 @draft
 @dllExport('SetCursorContents')
-function setCursorContents() {}
+function setCursorContents() { return 0 }
 
 @draft
 @dllExport('SetCursorPos')
-function setCursorPos() {}
+function setCursorPos() { return 0 }
 
 @draft
 @dllExport('SetDebugErrorLevel')
-function setDebugErrorLevel() {}
+function setDebugErrorLevel() { return 0 }
 
 @draft
 @dllExport('SetDesktopColorTransform')
-function setDesktopColorTransform() {}
+function setDesktopColorTransform() { return 0 }
 
 @draft
 @dllExport('SetDeskWallpaper')
-function setDeskWallpaper() {}
+function setDeskWallpaper() { return 0 }
 
 @draft
 @dllExport('SetDialogControlDpiChangeBehavior')
-function setDialogControlDpiChangeBehavior() {}
+function setDialogControlDpiChangeBehavior() { return 0 }
 
 @draft
 @dllExport('SetDialogDpiChangeBehavior')
-function setDialogDpiChangeBehavior() {}
+function setDialogDpiChangeBehavior() { return 0 }
 
 @draft
 @dllExport('SetDisplayAutoRotationPreferences')
-function setDisplayAutoRotationPreferences() {}
+function setDisplayAutoRotationPreferences() { return 0 }
 
 @draft
 @dllExport('SetDisplayConfig')
-function setDisplayConfig() {}
+function setDisplayConfig() { return 0 }
 
 @draft
 @dllExport('SetDlgItemInt')
-function setDlgItemInt() {}
+function setDlgItemInt() { return 0 }
 
 @draft
 @dllExport('SetDlgItemTextA')
-function setDlgItemTextA() {}
+function setDlgItemTextA() { return 0 }
 
 @draft
 @dllExport('SetDlgItemTextW')
-function setDlgItemTextW() {}
+function setDlgItemTextW() { return 0 }
 
 @draft
 @dllExport('SetDoubleClickTime')
-function setDoubleClickTime() {}
+function setDoubleClickTime() { return 0 }
 
 @draft
 @dllExport('SetFeatureReportResponse')
-function setFeatureReportResponse() {}
+function setFeatureReportResponse() { return 0 }
 
 @draft
 @dllExport('SetFocus')
-function setFocus() {}
+function setFocus() { return 0 }
 
 @draft
 @dllExport('SetForegroundWindow')
-function setForegroundWindow() {}
+function setForegroundWindow() { return 0 }
 
 @draft
 @dllExport('SetGestureConfig')
-function setGestureConfig() {}
+function setGestureConfig() { return 0 }
 
 @draft
 @dllExport('SetInternalWindowPos')
-function setInternalWindowPos() {}
+function setInternalWindowPos() { return 0 }
 
 @draft
 @dllExport('SetKeyboardState')
-function setKeyboardState() {}
+function setKeyboardState() { return 0 }
 
 @draft
 @dllExport('SetLastErrorEx')
-function setLastErrorEx() {}
+function setLastErrorEx() { return 0 }
 
 @draft
 @dllExport('SetLayeredWindowAttributes')
-function setLayeredWindowAttributes() {}
+function setLayeredWindowAttributes() { return 0 }
 
 @draft
 @dllExport('SetMagnificationDesktopColorEffect')
-function setMagnificationDesktopColorEffect() {}
+function setMagnificationDesktopColorEffect() { return 0 }
 
 @draft
 @dllExport('SetMagnificationDesktopMagnification')
-function setMagnificationDesktopMagnification() {}
+function setMagnificationDesktopMagnification() { return 0 }
 
 @draft
 @dllExport('SetMagnificationDesktopSamplingMode')
-function setMagnificationDesktopSamplingMode() {}
+function setMagnificationDesktopSamplingMode() { return 0 }
 
 @draft
 @dllExport('SetMagnificationLensCtxInformation')
-function setMagnificationLensCtxInformation() {}
+function setMagnificationLensCtxInformation() { return 0 }
 
 @draft
 @dllExport('SetMenu')
-function setMenu() {}
+function setMenu() { return 0 }
 
 @draft
 @dllExport('SetMenuContextHelpId')
-function setMenuContextHelpId() {}
+function setMenuContextHelpId() { return 0 }
 
 @draft
 @dllExport('SetMenuDefaultItem')
-function setMenuDefaultItem() {}
+function setMenuDefaultItem() { return 0 }
 
 @draft
 @dllExport('SetMenuInfo')
-function setMenuInfo() {}
+function setMenuInfo() { return 0 }
 
 @draft
 @dllExport('SetMenuItemBitmaps')
-function setMenuItemBitmaps() {}
+function setMenuItemBitmaps() { return 0 }
 
 @draft
 @dllExport('SetMenuItemInfoA')
-function setMenuItemInfoA() {}
+function setMenuItemInfoA() { return 0 }
 
 @draft
 @dllExport('SetMenuItemInfoW')
-function setMenuItemInfoW() {}
+function setMenuItemInfoW() { return 0 }
 
 @draft
 @dllExport('SetMessageExtraInfo')
-function setMessageExtraInfo() {}
+function setMessageExtraInfo() { return 0 }
 
 @draft
 @dllExport('SetMessageQueue')
-function setMessageQueue() {}
+function setMessageQueue() { return 0 }
 
 @draft
 @dllExport('SetMirrorRendering')
-function setMirrorRendering() {}
+function setMirrorRendering() { return 0 }
 
 @draft
 @dllExport('SetParent')
-function setParent() {}
+function setParent() { return 0 }
 
 @draft
 @dllExport('SetPhysicalCursorPos')
-function setPhysicalCursorPos() {}
+function setPhysicalCursorPos() { return 0 }
 
 @draft
 @dllExport('SetProcessDefaultLayout')
-function setProcessDefaultLayout() {}
+function setProcessDefaultLayout() { return 0 }
 
 @draft
 @dllExport('SetProcessDPIAware')
-function setProcessDPIAware() {}
+function setProcessDPIAware() { return 0 }
 
 @draft
 @dllExport('SetProcessDpiAwarenessContext')
-function setProcessDpiAwarenessContext() {}
+function setProcessDpiAwarenessContext() { return 0 }
 
 @draft
 @dllExport('SetProcessDpiAwarenessInternal')
-function setProcessDpiAwarenessInternal() {}
+function setProcessDpiAwarenessInternal() { return 0 }
 
 @draft
 @dllExport('SetProcessRestrictionExemption')
-function setProcessRestrictionExemption() {}
+function setProcessRestrictionExemption() { return 0 }
 
 @draft
 @dllExport('SetProcessWindowStation')
-function setProcessWindowStation() {}
+function setProcessWindowStation() { return 0 }
 
 @draft
 @dllExport('SetProgmanWindow')
-function setProgmanWindow() {}
+function setProgmanWindow() { return 0 }
 
 @draft
 @dllExport('SetPropA')
-function setPropA() {}
+function setPropA() { return 0 }
 
 @draft
 @dllExport('SetPropW')
-function setPropW() {}
+function setPropW() { return 0 }
 
 @draft
 @dllExport('SetRect')
-function setRect() {}
+function setRect() { return 0 }
 
 @draft
 @dllExport('SetRectEmpty')
-function setRectEmpty() {}
+function setRectEmpty() { return 0 }
 
 @draft
 @dllExport('SetScrollInfo')
-function setScrollInfo() {}
+function setScrollInfo() { return 0 }
 
 @draft
 @dllExport('SetScrollPos')
-function setScrollPos() {}
+function setScrollPos() { return 0 }
 
 @draft
 @dllExport('SetScrollRange')
-function setScrollRange() {}
+function setScrollRange() { return 0 }
 
 @draft
 @dllExport('SetShellWindow')
-function setShellWindow() {}
+function setShellWindow() { return 0 }
 
 @draft
 @dllExport('SetShellWindowEx')
-function setShellWindowEx() {}
+function setShellWindowEx() { return 0 }
 
 @draft
 @dllExport('SetSysColors')
-function setSysColors() {}
+function setSysColors() { return 0 }
 
 @draft
 @dllExport('SetSysColorsTemp')
-function setSysColorsTemp() {}
+function setSysColorsTemp() { return 0 }
 
 @draft
 @dllExport('SetSystemCursor')
-function setSystemCursor() {}
+function setSystemCursor() { return 0 }
 
 @draft
 @dllExport('SetSystemMenu')
-function setSystemMenu() {}
+function setSystemMenu() { return 0 }
 
 @draft
 @dllExport('SetTaskmanWindow')
-function setTaskmanWindow() {}
+function setTaskmanWindow() { return 0 }
 
 @draft
 @dllExport('SetThreadDesktop')
-function setThreadDesktop() {}
+function setThreadDesktop() { return 0 }
 
 @draft
 @dllExport('SetThreadDpiAwarenessContext')
-function setThreadDpiAwarenessContext() {}
+function setThreadDpiAwarenessContext() { return 0 }
 
 @draft
 @dllExport('SetThreadDpiHostingBehavior')
-function setThreadDpiHostingBehavior() {}
+function setThreadDpiHostingBehavior() { return 0 }
 
 @draft
 @dllExport('SetThreadInputBlocked')
-function setThreadInputBlocked() {}
+function setThreadInputBlocked() { return 0 }
 
 @draft
 @dllExport('SetTimer')
-function setTimer() {}
+function setTimer() { return 0 }
 
 @draft
 @dllExport('SetUserObjectInformationA')
-function setUserObjectInformationA() {}
+function setUserObjectInformationA() { return 0 }
 
 @draft
 @dllExport('SetUserObjectInformationW')
-function setUserObjectInformationW() {}
+function setUserObjectInformationW() { return 0 }
 
 @draft
 @dllExport('SetUserObjectSecurity')
-function setUserObjectSecurity() {}
+function setUserObjectSecurity() { return 0 }
 
 @draft
 @dllExport('SetWindowBand')
-function setWindowBand() {}
+function setWindowBand() { return 0 }
 
 @draft
 @dllExport('SetWindowCompositionAttribute')
-function setWindowCompositionAttribute() {}
+function setWindowCompositionAttribute() { return 0 }
 
 @draft
 @dllExport('SetWindowCompositionTransition')
-function setWindowCompositionTransition() {}
+function setWindowCompositionTransition() { return 0 }
 
 @draft
 @dllExport('SetWindowContextHelpId')
-function setWindowContextHelpId() {}
+function setWindowContextHelpId() { return 0 }
 
 @draft
 @dllExport('SetWindowDisplayAffinity')
-function setWindowDisplayAffinity() {}
+function setWindowDisplayAffinity() { return 0 }
 
 @draft
 @dllExport('SetWindowFeedbackSetting')
-function setWindowFeedbackSetting() {}
+function setWindowFeedbackSetting() { return 0 }
 
 @draft
 @dllExport('SetWindowLongA')
-function setWindowLongA() {}
+function setWindowLongA() { return 0 }
 
 @draft
 @dllExport('SetWindowLongPtrA')
-function setWindowLongPtrA() {}
+function setWindowLongPtrA() { return 0 }
 
 @draft
 @dllExport('SetWindowLongPtrW')
-function setWindowLongPtrW() {}
+function setWindowLongPtrW() { return 0 }
 
 @draft
 @dllExport('SetWindowLongW')
-function setWindowLongW() {}
+function setWindowLongW() { return 0 }
 
 @draft
 @dllExport('SetWindowPlacement')
-function setWindowPlacement() {}
+function setWindowPlacement() { return 0 }
 
 @draft
 @dllExport('SetWindowPos')
-function setWindowPos() {}
+function setWindowPos() { return 0 }
 
 @draft
 @dllExport('SetWindowRgn')
-function setWindowRgn() {}
+function setWindowRgn() { return 0 }
 
 @draft
 @dllExport('SetWindowRgnEx')
-function setWindowRgnEx() {}
+function setWindowRgnEx() { return 0 }
 
 @draft
 @dllExport('SetWindowsHookA')
-function setWindowsHookA() {}
+function setWindowsHookA() { return 0 }
 
 @draft
 @dllExport('SetWindowsHookExA')
-function setWindowsHookExA() {}
+function setWindowsHookExA() { return 0 }
 
 @draft
 @dllExport('SetWindowsHookExW')
-function setWindowsHookExW() {}
+function setWindowsHookExW() { return 0 }
 
 @draft
 @dllExport('SetWindowsHookW')
-function setWindowsHookW() {}
+function setWindowsHookW() { return 0 }
 
 @draft
 @dllExport('SetWindowStationUser')
-function setWindowStationUser() {}
+function setWindowStationUser() { return 0 }
 
 @draft
 @dllExport('SetWindowTextA')
-function setWindowTextA() {}
+function setWindowTextA() { return 0 }
 
 @draft
 @dllExport('SetWindowTextW')
-function setWindowTextW() {}
+function setWindowTextW() { return 0 }
 
 @draft
 @dllExport('SetWindowWord')
-function setWindowWord() {}
+function setWindowWord() { return 0 }
 
 @draft
 @dllExport('SetWinEventHook')
-function setWinEventHook() {}
+function setWinEventHook() { return 0 }
 
 @draft
 @dllExport('ShowCaret')
-function showCaret() {}
+function showCaret() { return 0 }
 
 @draft
 @dllExport('ShowCursor')
-function showCursor() {}
+function showCursor() { return 0 }
 
 @draft
 @dllExport('ShowOwnedPopups')
-function showOwnedPopups() {}
+function showOwnedPopups() { return 0 }
 
 @draft
 @dllExport('ShowScrollBar')
-function showScrollBar() {}
+function showScrollBar() { return 0 }
 
 @draft
 @dllExport('ShowStartGlass')
-function showStartGlass() {}
+function showStartGlass() { return 0 }
 
 @draft
 @dllExport('ShowSystemCursor')
-function showSystemCursor() {}
+function showSystemCursor() { return 0 }
 
 @draft
 @dllExport('ShowWindow')
-function showWindow() {}
+function showWindow() { return 0 }
 
 @draft
 @dllExport('ShowWindowAsync')
-function showWindowAsync() {}
+function showWindowAsync() { return 0 }
 
 @draft
 @dllExport('ShutdownBlockReasonCreate')
-function shutdownBlockReasonCreate() {}
+function shutdownBlockReasonCreate() { return 0 }
 
 @draft
 @dllExport('ShutdownBlockReasonDestroy')
-function shutdownBlockReasonDestroy() {}
+function shutdownBlockReasonDestroy() { return 0 }
 
 @draft
 @dllExport('ShutdownBlockReasonQuery')
-function shutdownBlockReasonQuery() {}
+function shutdownBlockReasonQuery() { return 0 }
 
 @draft
 @dllExport('SignalRedirectionStartComplete')
-function signalRedirectionStartComplete() {}
+function signalRedirectionStartComplete() { return 0 }
 
 @draft
 @dllExport('SkipPointerFrameMessages')
-function skipPointerFrameMessages() {}
+function skipPointerFrameMessages() { return 0 }
 
 @draft
 @dllExport('SoftModalMessageBox')
-function softModalMessageBox() {}
+function softModalMessageBox() { return 0 }
 
 @draft
 @dllExport('SoundSentry')
-function soundSentry() {}
+function soundSentry() { return 0 }
 
 @draft
 @dllExport('SubtractRect')
-function subtractRect() {}
+function subtractRect() { return 0 }
 
 @draft
 @dllExport('SwapMouseButton')
-function swapMouseButton() {}
+function swapMouseButton() { return 0 }
 
 @draft
 @dllExport('SwitchDesktop')
-function switchDesktop() {}
+function switchDesktop() { return 0 }
 
 @draft
 @dllExport('SwitchDesktopWithFade')
-function switchDesktopWithFade() {}
+function switchDesktopWithFade() { return 0 }
 
 @draft
 @dllExport('SwitchToThisWindow')
-function switchToThisWindow() {}
+function switchToThisWindow() { return 0 }
 
 @draft
 @dllExport('SystemParametersInfoA')
-function systemParametersInfoA() {}
+function systemParametersInfoA() { return 0 }
 
 @draft
 @dllExport('SystemParametersInfoForDpi')
-function systemParametersInfoForDpi() {}
+function systemParametersInfoForDpi() { return 0 }
 
 @draft
 @dllExport('SystemParametersInfoW')
-function systemParametersInfoW() {}
+function systemParametersInfoW() { return 0 }
 
 @draft
 @dllExport('TabbedTextOutA')
-function tabbedTextOutA() {}
+function tabbedTextOutA() { return 0 }
 
 @draft
 @dllExport('TabbedTextOutW')
-function tabbedTextOutW() {}
+function tabbedTextOutW() { return 0 }
 
 @draft
 @dllExport('TileChildWindows')
-function tileChildWindows() {}
+function tileChildWindows() { return 0 }
 
 @draft
 @dllExport('TileWindows')
-function tileWindows() {}
+function tileWindows() { return 0 }
 
 @draft
 @dllExport('ToAscii')
-function toAscii() {}
+function toAscii() { return 0 }
 
 @draft
 @dllExport('ToAsciiEx')
-function toAsciiEx() {}
+function toAsciiEx() { return 0 }
 
 @draft
 @dllExport('ToUnicode')
-function toUnicode() {}
+function toUnicode() { return 0 }
 
 @draft
 @dllExport('ToUnicodeEx')
-function toUnicodeEx() {}
+function toUnicodeEx() { return 0 }
 
 @draft
 @dllExport('TrackMouseEvent')
-function trackMouseEvent() {}
+function trackMouseEvent() { return 0 }
 
 @draft
 @dllExport('TrackPopupMenu')
-function trackPopupMenu() {}
+function trackPopupMenu() { return 0 }
 
 @draft
 @dllExport('TrackPopupMenuEx')
-function trackPopupMenuEx() {}
+function trackPopupMenuEx() { return 0 }
 
 @draft
 @dllExport('TranslateAccelerator')
-function translateAccelerator() {}
+function translateAccelerator() { return 0 }
 
 @draft
 @dllExport('TranslateAcceleratorA')
-function translateAcceleratorA() {}
+function translateAcceleratorA() { return 0 }
 
 @draft
 @dllExport('TranslateAcceleratorW')
-function translateAcceleratorW() {}
+function translateAcceleratorW() { return 0 }
 
 @draft
 @dllExport('TranslateMDISysAccel')
-function translateMDISysAccel() {}
+function translateMDISysAccel() { return 0 }
 
 @draft
 @dllExport('TranslateMessage')
-function translateMessage() {}
+function translateMessage() { return 0 }
 
 @draft
 @dllExport('TranslateMessageEx')
-function translateMessageEx() {}
+function translateMessageEx() { return 0 }
 
 @draft
 @dllExport('UndelegateInput')
-function undelegateInput() {}
+function undelegateInput() { return 0 }
 
 @draft
 @dllExport('UnhookWindowsHook')
-function unhookWindowsHook() {}
+function unhookWindowsHook() { return 0 }
 
 @draft
 @dllExport('UnhookWindowsHookEx')
-function unhookWindowsHookEx() {}
+function unhookWindowsHookEx() { return 0 }
 
 @draft
 @dllExport('UnhookWinEvent')
-function unhookWinEvent() {}
+function unhookWinEvent() { return 0 }
 
 @draft
 @dllExport('UnionRect')
-function unionRect() {}
+function unionRect() { return 0 }
 
 @draft
 @dllExport('UnloadKeyboardLayout')
-function unloadKeyboardLayout() {}
+function unloadKeyboardLayout() { return 0 }
 
 @draft
 @dllExport('UnlockWindowStation')
-function unlockWindowStation() {}
+function unlockWindowStation() { return 0 }
 
 @draft
 @dllExport('UnpackDDElParam')
-function unpackDDElParam() {}
+function unpackDDElParam() { return 0 }
 
 @draft
 @dllExport('UnregisterClassA')
-function unregisterClassA() {}
+function unregisterClassA() { return 0 }
 
 @draft
 @dllExport('UnregisterClassW')
-function unregisterClassW() {}
+function unregisterClassW() { return 0 }
 
 @draft
 @dllExport('UnregisterDeviceNotification')
-function unregisterDeviceNotification() {}
+function unregisterDeviceNotification() { return 0 }
 
 @draft
 @dllExport('UnregisterHotKey')
-function unregisterHotKey() {}
+function unregisterHotKey() { return 0 }
 
 @draft
 @dllExport('UnregisterMessagePumpHook')
-function unregisterMessagePumpHook() {}
+function unregisterMessagePumpHook() { return 0 }
 
 @draft
 @dllExport('UnregisterPointerInputTarget')
-function unregisterPointerInputTarget() {}
+function unregisterPointerInputTarget() { return 0 }
 
 @draft
 @dllExport('UnregisterPointerInputTargetEx')
-function unregisterPointerInputTargetEx() {}
+function unregisterPointerInputTargetEx() { return 0 }
 
 @draft
 @dllExport('UnregisterPowerSettingNotification')
-function unregisterPowerSettingNotification() {}
+function unregisterPowerSettingNotification() { return 0 }
 
 @draft
 @dllExport('UnregisterSessionPort')
-function unregisterSessionPort() {}
+function unregisterSessionPort() { return 0 }
 
 @draft
 @dllExport('UnregisterSuspendResumeNotification')
-function unregisterSuspendResumeNotification() {}
+function unregisterSuspendResumeNotification() { return 0 }
 
 @draft
 @dllExport('UnregisterTouchWindow')
-function unregisterTouchWindow() {}
+function unregisterTouchWindow() { return 0 }
 
 @draft
 @dllExport('UnregisterUserApiHook')
-function unregisterUserApiHook() {}
+function unregisterUserApiHook() { return 0 }
 
 @draft
 @dllExport('UpdateDefaultDesktopThumbnail')
-function updateDefaultDesktopThumbnail() {}
+function updateDefaultDesktopThumbnail() { return 0 }
 
 @draft
 @dllExport('UpdateLayeredWindow')
-function updateLayeredWindow() {}
+function updateLayeredWindow() { return 0 }
 
 @draft
 @dllExport('UpdateLayeredWindowIndirect')
-function updateLayeredWindowIndirect() {}
+function updateLayeredWindowIndirect() { return 0 }
 
 @draft
 @dllExport('UpdatePerUserSystemParameters')
-function updatePerUserSystemParameters() {}
+function updatePerUserSystemParameters() { return 0 }
 
 @draft
 @dllExport('UpdateWindow')
-function updateWindow() {}
+function updateWindow() { return 0 }
 
 @draft
 @dllExport('UpdateWindowInputSinkHints')
-function updateWindowInputSinkHints() {}
+function updateWindowInputSinkHints() { return 0 }
 
 @draft
 @dllExport('User32InitializeImmEntryTable')
-function user32InitializeImmEntryTable() {}
+function user32InitializeImmEntryTable() { return 0 }
 
 @draft
 @dllExport('UserClientDllInitialize')
-function userClientDllInitialize() {}
+function userClientDllInitialize() { return 0 }
 
 @draft
 @dllExport('UserHandleGrantAccess')
-function userHandleGrantAccess() {}
+function userHandleGrantAccess() { return 0 }
 
 @draft
 @dllExport('UserLpkPSMTextOut')
-function userLpkPSMTextOut() {}
+function userLpkPSMTextOut() { return 0 }
 
 @draft
 @dllExport('UserLpkTabbedTextOut')
-function userLpkTabbedTextOut() {}
+function userLpkTabbedTextOut() { return 0 }
 
 @draft
 @dllExport('UserRealizePalette')
-function userRealizePalette() {}
+function userRealizePalette() { return 0 }
 
 @draft
 @dllExport('UserRegisterWowHandlers')
-function userRegisterWowHandlers() {}
+function userRegisterWowHandlers() { return 0 }
 
 @draft
 @dllExport('ValidateRect')
-function validateRect() {}
+function validateRect() { return 0 }
 
 @draft
 @dllExport('ValidateRgn')
-function validateRgn() {}
+function validateRgn() { return 0 }
 
 @draft
 @dllExport('VkKeyScanA')
-function vkKeyScanA() {}
+function vkKeyScanA() { return 0 }
 
 @draft
 @dllExport('VkKeyScanExA')
-function vkKeyScanExA() {}
+function vkKeyScanExA() { return 0 }
 
 @draft
 @dllExport('VkKeyScanExW')
-function vkKeyScanExW() {}
+function vkKeyScanExW() { return 0 }
 
 @draft
 @dllExport('VkKeyScanW')
-function vkKeyScanW() {}
+function vkKeyScanW() { return 0 }
 
 @draft
 @dllExport('VRipOutput')
-function vRipOutput() {}
+function vRipOutput() { return 0 }
 
 @draft
 @dllExport('VTagOutput')
-function vTagOutput() {}
+function vTagOutput() { return 0 }
 
 @draft
 @dllExport('WaitForInputIdle')
-function waitForInputIdle() {}
+function waitForInputIdle() { return 0 }
 
 @draft
 @dllExport('WaitForRedirectionStartComplete')
-function waitForRedirectionStartComplete() {}
+function waitForRedirectionStartComplete() { return 0 }
 
 @draft
 @dllExport('WaitMessage')
-function waitMessage() {}
+function waitMessage() { return 0 }
 
 @draft
 @dllExport('WCSToMBEx')
-function wCSToMBEx() {}
+function wCSToMBEx() { return 0 }
 
 @draft
 @dllExport('WindowFromDC')
-function windowFromDC() {}
+function windowFromDC() { return 0 }
 
 @draft
 @dllExport('WindowFromPhysicalPoint')
-function windowFromPhysicalPoint() {}
+function windowFromPhysicalPoint() { return 0 }
 
 @draft
 @dllExport('WindowFromPoint')
-function windowFromPoint() {}
+function windowFromPoint() { return 0 }
 
 @draft
 @dllExport('WinHelpA')
-function winHelpA() {}
+function winHelpA() { return 0 }
 
 @draft
 @dllExport('WinHelpW')
-function winHelpW() {}
+function winHelpW() { return 0 }
 
 @draft
 @dllExport('WINNLSEnableIME')
-function wINNLSEnableIME() {}
+function wINNLSEnableIME() { return 0 }
 
 @draft
 @dllExport('WINNLSGetEnableStatus')
-function wINNLSGetEnableStatus() {}
+function wINNLSGetEnableStatus() { return 0 }
 
 @draft
 @dllExport('WINNLSGetIMEHotkey')
-function wINNLSGetIMEHotkey() {}
+function wINNLSGetIMEHotkey() { return 0 }
 
 @draft
 @dllExport('wsprintfA')
-function wsprintfA() {}
+function wsprintfA() { return 0 }
 
 @draft
 @dllExport('wsprintfW')
-function wsprintfW() {}
+function wsprintfW() { return 0 }
 
 @draft
 @dllExport('wvsprintfA')
-function wvsprintfA() {}
+function wvsprintfA() { return 0 }
 
 @draft
 @dllExport('wvsprintfW')
-function wvsprintfW() {}
+function wvsprintfW() { return 0 }
 
