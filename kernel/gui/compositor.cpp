@@ -144,22 +144,22 @@ function initializeCompositor() {
 
 	Bitmap32 *loadPng32(const RamDiskAsset *asset);
 
-	let a = getRamDiskAsset(u8"leaves.png");
+	let a = getRamDiskAsset(u8"root/Windows/Resources/Icons/leaves.png");
 	leaves = loadPng32(&a);
 
-	let b = getRamDiskAsset(u8"icons\\trash-empty48.png");
+	let b = getRamDiskAsset(u8"root/Windows/Resources/Icons/trash-empty48.png");
 	trashCan = loadPng32(&b);
 
-	let c = getRamDiskAsset(u8"icons\\notepad.ico_48x48.png");
+	let c = getRamDiskAsset(u8"root/Windows/Resources/Icons/notepad.ico_48x48.png");
 	notepad48 = loadPng32(&c);
 
-	let d = getRamDiskAsset(u8"icons\\notepad.ico_16x16.png");
+	let d = getRamDiskAsset(u8"root/Windows/Resources/Icons/notepad.ico_16x16.png");
 	notepad16 = loadPng32(&d);
 
-	let e = getRamDiskAsset(u8"icons\\link.png");
+	let e = getRamDiskAsset(u8"root/Windows/Resources/Icons/link.png");
 	link = loadPng32(&e);
 
-	let asset = getRamDiskAsset(u8"cursors\\normal.cur");
+	let asset = getRamDiskAsset(u8"root/Windows/Cursors/aero_arrow.cur");
 	cur = cursor::loadCursor(&asset);
 
 	serialPrintln(u8"[compositor.initializeCompositor] done");

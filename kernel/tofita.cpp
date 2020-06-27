@@ -138,7 +138,7 @@ function kernelInit(const KernelParams *params) {
 	quakePrintf(u8"Enter 'help' for commands\n");
 
 	{
-		RamDiskAsset a = getRamDiskAsset(u8"hello.bmp");
+		RamDiskAsset a = getRamDiskAsset(u8"root/Windows/Web/Wallpaper/Tofita/default.bmp");
 		Bitmap32 *bmp = bmp::loadBmp24(&a);
 		setWallpaper(bmp, Center);
 	}
