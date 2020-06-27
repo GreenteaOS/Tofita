@@ -27,12 +27,12 @@ typedef struct {
 	uint8_t a;
 } __attribute__((packed)) PixelRGBAData;
 
-typedef struct {
+struct Pixel32 {
 	union {
 		PixelRGBAData rgba;
 		uint32_t color;
 	};
-} __attribute__((packed)) Pixel32;
+};
 
 typedef struct {
 	uint16_t width;

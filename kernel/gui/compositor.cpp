@@ -118,8 +118,8 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 	vibranceLight = upscaleLight;
 }
 
-function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
-	let vibrance = vibranceDark; // Avoit non-register global access
+function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height, bool dark) {
+	let vibrance = dark ? vibranceDark : vibranceLight; // Avoit non-register global access
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
 			if (x + xx < 0)
