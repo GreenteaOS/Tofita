@@ -51,6 +51,16 @@ double getCharAdvance(const char8_t c) {
 	return textChar.width;
 }
 
+uint16_t getTextAdvance(const char8_t *text) {
+	uint16_t i = 0;
+	double xx = 0;
+	while (text[i] != 0 && i < 255 * 255) {
+		xx += textFontList[text[i]].width;
+		i++;
+	}
+	return xx;
+}
+
 double drawChar(const char8_t c, double x, uint16_t y, Pixel32 color) {
 	TextFontList textChar = textFontList[(uint64_t)c];
 

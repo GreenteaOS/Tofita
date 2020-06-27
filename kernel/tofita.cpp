@@ -78,6 +78,7 @@ void ___chkstk_ms(){};
 #include "gui/blur.cpp"
 #include "gui/quake.cpp"
 #include "gui/text.cpp"
+#include "gui/windows.cpp"
 #include "gui/compositor.cpp"
 
 function (*keyDownHandler)(uint8_t) = null;
