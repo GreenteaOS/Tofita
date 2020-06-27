@@ -21,7 +21,7 @@
 // ^ this may draw polling mechanism useless (poll for flag only in scheduler)
 // ^ use hlt in scheduler
 
-extern uint8_t haveToRender;
+extern bool haveToRender;
 extern uint8_t haveToQuake;
 function handleKeyDown(uint8_t key);
 extern function (*keyDownHandler)(uint8_t);

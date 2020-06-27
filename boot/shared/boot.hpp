@@ -17,7 +17,7 @@
 
 // Code Hexa-style for easier porting
 
-#define null nullptr
+constexpr auto null = nullptr;
 #define let const auto
 #define var auto
 typedef void function;
@@ -39,6 +39,7 @@ typedef void function;
 #define size_t do_not_use_such_types_please
 #define intptr_t do_not_use_such_types_please
 #define uintptr_t do_not_use_such_types_please
+#define nullptr do_not_use_such_types_please
 
 #define STR_IMPL_(x) #x		// stringify argument
 #define STR(x) STR_IMPL_(x) // indirection to expand argument macros
