@@ -29,6 +29,8 @@ Bitmap32 *notepad48;
 Bitmap32 *link;
 cursor::Cursor *cur = null;
 
+uint16_t startupAnimation = 0;
+
 typedef enum {
 	Center,
 	Stretch,
@@ -182,6 +184,12 @@ function handleMouseUp(uint8_t key) {
 function composite() {
 	var _framebuffer = ::_framebuffer; // Faster access
 
+	// Startup animation
+	if (startupAnimation < 2000) {
+		haveToRender = true;
+		startupAnimation += 9;
+	}
+
 	drawBitmap32(wallpaper, 0, 0);
 	drawBitmap32WithAlpha(trashCan, 12, 10);
 	Pixel32 color;
@@ -209,23 +217,29 @@ function composite() {
 		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH);
 	}
 
-	drawVibrancedRectangle(0, _framebuffer->height - 30, _framebuffer->width, 30);
+	// Taskbar
+	let animationTaskbarY = Math::min(startupAnimation / 1555.0, 1.0) * 30;
+	drawVibrancedRectangle(0, _framebuffer->height - animationTaskbarY, _framebuffer->width, 30);
+
+	let taskbarY = _framebuffer->height + 30 - animationTaskbarY * 2.0;
+
+	// Start button
 	color.rgba.a = 128;
 	color.rgba.a = 100;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x61;
 	if (mouseX < 40 && mouseY > (_framebuffer->height - 30))
-		drawRectangleWithAlpha(color, 0, _framebuffer->height - 30, 40, 30);
-	drawBitmap32WithAlpha(leaves, 2, _framebuffer->height - 30 + 2);
+		drawRectangleWithAlpha(color, 0, taskbarY, 40, 30);
+	drawBitmap32WithAlpha(leaves, 2, taskbarY + 2);
 
-	// taskbar shortcuts
+	// Taskbar shortcuts
 	let shortcutsStart = 5 + 36 + 4;
-	drawBitmap32WithAlpha(notepad16, shortcutsStart, _framebuffer->height - 30 + 7);
+	drawBitmap32WithAlpha(notepad16, shortcutsStart, taskbarY + 7);
 
-	// tray | line
+	// Tray | line
 	color.color = 0x00000000;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x66;
-	drawRectangle(color, _framebuffer->width - 4, _framebuffer->height - 30, 1, 30);
+	drawRectangle(color, _framebuffer->width - 4, taskbarY, 1, 30);
 
 	var trayButtonX = _framebuffer->width - 20 - 16;
 	trayButtonX = _framebuffer->width - 80;
@@ -236,15 +250,17 @@ function composite() {
 	let uptimeMinutes = (uint8_t)((uptimeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000));
 
 	var trayTimeX = trayButtonX + 20;
-	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, _framebuffer->height - 20, color);
-	trayTimeX += drawAsciiText(u8":", trayTimeX, _framebuffer->height - 20, color);
+	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10, color);
+	trayTimeX += drawAsciiText(u8":", trayTimeX, taskbarY + 10, color);
 	if (uptimeMinutes < 10)
-		trayTimeX += drawAsciiText(u8"0", trayTimeX, _framebuffer->height - 20, color);
-	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, _framebuffer->height - 20, color);
-	trayTimeX += drawAsciiText(u8" AM", trayTimeX, _framebuffer->height - 20, color);
-
 	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
+		trayTimeX += drawAsciiText(u8"0", trayTimeX, taskbarY + 10, color);
+	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10, color);
+	trayTimeX += drawAsciiText(u8" AM", trayTimeX, taskbarY + 10, color);
+
+	line45smooth(color, trayButtonX, taskbarY + 10 + 2, 6, 1);
+	line45smooth(color, trayButtonX + 1, taskbarY + 10 + 2, 6, -1);
 
 	drawCursor(cur, mouseX, mouseY);
 	quake();
