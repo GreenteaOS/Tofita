@@ -13,9 +13,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-class Math {
+extern "C++" class Math {
   public:
 	static int32_t round(double value) {
 		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5));
+	}
+
+	static int32_t min(int32_t a, int32_t b) {
+		return a < b ? a : b;
+	}
+
+	static double min(double a, double b) {
+		return a < b ? a : b;
+	}
+
+	static int32_t max(int32_t a, int32_t b) {
+		return a > b ? a : b;
+	}
+
+	static double max(double a, double b) {
+		return a > b ? a : b;
 	}
 };
