@@ -59,7 +59,9 @@ void ___chkstk_ms(){};
 #include "../devices/ps2/polling.cpp"
 #include "../devices/cpu/fallback.cpp"
 #include "../devices/acpi/acpi.cpp"
+#include "formats/exe/exe.hpp"
 #include "ramdisk.cpp"
+#include "module.cpp"
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO
