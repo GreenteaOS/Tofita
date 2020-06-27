@@ -29,10 +29,7 @@ namespace efi {
 #define unsigned do_not_use_such_types_please
 #define long do_not_use_such_types_please
 
-// Avoids PIT-triggered rendering
-// This is not a best solution
-uint8_t haveToRender = 1;
-uint64_t uptimeMilliseconds = 0;
+#include "tofita.hpp"
 
 // Forward for global usage
 function quakePrintf(const char8_t *c, ...);
@@ -164,11 +161,12 @@ function kernelInit(const KernelParams *params) {
 		if (mouseX < 0)
 			mouseX = 0;
 
-		if (haveToRender == 0) {
+		if (haveToRender == false) {
 			amd64::enableAllInterruptsAndHalt();
 			continue;
 		}
-		haveToRender = 0;
+
+		haveToRender = false;
 
 		composite();
 
