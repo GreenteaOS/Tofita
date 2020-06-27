@@ -253,8 +253,6 @@ function composite() {
 	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10, color);
 	trayTimeX += drawAsciiText(u8":", trayTimeX, taskbarY + 10, color);
 	if (uptimeMinutes < 10)
-	line45smooth(color, trayButtonX, _framebuffer->height - 20 + 2, 6, 1);
-	line45smooth(color, trayButtonX + 1, _framebuffer->height - 20 + 2, 6, -1);
 		trayTimeX += drawAsciiText(u8"0", trayTimeX, taskbarY + 10, color);
 	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10, color);
 	trayTimeX += drawAsciiText(u8" AM", trayTimeX, taskbarY + 10, color);
