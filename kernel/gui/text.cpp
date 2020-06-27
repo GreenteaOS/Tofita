@@ -32,7 +32,7 @@ function initText() {
 	textFontList = (TextFontList *)textFont.data;
 
 	Bitmap32 *loadPng32(const RamDiskAsset *asset);
-	RamDiskAsset a = getRamDiskAsset(u8"fonts\\default.png");
+	RamDiskAsset a = getRamDiskAsset(u8"root/Windows/Fonts/default.png");
 	textFontBitmap = loadPng32(&a);
 }
 

@@ -61,33 +61,6 @@ function packAssets(config: Config) {
 		assetName.push('ascii.tofita')
 		assetPath.push(config.tempFolder + '\\tofita\\ascii.tofita')
 
-		assetName.push('cursors\\normal.cur')
-		assetPath.push('assets/root/Windows/Cursors/aero_arrow.cur')
-
-		assetName.push('hello.bmp')
-		assetPath.push('assets/root/Windows/Web/Wallpaper/Tofita/default.bmp')
-
-		assetName.push('fonts\\default.png')
-		assetPath.push('assets/root/Windows/Fonts/default.png')
-
-		assetName.push('icons\\link.png')
-		assetPath.push('assets/root/Windows/Resources/Icons/link.png')
-
-		assetName.push('icons\\notepad.ico_16x16.png')
-		assetPath.push('assets/root/Windows/Resources/Icons/notepad.ico_16x16.png')
-
-		assetName.push('icons\\notepad.ico_48x48.png')
-		assetPath.push('assets/root/Windows/Resources/Icons/notepad.ico_48x48.png')
-
-		assetName.push('icons\\trash-empty48.png')
-		assetPath.push('assets/root/Windows/Resources/Icons/trash-empty48.png')
-
-		assetName.push('leaves.png')
-		assetPath.push('assets/root/Windows/Resources/Icons/leaves.png')
-
-		assetName.push('heart.ico')
-		assetPath.push('assets/root/Windows/Resources/Icons/256_application-community.ico')
-
 		function addFolderRecursive(path) {
 			if (fs.existsSync(path)) {
 				fs.readdirSync(path).forEach(function(file, index) {
