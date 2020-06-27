@@ -20,3 +20,9 @@
 bool haveToRender = true;
 
 uint64_t uptimeMilliseconds = 0;
+
+// Forward for global usage
+function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height, bool dark = true);
+struct Pixel32;
+uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color);
+function quakePrintf(const char8_t *c, ...);

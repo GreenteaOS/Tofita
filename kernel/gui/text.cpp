@@ -61,29 +61,42 @@ uint16_t getTextAdvance(const char8_t *text) {
 	return xx;
 }
 
-double drawChar(const char8_t c, double x, uint16_t y, Pixel32 color) {
+double drawChar(const char8_t c, double x, int16_t y, Pixel32 color) {
 	TextFontList textChar = textFontList[(uint64_t)c];
 
-	uint16_t xx = (int32_t)(x + 0.5);
+	int16_t xx = (int32_t)(x + 0.5);
 	uint8_t w = (int32_t)(textChar.width + 0.5);
 
 	for (uint8_t yi = 0; yi < 12; yi++)
 		for (uint8_t xi = 0; xi < w; xi++) {
+			const int32_t atx = xx + xi;
+			const int32_t aty = y + yi;
+
+			if (atx >= _framebuffer->width)
+				continue;
+			if (atx < 0)
+				continue;
+
+			if (aty >= _framebuffer->height)
+				continue;
+			if (aty < 0)
+				continue;
+
 			Pixel32 font =
 				textFontBitmap->pixels[(textChar.y + yi) * textFontBitmap->width + (textChar.x + xi)];
 
-			Pixel32 p = _pixels[(y + yi) * _framebuffer->width + (xx + xi)];
+			Pixel32 p = _pixels[aty * _framebuffer->width + atx];
 			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r);
 			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g);
 			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b);
-			_pixels[(y + yi) * _framebuffer->width + (xx + xi)] = p;
+			_pixels[aty * _framebuffer->width + atx] = p;
 		}
 
 	return textChar.width;
 }
 
 /// Returns advance after last character
-uint16_t drawAsciiText(const char8_t *text, double x, uint16_t y, Pixel32 color) {
+uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color) {
 	uint16_t i = 0;
 	double xx = x;
 	while (text[i] != 0 && i < 255 * 255) {
@@ -93,7 +106,7 @@ uint16_t drawAsciiText(const char8_t *text, double x, uint16_t y, Pixel32 color)
 	return xx - x;
 }
 
-uint16_t drawIntegerText(int64_t value, double x, uint16_t y, Pixel32 color) {
+uint16_t drawIntegerText(int64_t value, double x, int16_t y, Pixel32 color) {
 	double xx = x;
 	if (value < 0) {
 		xx += drawAsciiText(u8"-", xx, y, color);

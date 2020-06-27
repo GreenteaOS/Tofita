@@ -19,6 +19,23 @@ extern "C++" class Math {
 		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5));
 	}
 
+	static float sqrt(float number) {
+		int32_t i;
+		float x2, y;
+		const float threehalfs = 1.5F;
+
+		x2 = number * 0.5F;
+		y = number;
+		i = *(int32_t *)&y;		   // floating point bit level hacking [sic]
+		i = 0x5f3759df - (i >> 1); // Newton's approximation
+		y = *(float *)&i;
+		y = y * (threehalfs - (x2 * y * y)); // 1st iteration
+		y = y * (threehalfs - (x2 * y * y)); // 2nd iteration
+		y = y * (threehalfs - (x2 * y * y)); // 3rd iteration
+
+		return 1.0f / y;
+	}
+
 	static int32_t min(int32_t a, int32_t b) {
 		return a < b ? a : b;
 	}

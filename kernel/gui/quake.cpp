@@ -31,9 +31,7 @@ function quake() {
 		return;
 	}
 
-	function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height);
 	drawVibrancedRectangle(0, 0, _framebuffer->width, quakeHeight);
-	uint16_t drawAsciiText(const char8_t *text, double x, uint16_t y, Pixel32 color);
 	Pixel32 color;
 	// color.rgba.r = color.rgba.g = color.rgba.b = 48;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xDD;
