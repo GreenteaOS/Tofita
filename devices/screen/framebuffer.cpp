@@ -61,6 +61,7 @@ function setFramebuffer(const Framebuffer *framebuffer) {
 #define Blend255(target, color, alpha) (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
 function __attribute__((fastcall)) blendPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
+	var _framebuffer = ::_framebuffer; // Faster access
 	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1))
 		return;
 	Pixel32 p = _pixels[y * _framebuffer->width + x];
@@ -73,6 +74,7 @@ function __attribute__((fastcall)) blendPixel(uint16_t x, uint16_t y, Pixel32 pi
 }
 
 function __attribute__((fastcall)) setPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
+	var _framebuffer = ::_framebuffer; // Faster access
 	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1))
 		return;
 	_pixels[y * _framebuffer->width + x] = pixel;

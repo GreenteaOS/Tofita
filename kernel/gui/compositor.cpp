@@ -19,8 +19,9 @@
 
 // Differential composition is not yet supported, performance with large amount of apps may be low
 
-Bitmap32 *wallpaper; // Size of framebuffer
-Bitmap32 *vibrance;	 // Size of framebuffer
+Bitmap32 *wallpaper;	 // Size of framebuffer
+Bitmap32 *vibranceLight; // Size of framebuffer
+Bitmap32 *vibranceDark;	 // Size of framebuffer
 Bitmap32 *leaves;
 Bitmap32 *trashCan;
 Bitmap32 *notepad16;
@@ -79,30 +80,44 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 	serialPrintln(u8"[compositor.setWallpaper] upscale 8x");
 
 	// Upscale
-	Bitmap32 *upscale = allocateBitmap(bitmap->width, bitmap->height);
+	Bitmap32 *upscaleLight = allocateBitmap(bitmap->width, bitmap->height);
+	Bitmap32 *upscaleDark = allocateBitmap(bitmap->width, bitmap->height);
+	Bitmap32 *upscale = upscaleDark;
 
 	float hReciprocal = 1.0f / (float)upscale->height;
 	float wReciprocal = 1.0f / (float)upscale->width;
 
 	for (uint16_t y = 0; y < upscale->height; y++)
 		for (uint16_t x = 0; x < upscale->width; x++) {
-			PixelRGBAData rgba = interpolatePixel(downscale, ((float)x * wReciprocal) * downscale->width,
-												  ((float)y * hReciprocal) * (downscale->height - 8));
+			PixelRGBAData rgbaSource =
+				interpolatePixel(downscale, ((float)x * wReciprocal) * downscale->width,
+								 ((float)y * hReciprocal) * (downscale->height - 8));
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
-			// rgba.r = Blend255(rgba.r, 255, 168);
-			// rgba.g = Blend255(rgba.g, 255, 168);
-			// rgba.b = Blend255(rgba.b, 255, 168);
-			rgba.r = Blend255(rgba.r, 0, 168);
-			rgba.g = Blend255(rgba.g, 0, 168);
-			rgba.b = Blend255(rgba.b, 0, 168);
-			upscale->pixels[y * upscale->width + x].rgba = rgba;
+
+			{
+				PixelRGBAData rgba = rgbaSource;
+				rgba.r = Blend255(rgba.r, 0, 168);
+				rgba.g = Blend255(rgba.g, 0, 168);
+				rgba.b = Blend255(rgba.b, 0, 168);
+				upscaleDark->pixels[y * upscale->width + x].rgba = rgba;
+			}
+
+			{
+				PixelRGBAData rgba = rgbaSource;
+				rgba.r = Blend255(rgba.r, 255, 168);
+				rgba.g = Blend255(rgba.g, 255, 168);
+				rgba.b = Blend255(rgba.b, 255, 168);
+				upscaleLight->pixels[y * upscale->width + x].rgba = rgba;
+			}
 		}
 
-	vibrance = upscale;
+	vibranceDark = upscaleDark;
+	vibranceLight = upscaleLight;
 }
 
 function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
+	let vibrance = vibranceDark; // Avoit non-register global access
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
 			if (x + xx < 0)
@@ -165,6 +180,8 @@ function handleMouseUp(uint8_t key) {
 }
 
 function composite() {
+	var _framebuffer = ::_framebuffer; // Faster access
+
 	drawBitmap32(wallpaper, 0, 0);
 	drawBitmap32WithAlpha(trashCan, 12, 10);
 	Pixel32 color;
