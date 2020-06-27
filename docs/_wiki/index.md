@@ -4,7 +4,7 @@ title: Introduction
 into: intro
 ---
 
-GreenteaOS features own kernel [Tofita](https://github.com/GreenteaOS/Tofita): a non-portable, strictly x86-64 desktop-oriented monolithic design with UEFI bootloader.
+GreenteaOS features own kernel [Tofita](https://github.com/GreenteaOS/Tofita): a non-portable, strictly x86-64 desktop-oriented hybrid design with UEFI bootloader.
 
 GreenteaFS is also considered to be used as a primary file system. With hybrid approach of CoW and non-CoW structure to achieve maximal performance on consumer desktop PCs (in comparison to most other fs's designed for server use). Sources of GreenteaFS are not yet available due to active experimentation. Somewhat influenced by TFS of Redox. Intended to be very compatible with NTFS in API terms (like streams support and unicode file names).
 
