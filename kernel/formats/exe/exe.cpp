@@ -173,6 +173,31 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	return pei;
 }
 
+PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root) {
+	PeExportLinkedList *list = root;
+
+	while (list->next != null) {
+		// Step upfront, to ignore empty root
+		list = list->next;
+
+		uint16_t i = 0;
+		while (true) {
+			if ((list->name[i] == name[i]) && (name[i] == 0)) {
+				serialPrintf(u8"import {%s} resolved to {%s}\n", list->name, name);
+				return list;
+				break;
+			}
+			if (list->name[i] == name[i]) {
+				i++;
+				continue;
+			}
+			break;
+		}
+	}
+
+	return null;
+}
+
 function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	var buffer = pei.base;
 	var imageDataDirectory = pei.imageDataDirectory;
@@ -212,26 +237,10 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 					// Resolve import
 					fun = null;
 
-					PeExportLinkedList *list = root;
+					PeExportLinkedList *proc = getProcAddress(szImportName, root);
 
-					while (list->next != null) {
-						// Step upfront, to ignore empty root
-						list = list->next;
-
-						uint16_t i = 0;
-						while (true) {
-							if ((list->name[i] == szImportName[i]) && (szImportName[i] == 0)) {
-								serialPrintf(u8"import {%s} resolved to {%s}\n", list->name, szImportName);
-								fun = (void *)list->ptr;
-								break;
-							}
-							if (list->name[i] == szImportName[i]) {
-								i++;
-								continue;
-							}
-							break;
-						}
-					}
+					if (proc != null)
+						fun = (void *)proc->ptr;
 				}
 
 				*funcRef = (FARPROC)fun;
@@ -260,10 +269,6 @@ function simpleExeTest() {
 		resolveDllImports(b, root);
 		resolveDllImports(c, root);
 	}
-
-
-
-
 
 }
 
