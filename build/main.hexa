@@ -107,6 +107,34 @@ for (task in tasks) {
 					].join(''), { stdio: 'inherit' }
 				)
 
+				// DLL
+
+				// TODO 32-bit
+				for (i in dlls.length) {
+					require('child_process').execSync(
+						[
+							'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
+							'-m64 -target x86_64-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
+							'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w ',
+							'-Wimplicit-function-declaration -O2 -c ',
+							'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
+							'-o ',
+							config.tempFolder + '/tofita/' + dlls[i] + '_dll.obj'
+						].join(''), { stdio: 'inherit' }
+					)
+
+					require('child_process').execSync(
+						[
+							'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
+							'/verbose /DLL /WX /MACHINE:X64 ',
+							[for (dep in deps[i]) config.tempFolder + '/tofita/' + dep + '.lib '].join(''),
+							config.tempFolder + '/tofita/' + dlls[i] + '_dll.obj ',
+							'/out:',
+							config.tempFolder + '/tofita/' + dlls[i] + '.dll'
+						].join(''), { stdio: 'inherit' }
+					)
+				}
+
 				// UEFI
 
 				require('child_process').execSync(

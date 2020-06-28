@@ -23,6 +23,21 @@ declare class Config {
 	let versionTag: String
 }
 
+let dlls = [
+	// Order is important
+	'ntdll',
+	'kernel32',
+	'gdi32',
+	'user32'
+]
+
+let deps: [[String]] = [
+	[],
+	['ntdll'],
+	['ntdll', 'kernel32'],
+	['ntdll', 'kernel32', 'gdi32']
+]
+
 function packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
@@ -53,6 +68,11 @@ function packAssets(config: Config) {
 
 		assetName.push('tofita.gnu')
 		assetPath.push(config.tempFolder + '\\tofita\\tofita.exe')
+
+		for (dll in dlls) {
+			assetName.push('desktop/' + dll + '.dll')
+			assetPath.push(config.tempFolder + '\\tofita\\\(dll).dll')
+		}
 
 		assetName.push('trampoline.tofita')
 		assetPath.push(config.tempFolder + '\\tofita\\trampoline.bin')

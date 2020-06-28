@@ -28,16 +28,16 @@ bits 64
 ; rdx - second argument - (uint64_t)paging::pml4entries (CR3)
 ; r8 - third argument - stack
 ; r9 - fourth argument - upper (kernel)
+; xmm0, xmm1, xmm2, xmm3 for floating point arguments
+; rax - returned value
 
 cli ; Disable interrupts
 ;mov cr3, rsi ; UNIX
 ;o64 jmp rcx ; UNIX
 
 mov cr3, rdx ; NT
-mov rdi, rcx ; NT -> UNIX
-mov rdx, r8 ; NT -> UNIX
 
-mov rsp, rdx
+mov rsp, r8
 push 0 ; Signal end of stack with 0 return address
 push 0 ; and a few extra entries in case of stack
 push 0 ; problems
