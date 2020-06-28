@@ -164,4 +164,30 @@ typedef struct _IMAGE_DATA_DIRECTORY {
 #define IMAGE_REL_BASED_DIR64 10
 #define IMAGE_REL_BASED_HIGHLOW 3
 
+#pragma pack(1)
+typedef struct _IMAGE_IMPORT_DESCRIPTOR {
+	uint32_t OriginalFirstThunk;
+	uint32_t TimeDateStamp;
+	uint32_t ForwarderChain;
+	uint32_t Name;
+	uint32_t FirstThunk;
+} IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR;
+#pragma pack()
+
+typedef void (*FARPROC)();
+
+typedef struct _IMAGE_IMPORT_BY_NAME {
+	uint16_t Hint;
+	uint8_t Name[1];
+} IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME;
+
+typedef struct _IMAGE_THUNK_DATA {
+	union {
+		uint64_t Function;					 // address of imported function
+		uint32_t Ordinal;					 // ordinal value of function
+		PIMAGE_IMPORT_BY_NAME AddressOfData; // RVA of imported name
+		uint32_t ForwarderStringl;			 // RVA to forwarder string
+	} u1;
+} IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA;
+
 } // namespace exe
