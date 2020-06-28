@@ -46,11 +46,11 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	serialPrintf(u8"[loadDLL] loaded dll asset '%s' %d bytes at %d\n", name, asset.size, asset.data);
 	auto ptr = (uint8_t *)asset.data;
 	auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
-	serialPrintf(u8"PE header signature 'PE' == '%s'\n", peHeader);
+	serialPrintf(u8"[loadDLL] PE header signature 'PE' == '%s'\n", peHeader);
 	auto peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader));
-	serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic,
-				 0x020B);
-	serialPrintf(u8"PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
+	serialPrintf(u8"[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n",
+				 peOptionalHeader->mMagic, 0x020B);
+	serialPrintf(u8"[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
 	void *buffer =
 		(void *)PhysicalAllocator::allocatePages(DOWN_BYTES_TO_PAGES(peOptionalHeader->mSizeOfImage) + 1);
 	void *base = (void *)buffer;
@@ -60,8 +60,9 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	auto imageSectionHeader =
 		(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
 	for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
-		serialPrintf(u8"Copy section [%d] named '%s' of size %d at %u\n", i, &imageSectionHeader[i].mName,
-					 imageSectionHeader[i].mSizeOfRawData, imageSectionHeader[i].mVirtualAddress);
+		serialPrintf(u8"[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
+					 &imageSectionHeader[i].mName, imageSectionHeader[i].mSizeOfRawData,
+					 imageSectionHeader[i].mVirtualAddress);
 		uint64_t where = (uint64_t)base + imageSectionHeader[i].mVirtualAddress;
 
 		tmemcpy((void *)where,
@@ -72,7 +73,7 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	auto imageDataDirectory =
 		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(Pe64OptionalHeader));
 
-	// Relocate
+	// Relocate EXE or DLL to a new base
 	ptrdiff_t delta = (uint64_t)buffer - (uint64_t)peOptionalHeader->mImageBase;
 	if (delta != 0) {
 		uint8_t *codeBase = (uint8_t *)buffer;
@@ -81,6 +82,7 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 
 		PIMAGE_DATA_DIRECTORY directory =
 			(PIMAGE_DATA_DIRECTORY)&imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+
 		if (directory->Size == 0) {
 			// return (delta == 0);
 		}
@@ -117,6 +119,7 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 					//#endif
 
 				default:
+					serialPrintf(u8"[loadDLL] Unknown relocation: %d\n", type);
 					break;
 				}
 			}
@@ -185,7 +188,7 @@ PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root
 		uint16_t i = 0;
 		while (true) {
 			if ((list->name[i] == name[i]) && (name[i] == 0)) {
-				serialPrintf(u8"import {%s} resolved to {%s}\n", list->name, name);
+				serialPrintf(u8"[getProcAddress] import {%s} resolved to {%s}\n", list->name, name);
 				return list;
 				break;
 			}
@@ -224,7 +227,8 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 
 				if ((pThunkOrg->u1.Ordinal & 0x80000000) != 0) {
 					Ord = pThunkOrg->u1.Ordinal & 0xffff;
-					serialPrintf(u8"import {%s}.@%d - at address: {%d} <------------ NOT IMPLEMENTED YET!\n",
+					serialPrintf(u8"[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
+								 u8"IMPLEMENTED YET!\n",
 								 szName, Ord, pThunkOrg->u1.Function);
 				} else {
 					IMAGE_IMPORT_BY_NAME *pIBN =
@@ -233,8 +237,8 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 															0xffffffff));
 					Ord = pIBN->Hint;
 					szImportName = (char8_t *)pIBN->Name;
-					serialPrintf(u8"import {%s}.{%s}@%d - at address: {%d}\n", szName, szImportName, Ord,
-								 pThunkOrg->u1.Function);
+					serialPrintf(u8"[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
+								 szImportName, Ord, pThunkOrg->u1.Function);
 
 					// Resolve import
 					fun = null;
