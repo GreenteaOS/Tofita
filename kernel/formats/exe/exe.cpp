@@ -18,13 +18,29 @@
 
 namespace exe {
 
-__attribute__((aligned(64))) uint8_t buffer[16384 * 8] = {0};
+// TODO ntdll should have tofitaStub(){} for unresolved dll imports -> log them
 
 void *offsetPointer(void *data, ptrdiff_t offset) {
 	return (void *)((uint64_t)data + offset);
 }
 
-function loadDLL(const char8_t *name) {
+struct ImageDataDirectory {
+	uint32_t VirtualAddress;
+	uint32_t Size;
+};
+
+struct PeInterim {
+	void *base;
+	const ImageDataDirectory *imageDataDirectory;
+};
+
+struct PeExportLinkedList {
+	const char8_t *name;
+	uint64_t ptr;
+	PeExportLinkedList *next;
+};
+
+auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	RamDiskAsset asset = getRamDiskAsset(name);
 	serialPrintf(u8"[loadDLL] loaded dll asset '%s' %d bytes at %d\n", name, asset.size, asset.data);
 	auto ptr = (uint8_t *)asset.data;
@@ -34,6 +50,8 @@ function loadDLL(const char8_t *name) {
 	serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic,
 				 0x020B);
 	serialPrintf(u8"PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
+	void *buffer =
+		(void *)PhysicalAllocator::allocatePages(DOWN_BYTES_TO_PAGES(peOptionalHeader->mSizeOfImage) + 1);
 	void *base = (void *)buffer;
 	memset(base, 0, peOptionalHeader->mSizeOfImage); // Zeroing
 
@@ -50,10 +68,6 @@ function loadDLL(const char8_t *name) {
 				imageSectionHeader[i].mSizeOfRawData);
 	}
 
-	struct ImageDataDirectory {
-		uint32_t VirtualAddress;
-		uint32_t Size;
-	};
 	auto imageDataDirectory =
 		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(Pe64OptionalHeader));
 
@@ -113,6 +127,10 @@ function loadDLL(const char8_t *name) {
 
 	// Exports
 
+	PeExportLinkedList *tail = root;
+	while (tail->next != null)
+		tail = tail->next;
+
 	for (uint32_t i = 0; i < 15; ++i) {
 		if (i == IMAGE_DIRECTORY_ENTRY_EXPORT) {
 			uint64_t codeBase = (uint64_t)buffer;
@@ -134,9 +152,30 @@ function loadDLL(const char8_t *name) {
 				let ptr = (uint32_t *)addr;
 
 				uint32_t (*func)() = (uint32_t(*)())(codeBase + (uint64_t)*ptr);
+
+				PeExportLinkedList *list =
+					(PeExportLinkedList *)PhysicalAllocator::allocateBytes(sizeof(PeExportLinkedList));
+				list->next = null;
+				list->name = name;
+				list->ptr = (uint64_t)func;
+
+				tail->next = list;
+				tail = tail->next;
 			}
 		}
 	}
+
+	PeInterim pei;
+
+	pei.base = base;
+	pei.imageDataDirectory = imageDataDirectory;
+
+	return pei;
+}
+
+function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
+	var buffer = pei.base;
+	var imageDataDirectory = pei.imageDataDirectory;
 
 	// Imports
 	{
@@ -171,8 +210,28 @@ function loadDLL(const char8_t *name) {
 								 pThunkOrg->u1.Function);
 
 					// Resolve import
-					// TODO
 					fun = null;
+
+					PeExportLinkedList *list = root;
+
+					while (list->next != null) {
+						// Step upfront, to ignore empty root
+						list = list->next;
+
+						uint16_t i = 0;
+						while (true) {
+							if ((list->name[i] == szImportName[i]) && (szImportName[i] == 0)) {
+								serialPrintf(u8"import {%s} resolved to {%s}\n", list->name, szImportName);
+								fun = (void *)list->ptr;
+								break;
+							}
+							if (list->name[i] == szImportName[i]) {
+								i++;
+								continue;
+							}
+							break;
+						}
+					}
 				}
 
 				*funcRef = (FARPROC)fun;
@@ -186,7 +245,24 @@ function loadDLL(const char8_t *name) {
 }
 
 function simpleExeTest() {
-	RamDiskAsset asset = getRamDiskAsset(u8"mexe.exe");
+	{
+		PeExportLinkedList *root =
+			(PeExportLinkedList *)PhysicalAllocator::allocateBytes(sizeof(PeExportLinkedList));
+		root->next = null;
+		root->name = null;
+		root->ptr = 0;
+
+		auto a = loadDll(u8"desktop/dllimp.exe", root);
+		auto b = loadDll(u8"desktop/dll2.dll", root);
+		auto c = loadDll(u8"desktop/dll1.dll", root);
+
+		resolveDllImports(a, root);
+		resolveDllImports(b, root);
+		resolveDllImports(c, root);
+	}
+
+	return;
+	RamDiskAsset asset = getRamDiskAsset(u8"loop.exe");
 	serialPrintf(u8"[[[efi_main]]] loaded asset '_.exe' %d bytes at %d\n", asset.size, asset.data);
 
 	uint64_t mAddressOfEntryPoint = 0;
@@ -233,4 +309,4 @@ function simpleExeTest() {
 	serialPrintf(u8"entry end...\n", 0);
 }
 
-}
+} // namespace exe
