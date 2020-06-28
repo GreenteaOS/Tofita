@@ -25,8 +25,8 @@ void *offsetPointer(void *data, ptrdiff_t offset) {
 }
 
 struct ImageDataDirectory {
-	uint32_t VirtualAddress;
-	uint32_t Size;
+	uint32_t virtualAddress;
+	uint32_t size;
 };
 
 struct PeInterim {
@@ -49,32 +49,32 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	serialPrintf(u8"[loadDLL] PE header signature 'PE' == '%s'\n", peHeader);
 	auto peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader));
 	serialPrintf(u8"[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n",
-				 peOptionalHeader->mMagic, 0x020B);
-	serialPrintf(u8"[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
+				 peOptionalHeader->magic, 0x020B);
+	serialPrintf(u8"[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader->sizeOfImage);
 	void *buffer =
-		(void *)PhysicalAllocator::allocatePages(DOWN_BYTES_TO_PAGES(peOptionalHeader->mSizeOfImage) + 1);
+		(void *)PhysicalAllocator::allocatePages(DOWN_BYTES_TO_PAGES(peOptionalHeader->sizeOfImage) + 1);
 	void *base = (void *)buffer;
-	memset(base, 0, peOptionalHeader->mSizeOfImage); // Zeroing
+	memset(base, 0, peOptionalHeader->sizeOfImage); // Zeroing
 
 	// Copy sections
 	auto imageSectionHeader =
-		(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
-	for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
+		(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->sizeOfOptionalHeader);
+	for (uint16_t i = 0; i < peHeader->numberOfSections; ++i) {
 		serialPrintf(u8"[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
-					 &imageSectionHeader[i].mName, imageSectionHeader[i].mSizeOfRawData,
-					 imageSectionHeader[i].mVirtualAddress);
-		uint64_t where = (uint64_t)base + imageSectionHeader[i].mVirtualAddress;
+					 &imageSectionHeader[i].name, imageSectionHeader[i].sizeOfRawData,
+					 imageSectionHeader[i].virtualAddress);
+		uint64_t where = (uint64_t)base + imageSectionHeader[i].virtualAddress;
 
 		tmemcpy((void *)where,
-				(void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].mPointerToRawData),
-				imageSectionHeader[i].mSizeOfRawData);
+				(void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
+				imageSectionHeader[i].sizeOfRawData);
 	}
 
 	auto imageDataDirectory =
 		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(Pe64OptionalHeader));
 
 	// Relocate EXE or DLL to a new base
-	ptrdiff_t delta = (uint64_t)buffer - (uint64_t)peOptionalHeader->mImageBase;
+	ptrdiff_t delta = (uint64_t)buffer - (uint64_t)peOptionalHeader->imageBase;
 	if (delta != 0) {
 		uint8_t *codeBase = (uint8_t *)buffer;
 
@@ -83,16 +83,16 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 		PIMAGE_DATA_DIRECTORY directory =
 			(PIMAGE_DATA_DIRECTORY)&imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
 
-		if (directory->Size == 0) {
+		if (directory->size == 0) {
 			// return (delta == 0);
 		}
 
-		relocation = (PIMAGE_BASE_RELOCATION)(codeBase + directory->VirtualAddress);
-		for (; relocation->VirtualAddress > 0;) {
+		relocation = (PIMAGE_BASE_RELOCATION)(codeBase + directory->virtualAddress);
+		for (; relocation->virtualAddress > 0;) {
 			uint32_t i = 0;
-			uint8_t *dest = codeBase + relocation->VirtualAddress;
+			uint8_t *dest = codeBase + relocation->virtualAddress;
 			uint16_t *relInfo = (uint16_t *)offsetPointer(relocation, IMAGE_SIZEOF_BASE_RELOCATION);
-			for (i = 0; i < ((relocation->SizeOfBlock - IMAGE_SIZEOF_BASE_RELOCATION) / 2); i++, relInfo++) {
+			for (i = 0; i < ((relocation->sizeOfBlock - IMAGE_SIZEOF_BASE_RELOCATION) / 2); i++, relInfo++) {
 				// the upper 4 bits define the type of relocation
 				int32_t type = *relInfo >> 12;
 				// the lower 12 bits define the offset
@@ -125,7 +125,7 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 			}
 
 			// advance to next relocation block
-			relocation = (PIMAGE_BASE_RELOCATION)offsetPointer(relocation, relocation->SizeOfBlock);
+			relocation = (PIMAGE_BASE_RELOCATION)offsetPointer(relocation, relocation->sizeOfBlock);
 		}
 	}
 
@@ -142,17 +142,17 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 
 			PIMAGE_EXPORT_DIRECTORY exports;
 
-			exports = (PIMAGE_EXPORT_DIRECTORY)((uint64_t)buffer + (uint64_t)directory->VirtualAddress);
+			exports = (PIMAGE_EXPORT_DIRECTORY)((uint64_t)buffer + (uint64_t)directory->virtualAddress);
 
 			uint32_t i = 0;
-			uint32_t *nameRef = (uint32_t *)(codeBase + exports->AddressOfNames);
-			uint16_t *ordinal = (uint16_t *)(codeBase + exports->AddressOfNameOrdinals);
+			uint32_t *nameRef = (uint32_t *)(codeBase + exports->addressOfNames);
+			uint16_t *ordinal = (uint16_t *)(codeBase + exports->addressOfNameOrdinals);
 			uint32_t entry = 0;
-			for (i = 0; i < exports->NumberOfNames; i++, nameRef++, ordinal++, entry++) {
+			for (i = 0; i < exports->numberOfNames; i++, nameRef++, ordinal++, entry++) {
 				let name = (const char8_t *)(codeBase + (*nameRef));
 				let idx = *ordinal;
 
-				let addr = codeBase + exports->AddressOfFunctions + (idx * 4);
+				let addr = codeBase + exports->addressOfFunctions + (idx * 4);
 				let ptr = (uint32_t *)addr;
 
 				uint32_t (*func)() = (uint32_t(*)())(codeBase + (uint64_t)*ptr);
@@ -172,7 +172,7 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	PeInterim pei;
 
 	pei.base = base;
-	pei.entry = (uint64_t)buffer + (uint64_t)peOptionalHeader->mAddressOfEntryPoint;
+	pei.entry = (uint64_t)buffer + (uint64_t)peOptionalHeader->addressOfEntryPoint;
 	pei.imageDataDirectory = imageDataDirectory;
 
 	return pei;
@@ -210,35 +210,35 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	// Imports
 	{
 		uint8_t *at =
-			(uint8_t *)((uint64_t)buffer + imageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+			(uint8_t *)((uint64_t)buffer + imageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].virtualAddress);
 		auto iid = (IMAGE_IMPORT_DESCRIPTOR *)at;
 
 		// DLL
-		while (iid->OriginalFirstThunk != 0) {
-			char8_t *szName = (char8_t *)((uint64_t)buffer + iid->Name);
-			auto pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid->OriginalFirstThunk);
+		while (iid->originalFirstThunk != 0) {
+			char8_t *szName = (char8_t *)((uint64_t)buffer + iid->name);
+			auto pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid->originalFirstThunk);
 			FARPROC *funcRef;
-			funcRef = (FARPROC *)((uint64_t)buffer + iid->FirstThunk);
+			funcRef = (FARPROC *)((uint64_t)buffer + iid->firstThunk);
 
-			while (pThunkOrg->u1.AddressOfData != 0) {
+			while (pThunkOrg->u1.addressOfData != 0) {
 				char8_t *szImportName;
-				uint32_t Ord = 666;
+				uint32_t ord = 666;
 				auto fun = (void *)null;
 
-				if ((pThunkOrg->u1.Ordinal & 0x80000000) != 0) {
-					Ord = pThunkOrg->u1.Ordinal & 0xffff;
+				if ((pThunkOrg->u1.ordinal & 0x80000000) != 0) {
+					ord = pThunkOrg->u1.ordinal & 0xffff;
 					serialPrintf(u8"[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
 								 u8"IMPLEMENTED YET!\n",
-								 szName, Ord, pThunkOrg->u1.Function);
+								 szName, ord, pThunkOrg->u1.function);
 				} else {
 					IMAGE_IMPORT_BY_NAME *pIBN =
 						(IMAGE_IMPORT_BY_NAME *)((uint64_t)buffer +
-												 (uint64_t)((uint64_t)pThunkOrg->u1.AddressOfData &
+												 (uint64_t)((uint64_t)pThunkOrg->u1.addressOfData &
 															0xffffffff));
-					Ord = pIBN->Hint;
-					szImportName = (char8_t *)pIBN->Name;
+					ord = pIBN->hint;
+					szImportName = (char8_t *)pIBN->name;
 					serialPrintf(u8"[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
-								 szImportName, Ord, pThunkOrg->u1.Function);
+								 szImportName, ord, pThunkOrg->u1.function);
 
 					// Resolve import
 					fun = null;

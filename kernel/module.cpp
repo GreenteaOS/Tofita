@@ -37,21 +37,21 @@ Module *loadModule(ModuleInterim *params) {
 	auto ptr = (uint8_t *)params->dll->data;
 	auto peHeader = (const exe::PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
 	auto peOptionalHeader = (const exe::Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe::PeHeader));
-	void *base = (void *)peOptionalHeader->mImageBase;
-	memset(base, 0, peOptionalHeader->mSizeOfImage); // Zeroing
-	module->base = peOptionalHeader->mImageBase;
+	void *base = (void *)peOptionalHeader->imageBase;
+	memset(base, 0, peOptionalHeader->sizeOfImage); // Zeroing
+	module->base = peOptionalHeader->imageBase;
 
 	// Copy sections
 	auto imageSectionHeader =
-		(const exe::ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
-	for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
-		serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
-					 imageSectionHeader[i].mSizeOfRawData);
-		uint64_t where = (uint64_t)base + imageSectionHeader[i].mVirtualAddress;
+		(const exe::ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->sizeOfOptionalHeader);
+	for (uint16_t i = 0; i < peHeader->numberOfSections; ++i) {
+		serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
+					 imageSectionHeader[i].sizeOfRawData);
+		uint64_t where = (uint64_t)base + imageSectionHeader[i].virtualAddress;
 
 		tmemcpy((void *)where,
-				(void *)((uint64_t)params->dll->data + (uint64_t)imageSectionHeader[i].mPointerToRawData),
-				imageSectionHeader[i].mSizeOfRawData);
+				(void *)((uint64_t)params->dll->data + (uint64_t)imageSectionHeader[i].pointerToRawData),
+				imageSectionHeader[i].sizeOfRawData);
 	}
 
 	return module;
