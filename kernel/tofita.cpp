@@ -62,6 +62,8 @@ void ___chkstk_ms(){};
 #include "formats/exe/exe.hpp"
 #include "ramdisk.cpp"
 #include "module.cpp"
+#include "sandbox.cpp"
+#include "user.cpp"
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO
