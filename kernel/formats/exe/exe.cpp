@@ -31,6 +31,7 @@ struct ImageDataDirectory {
 
 struct PeInterim {
 	void *base;
+	uint64_t entry; // _DllMainCRTStartup
 	const ImageDataDirectory *imageDataDirectory;
 };
 
@@ -168,6 +169,7 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	PeInterim pei;
 
 	pei.base = base;
+	pei.entry = (uint64_t)buffer + (uint64_t)peOptionalHeader->mAddressOfEntryPoint;
 	pei.imageDataDirectory = imageDataDirectory;
 
 	return pei;
