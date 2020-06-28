@@ -196,6 +196,7 @@ for (task in tasks) {
 							if (fs.lstatSync(curPath).isDirectory()) {
 								formatFolderRecursive(curPath)
 							} else {
+								if (curPath.indexOf('external/') == -1)
 								if (curPath.endsWith('.cpp') || curPath.endsWith('.hpp')) {
 									files.push(curPath)
 								}
