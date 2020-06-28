@@ -41,8 +41,8 @@ function loadDLL(const char8_t *name) {
 	auto imageSectionHeader =
 		(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
 	for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
-		serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
-					 imageSectionHeader[i].mSizeOfRawData);
+		serialPrintf(u8"Copy section [%d] named '%s' of size %d at %u\n", i, &imageSectionHeader[i].mName,
+					 imageSectionHeader[i].mSizeOfRawData, imageSectionHeader[i].mVirtualAddress);
 		uint64_t where = (uint64_t)base + imageSectionHeader[i].mVirtualAddress;
 
 		tmemcpy((void *)where,
@@ -122,7 +122,7 @@ function loadDLL(const char8_t *name) {
 
 			exports = (PIMAGE_EXPORT_DIRECTORY)((uint64_t)buffer + (uint64_t)directory->VirtualAddress);
 
-			uint32_t i;
+			uint32_t i = 0;
 			uint32_t *nameRef = (uint32_t *)(codeBase + exports->AddressOfNames);
 			uint16_t *ordinal = (uint16_t *)(codeBase + exports->AddressOfNameOrdinals);
 			uint32_t entry = 0;
@@ -135,6 +135,52 @@ function loadDLL(const char8_t *name) {
 
 				uint32_t (*func)() = (uint32_t(*)())(codeBase + (uint64_t)*ptr);
 			}
+		}
+	}
+
+	// Imports
+	{
+		uint8_t *at =
+			(uint8_t *)((uint64_t)buffer + imageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+		auto iid = (IMAGE_IMPORT_DESCRIPTOR *)at;
+
+		// DLL
+		while (iid->OriginalFirstThunk != 0) {
+			char8_t *szName = (char8_t *)((uint64_t)buffer + iid->Name);
+			auto pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid->OriginalFirstThunk);
+			FARPROC *funcRef;
+			funcRef = (FARPROC *)((uint64_t)buffer + iid->FirstThunk);
+
+			while (pThunkOrg->u1.AddressOfData != 0) {
+				char8_t *szImportName;
+				uint32_t Ord = 666;
+				auto fun = (void *)null;
+
+				if ((pThunkOrg->u1.Ordinal & 0x80000000) != 0) {
+					Ord = pThunkOrg->u1.Ordinal & 0xffff;
+					serialPrintf(u8"import {%s}.@%d - at address: {%d} <------------ NOT IMPLEMENTED YET!\n",
+								 szName, Ord, pThunkOrg->u1.Function);
+				} else {
+					IMAGE_IMPORT_BY_NAME *pIBN =
+						(IMAGE_IMPORT_BY_NAME *)((uint64_t)buffer +
+												 (uint64_t)((uint64_t)pThunkOrg->u1.AddressOfData &
+															0xffffffff));
+					Ord = pIBN->Hint;
+					szImportName = (char8_t *)pIBN->Name;
+					serialPrintf(u8"import {%s}.{%s}@%d - at address: {%d}\n", szName, szImportName, Ord,
+								 pThunkOrg->u1.Function);
+
+					// Resolve import
+					// TODO
+					fun = null;
+				}
+
+				*funcRef = (FARPROC)fun;
+				pThunkOrg++;
+				funcRef++;
+			}
+
+			iid++;
 		}
 	}
 }
