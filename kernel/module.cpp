@@ -15,10 +15,12 @@
 
 // Implementation of hybrid kernel modules
 // Modules are .dll files
+namespace process {
 
 struct Module {
 	const char8_t *name;
 	const RamDiskAsset *dll;
+	uint64_t base;
 };
 
 struct ModuleInterim {
@@ -37,6 +39,7 @@ Module *loadModule(ModuleInterim *params) {
 	auto peOptionalHeader = (const exe::Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe::PeHeader));
 	void *base = (void *)peOptionalHeader->mImageBase;
 	memset(base, 0, peOptionalHeader->mSizeOfImage); // Zeroing
+	module->base = peOptionalHeader->mImageBase;
 
 	// Copy sections
 	auto imageSectionHeader =
@@ -53,3 +56,4 @@ Module *loadModule(ModuleInterim *params) {
 
 	return module;
 }
+} // namespace process

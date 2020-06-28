@@ -119,4 +119,49 @@ struct ImageSectionHeader { // size 40 bytes
 
 _Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect");
 
+#define IMAGE_DIRECTORY_ENTRY_EXPORT 0	  // Export Directory
+#define IMAGE_DIRECTORY_ENTRY_IMPORT 1	  // Import Directory
+#define IMAGE_DIRECTORY_ENTRY_RESOURCE 2  // Resource Directory
+#define IMAGE_DIRECTORY_ENTRY_EXCEPTION 3 // Exception Directory
+#define IMAGE_DIRECTORY_ENTRY_SECURITY 4  // Security Directory
+#define IMAGE_DIRECTORY_ENTRY_BASERELOC 5 // Base Relocation Table
+#define IMAGE_DIRECTORY_ENTRY_DEBUG 6	  // Debug Directory
+//      IMAGE_DIRECTORY_ENTRY_COPYRIGHT       7   // (X86 usage)
+#define IMAGE_DIRECTORY_ENTRY_ARCHITECTURE 7	// Architecture Specific Data
+#define IMAGE_DIRECTORY_ENTRY_GLOBALPTR 8		// RVA of GP
+#define IMAGE_DIRECTORY_ENTRY_TLS 9				// TLS Directory
+#define IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG 10	// Load Configuration Directory
+#define IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT 11	// Bound Import Directory in headers
+#define IMAGE_DIRECTORY_ENTRY_IAT 12			// Import Address Table
+#define IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT 13	// Delay Load Import Descriptors
+#define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR 14 // COM Runtime descriptor
+
+typedef struct _IMAGE_EXPORT_DIRECTORY {
+	uint32_t Characteristics;
+	uint32_t TimeDateStamp;
+	uint16_t MajorVersion;
+	uint16_t MinorVersion;
+	uint32_t Name;
+	uint32_t Base;
+	uint32_t NumberOfFunctions;
+	uint32_t NumberOfNames;
+	uint32_t AddressOfFunctions;
+	uint32_t AddressOfNames;
+	uint32_t AddressOfNameOrdinals;
+} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY;
+
+typedef struct _IMAGE_BASE_RELOCATION {
+	uint32_t VirtualAddress;
+	uint32_t SizeOfBlock;
+} IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION;
+
+typedef struct _IMAGE_DATA_DIRECTORY {
+	uint32_t VirtualAddress;
+	uint32_t Size;
+} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
+#define IMAGE_SIZEOF_BASE_RELOCATION 8
+#define IMAGE_REL_BASED_ABSOLUTE 0
+#define IMAGE_REL_BASED_DIR64 10
+#define IMAGE_REL_BASED_HIGHLOW 3
+
 } // namespace exe
