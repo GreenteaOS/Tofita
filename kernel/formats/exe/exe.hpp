@@ -18,14 +18,14 @@ namespace exe {
 // 1 byte aligned
 #pragma pack(1)
 struct PeHeader {
-	uint32_t mMagic; // PE\0\0 or 0x00004550
-	uint16_t mMachine;
-	uint16_t mNumberOfSections;
-	uint32_t mTimeDateStamp;
-	uint32_t mPointerToSymbolTable;
-	uint32_t mNumberOfSymbols;
-	uint16_t mSizeOfOptionalHeader;
-	uint16_t mCharacteristics;
+	uint32_t magic; // PE\0\0 or 0x00004550
+	uint16_t machine;
+	uint16_t numberOfSections;
+	uint32_t timeDateStamp;
+	uint32_t pointerToSymbolTable;
+	uint32_t numberOfSymbols;
+	uint16_t sizeOfOptionalHeader;
+	uint16_t characteristics;
 } __attribute__((packed));
 #pragma pack()
 
@@ -34,86 +34,86 @@ _Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect");
 // 1 byte aligned
 #pragma pack(1)
 struct Pe64OptionalHeader {
-	uint16_t mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	uint8_t mMajorLinkerVersion;
-	uint8_t mMinorLinkerVersion;
-	uint32_t mSizeOfCode;
-	uint32_t mSizeOfInitializedData;
-	uint32_t mSizeOfUninitializedData;
-	uint32_t mAddressOfEntryPoint;
-	uint32_t mBaseOfCode;
-	uint64_t mImageBase;
-	uint32_t mSectionAlignment;
-	uint32_t mFileAlignment;
-	uint16_t mMajorOperatingSystemVersion;
-	uint16_t mMinorOperatingSystemVersion;
-	uint16_t mMajorImageVersion;
-	uint16_t mMinorImageVersion;
-	uint16_t mMajorSubsystemVersion;
-	uint16_t mMinorSubsystemVersion;
-	uint32_t mWin32VersionValue;
-	uint32_t mSizeOfImage;
-	uint32_t mSizeOfHeaders;
-	uint32_t mCheckSum;
-	uint16_t mSubsystem;
-	uint16_t mDllCharacteristics;
-	uint64_t mSizeOfStackReserve;
-	uint64_t mSizeOfStackCommit;
-	uint64_t mSizeOfHeapReserve;
-	uint64_t mSizeOfHeapCommit;
-	uint32_t mLoaderFlags;
-	uint32_t mNumberOfRvaAndSizes;
+	uint16_t magic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	uint8_t majorLinkerVersion;
+	uint8_t minorLinkerVersion;
+	uint32_t sizeOfCode;
+	uint32_t sizeOfInitializedData;
+	uint32_t sizeOfUninitializedData;
+	uint32_t addressOfEntryPoint;
+	uint32_t baseOfCode;
+	uint64_t imageBase;
+	uint32_t sectionAlignment;
+	uint32_t fileAlignment;
+	uint16_t majorOperatingSystemVersion;
+	uint16_t minorOperatingSystemVersion;
+	uint16_t majorImageVersion;
+	uint16_t minorImageVersion;
+	uint16_t majorSubsystemVersion;
+	uint16_t minorSubsystemVersion;
+	uint32_t win32VersionValue;
+	uint32_t sizeOfImage;
+	uint32_t sizeOfHeaders;
+	uint32_t checkSum;
+	uint16_t subsystem;
+	uint16_t dllCharacteristics;
+	uint64_t sizeOfStackReserve;
+	uint64_t sizeOfStackCommit;
+	uint64_t sizeOfHeapReserve;
+	uint64_t sizeOfHeapCommit;
+	uint32_t loaderFlags;
+	uint32_t numberOfRvaAndSizes;
 } __attribute__((packed));
 #pragma pack()
 
 // 1 byte aligned
 #pragma pack(1)
 struct Pe32OptionalHeader {
-	uint16_t mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	uint8_t mMajorLinkerVersion;
-	uint8_t mMinorLinkerVersion;
-	uint32_t mSizeOfCode;
-	uint32_t mSizeOfInitializedData;
-	uint32_t mSizeOfUninitializedData;
-	uint32_t mAddressOfEntryPoint;
-	uint32_t mBaseOfCode;
-	uint32_t mBaseOfData; // present only in 32-bit
-	uint32_t mImageBase;
-	uint32_t mSectionAlignment;
-	uint32_t mFileAlignment;
-	uint16_t mMajorOperatingSystemVersion;
-	uint16_t mMinorOperatingSystemVersion;
-	uint16_t mMajorImageVersion;
-	uint16_t mMinorImageVersion;
-	uint16_t mMajorSubsystemVersion;
-	uint16_t mMinorSubsystemVersion;
-	uint32_t mWin32VersionValue;
-	uint32_t mSizeOfImage;
-	uint32_t mSizeOfHeaders;
-	uint32_t mCheckSum;
-	uint16_t mSubsystem;
-	uint16_t mDllCharacteristics;
-	uint32_t mSizeOfStackReserve;
-	uint32_t mSizeOfStackCommit;
-	uint32_t mSizeOfHeapReserve;
-	uint32_t mSizeOfHeapCommit;
-	uint32_t mLoaderFlags;
-	uint32_t mNumberOfRvaAndSizes;
+	uint16_t magic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	uint8_t majorLinkerVersion;
+	uint8_t minorLinkerVersion;
+	uint32_t sizeOfCode;
+	uint32_t sizeOfInitializedData;
+	uint32_t sizeOfUninitializedData;
+	uint32_t addressOfEntryPoint;
+	uint32_t baseOfCode;
+	uint32_t baseOfData; // present only in 32-bit
+	uint32_t imageBase;
+	uint32_t sectionAlignment;
+	uint32_t fileAlignment;
+	uint16_t majorOperatingSystemVersion;
+	uint16_t minorOperatingSystemVersion;
+	uint16_t majorImageVersion;
+	uint16_t minorImageVersion;
+	uint16_t majorSubsystemVersion;
+	uint16_t minorSubsystemVersion;
+	uint32_t win32VersionValue;
+	uint32_t sizeOfImage;
+	uint32_t sizeOfHeaders;
+	uint32_t checkSum;
+	uint16_t subsystem;
+	uint16_t dllCharacteristics;
+	uint32_t sizeOfStackReserve;
+	uint32_t sizeOfStackCommit;
+	uint32_t sizeOfHeapReserve;
+	uint32_t sizeOfHeapCommit;
+	uint32_t loaderFlags;
+	uint32_t numberOfRvaAndSizes;
 } __attribute__((packed));
 #pragma pack()
 
 #pragma pack(1)
 struct ImageSectionHeader { // size 40 bytes
-	uint8_t mName[8];
-	uint32_t mVirtualSize;
-	uint32_t mVirtualAddress;
-	uint32_t mSizeOfRawData;
-	uint32_t mPointerToRawData;
-	uint32_t mPointerToRealocations;
-	uint32_t mPointerToLinenumbers;
-	uint16_t mNumberOfRealocations;
-	uint16_t mNumberOfLinenumbers;
-	uint32_t mCharacteristics;
+	uint8_t name[8];
+	uint32_t virtualSize;
+	uint32_t virtualAddress;
+	uint32_t sizeOfRawData;
+	uint32_t pointerToRawData;
+	uint32_t pointerToRealocations;
+	uint32_t pointerToLinenumbers;
+	uint16_t numberOfRealocations;
+	uint16_t numberOfLinenumbers;
+	uint32_t characteristics;
 } __attribute__((packed));
 #pragma pack()
 
@@ -137,27 +137,27 @@ _Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect");
 #define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR 14 // COM Runtime descriptor
 
 typedef struct _IMAGE_EXPORT_DIRECTORY {
-	uint32_t Characteristics;
-	uint32_t TimeDateStamp;
-	uint16_t MajorVersion;
-	uint16_t MinorVersion;
-	uint32_t Name;
-	uint32_t Base;
-	uint32_t NumberOfFunctions;
-	uint32_t NumberOfNames;
-	uint32_t AddressOfFunctions;
-	uint32_t AddressOfNames;
-	uint32_t AddressOfNameOrdinals;
+	uint32_t characteristics;
+	uint32_t timeDateStamp;
+	uint16_t majorVersion;
+	uint16_t minorVersion;
+	uint32_t name;
+	uint32_t base;
+	uint32_t numberOfFunctions;
+	uint32_t numberOfNames;
+	uint32_t addressOfFunctions;
+	uint32_t addressOfNames;
+	uint32_t addressOfNameOrdinals;
 } IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY;
 
 typedef struct _IMAGE_BASE_RELOCATION {
-	uint32_t VirtualAddress;
-	uint32_t SizeOfBlock;
+	uint32_t virtualAddress;
+	uint32_t sizeOfBlock;
 } IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION;
 
 typedef struct _IMAGE_DATA_DIRECTORY {
-	uint32_t VirtualAddress;
-	uint32_t Size;
+	uint32_t virtualAddress;
+	uint32_t size;
 } IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
 #define IMAGE_SIZEOF_BASE_RELOCATION 8
 #define IMAGE_REL_BASED_ABSOLUTE 0
@@ -166,27 +166,30 @@ typedef struct _IMAGE_DATA_DIRECTORY {
 
 #pragma pack(1)
 typedef struct _IMAGE_IMPORT_DESCRIPTOR {
-	uint32_t OriginalFirstThunk;
-	uint32_t TimeDateStamp;
-	uint32_t ForwarderChain;
-	uint32_t Name;
-	uint32_t FirstThunk;
+	//_ANONYMOUS_UNION union {
+	//	uint32_t characteristics;
+	uint32_t originalFirstThunk;
+	//} DUMMYUNIONNAME;
+	uint32_t timeDateStamp;
+	uint32_t forwarderChain;
+	uint32_t name;
+	uint32_t firstThunk;
 } IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR;
 #pragma pack()
 
 typedef void (*FARPROC)();
 
 typedef struct _IMAGE_IMPORT_BY_NAME {
-	uint16_t Hint;
-	uint8_t Name[1];
+	uint16_t hint;
+	uint8_t name[1];
 } IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME;
 
 typedef struct _IMAGE_THUNK_DATA {
 	union {
-		uint64_t Function;					 // address of imported function
-		uint32_t Ordinal;					 // ordinal value of function
-		PIMAGE_IMPORT_BY_NAME AddressOfData; // RVA of imported name
-		uint32_t ForwarderStringl;			 // RVA to forwarder string
+		uint64_t function;					 // address of imported function
+		uint32_t ordinal;					 // ordinal value of function
+		PIMAGE_IMPORT_BY_NAME addressOfData; // RVA of imported name
+		uint32_t forwarderStringl;			 // RVA to forwarder string
 	} u1;
 } IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA;
 
