@@ -245,8 +245,10 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 
 					PeExportLinkedList *proc = getProcAddress(szImportName, root);
 
-					if (proc != null)
+					if (proc != null) {
 						fun = (void *)proc->ptr;
+					} else
+						fun = (void *)getProcAddress(u8"KiFastStub", root)->ptr;
 				}
 
 				*funcRef = (FARPROC)fun;
@@ -267,13 +269,15 @@ function simpleExeTest() {
 		root->name = null;
 		root->ptr = 0;
 
-		auto a = loadDll(u8"desktop/dllimp.exe", root);
-		auto b = loadDll(u8"desktop/dll2.dll", root);
-		auto c = loadDll(u8"desktop/dll1.dll", root);
+		auto ntdll = loadDll(u8"desktop/ntdll.dll", root);
+		auto kernel32 = loadDll(u8"desktop/kernel32.dll", root);
+		auto gdi32 = loadDll(u8"desktop/gdi32.dll", root);
+		auto user32 = loadDll(u8"desktop/user32.dll", root);
 
-		resolveDllImports(a, root);
-		resolveDllImports(b, root);
-		resolveDllImports(c, root);
+		resolveDllImports(ntdll, root);
+		resolveDllImports(kernel32, root);
+		resolveDllImports(gdi32, root);
+		resolveDllImports(user32, root);
 	}
 
 }
