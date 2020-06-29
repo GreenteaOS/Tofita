@@ -93,6 +93,7 @@ typedef struct {
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
+// TODO remove this
 static PageEntry *pml4entries PAGE_ALIGNED = null;
 
 static void *allocatePage() {
@@ -108,6 +109,9 @@ static function initializePage(PageEntry *entry, uint64_t address) {
 	entry->address = address >> ADDRESS_BITS;
 	entry->present = 1;
 	entry->writeAllowed = 1;
+
+	// TODO
+	entry->accessibleByAll = 1;
 }
 
 static void *getPage(PageEntry *table, uint64_t entryId) {
@@ -171,6 +175,8 @@ uint64_t resolveAddr(const PageEntry *pml4entries, uint64_t virtualAddr) {
 // TODO return error code (as enum)
 // TODO ^ hexa @mustCheckReturn for return values (like Golang)
 // TODO ^ same clang warning
+// TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
+// ^ probably should be other way for WoW processes
 function mapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln(u8"[paging] mapping memory range");
 
@@ -203,6 +209,24 @@ function mapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physic
 		vAddress += PAGE_SIZE;
 		pAddress += PAGE_SIZE;
 	}
+
+	// TODO rethink where to call this
+	amd64::writeCr3((uint64_t)pml4entries - (uint64_t)WholePhysicalStart);
+}
+
+// Unmaps pages without actually deallocating them, still deallocates unused page tables
+// (page tables are managed only and only here anyway)
+function unmapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint32_t pageCount) {
+	// TODO do NOT unmap reserved pages, i.e. WholePhysicalStart and upper half region!
+	// TODO probably special shared buffer allocator+mapper which uses linked list
+	// way upper than WholePhysicalStart limit
+	// TODO
+}
+
+// Completely unmaps and deallocates pages and page tables
+function unmapAndFreeMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint32_t pageCount) {
+	// TODO resolve and dealloc pages
+	unmapMemory(pml4entries, virtualAddr, pageCount);
 }
 
 // Upper half
