@@ -20,6 +20,8 @@ namespace exe {
 
 // TODO ntdll should have tofitaStub(){} for unresolved dll imports -> log them
 
+typedef function(__fastcall *Entry)(uint64_t entry);
+
 void *offsetPointer(void *data, ptrdiff_t offset) {
 	return (void *)((uint64_t)data + offset);
 }
@@ -33,6 +35,12 @@ struct PeInterim {
 	void *base;
 	uint64_t entry; // _DllMainCRTStartup
 	const ImageDataDirectory *imageDataDirectory;
+	uint64_t sizeOfStackReserve;
+};
+
+struct ExeInterim {
+	PeInterim pei;
+	uint64_t stackVirtual;
 };
 
 struct PeExportLinkedList {
@@ -41,7 +49,12 @@ struct PeExportLinkedList {
 	PeExportLinkedList *next;
 };
 
-auto loadDll(const char8_t *name, PeExportLinkedList *root) {
+struct Executable {
+	uint64_t nextBase;
+	pages::PageEntry *pml4;
+};
+
+auto loadDll(const char8_t *name, PeExportLinkedList *root, Executable *exec) {
 	RamDiskAsset asset = getRamDiskAsset(name);
 	serialPrintf(u8"[loadDLL] loaded dll asset '%s' %d bytes at %d\n", name, asset.size, asset.data);
 	auto ptr = (uint8_t *)asset.data;
@@ -51,19 +64,32 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 	serialPrintf(u8"[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n",
 				 peOptionalHeader->magic, 0x020B);
 	serialPrintf(u8"[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader->sizeOfImage);
-	void *buffer =
-		(void *)PhysicalAllocator::allocatePages(DOWN_BYTES_TO_PAGES(peOptionalHeader->sizeOfImage) + 1);
-	void *base = (void *)buffer;
-	memset(base, 0, peOptionalHeader->sizeOfImage); // Zeroing
+
+	let pages = DOWN_BYTES_TO_PAGES(peOptionalHeader->sizeOfImage) + 1;
+	let physical = PhysicalAllocator::allocatePages(pages);
+
+	if (exec->nextBase == 0) {
+		// TODO round to pages?
+		exec->nextBase = peOptionalHeader->imageBase;
+	}
+
+	pages::mapMemory(exec->pml4, exec->nextBase, physical - (uint64_t)WholePhysicalStart, pages);
+
+	const uint64_t buffer = exec->nextBase;
+	memset((void *)buffer, 0, peOptionalHeader->sizeOfImage); // Zeroing
+
+	exec->nextBase = exec->nextBase + pages * PAGE_SIZE;
 
 	// Copy sections
 	auto imageSectionHeader =
 		(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->sizeOfOptionalHeader);
+
+	// TODO copy PE headers?
 	for (uint16_t i = 0; i < peHeader->numberOfSections; ++i) {
 		serialPrintf(u8"[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
 					 &imageSectionHeader[i].name, imageSectionHeader[i].sizeOfRawData,
 					 imageSectionHeader[i].virtualAddress);
-		uint64_t where = (uint64_t)base + imageSectionHeader[i].virtualAddress;
+		uint64_t where = (uint64_t)buffer + imageSectionHeader[i].virtualAddress;
 
 		tmemcpy((void *)where,
 				(void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
@@ -171,9 +197,10 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root) {
 
 	PeInterim pei;
 
-	pei.base = base;
+	pei.base = (void *)buffer;
 	pei.entry = (uint64_t)buffer + (uint64_t)peOptionalHeader->addressOfEntryPoint;
 	pei.imageDataDirectory = imageDataDirectory;
+	pei.sizeOfStackReserve = peOptionalHeader->sizeOfStackReserve;
 
 	return pei;
 }
@@ -200,6 +227,7 @@ PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root
 		}
 	}
 
+	serialPrintf(u8"[getProcAddress] import {%s} unresolved\n", list->name);
 	return null;
 }
 
@@ -261,23 +289,60 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	}
 }
 
-function simpleExeTest() {
+auto loadExe(const char8_t *name, PeExportLinkedList *root, Executable *exec) {
+	ExeInterim ei;
+
+	ei.pei = loadDll(name, root, exec);
+
+	// Allocate stack
 	{
+		let pages = DOWN_BYTES_TO_PAGES(ei.pei.sizeOfStackReserve) + 1;
+		let physical = PhysicalAllocator::allocatePages(pages);
+
+		const uint64_t buffer = exec->nextBase;
+		pages::mapMemory(exec->pml4, exec->nextBase, physical - (uint64_t)WholePhysicalStart, pages);
+		memset((void *)buffer, 0, ei.pei.sizeOfStackReserve); // Zeroing
+
+		exec->nextBase = exec->nextBase + pages * PAGE_SIZE;
+
+		ei.stackVirtual = buffer;
+	}
+
+	return ei;
+}
+
+function resolveExeImports(const ExeInterim ei, PeExportLinkedList *root) {
+	resolveDllImports(ei.pei, root);
+}
+
+var loaded = false;
+function simpleExeTest() {
+	if (loaded == false) {
+		loaded = !loaded;
 		PeExportLinkedList *root =
 			(PeExportLinkedList *)PhysicalAllocator::allocateBytes(sizeof(PeExportLinkedList));
 		root->next = null;
 		root->name = null;
 		root->ptr = 0;
 
-		auto ntdll = loadDll(u8"desktop/ntdll.dll", root);
-		auto kernel32 = loadDll(u8"desktop/kernel32.dll", root);
-		auto gdi32 = loadDll(u8"desktop/gdi32.dll", root);
-		auto user32 = loadDll(u8"desktop/user32.dll", root);
+		Executable exec;
+		exec.nextBase = 0;
+		exec.pml4 = pages::pml4entries;
+
+		auto app = loadExe(u8"desktop/app.exe", root, &exec);
+		auto ntdll = loadDll(u8"desktop/ntdll.dll", root, &exec);
+		auto kernel32 = loadDll(u8"desktop/kernel32.dll", root, &exec);
+		auto gdi32 = loadDll(u8"desktop/gdi32.dll", root, &exec);
+		auto user32 = loadDll(u8"desktop/user32.dll", root, &exec);
 
 		resolveDllImports(ntdll, root);
 		resolveDllImports(kernel32, root);
 		resolveDllImports(gdi32, root);
 		resolveDllImports(user32, root);
+		resolveExeImports(app, root);
+
+		Entry entry = (Entry)ntdll.base;
+		// entry((uint64_t)app.pei.base);
 	}
 
 }
