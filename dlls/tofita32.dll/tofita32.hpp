@@ -14,16 +14,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdint.h>
+#include "../../kernel/syscalls/syscalls.hpp"
 
 #ifndef TOFITA32_DLL
 #define TOFITA32_DLL __declspec(dllimport)
 #endif
 
 extern "C" {
-
-enum class TofitaSyscalls : uint64_t {
-	ExitProcess = 1000,
-};
 
 __attribute__((naked, fastcall)) TOFITA32_DLL uint64_t KiFastSystemCall(TofitaSyscalls rcx, uint64_t rdx = 0,
 																		uint64_t r8 = 0, uint64_t r9 = 0);
