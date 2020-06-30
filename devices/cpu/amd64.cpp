@@ -42,6 +42,11 @@ inline function enableAllInterrupts() {
 	asm volatile("sti" ::);
 }
 
+// Except non-mascable
+inline function disableAllInterrupts() {
+	asm volatile("cli" ::);
+}
+
 inline function enableAllInterruptsAndHalt() {
 	asm volatile("sti\n\thlt" ::);
 }
