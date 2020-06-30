@@ -14,15 +14,30 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define NTDLL32_DLL __declspec(dllexport)
-#include "ntdll.hpp"
 #include "../tofita32.dll/tofita32.cpp"
+#include "ntdll.hpp"
 
-// High performance function, that does completely nothing
-uint32_t KiFastStub() {
-	return 0;
+uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx, uint64_t r8, uint64_t r9) {
+	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx, r8, r9);
 }
 
-extern "C" __attribute__((fastcall)) void _DllMainCRTStartup(int (*entry)()) {
-	// TODO entry arguments
-	tofitaExitProcess(entry());
+extern "C" void greenteaosIsTheBest(int32_t (*entry)()) {
+	// TODO entry arguments (argv, argc)
+	// TODO init DLLs
+	// TODO PEB/TEB
+	// TODO TLS callbacks
+	// TODO load DLLs in usermode
+	// tofitaExitProcess(entry()); TODO
+	tofitaExitProcess(3456);
+	while (true) {};
+}
+
+// TODO use modern __attribute__ syntax
+extern "C" __attribute__((naked, fastcall)) void _DllMainCRTStartup() {
+	asm volatile("pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "movq %rsp, %rbp\t\n"
+				 "call greenteaosIsTheBest");
 }

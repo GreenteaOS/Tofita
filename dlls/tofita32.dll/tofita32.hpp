@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdint.h>
+#include <stddef.h>
 #include "../../kernel/syscalls/syscalls.hpp"
 
 #ifndef TOFITA32_DLL
@@ -22,7 +23,10 @@
 
 extern "C" {
 
-__attribute__((naked, fastcall)) TOFITA32_DLL uint64_t KiFastSystemCall(TofitaSyscalls rcx, uint64_t rdx = 0,
-																		uint64_t r8 = 0, uint64_t r9 = 0);
+__attribute__((naked, fastcall)) TOFITA32_DLL uint64_t tofitaFastSystemCall(TofitaSyscalls rcx,
+																			uint64_t rdx = 0, uint64_t r8 = 0,
+																			uint64_t r9 = 0);
+__attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub();
 TOFITA32_DLL void tofitaExitProcess(uint32_t exitCode);
+TOFITA32_DLL void tofitaDebugLog(const char8_t *message);
 }

@@ -13,12 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
+namespace types {
 
-#ifndef NTDLL32_DLL
-#define NTDLL32_DLL __declspec(dllimport)
-#endif
+// HANDLE
 
-extern "C" {
-NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx, uint64_t r8, uint64_t r9);
 }

@@ -13,12 +13,31 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
+namespace process {
 
-#ifndef NTDLL32_DLL
-#define NTDLL32_DLL __declspec(dllimport)
-#endif
+struct Process {
+	// Is process exists at all and fully initialized
+	bool present;
 
-extern "C" {
-NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx, uint64_t r8, uint64_t r9);
-}
+	// Is it allowed to make this process current
+	bool schedulable;
+
+	// Should be false after creation
+	bool scheduleOnNextTick;
+
+	// CR3, should be page aligned
+	pages::PageEntry *pml4;
+
+	// TODO 32-bit
+
+	// State
+	InterruptFrame frame;
+	InterruptStack stack;
+};
+
+// TODO dynamic allocation of this list
+Process processes[256] = {0};
+
+uint64_t currentProcess = 0;
+
+} // namespace process

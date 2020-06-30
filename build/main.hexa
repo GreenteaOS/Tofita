@@ -77,6 +77,7 @@ for (task in tasks) {
 						'-D versionName=\\"' + config.versionName + '\\" ',
 						'-D versionTag=\\"' + config.versionTag + '\\" ',
 						'-mtune=nocona -fno-stack-protector -fshort-wchar -w -mno-red-zone ',
+						'-fno-stack-check ',
 						'-fvisibility=hidden ',
 						'-ffreestanding ',
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
@@ -90,6 +91,7 @@ for (task in tasks) {
 					].join(''), { stdio: 'inherit' }
 				)
 
+				// TODO get rid of .asm in tofita
 				require('child_process').execSync(
 					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
 					config.tempFolder + '\\tofita\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
@@ -117,6 +119,7 @@ for (task in tasks) {
 							'-m64 -target x86_64-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
 							'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w ',
 							'-Wimplicit-function-declaration -O2 -c ',
+							'-std=c++2a ',
 							'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
 							'-o ',
 							config.tempFolder + '/tofita/' + dlls[i] + '_dll.obj'

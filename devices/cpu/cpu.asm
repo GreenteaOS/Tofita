@@ -58,8 +58,8 @@ enterUserMode:
 	ret
 
 extern guiThread
-global guiThreadStart
-guiThreadStart:
+global guiThreadStart_
+guiThreadStart_:
 	push 0 ; Signal end of stack with 0 return address
 	push 0 ; and a few extra entries in case of stack
 	push 0 ; problems
@@ -68,8 +68,8 @@ guiThreadStart:
 	o64 call guiThread
 
 extern kernelThread
-global kernelThreadStart
-kernelThreadStart:
+global kernelThreadStart_
+kernelThreadStart_:
 	push 0 ; Signal end of stack with 0 return address
 	push 0 ; and a few extra entries in case of stack
 	push 0 ; problems

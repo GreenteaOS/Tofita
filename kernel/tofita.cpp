@@ -162,6 +162,7 @@ function kernelInit(const KernelParams *params) {
 
 		guiThreadFrame.ip = (uint64_t)&guiThreadStart;
 		guiThreadFrame.cs = SYS_CODE64_SEL;
+		// TODO allocate as physicall memory
 		guiThreadFrame.sp = (uint64_t)&guiStack + stackSizeForKernelThread;
 		guiThreadFrame.ss = SYS_DATA32_SEL;
 	}
@@ -176,6 +177,16 @@ function kernelInit(const KernelParams *params) {
 		kernelThreadFrame.cs = SYS_CODE64_SEL;
 		kernelThreadFrame.sp = (uint64_t)&kernelStack + stackSizeForKernelThread;
 		kernelThreadFrame.ss = SYS_DATA32_SEL;
+	}
+
+	// Idle process
+	{
+		memset(&process::processes, 0, sizeof(process::processes)); // Zeroing
+		process::Process *idle = &process::processes[0];
+		idle->pml4 = pages::pml4entries; // Save CR3 template to idle process
+		idle->schedulable = true;		 // At idle schedule to idle process
+		idle->present = true;
+		process::currentProcess = 0;
 	}
 
 	serialPrintln(u8"<Tofita> [ready for scheduling]");
@@ -193,6 +204,24 @@ function kernelThread() {
 	while (true) {
 		switchToUserProcess();
 	}
+}
+
+__attribute__((naked, fastcall)) function guiThreadStart() {
+	asm volatile("pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "movq %rsp, %rbp\t\n"
+				 "call guiThread");
+}
+
+__attribute__((naked, fastcall)) function kernelThreadStart() {
+	asm volatile("pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "pushq $0\t\n"
+				 "movq %rsp, %rbp\t\n"
+				 "call kernelThread");
 }
 
 function guiThread() {

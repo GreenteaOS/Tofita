@@ -19,7 +19,6 @@ namespace pages {
 
 #define ADDRESS_BITS 12
 #define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
-#define PACKED __attribute__((gcc_struct, packed))
 
 typedef struct {
 	uint16_t offset : 12;
@@ -89,7 +88,7 @@ typedef struct {
 
 	// Disable execution of code from this page
 	uint8_t disableExecution : 1;
-} PACKED PageEntry;
+} PACKED PageEntryz;
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
 
@@ -232,12 +231,18 @@ function unmapAndFreeMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint32
 // Upper half
 // Just makes a copy of upper half's PML4,
 // because it is always the same between processes
-function copyKernelMemory(const PageEntry *pml4source, PageEntry *pml4destination) {}
+function copyKernelMemoryMap(const PageEntry *pml4source, PageEntry *pml4destination) {
+	uint32_t i = 255; // TODO validate that this is where upper half starts
+	while (i < PAGE_TABLE_SIZE) {
+		pml4destination[i] = pml4source[i];
+		i++;
+	}
+}
 
 // Creates new PML4 for new process
 PageEntry *newCR3(const PageEntry *pml4source) {
-	PageEntry *pml4result;
-	copyKernelMemory(pml4source, pml4result);
+	PageEntry *pml4result = (PageEntry *)PhysicalAllocator::allocateOnePagePreZeroed();
+	copyKernelMemoryMap(pml4source, pml4result);
 	return pml4result;
 }
 
