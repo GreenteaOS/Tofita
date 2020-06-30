@@ -64,6 +64,7 @@ void ___chkstk_ms(){};
 #include "module.cpp"
 #include "sandbox.cpp"
 #include "user.cpp"
+#include "process.cpp"
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO
@@ -150,10 +151,58 @@ function kernelInit(const KernelParams *params) {
 	mouseX = _framebuffer->width / 2;
 	mouseY = _framebuffer->height / 2;
 
+	// Setup scheduling
+	currentThread = THREAD_INIT;
+
+	// GUI thread
+	{
+		memset(&guiThreadFrame, 0, sizeof(InterruptFrame));		// Zeroing
+		memset(&guiThreadStack, 0, sizeof(InterruptStack));		// Zeroing
+		memset(&guiStack, 0, sizeof(stackSizeForKernelThread)); // Zeroing
+
+		guiThreadFrame.ip = (uint64_t)&guiThreadStart;
+		guiThreadFrame.cs = SYS_CODE64_SEL;
+		guiThreadFrame.sp = (uint64_t)&guiStack + stackSizeForKernelThread;
+		guiThreadFrame.ss = SYS_DATA32_SEL;
+	}
+
+	// Main thread
+	{
+		memset(&kernelThreadFrame, 0, sizeof(InterruptFrame));	   // Zeroing
+		memset(&kernelThreadStack, 0, sizeof(InterruptStack));	   // Zeroing
+		memset(&kernelStack, 0, sizeof(stackSizeForKernelThread)); // Zeroing
+
+		kernelThreadFrame.ip = (uint64_t)&kernelThreadStart;
+		kernelThreadFrame.cs = SYS_CODE64_SEL;
+		kernelThreadFrame.sp = (uint64_t)&kernelStack + stackSizeForKernelThread;
+		kernelThreadFrame.ss = SYS_DATA32_SEL;
+	}
+
+	serialPrintln(u8"<Tofita> [ready for scheduling]");
+}
+
+uint32_t processesCount = 0;
+
+function switchToUserProcess() {
+	if (processesCount == 0)
+		amd64::enableAllInterruptsAndHalt();
+}
+
+function kernelThread() {
+	serialPrintln(u8"<Tofita> [kernelThread] thread started");
+	while (true) {
+		switchToUserProcess();
+	}
+}
+
+function guiThread() {
+	serialPrintln(u8"<Tofita> [guiThread] thread started");
+
 	while (true) {
 		// Poll PS/2 devices
 		haveToRender = haveToRender || (pollPS2Devices() == PollingPS2SomethingHappened);
 
+		// TODO move this to DWM
 		if (mouseX > _framebuffer->width)
 			mouseX = _framebuffer->width;
 		if (mouseY > _framebuffer->height)
@@ -164,15 +213,15 @@ function kernelInit(const KernelParams *params) {
 			mouseX = 0;
 
 		if (haveToRender == false) {
-			amd64::enableAllInterruptsAndHalt();
-			continue;
+			switchToUserProcess();
 		}
 
 		haveToRender = false;
 
 		composite();
-
 		copyToScreen();
+
+		switchToUserProcess();
 	}
 }
 
@@ -181,16 +230,10 @@ function kernelMain(const KernelParams *params) {
 	__sync_synchronize();
 	// sti -> start sheduling here
 	// It will erase whole stack on next sheduling
-	// and only continue if already in kernel mode
-	// and kernel is busy
-	// TODO also wakeUpReasons[]
-	// TOOD kernel `yield`/`await`
-	amd64::enableAllInterrupts();
 	while (true) {
-		while (false) { // TODO atomic
-						// iterate over wakeUpReasons
-		}
-		amd64::halt();
+		amd64::enableAllInterruptsAndHalt();
 	}
+	// TODO hexa: error if code present in unreachable block
+	// (no break/continue/throw)
 }
 }

@@ -38,6 +38,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - Very low on resources, just 1 GB RAM minimum required
  - Isolation and containerization of everything
  - ACPI 2.0, CPUID
+ - Preemptive multitasking/multithreading (both kernel and userspace)
  - Exclusively only multi-core CPUs
 
 ## GreenteaOS (Tofita) system requirements
