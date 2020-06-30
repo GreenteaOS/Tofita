@@ -518,6 +518,12 @@ void timerInterruptHadler(InterruptFrame *frame) {
 
 function syscallInterruptHadler(InterruptFrame *frame) {
 	let stack = (InterruptStack *)((uint64_t)frame - 200);
+	let index = (TofitaSyscalls)stack->rcx;
+
+	if (index == TofitaSyscalls::DebugLog) {
+		serialPrintf(u8"[[DebugLog]] %s\n", stack->rdx);
+		return;
+	}
 }
 
 __attribute__((aligned(64))) __attribute__((interrupt)) void syscallInterrupt(InterruptFrame *frame) {

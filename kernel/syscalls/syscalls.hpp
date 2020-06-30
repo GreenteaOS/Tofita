@@ -13,22 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "syscalls/syscalls.hpp"
-
-// Globals
-
-// Avoids PIT-triggered rendering
-// This is not a best solution
-bool haveToRender = true;
-
-uint64_t uptimeMilliseconds = 0;
-
-// Forward for global usage
-function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height, bool dark = true);
-struct Pixel32;
-uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color);
-function quakePrintf(const char8_t *c, ...);
-function guiThread();
-function kernelThread();
-extern function guiThreadStart();
-extern function kernelThreadStart();
+enum class TofitaSyscalls : uint64_t { DebugLog = 123000, ExitProcess };
