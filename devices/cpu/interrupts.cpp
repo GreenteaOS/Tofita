@@ -516,7 +516,15 @@ void timerInterruptHadler(InterruptFrame *frame) {
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
-void setTsr(uint16_t tsr_data) {
+function syscallInterruptHadler(InterruptFrame *frame) {
+	let stack = (InterruptStack *)((uint64_t)frame - 200);
+}
+
+__attribute__((aligned(64))) __attribute__((interrupt)) void syscallInterrupt(InterruptFrame *frame) {
+	syscallInterruptHadler(frame);
+}
+
+function setTsr(uint16_t tsr_data) {
 	asm volatile("ltr %[src]"
 				 :						 // No outputs
 				 : [ src ] "m"(tsr_data) // Inputs
@@ -682,6 +690,7 @@ function enableInterrupts() {
 	}
 
 	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt));
+	initializeFallback(&IDT[0x80], (uint64_t)(&syscallInterrupt));
 
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
 	cacheIdtr.offset = (uint64_t)IDT;
