@@ -377,7 +377,9 @@ struct InterruptFrame {
 } __attribute__((packed));
 
 struct InterruptStack {
-	uint64_t xmm[25 - 7];
+	uint64_t extra[6]; // TODO investigate (probably InterruptFrame itself + 8 byte offset)
+
+	uint64_t xmm[6 * 2]; // 16-byte spill
 
 	uint64_t rcx;
 	uint64_t rdx;
@@ -399,33 +401,17 @@ _Static_assert(sizeof(InterruptStack) == 200, "sizeof is incorrect");
 // uint64_t
 // extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
-void foo_interrupt_handler(InterruptFrame *frame);
+void anyInterruptHandler(InterruptFrame *frame);
 
 __attribute__((aligned(64))) __attribute__((interrupt)) void unknownInterrupt(InterruptFrame *frame) {
 	// TODO Find a better way to avoid LLVM bugs
-	foo_interrupt_handler(frame);
+	anyInterruptHandler(frame);
 }
 
-void foo_interrupt_handler(InterruptFrame *frame) {
-	serialPrintf(u8"[cpu] happened unknownInterrupt %u ip~=%u cs=%u flags=%u sp=%u ss=%u\n", frame, frame->ip,
-				 frame->cs, frame->flags, frame->sp, frame->ss);
-
+void anyInterruptHandler(InterruptFrame *frame) {
+	amd64::disableAllInterrupts();
 	let stack = (InterruptStack *)((uint64_t)frame - 200);
-	serialPrintf(u8"[cpu] rcx=%u", stack->rcx);
-	serialPrintf(u8" rdx=%u", stack->rdx);
-	serialPrintf(u8" r8=%u", stack->r8);
-	serialPrintf(u8" r9=%u", stack->r9);
-	serialPrintf(u8" r10=%u", stack->r10);
-	serialPrintf(u8" r11=%u", stack->r11);
-	serialPrintf(u8" rax=%u\n", stack->rax);
 
-	serialPrint(u8"[cpu] frame->ip points to: ");
-	serialPrintHex((uint64_t)frame->ip);
-	serialPrint(u8"\n");
-
-	serialPrint(u8"[cpu] frame->sp points to: ");
-	serialPrintHex((uint64_t)frame->sp);
-	serialPrint(u8"\n");
 
 	// Enable interrupts
 	writePort(0xA0, 0x20);
@@ -436,21 +422,95 @@ void foo_interrupt_handler(InterruptFrame *frame) {
 	// and in Linux it's for accessing cpu specific memory
 }
 
-// ~100 times per second
-int32_t timer_called = 0;
+// ~121 times per second
+uint64_t timerCalled = 0;
 
-void timer_interrupt_hadler(InterruptFrame *frame);
+// Scheduling
+const uint8_t THREAD_INIT = 0; // kernelMain, it will be destroyed
+const uint8_t THREAD_GUI = 1;
+const uint8_t THREAD_KENREL = 2;
+const uint8_t THREAD_USER = 3;
 
-__attribute__((aligned(64))) __attribute__((interrupt)) void timer_interrupt(InterruptFrame *frame) {
-	timer_interrupt_hadler(frame);
+uint8_t currentThread = THREAD_INIT;
+
+constexpr uint64_t stackSizeForKernelThread = 1024 * 1024;
+
+InterruptFrame kernelThreadFrame;
+InterruptStack kernelThreadStack;
+function kernelThread();
+__attribute__((aligned(64))) uint8_t kernelStack[stackSizeForKernelThread] = {0};
+
+InterruptFrame guiThreadFrame;
+InterruptStack guiThreadStack;
+function guiThread();
+__attribute__((aligned(64))) uint8_t guiStack[stackSizeForKernelThread] = {0};
+
+void timerInterruptHadler(InterruptFrame *frame);
+
+__attribute__((aligned(64))) __attribute__((interrupt)) void timerInterrupt(InterruptFrame *frame) {
+	timerInterruptHadler(frame);
 }
 
-void timer_interrupt_hadler(InterruptFrame *frame) {
-	if (timer_called % 121 == 0) {
-		serialPrintf(u8"[cpu] happened timer_interrupt (one second passed) < ! #%d\n", timer_called);
-		uptimeMilliseconds += 1000;
+uint8_t extraMillisecond = 0;
+uint8_t taskBarRedraw = 0; // Re-paint task bar current time
+bool nextIsUserProcess = false;
+uint64_t currentProccess = 0;
+
+void timerInterruptHadler(InterruptFrame *frame) {
+	amd64::disableAllInterrupts();
+	let stack = (InterruptStack *)((uint64_t)frame - 200);
+
+	if (timerCalled % 121 == 0) {
+		serialPrintf(u8"[cpu] happened timerInterrupt (one second passed) < ! #%d\n", timerCalled);
+		taskBarRedraw++;
+		if (taskBarRedraw > 30) {
+			haveToRender = 1;
+			taskBarRedraw = 0;
+		}
 	}
-	timer_called++;
+	uptimeMilliseconds += 8;
+	if (extraMillisecond % 4 == 0) {
+		uptimeMilliseconds += 1; // PIT is somewhat imprecise
+	}
+	if (extraMillisecond % 64 == 0) {
+		uptimeMilliseconds += 1; // PIT is somewhat imprecise
+	}
+	extraMillisecond++;
+	timerCalled++;
+
+	// Schedule
+	if (currentThread == THREAD_INIT) {
+		// TODO hexa error == statement: currentThread == THREAD_INIT;
+		guiThreadFrame.flags = frame->flags;	// TODO
+		kernelThreadFrame.flags = frame->flags; // TODO
+
+		// Restore
+		currentThread = THREAD_GUI;
+		tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
+
+#define RESTORE_STACK(from) tmemcpy(&stack->xmm, &from.xmm, 200 - (6 * 8));
+#define SAVE_STACK(to) tmemcpy(&to.xmm, &stack->xmm, 200 - (6 * 8));
+
+		RESTORE_STACK(guiThreadStack)
+	} else if (currentThread == THREAD_GUI) {
+		// Save
+		tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(guiThreadStack)
+
+		// Restore
+		currentThread = THREAD_KENREL;
+		tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
+		RESTORE_STACK(kernelThreadStack)
+	} else if (currentThread == THREAD_KENREL) {
+		// Save
+		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(kernelThreadStack)
+
+		// Restore
+		currentThread = THREAD_GUI;
+		tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
+		RESTORE_STACK(guiThreadStack)
+	}
 
 	// Enable interrupts
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
@@ -621,7 +681,7 @@ function enableInterrupts() {
 		initializeFallback(&IDT[i], (uint64_t)&unknownInterrupt);
 	}
 
-	initializeFallback(&IDT[IRQ0], (uint64_t)(&timer_interrupt));
+	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt));
 
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
 	cacheIdtr.offset = (uint64_t)IDT;
@@ -650,6 +710,9 @@ function enableInterrupts() {
 	let frequency = 1193181 / 121;
 	writePort(0x40, frequency & 0xFF);
 	writePort(0x40, (frequency >> 8) & 0xFF);
+
+	// Unmasking IRQ to support all the things
+	writePort(IRQ1, 0x00);
 }
 
 function enablePS2Mouse() {

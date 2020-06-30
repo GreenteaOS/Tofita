@@ -57,6 +57,26 @@ enterUserMode:
 	jmp $
 	ret
 
+extern guiThread
+global guiThreadStart
+guiThreadStart:
+	push 0 ; Signal end of stack with 0 return address
+	push 0 ; and a few extra entries in case of stack
+	push 0 ; problems
+	push 0
+	mov rbp, rsp ; Frame
+	o64 call guiThread
+
+extern kernelThread
+global kernelThreadStart
+kernelThreadStart:
+	push 0 ; Signal end of stack with 0 return address
+	push 0 ; and a few extra entries in case of stack
+	push 0 ; problems
+	push 0
+	mov rbp, rsp ; Frame
+	o64 call kernelThread
+
 global enterKernelMode
 enterKernelMode:
 	cli
@@ -71,7 +91,7 @@ enterKernelMode:
 	push SYS_DATA32_SEL; ss
 	push rcx; rsp
 	pushfq; rflags
-	or dword [rsp], 0b1000000000; IF - interrupt enable flag
+	;or dword [rsp], 0b1000000000; IF - interrupt enable flag
 	push SYS_CODE64_SEL; cs
 	mov     rcx, qword .ret; rip
 	push    rcx
