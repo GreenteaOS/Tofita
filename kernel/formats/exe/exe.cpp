@@ -276,7 +276,7 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 					if (proc != null) {
 						fun = (void *)proc->ptr;
 					} else
-						fun = (void *)getProcAddress(u8"KiFastStub", root)->ptr;
+						fun = (void *)getProcAddress(u8"tofitaFastStub", root)->ptr;
 				}
 
 				*funcRef = (FARPROC)fun;
@@ -315,8 +315,9 @@ function resolveExeImports(const ExeInterim ei, PeExportLinkedList *root) {
 	resolveDllImports(ei.pei, root);
 }
 
+// TODO remove this
 var loaded = false;
-function simpleExeTest() {
+function loadExeIntoProcess(const char8_t *file, process::Process *process) {
 	if (loaded == false) {
 		loaded = !loaded;
 		PeExportLinkedList *root =
@@ -327,9 +328,9 @@ function simpleExeTest() {
 
 		Executable exec;
 		exec.nextBase = 0;
-		exec.pml4 = pages::pml4entries;
+		exec.pml4 = process->pml4;
 
-		auto app = loadExe(u8"desktop/app.exe", root, &exec);
+		auto app = loadExe(file, root, &exec);
 		auto ntdll = loadDll(u8"desktop/ntdll.dll", root, &exec);
 		auto kernel32 = loadDll(u8"desktop/kernel32.dll", root, &exec);
 		auto gdi32 = loadDll(u8"desktop/gdi32.dll", root, &exec);
@@ -342,7 +343,9 @@ function simpleExeTest() {
 		resolveExeImports(app, root);
 
 		Entry entry = (Entry)ntdll.base;
-		// entry((uint64_t)app.pei.base);
+		process->frame.ip = ntdll.entry; // Contains crt0
+		process->frame.sp = app.stackVirtual;
+		process->stack.rcx = app.pei.entry; // First argument
 	}
 
 }

@@ -16,11 +16,20 @@
 #define TOFITA32_DLL __declspec(dllexport)
 #include "tofita32.hpp"
 
-uint64_t KiFastSystemCall(TofitaSyscalls rcx, uint64_t rdx, uint64_t r8, uint64_t r9) {
+// High performance function, that does completely nothing
+uint32_t tofitaFastStub() {
+	return 0;
+}
+
+uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx, uint64_t r8, uint64_t r9) {
 	asm volatile("int $0x80" ::);
 	asm volatile("ret" ::);
 }
 
 void tofitaExitProcess(uint32_t exitCode) {
-	KiFastSystemCall(TofitaSyscalls::ExitProcess, exitCode);
+	tofitaFastSystemCall(TofitaSyscalls::ExitProcess, exitCode);
+}
+
+void tofitaDebugLog(const char8_t *message) {
+	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)message);
 }

@@ -13,12 +13,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
+struct InterruptFrame {
+	uint64_t ip; // Instruction pointer
+	uint64_t cs; // Code segment
+	uint64_t flags;
+	uint64_t sp; // Stack pointer
+	uint64_t ss; // Stack segment
+} __attribute__((packed));
 
-#ifndef NTDLL32_DLL
-#define NTDLL32_DLL __declspec(dllimport)
-#endif
+struct InterruptStack {
+	uint64_t extra[6]; // TODO investigate (probably InterruptFrame itself + 8 byte offset)
 
-extern "C" {
-NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx, uint64_t r8, uint64_t r9);
-}
+	uint64_t xmm[6 * 2]; // 16-byte spill
+
+	uint64_t rcx;
+	uint64_t rdx;
+	uint64_t r8;
+	uint64_t r9;
+	uint64_t r10;
+	uint64_t r11;
+	uint64_t rax;
+} __attribute__((packed));
+
+_Static_assert(sizeof(InterruptStack) == 200, "sizeof is incorrect");

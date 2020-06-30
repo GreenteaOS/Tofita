@@ -14,6 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "syscalls/syscalls.hpp"
+#include "../devices/cpu/pages.hpp"
+#include "../devices/cpu/interrupts.hpp"
+#include "process.hpp"
 
 // Globals
 

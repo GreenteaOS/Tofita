@@ -368,30 +368,6 @@ __attribute__((aligned(64))) uint8_t rsp0stack[4096 * 32] = {0};
 __attribute__((aligned(64))) uint8_t rsp1stack[4096 * 32] = {0};
 __attribute__((aligned(64))) uint8_t rsp2stack[4096 * 32] = {0};
 
-struct InterruptFrame {
-	uint64_t ip; // Instruction pointer
-	uint64_t cs; // Code segment
-	uint64_t flags;
-	uint64_t sp; // Stack pointer
-	uint64_t ss; // Stack segment
-} __attribute__((packed));
-
-struct InterruptStack {
-	uint64_t extra[6]; // TODO investigate (probably InterruptFrame itself + 8 byte offset)
-
-	uint64_t xmm[6 * 2]; // 16-byte spill
-
-	uint64_t rcx;
-	uint64_t rdx;
-	uint64_t r8;
-	uint64_t r9;
-	uint64_t r10;
-	uint64_t r11;
-	uint64_t rax;
-} __attribute__((packed));
-
-_Static_assert(sizeof(InterruptStack) == 200, "sizeof is incorrect");
-
 // LLVM did the magic expected of it. It only saved registers that are clobbered by your function (hence rax).
 // All other register are left unchanged hence there’s no need of saving and restoring them.
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
@@ -428,7 +404,7 @@ uint64_t timerCalled = 0;
 // Scheduling
 const uint8_t THREAD_INIT = 0; // kernelMain, it will be destroyed
 const uint8_t THREAD_GUI = 1;
-const uint8_t THREAD_KENREL = 2;
+const uint8_t THREAD_KERNEL = 2;
 const uint8_t THREAD_USER = 3;
 
 uint8_t currentThread = THREAD_INIT;
@@ -498,13 +474,22 @@ void timerInterruptHadler(InterruptFrame *frame) {
 		SAVE_STACK(guiThreadStack)
 
 		// Restore
-		currentThread = THREAD_KENREL;
+		currentThread = THREAD_KERNEL;
 		tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
 		RESTORE_STACK(kernelThreadStack)
-	} else if (currentThread == THREAD_KENREL) {
+	} else if (currentThread == THREAD_KERNEL) {
 		// Save
 		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
 		SAVE_STACK(kernelThreadStack)
+
+		// Restore
+		currentThread = THREAD_USER;
+		tmemcpy(frame, &process::processes[1].frame, sizeof(InterruptFrame));
+		RESTORE_STACK(process::processes[1].stack)
+	} else if (currentThread == THREAD_USER) {
+		// Save
+		tmemcpy(&process::processes[1].frame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(process::processes[1].stack)
 
 		// Restore
 		currentThread = THREAD_GUI;
@@ -522,6 +507,12 @@ function syscallInterruptHadler(InterruptFrame *frame) {
 
 	if (index == TofitaSyscalls::DebugLog) {
 		serialPrintf(u8"[[DebugLog]] %s\n", stack->rdx);
+		return;
+	}
+
+	if (index == TofitaSyscalls::ExitProcess) {
+		serialPrintf(u8"[[ExitProcess]] %d\n", stack->rdx);
+		// TODO kernel wakeup
 		return;
 	}
 }
