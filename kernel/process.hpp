@@ -35,7 +35,6 @@ struct Process {
 
 	// State
 	InterruptFrame frame;
-	InterruptStack stack;
 };
 
 // TODO dynamic allocation of this list

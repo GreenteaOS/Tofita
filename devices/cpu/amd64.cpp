@@ -31,7 +31,9 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *
 }
 
 inline function writeCr3(uint64_t value) {
+	__sync_synchronize();
 	asm volatile("movq %0, %%cr3" ::"r"(value));
+	__sync_synchronize();
 }
 
 inline function halt() {

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-struct InterruptFrame {
+struct InterruptFrames {
 	uint64_t ip; // Instruction pointer
 	uint64_t cs; // Code segment
 	uint64_t flags;
@@ -22,8 +22,9 @@ struct InterruptFrame {
 } __attribute__((packed));
 
 struct InterruptStack {
-	uint64_t extra[6]; // TODO investigate (probably InterruptFrame itself + 8 byte offset)
+	uint64_t extra[5]; // TODO investigate (probably InterruptFrame itself + 8 byte offset)
 
+	uint64_t temp;
 	uint64_t xmm[6 * 2]; // 16-byte spill
 
 	uint64_t rcx;
@@ -36,3 +37,13 @@ struct InterruptStack {
 } __attribute__((packed));
 
 _Static_assert(sizeof(InterruptStack) == 200, "sizeof is incorrect");
+
+struct InterruptFrame {
+	uint64_t xmm[8 * 2];
+	uint64_t r15, r14, r13, r12, r11, r10, r9, r8;
+	uint64_t rdi, rsi, rbp, rbx, rdx, rcx, rax;
+	uint64_t interrupt, code;
+	uint64_t ip, cs, flags, sp, ss;
+};
+
+_Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect");
