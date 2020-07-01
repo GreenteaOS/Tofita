@@ -430,7 +430,31 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void timerInterrupt(Inte
 uint8_t extraMillisecond = 0;
 uint8_t taskBarRedraw = 0; // Re-paint task bar current time
 bool nextIsUserProcess = false;
-uint64_t currentProccess = 0;
+
+uint64_t getNextProcess() {
+	uint64_t index = 1;
+	while (index < 255) {
+		if (process::processes[index].present == true) {
+			if (process::processes[index].schedulable == true)
+				if (process::processes[index].scheduleOnNextTick == true)
+					return index;
+		}
+		index++;
+	}
+
+	return 0; // Idle
+}
+
+function markAllProcessessSchedulable() {
+	uint64_t index = 0;
+	while (index < 255) {
+		if (process::processes[index].present == true) {
+			if (process::processes[index].schedulable == true)
+				process::processes[index].scheduleOnNextTick = true;
+		}
+		index++;
+	}
+}
 
 void timerInterruptHadler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
@@ -483,13 +507,32 @@ void timerInterruptHadler(InterruptFrame *frame) {
 		SAVE_STACK(kernelThreadStack)
 
 		// Restore
-		currentThread = THREAD_USER;
-		tmemcpy(frame, &process::processes[1].frame, sizeof(InterruptFrame));
-		RESTORE_STACK(process::processes[1].stack)
+		var next = getNextProcess();
+
+		if (next == 0)
+			markAllProcessessSchedulable();
+
+		next = getNextProcess();
+
+		process::Process *process = &process::processes[next];
+		process::currentProcess = process->pid;
+		// TODO in .exe loader, disallow changing of CR3 until not fully loaded
+		// another option is to save/restore CR3 used by kernel thread
+		amd64::writeCr3((uint64_t)process->pml4 - (uint64_t)WholePhysicalStart);
+		process->scheduleOnNextTick = false;
+
+		// Note: pid 0 is not real process, so keep things in kernel
+		if (next != 0) {
+			currentThread = THREAD_USER;
+			tmemcpy(frame, &process->frame, sizeof(InterruptFrame));
+			RESTORE_STACK(process->stack)
+		} else
+			serialPrintf(u8"[cpu] keep to pid 0\n");
 	} else if (currentThread == THREAD_USER) {
 		// Save
-		tmemcpy(&process::processes[1].frame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(process::processes[1].stack)
+		process::Process *process = &process::processes[process::currentProcess];
+		tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(process->stack)
 
 		// Restore
 		currentThread = THREAD_GUI;
@@ -506,13 +549,14 @@ function syscallInterruptHadler(InterruptFrame *frame) {
 	let index = (TofitaSyscalls)stack->rcx;
 
 	if (index == TofitaSyscalls::DebugLog) {
-		serialPrintf(u8"[[DebugLog]] %s\n", stack->rdx);
+		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, stack->rdx);
 		return;
 	}
 
 	if (index == TofitaSyscalls::ExitProcess) {
-		serialPrintf(u8"[[ExitProcess]] %d\n", stack->rdx);
+		serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", process::currentProcess, stack->rdx);
 		// TODO kernel wakeup
+		// TODO destroy process & schedule somewhere
 		return;
 	}
 }
