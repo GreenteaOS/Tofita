@@ -17,6 +17,7 @@
 #include "../devices/cpu/pages.hpp"
 #include "../devices/cpu/interrupts.hpp"
 #include "process.hpp"
+#include "gui/quake.hpp"
 
 // Globals
 

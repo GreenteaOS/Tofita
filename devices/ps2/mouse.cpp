@@ -50,6 +50,12 @@ function handleMouse() {
 		mouseX += mouseXd;
 		mouseY -= mouseYd;
 
+		// TODO DWM
+		if (mouseY < 0)
+			mouseY = 0;
+		if (mouseX < 0)
+			mouseX = 0;
+
 		if (getBit(mouseByte[0], 0) != 0)
 			serialPrintln(u8"[mouse] left button is down");
 		if (getBit(mouseByte[0], 1) != 0)
@@ -66,8 +72,10 @@ function handleMouse() {
 	};
 	}
 
+	// TODO DWM
+	haveToRender = 1;
+
 	// EOI
-	// Disabled cause polling is used
-	// writePort(0xA0, 0x20);
-	// writePort(0x20, 0x20);
+	writePort(0xA0, 0x20);
+	writePort(0x20, 0x20);
 }

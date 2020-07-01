@@ -115,7 +115,14 @@ function handleKeyboard() {
 		//}
 	}
 
+	// TODO DWM
+	if (keyboardPressedState[41])
+		haveToQuake = !haveToQuake;
+	keyDownHandler = null;
+	if (haveToQuake)
+		keyDownHandler = quakeHandleButtonDown;
+	haveToRender = 1;
+
 	// EOI
-	// Disabled cause polling is used
-	// writePort(PIC1_COMMAND, PIC_EOI);
+	writePort(PIC1_COMMAND, PIC_EOI);
 }

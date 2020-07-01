@@ -234,7 +234,6 @@ function guiThread() {
 
 	while (true) {
 		// Poll PS/2 devices
-		haveToRender = haveToRender || (pollPS2Devices() == PollingPS2SomethingHappened);
 
 		// TODO move this to DWM
 		if (mouseX > _framebuffer->width)

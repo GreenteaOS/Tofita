@@ -114,9 +114,9 @@ function initializeKeyboard(IdtEntry *entry) {
 	entry->offsetHigherbits = (keyboardAddress & 0xffffffffffff0000) >> 16;
 	entry->selector = SYS_CODE64_SEL;
 	entry->zero = 0;
-	entry->ist = 0;
+	entry->ist = 2; // Stack
 	entry->z = 0;
-	entry->dpl = 0;
+	entry->dpl = 0; // Ring 0
 	entry->present = 1;
 	entry->gateType = 0xe; // Interrupt gate
 }
@@ -128,9 +128,9 @@ function initializeMouse(IdtEntry *entry) {
 	entry->offsetHigherbits = (mouseAddress & 0xffffffffffff0000) >> 16;
 	entry->selector = SYS_CODE64_SEL;
 	entry->zero = 0;
-	entry->ist = 0;
+	entry->ist = 2; // Stack
 	entry->z = 0;
-	entry->dpl = 0;
+	entry->dpl = 0; // Ring 0
 	entry->present = 1;
 	entry->gateType = 0xe; // Interrupt gate
 }
@@ -799,6 +799,8 @@ function enableInterrupts() {
 	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt));
 	initializeFallback(&IDT[0x80], (uint64_t)(&syscallInterrupt));
 	initializeFallback(&IDT[0x81], (uint64_t)(&yieldInterrupt));
+	initializeKeyboard(&IDT[IRQ1]);
+	initializeMouse(&IDT[IRQ12]);
 
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
 	cacheIdtr.offset = (uint64_t)IDT;
