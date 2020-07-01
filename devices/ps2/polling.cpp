@@ -21,11 +21,6 @@
 // ^ this may draw polling mechanism useless (poll for flag only in scheduler)
 // ^ use hlt in scheduler
 
-extern uint8_t haveToQuake;
-function handleKeyDown(uint8_t key);
-extern function (*keyDownHandler)(uint8_t);
-function quakeHandleButtonDown(uint8_t key);
-
 // Returns 1 if something happened
 const uint8_t PollingPS2SomethingHappened = 1;
 const uint8_t PollingPS2NothingHappened = 0;

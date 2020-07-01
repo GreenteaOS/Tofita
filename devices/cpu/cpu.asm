@@ -288,14 +288,8 @@ defineIRQ 0x82, syscallInterrupt, syscallInterruptPrelude
 defineIRQHandler yieldInterruptHandler, yieldInterruptPrelude
 defineIRQ 0x82, yieldInterrupt, yieldInterruptPrelude
 
-%macro fallback 1
-	fallback_handler%1:
-		iretq
-%endmacro
+defineIRQHandler handleKeyboard, keyboardInterruptPrelude
+defineIRQ 0x82, keyboardHandler, keyboardInterruptPrelude
 
-keyboardHandler:
-	iretq
-
-mouseHandler:
-	iretq
-
+defineIRQHandler handleMouse, mouseInterruptPrelude
+defineIRQ 0x82, mouseHandler, mouseInterruptPrelude
