@@ -368,6 +368,15 @@ __attribute__((aligned(64))) uint8_t rsp0stack[4096 * 32] = {0};
 __attribute__((aligned(64))) uint8_t rsp1stack[4096 * 32] = {0};
 __attribute__((aligned(64))) uint8_t rsp2stack[4096 * 32] = {0};
 
+__attribute__((aligned(64))) uint8_t ist0stack[4096 * 4] = {0};
+__attribute__((aligned(64))) uint8_t ist1stack[4096 * 4] = {0};
+__attribute__((aligned(64))) uint8_t ist2stack[4096 * 4] = {0};
+__attribute__((aligned(64))) uint8_t ist3stack[4096 * 4] = {0};
+__attribute__((aligned(64))) uint8_t ist4stack[4096 * 4] = {0};
+__attribute__((aligned(64))) uint8_t ist5stack[4096 * 4] = {0};
+__attribute__((aligned(64))) uint8_t ist6stack[4096 * 4] = {0};
+__attribute__((aligned(64))) uint8_t ist7stack[4096 * 4] = {0};
+
 // LLVM did the magic expected of it. It only saved registers that are clobbered by your function (hence rax).
 // All other register are left unchanged hence there’s no need of saving and restoring them.
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
@@ -421,11 +430,8 @@ InterruptStack guiThreadStack;
 function guiThread();
 __attribute__((aligned(64))) uint8_t guiStack[stackSizeForKernelThread] = {0};
 
-void timerInterruptHadler(InterruptFrame *frame);
+extern "C" void timerInterruptHandler(InterruptFrame *frame);
 
-__attribute__((aligned(64))) __attribute__((interrupt)) void timerInterrupt(InterruptFrame *frame) {
-	timerInterruptHadler(frame);
-}
 
 uint8_t extraMillisecond = 0;
 uint8_t taskBarRedraw = 0; // Re-paint task bar current time
@@ -460,7 +466,7 @@ function markAllProcessessSchedulable() {
 #define RESTORE_STACK(from) tmemcpy(&stack->xmm, &from.xmm, 200 - (6 * 8));
 #define SAVE_STACK(to) tmemcpy(&to.xmm, &stack->xmm, 200 - (6 * 8));
 
-function switchToKernelThread(InterruptFrame *frame, InterruptStack *stack) {
+function switchToKernelThread(InterruptFrame *frame) {
 	if (currentThread == THREAD_KERNEL)
 		return;
 
@@ -468,7 +474,6 @@ function switchToKernelThread(InterruptFrame *frame, InterruptStack *stack) {
 		// Save
 		process::Process *process = &process::processes[process::currentProcess];
 		tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(process->stack)
 	} else if (currentThread == THREAD_GUI) {
 		// Save
 		tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
@@ -481,7 +486,7 @@ function switchToKernelThread(InterruptFrame *frame, InterruptStack *stack) {
 	RESTORE_STACK(kernelThreadStack)
 }
 
-function switchToNextProcess(InterruptFrame *frame, InterruptStack *stack) {
+function switchToNextProcess(InterruptFrame *frame) {
 	var next = getNextProcess();
 
 	if (next == 0) {
@@ -507,7 +512,6 @@ function switchToNextProcess(InterruptFrame *frame, InterruptStack *stack) {
 			// Save
 			process::Process *process = &process::processes[old];
 			tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
-			SAVE_STACK(process->stack)
 		} else if (currentThread == THREAD_KERNEL) {
 			// Save
 			tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
@@ -517,14 +521,12 @@ function switchToNextProcess(InterruptFrame *frame, InterruptStack *stack) {
 		// Restore
 		currentThread = THREAD_USER;
 		tmemcpy(frame, &process->frame, sizeof(InterruptFrame));
-		frame->flags = frame->flags | 0x202; // Enable interrupts
-		RESTORE_STACK(process->stack)
 	} else {
-		switchToKernelThread(frame, stack);
+		switchToKernelThread(frame);
 	}
 }
 
-function switchToGuiThread(InterruptFrame *frame, InterruptStack *stack) {
+function switchToGuiThread(InterruptFrame *frame) {
 	if (currentThread == THREAD_GUI)
 		return;
 
@@ -532,7 +534,6 @@ function switchToGuiThread(InterruptFrame *frame, InterruptStack *stack) {
 		// Save
 		process::Process *process = &process::processes[process::currentProcess];
 		tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(process->stack)
 	} else if (currentThread == THREAD_KERNEL) {
 		// Save
 		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
@@ -545,19 +546,14 @@ function switchToGuiThread(InterruptFrame *frame, InterruptStack *stack) {
 	RESTORE_STACK(guiThreadStack)
 }
 
-void yieldInterruptHadler(InterruptFrame *frame) {
+void yieldInterruptHandler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
-	let stack = (InterruptStack *)((uint64_t)frame - 200);
-	switchToNextProcess(frame, stack);
+	switchToNextProcess(frame);
 }
 
-__attribute__((aligned(64))) __attribute__((interrupt)) void yieldInterrupt(InterruptFrame *frame) {
-	yieldInterruptHadler(frame);
-}
 
-void timerInterruptHadler(InterruptFrame *frame) {
+void timerInterruptHandler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
-	let stack = (InterruptStack *)((uint64_t)frame - 200);
 
 	if (timerCalled % 121 == 0) {
 		serialPrintf(u8"[cpu] happened timerInterrupt (one second passed) < ! #%d\n", timerCalled);
@@ -587,7 +583,6 @@ void timerInterruptHadler(InterruptFrame *frame) {
 			// Restore
 			currentThread = THREAD_GUI;
 			tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
-			RESTORE_STACK(guiThreadStack)
 		} else {
 			if (currentThread == THREAD_GUI) {
 				// Just give it enough time to fimish rendering
@@ -596,13 +591,13 @@ void timerInterruptHadler(InterruptFrame *frame) {
 			} else {
 				if (nextIsGuiThread == true) {
 					nextIsGuiThread = false;
-					switchToGuiThread(frame, stack);
+					switchToGuiThread(frame);
 				} else {
 					nextIsGuiThread = true;
 					if (nextIsUserProcess == true) {
-						switchToKernelThread(frame, stack);
+						switchToKernelThread(frame);
 					} else {
-						switchToNextProcess(frame, stack);
+						switchToNextProcess(frame);
 					}
 					nextIsUserProcess = !nextIsUserProcess;
 				}
@@ -614,10 +609,9 @@ void timerInterruptHadler(InterruptFrame *frame) {
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
-function syscallInterruptHadler(InterruptFrame *frame) {
+function syscallInterruptHandler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
-	let stack = (InterruptStack *)((uint64_t)frame - 200);
-	let index = (TofitaSyscalls)stack->rcx;
+	let index = (TofitaSyscalls)frame->rcx;
 
 	if (index == TofitaSyscalls::DebugLog) {
 		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, stack->rdx);
@@ -625,15 +619,12 @@ function syscallInterruptHadler(InterruptFrame *frame) {
 	}
 
 	if (index == TofitaSyscalls::ExitProcess) {
-		serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", process::currentProcess, stack->rdx);
+		serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", process::currentProcess, frame->rdx);
 		// TODO kernel wakeup
 		// TODO destroy process & schedule somewhere
 		return;
 	}
-}
 
-__attribute__((aligned(64))) __attribute__((interrupt)) void syscallInterrupt(InterruptFrame *frame) {
-	syscallInterruptHadler(frame);
 }
 
 function setTsr(uint16_t tsr_data) {
@@ -733,14 +724,14 @@ function enableInterrupts() {
 	globalTss.rsp[2] = (uint64_t)&rsp2stack;
 	// TODO zero out stacks
 	// TODO more stacks
-	globalTss.ist[0] = (uint64_t)&rsp1stack;
-	globalTss.ist[1] = (uint64_t)&rsp1stack;
-	globalTss.ist[2] = (uint64_t)&rsp1stack;
-	globalTss.ist[3] = (uint64_t)&rsp1stack;
-	globalTss.ist[4] = (uint64_t)&rsp1stack;
-	globalTss.ist[5] = (uint64_t)&rsp1stack;
-	globalTss.ist[6] = (uint64_t)&rsp1stack;
-	globalTss.ist[7] = (uint64_t)&rsp1stack;
+	globalTss.ist[0] = (uint64_t)&ist0stack;
+	globalTss.ist[1] = (uint64_t)&ist1stack;
+	globalTss.ist[2] = (uint64_t)&ist2stack;
+	globalTss.ist[3] = (uint64_t)&ist3stack;
+	globalTss.ist[4] = (uint64_t)&ist4stack;
+	globalTss.ist[5] = (uint64_t)&ist5stack;
+	globalTss.ist[6] = (uint64_t)&ist6stack;
+	globalTss.ist[7] = (uint64_t)&ist7stack;
 
 	serialPrint(u8"[cpu] RSP[0] points to: ");
 	serialPrintHex((uint64_t)globalTss.rsp[0]);

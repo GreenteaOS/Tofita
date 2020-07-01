@@ -156,8 +156,7 @@ function kernelInit(const KernelParams *params) {
 
 	// GUI thread
 	{
-		memset(&guiThreadFrame, 0, sizeof(InterruptFrame));		// Zeroing
-		memset(&guiThreadStack, 0, sizeof(InterruptStack));		// Zeroing
+		memset(&guiThreadFrame, 0, sizeof(InterruptFrame)); // Zeroing
 		memset(&guiStack, 0, sizeof(stackSizeForKernelThread)); // Zeroing
 
 		guiThreadFrame.ip = (uint64_t)&guiThreadStart;
@@ -169,8 +168,7 @@ function kernelInit(const KernelParams *params) {
 
 	// Main thread
 	{
-		memset(&kernelThreadFrame, 0, sizeof(InterruptFrame));	   // Zeroing
-		memset(&kernelThreadStack, 0, sizeof(InterruptStack));	   // Zeroing
+		memset(&kernelThreadFrame, 0, sizeof(InterruptFrame)); // Zeroing
 		memset(&kernelStack, 0, sizeof(stackSizeForKernelThread)); // Zeroing
 
 		kernelThreadFrame.ip = (uint64_t)&kernelThreadStart;
