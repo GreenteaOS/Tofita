@@ -614,14 +614,18 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 	let index = (TofitaSyscalls)frame->rcx;
 
 	if (index == TofitaSyscalls::DebugLog) {
-		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, stack->rdx);
+		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, frame->rdx);
 		return;
 	}
 
 	if (index == TofitaSyscalls::ExitProcess) {
 		serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", process::currentProcess, frame->rdx);
 		// TODO kernel wakeup
-		// TODO destroy process & schedule somewhere
+		// TODO destroy process
+		process::Process *process = &process::processes[process::currentProcess];
+		process->schedulable = false;
+		switchToNextProcess(frame);
+		process->present = false;
 		return;
 	}
 
