@@ -463,9 +463,6 @@ function markAllProcessessSchedulable() {
 	}
 }
 
-#define RESTORE_STACK(from) tmemcpy(&stack->xmm, &from.xmm, 200 - (6 * 8));
-#define SAVE_STACK(to) tmemcpy(&to.xmm, &stack->xmm, 200 - (6 * 8));
-
 function switchToKernelThread(InterruptFrame *frame) {
 	if (currentThread == THREAD_KERNEL)
 		return;
@@ -477,13 +474,11 @@ function switchToKernelThread(InterruptFrame *frame) {
 	} else if (currentThread == THREAD_GUI) {
 		// Save
 		tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(guiThreadStack)
 	}
 
 	// Restore
 	currentThread = THREAD_KERNEL;
 	tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
-	RESTORE_STACK(kernelThreadStack)
 }
 
 function switchToNextProcess(InterruptFrame *frame) {
@@ -507,7 +502,6 @@ function switchToNextProcess(InterruptFrame *frame) {
 		if (currentThread == THREAD_GUI) {
 			// Save
 			tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
-			SAVE_STACK(guiThreadStack)
 		} else if (currentThread == THREAD_USER) {
 			// Save
 			process::Process *process = &process::processes[old];
@@ -515,7 +509,6 @@ function switchToNextProcess(InterruptFrame *frame) {
 		} else if (currentThread == THREAD_KERNEL) {
 			// Save
 			tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
-			SAVE_STACK(kernelThreadStack)
 		}
 
 		// Restore
@@ -537,13 +530,11 @@ function switchToGuiThread(InterruptFrame *frame) {
 	} else if (currentThread == THREAD_KERNEL) {
 		// Save
 		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(kernelThreadStack)
 	}
 
 	// Restore
 	currentThread = THREAD_GUI;
 	tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
-	RESTORE_STACK(guiThreadStack)
 }
 
 void yieldInterruptHandler(InterruptFrame *frame) {
