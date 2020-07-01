@@ -187,7 +187,7 @@ function composite() {
 	// Startup animation
 	if (startupAnimation < 2000) {
 		haveToRender = true;
-		startupAnimation += 9;
+		startupAnimation += 9 * 2;
 	}
 
 	drawBitmap32(wallpaper, 0, 0);

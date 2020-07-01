@@ -430,6 +430,7 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void timerInterrupt(Inte
 uint8_t extraMillisecond = 0;
 uint8_t taskBarRedraw = 0; // Re-paint task bar current time
 bool nextIsUserProcess = false;
+bool nextIsGuiThread = true;
 
 uint64_t getNextProcess() {
 	uint64_t index = 1;
@@ -456,6 +457,104 @@ function markAllProcessessSchedulable() {
 	}
 }
 
+#define RESTORE_STACK(from) tmemcpy(&stack->xmm, &from.xmm, 200 - (6 * 8));
+#define SAVE_STACK(to) tmemcpy(&to.xmm, &stack->xmm, 200 - (6 * 8));
+
+function switchToKernelThread(InterruptFrame *frame, InterruptStack *stack) {
+	if (currentThread == THREAD_KERNEL)
+		return;
+
+	if (currentThread == THREAD_USER) {
+		// Save
+		process::Process *process = &process::processes[process::currentProcess];
+		tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(process->stack)
+	} else if (currentThread == THREAD_GUI) {
+		// Save
+		tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(guiThreadStack)
+	}
+
+	// Restore
+	currentThread = THREAD_KERNEL;
+	tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
+	RESTORE_STACK(kernelThreadStack)
+}
+
+function switchToNextProcess(InterruptFrame *frame, InterruptStack *stack) {
+	var next = getNextProcess();
+
+	if (next == 0) {
+		markAllProcessessSchedulable();
+		next = getNextProcess();
+	}
+
+	process::Process *process = &process::processes[next];
+	let old = process::currentProcess;
+	process::currentProcess = process->pid;
+	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
+	// another option is to save/restore CR3 used by kernel thread
+	amd64::writeCr3((uint64_t)process->pml4 - (uint64_t)WholePhysicalStart);
+	process->scheduleOnNextTick = false;
+
+	// Note: pid 0 is not real process, so keep things in kernel
+	if (next != 0) {
+		if (currentThread == THREAD_GUI) {
+			// Save
+			tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
+			SAVE_STACK(guiThreadStack)
+		} else if (currentThread == THREAD_USER) {
+			// Save
+			process::Process *process = &process::processes[old];
+			tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
+			SAVE_STACK(process->stack)
+		} else if (currentThread == THREAD_KERNEL) {
+			// Save
+			tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
+			SAVE_STACK(kernelThreadStack)
+		}
+
+		// Restore
+		currentThread = THREAD_USER;
+		tmemcpy(frame, &process->frame, sizeof(InterruptFrame));
+		frame->flags = frame->flags | 0x202; // Enable interrupts
+		RESTORE_STACK(process->stack)
+	} else {
+		switchToKernelThread(frame, stack);
+	}
+}
+
+function switchToGuiThread(InterruptFrame *frame, InterruptStack *stack) {
+	if (currentThread == THREAD_GUI)
+		return;
+
+	if (currentThread == THREAD_USER) {
+		// Save
+		process::Process *process = &process::processes[process::currentProcess];
+		tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(process->stack)
+	} else if (currentThread == THREAD_KERNEL) {
+		// Save
+		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
+		SAVE_STACK(kernelThreadStack)
+	}
+
+	// Restore
+	currentThread = THREAD_GUI;
+	tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
+	RESTORE_STACK(guiThreadStack)
+}
+
+void yieldInterruptHadler(InterruptFrame *frame) {
+	amd64::disableAllInterrupts();
+	let stack = (InterruptStack *)((uint64_t)frame - 200);
+	switchToNextProcess(frame, stack);
+}
+
+__attribute__((aligned(64))) __attribute__((interrupt)) void yieldInterrupt(InterruptFrame *frame) {
+	yieldInterruptHadler(frame);
+}
+
 void timerInterruptHadler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 	let stack = (InterruptStack *)((uint64_t)frame - 200);
@@ -479,65 +578,36 @@ void timerInterruptHadler(InterruptFrame *frame) {
 	timerCalled++;
 
 	// Schedule
-	if (currentThread == THREAD_INIT) {
-		// TODO hexa error == statement: currentThread == THREAD_INIT;
-		guiThreadFrame.flags = frame->flags;	// TODO
-		kernelThreadFrame.flags = frame->flags; // TODO
+	if (true) {
+		if (currentThread == THREAD_INIT) {
+			// TODO hexa error == statement: currentThread == THREAD_INIT;
+			guiThreadFrame.flags = frame->flags;	// TODO
+			kernelThreadFrame.flags = frame->flags; // TODO
 
-		// Restore
-		currentThread = THREAD_GUI;
-		tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
-
-#define RESTORE_STACK(from) tmemcpy(&stack->xmm, &from.xmm, 200 - (6 * 8));
-#define SAVE_STACK(to) tmemcpy(&to.xmm, &stack->xmm, 200 - (6 * 8));
-
-		RESTORE_STACK(guiThreadStack)
-	} else if (currentThread == THREAD_GUI) {
-		// Save
-		tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(guiThreadStack)
-
-		// Restore
-		currentThread = THREAD_KERNEL;
-		tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
-		RESTORE_STACK(kernelThreadStack)
-	} else if (currentThread == THREAD_KERNEL) {
-		// Save
-		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(kernelThreadStack)
-
-		// Restore
-		var next = getNextProcess();
-
-		if (next == 0)
-			markAllProcessessSchedulable();
-
-		next = getNextProcess();
-
-		process::Process *process = &process::processes[next];
-		process::currentProcess = process->pid;
-		// TODO in .exe loader, disallow changing of CR3 until not fully loaded
-		// another option is to save/restore CR3 used by kernel thread
-		amd64::writeCr3((uint64_t)process->pml4 - (uint64_t)WholePhysicalStart);
-		process->scheduleOnNextTick = false;
-
-		// Note: pid 0 is not real process, so keep things in kernel
-		if (next != 0) {
-			currentThread = THREAD_USER;
-			tmemcpy(frame, &process->frame, sizeof(InterruptFrame));
-			RESTORE_STACK(process->stack)
-		} else
-			serialPrintf(u8"[cpu] keep to pid 0\n");
-	} else if (currentThread == THREAD_USER) {
-		// Save
-		process::Process *process = &process::processes[process::currentProcess];
-		tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
-		SAVE_STACK(process->stack)
-
-		// Restore
-		currentThread = THREAD_GUI;
-		tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
-		RESTORE_STACK(guiThreadStack)
+			// Restore
+			currentThread = THREAD_GUI;
+			tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
+			RESTORE_STACK(guiThreadStack)
+		} else {
+			if (currentThread == THREAD_GUI) {
+				// Just give it enough time to fimish rendering
+				// It will schedule to other process on finish
+				nextIsGuiThread = false;
+			} else {
+				if (nextIsGuiThread == true) {
+					nextIsGuiThread = false;
+					switchToGuiThread(frame, stack);
+				} else {
+					nextIsGuiThread = true;
+					if (nextIsUserProcess == true) {
+						switchToKernelThread(frame, stack);
+					} else {
+						switchToNextProcess(frame, stack);
+					}
+					nextIsUserProcess = !nextIsUserProcess;
+				}
+			}
+		}
 	}
 
 	// Enable interrupts
@@ -545,6 +615,7 @@ void timerInterruptHadler(InterruptFrame *frame) {
 }
 
 function syscallInterruptHadler(InterruptFrame *frame) {
+	amd64::disableAllInterrupts();
 	let stack = (InterruptStack *)((uint64_t)frame - 200);
 	let index = (TofitaSyscalls)stack->rcx;
 
@@ -732,6 +803,7 @@ function enableInterrupts() {
 
 	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt));
 	initializeFallback(&IDT[0x80], (uint64_t)(&syscallInterrupt));
+	initializeFallback(&IDT[0x81], (uint64_t)(&yieldInterrupt));
 
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
 	cacheIdtr.offset = (uint64_t)IDT;
