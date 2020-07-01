@@ -192,11 +192,18 @@ function kernelInit(const KernelParams *params) {
 	serialPrintln(u8"<Tofita> [ready for scheduling]");
 }
 
-uint32_t processesCount = 0;
-
 function switchToUserProcess() {
-	if (processesCount == 0)
-		amd64::enableAllInterruptsAndHalt();
+	var next = getNextProcess();
+
+	if (next == 0) {
+		markAllProcessessSchedulable();
+		next = getNextProcess();
+	}
+
+	if (next == 0)
+		amd64::enableAllInterruptsAndHalt(); // Nothing to do
+	else
+		asm volatile("int $0x81"); // yield
 }
 
 function kernelThread() {
