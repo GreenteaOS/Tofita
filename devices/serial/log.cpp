@@ -256,9 +256,11 @@ function serialPrintf(const char8_t *c, ...) {
 		}
 
 		switch (*c) {
-		case 's':
-			puts(va_arg(lst, uint8_t *));
-			break;
+		case 's': {
+			const uint8_t *string = va_arg(lst, uint8_t *);
+			if (string != null)
+				puts(string);
+		} break;
 		case 'c':
 			putchar(va_arg(lst, int32_t));
 			break;
