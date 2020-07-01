@@ -27,8 +27,7 @@ extern "C" void greenteaosIsTheBest(int32_t (*entry)()) {
 	// TODO PEB/TEB
 	// TODO TLS callbacks
 	// TODO load DLLs in usermode
-	// tofitaExitProcess(entry()); TODO
-	tofitaExitProcess(3456);
+	tofitaExitProcess(entry());
 	while (true) {};
 }
 

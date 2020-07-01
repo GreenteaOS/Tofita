@@ -22,6 +22,8 @@ struct Spinlock {
 
   public:
 	function inline lock() {
+		// TODO uint8_t tries = 255;
+		// TODO yield to another process
 		while (!__sync_bool_compare_and_swap(&value, 0, 1)) {
 			while (value) {
 				asm volatile("pause");
@@ -29,6 +31,7 @@ struct Spinlock {
 		}
 	}
 
+	// TODO C++20 inline attribute
 	function inline unlock() {
 		__sync_lock_release(&value);
 	}
