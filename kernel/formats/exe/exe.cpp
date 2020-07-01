@@ -315,11 +315,8 @@ function resolveExeImports(const ExeInterim ei, PeExportLinkedList *root) {
 	resolveDllImports(ei.pei, root);
 }
 
-// TODO remove this
-var loaded = false;
 function loadExeIntoProcess(const char8_t *file, process::Process *process) {
-	if (loaded == false) {
-		loaded = !loaded;
+	{
 		PeExportLinkedList *root =
 			(PeExportLinkedList *)PhysicalAllocator::allocateBytes(sizeof(PeExportLinkedList));
 		root->next = null;

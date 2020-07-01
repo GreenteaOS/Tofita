@@ -19,6 +19,9 @@ struct Process {
 	// Is process exists at all and fully initialized
 	bool present;
 
+	// Index
+	uint64_t pid;
+
 	// Is it allowed to make this process current
 	bool schedulable;
 
@@ -38,6 +41,7 @@ struct Process {
 // TODO dynamic allocation of this list
 Process processes[256] = {0};
 
+// Working process pid, with restored state and active CR3
 uint64_t currentProcess = 0;
 
 } // namespace process

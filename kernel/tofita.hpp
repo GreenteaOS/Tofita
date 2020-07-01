@@ -22,7 +22,7 @@
 
 // Avoids PIT-triggered rendering
 // This is not a best solution
-bool haveToRender = true;
+volatile bool haveToRender = true;
 
 uint64_t uptimeMilliseconds = 0;
 

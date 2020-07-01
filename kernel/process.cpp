@@ -16,7 +16,6 @@
 namespace process {
 
 function Process_init(Process *process) {
-	process->present = true; // Occupied
 	process->pml4 = pages::newCR3(processes[0].pml4);
 	process->schedulable = false;						// Not yet ready
 	process->scheduleOnNextTick = false;				// Prevent DoS attack
@@ -26,6 +25,28 @@ function Process_init(Process *process) {
 	process->frame.ss = USER_DATA32_SEL + 3;
 	// process->frame.flags = 0x002; // No interrupts
 	process->frame.flags = 0x202;
+}
+
+Process *Process_create() {
+	uint64_t index = 0;
+	while (index < 255) {
+		index++;
+		if (index == 256)
+			return null;
+		if (processes[index].present != true)
+			break;
+	}
+
+	Process *process = &process::processes[index];
+	process->pid = index;
+	process->present = true; // Occupied
+
+	return process;
+}
+
+function Process_destroy(Process *process) {
+	// TODO deallocate stuff
+	process->present = false;
 }
 
 } // namespace process
