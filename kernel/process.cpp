@@ -24,6 +24,7 @@ function Process_init(Process *process) {
 	process->frame.ss = USER_DATA32_SEL + 3;
 	// process->frame.flags = 0x002; // No interrupts
 	process->frame.flags = 0x202;
+	process->frame.rdx = process->pid; // Second argument
 }
 
 Process *Process_create() {
