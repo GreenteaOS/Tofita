@@ -184,7 +184,9 @@ function kernelInit(const KernelParams *params) {
 		idle->pml4 = pages::pml4entries; // Save CR3 template to idle process
 		idle->schedulable = true;		 // At idle schedule to idle process
 		idle->present = true;
+		idle->syscallToHandle = TofitaSyscalls::Noop;
 		process::currentProcess = 0;
+		pml4kernelThread = process::processes[0].pml4;
 	}
 
 	serialPrintln(u8"<Tofita> [ready for scheduling]");
@@ -198,15 +200,57 @@ function switchToUserProcess() {
 		next = getNextProcess();
 	}
 
-	if (next == 0)
-		amd64::enableAllInterruptsAndHalt(); // Nothing to do
-	else
-		asm volatile("int $0x81"); // yield
+	if (next == 0) {
+		// serialPrintln(u8"<Tofita> [halt]");
+		// amd64::enableAllInterruptsAndHalt(); // Nothing to do
+	}
+	// else
+	asm volatile("int $0x81"); // yield
 }
 
 function kernelThread() {
 	serialPrintln(u8"<Tofita> [kernelThread] thread started");
 	while (true) {
+
+		volatile uint64_t index = 1; // Idle process ignored
+		while (index < 255) {		 // TODO 256?
+			volatile process::Process *process = &process::processes[index];
+			if (process->present == true) {
+				if (process->syscallToHandle != TofitaSyscalls::Noop) {
+					volatile let syscall = process->syscallToHandle;
+					process->syscallToHandle = TofitaSyscalls::Noop;
+					volatile var frame = &process->frame;
+
+					// Select pml4 to work within current process memory
+					// Remember pml4 for proper restore from scheduling
+					pml4kernelThread = process->pml4;
+					amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
+
+					// TODO refactor to separate syscall handler per-DLL
+
+					if (syscall == TofitaSyscalls::DebugLog) {
+						serialPrintf(u8"[[DebugLog:PID %d]] ", index);
+						serialPrintf(u8"[[rcx=%u rdx=%u r8=%u]] ", frame->rcx, frame->rdx, frame->r8);
+						serialPrintf((const char8_t *)frame->rdx, frame->r8, frame->r9);
+						serialPrintf(u8"\n");
+						process->schedulable = true;
+					}
+
+					if (syscall == TofitaSyscalls::ExitProcess) {
+						serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", index, frame->rdx);
+						process->present = false;
+
+						// Select pml4 of idle process for safety
+						pml4kernelThread = process::processes[0].pml4;
+						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
+
+						// TODO deallocate process
+					}
+				}
+			}
+			index++;
+		}
+
 		switchToUserProcess();
 	}
 }
@@ -227,6 +271,11 @@ __attribute__((naked, fastcall)) function kernelThreadStart() {
 				 "pushq $0\t\n"
 				 "movq %rsp, %rbp\t\n"
 				 "call kernelThread");
+}
+
+// In case of kernel crash set RIP to here
+function kernelThreadLoop() {
+	while (true) {}
 }
 
 function guiThread() {

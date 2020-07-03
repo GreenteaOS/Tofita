@@ -21,6 +21,9 @@
 
 // Globals
 
+// For syscalls & scheduler
+volatile pages::PageEntry *volatile pml4kernelThread = null;
+
 // Avoids PIT-triggered rendering
 // This is not a best solution
 volatile bool haveToRender = true;
