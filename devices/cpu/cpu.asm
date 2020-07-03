@@ -274,22 +274,31 @@ irqHandlerReturn:
 %macro defineIRQ 3
 	global %2
 	%2:
-		push 0
-		push %1
+		push 0; Fill error field
+		push %1; TODO single global handler?
 		jmp %3
 %endmacro
 
-defineIRQHandler timerInterruptHandler, timerInterruptPrelude
-defineIRQ 0x82, timerInterrupt, timerInterruptPrelude
+%macro defineIRQwithErrCode 3
+	global %2
+	%2:
+		; Error is pushed onto the stack
+		push %1; TODO single global handler?
+		jmp %3
+%endmacro
 
-defineIRQHandler syscallInterruptHandler, syscallInterruptPrelude
-defineIRQ 0x82, syscallInterrupt, syscallInterruptPrelude
+%macro defineIRQnoCode 4
+	defineIRQHandler %4, %2Prelude
+	defineIRQ %1, %2, %2Prelude
+%endmacro
 
-defineIRQHandler yieldInterruptHandler, yieldInterruptPrelude
-defineIRQ 0x82, yieldInterrupt, yieldInterruptPrelude
+%macro defineIRQwithCode 4
+	defineIRQHandler %4, %2Prelude
+	defineIRQwithErrCode %1, %2, %2Prelude
+%endmacro
 
-defineIRQHandler handleKeyboard, keyboardInterruptPrelude
-defineIRQ 0x82, keyboardHandler, keyboardInterruptPrelude
-
-defineIRQHandler handleMouse, mouseInterruptPrelude
-defineIRQ 0x82, mouseHandler, mouseInterruptPrelude
+defineIRQnoCode 0x00, timerInterrupt, timerInterruptPrelude, timerInterruptHandler
+defineIRQnoCode 0x80, syscallInterrupt, syscallInterruptPrelude, syscallInterruptHandler
+defineIRQnoCode 0x00, yieldInterrupt, yieldInterruptPrelude, yieldInterruptHandler
+defineIRQnoCode 0x00, keyboardHandler, keyboardInterruptPrelude, handleKeyboard
+defineIRQnoCode 0x00, mouseHandler, mouseInterruptPrelude, handleMouse

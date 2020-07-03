@@ -21,6 +21,7 @@ uint32_t tofitaFastStub() {
 	return 0;
 }
 
+// Return value is placed into RAX
 uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx, uint64_t r8, uint64_t r9) {
 	asm volatile("int $0x80" ::);
 	asm volatile("ret" ::);
@@ -30,6 +31,6 @@ void tofitaExitProcess(uint32_t exitCode) {
 	tofitaFastSystemCall(TofitaSyscalls::ExitProcess, exitCode);
 }
 
-void tofitaDebugLog(const char8_t *message) {
-	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)message);
+void tofitaDebugLog(const char8_t *message, uint64_t extra, uint64_t more) {
+	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)message, extra, more);
 }

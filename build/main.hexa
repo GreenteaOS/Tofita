@@ -119,6 +119,10 @@ for (task in tasks) {
 							'-m64 -target x86_64-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
 							'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w ',
 							'-Wimplicit-function-declaration -O2 -c ',
+							'-mtune=nocona -fno-stack-protector -mno-red-zone ',
+							'-fno-stack-check ',
+							'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
+							'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
 							'-std=c++2a ',
 							'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
 							'-o ',

@@ -15,32 +15,42 @@
 
 namespace process {
 
+// TODO probably use Thread instead of Process for easier scheduling & syscalls
+// and threads will have parentPID and that's
+// so we don't have linked list of threads per process
 struct Process {
 	// Is process exists at all and fully initialized
-	bool present;
+	volatile bool present;
+	// TODO SoA
 
 	// Index
-	uint64_t pid;
+	volatile uint64_t pid;
 
 	// Is it allowed to make this process current
-	bool schedulable;
+	volatile bool schedulable;
+	// TODO combine booleans into bit/flag mask?
 
 	// Should be false after creation
-	bool scheduleOnNextTick;
+	volatile bool scheduleOnNextTick;
 
 	// CR3, should be page aligned
-	pages::PageEntry *pml4;
+	pages::PageEntry *volatile pml4;
 
 	// TODO 32-bit
 
 	// State
 	InterruptFrame frame;
+
+	// When syscall happens, process halted and handled retroactively
+	// in the kernel's event loop
+	volatile TofitaSyscalls volatile syscallToHandle; // = Noop if no actions required
+													  // TODO do this on per-thread basis
 };
 
 // TODO dynamic allocation of this list
 Process processes[256] = {0};
 
 // Working process pid, with restored state and active CR3
-uint64_t currentProcess = 0;
+volatile uint64_t currentProcess = 0;
 
 } // namespace process

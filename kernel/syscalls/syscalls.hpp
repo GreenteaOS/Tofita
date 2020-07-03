@@ -13,4 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-enum class TofitaSyscalls : uint64_t { DebugLog = 123000, ExitProcess };
+enum class TofitaSyscalls : uint64_t { Noop = 0, DebugLog = 123000, ExitProcess };

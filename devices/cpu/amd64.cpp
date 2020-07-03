@@ -30,6 +30,7 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *
 		*edx = d;
 }
 
+// Note: this also a way to clear TLB cache even if cr3 not switched to another
 inline function writeCr3(uint64_t value) {
 	__sync_synchronize();
 	asm volatile("movq %0, %%cr3" ::"r"(value));

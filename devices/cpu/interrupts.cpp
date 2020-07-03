@@ -395,8 +395,10 @@ __attribute__((aligned(64))) __attribute__((interrupt)) void unknownInterrupt(In
 
 void anyInterruptHandler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
+#if 0
 	let stack = (InterruptStack *)((uint64_t)frame - 200);
 
+#endif
 
 	// Enable interrupts
 	writePort(0xA0, 0x20);
@@ -416,17 +418,15 @@ const uint8_t THREAD_GUI = 1;
 const uint8_t THREAD_KERNEL = 2;
 const uint8_t THREAD_USER = 3;
 
-uint8_t currentThread = THREAD_INIT;
+volatile uint8_t currentThread = THREAD_INIT;
 
 constexpr uint64_t stackSizeForKernelThread = 1024 * 1024;
 
 InterruptFrame kernelThreadFrame;
-InterruptStack kernelThreadStack;
 function kernelThread();
 __attribute__((aligned(64))) uint8_t kernelStack[stackSizeForKernelThread] = {0};
 
 InterruptFrame guiThreadFrame;
-InterruptStack guiThreadStack;
 function guiThread();
 __attribute__((aligned(64))) uint8_t guiStack[stackSizeForKernelThread] = {0};
 
@@ -435,8 +435,8 @@ extern "C" void timerInterruptHandler(InterruptFrame *frame);
 
 uint8_t extraMillisecond = 0;
 uint8_t taskBarRedraw = 0; // Re-paint task bar current time
-bool nextIsUserProcess = false;
-bool nextIsGuiThread = true;
+volatile bool nextIsUserProcess = false;
+volatile bool nextIsGuiThread = true;
 
 uint64_t getNextProcess() {
 	uint64_t index = 1;
@@ -454,7 +454,7 @@ uint64_t getNextProcess() {
 
 function markAllProcessessSchedulable() {
 	uint64_t index = 0;
-	while (index < 255) {
+	while (index < 255) { // TODO 256?
 		if (process::processes[index].present == true) {
 			if (process::processes[index].schedulable == true)
 				process::processes[index].scheduleOnNextTick = true;
@@ -478,11 +478,12 @@ function switchToKernelThread(InterruptFrame *frame) {
 
 	// Restore
 	currentThread = THREAD_KERNEL;
+	amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 	tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
 }
 
 function switchToNextProcess(InterruptFrame *frame) {
-	var next = getNextProcess();
+	volatile var next = getNextProcess();
 
 	if (next == 0) {
 		markAllProcessessSchedulable();
@@ -490,7 +491,7 @@ function switchToNextProcess(InterruptFrame *frame) {
 	}
 
 	process::Process *process = &process::processes[next];
-	let old = process::currentProcess;
+	volatile let old = process::currentProcess;
 	process::currentProcess = process->pid;
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
 	// another option is to save/restore CR3 used by kernel thread
@@ -504,8 +505,8 @@ function switchToNextProcess(InterruptFrame *frame) {
 			tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
 		} else if (currentThread == THREAD_USER) {
 			// Save
-			process::Process *process = &process::processes[old];
-			tmemcpy(&process->frame, frame, sizeof(InterruptFrame));
+			process::Process *processOld = &process::processes[old];
+			tmemcpy(&processOld->frame, frame, sizeof(InterruptFrame));
 		} else if (currentThread == THREAD_KERNEL) {
 			// Save
 			tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
@@ -602,7 +603,15 @@ void timerInterruptHandler(InterruptFrame *frame) {
 
 function syscallInterruptHandler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
-	let index = (TofitaSyscalls)frame->rcx;
+	volatile process::Process *process = &process::processes[process::currentProcess];
+	process->schedulable = false;
+	volatile let index = (TofitaSyscalls)frame->rcx;
+	process->syscallToHandle = index;
+
+	switchToKernelThread(frame);
+	// TODO weird frame+8 offset if called switchToNextProcess
+	// switchToNextProcess(frame);
+	return;
 
 	if (index == TofitaSyscalls::DebugLog) {
 		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, frame->rdx);
