@@ -194,10 +194,9 @@ function composite() {
 	drawBitmap32WithAlpha(trashCan, 12, 10);
 	Pixel32 color;
 	color.color = 0x00000000;
-	color.rgba.r = color.rgba.g = color.rgba.b = 0x88;
-	drawAsciiText(u8"Recycle Bin", 8, 62, color);
+	drawShadowText(u8"Recycle Bin", 8, 62);
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
-	drawAsciiText(u8"Recycle Bin", 8, 61, color);
+	drawAsciiText(u8"Recycle Bin", 8, 62, color);
 
 	var outlineX = mouseX < dragX ? mouseX : dragX;
 	var outlineY = mouseY < dragY ? mouseY : dragY;
