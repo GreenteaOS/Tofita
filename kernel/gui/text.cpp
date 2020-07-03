@@ -95,6 +95,51 @@ double drawChar(const char8_t c, double x, int16_t y, Pixel32 color) {
 	return textChar.width;
 }
 
+double drawAlphaChar(const char8_t c, double x, int16_t y, Pixel32 color) {
+	TextFontList textChar = textFontList[(uint64_t)c];
+
+	int16_t xx = (int16_t)(x + 0.5);
+	uint8_t w = (uint8_t)(textChar.width + 0.5);
+
+	for (uint8_t yi = 0; yi < 12; yi++)
+		for (uint8_t xi = 0; xi < w; xi++) {
+			const int16_t atx = (int16_t)xx + (int16_t)xi;
+			const int16_t aty = (int16_t)y + (int16_t)yi;
+
+			if (atx >= _framebuffer->width)
+				continue;
+			if (atx < 0)
+				continue;
+
+			if (aty >= _framebuffer->height)
+				continue;
+			if (aty < 0)
+				continue;
+
+			Pixel32 font =
+				textFontBitmap->pixels[(textChar.y + yi) * textFontBitmap->width + (textChar.x + xi)];
+
+			Pixel32 p = _pixels[aty * _framebuffer->width + atx];
+			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r);
+			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g);
+			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b);
+
+			// Grayscale
+			// TODO probably just blend color.rgb all with p.g?
+			uint16_t sum = (uint16_t)p.rgba.r + (uint16_t)p.rgba.g + (uint16_t)p.rgba.b;
+			sum = sum * 0.33;
+
+			p.rgba.r = sum;
+			p.rgba.g = sum;
+			p.rgba.b = sum;
+
+			p.rgba.a = color.rgba.a;
+			blendPixel(atx, aty, p);
+		}
+
+	return textChar.width;
+}
+
 /// Returns advance after last character
 uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color) {
 	uint16_t i = 0;
@@ -125,4 +170,23 @@ uint16_t drawIntegerText(int64_t value, double x, int16_t y, Pixel32 color) {
 			xx += drawAsciiText(chars[i], xx, y, color);
 	}
 	return xx - x;
+}
+
+function drawShadowText(const char8_t *text, double x, int16_t y) {
+	uint16_t i = 0;
+	double xx = x;
+	Pixel32 color;
+	color.color = 0x00000000;
+	color.rgba.a = 70;
+	while (text[i] != 0 && i < 255 * 255) {
+		char8_t ch = text[i];
+
+		drawAlphaChar(ch, xx + 1, y + 1, color);
+		drawAlphaChar(ch, xx + 1, y + 2, color);
+
+		drawAlphaChar(ch, xx - 1, y + 1, color);
+		xx += drawAlphaChar(ch, xx - 1, y + 2, color);
+
+		i++;
+	}
 }
