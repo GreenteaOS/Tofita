@@ -302,3 +302,29 @@ defineIRQnoCode 0x80, syscallInterrupt, syscallInterruptPrelude, syscallInterrup
 defineIRQnoCode 0x00, yieldInterrupt, yieldInterruptPrelude, yieldInterruptHandler
 defineIRQnoCode 0x00, keyboardHandler, keyboardInterruptPrelude, handleKeyboard
 defineIRQnoCode 0x00, mouseHandler, mouseInterruptPrelude, handleMouse
+
+; CPU exceptions
+defineIRQHandler exceptionHandler, exceptionPrelude
+
+defineIRQ 0x00, cpu0x00, exceptionPrelude ; Division by zero
+defineIRQ 0x01, cpu0x01, exceptionPrelude ; Single-step interrupt (see trap flag)
+defineIRQ 0x02, cpu0x02, exceptionPrelude ; NMI
+defineIRQ 0x03, cpu0x03, exceptionPrelude ; Breakpoint (callable by the special 1-byte instruction 0xCC, used by debuggers)
+defineIRQ 0x04, cpu0x04, exceptionPrelude ; Overflow
+defineIRQ 0x05, cpu0x05, exceptionPrelude ; Bounds
+defineIRQ 0x06, cpu0x06, exceptionPrelude ; Invalid Opcode
+defineIRQ 0x07, cpu0x07, exceptionPrelude ; Coprocessor not available
+defineIRQwithErrCode 0x08, cpu0x08, exceptionPrelude ; Double fault
+defineIRQ 0x09, cpu0x09, exceptionPrelude ; Coprocessor Segment Overrun (386 or earlier only)
+defineIRQwithErrCode 0x0A, cpu0x0A, exceptionPrelude ; Invalid Task State Segment
+defineIRQwithErrCode 0x0B, cpu0x0B, exceptionPrelude ; Segment not present
+defineIRQwithErrCode 0x0C, cpu0x0C, exceptionPrelude ; Stack Fault
+defineIRQwithErrCode 0x0D, cpu0x0D, exceptionPrelude ; General protection fault
+defineIRQwithErrCode 0x0E, cpu0x0E, exceptionPrelude ; Page fault
+defineIRQ 0x0F, cpu0x0F, exceptionPrelude ; reserved
+defineIRQ 0x10, cpu0x10, exceptionPrelude ; Math Fault
+defineIRQwithErrCode 0x11, cpu0x11, exceptionPrelude ; Alignment Check
+defineIRQ 0x12, cpu0x12, exceptionPrelude ; Machine Check
+defineIRQ 0x13, cpu0x13, exceptionPrelude ; SIMD Floating-Point Exception
+defineIRQ 0x14, cpu0x14, exceptionPrelude ; Virtualization Exception
+defineIRQ 0x15, cpu0x15, exceptionPrelude ; Control Protection Exception

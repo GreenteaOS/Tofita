@@ -13,34 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Bindings to the .asm
-
-function enterKernelMode();
-function selectSegment();
-function enterUserMode();
-function timerInterrupt();
-function syscallInterrupt();
-function yieldInterrupt();
-
-function cpu0x00();
-function cpu0x01();
-function cpu0x02();
-function cpu0x03();
-function cpu0x04();
-function cpu0x05();
-function cpu0x06();
-function cpu0x07();
-function cpu0x08();
-function cpu0x09();
-function cpu0x0A();
-function cpu0x0B();
-function cpu0x0C();
-function cpu0x0D();
-function cpu0x0E();
-function cpu0x0F();
-function cpu0x10();
-function cpu0x11();
-function cpu0x12();
-function cpu0x13();
-function cpu0x14();
-function cpu0x15();
+__attribute__((aligned(64))) extern void exceptionHandler(InterruptFrame *frame);

@@ -49,3 +49,13 @@ struct InterruptFrame {
 };
 
 _Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect");
+
+// Scheduling
+const uint8_t THREAD_INIT = 0; // kernelMain, it will be destroyed
+const uint8_t THREAD_GUI = 1;
+const uint8_t THREAD_KERNEL = 2;
+const uint8_t THREAD_USER = 3;
+
+volatile uint8_t currentThread = THREAD_INIT;
+
+function switchToKernelThread(InterruptFrame *frame);
