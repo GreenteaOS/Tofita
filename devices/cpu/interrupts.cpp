@@ -605,7 +605,7 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 	volatile process::Process *process = &process::processes[process::currentProcess];
 	process->schedulable = false;
-	volatile let index = (TofitaSyscalls)frame->rcx;
+	volatile let index = (TofitaSyscalls)frame->rcxArg0;
 	process->syscallToHandle = index;
 
 	switchToKernelThread(frame);
@@ -614,12 +614,12 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 	return;
 
 	if (index == TofitaSyscalls::DebugLog) {
-		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, frame->rdx);
+		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, frame->rdxArg1);
 		return;
 	}
 
 	if (index == TofitaSyscalls::ExitProcess) {
-		serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", process::currentProcess, frame->rdx);
+		serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", process::currentProcess, frame->rdxArg1);
 		// TODO kernel wakeup
 		// TODO destroy process
 		process::Process *process = &process::processes[process::currentProcess];

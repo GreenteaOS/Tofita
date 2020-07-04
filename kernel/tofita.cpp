@@ -229,14 +229,15 @@ function kernelThread() {
 
 					if (syscall == TofitaSyscalls::DebugLog) {
 						serialPrintf(u8"[[DebugLog:PID %d]] ", index);
-						serialPrintf(u8"[[rcx=%u rdx=%u r8=%u]] ", frame->rcx, frame->rdx, frame->r8);
-						serialPrintf((const char8_t *)frame->rdx, frame->r8, frame->r9);
+						serialPrintf(u8"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1,
+									 frame->r8Arg2);
+						serialPrintf((const char8_t *)frame->rdxArg1, frame->r8Arg2, frame->r9Arg3);
 						serialPrintf(u8"\n");
 						process->schedulable = true;
 					}
 
 					if (syscall == TofitaSyscalls::ExitProcess) {
-						serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", index, frame->rdx);
+						serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", index, frame->rdxArg1);
 						process->present = false;
 
 						// Select pml4 of idle process for safety

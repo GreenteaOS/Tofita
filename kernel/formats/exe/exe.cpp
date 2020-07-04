@@ -342,7 +342,7 @@ function loadExeIntoProcess(const char8_t *file, process::Process *process) {
 		Entry entry = (Entry)ntdll.base;
 		process->frame.ip = ntdll.entry; // Contains crt0
 		process->frame.sp = app.stackVirtual;
-		process->frame.rcx = app.pei.entry; // First argument
+		process->frame.rcxArg0 = app.pei.entry; // First argument
 	}
 
 }

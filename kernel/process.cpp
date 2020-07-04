@@ -25,7 +25,7 @@ function Process_init(Process *process) {
 	// process->frame.flags = 0x002; // No interrupts
 	process->frame.flags = 0x202;
 	process->syscallToHandle = TofitaSyscalls::Noop;
-	process->frame.rdx = process->pid; // Second argument
+	process->frame.rdxArg1 = process->pid; // Second argument
 }
 
 Process *Process_create() {
