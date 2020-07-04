@@ -257,6 +257,10 @@ function kernelThread() {
 						quakePrintf(u8"Process #%d closed due to CPU exception\n", index);
 						process->present = false;
 
+						// Page fault
+						if (frame->index == 0x0E)
+							quakePrintf(u8"#PF at %8\n", process->cr2PageFaultAddress);
+
 						// Select pml4 of idle process for safety
 						pml4kernelThread = process::processes[0].pml4;
 						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);

@@ -328,3 +328,8 @@ defineIRQ 0x12, cpu0x12, exceptionPrelude ; Machine Check
 defineIRQ 0x13, cpu0x13, exceptionPrelude ; SIMD Floating-Point Exception
 defineIRQ 0x14, cpu0x14, exceptionPrelude ; Virtualization Exception
 defineIRQ 0x15, cpu0x15, exceptionPrelude ; Control Protection Exception
+
+global getCr2
+getCr2:
+	mov rax, cr2
+	ret

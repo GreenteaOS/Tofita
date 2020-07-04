@@ -41,6 +41,9 @@ struct Process {
 	// State
 	InterruptFrame frame;
 
+	// Filled on #PF
+	volatile uint64_t cr2PageFaultAddress;
+
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
 	volatile TofitaSyscalls volatile syscallToHandle; // = Noop if no actions required
