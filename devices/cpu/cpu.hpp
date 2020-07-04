@@ -22,6 +22,7 @@ function timerInterrupt();
 function syscallInterrupt();
 function yieldInterrupt();
 volatile uint64_t getCr2();
+volatile bool sehReturnFalse();
 
 function cpu0x00();
 function cpu0x01();

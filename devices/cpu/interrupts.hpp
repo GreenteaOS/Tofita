@@ -58,4 +58,6 @@ const uint8_t THREAD_USER = 3;
 
 volatile uint8_t currentThread = THREAD_INIT;
 
+InterruptFrame kernelThreadFrame;
+
 function switchToKernelThread(InterruptFrame *frame);

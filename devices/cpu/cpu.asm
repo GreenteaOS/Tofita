@@ -333,3 +333,9 @@ global getCr2
 getCr2:
 	mov rax, cr2
 	ret
+
+global sehReturnFalse
+sehReturnFalse:
+	mov al, 0; bool
+	add	rsp, 16; Check disasm of probeFor*
+	ret

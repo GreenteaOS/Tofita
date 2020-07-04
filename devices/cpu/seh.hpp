@@ -17,5 +17,7 @@
 
 volatile bool sehProbe = false;
 
-volatile bool probeForReadOkay(volatile const uint64_t at, volatile const uint64_t bytes);
-volatile bool probeForWriteOkay(volatile const uint64_t at, volatile const uint64_t bytes);
+// This is a fascinating way to not allow compiler to optimize return value
+extern volatile bool (*volatile const probeForReadOkay)(volatile uint64_t at, volatile const uint64_t bytes);
+extern volatile bool (*volatile const probeForWriteOkay)(volatile const uint64_t at,
+														 volatile const uint64_t bytes);
