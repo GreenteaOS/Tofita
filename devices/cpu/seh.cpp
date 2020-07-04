@@ -17,19 +17,23 @@
 
 // Tests in disasm show that this is not optimized out thanks to volatile
 
-volatile bool probeForReadOkay(volatile const uint64_t at, volatile const uint64_t bytes) {
+volatile bool __attribute__((noinline))
+_probeForReadOkay(volatile uint64_t at, volatile const uint64_t bytes) {
 	sehProbe = true;
 	// TODO per-page not per-byte
 	volatile const uint8_t *ptr = (volatile const uint8_t *)at;
-	volatile uint64_t sum = 0;
 	for (uint64_t i = 0; i < bytes; ++i) {
-		sum += ptr[i];
+		at += ptr[i];
 	}
 	sehProbe = false;
 	return true;
 }
 
-volatile bool probeForWriteOkay(volatile const uint64_t at, volatile const uint64_t bytes) {
+volatile bool (*volatile const probeForReadOkay)(volatile uint64_t at,
+												 volatile const uint64_t bytes) = _probeForReadOkay;
+
+volatile bool __attribute__((noinline))
+_probeForWriteOkay(volatile const uint64_t at, volatile const uint64_t bytes) {
 	sehProbe = true;
 	// TODO per-page not per-byte
 	volatile uint8_t *ptr = (volatile uint8_t *)at;
@@ -40,3 +44,6 @@ volatile bool probeForWriteOkay(volatile const uint64_t at, volatile const uint6
 	sehProbe = false;
 	return true;
 }
+
+volatile bool (*volatile const probeForWriteOkay)(volatile const uint64_t at,
+												  volatile const uint64_t bytes) = _probeForWriteOkay;

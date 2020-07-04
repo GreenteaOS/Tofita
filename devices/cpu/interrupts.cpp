@@ -415,7 +415,6 @@ uint64_t timerCalled = 0;
 
 constexpr uint64_t stackSizeForKernelThread = 1024 * 1024;
 
-InterruptFrame kernelThreadFrame;
 function kernelThread();
 __attribute__((aligned(64))) uint8_t kernelStack[stackSizeForKernelThread] = {0};
 

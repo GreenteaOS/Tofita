@@ -31,13 +31,13 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
  - Tested on:
    - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
    - Intel Sandy Bridge `(socket 1155)`
-   - AMD APU A10
+   - AMD APU `A10`
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
    - WMware Workstation `(Other 64-bit, Virtualize Intel VT-x/EPT or AMD-V/RVI, Firmware type - UEFI)`
  - Hybrid performance-oriented kernel
  - Very low on resources, just 1 GB RAM minimum required
  - Isolation and containerization of everything
- - ACPI 2.0, CPUID
+ - ACPI 2.0, CPUID, SEH-style memory probing in syscalls
  - Preemptive multitasking/multithreading (both kernel and userspace)
  - Exclusively only multi-core CPUs
 
