@@ -17,7 +17,15 @@
 
 void exceptionHandler(InterruptFrame *const frame) {
 	if (currentThread == THREAD_USER) {
+		volatile process::Process *process = &process::processes[process::currentProcess];
+		process->schedulable = false;
+		process->syscallToHandle = TofitaSyscalls::Cpu;
+		switchToKernelThread(frame);
 	} else if (currentThread == THREAD_GUI) {
+		frame->ip = (uint64_t)&kernelThreadLoop;
+		qsod(u8"THREAD_GUI unhandled CPU exception: index = %u, code = %8\n", frame->index, frame->code);
 	} else if (currentThread == THREAD_KERNEL) {
+		frame->ip = (uint64_t)&kernelThreadLoop;
+		qsod(u8"THREAD_KERNEL unhandled CPU exception: index = %u, code = %8\n", frame->index, frame->code);
 	}
 }

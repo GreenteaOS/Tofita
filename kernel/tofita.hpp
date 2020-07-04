@@ -16,6 +16,7 @@
 #include "syscalls/syscalls.hpp"
 #include "../devices/cpu/pages.hpp"
 #include "../devices/cpu/interrupts.hpp"
+#include "../devices/cpu/exceptions.hpp"
 #include "process.hpp"
 #include "gui/quake.hpp"
 
@@ -37,5 +38,6 @@ uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color);
 function quakePrintf(const char8_t *c, ...);
 function guiThread();
 function kernelThread();
-extern function guiThreadStart();
-extern function kernelThreadStart();
+function guiThreadStart();
+function kernelThreadStart();
+function kernelThreadLoop();

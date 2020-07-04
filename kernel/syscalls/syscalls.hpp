@@ -18,6 +18,7 @@
 enum class TofitaSyscalls : uint64_t {
 	// System
 	Noop = 0,
+	Cpu = 1,
 
 	// User
 	DebugLog = USER_SYSCALLS,
