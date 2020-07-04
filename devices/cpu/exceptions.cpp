@@ -16,16 +16,26 @@
 // CPU exceptions
 
 void exceptionHandler(InterruptFrame *const frame) {
+	// Page fault
+	volatile uint64_t cr2 = 0;
+	if (frame->index == 0x0E)
+		cr2 = getCr2();
+
 	if (currentThread == THREAD_USER) {
 		volatile process::Process *process = &process::processes[process::currentProcess];
 		process->schedulable = false;
 		process->syscallToHandle = TofitaSyscalls::Cpu;
+		process->cr2PageFaultAddress = cr2;
 		switchToKernelThread(frame);
 	} else if (currentThread == THREAD_GUI) {
 		frame->ip = (uint64_t)&kernelThreadLoop;
+		volatile process::Process *process = &process::processes[0];
+		process->cr2PageFaultAddress = cr2;
 		qsod(u8"THREAD_GUI unhandled CPU exception: index = %u, code = %8\n", frame->index, frame->code);
 	} else if (currentThread == THREAD_KERNEL) {
 		frame->ip = (uint64_t)&kernelThreadLoop;
+		volatile process::Process *process = &process::processes[0];
+		process->cr2PageFaultAddress = cr2;
 		qsod(u8"THREAD_KERNEL unhandled CPU exception: index = %u, code = %8\n", frame->index, frame->code);
 	}
 }
