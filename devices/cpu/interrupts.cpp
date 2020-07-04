@@ -388,6 +388,7 @@ __attribute__((aligned(64))) uint8_t ist7stack[4096 * 4] = {0};
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
 void anyInterruptHandler(InterruptFrame *frame);
 
+// TODO remove
 __attribute__((aligned(64))) __attribute__((interrupt)) void unknownInterrupt(InterruptFrame *frame) {
 	// TODO Find a better way to avoid LLVM bugs
 	anyInterruptHandler(frame);
@@ -606,6 +607,13 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 	volatile process::Process *process = &process::processes[process::currentProcess];
 	process->schedulable = false;
 	volatile let index = (TofitaSyscalls)frame->rcxArg0;
+
+	// No-op
+	if ((uint64_t)index < USER_SYSCALLS) {
+		process->schedulable = true;
+		return;
+	}
+
 	process->syscallToHandle = index;
 
 	switchToKernelThread(frame);
