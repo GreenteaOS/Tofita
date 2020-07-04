@@ -188,6 +188,9 @@ function kernelInit(const KernelParams *params) {
 		pml4kernelThread = process::processes[0].pml4;
 	}
 
+	// Show something before scheduling delay
+	composite();
+	copyToScreen();
 	serialPrintln(u8"<Tofita> [ready for scheduling]");
 }
 
@@ -205,6 +208,7 @@ function switchToUserProcess() {
 	}
 	// else
 	asm volatile("int $0x81"); // yield
+							   // TODO
 }
 
 function kernelThread() {
