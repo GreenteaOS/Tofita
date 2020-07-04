@@ -48,6 +48,7 @@ void ___chkstk_ms(){};
 #include "../devices/serial/log.cpp"
 #include "../devices/cpu/cpuid.cpp"
 #include "../devices/cpu/spinlock.cpp"
+#include "../devices/cpu/exceptions.cpp"
 #include "../devices/cpu/interrupts.cpp"
 #include "../devices/cpu/rdtsc.cpp"
 #include "../devices/efi/efi.cpp"
@@ -250,6 +251,18 @@ function kernelThread() {
 
 						// TODO deallocate process
 					}
+
+					if (syscall == TofitaSyscalls::Cpu) {
+						serialPrintf(u8"[[Cpu:PID %d]] %d\n", index, frame->rdxArg1);
+						quakePrintf(u8"Process #%d closed due to CPU exception\n", index);
+						process->present = false;
+
+						// Select pml4 of idle process for safety
+						pml4kernelThread = process::processes[0].pml4;
+						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
+
+						// TODO deallocate process
+					}
 				}
 			}
 			index++;
@@ -277,9 +290,12 @@ __attribute__((naked, fastcall)) function kernelThreadStart() {
 				 "call kernelThread");
 }
 
-// In case of kernel crash set RIP to here
+// In case of kernel crash set instruction pointer to here
 function kernelThreadLoop() {
-	while (true) {}
+	serialPrintln(u8"<Tofita> [looping forever]");
+	while (true) {
+		while (true) {};
+	};
 }
 
 function guiThread() {
