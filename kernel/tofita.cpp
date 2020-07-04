@@ -50,6 +50,7 @@ void ___chkstk_ms(){};
 #include "../devices/cpu/spinlock.cpp"
 #include "../devices/cpu/exceptions.cpp"
 #include "../devices/cpu/interrupts.cpp"
+#include "../devices/cpu/seh.cpp"
 #include "../devices/cpu/rdtsc.cpp"
 #include "../devices/efi/efi.cpp"
 #include "../devices/cpu/physical.cpp"
@@ -236,7 +237,11 @@ function kernelThread() {
 						serialPrintf(u8"[[DebugLog:PID %d]] ", index);
 						serialPrintf(u8"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1,
 									 frame->r8Arg2);
-						serialPrintf((const char8_t *)frame->rdxArg1, frame->r8Arg2, frame->r9Arg3);
+
+						// Note this is still very usafe
+						if (probeForReadOkay(frame->rdxArg1, 1))
+							serialPrintf((const char8_t *)frame->rdxArg1, frame->r8Arg2, frame->r9Arg3);
+
 						serialPrintf(u8"\n");
 						process->schedulable = true;
 					}
@@ -298,7 +303,7 @@ __attribute__((naked, fastcall)) function kernelThreadStart() {
 function kernelThreadLoop() {
 	serialPrintln(u8"<Tofita> [looping forever]");
 	while (true) {
-		while (true) {};
+		asm volatile("pause");
 	};
 }
 
