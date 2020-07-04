@@ -413,14 +413,6 @@ void anyInterruptHandler(InterruptFrame *frame) {
 // ~121 times per second
 uint64_t timerCalled = 0;
 
-// Scheduling
-const uint8_t THREAD_INIT = 0; // kernelMain, it will be destroyed
-const uint8_t THREAD_GUI = 1;
-const uint8_t THREAD_KERNEL = 2;
-const uint8_t THREAD_USER = 3;
-
-volatile uint8_t currentThread = THREAD_INIT;
-
 constexpr uint64_t stackSizeForKernelThread = 1024 * 1024;
 
 InterruptFrame kernelThreadFrame;
@@ -804,11 +796,38 @@ function enableInterrupts() {
 		initializeFallback(&IDT[i], (uint64_t)&unknownInterrupt);
 	}
 
+	// CPU exceptions
+	initializeFallback(&IDT[0x00], (uint64_t)&cpu0x00);
+	initializeFallback(&IDT[0x01], (uint64_t)&cpu0x01);
+	initializeFallback(&IDT[0x02], (uint64_t)&cpu0x02);
+	initializeFallback(&IDT[0x03], (uint64_t)&cpu0x03);
+	initializeFallback(&IDT[0x04], (uint64_t)&cpu0x04);
+	initializeFallback(&IDT[0x05], (uint64_t)&cpu0x05);
+	initializeFallback(&IDT[0x06], (uint64_t)&cpu0x06);
+	initializeFallback(&IDT[0x07], (uint64_t)&cpu0x07);
+	initializeFallback(&IDT[0x08], (uint64_t)&cpu0x08);
+	initializeFallback(&IDT[0x09], (uint64_t)&cpu0x09);
+	initializeFallback(&IDT[0x0A], (uint64_t)&cpu0x0A);
+	initializeFallback(&IDT[0x0B], (uint64_t)&cpu0x0B);
+	initializeFallback(&IDT[0x0C], (uint64_t)&cpu0x0C);
+	initializeFallback(&IDT[0x0D], (uint64_t)&cpu0x0D);
+	initializeFallback(&IDT[0x0E], (uint64_t)&cpu0x0E);
+	initializeFallback(&IDT[0x0F], (uint64_t)&cpu0x0F);
+	initializeFallback(&IDT[0x10], (uint64_t)&cpu0x10);
+	initializeFallback(&IDT[0x11], (uint64_t)&cpu0x11);
+	initializeFallback(&IDT[0x12], (uint64_t)&cpu0x12);
+	initializeFallback(&IDT[0x13], (uint64_t)&cpu0x13);
+	initializeFallback(&IDT[0x14], (uint64_t)&cpu0x14);
+	initializeFallback(&IDT[0x15], (uint64_t)&cpu0x15);
+
+	// PIC interrupts
 	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt));
-	initializeFallback(&IDT[0x80], (uint64_t)(&syscallInterrupt));
-	initializeFallback(&IDT[0x81], (uint64_t)(&yieldInterrupt));
 	initializeKeyboard(&IDT[IRQ1]);
 	initializeMouse(&IDT[IRQ12]);
+
+	// Syscalls
+	initializeFallback(&IDT[0x80], (uint64_t)(&syscallInterrupt));
+	initializeFallback(&IDT[0x81], (uint64_t)(&yieldInterrupt));
 
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
 	cacheIdtr.offset = (uint64_t)IDT;
