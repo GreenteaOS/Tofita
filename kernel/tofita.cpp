@@ -83,7 +83,6 @@ void ___chkstk_ms(){};
 #include "gui/windows.cpp"
 #include "gui/compositor.cpp"
 
-function (*keyDownHandler)(uint8_t) = null;
 function handleKeyDown(uint8_t key) {
 	if (keyDownHandler)
 		keyDownHandler(key);

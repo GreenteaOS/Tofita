@@ -15,7 +15,6 @@
 
 // Quake-style console with ~
 
-uint8_t haveToQuake = 0;
 uint8_t quakeHeight = 255;
 char8_t quakeCommand[256] = {0};
 char8_t quakeLines[17][256] = {0};
@@ -79,6 +78,12 @@ function quakeHandleButtonDown(uint8_t key) {
 		}
 
 	serialPrintf(u8"quake command is %s\n", quakeCommand);
+}
+
+function qsod(const char8_t *format, const uint64_t extra, const uint64_t more) {
+	haveToQuake = 1;
+	quakePrintf(u8"Kernel stopped working. Please, reboot.\n");
+	quakePrintf(format, extra, more);
 }
 
 uint8_t *_quakeItoA(int32_t i, uint8_t b[]) {
@@ -153,6 +158,25 @@ int32_t _quake_puts(const uint8_t *string) {
 	return 1;
 }
 
+function quakePrintHex(uint64_t n) {
+	_quake_puts((const uint8_t *)"0x");
+	uint8_t buf[16], *bp = buf + 16;
+	for (int32_t i = 0; i < 16; i++)
+		buf[i] = '0';
+	do {
+		bp--;
+		uint8_t mod = n % 16;
+		if (mod < 10) {
+			*bp = '0' + mod;
+		} else {
+			*bp = 'A' - 10 + mod;
+		}
+		n /= 16;
+	} while (n != 0);
+	for (int32_t i = 0; i < 16; i++)
+		_quake_putchar(buf[i]);
+}
+
 function quakePrintf(const char8_t *c, ...) {
 	uint8_t *s;
 	va_list lst;
@@ -201,6 +225,11 @@ function quakePrintf(const char8_t *c, ...) {
 				_quake_putchar(*c);
 				c++;
 			}
+			break;
+		}
+		case '8': {
+			uint64_t value = va_arg(lst, uint64_t);
+			quakePrintHex(value);
 			break;
 		}
 		}

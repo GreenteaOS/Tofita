@@ -15,7 +15,8 @@
 
 // Quake-style console with ~
 
-extern uint8_t haveToQuake;
+uint8_t haveToQuake = 0;
 function handleKeyDown(uint8_t key);
-extern function (*keyDownHandler)(uint8_t);
+function (*keyDownHandler)(uint8_t) = null;
 function quakeHandleButtonDown(uint8_t key);
+function qsod(const char8_t *format, const uint64_t extra, const uint64_t more);
