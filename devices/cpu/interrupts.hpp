@@ -60,4 +60,4 @@ volatile uint8_t currentThread = THREAD_INIT;
 
 InterruptFrame kernelThreadFrame;
 
-function switchToKernelThread(InterruptFrame *frame);
+function switchToKernelThread(volatile InterruptFrame *frame);

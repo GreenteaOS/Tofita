@@ -29,15 +29,22 @@ uint8_t mouseRead();
 
 #define PACKED __attribute__((packed))
 
-void *tmemcpy(void *dest, const void *src, uint64_t count) {
+extern "C++" void tmemcpy(void *dest, const void *src, uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
 	uint8_t *src8 = (uint8_t *)src;
 
 	while (count--) {
 		*dst8++ = *src8++;
 	}
+}
 
-	return dest;
+extern "C++" void tmemcpy(volatile void *dest, const volatile void *src, volatile uint64_t count) {
+	uint8_t *dst8 = (uint8_t *)dest;
+	uint8_t *src8 = (uint8_t *)src;
+
+	while (count--) {
+		*dst8++ = *src8++;
+	}
 }
 
 #pragma pack(1)
@@ -422,7 +429,7 @@ InterruptFrame guiThreadFrame;
 function guiThread();
 __attribute__((aligned(64))) uint8_t guiStack[stackSizeForKernelThread] = {0};
 
-extern "C" void timerInterruptHandler(InterruptFrame *frame);
+extern "C" void timerInterruptHandler(volatile InterruptFrame *frame);
 
 
 uint8_t extraMillisecond = 0;
@@ -455,7 +462,7 @@ function markAllProcessessSchedulable() {
 	}
 }
 
-function switchToKernelThread(InterruptFrame *frame) {
+function switchToKernelThread(volatile InterruptFrame *frame) {
 	if (currentThread == THREAD_KERNEL)
 		return;
 
@@ -474,7 +481,7 @@ function switchToKernelThread(InterruptFrame *frame) {
 	tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
 }
 
-function switchToNextProcess(InterruptFrame *frame) {
+function switchToNextProcess(volatile InterruptFrame *frame) {
 	volatile var next = getNextProcess();
 
 	if (next == 0) {
@@ -513,7 +520,7 @@ function switchToNextProcess(InterruptFrame *frame) {
 	}
 }
 
-function switchToGuiThread(InterruptFrame *frame) {
+function switchToGuiThread(volatile InterruptFrame *frame) {
 	if (currentThread == THREAD_GUI)
 		return;
 
@@ -531,13 +538,13 @@ function switchToGuiThread(InterruptFrame *frame) {
 	tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
 }
 
-void yieldInterruptHandler(InterruptFrame *frame) {
+void yieldInterruptHandler(volatile InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 	switchToNextProcess(frame);
 }
 
 
-void timerInterruptHandler(InterruptFrame *frame) {
+void timerInterruptHandler(volatile InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 
 	if (timerCalled % 121 == 0) {
