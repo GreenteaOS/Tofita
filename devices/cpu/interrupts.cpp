@@ -508,6 +508,7 @@ function switchToNextProcess(InterruptFrame *frame) {
 		currentThread = THREAD_USER;
 		tmemcpy(frame, &process->frame, sizeof(InterruptFrame));
 	} else {
+		amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 		switchToKernelThread(frame);
 	}
 }

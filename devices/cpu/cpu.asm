@@ -169,13 +169,13 @@ struc InterruptFrame
 .rcx     resq 1
 .rax     resq 1
 
-.int     resq 1
-.err     resq 1
-.rip     resq 1
-.cs3     resq 1
-.rflags  resq 1
-.rsp3    resq 1
-.ss3     resq 1
+.index     resq 1
+.code     resq 1
+.ip     resq 1
+.cs     resq 1
+.flags  resq 1
+.sp    resq 1
+.ss     resq 1
 endstruc
 
 registerStorageSize equ (0x78 + 128)
@@ -243,12 +243,12 @@ registerStorageSize equ (0x78 + 128)
 %endmacro
 
 %macro swapGsIfRequired 0
-	mov rax, [rsp+0x90]
+	mov rax, [rsp + InterruptFrame.cs]
 	and rax, 0x03
 	cmp rax, 0x03
-	jne %%noSwapGs
+	jne .noSwapGs
 	swapgs
-%%noSwapGs:
+.noSwapGs:
 %endmacro
 
 %macro defineIRQHandler 2
@@ -259,7 +259,16 @@ global %2
 	swapGsIfRequired
 
 	mov rcx, rsp
+	push 0
+	push 0
+	push 0
+	push 0
+	mov	rbp, rsp
 	call %1
+	pop rcx
+	pop rcx
+	pop rcx
+	pop rcx
 	jmp irqHandlerReturn
 %endmacro
 
