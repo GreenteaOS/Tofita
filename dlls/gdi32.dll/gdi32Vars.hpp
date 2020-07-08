@@ -12,11 +12,3 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-#define GDI32_DLL __declspec(dllexport)
-#include "gdi32.hpp"
-#include "gdi32Vars.hpp"
-
-extern "C" {
-__attribute__((fastcall)) void _DllMainCRTStartup() {}
-}

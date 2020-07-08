@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdint.h>
+#include "../types.hpp"
 
 #ifndef NTDLL32_DLL
 #define NTDLL32_DLL __declspec(dllimport)

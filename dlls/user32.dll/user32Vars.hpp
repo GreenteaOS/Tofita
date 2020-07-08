@@ -13,10 +13,24 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define GDI32_DLL __declspec(dllexport)
-#include "gdi32.hpp"
-#include "gdi32Vars.hpp"
+namespace user32 {
+struct ClassesLinkedList {
+	// TODO char16_t
+	const uint16_t *name = nullptr;
+	wapi::WindowClass wc;
+	ClassesLinkedList *next = nullptr;
+};
 
-extern "C" {
-__attribute__((fastcall)) void _DllMainCRTStartup() {}
-}
+ClassesLinkedList rootClass;
+
+// TODO some HandleWrapper with handle type field?
+constexpr uint16_t windowIsWindow = 0xA1CE;
+
+struct Window {
+	uint16_t windowIsWindow;
+	uint64_t windowId;
+	// TODO bool isNativeWindow;
+	wapi::WindowProcedure proc;
+	nj::WindowFramebuffer fb;
+};
+} // namespace user32
