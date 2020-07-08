@@ -25,9 +25,8 @@
 
 extern "C" {
 // Tofita
-__attribute__((naked, fastcall)) TOFITA32_DLL uint64_t tofitaFastSystemCall(TofitaSyscalls rcx,
-																			uint64_t rdx = 0, uint64_t r8 = 0,
-																			uint64_t r9 = 0);
+TOFITA32_DLL uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx = 0, uint64_t r8 = 0,
+										   uint64_t r9 = 0);
 __attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub();
 TOFITA32_DLL void tofitaDebugLog(const char8_t *message, uint64_t extra = 0, uint64_t more = 0);
 

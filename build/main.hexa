@@ -111,8 +111,15 @@ for (task in tasks) {
 
 				// DLL
 
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
+					config.tempFolder + '\\tofita\\tofita64.asm.obj dlls\\tofita32.dll\\tofita64.asm', { stdio: 'inherit' }
+				)
+
 				// TODO 32-bit
 				for (i in dlls.length) {
+					var asm = ' '
+					if (dlls[i] == 'ntdll') asm = config.tempFolder + '/tofita/tofita64.asm.obj '
 					require('child_process').execSync(
 						[
 							'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
@@ -136,6 +143,7 @@ for (task in tasks) {
 							'/verbose /DLL /WX /MACHINE:X64 ',
 							[for (dep in deps[i]) config.tempFolder + '/tofita/' + dep + '.lib '].join(''),
 							config.tempFolder + '/tofita/' + dlls[i] + '_dll.obj ',
+							asm,
 							'/out:',
 							config.tempFolder + '/tofita/' + dlls[i] + '.dll'
 						].join(''), { stdio: 'inherit' }
