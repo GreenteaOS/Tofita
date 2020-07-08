@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#pragma once
+
 #include <stdint.h>
 #include <stddef.h>
 #include "../../kernel/syscalls/syscalls.hpp"
@@ -22,11 +24,23 @@
 #endif
 
 extern "C" {
-
+// Tofita
 __attribute__((naked, fastcall)) TOFITA32_DLL uint64_t tofitaFastSystemCall(TofitaSyscalls rcx,
 																			uint64_t rdx = 0, uint64_t r8 = 0,
 																			uint64_t r9 = 0);
 __attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub();
-TOFITA32_DLL void tofitaExitProcess(uint32_t exitCode);
 TOFITA32_DLL void tofitaDebugLog(const char8_t *message, uint64_t extra = 0, uint64_t more = 0);
+
+// Kernel32
+TOFITA32_DLL void tofitaExitProcess(uint32_t exitCode);
+
+// User32
+TOFITA32_DLL uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload);
+TOFITA32_DLL void tofitaShowWindow(uint64_t windowId, int32_t nCmdShow);
+TOFITA32_DLL wapi::Bool tofitaGetMessage(GetMessagePayload *payload);
+TOFITA32_DLL wapi::Bool tofitaPostMessage(PostMessagePayload *payload);
+
+// NjRAA
+TOFITA32_DLL nj::WindowFramebuffer njraaGetOrCreateWindowFramebuffer(uint64_t windowId);
+TOFITA32_DLL void njraaUploadWindowFramebuffer(uint64_t windowId);
 }

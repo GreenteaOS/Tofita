@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "../dlls/types.hpp"
 #include "syscalls/syscalls.hpp"
 #include "../devices/cpu/pages.hpp"
 #include "../devices/cpu/interrupts.hpp"

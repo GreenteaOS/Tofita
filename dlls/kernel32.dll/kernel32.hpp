@@ -22,4 +22,7 @@
 
 extern "C" {
 KERNEL32_DLL void ExitProcess(uint32_t exitCode);
+KERNEL32_DLL wapi::HLocal LocalAlloc(uint32_t flags, size_t bytes);
+KERNEL32_DLL wapi::HGlobal GlobalAlloc(uint32_t flags, size_t bytes);
+KERNEL32_DLL void *HeapAlloc(wapi::Handle heap, uint32_t flags, size_t bytes);
 }

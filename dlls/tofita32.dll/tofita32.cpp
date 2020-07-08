@@ -15,7 +15,9 @@
 
 #define TOFITA32_DLL __declspec(dllexport)
 #include "tofita32.hpp"
+#include "tofita32Vars.hpp"
 
+extern "C" {
 // High performance function, that does completely nothing
 uint32_t tofitaFastStub() {
 	return 0;
@@ -33,4 +35,29 @@ void tofitaExitProcess(uint32_t exitCode) {
 
 void tofitaDebugLog(const char8_t *message, uint64_t extra, uint64_t more) {
 	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)message, extra, more);
+}
+
+void njraaUploadWindowFramebuffer(uint64_t windowId) {
+	tofitaFastSystemCall(TofitaSyscalls::UploadWindowFramebuffer, (uint64_t)windowId);
+}
+
+nj::WindowFramebuffer njraaGetOrCreateWindowFramebuffer(uint64_t windowId) {
+	tofitaFastSystemCall(TofitaSyscalls::GetOrCreateWindowFramebuffer, (uint64_t)windowId);
+}
+
+uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload) {
+	tofitaFastSystemCall(TofitaSyscalls::CreateWindowEx, (uint64_t)payload);
+}
+
+void tofitaShowWindow(uint64_t windowId, int32_t nCmdShow) {
+	tofitaFastSystemCall(TofitaSyscalls::ShowWindow, (uint64_t)windowId, nCmdShow);
+}
+
+wapi::Bool tofitaGetMessage(GetMessagePayload *payload) {
+	return (wapi::Bool)tofitaFastSystemCall(TofitaSyscalls::GetMessage, (uint64_t)payload);
+}
+
+wapi::Bool tofitaPostMessage(PostMessagePayload *payload) {
+	return (wapi::Bool)tofitaFastSystemCall(TofitaSyscalls::PostMessage, (uint64_t)payload);
+}
 }

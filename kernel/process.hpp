@@ -50,8 +50,10 @@ struct Process {
 													  // TODO do this on per-thread basis
 };
 
+constexpr uint64_t ProcessLimit = 256;
+
 // TODO dynamic allocation of this list
-Process processes[256] = {0};
+Process processes[ProcessLimit] = {0};
 
 // Working process pid, with restored state and active CR3
 volatile uint64_t currentProcess = 0;

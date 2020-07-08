@@ -215,7 +215,7 @@ PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root
 		uint16_t i = 0;
 		while (true) {
 			if ((list->name[i] == name[i]) && (name[i] == 0)) {
-				serialPrintf(u8"[getProcAddress] import {%s} resolved to {%s}\n", list->name, name);
+				serialPrintf(u8"[getProcAddress] import {%s} resolved to {%s}\n", name, list->name);
 				return list;
 				break;
 			}
@@ -227,7 +227,7 @@ PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root
 		}
 	}
 
-	serialPrintf(u8"[getProcAddress] import {%s} unresolved\n", list->name);
+	serialPrintf(u8"[getProcAddress] import {%s} unresolved\n", name);
 	return null;
 }
 

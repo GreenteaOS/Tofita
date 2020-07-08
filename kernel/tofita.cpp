@@ -244,9 +244,7 @@ function kernelThread() {
 
 						serialPrintf(u8"\n");
 						process->schedulable = true;
-					}
-
-					if (syscall == TofitaSyscalls::ExitProcess) {
+					} else if (syscall == TofitaSyscalls::ExitProcess) {
 						serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", index, frame->rdxArg1);
 						process->present = false;
 
@@ -255,22 +253,29 @@ function kernelThread() {
 						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 
 						// TODO deallocate process
-					}
-
-					if (syscall == TofitaSyscalls::Cpu) {
+					} else if (syscall == TofitaSyscalls::Cpu) {
 						serialPrintf(u8"[[Cpu:PID %d]] %d\n", index, frame->rdxArg1);
-						quakePrintf(u8"Process #%d closed due to CPU exception\n", index);
+						quakePrintf(u8"Process #%d closed due to CPU exception #%u\n", index, frame->index);
 						process->present = false;
 
 						// Page fault
 						if (frame->index == 0x0E)
 							quakePrintf(u8"#PF at %8\n", process->cr2PageFaultAddress);
+						if (frame->index == 0x0D)
+							quakePrintf(u8"#GPF at %8\n", frame->ip);
+						if (frame->index == 0x03)
+							quakePrintf(u8"#BP at %8\n", frame->ip);
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = process::processes[0].pml4;
 						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 
 						// TODO deallocate process
+					} else {
+						// Unknown syscall is no-op
+						serialPrintf(u8"[[PID %d]] Unknown syscall %d\n", index, frame->rcxArg0);
+						frame->raxReturn = 0;
+						process->schedulable = true;
 					}
 				}
 			}

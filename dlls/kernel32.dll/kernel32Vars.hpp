@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define GDI32_DLL __declspec(dllexport)
-#include "gdi32.hpp"
-#include "gdi32Vars.hpp"
+namespace kernel32 {
 
-extern "C" {
-__attribute__((fastcall)) void _DllMainCRTStartup() {}
-}
+// TODO replace to virtual alloc
+uint8_t buffer[1024 * 1024] = {0};
+uint32_t bufferOffset = 0;
+
+} // namespace kernel32
