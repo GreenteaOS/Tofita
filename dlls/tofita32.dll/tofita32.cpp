@@ -23,10 +23,12 @@ uint32_t tofitaFastStub() {
 	return 0;
 }
 
+// External
+uint64_t tofitaFastSystemCallWrapper(TofitaSyscalls rcx, uint64_t rdx, uint64_t r8, uint64_t r9);
+
 // Return value is placed into RAX
 uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx, uint64_t r8, uint64_t r9) {
-	asm volatile("int $0x80" ::);
-	asm volatile("ret" ::);
+	return tofitaFastSystemCallWrapper(rcx, rdx, r8, r9);
 }
 
 void tofitaExitProcess(uint32_t exitCode) {
@@ -46,7 +48,7 @@ nj::WindowFramebuffer njraaGetOrCreateWindowFramebuffer(uint64_t windowId) {
 }
 
 uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload) {
-	tofitaFastSystemCall(TofitaSyscalls::CreateWindowEx, (uint64_t)payload);
+	return tofitaFastSystemCall(TofitaSyscalls::CreateWindowEx, (uint64_t)payload);
 }
 
 void tofitaShowWindow(uint64_t windowId, int32_t nCmdShow) {
