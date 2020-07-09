@@ -44,10 +44,13 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 	}
 
 	if (syscall == TofitaSyscalls::GetMessage) {
-		if (!probeForWriteOkay(frame->rdxArg1, sizeof(GetMessagePayload)))
+		if (!probeForReadOkay(frame->rdxArg1, sizeof(GetMessagePayload)))
 			return false;
 
 		var payload = (GetMessagePayload *)frame->rdxArg1;
+
+		if (!probeForWriteOkay((uint64_t)payload->msg, sizeof(wapi::Msg)))
+			return false;
 
 		frame->raxReturn = process::getMessage(process, payload);
 

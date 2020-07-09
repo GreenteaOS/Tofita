@@ -52,8 +52,17 @@ constexpr uint64_t messagesBufferSize = 256;
 
 wapi::Msg *getOrCreateMessagesBuffer(volatile Process *process) {
 	if (process->messages == null) {
-		process->messages =
-			(wapi::Msg *)PhysicalAllocator::allocateBytes(sizeof(wapi::Msg) * messagesBufferSize);
+		constexpr uint64_t bytes = sizeof(wapi::Msg) * messagesBufferSize;
+
+		process->messages = (wapi::Msg *)PhysicalAllocator::allocateBytes(bytes);
+
+		if (process->messages != PHYSICAL_NOT_FOUND) {
+			memset((void *)process->messages, 0, bytes);
+			process->messagesUsed = 0;
+		} else {
+			process->messages = null;
+			return null;
+		}
 	}
 
 	return process->messages;
@@ -62,13 +71,32 @@ wapi::Msg *getOrCreateMessagesBuffer(volatile Process *process) {
 bool postMessage(volatile Process *process, PostMessagePayload *payload) {
 	// TODO do not allocate messages queue if no windows and not awaits for them
 	var messages = getOrCreateMessagesBuffer(process);
+	if (messages == null)
+		return false;
+
+	if (process->messagesUsed == messagesBufferSize)
+		return false;
+
+	wapi::Msg *message = &messages[process->messagesUsed];
+
+	message->hwnd = payload->hWnd;
+	message->message = payload->msg;
+	message->wParam = payload->wParam;
+	message->lParam = payload->lParam;
+
+	message->time = uptimeMilliseconds; // TODO
+	message->pt.x = mouseX;				// TODO
+	message->pt.y = mouseY;				// TODO
+	message->lPrivate = 0;
+
+	process->messagesUsed++;
 
 	if (process->awaitsGetMessage) {
 		process->awaitsGetMessage = false;
 		process->syscallToHandle = TofitaSyscalls::GetMessage;
 	}
 
-	return false;
+	return true;
 }
 
 bool getMessage(volatile Process *process, GetMessagePayload *payload) {
@@ -77,8 +105,35 @@ bool getMessage(volatile Process *process, GetMessagePayload *payload) {
 		return false;
 
 	var messages = getOrCreateMessagesBuffer(process);
+	if (messages == null)
+		return false;
 
-	return false;
+	// TODO does not apply to wmQuit/wmPaint
+	if (process->messagesUsed == 0)
+		return false;
+
+	// TODO filters & hWnd
+	wapi::Msg *message = &messages[0];
+	wapi::Msg *target = payload->msg;
+
+	target->hwnd = message->hwnd;
+	target->message = message->message;
+	target->wParam = message->wParam;
+	target->lParam = message->lParam;
+
+	target->time = message->time;
+	target->pt.x = message->pt.x;
+	target->pt.y = message->pt.y;
+	target->lPrivate = message->lPrivate;
+
+	// Shift first element
+	process->messagesUsed--;
+
+	for (uint16_t i = 0; i < process->messagesUsed; ++i) {
+		messages[i] = messages[i + 1];
+	}
+
+	return true;
 }
 
 function Process_destroy(Process *process) {
