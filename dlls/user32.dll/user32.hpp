@@ -36,4 +36,5 @@ USER32_DLL wapi::HDc BeginPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps);
 USER32_DLL int32_t FillRect(wapi::HDc dc, const wapi::Rect *lprc, wapi::HBrush brush);
 USER32_DLL wapi::Bool EndPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps);
 USER32_DLL wapi::LResult DefWindowProcW(wapi::HWnd hWnd, wapi::Message uMsg, void *wParam, void *lParam);
+USER32_DLL wapi::Bool PostMessage(wapi::HWnd hWnd, wapi::Message msg, void *wParam, void *lParam);
 }
