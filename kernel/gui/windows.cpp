@@ -64,13 +64,13 @@ function drawShadowBox(int16_t x, int16_t y, uint16_t w, uint16_t h) {
 		}
 }
 
-function drawWindowFrame(const char8_t *title, int16_t x, int16_t y, uint16_t w, uint16_t h) {
+function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w, uint16_t h) {
 	Pixel32 color;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0;
 
 	drawVibrancedRectangle(x + 1, y + 1, w - 1, 32, false);
 
-	drawAsciiText(title, x + 8 + 4, y + 9, color);
+	drawText(title, x + 8 + 4, y + 9, color);
 
 	// Frame hairline
 	color.rgba.r = color.rgba.g = color.rgba.b = 164;

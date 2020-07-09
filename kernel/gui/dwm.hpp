@@ -25,14 +25,18 @@ struct OverlappedWindow {
 	// TODO tid - thread id
 	uint64_t windowId;
 	bool visible;
+	const wchar_t *title;
+
+	int16_t x;
+	int16_t y;
 
 	uint16_t width;
 	uint16_t height;
 
 	// fb.pixels == null if framebuffer not present
 	// Note: fb size may be != current window size
-	nj::WindowFramebuffer fbZeta;
-	nj::WindowFramebuffer fbGama;
+	Bitmap32 *fbZeta;
+	Bitmap32 *fbGama;
 	bool fbCurrentZeta; // Use to swap chain
 };
 

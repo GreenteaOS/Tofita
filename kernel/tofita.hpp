@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "../dlls/types.hpp"
+#include "../devices/screen/framebuffer.hpp"
 #include "gui/dwm.hpp"
 #include "syscalls/syscalls.hpp"
 #include "../devices/cpu/pages.hpp"

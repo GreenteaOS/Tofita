@@ -151,6 +151,17 @@ uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color) 
 	return xx - x;
 }
 
+/// Returns advance after last character
+uint16_t drawText(const wchar_t *text, double x, int16_t y, Pixel32 color) {
+	uint16_t i = 0;
+	double xx = x;
+	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
+		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, color);
+		i++;
+	}
+	return xx - x;
+}
+
 uint16_t drawIntegerText(int64_t value, double x, int16_t y, Pixel32 color) {
 	double xx = x;
 	if (value < 0) {

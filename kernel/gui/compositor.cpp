@@ -259,6 +259,24 @@ function composite() {
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, taskbarY + 10 + 2, 6, -1);
 
+	for (uint16_t i = 0; i < dwm::windowsLimit; ++i)
+		if (dwm::windowsList[i].present) {
+			let window = &dwm::windowsList[i];
+			if (!window->visible)
+				continue;
+
+			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
+							window->width, window->height);
+
+			if (window->fbZeta != null) {
+				let frameHeight = 30;
+				let frameWidth = 1;
+
+				drawBitmap32(window->fbCurrentZeta ? window->fbZeta : window->fbGama, window->x + frameWidth,
+							 window->y + frameHeight);
+			}
+		}
+
 	drawCursor(cur, mouseX, mouseY);
 	quake();
 }

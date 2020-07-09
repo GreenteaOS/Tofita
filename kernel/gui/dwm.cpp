@@ -34,9 +34,12 @@ OverlappedWindow *OverlappedWindow_create(uint64_t pid) {
 	window->visible = false;
 	window->width = 500;  // TODO actual wapi default values
 	window->height = 300; // TODO actual wapi default values
-	window->fbZeta.pixels = null;
-	window->fbGama.pixels = null;
+	window->x = 200;	  // TODO actual wapi default values
+	window->y = 100;	  // TODO actual wapi default values
+	window->fbZeta = null;
+	window->fbGama = null;
 	window->fbCurrentZeta = true;
+	window->title = null;
 	return window;
 }
 
