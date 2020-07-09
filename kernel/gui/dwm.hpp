@@ -17,6 +17,7 @@
 
 namespace dwm {
 
+// Zero for system GUI (like taskbar)
 uint64_t firstResponder = 0; // Active window to catch keyboard input
 
 struct OverlappedWindow {

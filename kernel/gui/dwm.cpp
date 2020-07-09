@@ -69,6 +69,17 @@ function OverlappedWindow_detach(uint64_t windowId) {
 	windowsList[window->prevId].nextId = window->nextId;
 	windowsList[window->nextId].prevId = window->prevId;
 
+	if (topmostWindow == windowId)
+		topmostWindow = window->prevId;
+
+	if (firstResponder == windowId) {
+		firstResponder = window->prevId;
+
+		while (windowsList[firstResponder].visible == false && firstResponder != 0) {
+			firstResponder = windowsList[firstResponder].prevId;
+		}
+	}
+
 	if (rootWindow == windowId)
 		rootWindow = window->nextId;
 
@@ -85,5 +96,8 @@ function OverlappedWindow_attach(uint64_t windowId) {
 
 	if (windowsList[windowId].prevId == 0)
 		rootWindow = 0;
+
+	if (windowsList[windowId].visible)
+		firstResponder = windowId;
 }
 } // namespace dwm
