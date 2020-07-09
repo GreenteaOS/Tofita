@@ -205,6 +205,9 @@ auto loadDll(const char8_t *name, PeExportLinkedList *root, Executable *exec) {
 	return pei;
 }
 
+// TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
+// may be moved between versions.
+// Search only selected .dll only within the user provided dlls
 PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root) {
 	PeExportLinkedList *list = root;
 

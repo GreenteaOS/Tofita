@@ -244,6 +244,7 @@ wapi::HDc BeginPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps) {
 	// We do this every time, cause window may be resized
 	njraaGetOrCreateWindowFramebuffer(window->windowId, &window->fb);
 	tofitaDebugLog(u8"BeginPaint done");
+	return (wapi::HDc)&window->fb; // TODO
 }
 
 int32_t FillRect(wapi::HDc dc, const wapi::Rect *lprc, wapi::HBrush brush) {
