@@ -182,9 +182,12 @@ function handleMouseUp(uint8_t key) {
 }
 
 function compositeWindows() {
-	for (uint16_t i = 0; i < dwm::windowsLimit; ++i)
-		if (dwm::windowsList[i].present) {
-			let window = &dwm::windowsList[i];
+	var i = dwm::rootWindow;
+	// Avoid infinite loop
+	for (uint16_t loop = 0; loop < dwm::windowsLimit; ++loop) {
+		let window = &dwm::windowsList[i];
+
+		if (i != 0 && window->present) {
 			if (!window->visible)
 				continue;
 
@@ -199,6 +202,11 @@ function compositeWindows() {
 							 window->y + frameHeight);
 			}
 		}
+
+		i = dwm::windowsList[i].nextId;
+		if (i == 0)
+			break;
+	}
 }
 
 function composite() {

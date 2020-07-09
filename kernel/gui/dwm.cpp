@@ -21,15 +21,15 @@ uint8_t nextDefaultWindowPosition = 0;
 
 OverlappedWindow *OverlappedWindow_create(uint64_t pid) {
 	uint64_t index = 0;
-	while (index < 255) {
-		index++;
-		if (index == 256)
+	while (index < windowsLimit - 1) {
+		index++; // Null-window not used directly
+		if (index == windowsLimit)
 			return null;
 		if (windowsList[index].present != true)
 			break;
 	}
 
-	auto window = &windowsList[index];
+	var window = &windowsList[index];
 	window->windowId = index;
 	window->pid = pid;
 	window->present = true;
@@ -45,19 +45,45 @@ OverlappedWindow *OverlappedWindow_create(uint64_t pid) {
 	window->fbGama = null;
 	window->fbCurrentZeta = true;
 	window->title = null;
+	window->prevId = 0;
+	window->nextId = 0;
 	return window;
 }
 
 OverlappedWindow *OverlappedWindow_find(uint64_t pid, uint64_t windowId) {
 	uint64_t index = 0;
-	while (index < 255) {
+	while (index < windowsLimit - 1) {
 		index++;
-		if (index == 256)
+		if (index == windowsLimit)
 			return null;
-		auto window = &windowsList[index];
+		var window = &windowsList[index];
 		if (window->present == true && window->pid == pid && window->windowId == windowId)
 			return window;
 	}
 	return null;
+}
+
+function OverlappedWindow_detach(uint64_t windowId) {
+	var window = &windowsList[windowId];
+
+	windowsList[window->prevId].nextId = window->nextId;
+	windowsList[window->nextId].prevId = window->prevId;
+
+	if (rootWindow == windowId)
+		rootWindow = window->nextId;
+
+	window->prevId = 0;
+	window->nextId = 0;
+}
+
+function OverlappedWindow_attach(uint64_t windowId) {
+	windowsList[topmostWindow].nextId = windowId;
+
+	windowsList[windowId].prevId = topmostWindow;
+	windowsList[windowId].nextId = 0;
+	topmostWindow = windowId;
+
+	if (windowsList[windowId].prevId == 0)
+		rootWindow = 0;
 }
 } // namespace dwm
