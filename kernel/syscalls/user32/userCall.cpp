@@ -65,6 +65,7 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 		} else {
 			process->awaitsGetMessage = true;
 		}
+
 		return true;
 	}
 

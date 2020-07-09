@@ -276,6 +276,10 @@ function kernelThread() {
 
 						// TODO deallocate process
 					} else {
+						frame->raxReturn = 0; // Must return at least something
+						// Note ^ some code in syscall handlers may *read* this value
+						// So set it to zero just in case
+
 						if (!userCall::userCallHandled(process, syscall)) {
 							// Unknown syscall is no-op
 							serialPrintf(u8"[[PID %d]] Unknown or unhandled syscall %d\n", index,
