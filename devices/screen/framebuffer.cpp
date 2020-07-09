@@ -61,40 +61,40 @@ function __attribute__((fastcall)) setPixel(uint16_t x, uint16_t y, Pixel32 pixe
 }
 
 function drawBitmap32WithAlpha(Bitmap32 *bitmap, uint16_t x, uint16_t y) {
-	for (int32_t yy = 0; yy < bitmap->height; yy++) {
-		for (int32_t xx = 0; xx < bitmap->width; xx++) {
+	for (int16_t yy = 0; yy < bitmap->height; yy++) {
+		for (int16_t xx = 0; xx < bitmap->width; xx++) {
 			blendPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
 		}
 	}
 }
 
 function drawBitmap32(Bitmap32 *bitmap, uint16_t x, uint16_t y) {
-	for (int32_t yy = 0; yy < bitmap->height; yy++) {
-		for (int32_t xx = 0; xx < bitmap->width; xx++) {
+	for (int16_t yy = 0; yy < bitmap->height; yy++) {
+		for (int16_t xx = 0; xx < bitmap->width; xx++) {
 			setPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
 		}
 	}
 }
 
 function drawRectangleWithAlpha(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
-	for (int32_t yy = 0; yy < height; yy++) {
-		for (int32_t xx = 0; xx < width; xx++) {
+	for (int16_t yy = 0; yy < height; yy++) {
+		for (int16_t xx = 0; xx < width; xx++) {
 			blendPixel(x + xx, y + yy, color);
 		}
 	}
 }
 
 function drawRectangle(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
-	for (int32_t yy = 0; yy < height; yy++) {
-		for (int32_t xx = 0; xx < width; xx++) {
+	for (int16_t yy = 0; yy < height; yy++) {
+		for (int16_t xx = 0; xx < width; xx++) {
 			setPixel(x + xx, y + yy, color);
 		}
 	}
 }
 
 function drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
-	for (int32_t yy = 0; yy < height; yy++) {
-		for (int32_t xx = 0; xx < width; xx++) {
+	for (int16_t yy = 0; yy < height; yy++) {
+		for (int16_t xx = 0; xx < width; xx++) {
 			// Rendering left and far right points sequentally should be
 			// better for cache-locality than vertical lines
 			// At least this is true for small rectangles (like buttons)
@@ -104,10 +104,10 @@ function drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t wi
 	}
 }
 
-function line45smooth(Pixel32 color, int32_t x, int32_t y, int32_t width, int32_t mod) {
+function line45smooth(Pixel32 color, int16_t x, int16_t y, int16_t width, int16_t mod) {
 	color.rgba.a = 98;
-	int32_t xx = 0;
-	for (int32_t xi = 0; xi < width - 1; xi++) {
+	int16_t xx = 0;
+	for (int16_t xi = 0; xi < width - 1; xi++) {
 		xx += mod;
 		setPixel(xx + x, y + xi, color);
 		blendPixel(xx + x, y + xi + 1, color);
@@ -115,4 +115,28 @@ function line45smooth(Pixel32 color, int32_t x, int32_t y, int32_t width, int32_
 	}
 	xx += mod;
 	setPixel(xx + x, y + width - 1, color);
+}
+
+function lineHorizontal(Pixel32 color, int16_t x, int16_t y, uint16_t rightLength) {
+	for (uint16_t i = 0; i < rightLength; ++i) {
+		setPixel(x + i, y, color);
+	}
+}
+
+function lineHorizontalWithAlpha(Pixel32 color, int16_t x, int16_t y, uint16_t rightLength) {
+	for (uint16_t i = 0; i < rightLength; ++i) {
+		blendPixel(x + i, y, color);
+	}
+}
+
+function lineVertical(Pixel32 color, int16_t x, int16_t y, uint16_t bottomLength) {
+	for (uint16_t i = 0; i < bottomLength; ++i) {
+		setPixel(x, y + i, color);
+	}
+}
+
+function lineVerticalWithAlpha(Pixel32 color, int16_t x, int16_t y, uint16_t bottomLength) {
+	for (uint16_t i = 0; i < bottomLength; ++i) {
+		blendPixel(x, y + i, color);
+	}
 }
