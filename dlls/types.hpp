@@ -174,8 +174,8 @@ struct WindowClass {
 	HIcon hIcon;
 	HCursor hCursor;
 	HBrush hbrBackground;
-	const uint16_t *lpszMenuName;
-	const uint16_t *lpszClassName;
+	const wchar_t *lpszMenuName;
+	const wchar_t *lpszClassName;
 };
 
 _Static_assert(sizeof(WindowClass) == 72, "bad sizeof");

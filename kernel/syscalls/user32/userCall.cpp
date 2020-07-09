@@ -25,6 +25,11 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 
 		var window = dwm::OverlappedWindow_create(process->pid);
 
+		// TODO proper probe method, probably separate probeForWideCharOkay
+		if (probeForReadOkay((uint64_t)payload->lpWindowName, 8)) {
+			window->title = String::duplicate(payload->lpWindowName);
+		}
+
 		frame->raxReturn = window->windowId;
 		process->schedulable = true;
 		return true;
