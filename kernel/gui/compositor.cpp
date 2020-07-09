@@ -181,6 +181,26 @@ function handleMouseUp(uint8_t key) {
 	drag = false;
 }
 
+function compositeWindows() {
+	for (uint16_t i = 0; i < dwm::windowsLimit; ++i)
+		if (dwm::windowsList[i].present) {
+			let window = &dwm::windowsList[i];
+			if (!window->visible)
+				continue;
+
+			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
+							window->width + 2, window->height + 34);
+
+			if (window->fbZeta != null && window->fbGama != null) {
+				let frameHeight = 30 + 3;
+				let frameWidth = 1;
+
+				drawBitmap32(window->fbCurrentZeta ? window->fbZeta : window->fbGama, window->x + frameWidth,
+							 window->y + frameHeight);
+			}
+		}
+}
+
 function composite() {
 	var _framebuffer = ::_framebuffer; // Faster access
 
@@ -215,6 +235,9 @@ function composite() {
 		drawRectangleWithAlpha(color, outlineX, outlineY, outlineW, outlineH);
 		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH);
 	}
+
+	// Windows below taskbar
+	compositeWindows();
 
 	// Taskbar
 	let animationTaskbarY = Math::min(startupAnimation / 1555.0, 1.0) * 30;
@@ -259,23 +282,7 @@ function composite() {
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, taskbarY + 10 + 2, 6, -1);
 
-	for (uint16_t i = 0; i < dwm::windowsLimit; ++i)
-		if (dwm::windowsList[i].present) {
-			let window = &dwm::windowsList[i];
-			if (!window->visible)
-				continue;
 
-			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
-							window->width + 2, window->height + 34);
-
-			if (window->fbZeta != null && window->fbGama != null) {
-				let frameHeight = 30 + 3;
-				let frameWidth = 1;
-
-				drawBitmap32(window->fbCurrentZeta ? window->fbZeta : window->fbGama, window->x + frameWidth,
-							 window->y + frameHeight);
-			}
-		}
 
 	drawCursor(cur, mouseX, mouseY);
 	quake();
