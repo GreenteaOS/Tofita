@@ -266,10 +266,10 @@ function composite() {
 				continue;
 
 			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
-							window->width, window->height);
+							window->width + 2, window->height + 34);
 
 			if (window->fbZeta != null && window->fbGama != null) {
-				let frameHeight = 30;
+				let frameHeight = 30 + 3;
 				let frameWidth = 1;
 
 				drawBitmap32(window->fbCurrentZeta ? window->fbZeta : window->fbGama, window->x + frameWidth,

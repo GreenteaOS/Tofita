@@ -143,6 +143,10 @@ wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName, const
 	window->windowIsWindow = user32::windowIsWindow;
 	window->proc = wc->lpfnWndProc;
 
+	// Initial paint
+	// TODO should be called somewhere else, in syscall of windows creation?
+	PostMessage(hWnd, wapi::Message::WM_PAINT, nullptr, nullptr);
+
 	tofitaDebugLog(u8"CreateWindowExW done");
 	return hWnd;
 }
@@ -222,7 +226,7 @@ wapi::Bool PostMessage(wapi::HWnd hWnd, wapi::Message msg, void *wParam, void *l
 	payload.msg = msg;
 	payload.wParam = wParam;
 	payload.lParam = lParam;
-	tofitaPostMessage(&payload);
+	return tofitaPostMessage(&payload);
 }
 
 void PostQuitMessage(int32_t nExitCode) {
