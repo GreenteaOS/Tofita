@@ -24,6 +24,9 @@ struct OverlappedWindow {
 	uint64_t pid; // Owner
 	// TODO tid - thread id
 	uint64_t windowId;
+	uint64_t nextId;
+	uint64_t prevId;
+
 	bool visible;
 	const wchar_t *title;
 
@@ -45,6 +48,11 @@ constexpr uint64_t windowsLimit = 256;
 // TODO allocate dynamically (just use Hexa Array or something)
 OverlappedWindow windowsList[windowsLimit];
 
+uint64_t rootWindow = 0;
+uint64_t topmostWindow = 0;
+
 OverlappedWindow *OverlappedWindow_create(uint64_t pid);
 OverlappedWindow *OverlappedWindow_find(uint64_t pid, uint64_t windowId);
+function OverlappedWindow_detach(uint64_t windowId);
+function OverlappedWindow_attach(uint64_t windowId);
 } // namespace dwm
