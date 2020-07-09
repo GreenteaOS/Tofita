@@ -51,7 +51,9 @@ struct Process {
 
 	// Ring buffer
 	wapi::Msg *messages;
+	uint64_t messagesUsed;
 	bool awaitsGetMessage;
+	// TODO bool wmQuit/wmPaint for lowest-priority must-never-lost messages
 };
 
 constexpr uint64_t ProcessLimit = 256;
