@@ -234,7 +234,7 @@ wapi::HDc BeginPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps) {
 	if (window == nullptr)
 		return nullptr;
 	// We do this every time, cause window may be resized
-	window->fb = njraaGetOrCreateWindowFramebuffer(window->windowId);
+	njraaGetOrCreateWindowFramebuffer(window->windowId, &window->fb);
 	tofitaDebugLog(u8"BeginPaint done");
 }
 
@@ -250,7 +250,7 @@ wapi::Bool EndPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps) {
 	auto window = handleToWindow(hWnd);
 	if (window == nullptr)
 		return 0;
-	njraaUploadWindowFramebuffer(window->windowId);
+	njraaSwapWindowFramebuffer(window->windowId, &window->fb);
 	tofitaDebugLog(u8"EndPaint done");
 	return 1;
 }

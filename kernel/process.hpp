@@ -48,6 +48,10 @@ struct Process {
 	// in the kernel's event loop
 	volatile TofitaSyscalls volatile syscallToHandle; // = Noop if no actions required
 													  // TODO do this on per-thread basis
+
+	// Ring buffer
+	wapi::Msg *messages;
+	bool awaitsGetMessage;
 };
 
 constexpr uint64_t ProcessLimit = 256;
@@ -58,4 +62,6 @@ Process processes[ProcessLimit] = {0};
 // Working process pid, with restored state and active CR3
 volatile uint64_t currentProcess = 0;
 
+bool postMessage(volatile Process *process, PostMessagePayload *payload);
+bool getMessage(volatile Process *process, GetMessagePayload *payload);
 } // namespace process

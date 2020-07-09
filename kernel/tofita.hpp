@@ -14,12 +14,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "../dlls/types.hpp"
+#include "gui/dwm.hpp"
 #include "syscalls/syscalls.hpp"
 #include "../devices/cpu/pages.hpp"
 #include "../devices/cpu/interrupts.hpp"
 #include "../devices/cpu/seh.hpp"
 #include "../devices/cpu/exceptions.hpp"
 #include "process.hpp"
+#include "syscalls/user32/userCall.hpp"
 #include "gui/quake.hpp"
 
 // Globals

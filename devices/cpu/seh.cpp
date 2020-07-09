@@ -20,6 +20,7 @@
 volatile bool __attribute__((noinline))
 _probeForReadOkay(volatile uint64_t at, volatile const uint64_t bytes) {
 	sehProbe = true;
+	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
 	volatile const uint8_t *ptr = (volatile const uint8_t *)at;
 	for (uint64_t i = 0; i < bytes; ++i) {

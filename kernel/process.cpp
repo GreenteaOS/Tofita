@@ -26,6 +26,8 @@ function Process_init(Process *process) {
 	process->frame.flags = 0x202;
 	process->syscallToHandle = TofitaSyscalls::Noop;
 	process->frame.rdxArg1 = process->pid; // Second argument
+	process->messages = null;
+	process->awaitsGetMessage = false;
 }
 
 Process *Process_create() {
@@ -43,6 +45,40 @@ Process *Process_create() {
 	process->present = true; // Occupied
 
 	return process;
+}
+
+// Note: 10.000 system-wise on NT
+constexpr uint64_t messagesBufferSize = 256;
+
+wapi::Msg *getOrCreateMessagesBuffer(volatile Process *process) {
+	if (process->messages == null) {
+		process->messages =
+			(wapi::Msg *)PhysicalAllocator::allocateBytes(sizeof(wapi::Msg) * messagesBufferSize);
+	}
+
+	return process->messages;
+}
+
+bool postMessage(volatile Process *process, PostMessagePayload *payload) {
+	// TODO do not allocate messages queue if no windows and not awaits for them
+	var messages = getOrCreateMessagesBuffer(process);
+
+	if (process->awaitsGetMessage) {
+		process->awaitsGetMessage = false;
+		process->syscallToHandle = TofitaSyscalls::GetMessage;
+	}
+
+	return false;
+}
+
+bool getMessage(volatile Process *process, GetMessagePayload *payload) {
+	// Do not allocate until needed
+	if (process->messages == null)
+		return false;
+
+	var messages = getOrCreateMessagesBuffer(process);
+
+	return false;
 }
 
 function Process_destroy(Process *process) {

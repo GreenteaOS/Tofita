@@ -84,6 +84,8 @@ void ___chkstk_ms(){};
 #include "gui/text.cpp"
 #include "gui/windows.cpp"
 #include "gui/compositor.cpp"
+#include "gui/dwm.cpp"
+#include "syscalls/user32/userCall.cpp"
 
 function handleKeyDown(uint8_t key) {
 	if (keyDownHandler)
@@ -218,7 +220,7 @@ function kernelThread() {
 	while (true) {
 
 		volatile uint64_t index = 1; // Idle process ignored
-		while (index < 255) {		 // TODO 256?
+		while (index < 255) {		 // TODO
 			volatile process::Process *process = &process::processes[index];
 			if (process->present == true) {
 				if (process->syscallToHandle != TofitaSyscalls::Noop) {
@@ -272,10 +274,13 @@ function kernelThread() {
 
 						// TODO deallocate process
 					} else {
-						// Unknown syscall is no-op
-						serialPrintf(u8"[[PID %d]] Unknown syscall %d\n", index, frame->rcxArg0);
-						frame->raxReturn = 0;
-						process->schedulable = true;
+						if (!userCall::userCallHandled(process, syscall)) {
+							// Unknown syscall is no-op
+							serialPrintf(u8"[[PID %d]] Unknown or unhandled syscall %d\n", index,
+										 frame->rcxArg0);
+							frame->raxReturn = 0;
+							process->schedulable = true;
+						}
 					}
 				}
 			}

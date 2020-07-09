@@ -29,7 +29,7 @@ enum class TofitaSyscalls : uint64_t {
 	GetMessage,
 	PostMessage,
 	GetOrCreateWindowFramebuffer,
-	UploadWindowFramebuffer,
+	SwapWindowFramebuffer,
 	ExitProcess
 };
 
@@ -50,6 +50,8 @@ struct CreateWindowExPayload {
 	void *lpParam;
 };
 
+_Static_assert(sizeof(CreateWindowExPayload) == 8 * 7 + 5 * 4 + 4, "bad sizeof");
+
 struct PostMessagePayload {
 	wapi::HWnd hWnd;
 	wapi::Message msg;
@@ -57,9 +59,13 @@ struct PostMessagePayload {
 	void *lParam;
 };
 
+_Static_assert(sizeof(PostMessagePayload) == 8 + 4 + 8 * 2 + 4, "bad sizeof");
+
 struct GetMessagePayload {
 	wapi::Msg *msg;
 	wapi::HWnd hWnd;
 	uint32_t wMsgFilterMin;
 	uint32_t wMsgFilterMax;
 };
+
+_Static_assert(sizeof(GetMessagePayload) == 8 * 2 + 4 * 2, "bad sizeof");

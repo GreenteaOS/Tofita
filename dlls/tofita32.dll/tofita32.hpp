@@ -40,6 +40,6 @@ TOFITA32_DLL wapi::Bool tofitaGetMessage(GetMessagePayload *payload);
 TOFITA32_DLL wapi::Bool tofitaPostMessage(PostMessagePayload *payload);
 
 // NjRAA
-TOFITA32_DLL nj::WindowFramebuffer njraaGetOrCreateWindowFramebuffer(uint64_t windowId);
-TOFITA32_DLL void njraaUploadWindowFramebuffer(uint64_t windowId);
+TOFITA32_DLL void njraaGetOrCreateWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb);
+TOFITA32_DLL void njraaSwapWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb);
 }

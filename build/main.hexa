@@ -118,8 +118,11 @@ for (task in tasks) {
 
 				// TODO 32-bit
 				for (i in dlls.length) {
+
+					// TODO refactor
 					var asm = ' '
 					if (dlls[i] == 'ntdll') asm = config.tempFolder + '/tofita/tofita64.asm.obj '
+
 					require('child_process').execSync(
 						[
 							'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
