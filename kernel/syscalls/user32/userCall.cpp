@@ -87,16 +87,16 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 		if (window == null)
 			return false;
 
-		if (window->fbZeta.pixels != null) {
+		if (window->fbZeta != null) {
 			window->fbCurrentZeta = !window->fbCurrentZeta;
 			if (window->fbCurrentZeta) {
-				fb->pixels = window->fbZeta.pixels;
-				fb->width = window->fbZeta.width;
-				fb->height = window->fbZeta.height;
+				fb->pixels = (nj::Pixel32 *)&window->fbZeta->pixels;
+				fb->width = window->fbZeta->width;
+				fb->height = window->fbZeta->height;
 			} else {
-				fb->pixels = window->fbGama.pixels;
-				fb->width = window->fbGama.width;
-				fb->height = window->fbGama.height;
+				fb->pixels = (nj::Pixel32 *)&window->fbGama->pixels;
+				fb->width = window->fbGama->width;
+				fb->height = window->fbGama->height;
 			}
 		}
 
@@ -117,29 +117,29 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 			return false;
 
 		// TODO resize fb *here* on window size change
-		if (window->fbZeta.pixels == null) {
+		if (window->fbZeta == null) {
 			let width = (uint32_t)window->width;
 			let height = (uint32_t)window->height;
 
-			let bytes = width * height * sizeof(nj::Pixel32);
-			window->fbZeta.pixels = (nj::Pixel32 *)PhysicalAllocator::allocateBytes(bytes);
-			window->fbGama.pixels = (nj::Pixel32 *)PhysicalAllocator::allocateBytes(bytes);
+			let bytes = width * height * sizeof(Pixel32);
 
-			window->fbZeta.width = width; // TODO client width
-			window->fbZeta.height = height;
+			// TODO client width
+			window->fbZeta = allocateBitmap(width, height);
+			window->fbGama = allocateBitmap(width, height);
 
-			window->fbGama.width = width; // TODO client width
-			window->fbGama.height = height;
+			memset((void *)window->fbZeta->pixels, 0x66, bytes);
+			memset((void *)window->fbGama->pixels, 0x33, bytes);
+
 		}
 
 		if (window->fbCurrentZeta) {
-			fb->pixels = window->fbZeta.pixels;
-			fb->width = window->fbZeta.width;
-			fb->height = window->fbZeta.height;
+			fb->pixels = (nj::Pixel32 *)&window->fbZeta->pixels;
+			fb->width = window->fbZeta->width;
+			fb->height = window->fbZeta->height;
 		} else {
-			fb->pixels = window->fbGama.pixels;
-			fb->width = window->fbGama.width;
-			fb->height = window->fbGama.height;
+			fb->pixels = (nj::Pixel32 *)&window->fbGama->pixels;
+			fb->width = window->fbGama->width;
+			fb->height = window->fbGama->height;
 		}
 
 		process->schedulable = true;

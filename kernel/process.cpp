@@ -136,9 +136,10 @@ bool getMessage(volatile Process *process, GetMessagePayload *payload) {
 	return true;
 }
 
-function Process_destroy(Process *process) {
+function Process_destroy(volatile Process *process) {
 	// TODO deallocate stuff
 	process->present = false;
+	process->messages = null;
 }
 
 } // namespace process

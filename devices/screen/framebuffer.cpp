@@ -20,35 +20,15 @@
 
 Framebuffer *_framebuffer;
 
-typedef struct {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-	uint8_t a;
-} __attribute__((packed)) PixelRGBAData;
-
-struct Pixel32 {
-	union {
-		PixelRGBAData rgba;
-		uint32_t color;
-	};
-};
-
-typedef struct {
-	uint16_t width;
-	uint16_t height;
-	Pixel32 pixels[];
-} Bitmap32;
-
 // Avoid one level of pointer indirection
 Pixel32 *_pixels;
 
 Bitmap32 *allocateBitmap(uint16_t width, uint16_t height) {
-	Bitmap32 *result =
-		(Bitmap32 *)PhysicalAllocator::allocateBytes(sizeof(uint16_t) * 2 + sizeof(Pixel32) * width * height);
+	var result = (Bitmap32Interim *)PhysicalAllocator::allocateBytes(sizeof(uint16_t) * 2 +
+																	 sizeof(Pixel32) * width * height);
 	result->width = width;
 	result->height = height;
-	return result;
+	return (Bitmap32 *)result;
 }
 
 function setFramebuffer(const Framebuffer *framebuffer) {

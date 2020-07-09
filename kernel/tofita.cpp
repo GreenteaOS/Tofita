@@ -254,7 +254,8 @@ function kernelThread() {
 						pml4kernelThread = process::processes[0].pml4;
 						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 
-						// TODO deallocate process
+						// Deallocate process
+						process::Process_destroy(process);
 					} else if (syscall == TofitaSyscalls::Cpu) {
 						serialPrintf(u8"[[Cpu:PID %d]] %d\n", index, frame->rdxArg1);
 						quakePrintf(u8"Process #%d closed due to CPU exception #%u\n", index, frame->index);
