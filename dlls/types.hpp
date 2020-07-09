@@ -161,6 +161,8 @@ struct Msg {
 	uint32_t lPrivate;
 };
 
+_Static_assert(sizeof(Msg) == 48, "bad sizeof");
+
 typedef LResult (*WindowProcedure)(HWnd hWnd, Message uMsg, void *wParam, void *lParam);
 
 struct WindowClass {
@@ -175,6 +177,8 @@ struct WindowClass {
 	const uint16_t *lpszMenuName;
 	const uint16_t *lpszClassName;
 };
+
+_Static_assert(sizeof(WindowClass) == 72, "bad sizeof");
 
 #define SW_HIDE 0
 #define SW_SHOWNORMAL 1
@@ -211,6 +215,8 @@ struct Pixel32 {
 		uint32_t color;
 	};
 };
+
+_Static_assert(sizeof(Pixel32) == 4, "bad sizeof");
 
 struct WindowFramebuffer {
 	Pixel32 *pixels;

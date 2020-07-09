@@ -39,12 +39,12 @@ void tofitaDebugLog(const char8_t *message, uint64_t extra, uint64_t more) {
 	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)message, extra, more);
 }
 
-void njraaUploadWindowFramebuffer(uint64_t windowId) {
-	tofitaFastSystemCall(TofitaSyscalls::UploadWindowFramebuffer, (uint64_t)windowId);
+void njraaSwapWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb) {
+	tofitaFastSystemCall(TofitaSyscalls::SwapWindowFramebuffer, (uint64_t)windowId, (uint64_t)fb);
 }
 
-nj::WindowFramebuffer njraaGetOrCreateWindowFramebuffer(uint64_t windowId) {
-	tofitaFastSystemCall(TofitaSyscalls::GetOrCreateWindowFramebuffer, (uint64_t)windowId);
+void njraaGetOrCreateWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb) {
+	tofitaFastSystemCall(TofitaSyscalls::GetOrCreateWindowFramebuffer, (uint64_t)windowId, (uint64_t)fb);
 }
 
 uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload) {
