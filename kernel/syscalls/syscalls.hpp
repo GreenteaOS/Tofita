@@ -35,10 +35,11 @@ enum class TofitaSyscalls : uint64_t {
 
 struct CreateWindowExPayload {
 	const wapi::WindowClass *wc;
+	wapi::HWnd hWnd;
 
 	// CreateWindowEx
-	const uint16_t *lpClassName;
-	const uint16_t *lpWindowName;
+	const wchar_t *lpClassName;
+	const wchar_t *lpWindowName;
 	uint32_t dwStyle;
 	int32_t x;
 	int32_t y;
@@ -50,7 +51,7 @@ struct CreateWindowExPayload {
 	void *lpParam;
 };
 
-_Static_assert(sizeof(CreateWindowExPayload) == 8 * 7 + 5 * 4 + 4, "bad sizeof");
+_Static_assert(sizeof(CreateWindowExPayload) == 8 * 8 + 5 * 4 + 4, "bad sizeof");
 
 struct PostMessagePayload {
 	wapi::HWnd hWnd;

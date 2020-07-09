@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "../devices/cpu/physical.hpp"
+#include "util/String.hpp"
 #include "../dlls/types.hpp"
 #include "../devices/screen/framebuffer.hpp"
 #include "gui/dwm.hpp"

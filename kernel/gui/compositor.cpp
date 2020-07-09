@@ -268,7 +268,7 @@ function composite() {
 			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
 							window->width, window->height);
 
-			if (window->fbZeta != null) {
+			if (window->fbZeta != null && window->fbGama != null) {
 				let frameHeight = 30;
 				let frameWidth = 1;
 

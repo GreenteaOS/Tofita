@@ -228,3 +228,7 @@ class PhysicalAllocator {
 uint8_t *PhysicalAllocator::buffer;
 uint64_t PhysicalAllocator::count;
 uint64_t PhysicalAllocator::last;
+
+uint64_t allocateBytes(uint64_t bytes) {
+	return PhysicalAllocator::allocateBytes(bytes);
+}

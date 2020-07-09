@@ -22,8 +22,8 @@
 
 extern "C" {
 USER32_DLL wapi::Atom RegisterClassW(const wapi::WindowClass *wc);
-USER32_DLL wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const uint16_t *lpClassName,
-									  const uint16_t *lpWindowName, uint32_t dwStyle, int32_t x, int32_t y,
+USER32_DLL wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName,
+									  const wchar_t *lpWindowName, uint32_t dwStyle, int32_t x, int32_t y,
 									  int32_t nWidth, int32_t nHeight, wapi::HWnd hWndParent,
 									  wapi::HMenu hMenu, wapi::HInstance hInstance, void *lpParam);
 USER32_DLL wapi::Bool ShowWindow(wapi::HWnd hWnd, int32_t nCmdShow);

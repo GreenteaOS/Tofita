@@ -42,6 +42,7 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 void ___chkstk_ms(){};
 
 #include "util/Math.cpp"
+#include "util/String.cpp"
 
 #include "../devices/cpu/cpu.hpp"
 #include "../devices/cpu/amd64.cpp"

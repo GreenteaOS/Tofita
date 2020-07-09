@@ -76,7 +76,7 @@ wapi::Atom RegisterClassW(const wapi::WindowClass *wc) {
 	return (wapi::Atom)0;
 }
 
-wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const uint16_t *lpClassName, const uint16_t *lpWindowName,
+wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName, const wchar_t *lpWindowName,
 						   uint32_t dwStyle, int32_t x, int32_t y, int32_t nWidth, int32_t nHeight,
 						   wapi::HWnd hWndParent, wapi::HMenu hMenu, wapi::HInstance hInstance,
 						   void *lpParam) {
@@ -130,17 +130,21 @@ wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const uint16_t *lpClassName, cons
 	payload.hInstance = hInstance;
 	payload.lpParam = lpParam;
 
+	// Create local window counterpart
+	auto window = (user32::Window *)LocalAlloc(0, sizeof(user32::Window));
+
+	const auto hWnd = (wapi::HWnd)window;
+	payload.hWnd = hWnd;
+
 	// Create native window counterpart
 	uint64_t windowId = tofitaCreateWindowEx(&payload);
 
-	// Create local window counterpart
-	auto window = (user32::Window *)LocalAlloc(0, sizeof(user32::Window));
 	window->windowId = windowId;
 	window->windowIsWindow = user32::windowIsWindow;
 	window->proc = wc->lpfnWndProc;
 
 	tofitaDebugLog(u8"CreateWindowExW done");
-	return (wapi::HWnd)window;
+	return hWnd;
 }
 
 wapi::Bool ShowWindow(wapi::HWnd hWnd, int32_t nCmdShow) {
