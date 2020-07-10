@@ -41,9 +41,9 @@ uint8_t pollPS2Devices() {
 				mouseX -= 4;
 			if (keyboardPressedState[41])
 				haveToQuake = !haveToQuake;
-			keyDownHandler = null;
-			if (haveToQuake)
-				keyDownHandler = quakeHandleButtonDown;
+			// keyDownHandler = null;
+			// if (haveToQuake)
+			//	keyDownHandler = quakeHandleButtonDown;
 			haveToRender = 1;
 		} else if (getBit(poll, 5) == 1) {
 			handleMouse();
