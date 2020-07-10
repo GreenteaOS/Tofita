@@ -328,17 +328,6 @@ function guiThread() {
 
 	while (true) {
 		// Poll PS/2 devices
-
-		// TODO move this to DWM
-		if (mouseX > _framebuffer->width)
-			mouseX = _framebuffer->width;
-		if (mouseY > _framebuffer->height)
-			mouseY = _framebuffer->height;
-		if (mouseY < 0)
-			mouseY = 0;
-		if (mouseX < 0)
-			mouseX = 0;
-
 		if (haveToRender == false) {
 			switchToUserProcess();
 		}

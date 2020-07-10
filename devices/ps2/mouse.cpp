@@ -17,8 +17,14 @@
 
 uint8_t mouseCycle = 0;
 int8_t mouseByte[3];
+
+// Note: those are controlled by DWM
 int16_t mouseX = 256;
 int16_t mouseY = 256;
+
+// Note: those are controlled by driver
+int16_t mouseXdiff = 0;
+int16_t mouseYdiff = 0;
 
 function handleMouseDown(uint8_t key);
 function handleMouseUp(uint8_t key);
@@ -47,14 +53,8 @@ function handleMouse() {
 		int8_t mouseXd = mouseByte[1];
 		int8_t mouseYd = mouseByte[2];
 		mouseCycle = 0;
-		mouseX += mouseXd;
-		mouseY -= mouseYd;
-
-		// TODO DWM
-		if (mouseY < 0)
-			mouseY = 0;
-		if (mouseX < 0)
-			mouseX = 0;
+		mouseXdiff += mouseXd;
+		mouseYdiff -= mouseYd;
 
 		if (getBit(mouseByte[0], 0) != 0)
 			serialPrintln(u8"[mouse] left button is down");
@@ -72,10 +72,8 @@ function handleMouse() {
 	};
 	}
 
-	// TODO DWM
-	haveToRender = 1;
-
 	// EOI
+	// Disable those lines if polling is used
 	writePort(0xA0, 0x20);
 	writePort(0x20, 0x20);
 }
