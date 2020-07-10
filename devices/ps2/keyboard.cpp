@@ -15,7 +15,6 @@
 
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
-function handleKeyDown(uint8_t key);
 uint8_t keyboardPressedState[128] = {0};
 uint8_t keyboardMap[128] = {
 	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
@@ -97,7 +96,10 @@ function handleKeyboard() {
 			serialPrint(buffer);
 			serialPrintf(u8" down] %d keycode\n", keycode);
 			keyboardPressedState[keycode] = 1;
-			handleKeyDown(keycode);
+			if (haveToQuake)
+				quakeHandleButtonDown(keycode);
+			else {
+			}
 		} else {
 			keycode = keycode - 128;
 			char8_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
@@ -115,14 +117,12 @@ function handleKeyboard() {
 		//}
 	}
 
-	// TODO DWM
+	// Note: Quake terminal has higher priority than kernel itself
 	if (keyboardPressedState[41])
 		haveToQuake = !haveToQuake;
-	keyDownHandler = null;
-	if (haveToQuake)
-		keyDownHandler = quakeHandleButtonDown;
 	haveToRender = 1;
 
 	// EOI
+	// Disable this line if polling is used
 	writePort(PIC1_COMMAND, PIC_EOI);
 }

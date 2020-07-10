@@ -88,11 +88,6 @@ void ___chkstk_ms(){};
 #include "gui/dwm.cpp"
 #include "syscalls/user32/userCall.cpp"
 
-function handleKeyDown(uint8_t key) {
-	if (keyDownHandler)
-		keyDownHandler(key);
-}
-
 const KernelParams *paramsCache = null;
 function kernelInit(const KernelParams *params) {
 	serialPrintln(u8"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
