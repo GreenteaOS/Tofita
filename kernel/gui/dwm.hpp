@@ -56,4 +56,6 @@ OverlappedWindow *OverlappedWindow_create(uint64_t pid);
 OverlappedWindow *OverlappedWindow_find(uint64_t pid, uint64_t windowId);
 function OverlappedWindow_detach(uint64_t windowId);
 function OverlappedWindow_attach(uint64_t windowId);
+function handleMouseActivity();
+function handleKeyboardActivity();
 } // namespace dwm

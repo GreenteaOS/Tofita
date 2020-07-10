@@ -100,4 +100,36 @@ function OverlappedWindow_attach(uint64_t windowId) {
 	if (windowsList[windowId].visible)
 		firstResponder = windowId;
 }
+
+function handleMouseActivity() {
+	var mouseXtemp = mouseX;
+	var mouseYtemp = mouseY;
+
+	mouseXtemp += mouseXdiff;
+	mouseXdiff = 0;
+
+	mouseYtemp += mouseYdiff;
+	mouseYdiff = 0;
+
+	if (mouseYtemp < 0)
+		mouseYtemp = 0;
+	if (mouseXtemp < 0)
+		mouseXtemp = 0;
+
+	if (mouseXtemp > _framebuffer->width)
+		mouseXtemp = _framebuffer->width;
+	if (mouseYtemp > _framebuffer->height)
+		mouseYtemp = _framebuffer->height;
+
+	// Atomically update
+	if (mouseX != mouseXtemp || mouseY != mouseYtemp)
+		haveToRender = 1;
+
+	mouseX = mouseXtemp;
+	mouseY = mouseYtemp;
+}
+
+function handleKeyboardActivity() {
+	// TODO
+}
 } // namespace dwm
