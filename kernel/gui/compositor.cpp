@@ -169,7 +169,8 @@ var dragX = 255;
 var dragY = 255;
 var drag = false;
 
-function handleMouseDown(uint8_t key) {
+// TODO
+function handleMouseDownDesktop(uint8_t key) {
 	if (drag == false) {
 		dragX = mouseX;
 		dragY = mouseY;
@@ -177,7 +178,8 @@ function handleMouseDown(uint8_t key) {
 	drag = true;
 }
 
-function handleMouseUp(uint8_t key) {
+// TODO
+function handleMouseUpDesktop(uint8_t key) {
 	drag = false;
 }
 
@@ -210,6 +212,10 @@ function compositeWindows() {
 }
 
 function composite() {
+	// TODO not best place for this
+	dwm::handleMouseActivity();
+	dwm::handleKeyboardActivity();
+
 	var _framebuffer = ::_framebuffer; // Faster access
 
 	// Startup animation

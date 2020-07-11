@@ -101,25 +101,67 @@ function OverlappedWindow_attach(uint64_t windowId) {
 		firstResponder = windowId;
 }
 
+function handleMouseMove(int16_t mouseX, int16_t mouseY) {
+	// TODO
+	serialPrintf(u8"[mouse move] %d %d\n", mouseX, mouseY);
+}
+
+function handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
+	// TODO
+	serialPrintf(u8"[mouse down] %d %d\n", mouseX, mouseY);
+}
+
+function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
+	// TODO
+	serialPrintf(u8"[mouse up] %d %d\n", mouseX, mouseY);
+}
+
 function handleMouseActivity() {
+	if (lockMouse) {
+		return;
+	}
+	// Swap buffers
+	mouseActionsUseZeta = !mouseActionsUseZeta;
+
+	volatile MouseAction(*mouseActions)[255] = (!mouseActionsUseZeta) ? &mouseActionsZeta : &mouseActionsGama;
+
+	uint8_t mouseActionsAmount = (!mouseActionsUseZeta) ? mouseActionsZetaAmount : mouseActionsGamaAmount;
+
 	var mouseXtemp = mouseX;
 	var mouseYtemp = mouseY;
 
-	mouseXtemp += mouseXdiff;
-	mouseXdiff = 0;
+	for (uint8_t i = 0; i < mouseActionsAmount; ++i) {
+		let type = mouseActions[i]->type;
 
-	mouseYtemp += mouseYdiff;
-	mouseYdiff = 0;
+		if (type == MouseActionType::Moved) {
 
-	if (mouseYtemp < 0)
-		mouseYtemp = 0;
-	if (mouseXtemp < 0)
-		mouseXtemp = 0;
+			mouseXtemp += mouseActions[i]->mouseXdiff;
+			mouseYtemp += mouseActions[i]->mouseYdiff;
 
-	if (mouseXtemp > _framebuffer->width)
-		mouseXtemp = _framebuffer->width;
-	if (mouseYtemp > _framebuffer->height)
-		mouseYtemp = _framebuffer->height;
+			if (mouseYtemp < 0)
+				mouseYtemp = 0;
+			if (mouseXtemp < 0)
+				mouseXtemp = 0;
+
+			if (mouseXtemp > _framebuffer->width)
+				mouseXtemp = _framebuffer->width;
+			if (mouseYtemp > _framebuffer->height)
+				mouseYtemp = _framebuffer->height;
+		} else if (type == MouseActionType::LeftUp || type == MouseActionType::RightUp ||
+				   type == MouseActionType::MiddleUp) {
+			handleMouseUp(type, mouseXtemp, mouseYtemp);
+		} else if (type == MouseActionType::LeftDown || type == MouseActionType::RightDown ||
+				   type == MouseActionType::MiddleDown) {
+			handleMouseDown(type, mouseXtemp, mouseYtemp);
+		}
+
+		mouseActions[i]->type = MouseActionType::Noop;
+	}
+
+	if (!mouseActionsUseZeta)
+		mouseActionsZetaAmount = 0;
+	if (mouseActionsUseZeta)
+		mouseActionsGamaAmount = 0;
 
 	// Atomically update
 	if (mouseX != mouseXtemp || mouseY != mouseYtemp)
