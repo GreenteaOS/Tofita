@@ -42,7 +42,7 @@ function setFramebuffer(const Framebuffer *framebuffer) {
 
 function __attribute__((fastcall)) blendPixel(int16_t x, int16_t y, Pixel32 pixel) {
 	var _framebuffer = ::_framebuffer; // Faster access
-	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1))
+	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1) || (x < 0) || (y < 0))
 		return;
 	Pixel32 p = _pixels[y * _framebuffer->width + x];
 
@@ -53,9 +53,9 @@ function __attribute__((fastcall)) blendPixel(int16_t x, int16_t y, Pixel32 pixe
 	_pixels[y * _framebuffer->width + x] = p;
 }
 
-function __attribute__((fastcall)) setPixel(uint16_t x, uint16_t y, Pixel32 pixel) {
+function __attribute__((fastcall)) setPixel(int16_t x, int16_t y, Pixel32 pixel) {
 	var _framebuffer = ::_framebuffer; // Faster access
-	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1))
+	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1) || (x < 0) || (y < 0))
 		return;
 	_pixels[y * _framebuffer->width + x] = pixel;
 }
