@@ -19,6 +19,7 @@
 #include "../devices/screen/framebuffer.hpp"
 #include "gui/dwm.hpp"
 #include "syscalls/syscalls.hpp"
+#include "formats/lnk/lnk.hpp"
 #include "../devices/cpu/pages.hpp"
 #include "../devices/cpu/interrupts.hpp"
 #include "../devices/cpu/seh.hpp"
