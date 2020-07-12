@@ -42,6 +42,7 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 
 		if (window != null) {
 			window->visible = true;
+			dwm::OverlappedWindow_attach(windowId);
 		}
 
 		process->schedulable = true;
@@ -96,10 +97,12 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 		if (window->fbZeta != null) {
 			window->fbCurrentZeta = !window->fbCurrentZeta;
 			if (window->fbCurrentZeta) {
+				// TODO copy pixels from previous
 				fb->pixels = (nj::Pixel32 *)&window->fbZeta->pixels;
 				fb->width = window->fbZeta->width;
 				fb->height = window->fbZeta->height;
 			} else {
+				// TODO copy pixels from previous
 				fb->pixels = (nj::Pixel32 *)&window->fbGama->pixels;
 				fb->width = window->fbGama->width;
 				fb->height = window->fbGama->height;
@@ -133,7 +136,7 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 			window->fbZeta = allocateBitmap(width, height);
 			window->fbGama = allocateBitmap(width, height);
 
-			memset((void *)window->fbZeta->pixels, 0x66, bytes);
+			memset((void *)window->fbZeta->pixels, 0x33, bytes);
 			memset((void *)window->fbGama->pixels, 0x33, bytes);
 
 		}

@@ -70,6 +70,8 @@ function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w,
 
 	drawVibrancedRectangle(x + 1, y + 1, w - 1, 32, true);
 
+	// TODO " (Not responding)"
+	// TODO crop text to fit size, i.e. drawText to take optional argument
 	drawText(title, x + 8 + 4, y + 9 + 3, color);
 
 	// Frame hairline
@@ -81,32 +83,37 @@ function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w,
 	drawRectangleOutline(color, x, y, w, h);
 
 	// Minimize
-	color.rgba.r = color.rgba.g = color.rgba.b = 229;
-	color.rgba.a = 128;
-	drawRectangleWithAlpha(color, x + w - (45 + 1) * 3, y + 1, 45, 29);
+	// color.rgba.r = color.rgba.g = color.rgba.b = 229;
+	// color.rgba.a = 128;
+	// rectangle(x + w - (45 + 1) * 3, y + 1, 45, 29, 229, 229, 229);
+	// drawRectangleWithAlpha(color, x + w - (45 + 1) * 3, y + 1, 45, 29);
 
-	color.rgba.r = color.rgba.g = color.rgba.b = 0;
-	drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4, y + 20, 8, 1);
+	// color.rgba.r = color.rgba.g = color.rgba.b = 0;
+	// rectangle(x + w - (45 + 1) * 3 + 23 - 4, y + 20, 8, 1, 0, 0, 0);
+	color.color = 0xFFFFB911;
+	drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4, y + 19, 8, 1);
 
 	// Maximize
-	color.rgba.r = color.rgba.g = color.rgba.b = 229;
-	color.rgba.a = 128;
-	drawRectangleWithAlpha(color, x + w - (45 + 1) * 2, y + 1, 45, 29);
+	// color.rgba.r = color.rgba.g = color.rgba.b = 229;
+	// color.rgba.a = 128;
+	// drawRectangleWithAlpha(color, x + w - (45 + 1) * 2, y + 1, 45, 29);
 
-	color.rgba.r = color.rgba.g = color.rgba.b = 0;
+	// color.rgba.r = color.rgba.g = color.rgba.b = 0;
+	color.color = 0xFF59B842;
 	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 - 4, 9, 1);
 	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 + 5, 10, 1);
 	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 - 4, 1, 9);
 	drawRectangle(color, x + w - (45 + 1) * 2 + 23 + 5, y + 14 - 4, 1, 9);
 
 	// Close
-	color.rgba.b = 232;
-	color.rgba.g = 17;
-	color.rgba.r = 35;
-	color.rgba.a = 128;
-	drawRectangleWithAlpha(color, x + w - (45 + 1) * 1, y + 1, 45, 29);
+	// color.rgba.b = 232;
+	// color.rgba.g = 17;
+	// color.rgba.r = 35;
+	// color.rgba.a = 128;
+	// drawRectangleWithAlpha(color, x + w - (45 + 1) * 1, y + 1, 45, 29);
 
-	color.rgba.r = color.rgba.g = color.rgba.b = 255;
+	// color.rgba.r = color.rgba.g = color.rgba.b = 255;
+	color.color = 0xFFFF5557;
 	line45smooth(color, x + w - (45 + 1) * 1 + 23 - 6, y + 10, 10, 1);
 	line45smooth(color, x + w - 18, y + 10, 10, -1);
 

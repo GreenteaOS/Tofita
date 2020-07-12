@@ -16,7 +16,7 @@
 // PS/2 Mouse
 
 volatile uint8_t mouseCycle = 0;
-volatile uint8_t mouseByte[3];
+volatile uint8_t mouseByte[3] = {0};
 
 // Note: those are controlled by DWM
 volatile int16_t mouseX = 256;

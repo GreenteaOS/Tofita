@@ -109,6 +109,8 @@ Cursor *loadCursor(const RamDiskAsset *asset) {
 }
 
 function drawCursor(const Cursor *cur, uint16_t x, uint16_t y) {
+	// TODO mirror cursor in this code if global setting for cursors mirroring is set
+	// to affect all apps
 	Pixel32 pixel;
 	for (uint8_t yi = 0; yi < cur->height; yi++)
 		for (uint8_t xi = 0; xi < cur->width; xi++) {
