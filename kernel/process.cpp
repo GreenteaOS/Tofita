@@ -140,6 +140,13 @@ function Process_destroy(volatile Process *process) {
 	// TODO deallocate stuff
 	process->present = false;
 	process->messages = null;
+
+	var window = dwm::OverlappedWindow_findAnyProcessWindow(process->pid);
+
+	while (window != null) {
+		dwm::OverlappedWindow_destroy(window->windowId);
+		window = dwm::OverlappedWindow_findAnyProcessWindow(process->pid);
+	}
 }
 
 } // namespace process
