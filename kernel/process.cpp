@@ -85,8 +85,8 @@ bool postMessage(volatile Process *process, PostMessagePayload *payload) {
 	message->lParam = payload->lParam;
 
 	message->time = uptimeMilliseconds; // TODO
-	message->pt.x = mouseX;				// TODO
-	message->pt.y = mouseY;				// TODO
+	message->pt.x = dwm::mouseX;		// TODO
+	message->pt.y = dwm::mouseY;		// TODO
 	message->lPrivate = 0;
 
 	process->messagesUsed++;
