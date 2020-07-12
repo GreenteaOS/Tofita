@@ -52,6 +52,11 @@ OverlappedWindow windowsList[windowsLimit];
 uint64_t rootWindow = 0;
 uint64_t topmostWindow = 0;
 
+bool mouseDragCapturedWindow = false;
+uint64_t mouseDragWindow = 0;
+int16_t mouseDragLastX = 0;
+int16_t mouseDragLastY = 0;
+
 OverlappedWindow *OverlappedWindow_create(uint64_t pid);
 OverlappedWindow *OverlappedWindow_find(uint64_t pid, uint64_t windowId);
 function OverlappedWindow_detach(uint64_t windowId);

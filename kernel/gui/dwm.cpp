@@ -102,8 +102,20 @@ function OverlappedWindow_attach(uint64_t windowId) {
 }
 
 function handleMouseMove(int16_t mouseX, int16_t mouseY) {
-	// TODO
-	serialPrintf(u8"[mouse move] %d %d\n", mouseX, mouseY);
+	var window = &windowsList[mouseDragWindow];
+
+	if (mouseDragCapturedWindow && window->present && window->visible) {
+		let diffX = mouseX - mouseDragLastX;
+		let diffY = mouseY - mouseDragLastY;
+
+		window->x += diffX;
+		window->y += diffY;
+		if (window->y < 0)
+			window->y = 0;
+
+		mouseDragLastX = mouseX;
+		mouseDragLastY = mouseY;
+	}
 }
 
 function selectMouseNextResponder(int16_t mouseX, int16_t mouseY) {
@@ -133,15 +145,42 @@ function selectMouseNextResponder(int16_t mouseX, int16_t mouseY) {
 	firstResponder = 0;
 }
 
+bool isDraggableFrame(int16_t mouseX, int16_t mouseY, uint64_t windowId) {
+	if (windowId == 0)
+		return false;
+
+	var window = &windowsList[windowId];
+
+	let y = window->y;
+	let x = window->x;
+
+	let frameHeight = 30 + 3;
+	const uint16_t frameButtonsWidth = 137;
+
+	let xx = x + window->width - frameButtonsWidth;
+	let yy = y + frameHeight;
+
+	if (mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy) {
+		return true;
+	}
+
+	return false;
+}
+
 function handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
-	// TODO
-	serialPrintf(u8"[mouse down] %d %d\n", mouseX, mouseY);
 	selectMouseNextResponder(mouseX, mouseY);
+
+	if (type == MouseActionType::LeftDown && isDraggableFrame(mouseX, mouseY, firstResponder)) {
+		mouseDragCapturedWindow = true;
+		mouseDragWindow = firstResponder;
+		mouseDragLastX = mouseX;
+		mouseDragLastY = mouseY;
+	}
 }
 
 function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
-	// TODO
-	serialPrintf(u8"[mouse up] %d %d\n", mouseX, mouseY);
+	if (type == MouseActionType::LeftUp)
+		mouseDragCapturedWindow = false;
 }
 
 function handleMouseActivity() {
@@ -175,6 +214,8 @@ function handleMouseActivity() {
 				mouseXtemp = _framebuffer->width;
 			if (mouseYtemp > _framebuffer->height)
 				mouseYtemp = _framebuffer->height;
+
+			handleMouseMove(mouseXtemp, mouseYtemp);
 		} else if (type == MouseActionType::LeftUp || type == MouseActionType::RightUp ||
 				   type == MouseActionType::MiddleUp) {
 			handleMouseUp(type, mouseXtemp, mouseYtemp);
