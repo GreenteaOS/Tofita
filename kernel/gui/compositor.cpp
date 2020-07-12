@@ -165,24 +165,6 @@ function initializeCompositor() {
 	serialPrintln(u8"[compositor.initializeCompositor] done");
 }
 
-var dragX = 255;
-var dragY = 255;
-var drag = false;
-
-// TODO
-function handleMouseDownDesktop(uint8_t key) {
-	if (drag == false) {
-		dragX = mouseX;
-		dragY = mouseY;
-	}
-	drag = true;
-}
-
-// TODO
-function handleMouseUpDesktop(uint8_t key) {
-	drag = false;
-}
-
 function compositeWindows() {
 	var i = dwm::rootWindow;
 	// Avoid infinite loop
@@ -220,6 +202,9 @@ function composite() {
 	dwm::handleMouseActivity();
 	dwm::handleKeyboardActivity();
 
+	let mouseX = dwm::mouseX;
+	let mouseY = dwm::mouseY;
+
 	var _framebuffer = ::_framebuffer; // Faster access
 
 	// Startup animation
@@ -236,10 +221,6 @@ function composite() {
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 	drawAsciiText(u8"Recycle Bin", 8, 62, color);
 
-	var outlineX = mouseX < dragX ? mouseX : dragX;
-	var outlineY = mouseY < dragY ? mouseY : dragY;
-	var outlineW = mouseX < dragX ? dragX - mouseX : mouseX - dragX;
-	var outlineH = mouseY < dragY ? dragY - mouseY : mouseY - dragY;
 	color.rgba.a = 64;
 	if ((mouseX > 20 && mouseX < (20 + 32) && mouseY > 12 && mouseY < (12 + 60))) {
 		let outlineX = 1;
@@ -249,10 +230,9 @@ function composite() {
 		drawRectangleWithAlpha(color, outlineX, outlineY, outlineW, outlineH);
 		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH);
 	};
-	if (drag) {
-		drawRectangleWithAlpha(color, outlineX, outlineY, outlineW, outlineH);
-		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH);
-	}
+
+	// Desktop below everything
+	desktop::compositeDesktop(mouseX, mouseY);
 
 	// Windows below taskbar
 	compositeWindows();

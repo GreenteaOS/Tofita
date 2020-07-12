@@ -82,6 +82,7 @@ void ___chkstk_ms(){};
 #include "formats/bmp/bmp.cpp"
 #include "formats/lnk/lnk.cpp"
 #include "gui/blur.cpp"
+#include "gui/desktop.cpp"
 #include "gui/quake.cpp"
 #include "gui/text.cpp"
 #include "gui/windows.cpp"
@@ -148,8 +149,8 @@ function kernelInit(const KernelParams *params) {
 		setWallpaper(bmp, Center);
 	}
 
-	mouseX = _framebuffer->width / 2;
-	mouseY = _framebuffer->height / 2;
+	// var sandbox = sandbox::createSandbox();
+	dwm::initDwm();
 
 	// Setup scheduling
 	currentThread = THREAD_INIT;

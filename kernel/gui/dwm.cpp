@@ -127,6 +127,11 @@ function OverlappedWindow_destroy(uint64_t windowId) {
 	window->title = null;
 }
 
+function initDwm() {
+	mouseX = _framebuffer->width / 2;
+	mouseY = _framebuffer->height / 2;
+}
+
 FrameHover getFrameButton(int16_t mouseX, int16_t mouseY, uint64_t windowId) {
 	if (windowId == 0)
 		return FrameHover::Noop;
@@ -250,6 +255,9 @@ function handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 	if (type == MouseActionType::LeftDown && frameHoverState != FrameHover::Noop) {
 		frameHoverWindowDown = true;
 	}
+
+	if (firstResponder == 0)
+		desktop::handleMouseDownDesktop(type, mouseX, mouseY);
 }
 
 function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
@@ -282,6 +290,7 @@ function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 
 	frameHoverWindowDown = false;
 	haveToRender = 1;
+	desktop::handleMouseUpDesktop(type, mouseX, mouseY);
 }
 
 function handleMouseActivity() {

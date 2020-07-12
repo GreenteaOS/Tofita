@@ -18,27 +18,10 @@
 volatile uint8_t mouseCycle = 0;
 volatile uint8_t mouseByte[3] = {0};
 
-// Note: those are controlled by DWM
-volatile int16_t mouseX = 256;
-volatile int16_t mouseY = 256;
-
 // Note: those are controlled by driver
 volatile bool leftDown = false;
 volatile bool rightDown = false;
 volatile bool middleDown = false;
-
-enum class MouseActionType : uint8_t {
-	Noop = 0,
-	LeftDown,
-	LeftUp,
-	RightDown,
-	RightUp,
-	MiddleDown,
-	MiddleUp,
-	// TODO ScrollFromUser,
-	// TODO ScrollToUser,
-	Moved
-};
 
 struct MouseAction {
 	int16_t mouseXdiff;
