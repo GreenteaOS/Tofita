@@ -101,6 +101,33 @@ function OverlappedWindow_attach(uint64_t windowId) {
 		firstResponder = windowId;
 }
 
+FrameHover getFrameButton(int16_t mouseX, int16_t mouseY, uint64_t windowId) {
+	if (windowId == 0)
+		return FrameHover::Noop;
+
+	var window = &windowsList[windowId];
+	const uint16_t frameButtonsWidth = 137;
+
+	let y = window->y;
+	let x = window->x + window->width - frameButtonsWidth;
+
+	let frameHeight = 30 + 3;
+
+	let xx = x + window->width;
+	let yy = y + frameHeight;
+
+	if (mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy) {
+		const uint8_t diff = (mouseX - x) / 46;
+		if (diff == 0)
+			return FrameHover::Min;
+		if (diff == 1)
+			return FrameHover::Max;
+		return FrameHover::Close;
+	}
+
+	return FrameHover::Noop;
+}
+
 function handleMouseMove(int16_t mouseX, int16_t mouseY) {
 	var window = &windowsList[mouseDragWindow];
 
@@ -115,10 +142,15 @@ function handleMouseMove(int16_t mouseX, int16_t mouseY) {
 
 		mouseDragLastX = mouseX;
 		mouseDragLastY = mouseY;
+
+		return;
 	}
+
+	frameHoverWindow = findWindowUnderCursor(mouseX, mouseY);
+	frameHoverState = getFrameButton(mouseX, mouseY, frameHoverWindow);
 }
 
-function selectMouseNextResponder(int16_t mouseX, int16_t mouseY) {
+uint64_t findWindowUnderCursor(int16_t mouseX, int16_t mouseY) {
 	var windowId = topmostWindow;
 
 	do {
@@ -135,14 +167,18 @@ function selectMouseNextResponder(int16_t mouseX, int16_t mouseY) {
 		let yy = y + window->height + frameHeight;
 
 		if (mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy) {
-			firstResponder = windowId;
-			return;
+			return windowId;
 		}
 
 		windowId = window->prevId;
 	} while (windowId != 0);
 
-	firstResponder = 0;
+	return 0;
+}
+
+function selectMouseNextResponder(int16_t mouseX, int16_t mouseY) {
+	// TODO hexa unconditional recursion firstResponder = selectMouseNextResponder(mouseX, mouseY);
+	firstResponder = findWindowUnderCursor(mouseX, mouseY);
 }
 
 bool isDraggableFrame(int16_t mouseX, int16_t mouseY, uint64_t windowId) {
@@ -182,11 +218,17 @@ function handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 		mouseDragLastX = mouseX;
 		mouseDragLastY = mouseY;
 	}
+
+	if (type == MouseActionType::LeftDown && frameHoverState != FrameHover::Noop) {
+		frameHoverWindowDown = true;
+	}
 }
 
 function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 	if (type == MouseActionType::LeftUp)
 		mouseDragCapturedWindow = false;
+
+	frameHoverWindowDown = false;
 }
 
 function handleMouseActivity() {

@@ -190,9 +190,11 @@ function compositeWindows() {
 		let window = &dwm::windowsList[i];
 
 		if (i != 0 && window->present && window->visible) {
+			let hover = dwm::frameHoverWindow == i ? dwm::frameHoverState : dwm::FrameHover::Noop;
 
 			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
-							window->width + 2, window->height + 34, dwm::firstResponder == i);
+							window->width + 2, window->height + 34, dwm::firstResponder == i, hover,
+							dwm::frameHoverWindowDown);
 
 			let frameHeight = 30 + 3;
 			let frameWidth = 1;

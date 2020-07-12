@@ -64,7 +64,8 @@ function drawShadowBox(int16_t x, int16_t y, uint16_t w, uint16_t h) {
 		}
 }
 
-function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w, uint16_t h, bool active) {
+function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w, uint16_t h, bool active,
+						 dwm::FrameHover hover, bool down) {
 	Pixel32 color;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xAA;
 
@@ -91,6 +92,13 @@ function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w,
 	// color.rgba.r = color.rgba.g = color.rgba.b = 0;
 	// rectangle(x + w - (45 + 1) * 3 + 23 - 4, y + 20, 8, 1, 0, 0, 0);
 	color.color = 0xFFFFB911;
+
+	if (hover == dwm::FrameHover::Min) {
+		color.rgba.a = down ? 128 : 230;
+		drawRectangleWithAlpha(color, x + w - (45 + 1) * 3 + 1, y + 1, 44, 29);
+		color.color = 0xFF000000;
+	}
+
 	drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4, y + 19, 8, 1);
 
 	// Maximize
@@ -100,6 +108,13 @@ function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w,
 
 	// color.rgba.r = color.rgba.g = color.rgba.b = 0;
 	color.color = 0xFF59B842;
+
+	if (hover == dwm::FrameHover::Max) {
+		color.rgba.a = down ? 128 : 240;
+		drawRectangleWithAlpha(color, x + w - (45 + 1) * 2 + 1, y + 1, 44, 29);
+		color.color = 0xFF000000;
+	}
+
 	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 - 4, 9, 1);
 	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 + 5, 10, 1);
 	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 - 4, 1, 9);
@@ -114,6 +129,13 @@ function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w,
 
 	// color.rgba.r = color.rgba.g = color.rgba.b = 255;
 	color.color = 0xFFFF5557;
+
+	if (hover == dwm::FrameHover::Close) {
+		color.rgba.a = down ? 128 : 240;
+		drawRectangleWithAlpha(color, x + w - (45 + 1) * 1 + 1, y + 1, 44, 29);
+		color.color = 0xFF000000;
+	}
+
 	line45smooth(color, x + w - (45 + 1) * 1 + 23 - 6, y + 10, 10, 1);
 	line45smooth(color, x + w - 18, y + 10, 10, -1);
 

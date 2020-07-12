@@ -57,10 +57,22 @@ uint64_t mouseDragWindow = 0;
 int16_t mouseDragLastX = 0;
 int16_t mouseDragLastY = 0;
 
+enum class FrameHover : uint8_t {
+	Noop = 0,
+	Min,
+	Max,
+	Close
+};
+
+uint64_t frameHoverWindow = 0;
+bool frameHoverWindowDown = false;
+FrameHover frameHoverState = FrameHover::Noop;
+
 OverlappedWindow *OverlappedWindow_create(uint64_t pid);
 OverlappedWindow *OverlappedWindow_find(uint64_t pid, uint64_t windowId);
 function OverlappedWindow_detach(uint64_t windowId);
 function OverlappedWindow_attach(uint64_t windowId);
 function handleMouseActivity();
 function handleKeyboardActivity();
+uint64_t findWindowUnderCursor(int16_t mouseX, int16_t mouseY);
 } // namespace dwm
