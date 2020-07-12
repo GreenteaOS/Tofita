@@ -170,6 +170,12 @@ bool isDraggableFrame(int16_t mouseX, int16_t mouseY, uint64_t windowId) {
 function handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 	selectMouseNextResponder(mouseX, mouseY);
 
+	if (firstResponder != 0 && firstResponder != topmostWindow) {
+		let id = firstResponder;
+		dwm::OverlappedWindow_detach(id);
+		dwm::OverlappedWindow_attach(id);
+	}
+
 	if (type == MouseActionType::LeftDown && isDraggableFrame(mouseX, mouseY, firstResponder)) {
 		mouseDragCapturedWindow = true;
 		mouseDragWindow = firstResponder;
