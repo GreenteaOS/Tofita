@@ -80,6 +80,7 @@ void ___chkstk_ms(){};
 #include "formats/cur/cur.cpp"
 #include "formats/ico/ico.cpp"
 #include "formats/bmp/bmp.cpp"
+#include "formats/lnk/lnk.cpp"
 #include "gui/blur.cpp"
 #include "gui/quake.cpp"
 #include "gui/text.cpp"
