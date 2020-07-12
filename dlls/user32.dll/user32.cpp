@@ -243,13 +243,36 @@ wapi::HDc BeginPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps) {
 		return nullptr;
 	// We do this every time, cause window may be resized
 	njraaGetOrCreateWindowFramebuffer(window->windowId, &window->fb);
+	ps->rcPaint.left = 0;
+	ps->rcPaint.top = 0;
+	ps->rcPaint.right = window->fb.width;
+	ps->rcPaint.bottom = window->fb.height;
 	tofitaDebugLog(u8"BeginPaint done");
 	return (wapi::HDc)&window->fb; // TODO
 }
 
+void __attribute__((fastcall)) setPixel(nj::WindowFramebuffer *fb, int16_t x, int16_t y, nj::Pixel32 pixel) {
+	if ((x < 0) || (y < 0))
+		return;
+	if ((x > fb->width - 1) || (y > fb->height - 1))
+		return;
+	fb->pixels[y * fb->width + x] = pixel;
+}
+
 int32_t FillRect(wapi::HDc dc, const wapi::Rect *lprc, wapi::HBrush brush) {
 	tofitaDebugLog(u8"FillRect called");
-	// TODO
+
+	auto fb = (nj::WindowFramebuffer *)dc;
+
+	nj::Pixel32 color;
+	color.color = 0xFFAA0000;
+
+	for (int16_t y = lprc->top; y < lprc->bottom; y++) {
+		for (int16_t x = lprc->left; x < lprc->right; x++) {
+			setPixel(fb, x, y, color);
+		}
+	}
+
 	tofitaDebugLog(u8"FillRect done");
 	return 1;
 }

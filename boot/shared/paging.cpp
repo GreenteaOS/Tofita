@@ -108,6 +108,7 @@ static function initializePage(PageEntry *entry, uint64_t address, uint8_t write
 	entry->address = address >> ADDRESS_BITS;
 	entry->present = 1;
 	entry->writeAllowed = (writeAllowed == 1) ? 1 : 0;
+	entry->accessibleByAll = 1; // TODO
 }
 
 static function initializePageHuge(PageEntry *entry, uint64_t address) {
@@ -115,6 +116,7 @@ static function initializePageHuge(PageEntry *entry, uint64_t address) {
 	entry->present = 1;
 	entry->writeAllowed = 1;
 	entry->largePage = 1;
+	entry->accessibleByAll = 1; // TODO
 }
 
 static void *getPage(PageEntry *table, uint64_t entryId, uint8_t writeAllowed) {

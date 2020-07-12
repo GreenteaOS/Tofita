@@ -96,15 +96,19 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 		if (window == null)
 			return false;
 
+		let width = (uint32_t)window->width;
+		let height = (uint32_t)window->height;
+		let bytes = width * height * sizeof(Pixel32);
+
 		if (window->fbZeta != null) {
 			window->fbCurrentZeta = !window->fbCurrentZeta;
 			if (window->fbCurrentZeta) {
-				// TODO copy pixels from previous
+				tmemcpy((void *)&window->fbZeta->pixels, (const void *)&window->fbGama->pixels, bytes);
 				fb->pixels = (nj::Pixel32 *)&window->fbZeta->pixels;
 				fb->width = window->fbZeta->width;
 				fb->height = window->fbZeta->height;
 			} else {
-				// TODO copy pixels from previous
+				tmemcpy((void *)&window->fbGama->pixels, (const void *)&window->fbZeta->pixels, bytes);
 				fb->pixels = (nj::Pixel32 *)&window->fbGama->pixels;
 				fb->width = window->fbGama->width;
 				fb->height = window->fbGama->height;
