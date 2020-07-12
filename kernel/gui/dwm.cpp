@@ -45,6 +45,7 @@ OverlappedWindow *OverlappedWindow_create(uint64_t pid) {
 	window->fbGama = null;
 	window->fbCurrentZeta = true;
 	window->title = null;
+	window->hWnd = null;
 	window->prevId = 0;
 	window->nextId = 0;
 	return window;
@@ -58,6 +59,19 @@ OverlappedWindow *OverlappedWindow_find(uint64_t pid, uint64_t windowId) {
 			return null;
 		var window = &windowsList[index];
 		if (window->present == true && window->pid == pid && window->windowId == windowId)
+			return window;
+	}
+	return null;
+}
+
+OverlappedWindow *OverlappedWindow_findAnyProcessWindow(uint64_t pid) {
+	uint64_t index = 0;
+	while (index < windowsLimit - 1) {
+		index++;
+		if (index == windowsLimit)
+			return null;
+		var window = &windowsList[index];
+		if (window->present == true && window->pid == pid)
 			return window;
 	}
 	return null;
@@ -99,6 +113,18 @@ function OverlappedWindow_attach(uint64_t windowId) {
 
 	if (windowsList[windowId].visible)
 		firstResponder = windowId;
+}
+
+function OverlappedWindow_destroy(uint64_t windowId) {
+	var window = &windowsList[windowId];
+	OverlappedWindow_detach(windowId);
+
+	// TODO deallocate
+	window->present = false;
+	window->visible = false;
+	window->fbZeta = null;
+	window->fbGama = null;
+	window->title = null;
 }
 
 FrameHover getFrameButton(int16_t mouseX, int16_t mouseY, uint64_t windowId) {
@@ -146,8 +172,10 @@ function handleMouseMove(int16_t mouseX, int16_t mouseY) {
 		return;
 	}
 
-	frameHoverWindow = findWindowUnderCursor(mouseX, mouseY);
-	frameHoverState = getFrameButton(mouseX, mouseY, frameHoverWindow);
+	if (!frameHoverWindowDown) {
+		frameHoverWindow = findWindowUnderCursor(mouseX, mouseY);
+		frameHoverState = getFrameButton(mouseX, mouseY, frameHoverWindow);
+	}
 }
 
 uint64_t findWindowUnderCursor(int16_t mouseX, int16_t mouseY) {
@@ -228,7 +256,32 @@ function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 	if (type == MouseActionType::LeftUp)
 		mouseDragCapturedWindow = false;
 
+	if (frameHoverWindowDown) {
+		frameHoverWindow = findWindowUnderCursor(mouseX, mouseY);
+		let hover = getFrameButton(mouseX, mouseY, frameHoverWindow);
+		var window = &windowsList[frameHoverWindow];
+
+		if (hover == frameHoverState && window->present) {
+			if (frameHoverState == FrameHover::Min) {}
+			if (frameHoverState == FrameHover::Max) {}
+			if (frameHoverState == FrameHover::Close) {
+				PostMessagePayload payload;
+
+				payload.hWnd = window->hWnd;
+				payload.msg = wapi::Message::WM_CLOSE;
+				payload.wParam = null;
+				payload.lParam = null;
+
+				volatile process::Process *process = &process::processes[window->pid];
+				process::postMessage(process, &payload);
+			}
+		}
+
+		frameHoverState = hover;
+	}
+
 	frameHoverWindowDown = false;
+	haveToRender = 1;
 }
 
 function handleMouseActivity() {
@@ -240,7 +293,8 @@ function handleMouseActivity() {
 
 	volatile MouseAction(*mouseActions)[255] = (!mouseActionsUseZeta) ? &mouseActionsZeta : &mouseActionsGama;
 
-	uint8_t mouseActionsAmount = (!mouseActionsUseZeta) ? mouseActionsZetaAmount : mouseActionsGamaAmount;
+	const uint8_t mouseActionsAmount =
+		(!mouseActionsUseZeta) ? mouseActionsZetaAmount : mouseActionsGamaAmount;
 
 	var mouseXtemp = mouseX;
 	var mouseYtemp = mouseY;

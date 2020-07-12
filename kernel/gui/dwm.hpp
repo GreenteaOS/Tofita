@@ -27,6 +27,7 @@ struct OverlappedWindow {
 	uint64_t windowId;
 	uint64_t nextId;
 	uint64_t prevId;
+	wapi::HWnd hWnd;
 
 	bool visible;
 	const wchar_t *title;
@@ -69,9 +70,11 @@ bool frameHoverWindowDown = false;
 FrameHover frameHoverState = FrameHover::Noop;
 
 OverlappedWindow *OverlappedWindow_create(uint64_t pid);
+OverlappedWindow *OverlappedWindow_findAnyProcessWindow(uint64_t pid);
 OverlappedWindow *OverlappedWindow_find(uint64_t pid, uint64_t windowId);
 function OverlappedWindow_detach(uint64_t windowId);
 function OverlappedWindow_attach(uint64_t windowId);
+function OverlappedWindow_destroy(uint64_t windowId);
 function handleMouseActivity();
 function handleKeyboardActivity();
 uint64_t findWindowUnderCursor(int16_t mouseX, int16_t mouseY);

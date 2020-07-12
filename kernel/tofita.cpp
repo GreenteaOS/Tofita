@@ -270,7 +270,8 @@ function kernelThread() {
 						pml4kernelThread = process::processes[0].pml4;
 						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 
-						// TODO deallocate process
+						// Deallocate process
+						process::Process_destroy(process);
 					} else {
 						frame->raxReturn = 0; // Must return at least something
 						// Note ^ some code in syscall handlers may *read* this value
