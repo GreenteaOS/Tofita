@@ -189,19 +189,21 @@ function compositeWindows() {
 	for (uint16_t loop = 0; loop < dwm::windowsLimit; ++loop) {
 		let window = &dwm::windowsList[i];
 
-		if (i != 0 && window->present) {
-			if (!window->visible)
-				continue;
+		if (i != 0 && window->present && window->visible) {
 
 			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
-							window->width + 2, window->height + 34);
+							window->width + 2, window->height + 34, dwm::firstResponder == i);
+
+			let frameHeight = 30 + 3;
+			let frameWidth = 1;
 
 			if (window->fbZeta != null && window->fbGama != null) {
-				let frameHeight = 30 + 3;
-				let frameWidth = 1;
 
 				drawBitmap32(window->fbCurrentZeta ? window->fbZeta : window->fbGama, window->x + frameWidth,
 							 window->y + frameHeight);
+			} else {
+				drawVibrancedRectangle(window->x + frameWidth, window->y + frameHeight, window->width,
+									   window->height, true);
 			}
 		}
 

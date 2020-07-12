@@ -49,6 +49,10 @@ struct Process {
 	volatile TofitaSyscalls volatile syscallToHandle; // = Noop if no actions required
 													  // TODO do this on per-thread basis
 
+	// TODO separate syscall arguments, cause they differ in 32-bit
+	// TODO syscall *optional* return value? not every syscall does
+	// oh probably
+
 	// Ring buffer
 	wapi::Msg *messages;
 	uint64_t messagesUsed;

@@ -106,9 +106,37 @@ function handleMouseMove(int16_t mouseX, int16_t mouseY) {
 	serialPrintf(u8"[mouse move] %d %d\n", mouseX, mouseY);
 }
 
+function selectMouseNextResponder(int16_t mouseX, int16_t mouseY) {
+	var windowId = topmostWindow;
+
+	do {
+		var window = &windowsList[windowId];
+
+		// TODO depend on style
+		let frameHeight = 30 + 3;
+		let frameWidth = 1;
+
+		let x = window->x - 1;
+		let y = window->y - 1;
+
+		let xx = x + window->width + frameWidth;
+		let yy = y + window->height + frameHeight;
+
+		if (mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy) {
+			firstResponder = windowId;
+			return;
+		}
+
+		windowId = window->prevId;
+	} while (windowId != 0);
+
+	firstResponder = 0;
+}
+
 function handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 	// TODO
 	serialPrintf(u8"[mouse down] %d %d\n", mouseX, mouseY);
+	selectMouseNextResponder(mouseX, mouseY);
 }
 
 function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {

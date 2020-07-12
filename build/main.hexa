@@ -86,7 +86,7 @@ for (task in tasks) {
 						'-m64 -target x86_64-pc-windows-gnu -nostdlib -nodefaultlibs -nostartfiles ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fno-pic -mcmodel=large ',
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w -Wimplicit-function-declaration ',
-						'-O2 -x c++ -std=c++2a -c kernel/tofita.cpp -o ',
+						'-Ofast -x c++ -std=c++2a -c kernel/tofita.cpp -o ',
 						config.tempFolder + '/tofita/tofita.obj '
 					].join(''), { stdio: 'inherit' }
 				)
