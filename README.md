@@ -46,7 +46,7 @@ Greentea OS is aimed to run `.exe` files natively, and to provide full operating
 - 1 GB RAM
 - Motherboard with UEFI, SATA (AHCI) or NVMe, PCIe and USB 2.0+
 - Multicore modern 64-bit CPU (most AMD and Intel CPUs from 2009 and newer)
-- [Read more](https://greenteaos.github.io/Tofita/wiki/cpus.html)
+- [Read more](https://greenteaos.github.io/wiki/cpus.html)
 
 [![Give a star](docs/star.png?raw=true)
 Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
