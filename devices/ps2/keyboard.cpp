@@ -89,12 +89,12 @@ function handleKeyboard() {
 		}
 
 		if (keycode < 128) {
-			char8_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
+			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0)
 				buffer[0] = '?';
-			serialPrint(u8"[keyboard] [");
+			serialPrint(L"[keyboard] [");
 			serialPrint(buffer);
-			serialPrintf(u8" down] %d keycode\n", keycode);
+			serialPrintf(L" down] %d keycode\n", keycode);
 			keyboardPressedState[keycode] = 1;
 			if (haveToQuake)
 				quakeHandleButtonDown(keycode);
@@ -102,12 +102,12 @@ function handleKeyboard() {
 			}
 		} else {
 			keycode = keycode - 128;
-			char8_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
+			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0)
 				buffer[0] = '?';
-			serialPrint(u8"[keyboard] [");
+			serialPrint(L"[keyboard] [");
 			serialPrint(buffer);
-			serialPrintf(u8" up] %d keycode\n", keycode + 128);
+			serialPrintf(L" up] %d keycode\n", keycode + 128);
 			keyboardPressedState[keycode] = 0;
 		}
 
