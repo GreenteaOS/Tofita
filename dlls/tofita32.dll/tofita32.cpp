@@ -62,7 +62,10 @@ uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload) {
 }
 
 void tofitaShowWindow(uint64_t windowId, int32_t nCmdShow) {
-	tofitaFastSystemCall(TofitaSyscalls::ShowWindow, (uint64_t)windowId, nCmdShow);
+	ShowWindowPayload payload;
+	payload.windowId = windowId;
+	payload.nCmdShow = nCmdShow;
+	tofitaFastSystemCall(TofitaSyscalls::ShowWindow, (uint64_t)&payload);
 }
 
 wapi::Bool tofitaGetMessage(GetMessagePayload *payload) {

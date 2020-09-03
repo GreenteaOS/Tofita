@@ -38,8 +38,14 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 	}
 
 	if (syscall == TofitaSyscalls::ShowWindow) {
-		const uint64_t windowId = frame->rdxArg1;
-		const int32_t nCmdShow = frame->r8Arg2;
+		// TODO merge to probeForReadAndConvert os it takes <T> and returns nullable for `if let`
+		if (!probeForReadOkay(frame->rdxArg1, sizeof(ShowWindowPayload)))
+			return false;
+
+		let payload = (ShowWindowPayload *)frame->rdxArg1;
+
+		const uint64_t windowId = payload->windowId;
+		const int32_t nCmdShow = payload->nCmdShow;
 		var window = dwm::OverlappedWindow_find(process->pid, windowId);
 
 		if (window != null) {
