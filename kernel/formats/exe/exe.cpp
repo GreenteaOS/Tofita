@@ -54,9 +54,9 @@ struct Executable {
 	pages::PageEntry *pml4;
 };
 
-auto loadDll(const char8_t *name, PeExportLinkedList *root, Executable *exec) {
+auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	RamDiskAsset asset = getRamDiskAsset(name);
-	serialPrintf(u8"[loadDLL] loaded dll asset '%s' %d bytes at %d\n", name, asset.size, asset.data);
+	serialPrintf(u8"[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data);
 	auto ptr = (uint8_t *)asset.data;
 	auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
 	serialPrintf(u8"[loadDLL] PE header signature 'PE' == '%s'\n", peHeader);
@@ -292,7 +292,7 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	}
 }
 
-auto loadExe(const char8_t *name, PeExportLinkedList *root, Executable *exec) {
+auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	ExeInterim ei;
 
 	ei.pei = loadDll(name, root, exec);
@@ -318,7 +318,7 @@ function resolveExeImports(const ExeInterim ei, PeExportLinkedList *root) {
 	resolveDllImports(ei.pei, root);
 }
 
-function loadExeIntoProcess(const char8_t *file, process::Process *process) {
+function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 	{
 		PeExportLinkedList *root =
 			(PeExportLinkedList *)PhysicalAllocator::allocateBytes(sizeof(PeExportLinkedList));
@@ -331,10 +331,10 @@ function loadExeIntoProcess(const char8_t *file, process::Process *process) {
 		exec.pml4 = process->pml4;
 
 		auto app = loadExe(file, root, &exec);
-		auto ntdll = loadDll(u8"desktop/ntdll.dll", root, &exec);
-		auto kernel32 = loadDll(u8"desktop/kernel32.dll", root, &exec);
-		auto gdi32 = loadDll(u8"desktop/gdi32.dll", root, &exec);
-		auto user32 = loadDll(u8"desktop/user32.dll", root, &exec);
+		auto ntdll = loadDll(L"desktop/ntdll.dll", root, &exec); // TODO proper path!!!
+		auto kernel32 = loadDll(L"desktop/kernel32.dll", root, &exec);
+		auto gdi32 = loadDll(L"desktop/gdi32.dll", root, &exec);
+		auto user32 = loadDll(L"desktop/user32.dll", root, &exec);
 
 		resolveDllImports(ntdll, root);
 		resolveDllImports(kernel32, root);

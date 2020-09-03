@@ -128,7 +128,7 @@ function packAssets(config: Config) {
 			let asset = assetName[i]
 			let path = assetPath[i]
 			let assetSize = fs.statSync(path).size
-			buffer.write(asset, assetInfoOffset, "utf-8")
+			buffer.write(asset, assetInfoOffset, "utf16le")
 			buffer.writeUInt32LE(assetSize, assetInfoOffset + 256)
 
 			let file = fs.readFileSync(path)
