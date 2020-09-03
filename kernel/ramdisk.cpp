@@ -20,7 +20,7 @@ typedef struct {
 } RamDiskInfo;
 
 typedef struct {
-	uint8_t path[256];
+	uint16_t path[128];
 	uint32_t size;
 	uint32_t offsetFromRamDiskFirstByte;
 } RamDiskAssetInfo;
@@ -35,10 +35,11 @@ typedef struct {
 	uint8_t *data;
 } RamDiskAsset;
 
-const RamDiskAsset getRamDiskAsset(const char8_t *path) {
+const RamDiskAsset getRamDiskAsset(const wchar_t *pathToAsset) {
 	RamDiskAsset asset;
 	asset.size = 0;
 	asset.data = 0;
+	const uint16_t *path = (const uint16_t *)pathToAsset;
 
 	const RamDiskInfo *ramDiskInfo = (const RamDiskInfo *)_ramdisk->base;
 
@@ -49,7 +50,7 @@ const RamDiskAsset getRamDiskAsset(const char8_t *path) {
 		const RamDiskAssetInfo *ramDiskAssetInfo = (const RamDiskAssetInfo *)ramDiskAssetInfoPtr;
 		uint8_t found = 1;
 
-		for (uint8_t at = 0; at < 255; at++) {
+		for (uint8_t at = 0; at < 127; at++) {
 			if (ramDiskAssetInfo->path[at] != path[at]) {
 				found = 0;
 				break;
@@ -65,7 +66,7 @@ const RamDiskAsset getRamDiskAsset(const char8_t *path) {
 		}
 	}
 
-	serialPrintf(u8"[ramdisk.getRamDiskAsset] asset '%s' not found in %d assets\n", path,
+	serialPrintf(u8"[ramdisk.getRamDiskAsset] asset '%S' not found in %d assets\n", path,
 				 ramDiskInfo->assetsCount);
 	return asset;
 }

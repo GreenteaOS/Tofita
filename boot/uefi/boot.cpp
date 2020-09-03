@@ -183,7 +183,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
 
-	RamDiskAsset asset = getRamDiskAsset(u8"tofita.gnu");
+	RamDiskAsset asset = getRamDiskAsset(L"tofita.gnu");
 	serialPrintf(u8"[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data);
 
 	const uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
