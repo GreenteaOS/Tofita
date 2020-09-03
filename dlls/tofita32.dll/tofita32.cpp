@@ -51,7 +51,10 @@ void njraaSwapWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb) {
 }
 
 void njraaGetOrCreateWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb) {
-	tofitaFastSystemCall(TofitaSyscalls::GetOrCreateWindowFramebuffer, (uint64_t)windowId, (uint64_t)fb);
+	SwapWindowFramebufferPayload payload;
+	payload.windowId = windowId;
+	payload.fb = fb;
+	tofitaFastSystemCall(TofitaSyscalls::GetOrCreateWindowFramebuffer, (uint64_t)&payload);
 }
 
 uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload) {
