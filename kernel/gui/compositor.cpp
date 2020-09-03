@@ -41,7 +41,7 @@ typedef enum {
 function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 
 	{
-		serialPrintln(u8"[compositor.setWallpaper] upscale wallpaper to screen size");
+		serialPrintln(L"[compositor.setWallpaper] upscale wallpaper to screen size");
 		Bitmap32 *upscale = allocateBitmap(_framebuffer->width, _framebuffer->height);
 
 		float hReciprocal = 1.0f / (float)_framebuffer->height;
@@ -58,7 +58,7 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 		bitmap = wallpaper;
 	}
 
-	serialPrintln(u8"[compositor.setWallpaper] downscale 8x");
+	serialPrintln(L"[compositor.setWallpaper] downscale 8x");
 
 	uint8_t blurScale = 8;
 
@@ -75,11 +75,11 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 			downscale->pixels[y * downscale->width + x].color =
 				bitmap->pixels[bitmap->width * (bitmap->height - 1) + x * blurScale].color;
 
-	serialPrintln(u8"[compositor.setWallpaper] blur");
+	serialPrintln(L"[compositor.setWallpaper] blur");
 
 	Bitmap32 *blur = gaussBlur(downscale, 4);
 
-	serialPrintln(u8"[compositor.setWallpaper] upscale 8x");
+	serialPrintln(L"[compositor.setWallpaper] upscale 8x");
 
 	// Upscale
 	Bitmap32 *upscaleLight = allocateBitmap(bitmap->width, bitmap->height);
@@ -138,31 +138,31 @@ function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t h
 
 Bitmap32 *doublebuffer;
 function initializeCompositor() {
-	serialPrintln(u8"[compositor.initializeCompositor] begin");
+	serialPrintln(L"[compositor.initializeCompositor] begin");
 	doublebuffer = allocateBitmap(_framebuffer->width, _framebuffer->height);
 	_pixels = doublebuffer->pixels;
 
 	Bitmap32 *loadPng32(const RamDiskAsset *asset);
 
-	let a = getRamDiskAsset(u8"root/Windows/Resources/Icons/leaves.png");
+	let a = getRamDiskAsset(L"root/Windows/Resources/Icons/leaves.png");
 	leaves = loadPng32(&a);
 
-	let b = getRamDiskAsset(u8"root/Windows/Resources/Icons/trash-empty48.png");
+	let b = getRamDiskAsset(L"root/Windows/Resources/Icons/trash-empty48.png");
 	trashCan = loadPng32(&b);
 
-	let c = getRamDiskAsset(u8"root/Windows/Resources/Icons/notepad.ico_48x48.png");
+	let c = getRamDiskAsset(L"root/Windows/Resources/Icons/notepad.ico_48x48.png");
 	notepad48 = loadPng32(&c);
 
-	let d = getRamDiskAsset(u8"root/Windows/Resources/Icons/notepad.ico_16x16.png");
+	let d = getRamDiskAsset(L"root/Windows/Resources/Icons/notepad.ico_16x16.png");
 	notepad16 = loadPng32(&d);
 
-	let e = getRamDiskAsset(u8"root/Windows/Resources/Icons/link.png");
+	let e = getRamDiskAsset(L"root/Windows/Resources/Icons/link.png");
 	link = loadPng32(&e);
 
-	let asset = getRamDiskAsset(u8"root/Windows/Cursors/aero_arrow.cur");
+	let asset = getRamDiskAsset(L"root/Windows/Cursors/aero_arrow.cur");
 	cur = cursor::loadCursor(&asset);
 
-	serialPrintln(u8"[compositor.initializeCompositor] done");
+	serialPrintln(L"[compositor.initializeCompositor] done");
 }
 
 function compositeWindows() {

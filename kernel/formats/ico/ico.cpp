@@ -41,7 +41,7 @@ Bitmap32 *loadIcon(const RamDiskAsset *asset, uint8_t widthToExtract) {
 		// 256 pixels. Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means
 		// image height is 256 pixels. Specifies number of colors in the color palette. Should be 0 if the
 		// image does not use a color palette.
-		serialPrintf(u8"[ico] %d image is %dx%d, palette = %d, bits = %d\n", i, buffer[offset],
+		serialPrintf(L"[ico] %d image is %dx%d, palette = %d, bits = %d\n", i, buffer[offset],
 					 buffer[offset + 1], buffer[offset + 2], buffer[offset + 6] + buffer[offset + 7] * 0xFF);
 		if (buffer[offset] == widthToExtract) {
 			// TODO accept by bits per pixel == 32
@@ -62,7 +62,7 @@ Bitmap32 *loadIcon(const RamDiskAsset *asset, uint8_t widthToExtract) {
 		// Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
 	}
 
-	serialPrintf(u8"[ico] The best image is %dx%d\n", buffer[best], buffer[best + 1]);
+	serialPrintf(L"[ico] The best image is %dx%d\n", buffer[best], buffer[best + 1]);
 
 	// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256
 	// pixels.
@@ -93,18 +93,18 @@ Bitmap32 *loadIcon(const RamDiskAsset *asset, uint8_t widthToExtract) {
 		height = width;
 	}
 
-	serialPrintf(u8"[ico] The icon is %dx%d, %d bits %d planes, %d bytes at %d\n", width, height, bits,
-				 planes, imageSize, offset);
+	serialPrintf(L"[ico] The icon is %dx%d, %d bits %d planes, %d bytes at %d\n", width, height, bits, planes,
+				 imageSize, offset);
 	// A PNG file starts with an 8-byte signature (refer to hex editor image on the right):
-	serialPrintf(u8"[ico] Header at %d: %d %d %d %d\n", offset, buffer[offset], buffer[offset + 1],
+	serialPrintf(L"[ico] Header at %d: %d %d %d %d\n", offset, buffer[offset], buffer[offset + 1],
 				 buffer[offset + 2], buffer[offset + 3]);
-	serialPrintf(u8"[ico] Header at %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14],
+	serialPrintf(L"[ico] Header at %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14],
 				 buffer[best + 15]);
 
 	// ?PNG
 	if (buffer[offset] == 0x89 && buffer[offset + 1] == 0x50 && buffer[offset + 2] == 0x4E &&
 		buffer[offset + 3] == 0x47) {
-		serialPrintf(u8"[ico] Decoding as PNG\n");
+		serialPrintf(L"[ico] Decoding as PNG\n");
 		return loadPng32FromBuffer((uint8_t *)&buffer[offset], imageSize);
 	}
 

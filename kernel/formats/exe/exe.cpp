@@ -56,14 +56,14 @@ struct Executable {
 
 auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	RamDiskAsset asset = getRamDiskAsset(name);
-	serialPrintf(u8"[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data);
+	serialPrintf(L"[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data);
 	auto ptr = (uint8_t *)asset.data;
 	auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
-	serialPrintf(u8"[loadDLL] PE header signature 'PE' == '%s'\n", peHeader);
+	serialPrintf(L"[loadDLL] PE header signature 'PE' == '%s'\n", peHeader);
 	auto peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader));
-	serialPrintf(u8"[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n",
-				 peOptionalHeader->magic, 0x020B);
-	serialPrintf(u8"[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader->sizeOfImage);
+	serialPrintf(L"[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->magic,
+				 0x020B);
+	serialPrintf(L"[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader->sizeOfImage);
 
 	let pages = DOWN_BYTES_TO_PAGES(peOptionalHeader->sizeOfImage) + 1;
 	let physical = PhysicalAllocator::allocatePages(pages);
@@ -86,7 +86,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 
 	// TODO copy PE headers?
 	for (uint16_t i = 0; i < peHeader->numberOfSections; ++i) {
-		serialPrintf(u8"[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
+		serialPrintf(L"[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
 					 &imageSectionHeader[i].name, imageSectionHeader[i].sizeOfRawData,
 					 imageSectionHeader[i].virtualAddress);
 		uint64_t where = (uint64_t)buffer + imageSectionHeader[i].virtualAddress;
@@ -145,7 +145,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 					//#endif
 
 				default:
-					serialPrintf(u8"[loadDLL] Unknown relocation: %d\n", type);
+					serialPrintf(L"[loadDLL] Unknown relocation: %d\n", type);
 					break;
 				}
 			}
@@ -218,7 +218,7 @@ PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root
 		uint16_t i = 0;
 		while (true) {
 			if ((list->name[i] == name[i]) && (name[i] == 0)) {
-				serialPrintf(u8"[getProcAddress] import {%s} resolved to {%s}\n", name, list->name);
+				serialPrintf(L"[getProcAddress] import {%s} resolved to {%s}\n", name, list->name);
 				return list;
 				break;
 			}
@@ -230,7 +230,7 @@ PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root
 		}
 	}
 
-	serialPrintf(u8"[getProcAddress] import {%s} unresolved\n", name);
+	serialPrintf(L"[getProcAddress] import {%s} unresolved\n", name);
 	return null;
 }
 
@@ -258,8 +258,8 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 
 				if ((pThunkOrg->u1.ordinal & 0x80000000) != 0) {
 					ord = pThunkOrg->u1.ordinal & 0xffff;
-					serialPrintf(u8"[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
-								 u8"IMPLEMENTED YET!\n",
+					serialPrintf(L"[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
+								 L"IMPLEMENTED YET!\n",
 								 szName, ord, pThunkOrg->u1.function);
 				} else {
 					IMAGE_IMPORT_BY_NAME *pIBN =
@@ -268,7 +268,7 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 															0xffffffff));
 					ord = pIBN->hint;
 					szImportName = (char8_t *)pIBN->name;
-					serialPrintf(u8"[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
+					serialPrintf(L"[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
 								 szImportName, ord, pThunkOrg->u1.function);
 
 					// Resolve import
