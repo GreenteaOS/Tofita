@@ -235,12 +235,16 @@ function kernelThread() {
 
 					if (syscall == TofitaSyscalls::DebugLog) {
 						serialPrintf(u8"[[DebugLog:PID %d]] ", index);
-						serialPrintf(u8"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1,
-									 frame->r8Arg2);
+						serialPrintf(u8"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1, frame->r8);
 
-						// Note this is still very usafe
-						if (probeForReadOkay(frame->rdxArg1, 1))
-							serialPrintf((const char8_t *)frame->rdxArg1, frame->r8Arg2, frame->r9Arg3);
+						if (probeForReadOkay(frame->rdxArg1, sizeof(DebugLogPayload))) {
+							DebugLogPayload *payload = (DebugLogPayload *)frame->rdxArg1;
+							// Note this is still very unsafe
+							if (probeForReadOkay((uint64_t)payload->message, 1)) {
+								serialPrintf((const char8_t *)payload->message, payload->extra,
+											 payload->more);
+							}
+						}
 
 						serialPrintf(u8"\n");
 						process->schedulable = true;
