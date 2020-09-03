@@ -164,30 +164,30 @@ createHugeMapping(p4huge, pml4, p3huge, pdpt);
 #undef createHugeMapping
 
 function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount, uint8_t writeAllowed) {
-	serialPrintln(u8"[paging] mapping memory range");
+	serialPrintln(L"[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
 
 	uint64_t vAddress = virtualAddr;
 	uint64_t pAddress = physicalAddr;
 
-	serialPrintf(u8"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
+	serialPrintf(L"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
-	serialPrint(u8"[paging.range] virtual address = ");
+	serialPrint(L"[paging.range] virtual address = ");
 	serialPrintHex((uint64_t)(virtualAddr));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[paging.range] physical address = ");
+	serialPrint(L"[paging.range] physical address = ");
 	serialPrintHex((uint64_t)(physicalAddr));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[paging.range] page count = ");
+	serialPrint(L"[paging.range] page count = ");
 	serialPrintHex((uint64_t)(pageCount));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[paging.range] virtual address end = ");
+	serialPrint(L"[paging.range] virtual address end = ");
 	serialPrintHex((uint64_t)(virtualAddrEnd));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
 	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4entries, vAddress, pAddress, writeAllowed);
@@ -238,7 +238,7 @@ uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 
 // TODO this should be reconsidered (i.e. pointer fixups)
 function mapEfi(EfiMemoryMap *memoryMap) {
-	serialPrintln(u8"[paging] mapping efi");
+	serialPrintln(L"[paging] mapping efi");
 
 	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
 	const uint64_t descriptorSize = memoryMap->descriptorSize;
@@ -260,7 +260,7 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	serialPrintf(u8"[paging] efi mapped %u pages\n", sum);
+	serialPrintf(L"[paging] efi mapped %u pages\n", sum);
 }
 
 #if 0
@@ -276,7 +276,7 @@ uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 	while (offset < endOfMemoryMap) {
 
 		if ((descriptor->Type == efi::EfiConventionalMemory) && (descriptor->NumberOfPages >= (pages + 1))) {
-			serialPrintf(u8"[paging] success allocate %d pages\n", pages);
+			serialPrintf(L"[paging] success allocate %d pages\n", pages);
 			result = ((descriptor->PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE);
 		}
 
@@ -311,7 +311,7 @@ uint64_t conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	serialPrintf(u8"[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
+	serialPrintf(L"[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
 				 (uint32_t)(largestPages * PAGE_SIZE), largestPages);
 
 	return result;

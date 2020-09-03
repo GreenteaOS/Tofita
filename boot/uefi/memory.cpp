@@ -19,10 +19,10 @@ function fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi::EFI_SYSTEM_TABLE *system
 		&efiMemoryMap->descriptorSize, &efiMemoryMap->descriptorVersion);
 
 	if (status != EFI_SUCCESS) {
-		serialPrint(u8"[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n");
+		serialPrint(L"[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n");
 	}
 
-	serialPrintf(u8"[[[efi_main.fillMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
+	serialPrintf(L"[[[efi_main.fillMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
 				 efiMemoryMap->memoryMapSize, efiMemoryMap->descriptorSize);
 }
 
@@ -42,7 +42,7 @@ function initializeFramebuffer(Framebuffer *fb, efi::EFI_SYSTEM_TABLE *systemTab
 }
 
 efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, uint64_t *bytes, void **destination) {
-	serialPrintf(u8"[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes);
+	serialPrintf(L"[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes);
 	efi::EFI_STATUS status;
 	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
 	efi::EFI_MEMORY_TYPE allocationType =
@@ -54,14 +54,13 @@ efi::EFI_STATUS uefiAllocate(efi::EFI_BOOT_SERVICES *bootsvc, uint64_t *bytes, v
 
 	status = bootsvc->AllocatePages(efi::AllocateAnyPages, allocationType, pages, &addr);
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
-		serialPrintf(
-			u8"[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
-			*bytes);
+		serialPrintf(L"[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
+					 *bytes);
 	}
 
 	if (status != EFI_SUCCESS)
-		serialPrintf(u8"[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, "
-					 u8"status %d\n",
+		serialPrintf(L"[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, "
+					 L"status %d\n",
 					 *bytes, pages, allocationType, status);
 
 	*bytes = pages * PAGE_SIZE;
