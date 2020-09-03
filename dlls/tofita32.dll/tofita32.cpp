@@ -24,11 +24,11 @@ uint32_t tofitaFastStub() {
 }
 
 // External
-uint64_t tofitaFastSystemCallWrapper(TofitaSyscalls rcx, uint64_t rdx, uint64_t r8, uint64_t r9);
+uint64_t tofitaFastSystemCallWrapper(TofitaSyscalls rcx, uint64_t rdx);
 
 // Return value is placed into RAX
-uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx, uint64_t r8, uint64_t r9) {
-	return tofitaFastSystemCallWrapper(rcx, rdx, r8, r9);
+uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx) {
+	return tofitaFastSystemCallWrapper(rcx, rdx);
 }
 
 void tofitaExitProcess(uint32_t exitCode) {

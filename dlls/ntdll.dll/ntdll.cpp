@@ -19,8 +19,8 @@
 #include "ntdllVars.hpp"
 
 extern "C" {
-uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx, uint64_t r8, uint64_t r9) {
-	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx, r8, r9);
+uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
+	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
 }
 
 void greenteaosIsTheBest(int32_t (*entry)(), uint64_t pid) {
