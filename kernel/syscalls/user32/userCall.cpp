@@ -85,12 +85,17 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 	}
 
 	if (syscall == TofitaSyscalls::SwapWindowFramebuffer) {
-		if (!probeForWriteOkay(frame->r8Arg2, sizeof(nj::WindowFramebuffer)))
+		if (!probeForReadOkay(frame->rdxArg1, sizeof(SwapWindowFramebufferPayload)))
 			return false;
 
-		uint64_t windowId = frame->rdxArg1;
+		let payload = (SwapWindowFramebufferPayload *)frame->rdxArg1;
 
-		var fb = (nj::WindowFramebuffer *)frame->r8Arg2;
+		if (!probeForWriteOkay((uint64_t)payload->fb, sizeof(nj::WindowFramebuffer)))
+			return false;
+
+		uint64_t windowId = payload->windowId;
+
+		var fb = (nj::WindowFramebuffer *)payload->fb;
 		var window = dwm::OverlappedWindow_find(process->pid, windowId);
 
 		if (window == null)
