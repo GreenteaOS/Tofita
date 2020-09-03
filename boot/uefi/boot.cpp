@@ -74,6 +74,11 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	return dest;
 }
 
+// CR3 trampoline
+extern "C" function __attribute__((fastcall))
+trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
+			  volatile uint64_t entry);
+
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
@@ -235,11 +240,6 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->ramdisk = ramdisk;
 	params->framebuffer = framebuffer;
 
-	serialPrintln(u8"[[[efi_main]]] loading trump-o-line");
-	RamDiskAsset trampoline = getRamDiskAsset(u8"trampoline.tofita");
-	serialPrintf(u8"[[[efi_main]]] loaded asset 'trampoline.tofita' %d bytes at %d\n", trampoline.size,
-				 trampoline.data);
-
 	// RAM usage bit-map
 
 	uint64_t ram = paging::getRAMSize(&params->efiMemoryMap);
@@ -275,7 +275,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	paging::mapMemoryHuge(WholePhysicalStart, 0, ram / PAGE_SIZE);
 
 	let startFunction = (InitKernelTrampoline)(paging::conventionalOffset + PAGE_SIZE);
-	tmemcpy((void *)startFunction, trampoline.data, trampoline.size);
+	tmemcpy((void *)startFunction, &trampolineCR3, 32);
 	paging::mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1, 0);
 
 	// Fix virtual addresses

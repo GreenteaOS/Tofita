@@ -14,6 +14,8 @@
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 bits 64
+default rel
+section .head
 
 ; UNIX
 ; rdi - first argument
@@ -31,6 +33,8 @@ bits 64
 ; xmm0, xmm1, xmm2, xmm3 for floating point arguments
 ; rax - returned value
 
+global trampolineCR3
+trampolineCR3:
 cli ; Disable interrupts
 ;mov cr3, rsi ; UNIX
 ;o64 jmp rcx ; UNIX
