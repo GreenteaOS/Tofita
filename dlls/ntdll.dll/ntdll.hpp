@@ -21,5 +21,5 @@
 #endif
 
 extern "C" {
-NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx, uint64_t r8, uint64_t r9);
+NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx);
 }
