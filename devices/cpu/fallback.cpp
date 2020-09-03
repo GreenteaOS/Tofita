@@ -17,89 +17,89 @@
 
 function handle_fallback0() {
 	// Comment if you want because it is pretty annoying
-	serialPrintln(u8"<Interruption fallback 0 Programmable Interrupt Timer Interrupt>");
+	serialPrintln(L"<Interruption fallback 0 Programmable Interrupt Timer Interrupt>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback1() {
-	serialPrintln(u8"<Interruption fallback 1 Keyboard Interrupt>");
+	serialPrintln(L"<Interruption fallback 1 Keyboard Interrupt>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback2() {
-	serialPrintln(u8"<Interruption fallback 2 Cascade (used internally by the two PICs. never raised)>");
+	serialPrintln(L"<Interruption fallback 2 Cascade (used internally by the two PICs. never raised)>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback3() {
-	serialPrintln(u8"<Interruption fallback 3 COM2 (if enabled)>");
+	serialPrintln(L"<Interruption fallback 3 COM2 (if enabled)>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback4() {
-	serialPrintln(u8"<Interruption fallback 4 COM1 (if enabled)>");
+	serialPrintln(L"<Interruption fallback 4 COM1 (if enabled)>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback5() {
-	serialPrintln(u8"<Interruption fallback 5 LPT2 (if enabled)>");
+	serialPrintln(L"<Interruption fallback 5 LPT2 (if enabled)>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback6() {
-	serialPrintln(u8"<Interruption fallback 6 Floppy Disk>");
+	serialPrintln(L"<Interruption fallback 6 Floppy Disk>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback7() {
-	serialPrintln(u8"<Interruption fallback 7 LPT1 / Unreliable spurious interrupt (usually)>");
+	serialPrintln(L"<Interruption fallback 7 LPT1 / Unreliable spurious interrupt (usually)>");
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback8() {
-	serialPrintln(u8"<Interruption fallback 8 CMOS real-time clock (if enabled)>");
+	serialPrintln(L"<Interruption fallback 8 CMOS real-time clock (if enabled)>");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback9() {
-	serialPrintln(u8"<Interruption fallback 9 Free for peripherals / legacy SCSI / NIC>");
+	serialPrintln(L"<Interruption fallback 9 Free for peripherals / legacy SCSI / NIC>");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback10() {
-	serialPrintln(u8"<Interruption fallback 10 Free for peripherals / SCSI / NIC>");
+	serialPrintln(L"<Interruption fallback 10 Free for peripherals / SCSI / NIC>");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback11() {
-	serialPrintln(u8"<Interruption fallback 11 Free for peripherals / SCSI / NIC>");
+	serialPrintln(L"<Interruption fallback 11 Free for peripherals / SCSI / NIC>");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback12() {
-	serialPrintln(u8"<Interruption fallback 12 PS2 Mouse>");
+	serialPrintln(L"<Interruption fallback 12 PS2 Mouse>");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback13() {
-	serialPrintln(u8"<Interruption fallback 13 FPU / Coprocessor / Inter-processor>");
+	serialPrintln(L"<Interruption fallback 13 FPU / Coprocessor / Inter-processor>");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback14() {
-	serialPrintln(u8"<Interruption fallback 14 Primary ATA Hard Disk>");
+	serialPrintln(L"<Interruption fallback 14 Primary ATA Hard Disk>");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
 function handle_fallback15() {
-	serialPrintln(u8"<Interruption fallback 15 Secondary ATA Hard Disk >");
+	serialPrintln(L"<Interruption fallback 15 Secondary ATA Hard Disk >");
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }

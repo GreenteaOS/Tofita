@@ -177,30 +177,30 @@ uint64_t resolveAddr(const PageEntry *pml4entries, uint64_t virtualAddr) {
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
 function mapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
-	serialPrintln(u8"[paging] mapping memory range");
+	serialPrintln(L"[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
 
 	uint64_t vAddress = virtualAddr;
 	uint64_t pAddress = physicalAddr;
 
-	serialPrintf(u8"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
+	serialPrintf(L"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
-	serialPrint(u8"[paging.range] virtual address = ");
+	serialPrint(L"[paging.range] virtual address = ");
 	serialPrintHex((uint64_t)(virtualAddr));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[paging.range] physical address = ");
+	serialPrint(L"[paging.range] physical address = ");
 	serialPrintHex((uint64_t)(physicalAddr));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[paging.range] page count = ");
+	serialPrint(L"[paging.range] page count = ");
 	serialPrintHex((uint64_t)(pageCount));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[paging.range] virtual address end = ");
+	serialPrint(L"[paging.range] virtual address end = ");
 	serialPrintHex((uint64_t)(virtualAddrEnd));
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
 	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4entries, vAddress, pAddress);

@@ -62,7 +62,7 @@ class PhysicalAllocator {
 				let steps = descriptor->NumberOfPages;
 
 				if (kind == PAGE_RESERVED)
-					serialPrintf(u8"[physical] Reserve %u pages from %u page\n", steps, where);
+					serialPrintf(L"[physical] Reserve %u pages from %u page\n", steps, where);
 
 				uint64_t i = where;
 				while (i < steps) {
@@ -80,7 +80,7 @@ class PhysicalAllocator {
 		// Reserve bootloader buffer
 		{
 			uint64_t physical = params->physicalBuffer;
-			serialPrintf(u8"[physical] Reserve %u bytes at %u of bootloader buffer\n", params->physicalBytes,
+			serialPrintf(L"[physical] Reserve %u bytes at %u of bootloader buffer\n", params->physicalBytes,
 						 physical);
 			uint64_t i = DOWN_BYTES_TO_PAGES(params->physicalBytes) + 1;
 			while (i > 0) {
@@ -98,7 +98,7 @@ class PhysicalAllocator {
 					available++;
 			}
 
-			serialPrintf(u8"[physical] Available %u of %u physical pages\n", available, count);
+			serialPrintf(L"[physical] Available %u of %u physical pages\n", available, count);
 		}
 	}
 
@@ -133,7 +133,7 @@ class PhysicalAllocator {
 			i++;
 		}
 
-		serialPrintf(u8"[physical] allocateOnePage == PHYSICAL_NOT_FOUND\n");
+		serialPrintf(L"[physical] allocateOnePage == PHYSICAL_NOT_FOUND\n");
 		return PHYSICAL_NOT_FOUND;
 	}
 
@@ -192,7 +192,7 @@ class PhysicalAllocator {
 			return largestAt * PAGE_SIZE + (uint64_t)WholePhysicalStart;
 		}
 
-		serialPrintf(u8"[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages);
+		serialPrintf(L"[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages);
 		return PHYSICAL_NOT_FOUND;
 	}
 

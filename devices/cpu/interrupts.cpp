@@ -176,7 +176,7 @@ arguments:
 Taken from http://wiki.osdev.org/8259_PIC
 */
 function remapPic(uint8_t offset1, uint8_t offset2) {
-	serialPrintln(u8"[cpu] begin: remap PIC");
+	serialPrintln(L"[cpu] begin: remap PIC");
 
 	writePort(0x20, 0x11);
 	writePort(0xA0, 0x11);
@@ -189,7 +189,7 @@ function remapPic(uint8_t offset1, uint8_t offset2) {
 	writePort(0x21, 0x0);
 	writePort(0xA1, 0x0);
 
-	serialPrintln(u8"[cpu] done: remap PIC");
+	serialPrintln(L"[cpu] done: remap PIC");
 
 	return;
 
@@ -219,7 +219,7 @@ function remapPic(uint8_t offset1, uint8_t offset2) {
 	writePort(PIC1_DATA, a1); // restore saved masks.
 	writePort(PIC2_DATA, a2);
 
-	serialPrintln(u8"[cpu] done: remap PIC");
+	serialPrintln(L"[cpu] done: remap PIC");
 }
 
 // Sets up the legacy PIC and then disables it
@@ -252,13 +252,13 @@ uint64_t physicalToVirtual(uint64_t physical) {
 
 // TODO check for CPU feature
 function enableLocalApic() {
-	serialPrintln(u8"[cpu] begin: enableLocalApic");
+	serialPrintln(L"[cpu] begin: enableLocalApic");
 
 	auto ptr = (uint32_t *)physicalToVirtual(0xfee000f0);
 	uint32_t val = *ptr;
 	quakePrintf(u8"APIC value is %u\n", val);
 
-	serialPrintln(u8"[cpu] done: enableLocalApic");
+	serialPrintln(L"[cpu] done: enableLocalApic");
 }
 
 function mouseWait(uint8_t aType);
@@ -548,7 +548,6 @@ void timerInterruptHandler(volatile InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 
 	if (timerCalled % 121 == 0) {
-		serialPrintf(u8"[cpu] happened timerInterrupt (one second passed) < ! #%d\n", timerCalled);
 		taskBarRedraw++;
 		if (taskBarRedraw > 30) {
 			haveToRender = 1;
@@ -621,12 +620,12 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 	return;
 
 	if (index == TofitaSyscalls::DebugLog) {
-		serialPrintf(u8"[[DebugLog:PID %d]] %s\n", process::currentProcess, frame->rdxArg1);
+		serialPrintf(L"[[DebugLog:PID %d]] %s\n", process::currentProcess, frame->rdxArg1);
 		return;
 	}
 
 	if (index == TofitaSyscalls::ExitProcess) {
-		serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", process::currentProcess, frame->rdxArg1);
+		serialPrintf(L"[[ExitProcess:PID %d]] %d\n", process::currentProcess, frame->rdxArg1);
 		// TODO kernel wakeup
 		// TODO destroy process
 		process::Process *process = &process::processes[process::currentProcess];
@@ -690,43 +689,43 @@ function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit) {
 __attribute__((aligned(64))) Idtr cacheIdtr;
 
 function dumpGDT(GdtDescriptorEx *desc) {
-	serialPrintf(u8"[dumpGDT]");
+	serialPrintf(L"[dumpGDT]");
 
 	if (desc->accessed)
-		serialPrintf(u8" accessed");
+		serialPrintf(L" accessed");
 	if (desc->rw)
-		serialPrintf(u8" rw");
+		serialPrintf(L" rw");
 	if (desc->direction)
-		serialPrintf(u8" direction");
+		serialPrintf(L" direction");
 	if (desc->execute)
-		serialPrintf(u8" execute");
+		serialPrintf(L" execute");
 	if (desc->one)
-		serialPrintf(u8" one");
+		serialPrintf(L" one");
 
 	if (desc->privilege == 0)
-		serialPrintf(u8" privilege=ring0");
+		serialPrintf(L" privilege=ring0");
 	if (desc->privilege == 1)
-		serialPrintf(u8" privilege=ring1");
+		serialPrintf(L" privilege=ring1");
 	if (desc->privilege == 2)
-		serialPrintf(u8" privilege=ring2");
+		serialPrintf(L" privilege=ring2");
 	if (desc->privilege == 3)
-		serialPrintf(u8" privilege=ring3");
+		serialPrintf(L" privilege=ring3");
 
 	if (desc->present)
-		serialPrintf(u8" present");
+		serialPrintf(L" present");
 	if (desc->zero16one32)
-		serialPrintf(u8" zero16one32");
+		serialPrintf(L" zero16one32");
 	if (desc->blocks)
-		serialPrintf(u8" pages");
+		serialPrintf(L" pages");
 
-	serialPrintf(u8"\n");
+	serialPrintf(L"\n");
 }
 
 function enableInterrupts() {
-	serialPrintln(u8"[cpu] initializing lgdt");
+	serialPrintln(L"[cpu] initializing lgdt");
 
 	uint64_t sizeof_TssEntry = sizeof(globalTss);
-	serialPrintf(u8"[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry));
+	serialPrintf(L"[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry));
 
 	memset((void *)&globalTss, 0, sizeof_TssEntry);
 	globalTss.iomap_offset = sizeof_TssEntry;
@@ -744,17 +743,17 @@ function enableInterrupts() {
 	globalTss.ist[6] = (uint64_t)&ist6stack;
 	globalTss.ist[7] = (uint64_t)&ist7stack;
 
-	serialPrint(u8"[cpu] RSP[0] points to: ");
+	serialPrint(L"[cpu] RSP[0] points to: ");
 	serialPrintHex((uint64_t)globalTss.rsp[0]);
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[cpu] RSP[1] points to: ");
+	serialPrint(L"[cpu] RSP[1] points to: ");
 	serialPrintHex((uint64_t)globalTss.rsp[1]);
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
-	serialPrint(u8"[cpu] RSP[2] points to: ");
+	serialPrint(L"[cpu] RSP[2] points to: ");
 	serialPrintHex((uint64_t)globalTss.rsp[2]);
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
 	uint64_t tssBase = (uint64_t)(&globalTss);
 
@@ -775,29 +774,29 @@ function enableInterrupts() {
 				continue; // TSS
 			if (gdt[i].present == 0)
 				continue;
-			serialPrintf(u8"[dumpGDT] #%u\n", i);
+			serialPrintf(L"[dumpGDT] #%u\n", i);
 			dumpGDT(&gdt[i]);
 		}
 	}
 
 	globalGdtr.limit = sizeof(gdtTemplate) - 1;
 	globalGdtr.base = (uint64_t)(&gdtTemplate[0]);
-	serialPrint(u8"[cpu] GDTR points to: ");
+	serialPrint(L"[cpu] GDTR points to: ");
 	serialPrintHex((uint64_t)&globalGdtr);
-	serialPrint(u8"\n");
-	serialPrint(u8"[cpu] GDT points to: ");
+	serialPrint(L"\n");
+	serialPrint(L"[cpu] GDT points to: ");
 	serialPrintHex((uint64_t)globalGdtr.base);
-	serialPrint(u8"\n");
-	serialPrintf(u8"[cpu] GDT size is %u == %u\n", globalGdtr.limit, 0x7F);
-	serialPrintln(u8"[cpu] calling lgdt");
+	serialPrint(L"\n");
+	serialPrintf(L"[cpu] GDT size is %u == %u\n", globalGdtr.limit, 0x7F);
+	serialPrintln(L"[cpu] calling lgdt");
 	lgdt(&globalGdtr);
-	serialPrintln(u8"[cpu] calling ltr");
+	serialPrintln(L"[cpu] calling ltr");
 	{
 		setTsr(64);
 		// setTsr(64 + 3);
 	}
 
-	serialPrintln(u8"[cpu] initializing unknownInterrupt");
+	serialPrintln(L"[cpu] initializing unknownInterrupt");
 
 	for (uint32_t i = 0; i < 286; ++i) {
 		initializeFallback(&IDT[i], (uint64_t)&unknownInterrupt);
@@ -839,21 +838,21 @@ function enableInterrupts() {
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
 	cacheIdtr.offset = (uint64_t)IDT;
 
-	serialPrint(u8"[cpu] IDTR points to: ");
+	serialPrint(L"[cpu] IDTR points to: ");
 	serialPrintHex((uint64_t)&cacheIdtr);
-	serialPrint(u8"\n");
-	serialPrint(u8"[cpu] IDT points to: ");
+	serialPrint(L"\n");
+	serialPrint(L"[cpu] IDT points to: ");
 	serialPrintHex((uint64_t)&IDT);
-	serialPrint(u8"\n");
-	serialPrintf(u8"[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, IDT_SIZE,
+	serialPrint(L"\n");
+	serialPrintf(L"[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, IDT_SIZE,
 				 sizeof(IdtEntry));
-	serialPrintln(u8"[cpu] loading IDTR");
+	serialPrintln(L"[cpu] loading IDTR");
 	// Before you implement the IDT, make sure you have a working GDT
 	remapPic(0x20, 0x28);
-	serialPrintln(u8"[cpu] calling lidtq");
+	serialPrintln(L"[cpu] calling lidtq");
 	loadIdt(&cacheIdtr);
 
-	serialPrintln(u8"[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL");
+	serialPrintln(L"[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL");
 	enterKernelMode();
 
 	// Set PIT frequency
@@ -869,7 +868,7 @@ function enableInterrupts() {
 }
 
 function enablePS2Mouse() {
-	serialPrintln(u8"[cpu] begin: setting PS/2 mouse");
+	serialPrintln(L"[cpu] begin: setting PS/2 mouse");
 	uint8_t _status;
 	// Enable the auxiliary mouse device
 	mouseWait(1);
@@ -903,7 +902,7 @@ function enablePS2Mouse() {
 	mouseRead(); // Acknowledge
 	// Setup the mouse handler
 	// irq_install_handler(12, mouseHandler);
-	serialPrintln(u8"[cpu] done: setting PS/2 mouse");
+	serialPrintln(L"[cpu] done: setting PS/2 mouse");
 	function quakePrintf(const char8_t *c, ...);
 	quakePrintf(u8"Enabled PS/2 mouse and keyboard\n");
 }
