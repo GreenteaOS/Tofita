@@ -82,7 +82,7 @@ trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile u
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
-	serialPrint(u8"\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(
+	serialPrint(L"\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(
 		versionMinor) " " versionName " UEFI bootloader. Welcome!\n");
 
 	// Disable watchdog timer
@@ -92,7 +92,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		uint32_t revision = systemTable->FirmwareRevision;
 		uint16_t minor = (uint16_t)revision;
 		uint16_t major = (uint16_t)(revision >> 16);
-		serialPrintf(u8"[[[efi_main]]] UEFI revision %d.%d\n", major, minor);
+		serialPrintf(L"[[[efi_main]]] UEFI revision %d.%d\n", major, minor);
 	}
 
 	// Actually, no matter where lower is present, cause no lower-relative addressing done in kernel
@@ -102,7 +102,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	const uint64_t upper = (uint64_t)0xffff800000000000;
 	void *acpiTable = NULL;
 	{
-		serialPrintln(u8"[[[efi_main]]] begin: ACPI");
+		serialPrintln(L"[[[efi_main]]] begin: ACPI");
 		efi::EFI_GUID acpi20 = ACPI_20_TABLE_GUID;
 		efi::EFI_GUID acpi = ACPI_TABLE_GUID;
 
@@ -110,29 +110,29 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 			efi::EFI_CONFIGURATION_TABLE *efiTable = &systemTable->ConfigurationTable[i];
 			if (0 == CompareGuid(&efiTable->VendorGuid, &acpi20)) { // Prefer ACPI 2.0
 				acpiTable = efiTable->VendorTable;
-				serialPrintln(u8"[[[efi_main]]] found: ACPI 2.0");
+				serialPrintln(L"[[[efi_main]]] found: ACPI 2.0");
 				break;
 			} else if (0 == CompareGuid(&efiTable->VendorGuid, &acpi)) {
 				// acpiTable = (void *)((intptr_t)efiTable->VendorTable | 0x1); // LSB high
 				// ACPI 2.0 is required by Windows 7
 				// So we don't need to support ACPI 1.0
-				serialPrintln(u8"[[[efi_main]]] found: ACPI 1.0, ignoring");
+				serialPrintln(L"[[[efi_main]]] found: ACPI 1.0, ignoring");
 			}
 		}
 
 		// TODO also transfer ACPI version to report SandyBridge
-		serialPrintln(u8"[[[efi_main]]] done: ACPI");
+		serialPrintln(L"[[[efi_main]]] done: ACPI");
 	}
 
 	efi::EFI_STATUS status = EFI_NOT_READY;
 
-	serialPrintln(u8"[[[efi_main]]] begin: initializeFramebuffer");
+	serialPrintln(L"[[[efi_main]]] begin: initializeFramebuffer");
 	Framebuffer framebuffer;
 	initializeFramebuffer(&framebuffer, systemTable);
 	drawLoading(&framebuffer, 0);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
-	serialPrintln(u8"[[[efi_main]]] done: initializeFramebuffer");
+	serialPrintln(L"[[[efi_main]]] done: initializeFramebuffer");
 	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
@@ -140,7 +140,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	findAndLoadRamDisk(systemTable->BootServices, &ramdisk);
 	drawLoading(&framebuffer, 1);
 
-	serialPrintln(u8"[[[efi_main]]] begin: fillMemoryMap");
+	serialPrintln(L"[[[efi_main]]] begin: fillMemoryMap");
 	uint64_t sizeAlloc = (ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE;
 	EfiMemoryMap efiMemoryMap;
 	efiMemoryMap.memoryMapSize = sizeof(efi::EFI_MEMORY_DESCRIPTOR) * 512;
@@ -153,17 +153,17 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		}
 	}
 	fillMemoryMap(&efiMemoryMap, systemTable);
-	serialPrintln(u8"[[[efi_main]]] done: fillMemoryMap");
+	serialPrintln(L"[[[efi_main]]] done: fillMemoryMap");
 
-	serialPrintln(u8"[[[efi_main]]] begin: ExitBootServices");
+	serialPrintln(L"[[[efi_main]]] begin: ExitBootServices");
 	uint8_t oops = 0;
 	status = EFI_NOT_READY;
 	while (status != EFI_SUCCESS) {
 		if (oops < 10)
-			serialPrintln(u8"[[[efi_main]]] try: ExitBootServices");
+			serialPrintln(L"[[[efi_main]]] try: ExitBootServices");
 		if (oops == 100) {
-			serialPrintln(u8"[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices");
-			serialPrintln(u8"[[[efi_main]]] <ERROR?> system may or may not start");
+			serialPrintln(L"[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices");
+			serialPrintln(L"[[[efi_main]]] <ERROR?> system may or may not start");
 			oops = 200;
 		}
 		if (oops < 100) {
@@ -174,31 +174,31 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	if (status != EFI_SUCCESS) {
 		// TODO `status` to string
-		serialPrintln(u8"[[[efi_main]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR");
+		serialPrintln(L"[[[efi_main]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR");
 		return EFI_LOAD_ERROR;
 	}
-	serialPrintln(u8"[[[efi_main]]] done: ExitBootServices");
+	serialPrintln(L"[[[efi_main]]] done: ExitBootServices");
 
 	setRamDisk(&ramdisk);
 
-	serialPrintln(u8"[[[efi_main]]] begin: preparing kernel loader");
+	serialPrintln(L"[[[efi_main]]] begin: preparing kernel loader");
 
 	RamDiskAsset asset = getRamDiskAsset(L"tofita.gnu");
-	serialPrintf(u8"[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data);
+	serialPrintf(L"[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data);
 
 	const uint64_t largeBuffer = paging::conventionalAllocateLargest(&efiMemoryMap);
-	serialPrintf(u8"[[[efi_main]]] large buffer allocated at %u\n", largeBuffer);
+	serialPrintf(L"[[[efi_main]]] large buffer allocated at %u\n", largeBuffer);
 	paging::conventionalOffset = largeBuffer;
 	uint64_t mAddressOfEntryPoint = 0;
 
 	{
 		auto ptr = (uint8_t *)asset.data;
 		auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
-		serialPrintf(u8"PE header signature 'PE' == '%s'\n", peHeader);
+		serialPrintf(L"PE header signature 'PE' == '%s'\n", peHeader);
 		auto peOptionalHeader = (const Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader));
-		serialPrintf(u8"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic,
+		serialPrintf(L"PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->mMagic,
 					 0x020B);
-		serialPrintf(u8"PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
+		serialPrintf(L"PE32(+) size of image == %d\n", peOptionalHeader->mSizeOfImage);
 		void *kernelBase = (void *)paging::conventionalAllocateNext(peOptionalHeader->mSizeOfImage);
 		memset(kernelBase, 0, peOptionalHeader->mSizeOfImage); // Zeroing
 
@@ -206,7 +206,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		auto imageSectionHeader =
 			(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
 		for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
-			serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
+			serialPrintf(L"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
 						 imageSectionHeader[i].mSizeOfRawData);
 			uint64_t where = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress;
 
@@ -244,9 +244,9 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	uint64_t ram = paging::getRAMSize(&params->efiMemoryMap);
 	uint32_t megs = (uint32_t)(ram / (1024 * 1024));
-	serialPrintf(u8"[paging] available RAM is ~%u megabytes\n", megs);
+	serialPrintf(L"[paging] available RAM is ~%u megabytes\n", megs);
 	while (megs < 768) {
-		serialPrintf(u8"Tofita requires at least 1 GB of memory\n");
+		serialPrintf(L"Tofita requires at least 1 GB of memory\n");
 	}
 	params->ramBytes = ram;
 	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram >> 12);
@@ -264,7 +264,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	// Map memory
 
-	serialPrintln(u8"[[[efi_main]]] mapping pages for kernel loader");
+	serialPrintln(L"[[[efi_main]]] mapping pages for kernel loader");
 
 	paging::mapMemory(upper, largeBuffer, (paging::conventionalOffset - largeBuffer) / PAGE_SIZE + 1, 1);
 
@@ -301,11 +301,11 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	params->physicalRamBitMaskVirtual = (uint64_t)WholePhysicalStart + params->physicalRamBitMaskVirtual;
 	params = (KernelParams *)((uint64_t)WholePhysicalStart + (uint64_t)params);
 
-	serialPrintln(u8"[[[efi_main]]] done: all done, entering kernel loader");
+	serialPrintln(L"[[[efi_main]]] done: all done, entering kernel loader");
 
-	serialPrint(u8"[[[efi_main]]] CR3 points to: ");
+	serialPrint(L"[[[efi_main]]] CR3 points to: ");
 	serialPrintHex((uint64_t)paging::pml4entries);
-	serialPrint(u8"\n");
+	serialPrint(L"\n");
 
 	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper + mAddressOfEntryPoint);
 
