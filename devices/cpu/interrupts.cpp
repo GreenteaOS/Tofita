@@ -256,7 +256,7 @@ function enableLocalApic() {
 
 	auto ptr = (uint32_t *)physicalToVirtual(0xfee000f0);
 	uint32_t val = *ptr;
-	quakePrintf(u8"APIC value is %u\n", val);
+	quakePrintf(L"APIC value is %u\n", val);
 
 	serialPrintln(L"[cpu] done: enableLocalApic");
 }
@@ -903,8 +903,8 @@ function enablePS2Mouse() {
 	// Setup the mouse handler
 	// irq_install_handler(12, mouseHandler);
 	serialPrintln(L"[cpu] done: setting PS/2 mouse");
-	function quakePrintf(const char8_t *c, ...);
-	quakePrintf(u8"Enabled PS/2 mouse and keyboard\n");
+	function quakePrintf(const wchar_t *c, ...);
+	quakePrintf(L"Enabled PS/2 mouse and keyboard\n");
 }
 
 function mouseWait(uint8_t aType) {

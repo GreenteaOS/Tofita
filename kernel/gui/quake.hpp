@@ -17,4 +17,4 @@
 
 uint8_t haveToQuake = 0;
 function quakeHandleButtonDown(uint8_t key);
-function qsod(const char8_t *format, const uint64_t extra, const uint64_t more);
+function qsod(const wchar_t *format, const uint64_t extra, const uint64_t more);
