@@ -66,7 +66,7 @@ const RamDiskAsset getRamDiskAsset(const wchar_t *pathToAsset) {
 		}
 	}
 
-	serialPrintf(u8"[ramdisk.getRamDiskAsset] asset '%S' not found in %d assets\n", path,
+	serialPrintf(L"[ramdisk.getRamDiskAsset] asset '%S' not found in %d assets\n", path,
 				 ramDiskInfo->assetsCount);
 	return asset;
 }

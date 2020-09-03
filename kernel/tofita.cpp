@@ -92,9 +92,9 @@ void ___chkstk_ms(){};
 
 const KernelParams *paramsCache = null;
 function kernelInit(const KernelParams *params) {
-	serialPrintln(u8"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
+	serialPrintln(L"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
 		versionMinor) " " versionTag " kernel loaded and operational");
-	serialPrintf(u8"<Tofita> CR3 points to: %8\n", (uint64_t)params->pml4);
+	serialPrintf(L"<Tofita> CR3 points to: %8\n", (uint64_t)params->pml4);
 	paramsCache = params;
 	PhysicalAllocator::init(params);
 	pages::pml4entries = (pages::PageEntry *)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
@@ -102,22 +102,22 @@ function kernelInit(const KernelParams *params) {
 	setRamDisk(&params->ramdisk);
 
 	if (sizeof(uint8_t *) == 4)
-		serialPrintln(u8"<Tofita> void*: 4 bytes");
+		serialPrintln(L"<Tofita> void*: 4 bytes");
 	if (sizeof(uint8_t *) == 8)
-		serialPrintln(u8"<Tofita> void*: 8 bytes");
+		serialPrintln(L"<Tofita> void*: 8 bytes");
 
 #ifdef __cplusplus
-	serialPrintln(u8"<Tofita> __cplusplus");
+	serialPrintln(L"<Tofita> __cplusplus");
 #else
-	serialPrintln(u8"<Tofita> !__cplusplus");
+	serialPrintln(L"<Tofita> !__cplusplus");
 #endif
 
 #if defined(__clang__)
-	serialPrintln(u8"<Tofita> __clang__");
+	serialPrintln(L"<Tofita> __clang__");
 #elif defined(__GNUC__) || defined(__GNUG__)
-	serialPrintln(u8"<Tofita> __GNUC__");
+	serialPrintln(L"<Tofita> __GNUC__");
 #elif defined(_MSC_VER)
-	serialPrintln(u8"<Tofita> _MSC_VER");
+	serialPrintln(L"<Tofita> _MSC_VER");
 #endif
 
 	disablePic();
@@ -193,7 +193,7 @@ function kernelInit(const KernelParams *params) {
 	// Show something before scheduling delay
 	composite();
 	copyToScreen();
-	serialPrintln(u8"<Tofita> [ready for scheduling]");
+	serialPrintln(L"<Tofita> [ready for scheduling]");
 }
 
 function switchToUserProcess() {
@@ -205,7 +205,7 @@ function switchToUserProcess() {
 	}
 
 	if (next == 0) {
-		// serialPrintln(u8"<Tofita> [halt]");
+		// serialPrintln(L"<Tofita> [halt]");
 		// amd64::enableAllInterruptsAndHalt(); // Nothing to do
 	}
 	// else
@@ -214,7 +214,7 @@ function switchToUserProcess() {
 }
 
 function kernelThread() {
-	serialPrintln(u8"<Tofita> [kernelThread] thread started");
+	serialPrintln(L"<Tofita> [kernelThread] thread started");
 	while (true) {
 
 		volatile uint64_t index = 1; // Idle process ignored
@@ -234,22 +234,21 @@ function kernelThread() {
 					// TODO refactor to separate syscall handler per-DLL
 
 					if (syscall == TofitaSyscalls::DebugLog) {
-						serialPrintf(u8"[[DebugLog:PID %d]] ", index);
-						serialPrintf(u8"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1, frame->r8);
+						serialPrintf(L"[[DebugLog:PID %d]] ", index);
+						serialPrintf(L"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1, frame->r8);
 
 						if (probeForReadOkay(frame->rdxArg1, sizeof(DebugLogPayload))) {
 							DebugLogPayload *payload = (DebugLogPayload *)frame->rdxArg1;
 							// Note this is still very unsafe
 							if (probeForReadOkay((uint64_t)payload->message, 1)) {
-								serialPrintf((const char8_t *)payload->message, payload->extra,
-											 payload->more);
+								serialPrintf(payload->message, payload->extra, payload->more);
 							}
 						}
 
-						serialPrintf(u8"\n");
+						serialPrintf(L"\n");
 						process->schedulable = true;
 					} else if (syscall == TofitaSyscalls::ExitProcess) {
-						serialPrintf(u8"[[ExitProcess:PID %d]] %d\n", index, frame->rdxArg1);
+						serialPrintf(L"[[ExitProcess:PID %d]] %d\n", index, frame->rdxArg1);
 						process->present = false;
 
 						// Select pml4 of idle process for safety
@@ -259,7 +258,7 @@ function kernelThread() {
 						// Deallocate process
 						process::Process_destroy(process);
 					} else if (syscall == TofitaSyscalls::Cpu) {
-						serialPrintf(u8"[[Cpu:PID %d]] %d\n", index, frame->rdxArg1);
+						serialPrintf(L"[[Cpu:PID %d]] %d\n", index, frame->rdxArg1);
 						quakePrintf(u8"Process #%d closed due to CPU exception #%u\n", index, frame->index);
 						process->present = false;
 
@@ -284,7 +283,7 @@ function kernelThread() {
 
 						if (!userCall::userCallHandled(process, syscall)) {
 							// Unknown syscall is no-op
-							serialPrintf(u8"[[PID %d]] Unknown or unhandled syscall %d\n", index,
+							serialPrintf(L"[[PID %d]] Unknown or unhandled syscall %d\n", index,
 										 frame->rcxArg0);
 							frame->raxReturn = 0;
 							process->schedulable = true;
@@ -319,14 +318,14 @@ __attribute__((naked, fastcall)) function kernelThreadStart() {
 
 // In case of kernel crash set instruction pointer to here
 function kernelThreadLoop() {
-	serialPrintln(u8"<Tofita> [looping forever]");
+	serialPrintln(L"<Tofita> [looping forever]");
 	while (true) {
 		asm volatile("pause");
 	};
 }
 
 function guiThread() {
-	serialPrintln(u8"<Tofita> [guiThread] thread started");
+	serialPrintln(L"<Tofita> [guiThread] thread started");
 
 	while (true) {
 		// Poll PS/2 devices
