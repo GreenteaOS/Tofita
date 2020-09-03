@@ -63,8 +63,8 @@ for (task in tasks) {
 				// CR3 TRAMPOLINE
 
 				require('child_process').execSync(
-					'..\\Teapot\\nasm-2.14.02\\nasm -o ' +
-					config.tempFolder + '\\tofita\\trampoline.bin boot\\loader\\trampoline.asm', { stdio: 'inherit' }
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
+					config.tempFolder + '/tofita/trampoline.o boot\\loader\\trampoline.asm', { stdio: 'inherit' }
 				)
 
 				// KERNEL
@@ -179,7 +179,8 @@ for (task in tasks) {
 					[
 						'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
 						'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
-						config.tempFolder + '/tofita/miniefi.o',
+						config.tempFolder + '/tofita/trampoline.o ',
+						config.tempFolder + '/tofita/miniefi.o ',
 						' -out:',
 						config.tempFolder + '/tofita/loader.efi'
 					].join(''), { stdio: 'inherit' }
