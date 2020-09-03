@@ -23,8 +23,8 @@ struct InterruptFrame {
 	volatile uint64_t r12;
 	volatile uint64_t r11;
 	volatile uint64_t r10;
-	volatile uint64_t r9Arg3;
-	volatile uint64_t r8Arg2;
+	volatile uint64_t r9;
+	volatile uint64_t r8;
 
 	// Note: ECX is RCX, EAX is RAX, etc in 32-bit mode
 	volatile uint64_t rdi;
