@@ -30,7 +30,7 @@ typedef void function;
 #define Void void
 #define Pointer(to) to *
 
-// wchar_t is UTF-16LE
+// wchar_t is UTF-16LE with -fshort-wchar
 _Static_assert(sizeof(wchar_t) == 2, "bad sizeof");
 _Static_assert(sizeof(char16_t) == 2, "bad sizeof");
 

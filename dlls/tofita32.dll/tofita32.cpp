@@ -35,7 +35,7 @@ void tofitaExitProcess(uint32_t exitCode) {
 	tofitaFastSystemCall(TofitaSyscalls::ExitProcess, exitCode);
 }
 
-void tofitaDebugLog(const char8_t *message, uint64_t extra, uint64_t more) {
+void tofitaDebugLog(const wchar_t *message, uint64_t extra, uint64_t more) {
 	DebugLogPayload payload;
 	payload.message = message;
 	payload.extra = extra;

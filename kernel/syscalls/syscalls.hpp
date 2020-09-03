@@ -17,6 +17,9 @@
 
 #define USER_SYSCALLS 123000
 
+// wchar_t is UTF-16LE with -fshort-wchar
+_Static_assert(sizeof(wchar_t) == 2, "bad sizeof");
+
 enum class TofitaSyscalls : uint64_t {
 	// System
 	Noop = 0,
@@ -34,7 +37,7 @@ enum class TofitaSyscalls : uint64_t {
 };
 
 struct DebugLogPayload {
-	const char8_t *message;
+	const wchar_t *message;
 	uint64_t extra = 0;
 	uint64_t more = 0;
 };
