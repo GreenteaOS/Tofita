@@ -146,17 +146,11 @@ uint64_t serialPortWrite(uint8_t *buffer, uint64_t size) {
 			writeSerialRegister(R_UART_TXBUF, *buffer);
 		}
 	}
+
 	return size;
 }
 
-function serialPrint(const char8_t *print) {
-	serialPortWrite((uint8_t *)print, kstrlen((uint8_t *)print));
-}
-
-function serialPrintln(const char8_t *print) {
-	serialPrint(print);
-	serialPrint(u8"\n");
-}
+function serialPrintf(const wchar_t *c, ...);
 
 function serialPrintInt(uint64_t n) {
 	uint8_t buf[24];
@@ -172,7 +166,7 @@ function serialPrintInt(uint64_t n) {
 }
 
 function serialPrintHex(uint64_t n) {
-	serialPrint(u8"0x");
+	serialPrintf(L"0x");
 	uint8_t buf[16], *bp = buf + 16;
 	for (int32_t i = 0; i < 16; i++)
 		buf[i] = '0';
@@ -190,17 +184,17 @@ function serialPrintHex(uint64_t n) {
 }
 
 function serialPrintBits(uint64_t value) {
+	serialPrintf(L"0b");
 	for (int32_t i = 0; i < 64; ++i) {
 		if (value & (1ull << i)) {
 			serialPrintInt(i);
-			serialPrint(u8";");
 		}
 	}
 }
 
 int32_t __cdecl putchar(uint8_t c) {
-	char8_t buffer[] = {c, 0};
-	serialPrint(buffer);
+	uint8_t buffer[] = {c, 0};
+	serialPortWrite(buffer, 1);
 	return c;
 }
 
@@ -238,13 +232,13 @@ uint8_t *comItoA(int64_t i, uint8_t b[]) {
 	return b;
 }
 
-function serialPrintf(const char8_t *c, ...) {
+function serialPrintf(const wchar_t *c, ...) {
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);
 	while (*c != '\0') {
 		if (*c != '%') {
-			putchar(*c);
+			putchar(*c & 0xFF);
 			c++;
 			continue;
 		}
@@ -307,4 +301,13 @@ function serialPrintf(const char8_t *c, ...) {
 		}
 		c++;
 	}
+}
+
+function serialPrint(const wchar_t *print) {
+	serialPrintf(print);
+}
+
+function serialPrintln(const wchar_t *print) {
+	serialPrintf(print);
+	serialPrintf(L"\n");
 }
