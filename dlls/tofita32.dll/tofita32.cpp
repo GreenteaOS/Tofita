@@ -36,7 +36,11 @@ void tofitaExitProcess(uint32_t exitCode) {
 }
 
 void tofitaDebugLog(const char8_t *message, uint64_t extra, uint64_t more) {
-	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)message, extra, more);
+	DebugLogPayload payload;
+	payload.message = message;
+	payload.extra = extra;
+	payload.more = more;
+	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)&payload);
 }
 
 void njraaSwapWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb) {
