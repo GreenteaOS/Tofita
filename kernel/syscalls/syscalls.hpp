@@ -33,6 +33,29 @@ enum class TofitaSyscalls : uint64_t {
 	ExitProcess
 };
 
+struct DebugLogPayload {
+	const char8_t *message;
+	uint64_t extra = 0;
+	uint64_t more = 0;
+};
+
+_Static_assert(sizeof(DebugLogPayload) == 8 * 3, "bad sizeof");
+
+struct SwapWindowFramebufferPayload {
+	uint64_t windowId;
+	nj::WindowFramebuffer *fb;
+};
+
+_Static_assert(sizeof(SwapWindowFramebufferPayload) == 8 * 2, "bad sizeof");
+
+struct ShowWindowPayload {
+	int32_t nCmdShow;
+	uint64_t windowId;
+};
+
+_Static_assert(sizeof(ShowWindowPayload) == 8 * 2, "bad sizeof");
+
+// TODO use pointer wrappers instead of raw pointers
 struct CreateWindowExPayload {
 	const wapi::WindowClass *wc;
 	wapi::HWnd hWnd;
