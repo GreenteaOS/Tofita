@@ -23,7 +23,7 @@ uint8_t quakeRow = 0;
 double quakeAdvance = 0.0;
 uint8_t quakeCommandSize = 0;
 
-function quakePrintf(const char8_t *c, ...);
+function quakePrintf(const wchar_t *c, ...);
 
 function quake() {
 	if (haveToQuake == 0) {
@@ -55,17 +55,17 @@ function quakeHandleButtonDown(uint8_t key) {
 	if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
 		if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
 			extern const KernelParams *paramsCache;
-			quakePrintf(u8"Doing hot reload. Note: this log may be persistent between hot reloads\n");
+			quakePrintf(L"Doing hot reload. Note: this log may be persistent between hot reloads\n");
 			InitKernel start = (InitKernel)KernelVirtualBase;
 			start(paramsCache); // TODO pml4, stack
 		} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
-			quakePrintf(u8"Hit `~` to show/hide this terminal\n", quakeCommand);
-			quakePrintf(u8"Command 'reload' does quick kernel restart (without actual reboot). Note: this "
-						u8"destroys all unsaved data and may crash the system!\n",
+			quakePrintf(L"Hit `~` to show/hide this terminal\n", quakeCommand);
+			quakePrintf(L"Command 'reload' does quick kernel restart (without actual reboot). Note: this "
+						L"destroys all unsaved data and may crash the system!\n",
 						quakeCommand);
 		} else {
-			quakePrintf(u8"Command '%s' not supported\n", quakeCommand);
-			quakePrintf(u8"Enter 'help' for commands\n");
+			quakePrintf(L"Command '%s' not supported\n", quakeCommand);
+			quakePrintf(L"Enter 'help' for commands\n");
 		}
 		for (uint8_t i = 0; i < 255; i++)
 			quakeCommand[i] = 0;
@@ -82,9 +82,9 @@ function quakeHandleButtonDown(uint8_t key) {
 	serialPrintf(L"quake command is %s\n", quakeCommand);
 }
 
-function qsod(const char8_t *format, const uint64_t extra, const uint64_t more) {
+function qsod(const wchar_t *format, const uint64_t extra, const uint64_t more) {
 	haveToQuake = 1;
-	quakePrintf(u8"Kernel stopped working. Please, reboot.\n");
+	quakePrintf(L"Kernel stopped working. Please, reboot.\n");
 	quakePrintf(format, extra, more);
 }
 
@@ -179,13 +179,13 @@ function quakePrintHex(uint64_t n) {
 		_quake_putchar(buf[i]);
 }
 
-function quakePrintf(const char8_t *c, ...) {
+function quakePrintf(const wchar_t *c, ...) {
 	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);
 	while (*c != '\0') {
 		if (*c != '%') {
-			_quake_putchar(*c);
+			_quake_putchar(*c & 0xFF);
 			c++;
 			continue;
 		}

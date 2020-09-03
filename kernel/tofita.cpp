@@ -127,21 +127,21 @@ function kernelInit(const KernelParams *params) {
 	initText();
 	initializeCompositor();
 
-	quakePrintf(u8"GreenteaOS " versionName
+	quakePrintf(L"GreenteaOS " versionName
 				" " STR(versionMajor) "." STR(versionMinor) " " versionTag " loaded and operational\n");
 
 	CPUID cpuid = getCPUID();
 
 	uint32_t megs = Math::round((double)params->ramBytes / (1024.0 * 1024.0));
-	quakePrintf(u8"[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
+	quakePrintf(L"[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
 	if (!ACPIParser::parse(params->acpiTablePhysical)) {
-		quakePrintf(u8"ACPI is *not* loaded\n");
+		quakePrintf(L"ACPI is *not* loaded\n");
 	} else {
-		quakePrintf(u8"ACPI 2.0 is loaded and ready\n");
+		quakePrintf(L"ACPI 2.0 is loaded and ready\n");
 	}
 
-	quakePrintf(u8"Enter 'help' for commands\n");
+	quakePrintf(L"Enter 'help' for commands\n");
 
 	{
 		RamDiskAsset a = getRamDiskAsset(L"root/Windows/Web/Wallpaper/Tofita/default.bmp");
@@ -259,16 +259,16 @@ function kernelThread() {
 						process::Process_destroy(process);
 					} else if (syscall == TofitaSyscalls::Cpu) {
 						serialPrintf(L"[[Cpu:PID %d]] %d\n", index, frame->rdxArg1);
-						quakePrintf(u8"Process #%d closed due to CPU exception #%u\n", index, frame->index);
+						quakePrintf(L"Process #%d closed due to CPU exception #%u\n", index, frame->index);
 						process->present = false;
 
 						// Page fault
 						if (frame->index == 0x0E)
-							quakePrintf(u8"#PF at %8\n", process->cr2PageFaultAddress);
+							quakePrintf(L"#PF at %8\n", process->cr2PageFaultAddress);
 						if (frame->index == 0x0D)
-							quakePrintf(u8"#GPF at %8\n", frame->ip);
+							quakePrintf(L"#GPF at %8\n", frame->ip);
 						if (frame->index == 0x03)
-							quakePrintf(u8"#BP at %8\n", frame->ip);
+							quakePrintf(L"#BP at %8\n", frame->ip);
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = process::processes[0].pml4;

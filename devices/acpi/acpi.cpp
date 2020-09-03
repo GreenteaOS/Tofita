@@ -218,7 +218,7 @@ class ACPIParser {
 		serialPrintf(L"[ACPI] ACPI 2.0+ tables loading\n");
 		acpi::put_sig(sig, xsdt->header.type);
 		serialPrintf(L"[ACPI] Found table %s\n", sig);
-		quakePrintf(u8"[ACPI] Found table %s, ", sig);
+		quakePrintf(L"[ACPI] Found table %s, ", sig);
 
 		uint64_t numTables = acpiTableEntries(xsdt, sizeof(void *));
 		serialPrintf(L"[ACPI] acpiTableEntries %d\n", numTables);
@@ -228,7 +228,7 @@ class ACPIParser {
 
 			acpi::put_sig(sig, header->type);
 			serialPrintf(L"[ACPI] Found table %s\n", sig);
-			quakePrintf(u8"found table %s, ", sig);
+			quakePrintf(L"found table %s, ", sig);
 
 			serialPrintf(L"[ACPI] acpiValidate(header) %d\n", header->validate());
 
@@ -246,7 +246,7 @@ class ACPIParser {
 			}
 		}
 
-		quakePrintf(u8"done.\n");
+		quakePrintf(L"done.\n");
 	}
 
 	static function loadApic(const acpi::AcpiApic *apic) {
