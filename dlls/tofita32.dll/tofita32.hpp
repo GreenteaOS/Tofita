@@ -28,7 +28,7 @@ extern "C" {
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 TOFITA32_DLL uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx = 0);
 __attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub();
-TOFITA32_DLL void tofitaDebugLog(const char8_t *message, uint64_t extra = 0, uint64_t more = 0);
+TOFITA32_DLL void tofitaDebugLog(const wchar_t *message, uint64_t extra = 0, uint64_t more = 0);
 
 // Kernel32
 TOFITA32_DLL void tofitaExitProcess(uint32_t exitCode);

@@ -40,7 +40,7 @@ wapi::HWnd windowToHandle(user32::Window *window) {
 extern "C" {
 
 wapi::Atom RegisterClassW(const wapi::WindowClass *wc) {
-	tofitaDebugLog(u8"RegisterClassW called");
+	tofitaDebugLog(L"RegisterClassW called");
 
 	// TODO use libc func utf16le
 	auto len = 0;
@@ -72,7 +72,7 @@ wapi::Atom RegisterClassW(const wapi::WindowClass *wc) {
 	tail->next = list;
 	tail = tail->next;
 
-	tofitaDebugLog(u8"RegisterClassW done");
+	tofitaDebugLog(L"RegisterClassW done");
 	return (wapi::Atom)0;
 }
 
@@ -80,7 +80,7 @@ wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName, const
 						   uint32_t dwStyle, int32_t x, int32_t y, int32_t nWidth, int32_t nHeight,
 						   wapi::HWnd hWndParent, wapi::HMenu hMenu, wapi::HInstance hInstance,
 						   void *lpParam) {
-	tofitaDebugLog(u8"CreateWindowExW called");
+	tofitaDebugLog(L"CreateWindowExW called");
 
 	// Find class
 	auto *list = &user32::rootClass;
@@ -95,7 +95,7 @@ wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName, const
 		uint16_t i = 0;
 		while (true) {
 			if ((list->name[i] == name[i]) && (name[i] == 0)) {
-				tofitaDebugLog(u8"CreateWindowExW found class {%S}\n", (uint64_t)name);
+				tofitaDebugLog(L"CreateWindowExW found class {%S}\n", (uint64_t)name);
 				found = true;
 				wc = &list->wc;
 				break;
@@ -109,7 +109,7 @@ wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName, const
 	}
 
 	if (!found) {
-		tofitaDebugLog(u8"CreateWindowExW not found return");
+		tofitaDebugLog(L"CreateWindowExW not found return");
 		return (wapi::HWnd) nullptr;
 	}
 
@@ -147,12 +147,12 @@ wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName, const
 	// TODO should be called somewhere else, in syscall of windows creation?
 	PostMessage(hWnd, wapi::Message::WM_PAINT, nullptr, nullptr);
 
-	tofitaDebugLog(u8"CreateWindowExW done");
+	tofitaDebugLog(L"CreateWindowExW done");
 	return hWnd;
 }
 
 wapi::Bool ShowWindow(wapi::HWnd hWnd, int32_t nCmdShow) {
-	tofitaDebugLog(u8"ShowWindow called");
+	tofitaDebugLog(L"ShowWindow called");
 	auto window = handleToWindow(hWnd);
 	wapi::Bool result = 0;
 	if (window != nullptr) {
@@ -174,13 +174,13 @@ wapi::Bool ShowWindow(wapi::HWnd hWnd, int32_t nCmdShow) {
 		}
 		}
 	}
-	tofitaDebugLog(u8"ShowWindow done");
+	tofitaDebugLog(L"ShowWindow done");
 	return result;
 }
 
 // TODO take 2 or more messages at a time for better perf (this is pretty common)
 wapi::Bool GetMessageW(wapi::Msg *msg, wapi::HWnd hWnd, uint32_t wMsgFilterMin, uint32_t wMsgFilterMax) {
-	tofitaDebugLog(u8"GetMessageW called");
+	tofitaDebugLog(L"GetMessageW called");
 	wapi::Bool result = 1;
 
 	GetMessagePayload payload;
@@ -194,19 +194,19 @@ wapi::Bool GetMessageW(wapi::Msg *msg, wapi::HWnd hWnd, uint32_t wMsgFilterMin, 
 	if (msg->message == wapi::Message::WM_QUIT)
 		result = 0;
 
-	tofitaDebugLog(u8"GetMessageW done");
+	tofitaDebugLog(L"GetMessageW done");
 	return result;
 }
 
 wapi::Bool TranslateMessage(wapi::Msg *msg) {
-	tofitaDebugLog(u8"TranslateMessage called");
+	tofitaDebugLog(L"TranslateMessage called");
 	// TODO
-	tofitaDebugLog(u8"TranslateMessage done");
+	tofitaDebugLog(L"TranslateMessage done");
 	return 0;
 }
 
 wapi::LResult DispatchMessageW(wapi::Msg *msg) {
-	tofitaDebugLog(u8"DispatchMessageW called");
+	tofitaDebugLog(L"DispatchMessageW called");
 	wapi::LResult result = 0;
 	if (msg->hwnd != nullptr) {
 		auto window = handleToWindow(msg->hwnd);
@@ -216,7 +216,7 @@ wapi::LResult DispatchMessageW(wapi::Msg *msg) {
 	} else {
 		// TODO
 	}
-	tofitaDebugLog(u8"DispatchMessageW done");
+	tofitaDebugLog(L"DispatchMessageW done");
 	return result;
 }
 
@@ -230,14 +230,14 @@ wapi::Bool PostMessage(wapi::HWnd hWnd, wapi::Message msg, void *wParam, void *l
 }
 
 void PostQuitMessage(int32_t nExitCode) {
-	tofitaDebugLog(u8"PostQuitMessage called");
+	tofitaDebugLog(L"PostQuitMessage called");
 	PostMessage(nullptr, wapi::Message::WM_QUIT, (void *)nExitCode, nullptr);
-	tofitaDebugLog(u8"PostQuitMessage done");
+	tofitaDebugLog(L"PostQuitMessage done");
 	// TODO ERROR_SUCCESS
 }
 
 wapi::HDc BeginPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps) {
-	tofitaDebugLog(u8"BeginPaint called");
+	tofitaDebugLog(L"BeginPaint called");
 	auto window = handleToWindow(hWnd);
 	if (window == nullptr)
 		return nullptr;
@@ -247,7 +247,7 @@ wapi::HDc BeginPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps) {
 	ps->rcPaint.top = 0;
 	ps->rcPaint.right = window->fb.width;
 	ps->rcPaint.bottom = window->fb.height;
-	tofitaDebugLog(u8"BeginPaint done");
+	tofitaDebugLog(L"BeginPaint done");
 	return (wapi::HDc)&window->fb; // TODO
 }
 
@@ -260,7 +260,7 @@ void __attribute__((fastcall)) setPixel(nj::WindowFramebuffer *fb, int16_t x, in
 }
 
 int32_t FillRect(wapi::HDc dc, const wapi::Rect *lprc, wapi::HBrush brush) {
-	tofitaDebugLog(u8"FillRect called");
+	tofitaDebugLog(L"FillRect called");
 
 	auto fb = (nj::WindowFramebuffer *)dc;
 
@@ -273,22 +273,22 @@ int32_t FillRect(wapi::HDc dc, const wapi::Rect *lprc, wapi::HBrush brush) {
 		}
 	}
 
-	tofitaDebugLog(u8"FillRect done");
+	tofitaDebugLog(L"FillRect done");
 	return 1;
 }
 
 wapi::Bool EndPaint(wapi::HWnd hWnd, wapi::PaintStruct *ps) {
-	tofitaDebugLog(u8"EndPaint called");
+	tofitaDebugLog(L"EndPaint called");
 	auto window = handleToWindow(hWnd);
 	if (window == nullptr)
 		return 0;
 	njraaSwapWindowFramebuffer(window->windowId, &window->fb);
-	tofitaDebugLog(u8"EndPaint done");
+	tofitaDebugLog(L"EndPaint done");
 	return 1;
 }
 
 wapi::LResult DefWindowProcW(wapi::HWnd hWnd, wapi::Message uMsg, void *wParam, void *lParam) {
-	tofitaDebugLog(u8"DefWindowProcW called");
+	tofitaDebugLog(L"DefWindowProcW called");
 	auto window = handleToWindow(hWnd);
 	if (window == nullptr)
 		return 0;
@@ -299,7 +299,7 @@ wapi::LResult DefWindowProcW(wapi::HWnd hWnd, wapi::Message uMsg, void *wParam, 
 		window->proc(hWnd, wapi::Message::WM_NCDESTROY, 0, 0);
 		return 0;
 	}
-	tofitaDebugLog(u8"DefWindowProcW done");
+	tofitaDebugLog(L"DefWindowProcW done");
 	return 0;
 }
 }
