@@ -45,7 +45,7 @@ Module *loadModule(ModuleInterim *params) {
 	auto imageSectionHeader =
 		(const exe::ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->sizeOfOptionalHeader);
 	for (uint16_t i = 0; i < peHeader->numberOfSections; ++i) {
-		serialPrintf(u8"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
+		serialPrintf(L"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
 					 imageSectionHeader[i].sizeOfRawData);
 		uint64_t where = (uint64_t)base + imageSectionHeader[i].virtualAddress;
 

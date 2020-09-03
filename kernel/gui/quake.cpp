@@ -45,7 +45,7 @@ function quake() {
 }
 
 function quakeHandleButtonDown(uint8_t key) {
-	serialPrintf(u8"quakeHandleButtonDown %d\n", key);
+	serialPrintf(L"quakeHandleButtonDown %d\n", key);
 
 	if (keyboardMap[key] == '\b' && quakeCommandSize > 0) {
 		quakeCommand[quakeCommandSize - 1] = 0;
@@ -60,8 +60,8 @@ function quakeHandleButtonDown(uint8_t key) {
 			start(paramsCache); // TODO pml4, stack
 		} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
 			quakePrintf(u8"Hit `~` to show/hide this terminal\n", quakeCommand);
-			quakePrintf(u8"Command 'reload' does quick kernel restart (without actual reboot) Note: this "
-						u8"destroys all data!\n",
+			quakePrintf(u8"Command 'reload' does quick kernel restart (without actual reboot). Note: this "
+						u8"destroys all unsaved data and may crash the system!\n",
 						quakeCommand);
 		} else {
 			quakePrintf(u8"Command '%s' not supported\n", quakeCommand);
@@ -79,7 +79,7 @@ function quakeHandleButtonDown(uint8_t key) {
 			quakeCommandSize++;
 		}
 
-	serialPrintf(u8"quake command is %s\n", quakeCommand);
+	serialPrintf(L"quake command is %s\n", quakeCommand);
 }
 
 function qsod(const char8_t *format, const uint64_t extra, const uint64_t more) {
