@@ -17,9 +17,9 @@ My code is self-explanatory, no extended description required
 - [ ] `(optional)` I added my real name to improve protective power of [GPL license](https://en.wikipedia.org/wiki/GNU_General_Public_License) to all touched source code files and [AUTHORS.md](https://github.com/GreenteaOS/Tofita/blob/master/AUTHORS.md)
 - [ ] My code is *autoformatted*
 - [ ] I have waited for completion of [automatic builds](https://ci.appveyor.com/project/PeyTy/tofita) for this project, downloaded [artifacts](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts), and checked their behavior
-- [ ] My code covered by at least basic automated tests
+- [ ] My code covered by at least basic automated tests or some sorts of compile-time type-based proofs
 - [ ] My code is **not** copy-pasted from leaked source codes of commercial projects, nor from protected with incompatible to GPL licenses
 - [ ] My code contains comments and adequate variable/methods names, I have made corresponding changes to the documentation
-- [ ] My code and myself follow [code of conduct](https://github.com/GreenteaOS/Greentea/blob/master/CODE_OF_CONDUCT.md#code-of-conduct), and I do understand, 
+- [ ] My code and myself follow [code of conduct](https://github.com/GreenteaOS/Greentea/blob/master/CODE_OF_CONDUCT.md#code-of-conduct), and I do understand,
 that our code of conduct has no relation with any [SJWs](https://en.wikipedia.org/wiki/Social_justice_warrior) or whatever parties,
 was chosen intentionally and solely by logic, and inadequate behavior would not be tolerated
