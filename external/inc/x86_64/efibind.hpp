@@ -41,8 +41,6 @@ Revision History
 
 #if defined(_MSC_EXTENSIONS)
 
-// Use Microsoft C compiler integer width declarations
-
 typedef unsigned __int64 uint64_t;
 typedef __int64 int64_t;
 typedef unsigned __int32 uint32_t;
@@ -182,7 +180,7 @@ typedef uint64_t UINTN;
 
 #ifndef EFIAPI // Forces EFI calling conventions reguardless of compiler options
 #ifdef _MSC_EXTENSIONS
-#define EFIAPI __cdecl // Force C calling convention for Microsoft C compiler
+#define EFIAPI __cdecl // Force C calling convention
 #elif defined(HAVE_USE_MS_ABI)
 // Force amd64/ms calling conventions.
 #define EFIAPI __attribute__((ms_abi))
@@ -209,7 +207,7 @@ typedef uint64_t UINTN;
 
 //
 // To help ensure proper coding of integrated drivers, they are
-// compiled as DLLs.  In NT they require a dll init entry pointer.
+// compiled as DLLs.
 // The macro puts a stub entry point into the DLL so it will load.
 //
 

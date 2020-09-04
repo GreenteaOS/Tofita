@@ -18,7 +18,7 @@
 namespace user {
 
 // A "user" is the one we can login into
-// Note: NT sandbox has it's own set of users
+// Note: Toast sandbox has it's own set of users
 struct User {
 	const char8_t *name;
 	sandbox::Sandbox *sandbox;

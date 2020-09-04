@@ -114,7 +114,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 				break;
 			} else if (0 == CompareGuid(&efiTable->VendorGuid, &acpi)) {
 				// acpiTable = (void *)((intptr_t)efiTable->VendorTable | 0x1); // LSB high
-				// ACPI 2.0 is required by Windows 7
+				// ACPI 2.0 is required by Tofita
 				// So we don't need to support ACPI 1.0
 				serialPrintln(L"[[[efi_main]]] found: ACPI 1.0, ignoring");
 			}

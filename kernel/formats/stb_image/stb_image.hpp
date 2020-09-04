@@ -628,8 +628,7 @@ typedef uint8_t validate_uint32[sizeof(stbi__uint32) == 4 ? 1 : -1];
 // Note that __MINGW32__ doesn't actually mean 32-bit, so we have to avoid
 // STBI__X64_TARGET
 //
-// 32-bit MinGW wants ESP to be 16-byte aligned, but this is not in the
-// Windows ABI and VC++ as well as Windows DLLs don't maintain that invariant.
+// 32-bit MinGW wants ESP to be 16-byte aligned.
 // As a result, enabling SSE2 on 32-bit MinGW is dangerous when not
 // simultaneously enabling "-mstackrealign".
 //
@@ -5422,7 +5421,7 @@ static int32_t stbi__png_is16(stbi__context *s) {
 }
 #endif
 
-// Microsoft/Windows BMP image
+// BMP image
 
 #ifndef STBI_NO_BMP
 static int32_t stbi__bmp_test_raw(stbi__context *s) {
@@ -6133,7 +6132,7 @@ static void *stbi__tga_load(stbi__context *s, int32_t *x, int32_t *y, int32_t *c
 		tga_data = stbi__convert_format(tga_data, tga_comp, req_comp, tga_width, tga_height);
 
 	//   the things I do to get rid of an error message, and yet keep
-	//   Microsoft's C compilers happy... [8^(
+	//   C compilers happy... [8^(
 	tga_palette_start = tga_palette_len = tga_palette_bits = tga_x_origin = tga_y_origin = 0;
 	//   OK, done
 	return tga_data;
@@ -7927,7 +7926,7 @@ STBIDEF int32_t stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *
 	  0.94    STBI_NO_STDIO to disable stdio usage; rename all #defines the same
 	  0.93    handle jpegtran output; verbose errors
 	  0.92    read 4,8,16,24,32-bit BMP files of several formats
-	  0.91    output 24-bit Windows 3.0 BMP files
+	  0.91    output 24-bit BMP files
 	  0.90    fix a few more warnings; bump version number to approach 1.0
 	  0.61    bugfixes due to Marc LeBlanc, Christopher Lloyd
 	  0.60    fix compiling as c++

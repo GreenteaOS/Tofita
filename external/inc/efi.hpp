@@ -25,7 +25,7 @@ Revision History
 // Build flags on input
 //  EFI32
 //  EFI_DEBUG               - Enable debugging code
-//  EFI_NT_EMULATOR         - Building for running under NT
+//  EFI_NT_EMULATOR         - Building for running under Tofita
 //
 
 #ifndef _EFI_INCLUDE_

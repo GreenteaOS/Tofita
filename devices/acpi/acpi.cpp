@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// ACPI 2.0 is required by Windows 7
+// ACPI 2.0 is required by Tofita
 // So we don't need to support ACPI 1.0
 // TODO check if more generic table ST->ConfigurationTable viable
 
