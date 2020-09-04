@@ -25,7 +25,7 @@ section .head
 ; r8 - fifth argument
 ; r9 - sixth
 
-; NT
+; Tofita
 ; rcx - first argument - (uint64_t)params
 ; rdx - second argument - (uint64_t)paging::pml4entries (CR3)
 ; r8 - third argument - stack
@@ -39,7 +39,7 @@ cli ; Disable interrupts
 ;mov cr3, rsi ; UNIX
 ;o64 jmp rcx ; UNIX
 
-mov cr3, rdx ; NT
+mov cr3, rdx ; Tofita
 
 mov rsp, r8
 push 0 ; Signal end of stack with 0 return address

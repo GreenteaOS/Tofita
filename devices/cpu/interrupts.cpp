@@ -412,8 +412,8 @@ void anyInterruptHandler(InterruptFrame *frame) {
 	writePort(0xA0, 0x20);
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 
-	// Several operating systems such as Windows and Linux, use some of the segments for internal usage.
-	// For instance Windows x64 uses the GS register to access the TLS (thread local storage)
+	// Operating systems use some of the segments for internal usage.
+	// For instance GS register to access the TLS (thread local storage)
 	// and in Linux it's for accessing cpu specific memory
 }
 
@@ -671,7 +671,7 @@ function gdtSetEntry(uint8_t i, uint32_t base, uint64_t limit, bool is64, enum G
 }
 
 // Takes 2 GDT entries
-function tssSetEntryNT(uint8_t i, uint64_t base, uint64_t limit) {
+function tssSetEntry(uint8_t i, uint64_t base, uint64_t limit) {
 	TssDescriptor *tssd = (TssDescriptor *)&gdtTemplate[i * 2];
 	tssd->limitLow = limit & 0xffff;
 	tssd->size = (limit >> 16) & 0xf;
@@ -759,8 +759,8 @@ function enableInterrupts() {
 
 	// upload
 	{
-		tssSetEntryNT(8, tssBase, sizeof_TssEntry);
-		// tssSetEntryNT(8, tssBase, sizeof_TssEntry - 1); TODO
+		tssSetEntry(8, tssBase, sizeof_TssEntry);
+		// tssSetEntry(8, tssBase, sizeof_TssEntry - 1); TODO
 	}
 
 	if (false) {

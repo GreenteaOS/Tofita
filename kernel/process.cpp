@@ -47,7 +47,7 @@ Process *Process_create() {
 	return process;
 }
 
-// Note: 10.000 system-wise on NT
+// Note: supposedly 10.000 system-wise
 constexpr uint64_t messagesBufferSize = 256;
 
 wapi::Msg *getOrCreateMessagesBuffer(volatile Process *process) {

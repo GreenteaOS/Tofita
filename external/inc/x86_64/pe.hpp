@@ -62,7 +62,7 @@ typedef struct _IMAGE_OS2_HEADER { // OS/2 .EXE header
 	UINT16 ne_pretthunks;		   // offset to return thunks
 	UINT16 ne_psegrefbytes;		   // offset to segment ref. bytes
 	UINT16 ne_swaparea;			   // Minimum code swap area size
-	UINT16 ne_expver;			   // Expected Windows version number
+	UINT16 ne_expver;			   // Expected OS version number
 } IMAGE_OS2_HEADER, *PIMAGE_OS2_HEADER;
 
 //
@@ -134,7 +134,7 @@ typedef struct _IMAGE_OPTIONAL_HEADER {
 	UINT32 BaseOfData;
 
 	//
-	// NT additional fields.
+	// Additional fields.
 	//
 
 	UINT32 ImageBase;
@@ -203,8 +203,8 @@ typedef struct _IMAGE_ROM_HEADERS {
 
 #define IMAGE_SUBSYSTEM_UNKNOWN 0	  // Unknown subsystem.
 #define IMAGE_SUBSYSTEM_NATIVE 1	  // Image doesn't require a subsystem.
-#define IMAGE_SUBSYSTEM_WINDOWS_GUI 2 // Image runs in the Windows GUI subsystem.
-#define IMAGE_SUBSYSTEM_WINDOWS_CUI 3 // Image runs in the Windows character subsystem.
+#define IMAGE_SUBSYSTEM_WINDOWS_GUI 2 // Image runs in the GUI subsystem.
+#define IMAGE_SUBSYSTEM_WINDOWS_CUI 3 // Image runs in the character subsystem.
 #define IMAGE_SUBSYSTEM_OS2_CUI 5	  // image runs in the OS/2 character subsystem.
 #define IMAGE_SUBSYSTEM_POSIX_CUI 7	  // image run  in the Posix character subsystem.
 

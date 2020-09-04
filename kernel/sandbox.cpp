@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// NT Sandboxes
+// Tofita Sandboxes/Toastes
 
 namespace sandbox {
 
-// "NT user" is one associated with NT sandbox
+// "Toast user" is one associated with Toast sandbox
 // We can "Run As" but cannot login
 struct NtUser {};
 

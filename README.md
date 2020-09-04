@@ -13,7 +13,7 @@ All-new kernel for [Greentea OS](https://github.com/GreenteaOS) — [read Tofita
 [![Language Top](https://img.shields.io/github/languages/top/GreenteaOS/Tofita.svg?colorB=green)](https://github.com/hexalang/hexa)
 [![TODO](https://img.shields.io/badge/!-TODO-0f9d58.svg?style=flat)](https://github.com/GreenteaOS/Tofita/search?q=TODO&unscoped_q=TODO&type=Code)
 
-Greentea OS is aimed to run `.exe` files natively, and to provide full operating system environment for that.
+Greentea OS is aimed to provide full operating system environment
 
 ![Screenshot](https://raw.githubusercontent.com/GreenteaOS/Greentea/master/Images/screenshot.jpg)
 
@@ -64,7 +64,7 @@ Help to hire developers and buy hardware](https://www.patreon.com/PeyTy)
 
 ## Build
 
-Windows or [WHQ on Linux/macOS](https://www.winehq.org/) is required to run build scripts and tools
+Get automatic build or make yours with Teapot (if you want to edit the code)
 
 #### Nightly builds
 
