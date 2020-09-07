@@ -32,14 +32,4 @@ void greenteaosIsTheBest(int32_t (*entry)(), uint64_t pid) {
 	tofitaExitProcess(entry());
 	while (true) {};
 }
-
-// TODO use modern __attribute__ syntax
-__attribute__((naked, fastcall)) void _DllMainCRTStartup() {
-	asm volatile("pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "movq %rsp, %rbp\t\n"
-				 "call greenteaosIsTheBest");
-}
 }

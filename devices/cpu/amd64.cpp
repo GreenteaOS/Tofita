@@ -31,26 +31,13 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *
 }
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
-inline function writeCr3(uint64_t value) {
-	__sync_synchronize();
-	asm volatile("movq %0, %%cr3" ::"r"(value));
-	__sync_synchronize();
-}
-
-inline function halt() {
-	asm volatile("hlt" ::);
-}
-
-inline function enableAllInterrupts() {
-	asm volatile("sti" ::);
-}
-
+function writeCr3(uint64_t value);
+// TODO asm("invd")
+function halt();
+function enableAllInterrupts();
 // Except non-mascable
-inline function disableAllInterrupts() {
-	asm volatile("cli" ::);
-}
-
-inline function enableAllInterruptsAndHalt() {
-	asm volatile("sti\n\thlt" ::);
-}
+function disableAllInterrupts();
+function enableAllInterruptsAndHalt();
+function pause();
+function yield();
 } // namespace amd64

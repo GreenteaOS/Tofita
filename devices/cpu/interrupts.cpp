@@ -24,7 +24,7 @@
 #define PIC_EOI_0x20 0x20 // End-of-interrupt command code
 
 uint8_t readPort(uint16_t port);
-function writePort(uint16_t port, uint8_t value);
+function writePort(volatile uint16_t port, volatile uint8_t value);
 uint8_t mouseRead();
 
 #define PACKED __attribute__((packed))
@@ -68,13 +68,13 @@ typedef struct {
 	uint32_t zero : 32;
 } PACKED IdtEntry;
 
-uint8_t readPort(uint16_t port) {
+uint8_t readPort(volatile uint16_t port) {
 	uint8_t data;
 	asm volatile("inb %w1,%b0" : "=a"(data) : "d"(port));
 	return data;
 }
 
-function writePort(uint16_t port, uint8_t value) {
+function writePort(volatile uint16_t port, volatile uint8_t value) {
 	asm volatile("outb %b0,%w1" : : "a"(value), "d"(port));
 }
 
@@ -907,8 +907,8 @@ function enablePS2Mouse() {
 	quakePrintf(L"Enabled PS/2 mouse and keyboard\n");
 }
 
-function mouseWait(uint8_t aType) {
-	uint32_t _timeOut = 100000;
+function mouseWait(volatile uint8_t aType) {
+	volatile uint32_t _timeOut = 1000000;
 	if (aType == 0) {
 		while (_timeOut--) // Data
 		{
@@ -928,7 +928,7 @@ function mouseWait(uint8_t aType) {
 	}
 }
 
-function mouseWrite(uint8_t aWrite) {
+function mouseWrite(volatile uint8_t aWrite) {
 	// Wait to be able to send a command
 	mouseWait(1);
 	// Tell the mouse we are sending a command

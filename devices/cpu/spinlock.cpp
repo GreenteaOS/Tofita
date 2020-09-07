@@ -26,7 +26,7 @@ struct Spinlock {
 		// TODO yield to another process
 		while (!__sync_bool_compare_and_swap(&value, 0, 1)) {
 			while (value) {
-				asm volatile("pause");
+				amd64::pause();
 			}
 		}
 	}
