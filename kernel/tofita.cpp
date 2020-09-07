@@ -209,8 +209,8 @@ function switchToUserProcess() {
 		// amd64::enableAllInterruptsAndHalt(); // Nothing to do
 	}
 	// else
-	asm volatile("int $0x81"); // yield
-							   // TODO
+	amd64::yield();
+	// TODO
 }
 
 function kernelThread() {
@@ -298,29 +298,15 @@ function kernelThread() {
 	}
 }
 
-__attribute__((naked, fastcall)) function guiThreadStart() {
-	asm volatile("pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "movq %rsp, %rbp\t\n"
-				 "call guiThread");
-}
+function guiThreadStart();
 
-__attribute__((naked, fastcall)) function kernelThreadStart() {
-	asm volatile("pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "pushq $0\t\n"
-				 "movq %rsp, %rbp\t\n"
-				 "call kernelThread");
-}
+function kernelThreadStart();
 
 // In case of kernel crash set instruction pointer to here
 function kernelThreadLoop() {
 	serialPrintln(L"<Tofita> [looping forever]");
 	while (true) {
-		asm volatile("pause");
+		amd64::pause();
 	};
 }
 

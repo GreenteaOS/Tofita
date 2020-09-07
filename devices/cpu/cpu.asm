@@ -133,14 +133,6 @@ global fallback_handler13
 global fallback_handler14
 global fallback_handler15
 
-;%macro write_string 2
-;	mov eax, 4
-;	mov ebx, 1
-;	mov ecx, %1
-;	mov edx, %2
-;	int 80h
-;%endmacro
-
 ; This is just a type declaration
 struc InterruptFrame
 .xmm0     resq 2
@@ -317,21 +309,21 @@ defineIRQHandler exceptionHandler, exceptionPrelude
 
 defineIRQ 0x00, cpu0x00, exceptionPrelude ; Division by zero
 defineIRQ 0x01, cpu0x01, exceptionPrelude ; Single-step interrupt (see trap flag)
-defineIRQ 0x02, cpu0x02, exceptionPrelude ; NMI
-defineIRQ 0x03, cpu0x03, exceptionPrelude ; Breakpoint (callable by the special 1-byte instruction 0xCC, used by debuggers)
-defineIRQ 0x04, cpu0x04, exceptionPrelude ; Overflow
-defineIRQ 0x05, cpu0x05, exceptionPrelude ; Bounds
-defineIRQ 0x06, cpu0x06, exceptionPrelude ; Invalid Opcode
-defineIRQ 0x07, cpu0x07, exceptionPrelude ; Coprocessor not available
+defineIRQ 0x02, cpu0x02, exceptionPrelude ; NMI Interrupt
+defineIRQ 0x03, cpu0x03, exceptionPrelude ; Breakpoint (callable by the special 1-byte instruction 0xCC (INT3), used by debuggers)
+defineIRQ 0x04, cpu0x04, exceptionPrelude ; Overflow (INTO)
+defineIRQ 0x05, cpu0x05, exceptionPrelude ; Bounds range exceeded (BOUND)
+defineIRQ 0x06, cpu0x06, exceptionPrelude ; Invalid Opcode (UD2)
+defineIRQ 0x07, cpu0x07, exceptionPrelude ; Device/Coprocessor not available (WAIT/FWAIT)
 defineIRQwithErrCode 0x08, cpu0x08, exceptionPrelude ; Double fault
 defineIRQ 0x09, cpu0x09, exceptionPrelude ; Coprocessor Segment Overrun (386 or earlier only)
 defineIRQwithErrCode 0x0A, cpu0x0A, exceptionPrelude ; Invalid Task State Segment
 defineIRQwithErrCode 0x0B, cpu0x0B, exceptionPrelude ; Segment not present
-defineIRQwithErrCode 0x0C, cpu0x0C, exceptionPrelude ; Stack Fault
-defineIRQwithErrCode 0x0D, cpu0x0D, exceptionPrelude ; General protection fault
-defineIRQwithErrCode 0x0E, cpu0x0E, exceptionPrelude ; Page fault
+defineIRQwithErrCode 0x0C, cpu0x0C, exceptionPrelude ; Stack-segment Fault
+defineIRQwithErrCode 0x0D, cpu0x0D, exceptionPrelude ; General protection fault #GP
+defineIRQwithErrCode 0x0E, cpu0x0E, exceptionPrelude ; Page fault #PF
 defineIRQ 0x0F, cpu0x0F, exceptionPrelude ; reserved
-defineIRQ 0x10, cpu0x10, exceptionPrelude ; Math Fault
+defineIRQ 0x10, cpu0x10, exceptionPrelude ; Math Fault (x87 FPU error)
 defineIRQwithErrCode 0x11, cpu0x11, exceptionPrelude ; Alignment Check
 defineIRQ 0x12, cpu0x12, exceptionPrelude ; Machine Check
 defineIRQ 0x13, cpu0x13, exceptionPrelude ; SIMD Floating-Point Exception
@@ -348,3 +340,60 @@ sehReturnFalse:
 	mov al, 0; bool
 	add	rsp, 16; Check disasm of probeFor*
 	ret
+
+global halt
+halt:
+	hlt
+	ret
+
+global enableAllInterrupts
+enableAllInterrupts:
+	sti
+	ret
+
+global disableAllInterrupts
+disableAllInterrupts:
+	cli
+	ret
+
+global enableAllInterruptsAndHalt
+enableAllInterruptsAndHalt:
+	sti
+	hlt
+	ret
+
+global writeCr3
+writeCr3:
+	mfence
+	mov	cr3, rcx
+	ret
+
+global pause
+pause:
+	pause
+	ret
+
+global yield
+yield:
+	int 0x81
+	ret
+
+extern guiThread
+global guiThreadStart
+guiThreadStart:
+	push 0
+	push 0
+	push 0
+	push 0
+	mov rbp, rsp
+	call guiThread
+
+extern kernelThread
+global kernelThreadStart
+kernelThreadStart:
+	push 0
+	push 0
+	push 0
+	push 0
+	mov rbp, rsp
+	call kernelThread

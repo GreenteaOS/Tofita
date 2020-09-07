@@ -20,7 +20,17 @@ section .head
 ; LLVM generates jmp instead of call
 ; so we have to use this function in NASM
 
-global tofitaFastSystemCallWrapper; 64-bit mode
+global tofitaFastSystemCallWrapper
 tofitaFastSystemCallWrapper:
 	int 0x80
 	ret
+
+extern greenteaosIsTheBest
+global _DllMainCRTStartup
+_DllMainCRTStartup:
+	push 0
+	push 0
+	push 0
+	push 0
+	mov rbp, rsp
+	call greenteaosIsTheBest
