@@ -69,13 +69,11 @@ typedef struct {
 } PACKED IdtEntry;
 
 uint8_t readPort(volatile uint16_t port) {
-	uint8_t data;
-	asm volatile("inb %w1,%b0" : "=a"(data) : "d"(port));
-	return data;
+	return portInb(port);
 }
 
 function writePort(volatile uint16_t port, volatile uint8_t value) {
-	asm volatile("outb %b0,%w1" : : "a"(value), "d"(port));
+	portOutb(port, value);
 }
 
 static inline function loadIdt(Idtr *idtr) {

@@ -24,6 +24,7 @@ section .head
 ; rcx - fourth argument
 ; r8 - fifth argument
 ; r9 - sixth
+; rax - returned value
 
 ; Tofita
 ; rcx - first argument - (uint64_t)params
@@ -49,3 +50,16 @@ push 0
 mov rbp, rsp ; Frame
 
 o64 call r9
+
+global portOutb
+portOutb:
+    mov rax, rdx
+    mov rdx, rcx
+    out dx, al
+    ret
+
+global portInb
+portInb:
+    mov rdx, rcx
+    in al, dx
+    ret

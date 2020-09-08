@@ -56,16 +56,9 @@ uint64_t kstrlen(const uint8_t *data) {
 	return r;
 }
 
-static inline uint8_t portInb(uint16_t port) {
-	uint8_t data;
-	asm volatile("inb %w1,%b0" : "=a"(data) : "d"(port));
-	return data;
-}
+uint8_t portInb(volatile uint16_t port);
 
-static inline uint8_t portOutb(uint16_t port, uint8_t value) {
-	asm volatile("outb %b0,%w1" : : "a"(value), "d"(port));
-	return value;
-}
+function portOutb(volatile uint16_t port, volatile uint8_t value);
 
 uint8_t readSerialRegister(uint16_t offset) {
 	return portInb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE);
