@@ -76,17 +76,7 @@ function writePort(volatile uint16_t port, volatile uint8_t value) {
 	portOutb(port, value);
 }
 
-static inline function loadIdt(Idtr *idtr) {
-	asm volatile("lidtq %0" : : "m"(*idtr));
-}
-
-// http://wiki.osdev.org/Inline_Assembly/Examples#I.2FO_access
-static inline function ioWait(void) {
-	// TODO: reinvestigate
-	asm volatile("jmp 1f\n\t"
-				 "1:jmp 2f\n\t"
-				 "2:");
-}
+function loadIdt(volatile Idtr *idtr);
 
 // Handling IDT
 #define IDT_SIZE 256
@@ -188,36 +178,6 @@ function remapPic(uint8_t offset1, uint8_t offset2) {
 	writePort(0xA1, 0x0);
 
 	serialPrintln(L"[cpu] done: remap PIC");
-
-	return;
-
-	uint8_t a1, a2;
-
-	a1 = readPort(PIC1_DATA); // save masks
-	a2 = readPort(PIC2_DATA);
-
-	writePort(PIC1_COMMAND, ICW1_INIT + ICW1_ICW4); // starts the initialization sequence (in cascade mode)
-	ioWait();
-	writePort(PIC2_COMMAND, ICW1_INIT + ICW1_ICW4);
-	ioWait();
-	writePort(PIC1_DATA, offset1); // ICW2: Master PIC vector offset
-	ioWait();
-	writePort(PIC2_DATA, offset2); // ICW2: Slave PIC vector offset
-	ioWait();
-	writePort(PIC1_DATA, 4); // ICW3: tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
-	ioWait();
-	writePort(PIC2_DATA, 2); // ICW3: tell Slave PIC its cascade identity (0000 0010)
-	ioWait();
-
-	writePort(PIC1_DATA, ICW4_8086);
-	ioWait();
-	writePort(PIC2_DATA, ICW4_8086);
-	ioWait();
-
-	writePort(PIC1_DATA, a1); // restore saved masks.
-	writePort(PIC2_DATA, a2);
-
-	serialPrintln(L"[cpu] done: remap PIC");
 }
 
 // Sets up the legacy PIC and then disables it
@@ -288,9 +248,7 @@ struct TablePtr {
 
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
-static inline function lgdt(volatile const TablePtr *gdt) {
-	asm volatile("lgdt (%0)" : : "r"(gdt) : "memory");
-}
+function lgdt(volatile const TablePtr *gdt);
 
 enum GdtType : uint8_t {
 	accessed = 0x01,
@@ -635,13 +593,7 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 
 }
 
-function setTsr(uint16_t tsr_data) {
-	asm volatile("ltr %[src]"
-				 :						 // No outputs
-				 : [ src ] "m"(tsr_data) // Inputs
-				 :						 // No clobbers
-	);
-}
+function setTsr(volatile uint16_t tsr_data);
 
 // 16 records
 __attribute__((aligned(64))) static uint32_t gdtTemplate[32] = {
