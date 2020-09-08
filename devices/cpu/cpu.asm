@@ -397,3 +397,16 @@ kernelThreadStart:
 	push 0
 	mov rbp, rsp
 	call kernelThread
+
+global portOutb
+portOutb:
+    mov rax, rdx
+    mov rdx, rcx
+    out dx, al
+    ret
+
+global portInb
+portInb:
+    mov rdx, rcx
+    in al, dx
+    ret
