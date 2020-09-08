@@ -426,3 +426,11 @@ global loadIdt
 loadIdt:
     lidt [rcx]
     ret
+
+global rdtscTicks
+rdtscTicks:
+    rdtsc
+    shl rdx, 32
+    or rax, rdx
+    mov qword [rcx], rax
+    ret
