@@ -410,3 +410,19 @@ portInb:
     mov rdx, rcx
     in al, dx
     ret
+
+global setTsr
+setTsr:
+    mov rax, rcx
+    ltr ax
+    ret
+
+global lgdt
+lgdt:
+    lgdt [rcx]
+    ret
+
+global loadIdt
+loadIdt:
+    lidt [rcx]
+    ret
