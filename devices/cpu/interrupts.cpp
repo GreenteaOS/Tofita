@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define PIC1 0x20 // IO base address for master PIC
-#define PIC2 0xA0 // IO base address for slave PIC
+#define PIC1 0x20 // IO base address for main PIC
+#define PIC2 0xA0 // IO base address for secondary PIC
 #define PIC1_COMMAND PIC1
 #define PIC1_COMMAND_0x20 0x20
 #define PIC1_DATA (PIC1 + 1)
@@ -151,15 +151,15 @@ function initializeFallback(IdtEntry *entry, uint64_t fallbackHandler) {
 
 #define ICW4_8086 0x01		 // 8086/88 (MCS-80/85) mode
 #define ICW4_AUTO 0x02		 // Auto (normal) EOI
-#define ICW4_BUF_SLAVE 0x08	 // Buffered mode/slave
-#define ICW4_BUF_MASTER 0x0C // Buffered mode/master
+#define ICW4_BUF_SECONDARY 0x08	 // Buffered mode/secondary
+#define ICW4_BUF_MASTER 0x0C // Buffered mode/primary
 #define ICW4_SFNM 0x10		 // Special fully nested (not)
 
 /*
 arguments:
 	offset1 - vector offset for master PIC
 			vectors on the master become offset1..offset1+7
-	offset2 - same for slave PIC: offset2..offset2+7
+	offset2 - same for secondary PIC: offset2..offset2+7
 
 Taken from http://wiki.osdev.org/8259_PIC
 */
