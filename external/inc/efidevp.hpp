@@ -171,7 +171,7 @@ typedef struct _ACPI_ADR_DEVICE_PATH {
 typedef struct _ATAPI_DEVICE_PATH {
 	EFI_DEVICE_PATH_PROTOCOL Header;
 	UINT8 PrimarySecondary;
-	UINT8 SlaveMaster;
+	UINT8 SlMs;
 	UINT16 Lun;
 } ATAPI_DEVICE_PATH;
 
