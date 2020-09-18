@@ -289,15 +289,20 @@ function composite() {
 function copyToScreen() {
 	// On 64-bit platform registers are 64-bit,
 	// so lets copy two pixels at a time
-	const uint64_t *source = (uint64_t *)_pixels;
-	uint64_t *destination = (uint64_t *)_framebuffer->base;
-	const uint32_t count = (_framebuffer->width * _framebuffer->height) / 2;
+	const uint16_t height = _framebuffer->height;
+	// Let's assume it is always divideable by 2
+	const uint16_t width = _framebuffer->width / 2;
+	const uint64_t scanline = _framebuffer->width * 4;
+	const uint64_t pixelsPerScanLine = _framebuffer->pixelsPerScanLine * 4;
+	const uint64_t *source = (const uint64_t *)((uint64_t)_pixels);
+	var destination = (uint64_t *)((uint64_t)_framebuffer->base);
 
-	for (uint32_t i = 0; i < count; i += 4) { // note +4
-		// All screen resolutions are guaranteed to be divisible by 8 pixels
-		destination[i + 0] = source[i + 0]; // each step is 2 pixels
-		destination[i + 1] = source[i + 1]; // thus 4 * 2 = 8 pixels
-		destination[i + 2] = source[i + 2]; // so CPU applies pipelining optimization
-		destination[i + 3] = source[i + 3];
+	for (uint16_t y = 0; y < height; y += 1) {
+		for (uint16_t x = 0; x < width; x += 1) {
+			destination[x] = source[x];
+		}
+
+		source = (const uint64_t *)(((uint64_t)source) + scanline);
+		destination = (uint64_t *)(((uint64_t)destination) + pixelsPerScanLine);
 	}
 }
