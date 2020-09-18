@@ -46,6 +46,9 @@ efi::EFI_STATUS loadRamDiskFromVolume(efi::EFI_BOOT_SERVICES *bootsvc, efi::EFI_
 	serialPrintf(L"[[[efi_main.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\n", status,
 				 size, address);
 
+	if (status != EFI_SUCCESS)
+		return status;
+
 	status = file->Read(file, &size, address);
 	serialPrintf(L"[[[efi_main.loadRamDiskFromVolume]]] status: Read %d\n", status);
 
