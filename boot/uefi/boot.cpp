@@ -31,17 +31,8 @@ namespace efi {
 #include "memory.cpp"
 #include "ramdisk.cpp"
 #include "pe.cpp"
+#include "visuals.cpp"
 #include "../../kernel/ramdisk.cpp"
-
-// trampoline.asm -> incbin
-extern const uint8_t binFont[];
-extern const uint8_t binFontBitmap[];
-const uint32_t fontWidth = 512;
-const uint32_t fontHeight = 32;
-
-extern const uint8_t binLeavesBitmap[];
-const uint32_t leavesWidth = 36;
-const uint32_t leavesHeight = 25;
 
 efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
 	efi::INT32 *g1, *g2, r;
@@ -63,31 +54,6 @@ void *tmemcpy(void *dest, const void *src, uint64_t count) {
 	}
 
 	return dest;
-}
-
-function drawPixel(Framebuffer *framebuffer, uint32_t x, uint32_t y, uint32_t color) {
-	uint32_t *pixels = (uint32_t *)framebuffer->base;
-	pixels[(y * framebuffer->pixelsPerScanLine) + x] = color;
-}
-
-struct UefiPixel {
-	uint8_t b;
-	uint8_t g;
-	uint8_t r;
-	uint8_t a;
-} __attribute__((packed));
-
-_Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit");
-
-uint32_t getBitmapPixel(const uint8_t *bmp, uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
-	let colors = bmp + 54;
-	UefiPixel pixel;
-	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0];
-	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1];
-	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2];
-	pixel.a = 0xFF;
-	uint32_t *color = (uint32_t *)&pixel;
-	return *color;
 }
 
 // Loading animation, progress 0...2
@@ -122,6 +88,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	initSerial();
 	serialPrint(L"\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(
 		versionMinor) " " versionName " UEFI bootloader. Welcome!\n");
+
+	initText();
 
 	// Disable watchdog timer
 	systemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
@@ -168,6 +136,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	Framebuffer framebuffer;
 	initializeFramebuffer(&framebuffer, systemTable);
 	drawLoading(&framebuffer, 0);
+	drawText(L"GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag "",
+			 (framebuffer.height / 4) * 3 + 64, &framebuffer);
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
 	serialPrintln(L"[[[efi_main]]] done: initializeFramebuffer");
