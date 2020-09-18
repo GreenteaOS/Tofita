@@ -33,6 +33,16 @@ namespace efi {
 #include "pe.cpp"
 #include "../../kernel/ramdisk.cpp"
 
+// trampoline.asm -> incbin
+extern const uint8_t binFont[];
+extern const uint8_t binFontBitmap[];
+const uint32_t fontWidth = 512;
+const uint32_t fontHeight = 32;
+
+extern const uint8_t binLeavesBitmap[];
+const uint32_t leavesWidth = 36;
+const uint32_t leavesHeight = 25;
+
 efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
 	efi::INT32 *g1, *g2, r;
 	g1 = (efi::INT32 *)guid1;
@@ -60,12 +70,36 @@ function drawPixel(Framebuffer *framebuffer, uint32_t x, uint32_t y, uint32_t co
 	pixels[(y * framebuffer->pixelsPerScanLine) + x] = color;
 }
 
+struct UefiPixel {
+	uint8_t b;
+	uint8_t g;
+	uint8_t r;
+	uint8_t a;
+} __attribute__((packed));
+
+_Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit");
+
+uint32_t getBitmapPixel(const uint8_t *bmp, uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+	let colors = bmp + 54;
+	UefiPixel pixel;
+	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0];
+	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1];
+	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2];
+	pixel.a = 0xFF;
+	uint32_t *color = (uint32_t *)&pixel;
+	return *color;
+}
+
 // Loading animation, progress 0...2
 function drawLoading(Framebuffer *framebuffer, uint8_t progress) {
-	for (uint8_t y = 0; y < 24; y++)
-		for (uint8_t x = 0; x < 24; x++)
-			drawPixel(framebuffer, x + framebuffer->width / 2 - 12 + progress * 24 * 2 - 48,
-					  y + (framebuffer->height / 4) * 3, (uint32_t)0xFFFFFFFF);
+	for (uint8_t y = 0; y < leavesHeight; y++)
+		for (uint8_t x = 0; x < leavesWidth; x++) {
+			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight);
+			drawPixel(framebuffer,
+					  x + framebuffer->width / 2 - (leavesWidth / 2) + progress * leavesWidth * 2 -
+						  leavesWidth * 2,
+					  y + (framebuffer->height / 4) * 3, pixel);
+		}
 }
 
 #include "../shared/paging.cpp"
