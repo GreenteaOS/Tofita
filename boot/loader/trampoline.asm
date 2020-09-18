@@ -63,3 +63,15 @@ portInb:
     mov rdx, rcx
     in al, dx
     ret
+
+global binFont
+binFont:
+incbin "boot/loader/ascii.tofita"
+
+global binFontBitmap
+binFontBitmap:
+incbin "boot/loader/font.bmp"
+
+global binLeavesBitmap
+binLeavesBitmap:
+incbin "boot/loader/leaves.bmp"
