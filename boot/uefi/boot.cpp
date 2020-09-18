@@ -33,7 +33,7 @@ namespace efi {
 #include "pe.cpp"
 #include "../../kernel/ramdisk.cpp"
 
-efi::INTN CompareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
+efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
 	efi::INT32 *g1, *g2, r;
 	g1 = (efi::INT32 *)guid1;
 	g2 = (efi::INT32 *)guid2;
@@ -55,13 +55,17 @@ void *tmemcpy(void *dest, const void *src, uint64_t count) {
 	return dest;
 }
 
+function drawPixel(Framebuffer *framebuffer, uint32_t x, uint32_t y, uint32_t color) {
+	uint32_t *pixels = (uint32_t *)framebuffer->base;
+	pixels[(y * framebuffer->pixelsPerScanLine) + x] = color;
+}
+
 // Loading animation, progress 0...2
 function drawLoading(Framebuffer *framebuffer, uint8_t progress) {
-	uint32_t *pixels = (uint32_t *)framebuffer->base;
 	for (uint8_t y = 0; y < 24; y++)
 		for (uint8_t x = 0; x < 24; x++)
-			pixels[((y + (framebuffer->height / 4) * 3) * framebuffer->width) + x + framebuffer->width / 2 -
-				   12 + progress * 24 * 2 - 48] = 0xFFFFFFFF;
+			drawPixel(framebuffer, x + framebuffer->width / 2 - 12 + progress * 24 * 2 - 48,
+					  y + (framebuffer->height / 4) * 3, (uint32_t)0xFFFFFFFF);
 }
 
 #include "../shared/paging.cpp"
@@ -108,11 +112,11 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 		for (uint64_t i = 0; i < systemTable->NumberOfTableEntries; i++) {
 			efi::EFI_CONFIGURATION_TABLE *efiTable = &systemTable->ConfigurationTable[i];
-			if (0 == CompareGuid(&efiTable->VendorGuid, &acpi20)) { // Prefer ACPI 2.0
+			if (0 == compareGuid(&efiTable->VendorGuid, &acpi20)) { // Prefer ACPI 2.0
 				acpiTable = efiTable->VendorTable;
 				serialPrintln(L"[[[efi_main]]] found: ACPI 2.0");
 				break;
-			} else if (0 == CompareGuid(&efiTable->VendorGuid, &acpi)) {
+			} else if (0 == compareGuid(&efiTable->VendorGuid, &acpi)) {
 				// acpiTable = (void *)((intptr_t)efiTable->VendorTable | 0x1); // LSB high
 				// ACPI 2.0 is required by Tofita
 				// So we don't need to support ACPI 1.0
