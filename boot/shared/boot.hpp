@@ -97,8 +97,9 @@ struct Framebuffer {
 	uint64_t base;	   // virtual address
 	uint64_t physical; // physical address
 	uint32_t size;	   // in bytes
-	uint16_t width;
-	uint16_t height;
+	uint32_t width;
+	uint32_t height;
+	uint32_t pixelsPerScanLine;
 };
 
 struct RamDisk {

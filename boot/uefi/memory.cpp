@@ -37,6 +37,10 @@ function initializeFramebuffer(Framebuffer *fb, efi::EFI_SYSTEM_TABLE *systemTab
 
 	fb->width = gop->Mode->Info->HorizontalResolution;
 	fb->height = gop->Mode->Info->VerticalResolution;
+	fb->pixelsPerScanLine = gop->Mode->Info->PixelsPerScanLine;
+
+	serialPrintf(L"[[[efi_main.initializeFramebuffer]]] width=%d height=%d pixelsPerScanLine=%d size=%d\n",
+				 fb->width, fb->height, fb->pixelsPerScanLine, fb->size);
 
 	gop->SetMode(gop, gop->Mode->Mode);
 }
