@@ -138,6 +138,13 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	drawLoading(&framebuffer, 0);
 	drawText(L"GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag "",
 			 (framebuffer.height / 4) * 3 + 64, &framebuffer);
+	const uint16_t errorY = (framebuffer.height / 4) * 3 + 64 + 32;
+
+	// Check ACPI here, after framebuffer initialization
+	while (acpiTable == NULL) {
+		drawText(L"[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, &framebuffer);
+	}
+
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
 	serialPrintln(L"[[[efi_main]]] done: initializeFramebuffer");
@@ -145,7 +152,10 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 
 	// Initial RAM disk
 	RamDisk ramdisk;
-	findAndLoadRamDisk(systemTable->BootServices, &ramdisk);
+	status = findAndLoadRamDisk(systemTable->BootServices, &ramdisk);
+	while (status != EFI_SUCCESS) {
+		drawText(L"[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, &framebuffer);
+	}
 	drawLoading(&framebuffer, 1);
 
 	serialPrintln(L"[[[efi_main]]] begin: fillMemoryMap");
@@ -254,6 +264,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	uint32_t megs = (uint32_t)(ram / (1024 * 1024));
 	serialPrintf(L"[paging] available RAM is ~%u megabytes\n", megs);
 	while (megs < 768) {
+		drawText(L"[ERROR] Tofita requires at least 1 GB of memory [ERROR]", errorY, &framebuffer);
 		serialPrintf(L"Tofita requires at least 1 GB of memory\n");
 	}
 	params->ramBytes = ram;
