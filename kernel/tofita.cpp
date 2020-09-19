@@ -91,6 +91,8 @@ void ___chkstk_ms(){};
 #include "syscalls/user32/userCall.cpp"
 
 const KernelParams *paramsCache = null;
+uint64_t startupMilliseconds = 0;
+
 function kernelInit(const KernelParams *params) {
 	serialPrintln(L"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
 		versionMinor) " " versionTag " kernel loaded and operational");
@@ -190,8 +192,11 @@ function kernelInit(const KernelParams *params) {
 		pml4kernelThread = process::processes[0].pml4;
 	}
 
+	startupMilliseconds = paramsCache->time.Hour * 60 * 60 * 1000 + paramsCache->time.Minute * 60 * 1000 +
+						  paramsCache->time.Second * 1000;
+
 	// Show something before scheduling delay
-	composite();
+	composite(startupMilliseconds);
 	copyToScreen();
 	serialPrintln(L"<Tofita> [ready for scheduling]");
 }
@@ -321,7 +326,7 @@ function guiThread() {
 
 		haveToRender = false;
 
-		composite();
+		composite(startupMilliseconds);
 		copyToScreen();
 
 		switchToUserProcess();
