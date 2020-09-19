@@ -122,6 +122,9 @@ struct KernelParams {
 	RamDisk ramdisk;
 	uint64_t acpiTablePhysical;
 	uint64_t ramBytes;
+
+	efi::EFI_TIME time;
+	efi::EFI_TIME_CAPABILITIES capabilities;
 	// uint8_t isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and
 	// don't allow to login! in the sense that it looks like a security hole
 	// like "let it in without entering a login-password")

@@ -173,6 +173,34 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	fillMemoryMap(&efiMemoryMap, systemTable);
 	serialPrintln(L"[[[efi_main]]] done: fillMemoryMap");
 
+	efi::EFI_TIME time;
+	time.Year = 2020;
+	efi::EFI_TIME_CAPABILITIES capabilities;
+	{
+		serialPrintln(L"[[[efi_main]]] begin: GetTime");
+		efi::EFI_STATUS status = systemTable->RuntimeServices->GetTime(&time, &capabilities);
+		while (status != EFI_SUCCESS) {
+			serialPrintln(L"[[[efi_main]]] <ERROR> GetTime");
+			drawText(L"[ERROR] Cannot get current time from UEFI [ERROR]", errorY, &framebuffer);
+		}
+
+		{
+			serialPrintf(L"[[[efi_main]]] EFI_TIME Year=%d Month=%d Day=%d Hour=%d Minute=%d Second=%d "
+						 L"Nanosecond=%d TimeZone=%d Daylight=%d\n",
+						 time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second,
+						 time.Nanosecond, time.TimeZone, time.Daylight);
+
+			serialPrintf(L"[[[efi_main]]] EFI_TIME_CAPABILITIES Resolution=%d Accuracy=%d SetsToZero=%d\n",
+						 capabilities.Resolution, capabilities.Accuracy, capabilities.SetsToZero);
+
+			// Set 2020 as least valid, so security/HTTPS certificates at least partially work
+			// and file system is not messed
+			if (time.Year < 2020)
+				time.Year = 2020;
+		}
+		serialPrintln(L"[[[efi_main]]] done: GetTime");
+	}
+
 	serialPrintln(L"[[[efi_main]]] begin: ExitBootServices");
 	uint8_t oops = 0;
 	status = EFI_NOT_READY;
@@ -180,6 +208,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		if (oops < 10)
 			serialPrintln(L"[[[efi_main]]] try: ExitBootServices");
 		if (oops == 100) {
+			drawText(L"Loading...", errorY, &framebuffer);
 			serialPrintln(L"[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices");
 			serialPrintln(L"[[[efi_main]]] <ERROR?> system may or may not start");
 			oops = 200;
@@ -243,6 +272,9 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 			b[i] = paging::buffa[0];
 		}
 	}
+
+	params->time = time;
+	params->capabilities = capabilities;
 
 	// Note: stack grows from x to X-N, not X+N
 	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
