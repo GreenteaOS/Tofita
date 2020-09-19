@@ -22,8 +22,6 @@
 // ^ use hlt in scheduler
 
 // Returns 1 if something happened
-const uint8_t PollingPS2SomethingHappened = 1;
-const uint8_t PollingPS2NothingHappened = 0;
 uint8_t pollPS2Devices() {
 	uint8_t result = PollingPS2NothingHappened;
 	uint8_t poll = readPort(0x64);

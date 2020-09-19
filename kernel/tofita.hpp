@@ -18,6 +18,7 @@
 #include "../dlls/types.hpp"
 #include "../devices/screen/framebuffer.hpp"
 #include "../devices/ps2/mouse.hpp"
+#include "../devices/ps2/polling.hpp"
 #include "gui/dwm.hpp"
 #include "gui/desktop.hpp"
 #include "syscalls/syscalls.hpp"
