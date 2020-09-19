@@ -197,7 +197,7 @@ function compositeWindows() {
 	}
 }
 
-function composite() {
+function composite(uint64_t startupMilliseconds) {
 	// TODO not best place for this
 	dwm::handleMouseActivity();
 	dwm::handleKeyboardActivity();
@@ -266,8 +266,16 @@ function composite() {
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x11;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 
-	let uptimeHours = (uint8_t)(uptimeMilliseconds / (60 * 60 * 1000));
-	let uptimeMinutes = (uint8_t)((uptimeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000));
+	let timeMilliseconds = uptimeMilliseconds + startupMilliseconds;
+	var uptimeHours = (uint64_t)(timeMilliseconds / (60 * 60 * 1000));
+	while (uptimeHours >= 24)
+		uptimeHours -= 24;
+	let uptimeMinutes = (uint8_t)((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000));
+
+	bool pm = uptimeHours >= 12;
+	if (uptimeHours > 12) {
+		uptimeHours -= 12;
+	}
 
 	var trayTimeX = trayButtonX + 20;
 	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10, color);
@@ -275,7 +283,7 @@ function composite() {
 	if (uptimeMinutes < 10)
 		trayTimeX += drawAsciiText(u8"0", trayTimeX, taskbarY + 10, color);
 	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10, color);
-	trayTimeX += drawAsciiText(u8" AM", trayTimeX, taskbarY + 10, color);
+	trayTimeX += drawAsciiText(pm ? u8" PM" : u8" AM", trayTimeX, taskbarY + 10, color);
 
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, taskbarY + 10 + 2, 6, -1);
