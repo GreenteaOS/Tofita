@@ -27,3 +27,6 @@ enum class MouseActionType : uint8_t {
 	// TODO ScrollToUser,
 	Moved
 };
+
+volatile bool lockMouse = false;
+function handleMousePacket();

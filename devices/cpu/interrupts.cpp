@@ -814,7 +814,8 @@ function enableInterrupts() {
 	writePort(0x40, (frequency >> 8) & 0xFF);
 
 	// Unmasking IRQ to support all the things
-	writePort(IRQ1, 0x00);
+	// but NOT keyboard
+	writePort(IRQ1, 0x00 | 0b00000010);
 }
 
 function enablePS2Mouse() {
