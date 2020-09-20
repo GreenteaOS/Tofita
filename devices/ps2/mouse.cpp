@@ -63,8 +63,8 @@ uint8_t getBit(uint8_t byte, uint8_t bit) {
 	return (byte & (1 << bit)) >> bit;
 }
 
-volatile bool lockMouse = false;
 function handleMousePacket() {
+	while (lockMouse) {};
 	lockMouse = true;
 
 	switch (mouseCycle) {
@@ -144,12 +144,4 @@ function handleMousePacket() {
 }
 
 function handleMouse() {
-	handleMousePacket();
-	uint8_t poll = readPort(0x64);
-	while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
-		handleMousePacket();
-		poll = readPort(0x64);
-	}
-	writePort(0xA0, 0x20);
-	writePort(0x20, 0x20);
 }

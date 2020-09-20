@@ -16,7 +16,7 @@
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
 uint8_t keyboardPressedState[128] = {0};
-uint8_t keyboardMap[128] = {
+const uint8_t keyboardMap[128] = {
 	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
 	'9',  '0', '-', '=',
@@ -66,22 +66,10 @@ uint8_t keyboardMap[128] = {
 #define STATUS_REGISTER 0x64
 #define DATA_PORT 0x60
 
-function handleKeyboard() {
-	uint8_t status = readPort(STATUS_REGISTER);
+function handleKeyboardPacket() {
 
-	// PS2 Mouse
-	if (status & 0x20) {
-		//    uint8_t keycode = readPort(DATA_PORT);
-		//    //if (keycode < 0) {
-		return;
-		//    //}
-		//    //uint8_t buffer[] = {keyboardMap[keycode], 0};
-		//    uint8_t buffer[] = {'M','o','u','s','e',':', 0};
-		//    serialPrint(buffer);
-		//    serialPrint(buffer);
-	}
 
-	if (status & 0x1) {
+	{
 		uint8_t keycode = readPort(DATA_PORT);
 
 		if (keycode < 0) {
@@ -118,11 +106,16 @@ function handleKeyboard() {
 	}
 
 	// Note: Quake terminal has higher priority than kernel itself
-	if (keyboardPressedState[41])
+	if (keyboardPressedState[41]) {
 		haveToQuake = !haveToQuake;
-	haveToRender = 1;
+		// TODO DWM
+		haveToRender = 1;
+	}
 
 	// EOI
 	// Disable this line if polling is used
 	writePort(PIC1_COMMAND, PIC_EOI);
+}
+
+function handleKeyboard() {
 }

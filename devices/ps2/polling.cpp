@@ -23,32 +23,20 @@
 
 // Returns 1 if something happened
 uint8_t pollPS2Devices() {
-	uint8_t result = PollingPS2NothingHappened;
+
 	uint8_t poll = readPort(0x64);
-	while (getBit(poll, 0) == 1) {
-		result = PollingPS2SomethingHappened;
-		if (getBit(poll, 5) == 0) {
-			handleKeyboard();
-			// if (keyboardPressedState[72])
-			//	mouseY -= 4;
-			// if (keyboardPressedState[80])
-			//	mouseY += 4;
-			// if (keyboardPressedState[77])
-			//	mouseX += 4;
-			// if (keyboardPressedState[75])
-			//	mouseX -= 4;
-			// if (keyboardPressedState[41])
-			//	haveToQuake = !haveToQuake;
-			// keyDownHandler = null;
-			// if (haveToQuake)
-			//	keyDownHandler = quakeHandleButtonDown;
-			haveToRender = 1;
-		} else if (getBit(poll, 5) == 1) {
-			handleMouse();
-			haveToRender = 1;
-		}
+
+	while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
+		handleMousePacket();
+		writePort(0xA0, 0x20);
+		writePort(0x20, 0x20);
 		poll = readPort(0x64);
 	}
 
-	return result;
+	while (getBit(poll, 0) == 1 && getBit(poll, 5) == 0) {
+		handleKeyboardPacket();
+		poll = readPort(0x64);
+	}
+
+	return 0;
 }
