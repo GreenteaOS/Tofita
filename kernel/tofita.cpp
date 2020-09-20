@@ -320,6 +320,8 @@ function guiThread() {
 
 	while (true) {
 		// Poll PS/2 devices
+		pollPS2Devices();
+
 		if (haveToRender == false) {
 			switchToUserProcess();
 		}
