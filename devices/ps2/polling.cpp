@@ -21,21 +21,23 @@
 // ^ this may draw polling mechanism useless (poll for flag only in scheduler)
 // ^ use hlt in scheduler
 
-// Returns 1 if something happened
 uint8_t pollPS2Devices() {
 
 	uint8_t poll = readPort(0x64);
 
-	while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
-		handleMousePacket();
-		writePort(0xA0, 0x20);
-		writePort(0x20, 0x20);
-		poll = readPort(0x64);
-	}
+	while (getBit(poll, 0) == 1) {
+		// Mouse has higher priority
+		while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
+			handleMousePacket();
+			writePort(0xA0, 0x20);
+			writePort(0x20, 0x20);
+			poll = readPort(0x64);
+		}
 
-	while (getBit(poll, 0) == 1 && getBit(poll, 5) == 0) {
-		handleKeyboardPacket();
-		poll = readPort(0x64);
+		if (getBit(poll, 0) == 1 && getBit(poll, 5) == 0) {
+			handleKeyboardPacket();
+			poll = readPort(0x64);
+		}
 	}
 
 	return 0;

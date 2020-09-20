@@ -80,9 +80,9 @@ function handleKeyboardPacket() {
 			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0)
 				buffer[0] = '?';
-			serialPrint(L"[keyboard] [");
-			serialPrint(buffer);
-			serialPrintf(L" down] %d keycode\n", keycode);
+			// serialPrint(L"[");
+			// serialPrint(buffer);
+			// serialPrintf(L" down] %d\n", keycode);
 			keyboardPressedState[keycode] = 1;
 			if (haveToQuake)
 				quakeHandleButtonDown(keycode);
@@ -93,9 +93,9 @@ function handleKeyboardPacket() {
 			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0)
 				buffer[0] = '?';
-			serialPrint(L"[keyboard] [");
-			serialPrint(buffer);
-			serialPrintf(L" up] %d keycode\n", keycode + 128);
+			// serialPrint(L"[");
+			// serialPrint(buffer);
+			// serialPrintf(L" up] %d\n", keycode + 128);
 			keyboardPressedState[keycode] = 0;
 		}
 
