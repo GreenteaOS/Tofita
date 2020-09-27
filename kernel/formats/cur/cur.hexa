@@ -15,7 +15,7 @@
 
 module
 
-function loadCursor(buffer: Buffer) {
+fun loadCursor(buffer: Buffer) {
 	// Reserved. Must always be 0.
 	if (buffer[0] != 0) return null
 	// Specifies image type: 1 for icon (.ICO) image, 2 for cursor (.CUR) image.

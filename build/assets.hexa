@@ -38,7 +38,7 @@ let deps: [[String]] = [
 	['ntdll', 'kernel32', 'gdi32']
 ]
 
-function packFonts(config: Config) {
+fun packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
 			JSON.parse(fs.readFileSync('assets/root/Windows/Fonts/default.json').toString().trim())
@@ -59,7 +59,7 @@ function packFonts(config: Config) {
 		fs.writeFileSync(config.tempFolder + '\\tofita\\ascii.tofita', buffer, "binary")
 }
 
-function packAssets(config: Config) {
+fun packAssets(config: Config) {
 
 		let fs = require('fs')
 
@@ -78,9 +78,9 @@ function packAssets(config: Config) {
 		assetName.push('ascii.tofita')
 		assetPath.push(config.tempFolder + '\\tofita\\ascii.tofita')
 
-		function addFolderRecursive(path) {
+		fun addFolderRecursive(path) {
 			if (fs.existsSync(path)) {
-				fs.readdirSync(path).forEach(function(file, index) {
+				fs.readdirSync(path).forEach(fun(file, index) {
 					let curPath = path + "/" + file
 					if (fs.lstatSync(curPath).isDirectory()) {
 						addFolderRecursive(curPath)
@@ -101,14 +101,14 @@ function packAssets(config: Config) {
 			ramDiskSize += fs.statSync(asset).size
 		}
 
-		ramDiskSize += 4 // uint32_t ramDiskChecksum;
-		ramDiskSize += 4 // uint32_t ramDiskSize;
-		ramDiskSize += 4 // uint32_t assetsCount;
+		ramDiskSize += 4 // UInt32 ramDiskChecksum;
+		ramDiskSize += 4 // UInt32 ramDiskSize;
+		ramDiskSize += 4 // UInt32 assetsCount;
 		ramDiskSize += ( //struct assetDefinition
 			//{
-			256 + //	uint8_t path[256];
-			4 + //	    uint32_t size;
-			4 //	    uint32_t offsetFromRamDiskFirstByte; // NOT relative to `data`
+			256 + //	UInt8 path[256];
+			4 + //	    UInt32 size;
+			4 //	    UInt32 offsetFromRamDiskFirstByte; // NOT relative to `data`
 			//};
 		) * assetName.length
 		//uint8_t* data;
@@ -139,7 +139,7 @@ function packAssets(config: Config) {
 			assetInfoOffset += assetInfoSize
 		}
 
-		function getChecksum() {
+		fun getChecksum() {
 			var checksum = 0
 			// Start from 1, coz 0 contains original checksum
 			var i = 1

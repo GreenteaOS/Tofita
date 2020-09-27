@@ -19,21 +19,21 @@
 #include "ntdllVars.hpp"
 
 extern "C" {
-uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
+UInt64 KiFastSystemCall(UInt64 rcx, UInt64 rdx) {
 	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
 }
 
-void greenteaosIsTheBest(int32_t (*entry)(), uint64_t pid) {
+void greenteaosIsTheBest(Int32 (*entry)(), UInt64 pid) {
 	// TODO entry arguments (argv, argc)
 	// TODO init DLLs
 	// TODO PEB/TEB
 	// TODO TLS callbacks
 	// TODO load DLLs in usermode
-	tofitaDebugLog(L"CRT ready for PID %u", pid);
+	tofitaDebugLog("CRT ready for PID %u", pid);
 	if (entry != nullptr)
-		tofitaDebugLog(L"entry != nullptr OK for PID %u", pid);
+		tofitaDebugLog("entry != nullptr OK for PID %u", pid);
 	if (entry == nullptr)
-		tofitaDebugLog(L"entry == nullptr ERROR for PID %u", pid);
+		tofitaDebugLog("entry == nullptr ERROR for PID %u", pid);
 	tofitaExitProcess(entry());
 	while (true) {};
 }

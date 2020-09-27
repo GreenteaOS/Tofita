@@ -20,7 +20,7 @@ extern "C++" namespace desktop {
 	var dragY = 255;
 	var drag = false;
 
-	function compositeDesktop(int16_t mouseX, int16_t mouseY);
-	function handleMouseDownDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY);
-	function handleMouseUpDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY);
+	fun compositeDesktop(int16_t mouseX, int16_t mouseY);
+	fun handleMouseDownDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY);
+	fun handleMouseUpDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY);
 }

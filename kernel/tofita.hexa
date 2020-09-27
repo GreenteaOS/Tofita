@@ -35,28 +35,28 @@ namespace efi {
 #define HEXA_NO_DEFAULT_INCLUDES
 #undef char
 #undef int
-function serialPrintf(const wchar_t *c, ...);
+fun serialPrintf(const wchar_t *c, ...);
 void printf(const char *c, ...) {
-	serialPrintf(L"<Hexa> printf %s\n", c);
+	serialPrintf("<Hexa> printf %s\n", c);
 };
 void fflush(void *pipe) {
-	serialPrintf(L"<Hexa> fflush\n");
+	serialPrintf("<Hexa> fflush\n");
 };
-void *malloc(uint64_t bytes) {
-	serialPrintf(L"<Hexa> malloc\n");
+void *malloc(UInt64 bytes) {
+	serialPrintf("<Hexa> malloc\n");
 	return (void *)allocateBytes(bytes);
 };
 // void memcpy(...){};
-function memcpy(void *dest, const void *src, uint64_t n);
-int32_t wcslen(const wchar_t *string_) {
-	serialPrintf(L"<Hexa> wcslen\n");
-	int32_t i = 0;
+fun memcpy(void *dest, const void *src, UInt64 n);
+Int32 wcslen(const wchar_t *string_) {
+	serialPrintf("<Hexa> wcslen\n");
+	Int32 i = 0;
 	while (string_[i] != '\0')
 		i++;
 	return i;
 };
 void free(void *ptr) {
-	serialPrintf(L"<Hexa> free\n");
+	serialPrintf("<Hexa> free\n");
 };
 typedef void FILE;
 #define HEXA_MAIN mainHexa
@@ -65,15 +65,15 @@ typedef void FILE;
 #define char do_not_use_such_types_please
 #define int do_not_use_such_types_please
 
-void *memset(void *dest, int32_t e, uint64_t len) {
-	uint8_t *d = (uint8_t *)dest;
-	for (uint64_t i = 0; i < len; i++, d++) {
+void *memset(void *dest, Int32 e, UInt64 len) {
+	UInt8 *d = (UInt8 *)dest;
+	for (UInt64 i = 0; i < len; i++, d++) {
 		*d = e;
 	}
 	return dest;
 }
 
-function memzero(void *dest, uint64_t len) {
+fun memzero(void *dest, UInt64 len) {
 	memset(dest, 0, len);
 }
 
@@ -129,79 +129,79 @@ void ___chkstk_ms(){};
 #include "syscalls/user32/userCall.cpp"
 
 const KernelParams *paramsCache = null;
-uint64_t startupMilliseconds = 0;
+UInt64 startupMilliseconds = 0;
 
-function kernelInit(const KernelParams *params) {
-	serialPrintln(L"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
+fun kernelInit(const KernelParams *params) {
+	serialPrintln("<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
 		versionMinor) " " versionTag " kernel loaded and operational");
-	serialPrintf(L"<Tofita> CR3 points to: %8\n", (uint64_t)params->pml4);
+	serialPrintf("<Tofita> CR3 points to: %8\n", (uint64_t)params.pml4);
 	paramsCache = params;
-	// PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual,
-	// DOWN_BYTES_TO_PAGES(params->ramBytes));
-	PhysicalAllocator::init(params);
-	pages::pml4entries = (pages::PageEntry *)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
+	// PhysicalAllocator.init(&params.efiMemoryMap, params.physicalRamBitMaskVirtual,
+	// DOWN_BYTES_TO_PAGES(params.ramBytes));
+	PhysicalAllocator.init(params);
+	pages.pml4entries = (pages.PageEntry *)((uint64_t)WholePhysicalStart + (uint64_t)(params.pml4));
 
 	if (false) {
-		pages::mapMemory(pages::pml4entries, 4096, 4096, 256);
-		pages::mapMemory(pages::pml4entries, 4096, 4096, 256);
-		pages::mapMemory(pages::pml4entries, 4096 * 20, 4096 * 10, 256);
+		pages.mapMemory(pages.pml4entries, 4096, 4096, 256);
+		pages.mapMemory(pages.pml4entries, 4096, 4096, 256);
+		pages.mapMemory(pages.pml4entries, 4096 * 20, 4096 * 10, 256);
 
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(4096 * 10),
-					 pages::resolveAddr(pages::pml4entries, 4096 * 20));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(4096 * 10 + 123),
-					 pages::resolveAddr(pages::pml4entries, 4096 * 20 + 123));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(0),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(0 + 123),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart + 123));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(0 + 4096),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart + 4096));
+		serialPrintf("<> %8 == %8\n", (uint64_t)(4096 * 10),
+					 pages.resolveAddr(pages.pml4entries, 4096 * 20));
+		serialPrintf("<> %8 == %8\n", (uint64_t)(4096 * 10 + 123),
+					 pages.resolveAddr(pages.pml4entries, 4096 * 20 + 123));
+		serialPrintf("<> %8 == %8\n", (uint64_t)(0),
+					 pages.resolveAddr(pages.pml4entries, (uint64_t)WholePhysicalStart));
+		serialPrintf("<> %8 == %8\n", (uint64_t)(0 + 123),
+					 pages.resolveAddr(pages.pml4entries, (uint64_t)WholePhysicalStart + 123));
+		serialPrintf("<> %8 == %8\n", (uint64_t)(0 + 4096),
+					 pages.resolveAddr(pages.pml4entries, (uint64_t)WholePhysicalStart + 4096));
 		serialPrintf(
-			L"<> %8 == %8\n", (uint64_t)(0 + 4096 * 1000 + 123),
-			pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart + 4096 * 1000 + 123));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(1048576),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)0xffff800000000000));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(1048576 + 123),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)0xffff800000000000 + 123));
+			"<> %8 == %8\n", (uint64_t)(0 + 4096 * 1000 + 123),
+			pages.resolveAddr(pages.pml4entries, (uint64_t)WholePhysicalStart + 4096 * 1000 + 123));
+		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576),
+					 pages.resolveAddr(pages.pml4entries, (uint64_t)0xffff800000000000));
+		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576 + 123),
+					 pages.resolveAddr(pages.pml4entries, (uint64_t)0xffff800000000000 + 123));
 
-		// serialPrint(L"resolves from, to, wh, wh+8888: ");
-		// serialPrint(L"\n");
+		// serialPrint("resolves from, to, wh, wh+8888: ");
+		// serialPrint("\n");
 		// serialPrintHex(4096 * 10);
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr(4096 * 20 + 123));
-		// serialPrint(L"==\n");
-		// serialPrintHex(pages::resolveAddr(4096 * 20));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)WholePhysicalStart));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)WholePhysicalStart + 8888));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)WholePhysicalStart + 4096 * 1000));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)0xffff800000000000));
-		// serialPrint(L"\n");
+		// serialPrint("\n");
+		// serialPrintHex(pages.resolveAddr(4096 * 20 + 123));
+		// serialPrint("==\n");
+		// serialPrintHex(pages.resolveAddr(4096 * 20));
+		// serialPrint("\n");
+		// serialPrintHex(pages.resolveAddr((uint64_t)WholePhysicalStart));
+		// serialPrint("\n");
+		// serialPrintHex(pages.resolveAddr((uint64_t)WholePhysicalStart + 8888));
+		// serialPrint("\n");
+		// serialPrintHex(pages.resolveAddr((uint64_t)WholePhysicalStart + 4096 * 1000));
+		// serialPrint("\n");
+		// serialPrintHex(pages.resolveAddr((uint64_t)0xffff800000000000));
+		// serialPrint("\n");
 	};
 
-	setFramebuffer(&params->framebuffer);
-	setRamDisk(&params->ramdisk);
+	setFramebuffer(&params.framebuffer);
+	setRamDisk(&params.ramdisk);
 
-	if (sizeof(uint8_t *) == 4)
-		serialPrintln(L"<Tofita> void*: 4 bytes");
-	if (sizeof(uint8_t *) == 8)
-		serialPrintln(L"<Tofita> void*: 8 bytes");
+	if (sizeof(UInt8 *) == 4)
+		serialPrintln("<Tofita> void*: 4 bytes");
+	if (sizeof(UInt8 *) == 8)
+		serialPrintln("<Tofita> void*: 8 bytes");
 
 #ifdef __cplusplus
-	serialPrintln(L"<Tofita> __cplusplus");
+	serialPrintln("<Tofita> __cplusplus");
 #else
-	serialPrintln(L"<Tofita> !__cplusplus");
+	serialPrintln("<Tofita> !__cplusplus");
 #endif
 
 #if defined(__clang__)
-	serialPrintln(L"<Tofita> __clang__");
+	serialPrintln("<Tofita> __clang__");
 #elif defined(__GNUC__) || defined(__GNUG__)
-	serialPrintln(L"<Tofita> __GNUC__");
+	serialPrintln("<Tofita> __GNUC__");
 #elif defined(_MSC_VER)
-	serialPrintln(L"<Tofita> _MSC_VER");
+	serialPrintln("<Tofita> _MSC_VER");
 #endif
 
 	disablePic();
@@ -211,33 +211,33 @@ function kernelInit(const KernelParams *params) {
 	initText();
 	initializeCompositor();
 
-	quakePrintf(L"GreenteaOS " versionName
+	quakePrintf("GreenteaOS " versionName
 				" " STR(versionMajor) "." STR(versionMinor) " " versionTag " loaded and operational\n");
 
 	// enableLocalApic();
 
 	CPUID cpuid = getCPUID();
 
-	uint32_t megs = Math::round((double)params->ramBytes / (1024.0 * 1024.0));
-	quakePrintf(L"[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
+	UInt32 megs = Math.round((double)params.ramBytes / (1024.0 * 1024.0));
+	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
 
-	if (!ACPIParser::parse(params->acpiTablePhysical)) {
-		quakePrintf(L"ACPI is *not* loaded\n");
+	if (!ACPIParser.parse(params.acpiTablePhysical)) {
+		quakePrintf("ACPI is *not* loaded\n");
 	} else {
-		quakePrintf(L"ACPI 2.0 is loaded and ready\n");
+		quakePrintf("ACPI 2.0 is loaded and ready\n");
 	}
 
-	quakePrintf(L"Enter 'help' for commands\n");
+	quakePrintf("Enter 'help' for commands\n");
 
 	{
 		// TODO move to compositor
-		RamDiskAsset a = getRamDiskAsset(L"root/Windows/Web/Wallpaper/Tofita/default.bmp");
-		Bitmap32 *bmp = bmp::loadBmp24(&a);
+		RamDiskAsset a = getRamDiskAsset("root/Windows/Web/Wallpaper/Tofita/default.bmp");
+		Bitmap32 *bmp = bmp.loadBmp24(&a);
 		setWallpaper(bmp, Center);
 	}
 
-	// var sandbox = sandbox::createSandbox();
-	dwm::initDwm();
+	// var sandbox = sandbox.createSandbox();
+	dwm.initDwm();
 
 	// Setup scheduling
 	currentThread = THREAD_INIT;
@@ -267,39 +267,39 @@ function kernelInit(const KernelParams *params) {
 
 	// Idle process
 	{
-		memset(&process::processes, 0, sizeof(process::processes)); // Zeroing
-		process::Process *idle = &process::processes[0];
-		idle->pml4 = pages::pml4entries; // Save CR3 template to idle process
-		idle->schedulable = true;		 // At idle schedule to idle process
-		idle->present = true;
-		idle->syscallToHandle = TofitaSyscalls::Noop;
-		process::currentProcess = 0;
-		pml4kernelThread = process::processes[0].pml4;
+		memset(&process.processes, 0, sizeof(process.processes)); // Zeroing
+		process.Process *idle = &process.processes[0];
+		idle.pml4 = pages.pml4entries; // Save CR3 template to idle process
+		idle.schedulable = true;		 // At idle schedule to idle process
+		idle.present = true;
+		idle.syscallToHandle = TofitaSyscalls.Noop;
+		process.currentProcess = 0;
+		pml4kernelThread = process.processes[0].pml4;
 	}
 
 	// Demo
 	if (false) {
-		for (uint8_t i = 0; i < 3; ++i) {
-			process::Process *demo = process::Process_create();
-			serialPrintf(L"<> pid == %u\n", demo->pid);
-			process::Process_init(demo);
-			exe::loadExeIntoProcess(L"desktop/wndapp.exe", demo);
-			demo->schedulable = true;
+		for (UInt8 i = 0; i < 3; ++i) {
+			process.Process *demo = process.Process_create();
+			serialPrintf("<> pid == %u\n", demo.pid);
+			process.Process_init(demo);
+			exe.loadExeIntoProcess("desktop/wndapp.exe", demo);
+			demo.schedulable = true;
 		}
 	}
 
-	startupMilliseconds = paramsCache->time.Hour * 60 * 60 * 1000 + paramsCache->time.Minute * 60 * 1000 +
-						  paramsCache->time.Second * 1000;
+	startupMilliseconds = paramsCache.time.Hour * 60 * 60 * 1000 + paramsCache.time.Minute * 60 * 1000 +
+						  paramsCache.time.Second * 1000;
 
 	// Show something before scheduling delay
 	composite(startupMilliseconds);
 	copyToScreen();
-	serialPrintln(L"<Tofita> [ready for scheduling]");
+	serialPrintln("<Tofita> [ready for scheduling]");
 }
 
-function switchToUserProcess() {
+fun switchToUserProcess() {
 	// if (processesCount == 0)
-	//	amd64::enableAllInterruptsAndHalt();
+	//	amd64.enableAllInterruptsAndHalt();
 	// TODO
 	var next = getNextProcess();
 
@@ -309,96 +309,96 @@ function switchToUserProcess() {
 	}
 
 	if (next == 0) {
-		// serialPrintln(L"<Tofita> [halt]");
-		// amd64::enableAllInterruptsAndHalt(); // Nothing to do
+		// serialPrintln("<Tofita> [halt]");
+		// amd64.enableAllInterruptsAndHalt(); // Nothing to do
 	}
 	// else
-	amd64::yield();
+	amd64.yield();
 	// TODO
 }
 
-function kernelThread() {
-	serialPrintln(L"<Tofita> [kernelThread] thread started");
+fun kernelThread() {
+	serialPrintln("<Tofita> [kernelThread] thread started");
 
 	// TODO move to preTest with infinite loop on fail
-	serialPrintf(L"<seh> 0 == %u\n", probeForReadOkay((uint64_t)321, 1));
-	serialPrintf(L"<seh> 1 == %u\n", probeForReadOkay((uint64_t)&currentThread, 1));
-	serialPrintf(L"<seh> 0 == %u\n", probeForReadOkay((uint64_t)999999999, 1));
-	serialPrintf(L"<seh> 1 == %u\n", probeForReadOkay((uint64_t)&guiStack, 1));
-	serialPrintf(L"<seh> 0 == %u\n", probeForReadOkay((uint64_t)-1, 1));
-	serialPrintf(L"<seh> 1 == %u\n", probeForReadOkay((uint64_t)&switchToNextProcess, 1));
+	serialPrintf("<seh> 0 == %u\n", probeForReadOkay((uint64_t)321, 1));
+	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)&currentThread, 1));
+	serialPrintf("<seh> 0 == %u\n", probeForReadOkay((uint64_t)999999999, 1));
+	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)&guiStack, 1));
+	serialPrintf("<seh> 0 == %u\n", probeForReadOkay((uint64_t)-1, 1));
+	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)&switchToNextProcess, 1));
 
 	while (true) {
-		volatile uint64_t index = 1; // Idle process ignored
+		@volatile UInt64 index = 1; // Idle process ignored
 		while (index < 255) {		 // TODO
-			volatile process::Process *process = &process::processes[index];
-			if (process->present == true) {
-				if (process->syscallToHandle != TofitaSyscalls::Noop) {
-					volatile let syscall = process->syscallToHandle;
-					process->syscallToHandle = TofitaSyscalls::Noop;
-					volatile var frame = &process->frame;
+			@volatile process.Process *process = &process.processes[index];
+			if (process.present == true) {
+				if (process.syscallToHandle != TofitaSyscalls.Noop) {
+					@volatile let syscall = process.syscallToHandle;
+					process.syscallToHandle = TofitaSyscalls.Noop;
+					@volatile var frame = &process.frame;
 
 					// Select pml4 to work within current process memory
 					// Remember pml4 for proper restore from scheduling
-					pml4kernelThread = process->pml4;
-					amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
+					pml4kernelThread = process.pml4;
+					amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 
 					// TODO refactor to separate syscall handler per-DLL
 
-					if (syscall == TofitaSyscalls::DebugLog) {
-						serialPrintf(L"[[DebugLog:PID %d]] ", index);
-						serialPrintf(L"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1, frame->r8);
+					if (syscall == TofitaSyscalls.DebugLog) {
+						serialPrintf("[[DebugLog:PID %d]] ", index);
+						serialPrintf("[[rcx=%u rdx=%u r8=%u]] ", frame.rcxArg0, frame.rdxArg1, frame.r8);
 
-						if (probeForReadOkay(frame->rdxArg1, sizeof(DebugLogPayload))) {
-							DebugLogPayload *payload = (DebugLogPayload *)frame->rdxArg1;
+						if (probeForReadOkay(frame.rdxArg1, sizeof(DebugLogPayload))) {
+							DebugLogPayload *payload = (DebugLogPayload *)frame.rdxArg1;
 							// Note this is still very unsafe
-							if (probeForReadOkay((uint64_t)payload->message, 1)) {
-								serialPrintf(payload->message, payload->extra, payload->more);
+							if (probeForReadOkay((uint64_t)payload.message, 1)) {
+								serialPrintf(payload.message, payload.extra, payload.more);
 							}
 						}
 
-						serialPrintf(L"\n");
-						process->schedulable = true;
-					} else if (syscall == TofitaSyscalls::ExitProcess) {
-						serialPrintf(L"[[ExitProcess:PID %d]] %d\n", index, frame->rdxArg1);
-						process->present = false;
+						serialPrintf("\n");
+						process.schedulable = true;
+					} else if (syscall == TofitaSyscalls.ExitProcess) {
+						serialPrintf("[[ExitProcess:PID %d]] %d\n", index, frame.rdxArg1);
+						process.present = false;
 
 						// Select pml4 of idle process for safety
-						pml4kernelThread = process::processes[0].pml4;
-						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
+						pml4kernelThread = process.processes[0].pml4;
+						amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 
 						// Deallocate process
-						process::Process_destroy(process);
-					} else if (syscall == TofitaSyscalls::Cpu) {
-						serialPrintf(L"[[Cpu:PID %d]] %d\n", index, frame->rdxArg1);
-						quakePrintf(L"Process #%d closed due to CPU exception #%u\n", index, frame->index);
-						process->present = false;
+						process.Process_destroy(process);
+					} else if (syscall == TofitaSyscalls.Cpu) {
+						serialPrintf("[[Cpu:PID %d]] %d\n", index, frame.rdxArg1);
+						quakePrintf("Process #%d closed due to CPU exception #%u\n", index, frame.index);
+						process.present = false;
 
 						// Page fault
-						if (frame->index == 0x0E)
-							quakePrintf(L"#PF at %8\n", process->cr2PageFaultAddress);
-						if (frame->index == 0x0D)
-							quakePrintf(L"#GPF at %8\n", frame->ip);
-						if (frame->index == 0x03)
-							quakePrintf(L"#BP at %8\n", frame->ip);
+						if (frame.index == 0x0E)
+							quakePrintf("#PF at %8\n", process.cr2PageFaultAddress);
+						if (frame.index == 0x0D)
+							quakePrintf("#GPF at %8\n", frame.ip);
+						if (frame.index == 0x03)
+							quakePrintf("#BP at %8\n", frame.ip);
 
 						// Select pml4 of idle process for safety
-						pml4kernelThread = process::processes[0].pml4;
-						amd64::writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
+						pml4kernelThread = process.processes[0].pml4;
+						amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
 
 						// Deallocate process
-						process::Process_destroy(process);
+						process.Process_destroy(process);
 					} else {
-						frame->raxReturn = 0; // Must return at least something
+						frame.raxReturn = 0; // Must return at least something
 						// Note ^ some code in syscall handlers may *read* this value
 						// So set it to zero just in case
 
-						if (!userCall::userCallHandled(process, syscall)) {
+						if (!userCall.userCallHandled(process, syscall)) {
 							// Unknown syscall is no-op
-							serialPrintf(L"[[PID %d]] Unknown or unhandled syscall %d\n", index,
-										 frame->rcxArg0);
-							frame->raxReturn = 0;
-							process->schedulable = true;
+							serialPrintf("[[PID %d]] Unknown or unhandled syscall %d\n", index,
+										 frame.rcxArg0);
+							frame.raxReturn = 0;
+							process.schedulable = true;
 						}
 					}
 				}
@@ -410,20 +410,20 @@ function kernelThread() {
 	}
 }
 
-function guiThreadStart();
+fun guiThreadStart();
 
-function kernelThreadStart();
+fun kernelThreadStart();
 
 // In case of kernel crash set instruction pointer to here
-function kernelThreadLoop() {
-	serialPrintln(L"<Tofita> [looping forever]");
+fun kernelThreadLoop() {
+	serialPrintln("<Tofita> [looping forever]");
 	while (true) {
-		amd64::pause();
+		amd64.pause();
 	};
 }
 
-function guiThread() {
-	serialPrintln(L"<Tofita> [guiThread] thread started");
+fun guiThread() {
+	serialPrintln("<Tofita> [guiThread] thread started");
 
 	while (true) {
 		// Poll PS/2 devices
@@ -442,7 +442,7 @@ function guiThread() {
 	}
 }
 
-function kernelMain(const KernelParams *params) {
+fun kernelMain(const KernelParams *params) {
 	kernelInit(params);
 	mainHexa(0, null);
 	__sync_synchronize();
@@ -450,11 +450,11 @@ function kernelMain(const KernelParams *params) {
 	// TODO composite here first frame!!!
 	// cause if crashes on hardware, at least it shows something
 
-	// sti -> start sheduling here
+	// sti . start sheduling here
 	// It will erase whole stack on next sheduling
 	// TOOD kernel `yield`/`await`
 	while (true) {
-		amd64::enableAllInterruptsAndHalt();
+		amd64.enableAllInterruptsAndHalt();
 	}
 	// TODO hexa: error if code present in unreachable block
 	// (no break/continue/throw)

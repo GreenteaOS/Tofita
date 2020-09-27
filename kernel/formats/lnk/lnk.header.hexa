@@ -14,55 +14,55 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 extern "C++" namespace shortcut {
-	constexpr uint32_t magic = 0x0000004C;
-	constexpr uint8_t cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46};
+	constexpr UInt32 magic = 0x0000004C;
+	constexpr UInt8 cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46};
 
 	__attribute__((packed)) struct LnkFlags {
-		uint8_t shellItemIdListIsPresent : 1;
-		uint8_t pointsToFileOrDirectory : 1;
-		uint8_t hasDescription : 1;
-		uint8_t hasRelativePath : 1;
-		uint8_t hasWorkingDirectory : 1;
-		uint8_t hasCommandLineArguments : 1;
-		uint8_t hasCustomIcon : 1;
-		uint32_t padding : 25;
+		UInt8 shellItemIdListIsPresent : 1;
+		UInt8 pointsToFileOrDirectory : 1;
+		UInt8 hasDescription : 1;
+		UInt8 hasRelativePath : 1;
+		UInt8 hasWorkingDirectory : 1;
+		UInt8 hasCommandLineArguments : 1;
+		UInt8 hasCustomIcon : 1;
+		UInt32 padding : 25;
 	};
 
 	_Static_assert(sizeof(LnkFlags) == 4, "bad sizeof");
 
 	__attribute__((packed)) struct LnkAttributes {
-		uint8_t readOnly : 1;
-		uint8_t hidden : 1;
-		uint8_t systemFile : 1;
-		uint8_t volumeLabel : 1;
-		uint8_t directory : 1;
-		uint8_t targetArchiveChanged : 1;
-		uint8_t encrypted : 1;
-		uint8_t none : 1;
-		uint8_t temporary : 1;
-		uint8_t sparseFile : 1;
-		uint8_t hasReparsePointData : 1;
-		uint8_t compressed : 1;
-		uint8_t offline : 1;
-		uint32_t padding : 19;
+		UInt8 readOnly : 1;
+		UInt8 hidden : 1;
+		UInt8 systemFile : 1;
+		UInt8 volumeLabel : 1;
+		UInt8 directory : 1;
+		UInt8 targetArchiveChanged : 1;
+		UInt8 encrypted : 1;
+		UInt8 none : 1;
+		UInt8 temporary : 1;
+		UInt8 sparseFile : 1;
+		UInt8 hasReparsePointData : 1;
+		UInt8 compressed : 1;
+		UInt8 offline : 1;
+		UInt32 padding : 19;
 	};
 
 	_Static_assert(sizeof(LnkAttributes) == 4, "bad sizeof");
 
 #pragma pack(1)
 	__attribute__((packed)) struct Lnk {
-		uint32_t magucka;
-		uint8_t clus[16];
+		UInt32 magucka;
+		UInt8 clus[16];
 		LnkFlags flugs;
 		LnkAttributes atts;
-		uint64_t timeOfCreation;
-		uint64_t timeOfModification;
-		uint64_t timeOfAccess;
-		uint32_t lengthOfTargetFileBytesOfLeastBits;
-		uint32_t iconIndex;
-		uint32_t showWund;
-		uint16_t hotKey;
-		uint8_t padding[10];
+		UInt64 timeOfCreation;
+		UInt64 timeOfModification;
+		UInt64 timeOfAccess;
+		UInt32 lengthOfTargetFileBytesOfLeastBits;
+		UInt32 iconIndex;
+		UInt32 showWund;
+		UInt16 hotKey;
+		UInt8 padding[10];
 	};
 #pragma pack()
 

@@ -18,28 +18,28 @@
 namespace pages {
 typedef struct {
 	// Is the page present in physical memory?
-	uint8_t present : 1;
+	UInt8 present : 1;
 
 	// Pages are read-only by default
-	uint8_t writeAllowed : 1;
+	UInt8 writeAllowed : 1;
 
 	// Pages are only accessible by supervisor by default
-	uint8_t accessibleByAll : 1;
+	UInt8 accessibleByAll : 1;
 
 	// Write through abilities of the page
-	uint8_t writeThrough : 1;
+	UInt8 writeThrough : 1;
 
 	// If set, the page will not be cached
-	uint8_t cacheDisabled : 1;
+	UInt8 cacheDisabled : 1;
 
 	// Was the page accessed?
-	uint8_t accessed : 1;
+	UInt8 accessed : 1;
 
 	// Has the page been written to? Only applicable for PTE.
-	uint8_t dirty : 1;
+	UInt8 dirty : 1;
 
 	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
-	uint8_t largePage : 1;
+	UInt8 largePage : 1;
 
 	// Prevent the translations cache from updating
 	// the address in cache if CR3 is reset.
@@ -48,22 +48,22 @@ typedef struct {
 	// enable this feature.
 	//
 	// Only applicable for PTE
-	uint8_t global : 1;
+	UInt8 global : 1;
 
 	// Not used by the processor
-	uint8_t metadata : 3;
+	UInt8 metadata : 3;
 
 	// Physical address of the child table/page
-	uint64_t address : 40;
+	UInt64 address : 40;
 
 	// Not used by the processor
-	uint8_t metadata2 : 7;
+	UInt8 metadata2 : 7;
 
 	// Only applicable for PTE
-	uint8_t protectionKey : 4;
+	UInt8 protectionKey : 4;
 
 	// Disable execution of code from this page
-	uint8_t disableExecution : 1;
+	UInt8 disableExecution : 1;
 } PACKED PageEntry;
 
 _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");

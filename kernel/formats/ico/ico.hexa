@@ -15,11 +15,11 @@
 
 module
 
-function toInt32(a, b, c, d) {
+fun toInt32(a, b, c, d) {
 	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFF
 }
 
-function loadIcon(buffer: Buffer, width: Int) {
+fun loadIcon(buffer: Buffer, width: Int) {
 	// Reserved. Must always be 0.
 	if (buffer[0] != 0) return null
 	// Specifies image type: 1 for icon (.ICO) image, 2 for cursor (.CUR) image.

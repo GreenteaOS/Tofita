@@ -17,36 +17,36 @@
 
 // Tests in disasm show that this is not optimized out thanks to volatile
 
-// TODO probeCopy to local stack instead of probe->read, good for SMP
+// TODO probeCopy to local stack instead of probe.read, good for SMP
 
-volatile bool __attribute__((noinline))
-_probeForReadOkay(volatile uint64_t at, volatile const uint64_t bytes) {
+@volatile Bool @noInline
+_probeForReadOkay(@volatile UInt64 at, @volatile const UInt64 bytes) {
 	sehProbe = true;
 	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
-	volatile const uint8_t *ptr = (volatile const uint8_t *)at;
-	for (uint64_t i = 0; i < bytes; ++i) {
+	@volatile const UInt8 *ptr = (@volatile const UInt8 *)at;
+	for (UInt64 i = 0; i < bytes; ++i) {
 		at += ptr[i];
 	}
 	sehProbe = false;
 	return true;
 }
 
-volatile bool (*volatile const probeForReadOkay)(volatile uint64_t at,
-												 volatile const uint64_t bytes) = _probeForReadOkay;
+@volatile Bool (*@volatile const probeForReadOkay)(@volatile UInt64 at,
+												 @volatile const UInt64 bytes) = _probeForReadOkay;
 
-volatile bool __attribute__((noinline))
-_probeForWriteOkay(volatile const uint64_t at, volatile const uint64_t bytes) {
+@volatile Bool @noInline
+_probeForWriteOkay(@volatile const UInt64 at, @volatile const UInt64 bytes) {
 	sehProbe = true;
 	// TODO per-page not per-byte
-	volatile uint8_t *ptr = (volatile uint8_t *)at;
+	@volatile UInt8 *ptr = (@volatile UInt8 *)at;
 	// TODO i also as volatile?
-	for (uint64_t i = 0; i < bytes; ++i) {
+	for (UInt64 i = 0; i < bytes; ++i) {
 		ptr[i] = ptr[i];
 	}
 	sehProbe = false;
 	return true;
 }
 
-volatile bool (*volatile const probeForWriteOkay)(volatile const uint64_t at,
-												  volatile const uint64_t bytes) = _probeForWriteOkay;
+@volatile Bool (*@volatile const probeForWriteOkay)(@volatile const UInt64 at,
+												  @volatile const UInt64 bytes) = _probeForWriteOkay;

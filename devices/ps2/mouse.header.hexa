@@ -15,7 +15,7 @@
 
 // PS/2 Mouse
 
-enum class MouseActionType : uint8_t {
+enum class MouseActionType : UInt8 {
 	Noop = 0,
 	LeftDown,
 	LeftUp,
@@ -28,5 +28,5 @@ enum class MouseActionType : uint8_t {
 	Moved
 };
 
-volatile bool lockMouse = false;
-function handleMousePacket();
+@volatile Bool lockMouse = false;
+fun handleMousePacket();

@@ -16,9 +16,9 @@
 let fs = require('fs')
 
 // Removes folder recursively
-function deleteFolderRecursive(path, noRemoveSelf) {
+fun deleteFolderRecursive(path, noRemoveSelf) {
 	if (fs.existsSync(path)) {
-		fs.readdirSync(path).forEach(function(file, index) {
+		fs.readdirSync(path).forEach(fun(file, index) {
 			let curPath = path + "/" + file
 			if (fs.lstatSync(curPath).isDirectory()) {
 				deleteFolderRecursive(curPath)
@@ -236,9 +236,9 @@ for (task in tasks) {
 				let clang = '..\\Teapot\\\(llvm)\\bin\\clang-format'
 				let files: [String] = []
 
-				function formatFolderRecursive(path) {
+				fun formatFolderRecursive(path) {
 					if (fs.existsSync(path)) {
-						fs.readdirSync(path).forEach(function(file, index) {
+						fs.readdirSync(path).forEach(fun(file, index) {
 							let curPath = path + "/" + file
 							if (fs.lstatSync(curPath).isDirectory()) {
 								formatFolderRecursive(curPath)

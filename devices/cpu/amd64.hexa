@@ -16,9 +16,9 @@
 // AMD64 assembly instructions wrapper
 
 namespace amd64 {
-inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx,
-					  uint32_t *edx) {
-	uint32_t a, b, c, d;
+inline fun cpuid(UInt32 leaf, UInt32 subleaf, UInt32 *eax, UInt32 *ebx, UInt32 *ecx,
+					  UInt32 *edx) {
+	UInt32 a, b, c, d;
 	asm volatile("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf));
 	*eax = a;
 	*ebx = b;
@@ -27,13 +27,13 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *
 }
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
-function writeCr3(uint64_t value);
+fun writeCr3(UInt64 value);
 // TODO asm("invd")
-function halt();
-function enableAllInterrupts();
+fun halt();
+fun enableAllInterrupts();
 // Except non-mascable
-function disableAllInterrupts();
-function enableAllInterruptsAndHalt();
-function pause();
-function yield();
+fun disableAllInterrupts();
+fun enableAllInterruptsAndHalt();
+fun pause();
+fun yield();
 } // namespace amd64

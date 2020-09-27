@@ -36,20 +36,20 @@
 // to avoid system crash on our of memory
 
 class PhysicalAllocator {
-  private:
+  private
 	// Approx. 1 megabyte per each 4 gygabyte of RAM
-	static uint8_t *buffer; // TODO use bits, not bytes
-	static uint64_t count;
-	static uint64_t countUser; // count - KERNEL_RESERVED_PAGES
-	static uint64_t available;
-	static uint64_t last;
+	static UInt8 *buffer; // TODO use bits, not bytes
+	static UInt64 count;
+	static UInt64 countUser; // count - KERNEL_RESERVED_PAGES
+	static UInt64 available;
+	static UInt64 last;
 
-  public:
-	// static function init(const EfiMemoryMap *memoryMap, uint64_t bufferVirtual, uint64_t ramPages) {
-	static function init(const KernelParams *params) {
-		buffer = (uint8_t *)params->physicalRamBitMaskVirtual;
-		const EfiMemoryMap *memoryMap = &params->efiMemoryMap;
-		count = DOWN_BYTES_TO_PAGES(params->ramBytes);
+  public
+	// static fun init(const EfiMemoryMap *memoryMap, UInt64 bufferVirtual, UInt64 ramPages) {
+	static fun init(const KernelParams *params) {
+		buffer = (UInt8 *)params.physicalRamBitMaskVirtual;
+		const EfiMemoryMap *memoryMap = &params.efiMemoryMap;
+		count = DOWN_BYTES_TO_PAGES(params.ramBytes);
 		countUser = count - KERNEL_RESERVED_PAGES;
 		last = PHYSICAL_NOT_FOUND;
 
@@ -57,23 +57,23 @@ class PhysicalAllocator {
 
 		// Reserve UEFI memory map
 		{
-			const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
-			const uint64_t descriptorSize = memoryMap->descriptorSize;
-			uint64_t numberOfPages = 0;
+			const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap;
+			const UInt64 descriptorSize = memoryMap.descriptorSize;
+			UInt64 numberOfPages = 0;
 
-			uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
-			uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
-			uint64_t offset = startOfMemoryMap;
+			UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap;
+			UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize;
+			UInt64 offset = startOfMemoryMap;
 
 			while (offset < endOfMemoryMap) {
-				let kind = (descriptor->Type == efi::EfiConventionalMemory) ? PAGE_FREE : PAGE_RESERVED;
-				let where = DOWN_BYTES_TO_PAGES(descriptor->PhysicalStart);
-				let steps = descriptor->NumberOfPages;
+				let kind = (descriptor.Type == efi.EfiConventionalMemory) ? PAGE_FREE : PAGE_RESERVED;
+				let where = DOWN_BYTES_TO_PAGES(descriptor.PhysicalStart);
+				let steps = descriptor.NumberOfPages;
 
 				if (kind == PAGE_RESERVED)
-					serialPrintf(L"[physical] Reserve %u pages from %u page\n", steps, where);
+					serialPrintf("[physical] Reserve %u pages from %u page\n", steps, where);
 
-				uint64_t i = where;
+				UInt64 i = where;
 				while (i < steps) {
 					// TODO bounds check - may be not in physycal area
 					buffer[i] = kind;
@@ -81,7 +81,7 @@ class PhysicalAllocator {
 				}
 
 				offset += descriptorSize;
-				descriptor = efi::getNextDescriptor(descriptor, descriptorSize);
+				descriptor = efi.getNextDescriptor(descriptor, descriptorSize);
 			}
 		}
 
@@ -89,10 +89,10 @@ class PhysicalAllocator {
 
 		// Reserve bootloader buffer
 		{
-			uint64_t physical = params->physicalBuffer;
-			serialPrintf(L"[physical] Reserve %u bytes at %u of bootloader buffer\n", params->physicalBytes,
+			UInt64 physical = params.physicalBuffer;
+			serialPrintf("[physical] Reserve %u bytes at %u of bootloader buffer\n", params.physicalBytes,
 						 physical);
-			uint64_t i = DOWN_BYTES_TO_PAGES(params->physicalBytes) + 1;
+			UInt64 i = DOWN_BYTES_TO_PAGES(params.physicalBytes) + 1;
 			while (i > 0) {
 				i--;
 				reserveOnePage(physical + i * PAGE_SIZE);
@@ -101,19 +101,19 @@ class PhysicalAllocator {
 
 		{
 			available = 0;
-			uint64_t i = count;
+			UInt64 i = count;
 			while (i > 0) {
 				i--;
 				if (buffer[i] == PAGE_FREE)
 					available++;
 			}
 
-			serialPrintf(L"[physical] Available %u of %u physical pages\n", available, count);
+			serialPrintf("[physical] Available %u of %u physical pages\n", available, count);
 		}
 	}
 
 	// Note: takes real physical address, without mapped offset
-	static function reserveOnePage(uint64_t physical) {
+	static fun reserveOnePage(UInt64 physical) {
 		let where = DOWN_BYTES_TO_PAGES(physical);
 		buffer[where] = PAGE_RESERVED;
 		if (last == where)
@@ -126,20 +126,20 @@ class PhysicalAllocator {
 	// 31-bit addressable, first 2 GB of RAM
 	// Required by some hardware
 	// We assume this by-default
-	// static uint64_t allocateDmaPage2G() {}
+	// static UInt64 allocateDmaPage2G() {}
 	// TODO fill pages in reverse so I can traverse bitmap from zero?
 
 	// Returns physical 64-bit address, not page number
-	static uint64_t allocateOnePage() {
+	static UInt64 allocateOnePage() {
 		if (last != PHYSICAL_NOT_FOUND) {
 			let where = last;
 			last = PHYSICAL_NOT_FOUND;
 			return where * PAGE_SIZE + (uint64_t)WholePhysicalStart;
 		}
 
-		uint64_t i = 0;
+		UInt64 i = 0;
 		// TODO fast large-step outer search with uint64_t
-		uint64_t steps = count; // Avoid non-register access
+		UInt64 steps = count; // Avoid non-register access
 		while (i < steps) {
 			if (buffer[i] == PAGE_FREE) {
 				buffer[i] = PAGE_FULL;
@@ -149,11 +149,11 @@ class PhysicalAllocator {
 			i++;
 		}
 
-		serialPrintf(L"[physical] allocateOnePage == PHYSICAL_NOT_FOUND\n");
+		serialPrintf("[physical] allocateOnePage == PHYSICAL_NOT_FOUND\n");
 		return PHYSICAL_NOT_FOUND;
 	}
 
-	static uint64_t allocateOnePagePreZeroed() {
+	static UInt64 allocateOnePagePreZeroed() {
 		var result = allocateOnePage();
 		if (result != PHYSICAL_NOT_FOUND)
 			memset((void *)result, 0, PAGE_SIZE);
@@ -164,30 +164,30 @@ class PhysicalAllocator {
 	// TODO modify available
 	// TODO each process should have some private extra pages (1 megabyte)
 	// ^ means that available_now = (available - 1mb * process_count)
-	static uint64_t allocateSafeUserspaceOnePagePreZeroed() {
+	static UInt64 allocateSafeUserspaceOnePagePreZeroed() {
 		if (available > KERNEL_RESERVED_PAGES)
 			return allocateOnePagePreZeroed();
 		return PHYSICAL_NOT_FOUND;
 	}
 
 	// TODO faster
-	static uint64_t allocatePages(uint64_t pages) {
+	static UInt64 allocatePages(UInt64 pages) {
 		// 0 or 1 == 1 page anyway
 		if (pages < 2)
 			return allocateOnePage();
 		last = PHYSICAL_NOT_FOUND;
 
 		// Find largest free block
-		uint64_t largest = 0;
-		uint64_t largestAt = 0;
+		UInt64 largest = 0;
+		UInt64 largestAt = 0;
 
 		{
-			uint64_t current = 0;
-			uint64_t currentAt = 0;
-			uint64_t i = 0;
-			uint64_t steps = count; // Avoid non-register access
+			UInt64 current = 0;
+			UInt64 currentAt = 0;
+			UInt64 i = 0;
+			UInt64 steps = count; // Avoid non-register access
 			// TODO ^ same for buffer[]
-			// TODO probably uint32_t is completely enough to represent pages
+			// TODO probably UInt32 is completely enough to represent pages
 			while (i < steps) {
 				// if (buffer[i] != PAGE_FREE) {
 				//	if (current > largest) {
@@ -220,12 +220,12 @@ class PhysicalAllocator {
 
 				i++;
 			}
-			serialPrintf(L"[physical] allocatePages current %u\n", current);
-			serialPrintf(L"[physical] allocatePages currentAt %u\n", currentAt);
+			serialPrintf("[physical] allocatePages current %u\n", current);
+			serialPrintf("[physical] allocatePages currentAt %u\n", currentAt);
 		}
 
 		if (largest >= pages) {
-			uint64_t i = pages;
+			UInt64 i = pages;
 			while (i > 0) {
 				i--;
 				buffer[largestAt + i] = PAGE_FULL;
@@ -233,18 +233,18 @@ class PhysicalAllocator {
 			return largestAt * PAGE_SIZE + (uint64_t)WholePhysicalStart;
 		}
 
-		serialPrintf(L"[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages);
+		serialPrintf("[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages);
 		return PHYSICAL_NOT_FOUND;
 	}
 
 	// Current granularity: 4096 bytes
-	static uint64_t allocateBytes(uint64_t bytes) {
+	static UInt64 allocateBytes(UInt64 bytes) {
 		// TODO
 		return allocatePages(DOWN_BYTES_TO_PAGES(bytes) + 1);
 	}
 
 	// Current granularity: xxx bytes
-	static uint64_t allocateFileCacheBlock(uint64_t bytes) {
+	static UInt64 allocateFileCacheBlock(UInt64 bytes) {
 		// TODO
 		// The idea is to use very fast wide search over bitmask
 		// too quickly find large chunks of memory
@@ -255,7 +255,7 @@ class PhysicalAllocator {
 		return allocatePages(DOWN_BYTES_TO_PAGES(bytes) + 1);
 	}
 
-	static function freeOnePage(uint64_t physical) {
+	static fun freeOnePage(UInt64 physical) {
 		let where = DOWN_BYTES_TO_PAGES(physical - (uint64_t)WholePhysicalStart);
 		// Bounds check
 		if (physical <= WholePhysicalStart || where > count)
@@ -266,25 +266,25 @@ class PhysicalAllocator {
 		last = where;
 	}
 
-	static function freePages(uint64_t physical, uint64_t pages) {
+	static fun freePages(UInt64 physical, UInt64 pages) {
 		// TODO
 		freeOnePage(physical);
 	}
 
-	static function freeBytes(uint64_t physical, uint64_t bytes) {
+	static fun freeBytes(UInt64 physical, UInt64 bytes) {
 		// TODO
 		freePages(physical, DOWN_BYTES_TO_PAGES(bytes) + 1);
 	}
 
 	// Same mechanics as in garbage collector
-	static function freeIfNotUsed(uint64_t physical, uint64_t bytes) {
+	static fun freeIfNotUsed(UInt64 physical, UInt64 bytes) {
 		// TODO
 	}
 
 	// Same mechanics as in garbage collector
 	// Applies only on whole pages
 	// Pointers should be 64-bit aligned
-	static function freeAllNotUsedPages() {
+	static fun freeAllNotUsedPages() {
 		// TODO
 		// TODO return amount of freed pages
 	}
@@ -293,12 +293,12 @@ class PhysicalAllocator {
 #undef PAGE_FULL
 #undef PAGE_FREE
 #undef PAGE_MASK
-uint8_t *PhysicalAllocator::buffer;
-uint64_t PhysicalAllocator::count;
-uint64_t PhysicalAllocator::last;
-uint64_t PhysicalAllocator::available;
-uint64_t PhysicalAllocator::countUser;
+UInt8 *PhysicalAllocator.buffer;
+UInt64 PhysicalAllocator.count;
+UInt64 PhysicalAllocator.last;
+UInt64 PhysicalAllocator.available;
+UInt64 PhysicalAllocator.countUser;
 
-uint64_t allocateBytes(uint64_t bytes) {
-	return PhysicalAllocator::allocateBytes(bytes);
+UInt64 allocateBytes(UInt64 bytes) {
+	return PhysicalAllocator.allocateBytes(bytes);
 }

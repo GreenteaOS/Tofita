@@ -16,7 +16,7 @@
 // Based on the http://blog.ivank.net/fastest-gaussian-blur.html
 module
 
-function boxBlurT(source, target, width: Int, height: Int, radius: Int) {
+fun boxBlurT(source, target, width: Int, height: Int, radius: Int) {
 	let iarr = 1.0 / (radius + radius + 1)
 	for (i in width) {
 		var ti = i
@@ -85,7 +85,7 @@ function boxBlurT(source, target, width: Int, height: Int, radius: Int) {
 	}
 }
 
-function boxBlurH(source, target, width: Int, height: Int, radius: Int) {
+fun boxBlurH(source, target, width: Int, height: Int, radius: Int) {
 	let iarr = 1.0 / (radius + radius + 1)
 	for (i in height) {
 		var ti = i * width
@@ -146,14 +146,14 @@ function boxBlurH(source, target, width: Int, height: Int, radius: Int) {
 	}
 }
 
-function boxBlur(source: {width: Int, height: Int, pixels: [Pixel]}, target, width, height, radius) {
+fun boxBlur(source: {width: Int, height: Int, pixels: [Pixel]}, target, width, height, radius) {
 	for (i in source.width*source.height)
 		target.pixels[i].color = source.pixels[i].color
 	boxBlurH(target, source, width, height, radius)
 	boxBlurT(source, target, width, height, radius)
 }
 
-function boxesForGauss(sigma, n: Int) {
+fun boxesForGauss(sigma, n: Int) {
 	let wIdeal = Math.sqrt((12 * sigma * sigma / n) + 1) // Ideal averaging filter width
 	var wl = Math.floor(wIdeal)
 	if (wl % 2 == 0) wl--
@@ -202,7 +202,7 @@ class Pixel {
 	}
 }
 
-function gaussBlur(bitmapSource, radius) {
+fun gaussBlur(bitmapSource, radius) {
 	let width: Int = bitmapSource.width
 	let height: Int = bitmapSource.height
 

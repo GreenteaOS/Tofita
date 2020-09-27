@@ -17,6 +17,6 @@ module
 
 @draft
 @entryPoint
-function efi_main(): EFI_STATUS {
+fun efi_main(): EFI_STATUS {
 	return EFI_STATUS.EFI_SUCCESS
 }

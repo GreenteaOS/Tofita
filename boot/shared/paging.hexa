@@ -28,8 +28,8 @@ struct LinearAddress {
 	unsigned long long reserved : 16;
 } __attribute__((gcc_struct, packed));
 
-_Static_assert(sizeof(uint64_t) == 8, "uint64_t has to have 64 bits");
-_Static_assert(sizeof(paging::LinearAddress) == 8, "linear address has to have 64 bits");
+_Static_assert(sizeof(uint64_t) == 8, "UInt64 has to have 64 bits");
+_Static_assert(sizeof(paging.LinearAddress) == 8, "linear address has to have 64 bits");
 
 // 512 entries * 8 bytes = 4 KiB
 // PML4 size = PDP size = PD size = PT size
@@ -94,36 +94,36 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 
 static PageEntry *pml4entries PAGE_ALIGNED = null;
 
-uint64_t conventionalAllocateNext(uint64_t bytes);
+UInt64 conventionalAllocateNext(UInt64 bytes);
 static void *allocatePage() {
 	// TODO bounds check
 	return (void *)conventionalAllocateNext(PAGE_SIZE);
 }
 
-static LinearAddress getLinearAddress(uint64_t address) {
+static LinearAddress getLinearAddress(UInt64 address) {
 	return *((LinearAddress *)&address);
 }
 
-static function initializePage(PageEntry *entry, uint64_t address, uint8_t writeAllowed) {
-	entry->address = address >> ADDRESS_BITS;
-	entry->present = 1;
-	entry->writeAllowed = (writeAllowed == 1) ? 1 : 0;
-	entry->accessibleByAll = 1; // TODO
+static fun initializePage(PageEntry *entry, UInt64 address, UInt8 writeAllowed) {
+	entry.address = address >> ADDRESS_BITS;
+	entry.present = 1;
+	entry.writeAllowed = (writeAllowed == 1) ? 1 : 0;
+	entry.accessibleByAll = 1; // TODO
 }
 
-static function initializePageHuge(PageEntry *entry, uint64_t address) {
-	entry->address = address >> ADDRESS_BITS;
-	entry->present = 1;
-	entry->writeAllowed = 1;
-	entry->largePage = 1;
-	entry->accessibleByAll = 1; // TODO
+static fun initializePageHuge(PageEntry *entry, UInt64 address) {
+	entry.address = address >> ADDRESS_BITS;
+	entry.present = 1;
+	entry.writeAllowed = 1;
+	entry.largePage = 1;
+	entry.accessibleByAll = 1; // TODO
 }
 
-static void *getPage(PageEntry *table, uint64_t entryId, uint8_t writeAllowed) {
+static void *getPage(PageEntry *table, UInt64 entryId, UInt8 writeAllowed) {
 	PageEntry *entry = &table[entryId];
 
-	if (entry->present == 1) {
-		return (void *)(entry->address << ADDRESS_BITS);
+	if (entry.present == 1) {
+		return (void *)(entry.address << ADDRESS_BITS);
 	} else {
 		void *newPage = allocatePage();
 		initializePage(entry, (uint64_t)newPage, writeAllowed);
@@ -131,19 +131,19 @@ static void *getPage(PageEntry *table, uint64_t entryId, uint8_t writeAllowed) {
 	}
 }
 
-function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr, uint8_t writeAllowed) {
+fun map_pt(PageEntry pt[], UInt64 virtualAddr, UInt64 physicalAddr, UInt8 writeAllowed) {
 	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt];
 	initializePage(entry, physicalAddr, writeAllowed);
 }
 
-function map_p2huge(PageEntry pd[], uint64_t virtualAddr, uint64_t physicalAddr) {
+fun map_p2huge(PageEntry pd[], UInt64 virtualAddr, UInt64 physicalAddr) {
 	PageEntry *entry = &pd[getLinearAddress(virtualAddr).pd];
 	initializePageHuge(entry, physicalAddr);
 }
 
 #define createMapping(fromTable, toTable)                                                                    \
-	static void map_##fromTable(PageEntry fromTable[], uint64_t virtualAddr, uint64_t physicalAddr,          \
-								uint8_t writeAllowed) {                                                      \
+	static void map_##fromTable(PageEntry fromTable[], UInt64 virtualAddr, UInt64 physicalAddr,          \
+								UInt8 writeAllowed) {                                                      \
 		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed);           \
 		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr, writeAllowed);                        \
 	}
@@ -154,7 +154,7 @@ createMapping(pml4, pdpt);
 #undef createMapping
 
 #define createHugeMapping(name, fromTable, calls, toTable)                                                   \
-	static void map_##name(PageEntry fromTable[], uint64_t virtualAddr, uint64_t physicalAddr) {             \
+	static void map_##name(PageEntry fromTable[], UInt64 virtualAddr, UInt64 physicalAddr) {             \
 		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1);                      \
 		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr);                                        \
 	}
@@ -163,31 +163,31 @@ createHugeMapping(p3huge, pdpt, p2huge, pd);
 createHugeMapping(p4huge, pml4, p3huge, pdpt);
 #undef createHugeMapping
 
-function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount, uint8_t writeAllowed) {
-	serialPrintln(L"[paging] mapping memory range");
+fun mapMemory(UInt64 virtualAddr, UInt64 physicalAddr, UInt32 pageCount, UInt8 writeAllowed) {
+	serialPrintln("[paging] mapping memory range");
 
-	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
+	UInt64 virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
 
-	uint64_t vAddress = virtualAddr;
-	uint64_t pAddress = physicalAddr;
+	UInt64 vAddress = virtualAddr;
+	UInt64 pAddress = physicalAddr;
 
-	serialPrintf(L"[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
+	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
 
-	serialPrint(L"[paging.range] virtual address = ");
+	serialPrint("[paging.range] virtual address = ");
 	serialPrintHex((uint64_t)(virtualAddr));
-	serialPrint(L"\n");
+	serialPrint("\n");
 
-	serialPrint(L"[paging.range] physical address = ");
+	serialPrint("[paging.range] physical address = ");
 	serialPrintHex((uint64_t)(physicalAddr));
-	serialPrint(L"\n");
+	serialPrint("\n");
 
-	serialPrint(L"[paging.range] page count = ");
+	serialPrint("[paging.range] page count = ");
 	serialPrintHex((uint64_t)(pageCount));
-	serialPrint(L"\n");
+	serialPrint("\n");
 
-	serialPrint(L"[paging.range] virtual address end = ");
+	serialPrint("[paging.range] virtual address end = ");
 	serialPrintHex((uint64_t)(virtualAddrEnd));
-	serialPrint(L"\n");
+	serialPrint("\n");
 
 	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4entries, vAddress, pAddress, writeAllowed);
@@ -197,11 +197,11 @@ function mapMemory(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCou
 	}
 }
 
-function mapMemoryHuge(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
-	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
+fun mapMemoryHuge(UInt64 virtualAddr, UInt64 physicalAddr, UInt32 pageCount) {
+	UInt64 virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
 
-	uint64_t vAddress = virtualAddr;
-	uint64_t pAddress = physicalAddr;
+	UInt64 vAddress = virtualAddr;
+	UInt64 pAddress = physicalAddr;
 
 	while (vAddress < virtualAddrEnd) {
 		map_p4huge(pml4entries, vAddress, pAddress);
@@ -211,23 +211,23 @@ function mapMemoryHuge(uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pag
 	}
 }
 
-static const efi::EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi::EFI_MEMORY_DESCRIPTOR *descriptor,
-														   uint64_t descriptorSize) {
-	const uint8_t *desc = ((const uint8_t *)descriptor) + descriptorSize;
-	return (const efi::EFI_MEMORY_DESCRIPTOR *)desc;
+static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.EFI_MEMORY_DESCRIPTOR *descriptor,
+														   UInt64 descriptorSize) {
+	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize;
+	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc;
 }
 
-uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
-	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
-	const uint64_t descriptorSize = memoryMap->descriptorSize;
-	uint64_t numberOfPages = 0;
+UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
+	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap;
+	const UInt64 descriptorSize = memoryMap.descriptorSize;
+	UInt64 numberOfPages = 0;
 
-	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
-	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
-	uint64_t offset = startOfMemoryMap;
+	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap;
+	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize;
+	UInt64 offset = startOfMemoryMap;
 
 	while (offset < endOfMemoryMap) {
-		numberOfPages += descriptor->NumberOfPages;
+		numberOfPages += descriptor.NumberOfPages;
 
 		offset += descriptorSize;
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
@@ -237,49 +237,49 @@ uint64_t getRAMSize(EfiMemoryMap *memoryMap) {
 }
 
 // TODO this should be reconsidered (i.e. pointer fixups)
-function mapEfi(EfiMemoryMap *memoryMap) {
-	serialPrintln(L"[paging] mapping efi");
+fun mapEfi(EfiMemoryMap *memoryMap) {
+	serialPrintln("[paging] mapping efi");
 
-	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
-	const uint64_t descriptorSize = memoryMap->descriptorSize;
-	uint64_t sum = 0;
+	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap;
+	const UInt64 descriptorSize = memoryMap.descriptorSize;
+	UInt64 sum = 0;
 
-	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
-	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
-	uint64_t offset = startOfMemoryMap;
+	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap;
+	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize;
+	UInt64 offset = startOfMemoryMap;
 
 	while (offset < endOfMemoryMap) {
-		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
+		if (descriptor.Attribute & EFI_MEMORY_RUNTIME) {
 			// TODO pointer fixups
 			// TODO should be RW or RO?
 			// Note: in VirtualBox, PhysicalStart seems way beyound RAM bounds
 			// Seems like fixup should be applied only if PhysicalStart < ramBytes?
-			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart, descriptor->NumberOfPages, 1);
-			sum += descriptor->NumberOfPages;
+			mapMemory(descriptor.PhysicalStart, descriptor.PhysicalStart, descriptor.NumberOfPages, 1);
+			sum += descriptor.NumberOfPages;
 		}
 
 		offset += descriptorSize;
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	serialPrintf(L"[paging] efi mapped %u pages\n", sum);
+	serialPrintf("[paging] efi mapped %u pages\n", sum);
 }
 
 #if 0
-uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
-	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
-	const uint64_t descriptorSize = memoryMap->descriptorSize;
-	uint64_t result = 0;
+UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, UInt32 pages) {
+	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap;
+	const UInt64 descriptorSize = memoryMap.descriptorSize;
+	UInt64 result = 0;
 
-	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
-	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
-	uint64_t offset = startOfMemoryMap;
+	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap;
+	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize;
+	UInt64 offset = startOfMemoryMap;
 
 	while (offset < endOfMemoryMap) {
 
-		if ((descriptor->Type == efi::EfiConventionalMemory) && (descriptor->NumberOfPages >= (pages + 1))) {
-			serialPrintf(L"[paging] success allocate %d pages\n", pages);
-			result = ((descriptor->PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE);
+		if ((descriptor.Type == efi.EfiConventionalMemory) && (descriptor.NumberOfPages >= (pages + 1))) {
+			serialPrintf("[paging] success allocate %d pages\n", pages);
+			result = ((descriptor.PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE);
 		}
 
 		offset += descriptorSize;
@@ -290,37 +290,37 @@ uint64_t conventionalAllocate(EfiMemoryMap *memoryMap, uint32_t pages) {
 }
 #endif
 
-uint8_t buffa[1] = {0};
+UInt8 buffa[1] = {0};
 
-uint64_t conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
-	const efi::EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap->memoryMap;
-	const uint64_t descriptorSize = memoryMap->descriptorSize;
-	uint64_t result = 0;
-	uint64_t largestPages = 0;
+UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
+	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap;
+	const UInt64 descriptorSize = memoryMap.descriptorSize;
+	UInt64 result = 0;
+	UInt64 largestPages = 0;
 
-	uint64_t startOfMemoryMap = (uint64_t)memoryMap->memoryMap;
-	uint64_t endOfMemoryMap = startOfMemoryMap + memoryMap->memoryMapSize;
-	uint64_t offset = startOfMemoryMap;
+	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap;
+	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize;
+	UInt64 offset = startOfMemoryMap;
 
 	while (offset < endOfMemoryMap) {
 		// Note: > not >= cause we should have some extra space next to this
-		if ((descriptor->Type == efi::EfiConventionalMemory) && (descriptor->NumberOfPages > largestPages)) {
-			largestPages = descriptor->NumberOfPages;
-			result = descriptor->PhysicalStart;
+		if ((descriptor.Type == efi.EfiConventionalMemory) && (descriptor.NumberOfPages > largestPages)) {
+			largestPages = descriptor.NumberOfPages;
+			result = descriptor.PhysicalStart;
 		}
 
 		offset += descriptorSize;
 		descriptor = getNextDescriptor(descriptor, descriptorSize);
 	}
 
-	serialPrintf(L"[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
+	serialPrintf("[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
 				 (uint32_t)(largestPages * PAGE_SIZE), largestPages);
 
 	return result;
 }
 
-uint64_t conventionalOffset;
-uint64_t conventionalAllocateNext(uint64_t bytes) {
+UInt64 conventionalOffset;
+UInt64 conventionalAllocateNext(UInt64 bytes) {
 	let result = conventionalOffset;
 	let pages = bytes / PAGE_SIZE; // Math.floor
 	conventionalOffset += pages * PAGE_SIZE;
@@ -329,10 +329,10 @@ uint64_t conventionalAllocateNext(uint64_t bytes) {
 	return result;
 }
 
-function mapFramebuffer(const Framebuffer *fb) {
-	let framebufferBase = fb->base;
+fun mapFramebuffer(const Framebuffer *fb) {
+	let framebufferBase = fb.base;
 	// TODO map with hugepages!!!
 	// TODO map ALL with EPIC pages?
-	mapMemory(FramebufferStart, (uint64_t)framebufferBase, fb->size / PAGE_SIZE + 1, 1);
+	mapMemory(FramebufferStart, (uint64_t)framebufferBase, fb.size / PAGE_SIZE + 1, 1);
 }
 } // namespace paging
