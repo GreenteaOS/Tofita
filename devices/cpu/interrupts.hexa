@@ -27,7 +27,7 @@ UInt8 readPort(UInt16 port)
 fun writePort(@volatile UInt16 port, @volatile UInt8 value)
 UInt8 mouseRead()
 
-#define PACKED __attribute__((packed))
+#define PACKED @packed
 
 @extern "C++" Void tmemcpy(Void *dest, const Void *src, UInt64 count) {
 	UInt8 *dst8 = (UInt8 *)dest
@@ -246,7 +246,7 @@ UInt8 mouseRead()
 class TablePtr {
 	UInt16 limit
 	UInt64 base
-} __attribute__((packed))
+} @packed
 #pragma pack()
 
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect")
@@ -273,7 +273,7 @@ class GdtDescriptor {
 	enum GdtType type // Access
 	UInt8 size
 	UInt8 baseHigh
-} __attribute__((packed))
+} @packed
 
 _Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect")
 
@@ -300,7 +300,7 @@ class GdtDescriptorEx {
 	UInt8 blocks : 1
 
 	UInt8 baseHigh : 8
-} __attribute__((packed))
+} @packed
 #pragma pack()
 
 _Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect")
@@ -315,7 +315,7 @@ class TssDescriptor {
 	UInt8 base_24
 	UInt32 base_32
 	UInt32 reserved
-} __attribute__((packed))
+} @packed
 
 @struct
 class TssEntry {
@@ -327,39 +327,39 @@ class TssEntry {
 	UInt64 reserved1
 	UInt16 reserved2
 	UInt16 iomap_offset
-} __attribute__((packed))
+} @packed
 
-__attribute__((aligned(64))) static @volatile TablePtr globalGdtr
-__attribute__((aligned(64))) static @volatile TssEntry globalTss
+@aligned(64) static @volatile TablePtr globalGdtr
+@aligned(64) static @volatile TssEntry globalTss
 
 // rsp0stack = exp0 in TSS
 // Stack used by kernel to handle syscalls/interrupts
-__attribute__((aligned(64))) UInt8 rsp0stack[4096 * 32] = {0}
-__attribute__((aligned(64))) UInt8 rsp1stack[4096 * 32] = {0}
-__attribute__((aligned(64))) UInt8 rsp2stack[4096 * 32] = {0}
+@aligned(64) UInt8 rsp0stack[4096 * 32] = {0}
+@aligned(64) UInt8 rsp1stack[4096 * 32] = {0}
+@aligned(64) UInt8 rsp2stack[4096 * 32] = {0}
 
-__attribute__((aligned(64))) UInt8 ist0stack[4096 * 4] = {0}
-__attribute__((aligned(64))) UInt8 ist1stack[4096 * 4] = {0}
-__attribute__((aligned(64))) UInt8 ist2stack[4096 * 4] = {0}
-__attribute__((aligned(64))) UInt8 ist3stack[4096 * 4] = {0}
-__attribute__((aligned(64))) UInt8 ist4stack[4096 * 4] = {0}
-__attribute__((aligned(64))) UInt8 ist5stack[4096 * 4] = {0}
-__attribute__((aligned(64))) UInt8 ist6stack[4096 * 4] = {0}
-__attribute__((aligned(64))) UInt8 ist7stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist0stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist1stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist2stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist3stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist4stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist5stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist6stack[4096 * 4] = {0}
+@aligned(64) UInt8 ist7stack[4096 * 4] = {0}
 
 // LLVM did the magic expected of it. It only saved registers that are clobbered by your fun (hence rax).
 // All other register are left unchanged hence there’s no need of saving and restoring them.
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
 
 // TODO: errcode is `extra` here:
-//__attribute__((aligned(64))) __attribute__((interrupt)) Void unknownInterrupt(struct InterruptFrame *frame,
+//@aligned(64) @interrupt Void unknownInterrupt(struct InterruptFrame *frame,
 // uint64_t
 // extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
 Void anyInterruptHandler(InterruptFrame *frame)
 
 // TODO remove
-__attribute__((aligned(64))) __attribute__((interrupt)) Void unknownInterrupt(InterruptFrame *frame) {
+@aligned(64) @interrupt Void unknownInterrupt(InterruptFrame *frame) {
 	// TODO Find a better way to avoid LLVM bugs
 	anyInterruptHandler(frame)
 }
@@ -386,11 +386,11 @@ UInt64 timerCalled = 0
 constexpr UInt64 stackSizeForKernelThread = 1024 * 1024
 
 fun kernelThread()
-__attribute__((aligned(64))) UInt8 kernelStack[stackSizeForKernelThread] = {0}
+@aligned(64) UInt8 kernelStack[stackSizeForKernelThread] = {0}
 
 InterruptFrame guiThreadFrame
 fun guiThread()
-__attribute__((aligned(64))) UInt8 guiStack[stackSizeForKernelThread] = {0}
+@aligned(64) UInt8 guiStack[stackSizeForKernelThread] = {0}
 
 @extern "C" Void timerInterruptHandler(@volatile InterruptFrame *frame)
 
@@ -602,7 +602,7 @@ fun syscallInterruptHandler(InterruptFrame *frame) {
 fun setTsr(@volatile UInt16 tsr_data)
 
 // 16 records
-__attribute__((aligned(64))) static UInt32 gdtTemplate[32] = {
+@aligned(64) static UInt32 gdtTemplate[32] = {
 	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209b00, 0x0000ffff, 0x00cf9300,
 	0x0000ffff, 0x00cffa00, 0x0000ffff, 0x00cff300, 0x00000000, 0x0020fb00, 0x00000000, 0x00000000,
 	0x60800067, 0x00008bb9, 0xfffff800, 0x00000000, 0xe0003c00, 0xff40f3fa, 0x00000000, 0x00000000,
@@ -642,7 +642,7 @@ fun tssSetEntry(UInt8 i, UInt64 base, UInt64 limit) {
 								present)
 }
 
-__attribute__((aligned(64))) Idtr cacheIdtr
+@aligned(64) Idtr cacheIdtr
 
 fun dumpGDT(GdtDescriptorEx *desc) {
 	serialPrintf("[dumpGDT]")

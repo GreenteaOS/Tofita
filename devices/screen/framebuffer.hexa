@@ -40,7 +40,7 @@ fun setFramebuffer(const Framebuffer *framebuffer) {
 #define Mul255(a255, c255) (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
 #define Blend255(target, color, alpha) (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
-fun __attribute__((fastcall)) blendPixel(Int16 x, Int16 y, Pixel32 pixel) {
+fun @fastcall blendPixel(Int16 x, Int16 y, Pixel32 pixel) {
 	var _framebuffer = ._framebuffer // Faster access
 	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
 		return
@@ -53,7 +53,7 @@ fun __attribute__((fastcall)) blendPixel(Int16 x, Int16 y, Pixel32 pixel) {
 	_pixels[y * _framebuffer.width + x] = p
 }
 
-fun __attribute__((fastcall)) setPixel(Int16 x, Int16 y, Pixel32 pixel) {
+fun @fastcall setPixel(Int16 x, Int16 y, Pixel32 pixel) {
 	var _framebuffer = ._framebuffer // Faster access
 	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
 		return

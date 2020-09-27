@@ -43,5 +43,5 @@ Void *HeapAlloc(wapi.Handle heap, UInt32 flags, size_t bytes) {
 	return (Void *)LocalAlloc(0, bytes)
 }
 
-__attribute__((fastcall)) Void _DllMainCRTStartup() {}
+@fastcall Void _DllMainCRTStartup() {}
 }

@@ -36,7 +36,7 @@ class UefiPixel {
 	UInt8 g
 	UInt8 r
 	UInt8 a
-} __attribute__((packed))
+} @packed
 
 _Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit")
 
@@ -57,7 +57,7 @@ class TextFontList {
 	UInt16 x
 	UInt16 y
 	Float width
-} __attribute__((packed))
+} @packed
 #pragma pack()
 
 _Static_assert(sizeof(TextFontList) == 12, "TextFontList has to be 12 byte")

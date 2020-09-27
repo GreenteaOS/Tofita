@@ -43,7 +43,7 @@ class AcpiTableHeader {
 	UInt32 creator_revision
 
 	Bool validate(UInt32 expectedType = 0) const
-} __attribute__((packed))
+} @packed
 
 Bool AcpiTableHeader.validate(UInt32 expectedType) const {
 	return !expectedType || (expectedType == type)
@@ -56,14 +56,14 @@ class AcpiMcfgEntry {
 	UInt8 busStart
 	UInt8 busEnd
 	UInt32 reserved
-} __attribute__((packed))
+} @packed
 
 @struct
 class AcpiMcfg {
 	TABLE_HEADER('MCFG')
 	UInt64 reserved
 	AcpiMcfgEntry entries[0]
-} __attribute__((packed))
+} @packed
 
 @struct
 class AcpiApic {
@@ -71,13 +71,13 @@ class AcpiApic {
 	UInt32 localAddress
 	UInt32 flags
 	UInt8 controllerData[0]
-} __attribute__((packed))
+} @packed
 
 @struct
 class XSDT {
 	TABLE_HEADER('XSDT')
 	AcpiTableHeader *headers[0]
-} __attribute__((packed))
+} @packed
 
 @struct
 class Acpi20 {
@@ -85,7 +85,7 @@ class Acpi20 {
 	Physical<XSDT> xsdtAddress
 	UInt8 checksum
 	UInt8 reserved[3]
-} __attribute__((packed))
+} @packed
 
 @struct
 class Acpi10 {
@@ -94,13 +94,13 @@ class Acpi10 {
 	Char8 oemID[6]
 	UInt8 revision
 	UInt32 rsdtAddress
-} __attribute__((packed))
+} @packed
 
 @struct
 class ACPI {
 	Acpi10 acpi10
 	Acpi20 acpi20
-} __attribute__((packed))
+} @packed
 
 @extern "C++" template <typename T> UInt64 acpiTableEntries(const T *t, UInt64 size) {
 	return (t.header.length - sizeof(T)) / size
