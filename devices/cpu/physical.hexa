@@ -18,13 +18,13 @@ let PHYSICAL_NOT_FOUND = 0
 // i.e. good in case of cosmic rays or something
 // Completely reserved by hardware and kernel executable image
 // Anything that is not defined considered to be PAGE_RESERVED
-#define PAGE_RESERVED 0xFF
-#define PAGE_FREE 0b1010
-#define PAGE_FULL 0b0101
-#define PAGE_MASK 0b1111
+let PAGE_RESERVED = 0xFF
+let PAGE_FREE = 0b1010
+let PAGE_FULL = 0b0101
+let PAGE_MASK = 0b1111
 // TODO mask user-mode pages differently than kernel-mode
-// TODO #define GRANULAR_PARTIAL 0b1010
-// TODO #define GRANULAR_FULL 0b1001
+// TODO let GRANULAR_PARTIAL = 0b1010
+// TODO let GRANULAR_FULL = 0b1001
 #define DOWN_BYTES_TO_PAGES(bytes) ((bytes) >> 12)
 // 4095 >> 12 == 0
 // 4096 >> 12 == 1

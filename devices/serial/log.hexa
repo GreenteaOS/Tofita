@@ -16,15 +16,15 @@
 // Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
 // Check `serialPrintf` to see supported features
 
-#define SERIAL_REGISTER_BASE 0x03F8
+let SERIAL_REGISTER_BASE = 0x03F8
 let SERIAL_BAUD_RATE = 115200
 let SERIAL_CLOCK_RATE = 1843200
-#define SERIAL_LINE_CONTROL 0x03
+let SERIAL_LINE_CONTROL = 0x03
 let SERIAL_REGISTER_STRIDE = 1
-#define SERIAL_FIFO_CONTROL 0x07
+let SERIAL_FIFO_CONTROL = 0x07
 let SERIAL_EXTENDED_FIFO_TX_SIZE = 64
-#define SERIAL_USE_HW_FLOW_CONTROL false
-#define SERIAL_DETECT_CABLE false
+let SERIAL_USE_HW_FLOW_CONTROL = false
+let SERIAL_DETECT_CABLE = false
 
 // 16550 UART register offsets and bitfields
 let R_UART_RXBUF = 0

@@ -13,15 +13,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define PIC1 0x20 // IO base address for main PIC
-#define PIC2 0xA0 // IO base address for secondary PIC
+let PIC1 = 0x20 // IO base address for main PIC
+let PIC2 = 0xA0 // IO base address for secondary PIC
 #define PIC1_COMMAND PIC1
-#define PIC1_COMMAND_0x20 0x20
+let PIC1_COMMAND_0x20 = 0x20
 #define PIC1_DATA (PIC1 + 1)
 #define PIC2_COMMAND PIC2
 #define PIC2_DATA (PIC2 + 1)
-#define PIC_EOI 0x20	  // End-of-interrupt command code
-#define PIC_EOI_0x20 0x20 // End-of-interrupt command code
+let PIC_EOI = 0x20	  // End-of-interrupt command code
+let PIC_EOI_0x20 = 0x20 // End-of-interrupt command code
 
 UInt8 readPort(port: UInt16)
 fun writePort(@volatile UInt16 port, @volatile UInt8 value)
@@ -83,23 +83,23 @@ fun loadIdt(@volatile Idtr *idtr)
 // Handling IDT
 let IDT_SIZE = 256
 // Records of the GDT - 16 items
-#define NULL_SEL 0x00
-//#define EMPTY_SEL 0x08
-#define SYS_CODE64_SEL 0x10 // Execute/Read
-#define SYS_DATA32_SEL 0x18 // Read/Write
+let NULL_SEL = 0x00
+//let EMPTY_SEL = 0x08
+let SYS_CODE64_SEL = 0x10 // Execute/Read
+let SYS_DATA32_SEL = 0x18 // Read/Write
 // Layout expected by SYSRET
-#define USER_CODE32_SEL 0x20 // Execute/Read
-#define USER_DATA32_SEL 0x28 // Read/Write
-#define USER_CODE64_SEL 0x30 // Execute/Read
-//#define EMPTY_SEL 0x38
-//#define TSS_SEL 0x40 // Index = 8
-//#define TSS_SEL 0x48
-//#define USER_DATA32_SEL 0x50 // Read/Write
-//#define EMPTY_SEL 0x58
-#define SYS_CODE32_SEL 0x60 // Execute/Read
-//#define EMPTY_SEL 0x68
-//#define EMPTY_SEL 0x70
-//#define EMPTY_SEL 0x78
+let USER_CODE32_SEL = 0x20 // Execute/Read
+let USER_DATA32_SEL = 0x28 // Read/Write
+let USER_CODE64_SEL = 0x30 // Execute/Read
+//let EMPTY_SEL = 0x38
+//let TSS_SEL = 0x40 // Index = 8
+//let TSS_SEL = 0x48
+//let USER_DATA32_SEL = 0x50 // Read/Write
+//let EMPTY_SEL = 0x58
+let SYS_CODE32_SEL = 0x60 // Execute/Read
+//let EMPTY_SEL = 0x68
+//let EMPTY_SEL = 0x70
+//let EMPTY_SEL = 0x78
 
 IdtEntry IDT[IDT_SIZE]
 
@@ -145,17 +145,17 @@ fun initializeFallback(IdtEntry *entry, fallbackHandler: UInt64) {
 	entry.gateType = 0xe // Interrupt gate
 }
 
-#define ICW1_ICW4 0x01		// ICW4 (not) needed
-#define ICW1_SINGLE 0x02	// Single (cascade) mode
-#define ICW1_INTERVAL4 0x04 // Call address interval 4 (8)
-#define ICW1_LEVEL 0x08		// Level triggered (edge) mode
-#define ICW1_INIT 0x10		// Initialization - required!
+let ICW1_ICW4 = 0x01		// ICW4 (not) needed
+let ICW1_SINGLE = 0x02	// Single (cascade) mode
+let ICW1_INTERVAL4 = 0x04 // Call address interval 4 (8)
+let ICW1_LEVEL = 0x08		// Level triggered (edge) mode
+let ICW1_INIT = 0x10		// Initialization - required!
 
-#define ICW4_8086 0x01			// 8086/88 (MCS-80/85) mode
-#define ICW4_AUTO 0x02			// Auto (normal) EOI
-#define ICW4_BUF_SECONDARY 0x08 // Buffered mode/secondary
-#define ICW4_BUF_MASTER 0x0C	// Buffered mode/primary
-#define ICW4_SFNM 0x10			// Special fully nested (not)
+let ICW4_8086 = 0x01			// 8086/88 (MCS-80/85) mode
+let ICW4_AUTO = 0x02			// Auto (normal) EOI
+let ICW4_BUF_SECONDARY = 0x08 // Buffered mode/secondary
+let ICW4_BUF_MASTER = 0x0C	// Buffered mode/primary
+let ICW4_SFNM = 0x10			// Special fully nested (not)
 
 /*
 arguments:
@@ -225,7 +225,7 @@ fun mouseWait(UInt8 aType)
 fun mouseWrite(UInt8 aWrite)
 UInt8 mouseRead()
 let IRQ0 = 32
-#define IRQ1 0x21 // 33
+let IRQ1 = 0x21 // 33
 let IRQ2 = 34
 let IRQ3 = 35
 let IRQ4 = 36
@@ -608,8 +608,8 @@ fun setTsr(@volatile UInt16 tsr_data)
 	0x60800067, 0x00008bb9, 0xfffff800, 0x00000000, 0xe0003c00, 0xff40f3fa, 0x00000000, 0x00000000,
 	0x0000ffff, 0x00cf9a00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000}
 
-#define PS2_DATA_PORT 0x60
-#define PS2_CONTROL_PORT 0x64
+let PS2_DATA_PORT = 0x60
+let PS2_CONTROL_PORT = 0x64
 
 fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, enum GdtType typed) {
 	GdtDescriptor *gdtd = (GdtDescriptor *)&gdtTemplate[i * 2]
