@@ -15,7 +15,8 @@
 
 // Based on https://forum.osdev.org/viewtopic.php?f=8&t=30052
 
-struct Spinlock {
+@struct
+class Spinlock {
   private
 	// TODO is it faster to use uint8_t?
 	@volatile UInt32 value

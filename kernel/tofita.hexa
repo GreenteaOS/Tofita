@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-extern "C" {
+@extern "C" {
 
 namespace efi {
 #include <efi.hpp>
@@ -244,7 +244,7 @@ fun kernelInit(const KernelParams *params) {
 
 	// GUI thread
 	{
-		memset(&guiThreadFrame, 0, sizeof(InterruptFrame));		// Zeroing
+		memset(&guiThreadFrame, 0, sizeof(InterruptFrame)) // Zeroing
 		memset(&guiStack, 0, sizeof(stackSizeForKernelThread)) // Zeroing
 
 		guiThreadFrame.ip = (uint64_t)&guiThreadStart
@@ -256,7 +256,7 @@ fun kernelInit(const KernelParams *params) {
 
 	// Main thread
 	{
-		memset(&kernelThreadFrame, 0, sizeof(InterruptFrame));	   // Zeroing
+		memset(&kernelThreadFrame, 0, sizeof(InterruptFrame)) // Zeroing
 		memset(&kernelStack, 0, sizeof(stackSizeForKernelThread)) // Zeroing
 
 		kernelThreadFrame.ip = (uint64_t)&kernelThreadStart
@@ -270,7 +270,7 @@ fun kernelInit(const KernelParams *params) {
 		memset(&process.processes, 0, sizeof(process.processes)) // Zeroing
 		process.Process *idle = &process.processes[0]
 		idle.pml4 = pages.pml4entries // Save CR3 template to idle process
-		idle.schedulable = true;		 // At idle schedule to idle process
+		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
 		idle.syscallToHandle = TofitaSyscalls.Noop
 		process.currentProcess = 0

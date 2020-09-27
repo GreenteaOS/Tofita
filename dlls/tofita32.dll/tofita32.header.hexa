@@ -23,7 +23,7 @@
 #define TOFITA32_DLL __declspec(dllimport)
 #endif
 
-extern "C" {
+@extern "C" {
 // Tofita
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 TOFITA32_DLL UInt64 tofitaFastSystemCall(TofitaSyscalls rcx, UInt64 rdx = 0)

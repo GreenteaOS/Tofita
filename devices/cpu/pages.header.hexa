@@ -16,7 +16,8 @@
 #define PACKED __attribute__((gcc_struct, packed))
 
 namespace pages {
-typedef struct {
+@struct
+class {
 	// Is the page present in physical memory?
 	UInt8 present : 1
 

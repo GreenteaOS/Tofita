@@ -16,11 +16,11 @@
 // Quake-style console with ~
 
 UInt8 quakeHeight = 255
-char8_t quakeCommand[256] = {0}
-char8_t quakeLines[17][256] = {0}
+Char8 quakeCommand[256] = {0}
+Char8 quakeLines[17][256] = {0}
 UInt8 quakeLine = 0
 UInt8 quakeRow = 0
-double quakeAdvance = 0.0
+Float quakeAdvance = 0.0
 UInt8 quakeCommandSize = 0
 
 fun quakePrintf(const wchar_t *c, ...)
@@ -54,7 +54,7 @@ fun quakeHandleButtonDown(UInt8 key) {
 
 	if (keyboardMap[key] == '\n' && quakeCommandSize > 0) {
 		if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
-			extern const KernelParams *paramsCache
+			@extern const KernelParams *paramsCache
 			quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n")
 			InitKernel start = (InitKernel)KernelVirtualBase
 			start(paramsCache) // TODO pml4, stack
@@ -133,7 +133,7 @@ fun _quake_newline() {
 }
 
 UInt8 __cdecl _quake_putchar(const UInt8 c) {
-	double getCharAdvance(const char8_t c)
+	Float getCharAdvance(const Char8 c)
 
 	if (c != 0) {
 		putchar(c) // Copy to serial log

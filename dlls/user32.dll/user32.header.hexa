@@ -20,7 +20,7 @@
 #define USER32_DLL __declspec(dllimport)
 #endif
 
-extern "C" {
+@extern "C" {
 USER32_DLL wapi.Atom RegisterClassW(const wapi.WindowClass *wc)
 USER32_DLL wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const wchar_t *lpClassName,
 									  const wchar_t *lpWindowName, UInt32 dwStyle, Int32 x, Int32 y,

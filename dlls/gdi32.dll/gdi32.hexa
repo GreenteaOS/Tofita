@@ -17,6 +17,6 @@
 #include "gdi32.hpp"
 #include "gdi32Vars.hpp"
 
-extern "C" {
+@extern "C" {
 __attribute__((fastcall)) Void _DllMainCRTStartup() {}
 }

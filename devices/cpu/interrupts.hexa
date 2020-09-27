@@ -29,7 +29,7 @@ UInt8 mouseRead()
 
 #define PACKED __attribute__((packed))
 
-extern "C++" Void tmemcpy(Void *dest, const Void *src, UInt64 count) {
+@extern "C++" Void tmemcpy(Void *dest, const Void *src, UInt64 count) {
 	UInt8 *dst8 = (UInt8 *)dest
 	UInt8 *src8 = (UInt8 *)src
 
@@ -38,7 +38,7 @@ extern "C++" Void tmemcpy(Void *dest, const Void *src, UInt64 count) {
 	}
 }
 
-extern "C++" Void tmemcpy(@volatile Void *dest, const @volatile Void *src, @volatile UInt64 count) {
+@extern "C++" Void tmemcpy(@volatile Void *dest, const @volatile Void *src, @volatile UInt64 count) {
 	UInt8 *dst8 = (UInt8 *)dest
 	UInt8 *src8 = (UInt8 *)src
 
@@ -48,7 +48,8 @@ extern "C++" Void tmemcpy(@volatile Void *dest, const @volatile Void *src, @vola
 }
 
 #pragma pack(1)
-typedef struct {
+@struct
+class {
 	UInt16 limit
 	UInt64 offset
 } PACKED Idtr
@@ -56,7 +57,8 @@ typedef struct {
 
 _Static_assert(sizeof(Idtr) == 10, "IDTR register has to be 80 bits long")
 
-typedef struct {
+@struct
+class {
 	UInt16 offsetLowerbits : 16
 	UInt16 selector : 16
 	UInt8 ist : 8
@@ -102,7 +104,7 @@ fun loadIdt(@volatile Idtr *idtr)
 IdtEntry IDT[IDT_SIZE]
 
 // Handling keyboard
-extern fun keyboardHandler()
+@extern fun keyboardHandler()
 fun initializeKeyboard(IdtEntry *entry) {
 	UInt64 keyboardAddress = ((uint64_t)keyboardHandler)
 	entry.offsetLowerbits = keyboardAddress & 0xffff
@@ -116,7 +118,7 @@ fun initializeKeyboard(IdtEntry *entry) {
 	entry.gateType = 0xe // Interrupt gate
 }
 
-extern fun mouseHandler()
+@extern fun mouseHandler()
 fun initializeMouse(IdtEntry *entry) {
 	UInt64 mouseAddress = ((uint64_t)mouseHandler)
 	entry.offsetLowerbits = mouseAddress & 0xffff
@@ -240,7 +242,8 @@ UInt8 mouseRead()
 #define IRQ15 47
 
 #pragma pack(1)
-struct TablePtr {
+@struct
+class TablePtr {
 	UInt16 limit
 	UInt64 base
 } __attribute__((packed))
@@ -262,7 +265,8 @@ enum GdtType : UInt8 {
 	present = 0x80
 }
 
-struct GdtDescriptor {
+@struct
+class GdtDescriptor {
 	UInt16 limitLow
 	UInt16 baseLow
 	UInt8 baseMid
@@ -274,13 +278,14 @@ struct GdtDescriptor {
 _Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect")
 
 #pragma pack(1)
-struct GdtDescriptorEx {
+@struct
+class GdtDescriptorEx {
 	UInt16 limitLow : 16
 	UInt16 baseLow : 16
 	UInt8 baseMid : 8
 	// Access
 	UInt8 accessed : 1
-	UInt8 rw : 1;		   // 0 - read, 1 - read/write
+	UInt8 rw : 1 // 0 - read, 1 - read/write
 	UInt8 direction : 1 // or conform
 	// If 1 code in this segment can be executed from an equal or lower privilege level
 	// If 0 code in this segment can only be executed from the ring set in "privilege"
@@ -300,7 +305,8 @@ struct GdtDescriptorEx {
 
 _Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect")
 
-struct TssDescriptor {
+@struct
+class TssDescriptor {
 	UInt16 limitLow
 	UInt16 base_00
 	UInt8 base_16
@@ -311,7 +317,8 @@ struct TssDescriptor {
 	UInt32 reserved
 } __attribute__((packed))
 
-struct TssEntry {
+@struct
+class TssEntry {
 	UInt32 reserved0
 
 	UInt64 rsp[3] // stack pointers for CPL 0-2
@@ -385,14 +392,14 @@ InterruptFrame guiThreadFrame
 fun guiThread()
 __attribute__((aligned(64))) UInt8 guiStack[stackSizeForKernelThread] = {0}
 
-extern "C" Void timerInterruptHandler(@volatile InterruptFrame *frame)
+@extern "C" Void timerInterruptHandler(@volatile InterruptFrame *frame)
 
 UInt8 extraMillisecond = 0
 UInt8 taskBarRedraw = 0 // Re-paint task bar current time
 @volatile Bool nextIsUserProcess = false
 @volatile Bool nextIsGuiThread = true
 
-UInt64 getNextProcess() {
+fun getNextProcess(): UInt64 {
 	UInt64 index = 1
 	while (index < 255) {
 		if (process.processes[index].present == true) {
@@ -522,7 +529,7 @@ Void timerInterruptHandler(@volatile InterruptFrame *frame) {
 	if (true) {
 		if (currentThread == THREAD_INIT) {
 			// TODO hexa error == statement: currentThread == THREAD_INIT
-			guiThreadFrame.flags = frame.flags;	// TODO
+			guiThreadFrame.flags = frame.flags // TODO
 			kernelThreadFrame.flags = frame.flags // TODO
 
 			// Restore
@@ -894,7 +901,7 @@ fun mouseWrite(@volatile UInt8 aWrite) {
 	writePort(PS2_DATA_PORT, aWrite)
 }
 
-UInt8 mouseRead() {
+fun mouseRead(): UInt8 {
 	// Get's response from mouse
 	mouseWait(0)
 	return readPort(PS2_DATA_PORT)

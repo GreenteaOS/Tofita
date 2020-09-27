@@ -21,11 +21,11 @@
 // ^ this may draw polling mechanism useless (poll for flag only in scheduler)
 // ^ use hlt in scheduler
 
-UInt8 readPS2() {
+fun readPS2(): UInt8 {
 	return readPort(0x64)
 }
 
-UInt8 pollPS2Devices() {
+fun pollPS2Devices(): UInt8 {
 
 	UInt8 poll = readPS2()
 

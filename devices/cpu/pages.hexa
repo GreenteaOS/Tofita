@@ -20,7 +20,8 @@ namespace pages {
 #define ADDRESS_BITS 12
 #define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
 
-typedef struct {
+@struct
+class {
 	UInt16 offset : 12
 	UInt16 pt : 9
 	UInt16 pd : 9
@@ -41,7 +42,8 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 
 // TODO delet
 // Entry in a page table
-typedef struct {
+@struct
+class {
 	// Is the page present in physical memory?
 	UInt8 present : 1
 

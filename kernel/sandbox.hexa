@@ -19,10 +19,12 @@ namespace sandbox {
 
 // "Toast user" is one associated with Toast sandbox
 // We can "Run As" but cannot login
-struct NtUser {}
+@struct
+class NtUser {}
 
-struct Sandbox {
-	const char8_t *name
+@struct
+class Sandbox {
+	const Char8 *name
 }
 
 } // namespace sandbox

@@ -31,7 +31,7 @@ float __attribute__((fastcall)) sqrt(float number) {
 
 	x2 = number * 0.5F
 	y = number
-	i = *(Int32 *)&y;		   // floating point bit level hacking [sic]
+	i = *(Int32 *)&y // floating point bit level hacking [sic]
 	i = 0x5f3759df - (i >> 1) // Newton's approximation
 	y = *(float *)&i
 	y = y * (threehalfs - (x2 * y * y)) // 1st iteration
@@ -43,7 +43,7 @@ float __attribute__((fastcall)) sqrt(float number) {
 
 fun __attribute__((fastcall))
 boxBlurT(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
-	double iarr = (double)1.0 / (radius + radius + 1)
+	Float iarr = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < width; i++) {
 		UInt32 ti = i
 		UInt32 li = ti
@@ -113,7 +113,7 @@ boxBlurT(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 
 
 fun __attribute__((fastcall))
 boxBlurH(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
-	double iarr = (double)1.0 / (radius + radius + 1)
+	Float iarr = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < height; i++) {
 		UInt32 ti = i * width
 		UInt32 li = ti
@@ -181,16 +181,16 @@ boxBlur(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 r
 	boxBlurT(source, target, width, height, radius)
 }
 
-UInt8 *boxesForGauss(double sigma, UInt8 n) {
-	double wIdeal = sqrt((12 * sigma * sigma / n) + 1) // Ideal averaging filter width
+UInt8 *boxesForGauss(Float sigma, UInt8 n) {
+	Float wIdeal = sqrt((12 * sigma * sigma / n) + 1) // Ideal averaging filter width
 	UInt8 wl = (uint8_t)floor(wIdeal)
 	if (wl % 2 == 0)
 		wl--
 	UInt8 wu = wl + 2
 
-	double mIdeal = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
+	Float mIdeal = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
 #define round(x) ((x) >= 0 ? (int64_t)((x) + 0.5) : (int64_t)((x)-0.5))
-	int8_t m = round(mIdeal)
+	Int8 m = round(mIdeal)
 #undef round
 
 	UInt8 *sizes = (UInt8 *)PhysicalAllocator.allocateBytes(n)
@@ -200,7 +200,7 @@ UInt8 *boxesForGauss(double sigma, UInt8 n) {
 	return sizes
 }
 
-Bitmap32 *gaussBlur(Bitmap32 *bitmap, double radius) {
+Bitmap32 *gaussBlur(Bitmap32 *bitmap, Float radius) {
 	Bitmap32 *target = allocateBitmap(bitmap.width, bitmap.height)
 
 	UInt8 *boxes = boxesForGauss(radius, 3)

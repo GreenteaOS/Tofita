@@ -14,23 +14,24 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // trampoline.asm . incbin
-extern const UInt8 binFont[]
-extern const UInt8 binFontBitmap[]
+@extern const UInt8 binFont[]
+@extern const UInt8 binFontBitmap[]
 const UInt32 fontWidth = 512
 const UInt32 fontHeight = 32
 
-extern const UInt8 binLeavesBitmap[]
+@extern const UInt8 binLeavesBitmap[]
 const UInt32 leavesWidth = 36
 const UInt32 leavesHeight = 25
 
-int64_t _fltused = 0
+Int64 _fltused = 0
 
 fun drawPixel(Framebuffer *framebuffer, UInt32 x, UInt32 y, UInt32 color) {
 	UInt32 *pixels = (UInt32 *)framebuffer.base
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
 
-struct UefiPixel {
+@struct
+class UefiPixel {
 	UInt8 b
 	UInt8 g
 	UInt8 r
@@ -51,10 +52,11 @@ UInt32 getBitmapPixel(const UInt8 *bmp, UInt32 x, UInt32 y, UInt32 width, UInt32
 }
 
 #pragma pack(1)
-struct TextFontList {
+@struct
+class TextFontList {
 	UInt16 x
 	UInt16 y
-	double width
+	Float width
 } __attribute__((packed))
 #pragma pack()
 
@@ -66,15 +68,15 @@ fun initText() {
 	textFontList = (TextFontList *)binFont
 }
 
-double getCharAdvance(const char8_t c) {
+Float getCharAdvance(const Char8 c) {
 	TextFontList textChar = textFontList[(uint64_t)c]
 	return textChar.width
 }
 
-double drawChar(const char8_t c, double x, int16_t y, Framebuffer *framebuffer) {
+Float drawChar(const Char8 c, Float x, Int16 y, Framebuffer *framebuffer) {
 	TextFontList textChar = textFontList[(uint64_t)c]
 
-	int16_t xx = (int32_t)(x + 0.5)
+	Int16 xx = (int32_t)(x + 0.5)
 	UInt16 w = (int32_t)(textChar.width + 0.5)
 
 	for (UInt16 yi = 0; yi < 12; yi++)
@@ -90,16 +92,16 @@ double drawChar(const char8_t c, double x, int16_t y, Framebuffer *framebuffer) 
 	return textChar.width
 }
 
-fun drawText(const wchar_t *text, int16_t y, Framebuffer *framebuffer) {
+fun drawText(const wchar_t *text, Int16 y, Framebuffer *framebuffer) {
 	UInt16 i = 0
 
 	// Get width to center text on screen
-	double width = 0
+	Float width = 0
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
 		width += getCharAdvance((uint16_t)text[i] & 0xFF)
 		i++
 	}
-	double xx = framebuffer.width / 2 - width / 2
+	Float xx = framebuffer.width / 2 - width / 2
 
 	i = 0
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {

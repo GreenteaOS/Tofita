@@ -18,8 +18,8 @@
 @volatile Bool sehProbe = false
 
 // This is a fascinating way to not allow compiler to optimize return value
-extern @volatile Bool (*@volatile const probeForReadOkay)(@volatile UInt64 at, @volatile const UInt64 bytes)
-extern @volatile Bool (*@volatile const probeForWriteOkay)(@volatile const UInt64 at,
+@extern @volatile Bool (*@volatile const probeForReadOkay)(@volatile UInt64 at, @volatile const UInt64 bytes)
+@extern @volatile Bool (*@volatile const probeForWriteOkay)(@volatile const UInt64 at,
 														 @volatile const UInt64 bytes)
 
 // TODO template wrappers

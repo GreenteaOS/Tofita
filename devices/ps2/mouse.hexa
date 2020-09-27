@@ -23,9 +23,10 @@
 @volatile Bool rightDown = false
 @volatile Bool middleDown = false
 
-struct MouseAction {
-	int16_t mouseXdiff
-	int16_t mouseYdiff
+@struct
+class MouseAction {
+	Int16 mouseXdiff
+	Int16 mouseYdiff
 	MouseActionType type
 	// TODO time stamp
 }
@@ -37,7 +38,7 @@ constexpr UInt8 mouseActionsLimit = 255
 @volatile UInt8 mouseActionsZetaAmount = 0
 @volatile UInt8 mouseActionsGamaAmount = 0
 
-fun pushMouseAction(MouseActionType type, int16_t mouseXdiff = 0, int16_t mouseYdiff = 0) {
+fun pushMouseAction(MouseActionType type, Int16 mouseXdiff = 0, Int16 mouseYdiff = 0) {
 	if (mouseActionsUseZeta) {
 		if (mouseActionsZetaAmount == mouseActionsLimit)
 			return
@@ -84,8 +85,8 @@ fun handleMousePacket() {
 	case 2: {
 		mouseByte[2] = mouseRead()
 
-		int16_t mouseXd = mouseByte[1]
-		int16_t mouseYd = mouseByte[2]
+		Int16 mouseXd = mouseByte[1]
+		Int16 mouseYd = mouseByte[2]
 		mouseYd = -mouseYd
 
 		// Overflow

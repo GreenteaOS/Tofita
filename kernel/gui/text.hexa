@@ -17,13 +17,14 @@
 // Non-monospace
 
 Bitmap32 *textFontBitmap
-extern Pixel32 *_pixels
+@extern Pixel32 *_pixels
 
-typedef struct {
+@struct
+class {
 	UInt16 x
 	UInt16 y
-	double width
-} __attribute__((packed)) TextFontList
+	Float width
+} @packed TextFontList
 
 TextFontList *textFontList = null
 
@@ -36,7 +37,7 @@ fun initText() {
 	textFontBitmap = loadPng32(&a)
 }
 
-int8_t getLigatureAdvance(const char8_t left, const char8_t right) {
+Int8 getLigatureAdvance(const Char8 left, const Char8 right) {
 	if (left == 0)
 		return 0
 	if (right == 0)
@@ -44,16 +45,16 @@ int8_t getLigatureAdvance(const char8_t left, const char8_t right) {
 	return 8
 }
 
-double getCharAdvance(const char8_t c) {
+Float getCharAdvance(const Char8 c) {
 	if (textFontList == null)
 		return 8
 	TextFontList textChar = textFontList[(uint64_t)c]
 	return textChar.width
 }
 
-UInt16 getTextAdvance(const char8_t *text) {
+UInt16 getTextAdvance(const Char8 *text) {
 	UInt16 i = 0
-	double xx = 0
+	Float xx = 0
 	while (text[i] != 0 && i < 255 * 255) {
 		xx += textFontList[text[i]].width
 		i++
@@ -61,10 +62,10 @@ UInt16 getTextAdvance(const char8_t *text) {
 	return xx
 }
 
-double drawChar(const char8_t c, double x, int16_t y, Pixel32 color) {
+Float drawChar(const Char8 c, Float x, Int16 y, Pixel32 color) {
 	TextFontList textChar = textFontList[(uint64_t)c]
 
-	int16_t xx = (int32_t)(x + 0.5)
+	Int16 xx = (int32_t)(x + 0.5)
 	UInt8 w = (int32_t)(textChar.width + 0.5)
 
 	for (UInt8 yi = 0; yi < 12; yi++)
@@ -95,16 +96,16 @@ double drawChar(const char8_t c, double x, int16_t y, Pixel32 color) {
 	return textChar.width
 }
 
-double drawAlphaChar(const char8_t c, double x, int16_t y, Pixel32 color) {
+Float drawAlphaChar(const Char8 c, Float x, Int16 y, Pixel32 color) {
 	TextFontList textChar = textFontList[(uint64_t)c]
 
-	int16_t xx = (int16_t)(x + 0.5)
+	Int16 xx = (int16_t)(x + 0.5)
 	UInt8 w = (uint8_t)(textChar.width + 0.5)
 
 	for (UInt8 yi = 0; yi < 12; yi++)
 		for (UInt8 xi = 0; xi < w; xi++) {
-			const int16_t atx = (int16_t)xx + (int16_t)xi
-			const int16_t aty = (int16_t)y + (int16_t)yi
+			const Int16 atx = (int16_t)xx + (int16_t)xi
+			const Int16 aty = (int16_t)y + (int16_t)yi
 
 			if (atx >= _framebuffer.width)
 				continue
@@ -141,9 +142,9 @@ double drawAlphaChar(const char8_t c, double x, int16_t y, Pixel32 color) {
 }
 
 /// Returns advance after last character
-UInt16 drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color) {
+UInt16 drawAsciiText(const Char8 *text, Float x, Int16 y, Pixel32 color) {
 	UInt16 i = 0
-	double xx = x
+	Float xx = x
 	while (text[i] != 0 && i < 255 * 255) {
 		xx += drawChar(text[i], xx, y, color)
 		i++
@@ -152,9 +153,9 @@ UInt16 drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color) {
 }
 
 /// Returns advance after last character
-UInt16 drawText(const wchar_t *text, double x, int16_t y, Pixel32 color) {
+UInt16 drawText(const wchar_t *text, Float x, Int16 y, Pixel32 color) {
 	UInt16 i = 0
-	double xx = x
+	Float xx = x
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
 		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, color)
 		i++
@@ -162,14 +163,14 @@ UInt16 drawText(const wchar_t *text, double x, int16_t y, Pixel32 color) {
 	return xx - x
 }
 
-UInt16 drawIntegerText(int64_t value, double x, int16_t y, Pixel32 color) {
-	double xx = x
+UInt16 drawIntegerText(Int64 value, Float x, Int16 y, Pixel32 color) {
+	Float xx = x
 	if (value < 0) {
 		xx += drawAsciiText(u8"-", xx, y, color)
 		value = -value
 	}
-	const char8_t *digits[] = {u8"0", u8"1", u8"2", u8"3", u8"4", u8"5", u8"6", u8"7", u8"8", u8"9"}
-	const char8_t *chars[24] = {0}
+	const Char8 *digits[] = {u8"0", u8"1", u8"2", u8"3", u8"4", u8"5", u8"6", u8"7", u8"8", u8"9"}
+	const Char8 *chars[24] = {0}
 	UInt8 count = 0
 	do {
 		chars[23 - count] = digits[value % 10]
@@ -183,14 +184,14 @@ UInt16 drawIntegerText(int64_t value, double x, int16_t y, Pixel32 color) {
 	return xx - x
 }
 
-fun drawShadowText(const char8_t *text, double x, int16_t y) {
+fun drawShadowText(const Char8 *text, Float x, Int16 y) {
 	UInt16 i = 0
-	double xx = x
+	Float xx = x
 	Pixel32 color
 	color.color = 0x00000000
 	color.rgba.a = 70
 	while (text[i] != 0 && i < 255 * 255) {
-		char8_t ch = text[i]
+		Char8 ch = text[i]
 
 		drawAlphaChar(ch, xx + 1, y + 1, color)
 		drawAlphaChar(ch, xx + 1, y + 2, color)

@@ -15,12 +15,12 @@
 
 // Desktop (i.e. icons)
 
-extern "C++" namespace desktop {
+@extern "C++" namespace desktop {
 	var dragX = 255
 	var dragY = 255
 	var drag = false
 
-	fun compositeDesktop(int16_t mouseX, int16_t mouseY)
-	fun handleMouseDownDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY)
-	fun handleMouseUpDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY)
+	fun compositeDesktop(Int16 mouseX, Int16 mouseY)
+	fun handleMouseDownDesktop(MouseActionType type, Int16 mouseX, Int16 mouseY)
+	fun handleMouseUpDesktop(MouseActionType type, Int16 mouseX, Int16 mouseY)
 }

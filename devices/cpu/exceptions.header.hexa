@@ -13,4 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__attribute__((aligned(64))) extern Void exceptionHandler(InterruptFrame *frame)
+__attribute__((aligned(64))) @extern Void exceptionHandler(InterruptFrame *frame)

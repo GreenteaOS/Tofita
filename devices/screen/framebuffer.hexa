@@ -40,7 +40,7 @@ fun setFramebuffer(const Framebuffer *framebuffer) {
 #define Mul255(a255, c255) (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
 #define Blend255(target, color, alpha) (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
-fun __attribute__((fastcall)) blendPixel(int16_t x, int16_t y, Pixel32 pixel) {
+fun __attribute__((fastcall)) blendPixel(Int16 x, Int16 y, Pixel32 pixel) {
 	var _framebuffer = ._framebuffer // Faster access
 	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
 		return
@@ -53,7 +53,7 @@ fun __attribute__((fastcall)) blendPixel(int16_t x, int16_t y, Pixel32 pixel) {
 	_pixels[y * _framebuffer.width + x] = p
 }
 
-fun __attribute__((fastcall)) setPixel(int16_t x, int16_t y, Pixel32 pixel) {
+fun __attribute__((fastcall)) setPixel(Int16 x, Int16 y, Pixel32 pixel) {
 	var _framebuffer = ._framebuffer // Faster access
 	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
 		return
@@ -61,40 +61,40 @@ fun __attribute__((fastcall)) setPixel(int16_t x, int16_t y, Pixel32 pixel) {
 }
 
 fun drawBitmap32WithAlpha(Bitmap32 *bitmap, UInt16 x, UInt16 y) {
-	for (int16_t yy = 0; yy < bitmap.height; yy++) {
-		for (int16_t xx = 0; xx < bitmap.width; xx++) {
+	for (Int16 yy = 0; yy < bitmap.height; yy++) {
+		for (Int16 xx = 0; xx < bitmap.width; xx++) {
 			blendPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
 		}
 	}
 }
 
 fun drawBitmap32(Bitmap32 *bitmap, UInt16 x, UInt16 y) {
-	for (int16_t yy = 0; yy < bitmap.height; yy++) {
-		for (int16_t xx = 0; xx < bitmap.width; xx++) {
+	for (Int16 yy = 0; yy < bitmap.height; yy++) {
+		for (Int16 xx = 0; xx < bitmap.width; xx++) {
 			setPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
 		}
 	}
 }
 
 fun drawRectangleWithAlpha(Pixel32 color, UInt16 x, UInt16 y, UInt16 width, UInt16 height) {
-	for (int16_t yy = 0; yy < height; yy++) {
-		for (int16_t xx = 0; xx < width; xx++) {
+	for (Int16 yy = 0; yy < height; yy++) {
+		for (Int16 xx = 0; xx < width; xx++) {
 			blendPixel(x + xx, y + yy, color)
 		}
 	}
 }
 
 fun drawRectangle(Pixel32 color, UInt16 x, UInt16 y, UInt16 width, UInt16 height) {
-	for (int16_t yy = 0; yy < height; yy++) {
-		for (int16_t xx = 0; xx < width; xx++) {
+	for (Int16 yy = 0; yy < height; yy++) {
+		for (Int16 xx = 0; xx < width; xx++) {
 			setPixel(x + xx, y + yy, color)
 		}
 	}
 }
 
 fun drawRectangleOutline(Pixel32 color, UInt16 x, UInt16 y, UInt16 width, UInt16 height) {
-	for (int16_t yy = 0; yy < height; yy++) {
-		for (int16_t xx = 0; xx < width; xx++) {
+	for (Int16 yy = 0; yy < height; yy++) {
+		for (Int16 xx = 0; xx < width; xx++) {
 			// Rendering left and far right points sequentally should be
 			// better for cache-locality than vertical lines
 			// At least this is true for small rectangles (like buttons)
@@ -104,10 +104,10 @@ fun drawRectangleOutline(Pixel32 color, UInt16 x, UInt16 y, UInt16 width, UInt16
 	}
 }
 
-fun line45smooth(Pixel32 color, int16_t x, int16_t y, int16_t width, int16_t mod) {
+fun line45smooth(Pixel32 color, Int16 x, Int16 y, Int16 width, Int16 mod) {
 	color.rgba.a = 98
-	int16_t xx = 0
-	for (int16_t xi = 0; xi < width - 1; xi++) {
+	Int16 xx = 0
+	for (Int16 xi = 0; xi < width - 1; xi++) {
 		xx += mod
 		setPixel(xx + x, y + xi, color)
 		blendPixel(xx + x, y + xi + 1, color)
@@ -117,25 +117,25 @@ fun line45smooth(Pixel32 color, int16_t x, int16_t y, int16_t width, int16_t mod
 	setPixel(xx + x, y + width - 1, color)
 }
 
-fun lineHorizontal(Pixel32 color, int16_t x, int16_t y, UInt16 rightLength) {
+fun lineHorizontal(Pixel32 color, Int16 x, Int16 y, UInt16 rightLength) {
 	for (UInt16 i = 0; i < rightLength; ++i) {
 		setPixel(x + i, y, color)
 	}
 }
 
-fun lineHorizontalWithAlpha(Pixel32 color, int16_t x, int16_t y, UInt16 rightLength) {
+fun lineHorizontalWithAlpha(Pixel32 color, Int16 x, Int16 y, UInt16 rightLength) {
 	for (UInt16 i = 0; i < rightLength; ++i) {
 		blendPixel(x + i, y, color)
 	}
 }
 
-fun lineVertical(Pixel32 color, int16_t x, int16_t y, UInt16 bottomLength) {
+fun lineVertical(Pixel32 color, Int16 x, Int16 y, UInt16 bottomLength) {
 	for (UInt16 i = 0; i < bottomLength; ++i) {
 		setPixel(x, y + i, color)
 	}
 }
 
-fun lineVerticalWithAlpha(Pixel32 color, int16_t x, int16_t y, UInt16 bottomLength) {
+fun lineVerticalWithAlpha(Pixel32 color, Int16 x, Int16 y, UInt16 bottomLength) {
 	for (UInt16 i = 0; i < bottomLength; ++i) {
 		blendPixel(x, y + i, color)
 	}

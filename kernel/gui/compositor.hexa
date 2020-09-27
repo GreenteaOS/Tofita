@@ -19,9 +19,9 @@
 
 // Differential composition is not yet supported, performance with large amount of apps may be low
 
-Bitmap32 *wallpaper;	 // Size of framebuffer
+Bitmap32 *wallpaper // Size of framebuffer
 Bitmap32 *vibranceLight // Size of framebuffer
-Bitmap32 *vibranceDark;	 // Size of framebuffer
+Bitmap32 *vibranceDark // Size of framebuffer
 Bitmap32 *leaves
 Bitmap32 *trashCan
 Bitmap32 *notepad16
@@ -121,10 +121,10 @@ fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 	vibranceLight = upscaleLight
 }
 
-fun drawVibrancedRectangle(int16_t x, int16_t y, UInt16 width, UInt16 height, Bool dark) {
+fun drawVibrancedRectangle(Int16 x, Int16 y, UInt16 width, UInt16 height, Bool dark) {
 	let vibrance = dark ? vibranceDark : vibranceLight // Avoit non-register global access
-	for (int16_t yy = 0; yy < height; yy++) {
-		for (int16_t xx = 0; xx < width; xx++) {
+	for (Int16 yy = 0; yy < height; yy++) {
+		for (Int16 xx = 0; xx < width; xx++) {
 			if (x + xx < 0)
 				continue
 			if (x + xx > vibrance.width)

@@ -17,8 +17,8 @@ namespace process {
 
 fun Process_init(Process *process) {
 	process.pml4 = pages.newCR3(processes[0].pml4)
-	process.schedulable = false;						// Not yet ready
-	process.scheduleOnNextTick = false;				// Prevent DoS attack
+	process.schedulable = false // Not yet ready
+	process.scheduleOnNextTick = false // Prevent DoS attack
 	memset(&process.frame, 0, sizeof(InterruptFrame)) // Zeroing
 	process.frame.cs = USER_CODE64_SEL + 3
 	process.frame.ss = USER_DATA32_SEL + 3
@@ -85,8 +85,8 @@ Bool postMessage(@volatile Process *process, PostMessagePayload *payload) {
 	message.lParam = payload.lParam
 
 	message.time = uptimeMilliseconds // TODO
-	message.pt.x = dwm.mouseX;		// TODO
-	message.pt.y = dwm.mouseY;		// TODO
+	message.pt.x = dwm.mouseX // TODO
+	message.pt.y = dwm.mouseY // TODO
 	message.lPrivate = 0
 
 	process.messagesUsed++

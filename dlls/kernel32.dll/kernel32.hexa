@@ -17,7 +17,7 @@
 #include "kernel32.hpp"
 #include "kernel32Vars.hpp"
 
-extern "C" {
+@extern "C" {
 Void ExitProcess(UInt32 exitCode) {
 	tofitaExitProcess(exitCode)
 	while (true) {}
