@@ -212,7 +212,13 @@ wapi::LResult DispatchMessageW(wapi::Msg *msg) {
 		auto window = handleToWindow(msg->hwnd);
 		if (window == nullptr)
 			return 0;
-		result = window->proc(msg->hwnd, msg->message, msg->wParam, msg->lParam);
+		// ERROR_INVALID_HANDLE;
+		if (msg->message == wapi::Message::WM_PAINT) {
+			result = window->proc(msg->hwnd, msg->message, msg->wParam, msg->lParam);
+		} else {
+			result = window->proc(msg->hwnd, msg->message, msg->wParam, msg->lParam);
+		}
+		// result = ERROR_SUCCESS;
 	} else {
 		// TODO
 	}
