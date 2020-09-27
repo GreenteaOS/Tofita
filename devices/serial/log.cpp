@@ -291,6 +291,11 @@ function serialPrintf(const wchar_t *c, ...) {
 			serialPrintHex(value);
 			break;
 		}
+		case 'b': {
+			uint64_t value = va_arg(lst, uint64_t);
+			serialPrintBits(value);
+			break;
+		}
 		}
 		c++;
 	}

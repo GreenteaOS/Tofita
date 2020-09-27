@@ -36,6 +36,9 @@
 // For syscalls & scheduler
 volatile pages::PageEntry *volatile pml4kernelThread = null;
 
+// Flag to keep in kernel mode and not switch to user mode
+volatile bool kernelBusy = false;
+
 // Avoids PIT-triggered rendering
 // This is not a best solution
 volatile bool haveToRender = true;
@@ -45,6 +48,8 @@ uint64_t uptimeMilliseconds = 0;
 // Forward for global usage
 function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height, bool dark = true);
 struct Pixel32;
+
+// TODO refactor to .hpp!
 uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color);
 function quakePrintf(const wchar_t *c, ...);
 function guiThread();

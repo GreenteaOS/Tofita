@@ -29,6 +29,11 @@ void greenteaosIsTheBest(int32_t (*entry)(), uint64_t pid) {
 	// TODO PEB/TEB
 	// TODO TLS callbacks
 	// TODO load DLLs in usermode
+	tofitaDebugLog(L"CRT ready for PID %u", pid);
+	if (entry != nullptr)
+		tofitaDebugLog(L"entry != nullptr OK for PID %u", pid);
+	if (entry == nullptr)
+		tofitaDebugLog(L"entry == nullptr ERROR for PID %u", pid);
 	tofitaExitProcess(entry());
 	while (true) {};
 }
