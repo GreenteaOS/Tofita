@@ -15,7 +15,7 @@
 
 // Desktop (i.e. icons)
 
-@extern "C++" namespace desktop {
+@extern "C++"
 	fun compositeDesktop(Int16 mouseX, mouseY: Int16) {
 		Pixel32 color
 		color.rgba.r = color.rgba.g = color.rgba.b = 0xFF

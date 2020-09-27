@@ -18,7 +18,7 @@
 
 #ifndef NTDLL32_DLL
 #define NTDLL32_DLL __declspec(dllimport)
-#endif
+#end
 
 // TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
 @extern "C" {

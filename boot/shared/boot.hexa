@@ -72,12 +72,12 @@ class Physical {
 	}
 
 	T *toVirtual() const {
-		var result: UInt64 = (uint64_t)WholePhysicalStart + physical
+		var result: UInt64 = (WholePhysicalStart as! UInt64) + physical
 		return (T *)result
 	}
 
 	T *toVirtualOffset(offset: UInt64) const {
-		var result: UInt64 = (uint64_t)WholePhysicalStart + physical + offset
+		var result: UInt64 = (WholePhysicalStart as! UInt64) + physical + offset
 		return (T *)result
 	}
 }

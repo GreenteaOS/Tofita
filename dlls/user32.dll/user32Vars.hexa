@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace user32 {
+
 @struct
 class ClassesLinkedList {
 	// TODO char16_t
@@ -47,4 +47,3 @@ class RemoteWindow {
 	wapi.HWnd hWnd
 	UInt64 instanceId // Random unique ID
 }
-} // namespace user32

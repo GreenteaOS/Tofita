@@ -18,7 +18,7 @@
 
 #ifndef KERNEL32_DLL
 #define KERNEL32_DLL __declspec(dllimport)
-#endif
+#end
 
 @extern "C" {
 KERNEL32_DLL Void ExitProcess(UInt32 exitCode)

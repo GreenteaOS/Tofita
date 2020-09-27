@@ -17,7 +17,7 @@
 // So we don't need to support ACPI 1.0
 // TODO check if more generic table ST.ConfigurationTable viable
 
-namespace acpi {
+
 
 // Types
 
@@ -139,7 +139,7 @@ class PciGroup {
 	}
 }
 
-} // namespace acpi
+
 
 class ACPIParser {
   public
@@ -200,7 +200,7 @@ class ACPIParser {
 
   private
 	static UInt64 physicalToVirtual(physical: UInt64) {
-		var result: UInt64 = (uint64_t)WholePhysicalStart + (uint64_t)physical
+		var result: UInt64 = (WholePhysicalStart as! UInt64) + (uint64_t)physical
 		return result
 	}
 

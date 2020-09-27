@@ -15,7 +15,7 @@
 
 // Desktop window manager (i.e. GUI logic)
 
-namespace dwm {
+
 
 // Zero for system GUI (like taskbar)
 UInt64 firstResponder = 0 // Active window to catch keyboard input
@@ -79,4 +79,3 @@ fun initDwm()
 fun handleMouseActivity()
 fun handleKeyboardActivity()
 UInt64 findWindowUnderCursor(Int16 mouseX, mouseY: Int16)
-} // namespace dwm

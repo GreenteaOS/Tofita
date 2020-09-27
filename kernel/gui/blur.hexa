@@ -191,7 +191,7 @@ UInt8 *boxesForGauss(sigma: Float, n: UInt8) {
 	var mIdeal: Float = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
 #define round(x) ((x) >= 0 ? (int64_t)((x) + 0.5) : (int64_t)((x)-0.5))
 	var m: Int8 = round(mIdeal)
-#undef round
+
 
 	UInt8 *sizes = (UInt8 *)PhysicalAllocator.allocateBytes(n)
 	for (UInt8 i = 0; i < n; i++) {

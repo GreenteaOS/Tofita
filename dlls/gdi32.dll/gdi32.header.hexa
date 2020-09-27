@@ -17,6 +17,6 @@
 
 #ifndef GDI32_DLL
 #define GDI32_DLL __declspec(dllimport)
-#endif
+#end
 
 @extern "C" {}

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace paging {
+
 
 let ADDRESS_BITS = 12
 #define PAGE_ALIGNED @aligned(PAGE_SIZE)
@@ -153,7 +153,6 @@ fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
 createMapping(pd, pt)
 createMapping(pdpt, pd)
 createMapping(pml4, pdpt)
-#undef createMapping
 
 #define createHugeMapping(name, fromTable, calls, toTable)                                                   \
 	static Void map_##name(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {             \
@@ -163,7 +162,6 @@ createMapping(pml4, pdpt)
 
 createHugeMapping(p3huge, pdpt, p2huge, pd)
 createHugeMapping(p4huge, pml4, p3huge, pdpt)
-#undef createHugeMapping
 
 fun mapMemory(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32, writeAllowed: UInt8) {
 	serialPrintln("[paging] mapping memory range")
@@ -267,7 +265,7 @@ fun mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintf("[paging] efi mapped %u pages\n", sum)
 }
 
-#if 0
+#if false
 UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, pages: UInt32) {
 	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
@@ -290,7 +288,7 @@ UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, pages: UInt32) {
 
 	return result
 }
-#endif
+#end
 
 UInt8 buffa[1] = {0}
 
@@ -337,4 +335,3 @@ fun mapFramebuffer(const Framebuffer *fb) {
 	// TODO map ALL with EPIC pages?
 	mapMemory(FramebufferStart, (uint64_t)framebufferBase, fb.size / PAGE_SIZE + 1, 1)
 }
-} // namespace paging

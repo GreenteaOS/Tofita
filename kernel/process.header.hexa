@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace process {
+
 
 // TODO probably use Thread instead of Process for easier scheduling & syscalls
 // and threads will have parentPID and that's
@@ -71,4 +71,3 @@ Process processes[ProcessLimit] = {0}
 
 Bool postMessage(@volatile Process *process, PostMessagePayload *payload)
 Bool getMessage(@volatile Process *process, GetMessagePayload *payload)
-} // namespace process

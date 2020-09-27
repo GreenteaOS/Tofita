@@ -15,7 +15,7 @@
 
 // Desktop (i.e. icons)
 
-@extern "C++" namespace desktop {
+@extern "C++"
 	var dragX = 255
 	var dragY = 255
 	var drag = false
