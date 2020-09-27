@@ -79,7 +79,7 @@ Void *memset(Void *dest, Int32 e, UInt64 len) {
 }
 
 // CR3 trampoline
-@extern "C" fun __attribute__((fastcall))
+@extern "C" fun @fastcall
 trampolineCR3(@volatile UInt64 kernelParams, @volatile UInt64 pml4, @volatile UInt64 stack,
 			  @volatile UInt64 entry)
 

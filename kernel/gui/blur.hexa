@@ -15,7 +15,7 @@
 
 // Based on the http://blog.ivank.net/fastest-gaussian-blur.html
 
-Int32 __attribute__((fastcall)) floor(float x) {
+Int32 @fastcall floor(float x) {
 	if (x >= 0) {
 		return (int32_t)x
 	} else {
@@ -24,7 +24,7 @@ Int32 __attribute__((fastcall)) floor(float x) {
 	}
 }
 
-float __attribute__((fastcall)) sqrt(float number) {
+float @fastcall sqrt(float number) {
 	Int32 i
 	float x2, y
 	const float threehalfs = 1.5F
@@ -41,7 +41,7 @@ float __attribute__((fastcall)) sqrt(float number) {
 	return 1.0f / y
 }
 
-fun __attribute__((fastcall))
+fun @fastcall
 boxBlurT(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
 	Float iarr = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < width; i++) {
@@ -111,7 +111,7 @@ boxBlurT(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 
 	}
 }
 
-fun __attribute__((fastcall))
+fun @fastcall
 boxBlurH(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
 	Float iarr = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < height; i++) {
@@ -173,7 +173,7 @@ boxBlurH(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 
 	}
 }
 
-fun __attribute__((fastcall))
+fun @fastcall
 boxBlur(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
 	for (UInt32 i = 0; i < source.width * source.height; i++)
 		target.pixels[i].color = source.pixels[i].color
@@ -213,7 +213,7 @@ Bitmap32 *gaussBlur(Bitmap32 *bitmap, Float radius) {
 }
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
-PixelRGBAData __attribute__((fastcall))
+PixelRGBAData @fastcall
 interpolatePixel(const Bitmap32 *bitmap, const float x, const float y) {
 	const UInt16 px = (uint16_t)x // Same as floor(x)
 	const UInt16 py = (uint16_t)y // Same as floor(y)

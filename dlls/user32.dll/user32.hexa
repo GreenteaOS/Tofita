@@ -257,7 +257,7 @@ wapi.HDc BeginPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
 	return (wapi.HDc)&window.fb // TODO
 }
 
-Void __attribute__((fastcall)) setPixel(nj.WindowFramebuffer *fb, Int16 x, Int16 y, nj.Pixel32 pixel) {
+Void @fastcall setPixel(nj.WindowFramebuffer *fb, Int16 x, Int16 y, nj.Pixel32 pixel) {
 	if ((x < 0) || (y < 0))
 		return
 	if ((x > fb.width - 1) || (y > fb.height - 1))
@@ -310,6 +310,6 @@ wapi.LResult DefWindowProcW(wapi.HWnd hWnd, wapi.Message uMsg, Void *wParam, Voi
 }
 }
 
-@extern "C" __attribute__((fastcall)) Void _DllMainCRTStartup() {
+@extern "C" @fastcall Void _DllMainCRTStartup() {
 	user32.rootClass.next = nullptr
 }

@@ -16,8 +16,8 @@
 namespace paging {
 
 #define ADDRESS_BITS 12
-#define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
-#define PACKED __attribute__((gcc_struct, packed))
+#define PAGE_ALIGNED @aligned(PAGE_SIZE)
+#define PACKED @packed
 
 @struct
 class LinearAddress {
@@ -27,7 +27,7 @@ class LinearAddress {
 	unsigned long long pdpt : 9
 	unsigned long long pml4 : 9
 	unsigned long long reserved : 16
-} __attribute__((gcc_struct, packed))
+} @packed
 
 _Static_assert(sizeof(uint64_t) == 8, "UInt64 has to have 64 bits")
 _Static_assert(sizeof(paging.LinearAddress) == 8, "linear address has to have 64 bits")

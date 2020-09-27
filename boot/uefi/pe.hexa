@@ -25,7 +25,7 @@ class PeHeader {
 	UInt32 mNumberOfSymbols
 	UInt16 mSizeOfOptionalHeader
 	UInt16 mCharacteristics
-} __attribute__((packed))
+} @packed
 #pragma pack()
 
 _Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
@@ -64,7 +64,7 @@ class Pe32OptionalHeader {
 	UInt64 mSizeOfHeapCommit // UInt32 mSizeOfHeapCommit
 	UInt32 mLoaderFlags
 	UInt32 mNumberOfRvaAndSizes
-} __attribute__((packed))
+} @packed
 #pragma pack()
 
 #pragma pack(1)
@@ -80,7 +80,7 @@ class ImageSectionHeader { // size 40 bytes
 	UInt16 mNumberOfRealocations
 	UInt16 mNumberOfLinenumbers
 	UInt32 mCharacteristics
-} __attribute__((packed))
+} @packed
 #pragma pack()
 
 _Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect")
