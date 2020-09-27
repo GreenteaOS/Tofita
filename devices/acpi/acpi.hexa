@@ -45,7 +45,7 @@ class AcpiTableHeader {
 	Bool validate(UInt32 expectedType = 0) const
 } @packed
 
-Bool AcpiTableHeader.validate(UInt32 expectedType) const {
+Bool AcpiTableHeader.validate(expectedType: UInt32) {
 	return !expectedType || (expectedType == type)
 }
 
@@ -143,7 +143,7 @@ class PciGroup {
 
 class ACPIParser {
   public
-	static Bool parse(UInt64 acpiVendorTable) {
+	static Bool parse(acpiVendorTable: UInt64) {
 		serialPrint("[ACPI] parsing started at physical ")
 		serialPrintHex((uint64_t)(acpiVendorTable))
 		serialPrint("\n")
@@ -153,9 +153,9 @@ class ACPIParser {
 			return false
 		}
 
-		auto acpiTable = (const acpi.ACPI *)physicalToVirtual(acpiVendorTable)
+		var acpiTable = (const acpi.ACPI *)physicalToVirtual(acpiVendorTable)
 
-		auto acpi10 = &acpiTable.acpi10
+		var acpi10 = &acpiTable.acpi10
 
 		serialPrint("[ACPI] signature is '")
 		for (Int32 i = 0; i < sizeof(acpi10.signature); i++)
@@ -190,7 +190,7 @@ class ACPIParser {
 			return false
 		}
 
-		auto xsdt = acpiTable.acpi20.xsdtAddress.toVirtual()
+		var xsdt = acpiTable.acpi20.xsdtAddress.toVirtual()
 
 		loadXsdt(xsdt)
 
@@ -233,7 +233,7 @@ class ACPIParser {
 		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)
 
 		for (UInt64 i = 0; i < numTables; ++i) {
-			auto header = (const acpi.AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt.headers[i])
+			var header = (const acpi.AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt.headers[i])
 
 			acpi.put_sig(sig, header.type)
 			serialPrintf("[ACPI] Found table %s\n", sig)
@@ -284,7 +284,7 @@ class ACPIParser {
 
 	static Bool multi(acpi.PciGroup *group, bus: UInt8, device: UInt8, func: UInt8) {
 		UInt32 *mBase = group.baseFor(bus, device, func)
-		auto mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
+		var mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
 		return mMulti
 	}
 

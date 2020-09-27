@@ -31,7 +31,7 @@ TOFITA32_DLL UInt64 tofitaFastSystemCall(rcx: TofitaSyscalls, UInt64 rdx = 0)
 TOFITA32_DLL Void tofitaDebugLog(const WideChar *message, UInt64 extra = 0, UInt64 more = 0)
 
 // Kernel32
-TOFITA32_DLL Void tofitaExitProcess(UInt32 exitCode)
+TOFITA32_DLL Void tofitaExitProcess(exitCode: UInt32)
 
 // User32
 TOFITA32_DLL UInt64 tofitaCreateWindowEx(CreateWindowExPayload *payload)

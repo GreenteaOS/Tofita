@@ -21,7 +21,7 @@
 #end
 
 @extern "C" {
-KERNEL32_DLL Void ExitProcess(UInt32 exitCode)
+KERNEL32_DLL Void ExitProcess(exitCode: UInt32)
 KERNEL32_DLL wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes)
 KERNEL32_DLL wapi.HGlobal GlobalAlloc(flags: UInt32, size_t bytes)
 KERNEL32_DLL Void *HeapAlloc(wapi.Handle heap, flags: UInt32, size_t bytes)

@@ -36,15 +36,15 @@ Module *loadModule(ModuleInterim *params) {
 	module.dll = params.dll
 
 	// TODO relocation? or overwrite?
-	auto ptr = (UInt8 *)params.dll.data
-	auto peHeader = (const exe.PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
-	auto peOptionalHeader = (const exe.Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe.PeHeader))
+	var ptr = (UInt8 *)params.dll.data
+	var peHeader = (const exe.PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
+	var peOptionalHeader = (const exe.Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe.PeHeader))
 	Void *base = (Void *)peOptionalHeader.imageBase
 	memset(base, 0, peOptionalHeader.sizeOfImage) // Zeroing
 	module.base = peOptionalHeader.imageBase
 
 	// Copy sections
-	auto imageSectionHeader =
+	var imageSectionHeader =
 		(const exe.ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.sizeOfOptionalHeader)
 	for (UInt16 i = 0; i < peHeader.numberOfSections; ++i) {
 		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,

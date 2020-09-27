@@ -214,15 +214,15 @@ UInt64 physicalToVirtual(physical: UInt64) {
 fun enableLocalApic() {
 	serialPrintln("[cpu] begin: enableLocalApic")
 
-	auto ptr = (UInt32 *)physicalToVirtual(0xfee000f0)
+	var ptr = (UInt32 *)physicalToVirtual(0xfee000f0)
 	var val: UInt32 = *ptr
 	quakePrintf("APIC value is %u\n", val)
 
 	serialPrintln("[cpu] done: enableLocalApic")
 }
 
-fun mouseWait(UInt8 aType)
-fun mouseWrite(UInt8 aWrite)
+fun mouseWait(aType: UInt8)
+fun mouseWrite(aWrite: UInt8)
 UInt8 mouseRead()
 let IRQ0 = 32
 let IRQ1 = 0x21 // 33

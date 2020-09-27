@@ -200,7 +200,7 @@ fun compositeWindows() {
 	}
 }
 
-fun composite(UInt64 startupMilliseconds) {
+fun composite(startupMilliseconds: UInt64) {
 	// TODO not best place for this
 	dwm.handleMouseActivity()
 	dwm.handleKeyboardActivity()
