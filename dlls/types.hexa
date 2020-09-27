@@ -161,8 +161,8 @@ class Point {
 class Msg {
 	var hwnd: HWnd
 	var message: Message
-	Void *wParam
-	Void *lParam
+	var wParam: Pointer<Void>
+	var lParam: Pointer<Void>
 	var time: UInt32
 	var pt: Point
 	var lPrivate: UInt32
@@ -230,7 +230,7 @@ _Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 
 @struct
 class WindowFramebuffer {
-	Pixel32 *pixels
+	var pixels: Pointer<Pixel32>
 	var width: UInt16
 	var height: UInt16
 }

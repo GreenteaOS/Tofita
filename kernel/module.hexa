@@ -39,7 +39,7 @@ Module *loadModule(ModuleInterim *params) {
 	var ptr = (UInt8 *)params.dll.data
 	var peHeader = (const exe.PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
 	var peOptionalHeader = (const exe.Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe.PeHeader))
-	Void *base = (Void *)peOptionalHeader.imageBase
+	var base: Pointer<Void> = (Void *)peOptionalHeader.imageBase
 	memset(base, 0, peOptionalHeader.sizeOfImage) // Zeroing
 	module.base = peOptionalHeader.imageBase
 

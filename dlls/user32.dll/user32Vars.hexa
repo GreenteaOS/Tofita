@@ -19,7 +19,7 @@ class ClassesLinkedList {
 	// TODO char16_t
 	const UInt16 *name = null
 	var wc: wapi.WindowClass
-	ClassesLinkedList *next = null
+	var next: Pointer<ClassesLinkedList> = null
 }
 
 ClassesLinkedList rootClass

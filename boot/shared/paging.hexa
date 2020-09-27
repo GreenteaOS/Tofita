@@ -122,31 +122,31 @@ static fun initializePageHuge(PageEntry *entry, address: UInt64) {
 }
 
 static Void *getPage(PageEntry *table, entryId: UInt64, writeAllowed: UInt8) {
-	PageEntry *entry = &table[entryId]
+	var entry: Pointer<PageEntry> = &table[entryId]
 
 	if (entry.present == 1) {
 		return (Void *)(entry.address << ADDRESS_BITS)
 	} else {
-		Void *newPage = allocatePage()
+		var newPage: Pointer<Void> = allocatePage()
 		initializePage(entry, (uint64_t)newPage, writeAllowed)
 		return newPage
 	}
 }
 
 fun map_pt(PageEntry pt[], virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
-	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt]
+	var entry: Pointer<PageEntry> = &pt[getLinearAddress(virtualAddr).pt]
 	initializePage(entry, physicalAddr, writeAllowed)
 }
 
 fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
-	PageEntry *entry = &pd[getLinearAddress(virtualAddr).pd]
+	var entry: Pointer<PageEntry> = &pd[getLinearAddress(virtualAddr).pd]
 	initializePageHuge(entry, physicalAddr)
 }
 
 #define createMapping(fromTable, toTable)                                                                    \
 	static Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64,          \
 								UInt8 writeAllowed) {                                                      \
-		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed)           \
+		var toTable: Pointer<Void> = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed)           \
 		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr, writeAllowed)                        \
 	}
 
@@ -156,7 +156,7 @@ createMapping(pml4, pdpt)
 
 #define createHugeMapping(name, fromTable, calls, toTable)                                                   \
 	static Void map_##name(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {             \
-		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1)                      \
+		var toTable: Pointer<Void> = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1)                      \
 		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr)                                        \
 	}
 

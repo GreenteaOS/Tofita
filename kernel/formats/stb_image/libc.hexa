@@ -43,7 +43,7 @@ Void *libc_realloc(Void *addr, size: UInt64) {
 
 Void *libc_memset(Void *b, c: Int32, len: Int32) {
 	var i: Int32
-	UInt8 *p = (UInt8 *)b
+	var p: Pointer<UInt8> = (UInt8 *)b
 	i = 0
 	while (len > 0) {
 		*p = c
@@ -70,7 +70,7 @@ Int32 libc_pow(a: Int32, n: Int32) {
 
 fun libc_memcpy(Void *dest, const Void *src, n: UInt64) {
 	const UInt8 *csrc = (UInt8 *)src
-	UInt8 *cdest = (UInt8 *)dest
+	var cdest: Pointer<UInt8> = (UInt8 *)dest
 	for (Int32 i = 0; i < n; i++)
 		cdest[i] = csrc[i]
 }

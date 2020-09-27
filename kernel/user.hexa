@@ -22,5 +22,5 @@
 @struct
 class User {
 	const Char8 *name
-	sandbox.Sandbox *sandbox
+	var sandbox: Pointer<sandbox.Sandbox>
 }

@@ -42,7 +42,7 @@ fun setWallpaper(Bitmap32 *bitmap, style: WallpaperStyle) {
 
 	{
 		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size")
-		Bitmap32 *upscale = allocateBitmap(_framebuffer.width, _framebuffer.height)
+		var upscale: Pointer<Bitmap32> = allocateBitmap(_framebuffer.width, _framebuffer.height)
 
 		float hReciprocal = 1.0f / (float)_framebuffer.height
 		float wReciprocal = 1.0f / (float)_framebuffer.width
@@ -62,7 +62,7 @@ fun setWallpaper(Bitmap32 *bitmap, style: WallpaperStyle) {
 
 	var blurScale: UInt8 = 8
 
-	Bitmap32 *downscale = allocateBitmap(bitmap.width / blurScale - 1, bitmap.height / blurScale - 1 + 8)
+	var downscale: Pointer<Bitmap32> = allocateBitmap(bitmap.width / blurScale - 1, bitmap.height / blurScale - 1 + 8)
 
 	for (UInt32 y = 0; y < downscale.height - 8; y++)
 		for (UInt32 x = 0; x < downscale.width; x++)
@@ -77,14 +77,14 @@ fun setWallpaper(Bitmap32 *bitmap, style: WallpaperStyle) {
 
 	serialPrintln("[compositor.setWallpaper] blur")
 
-	Bitmap32 *blur = gaussBlur(downscale, 4)
+	var blur: Pointer<Bitmap32> = gaussBlur(downscale, 4)
 
 	serialPrintln("[compositor.setWallpaper] upscale 8x")
 
 	// Upscale
-	Bitmap32 *upscaleLight = allocateBitmap(bitmap.width, bitmap.height)
-	Bitmap32 *upscaleDark = allocateBitmap(bitmap.width, bitmap.height)
-	Bitmap32 *upscale = upscaleDark
+	var upscaleLight: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
+	var upscaleDark: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
+	var upscale: Pointer<Bitmap32> = upscaleDark
 
 	float hReciprocal = 1.0f / (float)upscale.height
 	float wReciprocal = 1.0f / (float)upscale.width

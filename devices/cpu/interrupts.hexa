@@ -30,8 +30,8 @@ UInt8 mouseRead()
 #define PACKED @packed
 
 @extern "C++" Void tmemcpy(Void *dest, const Void *src, count: UInt64) {
-	UInt8 *dst8 = (UInt8 *)dest
-	UInt8 *src8 = (UInt8 *)src
+	var dst8: Pointer<UInt8> = (UInt8 *)dest
+	var src8: Pointer<UInt8> = (UInt8 *)src
 
 	while (count--) {
 		*dst8++ = *src8++
@@ -39,8 +39,8 @@ UInt8 mouseRead()
 }
 
 @extern "C++" Void tmemcpy(@volatile Void *dest, const @volatile Void *src, @volatile UInt64 count) {
-	UInt8 *dst8 = (UInt8 *)dest
-	UInt8 *src8 = (UInt8 *)src
+	var dst8: Pointer<UInt8> = (UInt8 *)dest
+	var src8: Pointer<UInt8> = (UInt8 *)src
 
 	while (count--) {
 		*dst8++ = *src8++
@@ -430,7 +430,7 @@ fun switchToKernelThread(@volatile InterruptFrame *frame) {
 
 	if (currentThread == THREAD_USER) {
 		// Save
-		process.Process *process = &process.processes[process.currentProcess]
+		var process: Pointer<process.Process> = &process.processes[process.currentProcess]
 		tmemcpy(&process.frame, frame, sizeof(InterruptFrame))
 	} else if (currentThread == THREAD_GUI) {
 		// Save
@@ -451,7 +451,7 @@ fun switchToNextProcess(@volatile InterruptFrame *frame) {
 		next = getNextProcess()
 	}
 
-	process.Process *process = &process.processes[next]
+	var process: Pointer<process.Process> = &process.processes[next]
 	@volatile let old = process.currentProcess
 	process.currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
@@ -466,7 +466,7 @@ fun switchToNextProcess(@volatile InterruptFrame *frame) {
 			tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame))
 		} else if (currentThread == THREAD_USER) {
 			// Save
-			process.Process *processOld = &process.processes[old]
+			var processOld: Pointer<process.Process> = &process.processes[old]
 			tmemcpy(&processOld.frame, frame, sizeof(InterruptFrame))
 		} else if (currentThread == THREAD_KERNEL) {
 			// Save
@@ -488,7 +488,7 @@ fun switchToGuiThread(@volatile InterruptFrame *frame) {
 
 	if (currentThread == THREAD_USER) {
 		// Save
-		process.Process *process = &process.processes[process.currentProcess]
+		var process: Pointer<process.Process> = &process.processes[process.currentProcess]
 		tmemcpy(&process.frame, frame, sizeof(InterruptFrame))
 	} else if (currentThread == THREAD_KERNEL) {
 		// Save
@@ -591,7 +591,7 @@ fun syscallInterruptHandler(InterruptFrame *frame) {
 		serialPrintf("[[ExitProcess:PID %d]] %d\n", process.currentProcess, frame.rdxArg1)
 		// TODO kernel wakeup
 		// TODO destroy process
-		process.Process *process = &process.processes[process.currentProcess]
+		var process: Pointer<process.Process> = &process.processes[process.currentProcess]
 		process.schedulable = false
 		switchToNextProcess(frame)
 		process.present = false
@@ -612,7 +612,7 @@ let PS2_DATA_PORT = 0x60
 let PS2_CONTROL_PORT = 0x64
 
 fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, enum GdtType typed) {
-	GdtDescriptor *gdtd = (GdtDescriptor *)&gdtTemplate[i * 2]
+	var gdtd: Pointer<GdtDescriptor> = (GdtDescriptor *)&gdtTemplate[i * 2]
 	gdtd.limitLow = limit & 0xffff
 	gdtd.size = (limit >> 16) & 0xf
 	// gdtd.size |= (is64 ? 0xa0 : 0xc0)
@@ -628,7 +628,7 @@ fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, enum GdtType 
 
 // Takes 2 GDT entries
 fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
-	TssDescriptor *tssd = (TssDescriptor *)&gdtTemplate[i * 2]
+	var tssd: Pointer<TssDescriptor> = (TssDescriptor *)&gdtTemplate[i * 2]
 	tssd.limitLow = limit & 0xffff
 	tssd.size = (limit >> 16) & 0xf
 

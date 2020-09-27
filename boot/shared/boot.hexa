@@ -53,7 +53,7 @@ _Static_assert(sizeof(Physical<char8_t>) == sizeof(uint64_t), "physical address 
 
 @struct
 class EfiMemoryMap {
-	efi.EFI_MEMORY_DESCRIPTOR *memoryMap
+	var memoryMap: Pointer<efi.EFI_MEMORY_DESCRIPTOR>
 	var memoryMapSize: UInt64
 	var mapKey: UInt64
 	var descriptorSize: UInt64
@@ -87,7 +87,7 @@ class KernelParams {
 										// bit-map stored
 	var imageHandle: efi.EFI_HANDLE
 	var efiMemoryMap: EfiMemoryMap
-	efi.EFI_RUNTIME_SERVICES *efiRuntimeServices = null
+	var efiRuntimeServices: Pointer<efi.EFI_RUNTIME_SERVICES> = null
 	var framebuffer: Framebuffer
 	var ramdisk: RamDisk
 	var acpiTablePhysical: UInt64

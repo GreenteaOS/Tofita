@@ -23,10 +23,10 @@
 
 Bitmap32 *loadPng32FromBuffer(UInt8 *data, size: UInt32) {
 	Int32 width, height, png_bpp
-	UInt8 *colors = stbi_load_from_memory(data, size, &width, &height, &png_bpp, 4)
-	Bitmap32 *bitmap = allocateBitmap(width, height)
+	var colors: Pointer<UInt8> = stbi_load_from_memory(data, size, &width, &height, &png_bpp, 4)
+	var bitmap: Pointer<Bitmap32> = allocateBitmap(width, height)
 
-	UInt32 *rgba = (UInt32 *)colors
+	var rgba: Pointer<UInt32> = (UInt32 *)colors
 	for (UInt16 y = 0; y < height; y++)
 		for (UInt16 x = 0; x < width; x++) {
 			bitmap.pixels[y * width + x].color = rgba[y * width + x]

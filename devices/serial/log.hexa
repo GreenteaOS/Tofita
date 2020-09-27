@@ -149,7 +149,7 @@ fun serialPrintInt(n: UInt64) {
 	var buf[24]: UInt8
 	for (UInt8 i = 0; i < 24; i++)
 		buf[i] = 0
-	UInt8 *bp = buf + 24
+	var bp: Pointer<UInt8> = buf + 24
 	do {
 		bp--
 		*bp = '0' + n % 10
@@ -207,7 +207,7 @@ Int32 puts(const UInt8 *string) {
 
 UInt8 *comItoA(i: Int64, b[]: UInt8) {
 	UInt8 const digit[] = "0123456789"
-	UInt8 *p = b
+	var p: Pointer<UInt8> = b
 	if (i < 0) {
 		*p++ = '-'
 		i *= -1
@@ -226,7 +226,7 @@ UInt8 *comItoA(i: Int64, b[]: UInt8) {
 }
 
 fun serialPrintf(const WideChar *c, ...) {
-	UInt8 *s
+	var s: Pointer<UInt8>
 	va_list lst
 	va_start(lst, c)
 	while (*c != '\0') {
@@ -266,7 +266,7 @@ fun serialPrintf(const WideChar *c, ...) {
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			comItoA(value, buffer)
-			UInt8 *c = buffer
+			var c: Pointer<UInt8> = buffer
 			while (*c != '\0') {
 				putchar(*c)
 				c++
@@ -279,7 +279,7 @@ fun serialPrintf(const WideChar *c, ...) {
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			comItoA(value, buffer)
-			UInt8 *c = buffer
+			var c: Pointer<UInt8> = buffer
 			while (*c != '\0') {
 				putchar(*c)
 				c++

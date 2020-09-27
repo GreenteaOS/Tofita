@@ -55,7 +55,7 @@ class Process {
 	// oh probably
 
 	// Ring buffer
-	wapi.Msg *messages
+	var messages: Pointer<wapi.Msg>
 	var messagesUsed: UInt64
 	var awaitsGetMessage: Bool
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
