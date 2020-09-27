@@ -38,6 +38,7 @@ enum class TofitaSyscalls : uint64_t {
 
 struct DebugLogPayload {
 	const wchar_t *message;
+	// TODO count chars at userspace, and transfer as length for SEH probing
 	uint64_t extra = 0;
 	uint64_t more = 0;
 };
@@ -65,6 +66,7 @@ struct CreateWindowExPayload {
 
 	// CreateWindowEx
 	const wchar_t *lpClassName;
+	// TODO count chars at userspace, and transfer as length for SEH probing
 	const wchar_t *lpWindowName;
 	uint32_t dwStyle;
 	int32_t x;
