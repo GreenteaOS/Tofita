@@ -140,6 +140,8 @@ function handleMousePacket() {
 
 	// EOI
 	// Disable those lines if polling is used
+	writePort(0xA0, 0x20);
+	writePort(0x20, 0x20);
 	lockMouse = false;
 }
 

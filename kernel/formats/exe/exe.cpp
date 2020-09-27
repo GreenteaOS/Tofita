@@ -47,6 +47,7 @@ struct PeExportLinkedList {
 	const char8_t *name;
 	uint64_t ptr;
 	PeExportLinkedList *next;
+	uint8_t hash;
 };
 
 struct Executable {
@@ -255,7 +256,7 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 			while (pThunkOrg->u1.addressOfData != 0) {
 				char8_t *szImportName;
 				uint32_t ord = 666;
-				auto fun = (void *)null;
+				auto func = (void *)null;
 
 				if ((pThunkOrg->u1.ordinal & 0x80000000) != 0) {
 					ord = pThunkOrg->u1.ordinal & 0xffff;
@@ -273,17 +274,17 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 								 szImportName, ord, pThunkOrg->u1.function);
 
 					// Resolve import
-					fun = null;
+					func = null;
 
 					PeExportLinkedList *proc = getProcAddress(szImportName, root);
 
 					if (proc != null) {
-						fun = (void *)proc->ptr;
+						func = (void *)proc->ptr;
 					} else
-						fun = (void *)getProcAddress(u8"tofitaFastStub", root)->ptr;
+						func = (void *)getProcAddress(u8"tofitaFastStub", root)->ptr;
 				}
 
-				*funcRef = (FARPROC)fun;
+				*funcRef = (FARPROC)func;
 				pThunkOrg++;
 				funcRef++;
 			}

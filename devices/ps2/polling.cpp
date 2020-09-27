@@ -29,8 +29,6 @@ uint8_t pollPS2Devices() {
 		// Mouse has higher priority
 		while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
 			handleMousePacket();
-			writePort(0xA0, 0x20);
-			writePort(0x20, 0x20);
 			poll = readPort(0x64);
 		}
 
