@@ -96,6 +96,9 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 								 ((float)y * hReciprocal) * (downscale->height - 8));
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
+			/// rgba.r = Blend255(rgba.r, 255, 168);
+			/// rgba.g = Blend255(rgba.g, 255, 168);
+			/// rgba.b = Blend255(rgba.b, 255, 168);
 
 			{
 				PixelRGBAData rgba = rgbaSource;
@@ -287,8 +290,6 @@ function composite(uint64_t startupMilliseconds) {
 
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2, 6, 1);
 	line45smooth(color, trayButtonX + 1, taskbarY + 10 + 2, 6, -1);
-
-
 
 	drawCursor(cur, mouseX, mouseY);
 	quake();
