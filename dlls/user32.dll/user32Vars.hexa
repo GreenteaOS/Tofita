@@ -17,9 +17,9 @@
 @struct
 class ClassesLinkedList {
 	// TODO char16_t
-	const UInt16 *name = nullptr
+	const UInt16 *name = null
 	wapi.WindowClass wc
-	ClassesLinkedList *next = nullptr
+	ClassesLinkedList *next = null
 }
 
 ClassesLinkedList rootClass

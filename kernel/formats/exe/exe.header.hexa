@@ -130,7 +130,7 @@ let IMAGE_DIRECTORY_ENTRY_EXCEPTION = 3 // Exception Directory
 let IMAGE_DIRECTORY_ENTRY_SECURITY = 4  // Security Directory
 let IMAGE_DIRECTORY_ENTRY_BASERELOC = 5 // Base Relocation Table
 let IMAGE_DIRECTORY_ENTRY_DEBUG = 6	  // Debug Directory
-//      IMAGE_DIRECTORY_ENTRY_COPYRIGHT       7   // (X86 usage)
+//      IMAGE_DIRECTORY_ENTRY_COPYRIGHT       7   // (usage: X86)
 let IMAGE_DIRECTORY_ENTRY_ARCHITECTURE = 7	// Architecture Specific Data
 let IMAGE_DIRECTORY_ENTRY_GLOBALPTR = 8		// RVA of GP
 let IMAGE_DIRECTORY_ENTRY_TLS = 9				// TLS Directory

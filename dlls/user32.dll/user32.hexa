@@ -13,20 +13,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define USER32_DLL __declspec(dllexport)
+#define USER32_DLL @dllExport
 #include "user32.hpp"
 #include "user32Vars.hpp"
 #include "../kernel32.dll/kernel32.hpp"
 
 // Utils
 
-user32.Window *handleToWindow(wapi.HWnd hWnd) {
-	if (hWnd == nullptr)
-		return nullptr // TODO return desktop
+user32.Window *handleToWindow(hWnd: wapi.HWnd) {
+	if (hWnd == null)
+		return null // TODO return desktop
 	if (hWnd == INVALID_HANDLE_VALUE)
-		return nullptr
+		return null
 	if (((user32.Window *)hWnd).windowIsWindow != user32.windowIsWindow)
-		return nullptr
+		return null
 	return (user32.Window *)hWnd
 }
 
@@ -43,9 +43,9 @@ wapi.Atom RegisterClassW(const wapi.WindowClass *wc) {
 	tofitaDebugLog("RegisterClassW called")
 
 	// TODO use libc func utf16le
-	auto len = 0
+	var len = 0
 	// TODO lpszClassName takes atoms?
-	auto str = (const UInt16 *)wc.lpszClassName
+	var str = (const UInt16 *)wc.lpszClassName
 	for (UInt16 i = 0; i < 256; ++i) {
 		// Increment upfront to rezerve for zeros
 		len += 2
@@ -54,13 +54,13 @@ wapi.Atom RegisterClassW(const wapi.WindowClass *wc) {
 			break
 	}
 
-	auto tail = &user32.rootClass
-	while (tail.next != nullptr)
+	var tail = &user32.rootClass
+	while (tail.next != null)
 		tail = tail.next
 
-	auto list = (user32.ClassesLinkedList *)LocalAlloc(0, sizeof(user32.ClassesLinkedList))
-	auto name = (UInt16 *)LocalAlloc(0, len)
-	list.next = nullptr
+	var list = (user32.ClassesLinkedList *)LocalAlloc(0, sizeof(user32.ClassesLinkedList))
+	var name = (UInt16 *)LocalAlloc(0, len)
+	list.next = null
 
 	for (UInt16 i = 0; i < len; ++i) {
 		name[i] = str[i]
@@ -83,12 +83,12 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 	tofitaDebugLog("CreateWindowExW called")
 
 	// Find class
-	auto *list = &user32.rootClass
-	auto name = lpClassName
-	auto found = false
-	const wapi.WindowClass *wc = nullptr
+	var *list = &user32.rootClass
+	var name = lpClassName
+	var found = false
+	const wapi.WindowClass *wc = null
 
-	while (list.next != nullptr) {
+	while (list.next != null) {
 		// Step upfront, to ignore empty root
 		list = list.next
 
@@ -110,7 +110,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 
 	if (!found) {
 		tofitaDebugLog("CreateWindowExW not found return")
-		return (wapi.HWnd) nullptr
+		return (wapi.HWnd) null
 	}
 
 	// Prepare for syscall
@@ -131,9 +131,9 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 	payload.lpParam = lpParam
 
 	// Create local window counterpart
-	auto window = (user32.Window *)LocalAlloc(0, sizeof(user32.Window))
+	var window = (user32.Window *)LocalAlloc(0, sizeof(user32.Window))
 
-	const auto hWnd = (wapi.HWnd)window
+	let hWnd = (wapi.HWnd)window
 	payload.hWnd = hWnd
 
 	// Create native window counterpart
@@ -145,7 +145,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 
 	// Initial paint
 	// TODO should be called somewhere else, in syscall of windows creation?
-	PostMessage(hWnd, wapi.Message.WM_PAINT, nullptr, nullptr)
+	PostMessage(hWnd, wapi.Message.WM_PAINT, null, null)
 
 	tofitaDebugLog("CreateWindowExW done")
 	return hWnd
@@ -153,9 +153,9 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 
 wapi.Bool ShowWindow(wapi.HWnd hWnd, nCmdShow: Int32) {
 	tofitaDebugLog("ShowWindow called")
-	auto window = handleToWindow(hWnd)
+	var window = handleToWindow(hWnd)
 	wapi.Bool result = 0
-	if (window != nullptr) {
+	if (window != null) {
 		switch (nCmdShow) {
 		case SW_HIDE: {
 			tofitaShowWindow(window.windowId, nCmdShow)
@@ -208,9 +208,9 @@ wapi.Bool TranslateMessage(wapi.Msg *msg) {
 wapi.LResult DispatchMessageW(wapi.Msg *msg) {
 	tofitaDebugLog("DispatchMessageW called")
 	wapi.LResult result = 0
-	if (msg.hwnd != nullptr) {
-		auto window = handleToWindow(msg.hwnd)
-		if (window == nullptr)
+	if (msg.hwnd != null) {
+		var window = handleToWindow(msg.hwnd)
+		if (window == null)
 			return 0
 		// ERROR_INVALID_HANDLE
 		if (msg.message == wapi.Message.WM_PAINT) {
@@ -235,18 +235,18 @@ wapi.Bool PostMessage(wapi.HWnd hWnd, wapi.Message msg, Void *wParam, Void *lPar
 	return tofitaPostMessage(&payload)
 }
 
-Void PostQuitMessage(Int32 nExitCode) {
+Void PostQuitMessage(nExitCode: Int32) {
 	tofitaDebugLog("PostQuitMessage called")
-	PostMessage(nullptr, wapi.Message.WM_QUIT, (Void *)nExitCode, nullptr)
+	PostMessage(null, wapi.Message.WM_QUIT, (Void *)nExitCode, null)
 	tofitaDebugLog("PostQuitMessage done")
 	// TODO ERROR_SUCCESS
 }
 
 wapi.HDc BeginPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
 	tofitaDebugLog("BeginPaint called")
-	auto window = handleToWindow(hWnd)
-	if (window == nullptr)
-		return nullptr
+	var window = handleToWindow(hWnd)
+	if (window == null)
+		return null
 	// We do this every time, cause window may be resized
 	njraaGetOrCreateWindowFramebuffer(window.windowId, &window.fb)
 	ps.rcPaint.left = 0
@@ -268,7 +268,7 @@ Void @fastcall setPixel(nj.WindowFramebuffer *fb, x: Int16, y: Int16, nj.Pixel32
 Int32 FillRect(wapi.HDc dc, const wapi.Rect *lprc, wapi.HBrush brush) {
 	tofitaDebugLog("FillRect called")
 
-	auto fb = (nj.WindowFramebuffer *)dc
+	var fb = (nj.WindowFramebuffer *)dc
 
 	nj.Pixel32 color
 	color.color = 0xFFAA0000
@@ -285,8 +285,8 @@ Int32 FillRect(wapi.HDc dc, const wapi.Rect *lprc, wapi.HBrush brush) {
 
 wapi.Bool EndPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
 	tofitaDebugLog("EndPaint called")
-	auto window = handleToWindow(hWnd)
-	if (window == nullptr)
+	var window = handleToWindow(hWnd)
+	if (window == null)
 		return 0
 	njraaSwapWindowFramebuffer(window.windowId, &window.fb)
 	tofitaDebugLog("EndPaint done")
@@ -295,8 +295,8 @@ wapi.Bool EndPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
 
 wapi.LResult DefWindowProcW(wapi.HWnd hWnd, wapi.Message uMsg, Void *wParam, Void *lParam) {
 	tofitaDebugLog("DefWindowProcW called")
-	auto window = handleToWindow(hWnd)
-	if (window == nullptr)
+	var window = handleToWindow(hWnd)
+	if (window == null)
 		return 0
 	if (uMsg == wapi.Message.WM_CLOSE) {
 		// TODO DestroyWindow(hWnd)
@@ -311,5 +311,5 @@ wapi.LResult DefWindowProcW(wapi.HWnd hWnd, wapi.Message uMsg, Void *wParam, Voi
 }
 
 @extern "C" @fastcall Void _DllMainCRTStartup() {
-	user32.rootClass.next = nullptr
+	user32.rootClass.next = null
 }

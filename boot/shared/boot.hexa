@@ -17,7 +17,7 @@
 
 // Code Hexa-style for easier porting
 
-const auto null = nullptr
+let null = null
 #define let const auto
 #define var auto
 typedef Void fun
@@ -43,7 +43,7 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof")
 #define size_t do_not_use_such_types_please
 #define intptr_t do_not_use_such_types_please
 #define uintptr_t do_not_use_such_types_please
-#define nullptr do_not_use_such_types_please
+#define null do_not_use_such_types_please
 
 #define STR_IMPL_(x) #x		// stringify argument
 #define STR(x) STR_IMPL_(x) // indirection to expand argument macros
@@ -71,12 +71,12 @@ class Physical {
 		return (Physical<T>)physical
 	}
 
-	T *toVirtual() const {
+	T *toVirtual() {
 		var result: UInt64 = (WholePhysicalStart as! UInt64) + physical
 		return (T *)result
 	}
 
-	T *toVirtualOffset(offset: UInt64) const {
+	T *toVirtualOffset(offset: UInt64) {
 		var result: UInt64 = (WholePhysicalStart as! UInt64) + physical + offset
 		return (T *)result
 	}

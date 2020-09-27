@@ -98,7 +98,7 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 // TODO remove this
 static PageEntry *pml4entries PAGE_ALIGNED = null
 
-LinearAddress getLinearAddress(UInt64 virtualAddr) {
+LinearAddress getLinearAddress(virtualAddr: UInt64) {
 	return *((LinearAddress *)&virtualAddr)
 }
 
@@ -144,7 +144,7 @@ createMapping(pml4, pdpt)
 
 // Returns actual physical address from virtual address
 UInt64 resolveAddr(const PageEntry *pml4entries, virtualAddr: UInt64) {
-	auto linear = getLinearAddress(virtualAddr)
+	var linear = getLinearAddress(virtualAddr)
 	// pml4
 	const PageEntry *entry = &pml4entries[linear.pml4]
 	if (entry.present == 0)

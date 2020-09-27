@@ -239,10 +239,10 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	var mAddressOfEntryPoint: UInt64 = 0
 
 	{
-		auto ptr = (UInt8 *)asset.data
-		auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
+		var ptr = (UInt8 *)asset.data
+		var peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
 		serialPrintf("PE header signature 'PE' == '%s'\n", peHeader)
-		auto peOptionalHeader = (const Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader))
+		var peOptionalHeader = (const Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader))
 		serialPrintf("PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.mMagic,
 					 0x020B)
 		serialPrintf("PE32(+) size of image == %d\n", peOptionalHeader.mSizeOfImage)
@@ -250,7 +250,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 		memset(kernelBase, 0, peOptionalHeader.mSizeOfImage) // Zeroing
 
 		// Copy sections
-		auto imageSectionHeader =
+		var imageSectionHeader =
 			(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.mSizeOfOptionalHeader)
 		for (UInt16 i = 0; i < peHeader.mNumberOfSections; ++i) {
 			serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,

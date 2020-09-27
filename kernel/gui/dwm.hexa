@@ -77,7 +77,7 @@ OverlappedWindow *OverlappedWindow_findAnyProcessWindow(pid: UInt64) {
 	return null
 }
 
-fun OverlappedWindow_detach(UInt64 windowId) {
+fun OverlappedWindow_detach(windowId: UInt64) {
 	var window = &windowsList[windowId]
 
 	windowsList[window.prevId].nextId = window.nextId
@@ -101,7 +101,7 @@ fun OverlappedWindow_detach(UInt64 windowId) {
 	window.nextId = 0
 }
 
-fun OverlappedWindow_attach(UInt64 windowId) {
+fun OverlappedWindow_attach(windowId: UInt64) {
 	windowsList[topmostWindow].nextId = windowId
 
 	windowsList[windowId].prevId = topmostWindow
@@ -115,7 +115,7 @@ fun OverlappedWindow_attach(UInt64 windowId) {
 		firstResponder = windowId
 }
 
-fun OverlappedWindow_destroy(UInt64 windowId) {
+fun OverlappedWindow_destroy(windowId: UInt64) {
 	var window = &windowsList[windowId]
 	OverlappedWindow_detach(windowId)
 

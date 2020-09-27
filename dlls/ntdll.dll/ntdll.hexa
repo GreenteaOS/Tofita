@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define NTDLL32_DLL __declspec(dllexport)
+#define NTDLL32_DLL @dllExport
 #include "ntdll.hpp"
 #include "../tofita32.dll/tofita32.cpp"
 #include "ntdllVars.hpp"
@@ -30,10 +30,10 @@ Void greenteaosIsTheBest(Int32 (*entry)(), pid: UInt64) {
 	// TODO TLS callbacks
 	// TODO load DLLs in usermode
 	tofitaDebugLog("CRT ready for PID %u", pid)
-	if (entry != nullptr)
-		tofitaDebugLog("entry != nullptr OK for PID %u", pid)
-	if (entry == nullptr)
-		tofitaDebugLog("entry == nullptr ERROR for PID %u", pid)
+	if (entry != null)
+		tofitaDebugLog("entry != null OK for PID %u", pid)
+	if (entry == null)
+		tofitaDebugLog("entry == null ERROR for PID %u", pid)
 	tofitaExitProcess(entry())
 	while (true) {}
 }

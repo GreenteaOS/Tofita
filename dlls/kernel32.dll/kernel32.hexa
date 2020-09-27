@@ -13,18 +13,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define KERNEL32_DLL __declspec(dllexport)
+#define KERNEL32_DLL @dllExport
 #include "kernel32.hpp"
 #include "kernel32Vars.hpp"
 
 @extern "C" {
-Void ExitProcess(UInt32 exitCode) {
+Void ExitProcess(exitCode: UInt32) {
 	tofitaExitProcess(exitCode)
 	while (true) {}
 }
 
 wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes) {
-	auto result = &kernel32.buffer[kernel32.bufferOffset]
+	var result = &kernel32.buffer[kernel32.bufferOffset]
 	kernel32.bufferOffset += bytes
 	// Align to 8 bytes
 	// Because handle has some bits reserved for tags

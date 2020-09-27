@@ -64,10 +64,10 @@ class Executable {
 auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 	var asset: RamDiskAsset = getRamDiskAsset(name)
 	serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data)
-	auto ptr = (UInt8 *)asset.data
-	auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
+	var ptr = (UInt8 *)asset.data
+	var peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
 	serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
-	auto peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader))
+	var peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader))
 	serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
 				 0x020B)
 	serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
@@ -88,7 +88,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 	exec.nextBase = exec.nextBase + pages * PAGE_SIZE
 
 	// Copy sections
-	auto imageSectionHeader =
+	var imageSectionHeader =
 		(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.sizeOfOptionalHeader)
 
 	// TODO copy PE headers?
@@ -111,7 +111,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 			serialPrintf("[[[IMAGE_DIRECTORY_ENTRY_EXPORT]]] calling _DllMainCRTStartup == %d\n", func())
 	}
 
-	auto imageDataDirectory =
+	var imageDataDirectory =
 		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(Pe64OptionalHeader))
 
 	// Relocate EXE or DLL to a new base
@@ -257,19 +257,19 @@ fun resolveDllImports(pei: PeInterim, PeExportLinkedList *root) {
 	{
 		UInt8 *at =
 			(UInt8 *)((uint64_t)buffer + imageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].virtualAddress)
-		auto iid = (IMAGE_IMPORT_DESCRIPTOR *)at
+		var iid = (IMAGE_IMPORT_DESCRIPTOR *)at
 
 		// DLL
 		while (iid.originalFirstThunk != 0) {
 			Char8 *szName = (Char8 *)((uint64_t)buffer + iid.name)
-			auto pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid.originalFirstThunk)
+			var pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid.originalFirstThunk)
 			FARPROC *funcRef
 			funcRef = (FARPROC *)((uint64_t)buffer + iid.firstThunk)
 
 			while (pThunkOrg.u1.addressOfData != 0) {
 				Char8 *szImportName
 				var ord: UInt32 = 666
-				auto func = (Void *)null
+				var func = (Void *)null
 
 				if ((pThunkOrg.u1.ordinal & 0x80000000) != 0) {
 					ord = pThunkOrg.u1.ordinal & 0xffff
@@ -345,11 +345,11 @@ fun loadExeIntoProcess(const WideChar *file, process.Process *process) {
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
 
-		auto app = loadExe(file, root, &exec)
-		auto ntdll = loadDll("desktop/ntdll.dll", root, &exec) // TODO proper path!!!
-		auto kernel32 = loadDll("desktop/kernel32.dll", root, &exec)
-		auto gdi32 = loadDll("desktop/gdi32.dll", root, &exec)
-		auto user32 = loadDll("desktop/user32.dll", root, &exec)
+		var app = loadExe(file, root, &exec)
+		var ntdll = loadDll("desktop/ntdll.dll", root, &exec) // TODO proper path!!!
+		var kernel32 = loadDll("desktop/kernel32.dll", root, &exec)
+		var gdi32 = loadDll("desktop/gdi32.dll", root, &exec)
+		var user32 = loadDll("desktop/user32.dll", root, &exec)
 
 		resolveDllImports(ntdll, root)
 		resolveDllImports(kernel32, root)
