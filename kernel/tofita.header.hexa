@@ -46,11 +46,11 @@
 UInt64 uptimeMilliseconds = 0
 
 // Forward for global usage
-fun drawVibrancedRectangle(int16_t x, int16_t y, UInt16 width, UInt16 height, Bool dark = true)
+fun drawVibrancedRectangle(Int16 x, Int16 y, UInt16 width, UInt16 height, Bool dark = true)
 struct Pixel32
 
 // TODO refactor to .hpp!
-UInt16 drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color)
+UInt16 drawAsciiText(const Char8 *text, Float x, Int16 y, Pixel32 color)
 fun quakePrintf(const wchar_t *c, ...)
 fun guiThread()
 fun kernelThread()

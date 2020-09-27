@@ -18,7 +18,8 @@ namespace process {
 // TODO probably use Thread instead of Process for easier scheduling & syscalls
 // and threads will have parentPID and that's
 // so we don't have linked list of threads per process
-struct Process {
+@struct
+class Process {
 	// Is process exists at all and fully initialized
 	@volatile Bool present
 	// TODO SoA

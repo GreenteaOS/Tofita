@@ -17,7 +17,7 @@
 
 #include "log.cpp"
 
-UInt8 initSerial() {
+fun initSerial(): UInt8 {
 	// Calculate divisor for baud generator
 	//    Ref_Clk_Rate / Baud_Rate / 16
 	UInt32 divisor = SERIAL_CLOCK_RATE / (SERIAL_BAUD_RATE * 16)

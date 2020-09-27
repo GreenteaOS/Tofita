@@ -17,14 +17,16 @@
 // Modules are .dll files
 namespace process {
 
-struct Module {
-	const char8_t *name
+@struct
+class Module {
+	const Char8 *name
 	const RamDiskAsset *dll
 	UInt64 base
 }
 
-struct ModuleInterim {
-	const char8_t *name
+@struct
+class ModuleInterim {
+	const Char8 *name
 	const RamDiskAsset *dll
 }
 

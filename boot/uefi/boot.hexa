@@ -15,7 +15,7 @@
 
 // Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
 
-extern "C" {
+@extern "C" {
 
 namespace efi {
 #include <efi.hpp>
@@ -79,7 +79,7 @@ Void *memset(Void *dest, Int32 e, UInt64 len) {
 }
 
 // CR3 trampoline
-extern "C" fun __attribute__((fastcall))
+@extern "C" fun __attribute__((fastcall))
 trampolineCR3(@volatile UInt64 kernelParams, @volatile UInt64 pml4, @volatile UInt64 stack,
 			  @volatile UInt64 entry)
 
@@ -338,7 +338,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	params.ramdisk.base = WholePhysicalStart + params.ramdisk.physical
 
 	params.pml4 = (uint64_t)paging.pml4entries // physical address for CPU
-	params.stack = stack;						  // physical address for stack overflow detection
+	params.stack = stack // physical address for stack overflow detection
 	params.physicalBuffer = largeBuffer
 	params.physicalBytes = paging.conventionalOffset - largeBuffer
 	params.efiRuntimeServices = systemTable.RuntimeServices

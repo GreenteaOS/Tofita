@@ -68,7 +68,7 @@ fun writeSerialRegister(UInt16 offset, UInt8 d) {
 	portOutb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE, d)
 }
 
-Bool serialPortWritable() {
+fun serialPortWritable(): Bool {
 	if (SERIAL_USE_HW_FLOW_CONTROL) {
 		if (SERIAL_DETECT_CABLE) {
 			// Wait for both DSR and CTS to be set
@@ -205,7 +205,7 @@ Int32 puts(const UInt8 *string) {
 	return 1 // to meet spec.
 }
 
-UInt8 *comItoA(int64_t i, UInt8 b[]) {
+UInt8 *comItoA(Int64 i, UInt8 b[]) {
 	UInt8 const digit[] = "0123456789"
 	UInt8 *p = b
 	if (i < 0) {

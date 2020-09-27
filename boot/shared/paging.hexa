@@ -19,7 +19,8 @@ namespace paging {
 #define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
 #define PACKED __attribute__((gcc_struct, packed))
 
-struct LinearAddress {
+@struct
+class LinearAddress {
 	unsigned long long offset : 12
 	unsigned long long pt : 9
 	unsigned long long pd : 9
@@ -40,7 +41,8 @@ _Static_assert(sizeof(paging.LinearAddress) == 8, "linear address has to have 64
 #define PAGE_TABLE_SIZE 512
 
 // Entry in a page table
-typedef struct {
+@struct
+class {
 	// Is the page present in physical memory?
 	unsigned long long present : 1
 

@@ -37,7 +37,7 @@ wapi.HWnd windowToHandle(user32.Window *window) {
 }
 
 // WAPI
-extern "C" {
+@extern "C" {
 
 wapi.Atom RegisterClassW(const wapi.WindowClass *wc) {
 	tofitaDebugLog("RegisterClassW called")
@@ -257,7 +257,7 @@ wapi.HDc BeginPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
 	return (wapi.HDc)&window.fb // TODO
 }
 
-Void __attribute__((fastcall)) setPixel(nj.WindowFramebuffer *fb, int16_t x, int16_t y, nj.Pixel32 pixel) {
+Void __attribute__((fastcall)) setPixel(nj.WindowFramebuffer *fb, Int16 x, Int16 y, nj.Pixel32 pixel) {
 	if ((x < 0) || (y < 0))
 		return
 	if ((x > fb.width - 1) || (y > fb.height - 1))
@@ -273,8 +273,8 @@ Int32 FillRect(wapi.HDc dc, const wapi.Rect *lprc, wapi.HBrush brush) {
 	nj.Pixel32 color
 	color.color = 0xFFAA0000
 
-	for (int16_t y = lprc.top; y < lprc.bottom; y++) {
-		for (int16_t x = lprc.left; x < lprc.right; x++) {
+	for (Int16 y = lprc.top; y < lprc.bottom; y++) {
+		for (Int16 x = lprc.left; x < lprc.right; x++) {
 			setPixel(fb, x, y, color)
 		}
 	}
@@ -310,6 +310,6 @@ wapi.LResult DefWindowProcW(wapi.HWnd hWnd, wapi.Message uMsg, Void *wParam, Voi
 }
 }
 
-extern "C" __attribute__((fastcall)) Void _DllMainCRTStartup() {
+@extern "C" __attribute__((fastcall)) Void _DllMainCRTStartup() {
 	user32.rootClass.next = nullptr
 }

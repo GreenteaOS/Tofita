@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-extern "C++" class Math {
+@extern "C++" class Math {
   public
-	static Int32 round(double value) {
+	static Int32 round(Float value) {
 		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5))
 	}
 
@@ -26,7 +26,7 @@ extern "C++" class Math {
 
 		x2 = number * 0.5F
 		y = number
-		i = *(Int32 *)&y;		   // floating point bit level hacking [sic]
+		i = *(Int32 *)&y // floating point bit level hacking [sic]
 		i = 0x5f3759df - (i >> 1) // Newton's approximation
 		y = *(float *)&i
 		y = y * (threehalfs - (x2 * y * y)) // 1st iteration
@@ -40,7 +40,7 @@ extern "C++" class Math {
 		return a < b ? a : b
 	}
 
-	static double min(double a, double b) {
+	static Float min(Float a, Float b) {
 		return a < b ? a : b
 	}
 
@@ -48,7 +48,7 @@ extern "C++" class Math {
 		return a > b ? a : b
 	}
 
-	static double max(double a, double b) {
+	static Float max(Float a, Float b) {
 		return a > b ? a : b
 	}
 }

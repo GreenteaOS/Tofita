@@ -18,7 +18,7 @@
 #include "../tofita32.dll/tofita32.cpp"
 #include "ntdllVars.hpp"
 
-extern "C" {
+@extern "C" {
 UInt64 KiFastSystemCall(UInt64 rcx, UInt64 rdx) {
 	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx)
 }

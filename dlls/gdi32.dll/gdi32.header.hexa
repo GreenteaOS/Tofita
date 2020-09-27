@@ -19,4 +19,4 @@
 #define GDI32_DLL __declspec(dllimport)
 #endif
 
-extern "C" {}
+@extern "C" {}

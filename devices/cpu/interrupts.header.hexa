@@ -13,7 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-struct InterruptFrame {
+@struct
+class InterruptFrame {
 	// SSE
 	@volatile UInt64 xmm[8 * 2]
 
@@ -41,11 +42,11 @@ struct InterruptFrame {
 	// IRQ error code
 	@volatile UInt64 code
 
-	@volatile UInt64 ip;	 // Instruction pointer
-	@volatile UInt64 cs;	 // Code segment
+	@volatile UInt64 ip // Instruction pointer
+	@volatile UInt64 cs // Code segment
 	@volatile UInt64 flags // RFLAGS\EFLAGS (same on AMD64 and x86)
-	@volatile UInt64 sp;	 // Stack pointer
-	@volatile UInt64 ss;	 // Stack segment
+	@volatile UInt64 sp // Stack pointer
+	@volatile UInt64 ss // Stack segment
 }
 
 _Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect")

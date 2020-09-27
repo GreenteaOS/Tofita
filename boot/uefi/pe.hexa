@@ -15,7 +15,8 @@
 
 // 1 byte aligned
 #pragma pack(1)
-struct PeHeader {
+@struct
+class PeHeader {
 	UInt32 mMagic // PE\0\0 or 0x00004550
 	UInt16 mMachine
 	UInt16 mNumberOfSections
@@ -31,7 +32,8 @@ _Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
 
 // 1 byte aligned
 #pragma pack(1)
-struct Pe32OptionalHeader {
+@struct
+class Pe32OptionalHeader {
 	UInt16 mMagic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
 	UInt8 mMajorLinkerVersion
 	UInt8 mMinorLinkerVersion
@@ -57,16 +59,17 @@ struct Pe32OptionalHeader {
 	UInt16 mSubsystem
 	UInt16 mDllCharacteristics
 	UInt64 mSizeOfStackReserve // UInt32 mSizeOfStackReserve
-	UInt64 mSizeOfStackCommit;  // UInt32 mSizeOfStackCommit
-	UInt64 mSizeOfHeapReserve;  // UInt32 mSizeOfHeapReserve
-	UInt64 mSizeOfHeapCommit;	  // UInt32 mSizeOfHeapCommit
+	UInt64 mSizeOfStackCommit // UInt32 mSizeOfStackCommit
+	UInt64 mSizeOfHeapReserve // UInt32 mSizeOfHeapReserve
+	UInt64 mSizeOfHeapCommit // UInt32 mSizeOfHeapCommit
 	UInt32 mLoaderFlags
 	UInt32 mNumberOfRvaAndSizes
 } __attribute__((packed))
 #pragma pack()
 
 #pragma pack(1)
-struct ImageSectionHeader { // size 40 bytes
+@struct
+class ImageSectionHeader { // size 40 bytes
 	UInt8 mName[8]
 	UInt32 mVirtualSize
 	UInt32 mVirtualAddress

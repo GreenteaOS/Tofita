@@ -34,8 +34,8 @@ OverlappedWindow *OverlappedWindow_create(UInt64 pid) {
 	window.pid = pid
 	window.present = true
 	window.visible = false
-	window.width = 500;							  // TODO actual wapi default values
-	window.height = 300;							  // TODO actual wapi default values
+	window.width = 500 // TODO actual wapi default values
+	window.height = 300 // TODO actual wapi default values
 	window.x = 200 + 48 * nextDefaultWindowPosition // TODO actual wapi default values
 	window.y = 100 + 48 * nextDefaultWindowPosition // TODO actual wapi default values
 	nextDefaultWindowPosition++
@@ -132,7 +132,7 @@ fun initDwm() {
 	mouseY = _framebuffer.height / 2
 }
 
-FrameHover getFrameButton(int16_t mouseX, int16_t mouseY, UInt64 windowId) {
+FrameHover getFrameButton(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
 	if (windowId == 0)
 		return FrameHover.Noop
 
@@ -159,7 +159,7 @@ FrameHover getFrameButton(int16_t mouseX, int16_t mouseY, UInt64 windowId) {
 	return FrameHover.Noop
 }
 
-fun handleMouseMove(int16_t mouseX, int16_t mouseY) {
+fun handleMouseMove(Int16 mouseX, Int16 mouseY) {
 	var window = &windowsList[mouseDragWindow]
 
 	if (mouseDragCapturedWindow && window.present && window.visible) {
@@ -183,7 +183,7 @@ fun handleMouseMove(int16_t mouseX, int16_t mouseY) {
 	}
 }
 
-UInt64 findWindowUnderCursor(int16_t mouseX, int16_t mouseY) {
+UInt64 findWindowUnderCursor(Int16 mouseX, Int16 mouseY) {
 	var windowId = topmostWindow
 
 	do {
@@ -209,12 +209,12 @@ UInt64 findWindowUnderCursor(int16_t mouseX, int16_t mouseY) {
 	return 0
 }
 
-fun selectMouseNextResponder(int16_t mouseX, int16_t mouseY) {
+fun selectMouseNextResponder(Int16 mouseX, Int16 mouseY) {
 	// TODO hexa unconditional recursion firstResponder = selectMouseNextResponder(mouseX, mouseY)
 	firstResponder = findWindowUnderCursor(mouseX, mouseY)
 }
 
-Bool isDraggableFrame(int16_t mouseX, int16_t mouseY, UInt64 windowId) {
+Bool isDraggableFrame(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
 	if (windowId == 0)
 		return false
 
@@ -236,7 +236,7 @@ Bool isDraggableFrame(int16_t mouseX, int16_t mouseY, UInt64 windowId) {
 	return false
 }
 
-fun handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
+fun handleMouseDown(MouseActionType type, Int16 mouseX, Int16 mouseY) {
 	selectMouseNextResponder(mouseX, mouseY)
 
 	if (firstResponder != 0 && firstResponder != topmostWindow) {
@@ -260,7 +260,7 @@ fun handleMouseDown(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 		desktop.handleMouseDownDesktop(type, mouseX, mouseY)
 }
 
-fun handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
+fun handleMouseUp(MouseActionType type, Int16 mouseX, Int16 mouseY) {
 	if (type == MouseActionType.LeftUp)
 		mouseDragCapturedWindow = false
 

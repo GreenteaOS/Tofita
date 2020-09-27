@@ -15,7 +15,7 @@
 
 // Window frames and some GUI elements
 
-fun drawHint(const char8_t *text, int16_t x, int16_t y) {
+fun drawHint(const Char8 *text, Int16 x, Int16 y) {
 	let measure = getTextAdvance(text)
 	let w = 6 * 2 + measure + 1
 	let h = 20
@@ -29,31 +29,31 @@ fun drawHint(const char8_t *text, int16_t x, int16_t y) {
 	drawAsciiText(text, x + 6, y + 5, color)
 }
 
-fun shadow(int16_t x, int16_t y, UInt8 darkness) {
+fun shadow(Int16 x, Int16 y, UInt8 darkness) {
 	Pixel32 pixel
 	pixel.color = 0
 	pixel.rgba.a = 0xFF - darkness
 	blendPixel(x, y, pixel)
 }
 
-auto distance(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+auto distance(Int16 x1, Int16 y1, Int16 x2, Int16 y2) {
 	// TODO floor?
 	return Math.round(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)))
 }
 
-fun drawShadowBox(int16_t x, int16_t y, UInt16 w, UInt16 h) {
-	for (int16_t iy = 0; iy < 16; ++iy)
-		for (int16_t ix = 0; ix < w; ++ix) {
+fun drawShadowBox(Int16 x, Int16 y, UInt16 w, UInt16 h) {
+	for (Int16 iy = 0; iy < 16; ++iy)
+		for (Int16 ix = 0; ix < w; ++ix) {
 			shadow(x + ix, y - iy, 192 + iy * 4)
 			shadow(x + ix, y + iy + h, 192 + iy * 4)
 		}
-	for (int16_t iy = 0; iy < h; ++iy)
-		for (int16_t ix = 0; ix < 16; ++ix) {
+	for (Int16 iy = 0; iy < h; ++iy)
+		for (Int16 ix = 0; ix < 16; ++ix) {
 			shadow(x - ix, y + iy, 192 + ix * 4)
 			shadow(x + ix + w, y + iy, 192 + ix * 4)
 		}
-	for (int16_t iy = 1; iy < 15; ++iy)
-		for (int16_t ix = 1; ix < 15; ++ix) {
+	for (Int16 iy = 1; iy < 15; ++iy)
+		for (Int16 ix = 1; ix < 15; ++ix) {
 			let dist = 192 + distance(x, y, x - ix, y - iy) * 4
 			if (dist > 255)
 				continue
@@ -64,7 +64,7 @@ fun drawShadowBox(int16_t x, int16_t y, UInt16 w, UInt16 h) {
 		}
 }
 
-fun drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, UInt16 w, UInt16 h, Bool active,
+fun drawWindowFrame(const wchar_t *title, Int16 x, Int16 y, UInt16 w, UInt16 h, Bool active,
 						 dwm.FrameHover hover, Bool down) {
 	Bool shorterFrame = false // OSX style
 

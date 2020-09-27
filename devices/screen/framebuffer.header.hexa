@@ -13,14 +13,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-typedef struct {
+@struct
+class {
 	UInt8 r
 	UInt8 g
 	UInt8 b
 	UInt8 a
-} __attribute__((packed)) PixelRGBAData
+} @packed PixelRGBAData
 
-struct Pixel32 {
+@struct
+class Pixel32 {
 	union {
 		PixelRGBAData rgba
 		UInt32 color
@@ -29,13 +31,15 @@ struct Pixel32 {
 
 _Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 
-struct Bitmap32Interim {
+@struct
+class Bitmap32Interim {
 	UInt16 width
 	UInt16 height
 	Pixel32 pixels[]
 }
 
-struct Bitmap32 {
+@struct
+class Bitmap32 {
 	const UInt16 width
 	const UInt16 height
 	Pixel32 pixels[]

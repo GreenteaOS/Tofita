@@ -63,7 +63,8 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof")
 
 // Helpers
 
-extern "C++" template <typename T> struct Physical {
+@extern "C++" template <typename T> @struct
+class Physical {
 	UInt64 physical
 
 	static Physical<T> toPhysical(UInt64 physical) {
@@ -85,7 +86,8 @@ _Static_assert(sizeof(Physical<char8_t>) == sizeof(uint64_t), "physical address 
 
 // Data transferred from UEFI application into kernel loader
 
-struct EfiMemoryMap {
+@struct
+class EfiMemoryMap {
 	efi.EFI_MEMORY_DESCRIPTOR *memoryMap
 	UInt64 memoryMapSize
 	UInt64 mapKey
@@ -93,22 +95,25 @@ struct EfiMemoryMap {
 	UInt32 descriptorVersion
 }
 
-struct Framebuffer {
-	UInt64 base;	   // virtual address
+@struct
+class Framebuffer {
+	UInt64 base // virtual address
 	UInt64 physical // physical address
-	UInt32 size;	   // in bytes
+	UInt32 size // in bytes
 	UInt32 width
 	UInt32 height
 	UInt32 pixelsPerScanLine
 }
 
-struct RamDisk {
-	UInt64 base;	   // virtual address
+@struct
+class RamDisk {
+	UInt64 base // virtual address
 	UInt64 physical // physical address
-	UInt32 size;	   // in bytes
+	UInt32 size // in bytes
 }
 
-struct KernelParams {
+@struct
+class KernelParams {
 	UInt64 pml4
 	UInt64 stack
 	UInt64 physicalBuffer // physical address of where kernel loader placed

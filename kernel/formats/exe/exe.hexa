@@ -26,31 +26,36 @@ Void *offsetPointer(Void *data, ptrdiff_t offset) {
 	return (Void *)((uint64_t)data + offset)
 }
 
-struct ImageDataDirectory {
+@struct
+class ImageDataDirectory {
 	UInt32 virtualAddress
 	UInt32 size
 }
 
-struct PeInterim {
+@struct
+class PeInterim {
 	Void *base
 	UInt64 entry // _DllMainCRTStartup
 	const ImageDataDirectory *imageDataDirectory
 	UInt64 sizeOfStackReserve
 }
 
-struct ExeInterim {
+@struct
+class ExeInterim {
 	PeInterim pei
 	UInt64 stackVirtual
 }
 
-struct PeExportLinkedList {
-	const char8_t *name
+@struct
+class PeExportLinkedList {
+	const Char8 *name
 	UInt64 ptr
 	PeExportLinkedList *next
 	UInt8 hash
 }
 
-struct Executable {
+@struct
+class Executable {
 	UInt64 nextBase
 	pages.PageEntry *pml4
 }
@@ -185,7 +190,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 			UInt16 *ordinal = (UInt16 *)(codeBase + exports.addressOfNameOrdinals)
 			UInt32 entry = 0
 			for (i = 0; i < exports.numberOfNames; i++, nameRef++, ordinal++, entry++) {
-				let name = (const char8_t *)(codeBase + (*nameRef))
+				let name = (const Char8 *)(codeBase + (*nameRef))
 				let idx = *ordinal
 
 				let addr = codeBase + exports.addressOfFunctions + (idx * 4)
@@ -218,7 +223,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 // TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
 // may be moved between versions.
 // Search only selected .dll only within the user provided dlls
-PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root) {
+PeExportLinkedList *getProcAddress(const Char8 *name, PeExportLinkedList *root) {
 	PeExportLinkedList *list = root
 	// TODO compute crc for faster .dll import names lookup
 	while (list.next != null) {
@@ -256,13 +261,13 @@ fun resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 
 		// DLL
 		while (iid.originalFirstThunk != 0) {
-			char8_t *szName = (char8_t *)((uint64_t)buffer + iid.name)
+			Char8 *szName = (Char8 *)((uint64_t)buffer + iid.name)
 			auto pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid.originalFirstThunk)
 			FARPROC *funcRef
 			funcRef = (FARPROC *)((uint64_t)buffer + iid.firstThunk)
 
 			while (pThunkOrg.u1.addressOfData != 0) {
-				char8_t *szImportName
+				Char8 *szImportName
 				UInt32 ord = 666
 				auto func = (Void *)null
 
@@ -277,7 +282,7 @@ fun resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 												 (uint64_t)((uint64_t)pThunkOrg.u1.addressOfData &
 															0xffffffff))
 					ord = pIBN.hint
-					szImportName = (char8_t *)pIBN.name
+					szImportName = (Char8 *)pIBN.name
 					serialPrintf("[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
 								 szImportName, ord, pThunkOrg.u1.fun)
 

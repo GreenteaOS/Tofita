@@ -13,13 +13,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-typedef struct {
+@struct
+class {
 	UInt32 ramDiskChecksum
 	UInt32 ramDiskSize
 	UInt32 assetsCount
 } RamDiskInfo
 
-typedef struct {
+@struct
+class {
 	UInt16 path[128]
 	UInt32 size
 	UInt32 offsetFromRamDiskFirstByte
@@ -30,7 +32,8 @@ fun setRamDisk(const RamDisk *ramdisk) {
 	_ramdisk = ramdisk
 }
 
-typedef struct {
+@struct
+class {
 	UInt32 size
 	UInt8 *data
 } RamDiskAsset

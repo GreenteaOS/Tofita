@@ -17,7 +17,8 @@ namespace exe {
 
 // 1 byte aligned
 #pragma pack(1)
-struct PeHeader {
+@struct
+class PeHeader {
 	UInt32 magic // PE\0\0 or 0x00004550
 	UInt16 machine
 	UInt16 numberOfSections
@@ -33,7 +34,8 @@ _Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
 
 // 1 byte aligned
 #pragma pack(1)
-struct Pe64OptionalHeader {
+@struct
+class Pe64OptionalHeader {
 	UInt16 magic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
 	UInt8 majorLinkerVersion
 	UInt8 minorLinkerVersion
@@ -68,7 +70,8 @@ struct Pe64OptionalHeader {
 
 // 1 byte aligned
 #pragma pack(1)
-struct Pe32OptionalHeader {
+@struct
+class Pe32OptionalHeader {
 	UInt16 magic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
 	UInt8 majorLinkerVersion
 	UInt8 minorLinkerVersion
@@ -103,7 +106,8 @@ struct Pe32OptionalHeader {
 #pragma pack()
 
 #pragma pack(1)
-struct ImageSectionHeader { // size 40 bytes
+@struct
+class ImageSectionHeader { // size 40 bytes
 	UInt8 name[8]
 	UInt32 virtualSize
 	UInt32 virtualAddress
@@ -186,10 +190,10 @@ typedef struct _IMAGE_IMPORT_BY_NAME {
 
 typedef struct _IMAGE_THUNK_DATA {
 	union {
-		UInt64 fun;					 // address of imported fun
-		UInt32 ordinal;					 // ordinal value of fun
+		UInt64 fun // address of imported fun
+		UInt32 ordinal // ordinal value of fun
 		PIMAGE_IMPORT_BY_NAME addressOfData // RVA of imported name
-		UInt32 forwarderStringl;			 // RVA to forwarder string
+		UInt32 forwarderStringl // RVA to forwarder string
 	} u1
 } IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA
 
