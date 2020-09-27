@@ -54,18 +54,18 @@ class LnkAttributes {
 #pragma pack(1)
 	@packed @struct
 class Lnk {
-		UInt32 magucka
-		UInt8 clus[16]
-		LnkFlags flugs
-		LnkAttributes atts
-		UInt64 timeOfCreation
-		UInt64 timeOfModification
-		UInt64 timeOfAccess
-		UInt32 lengthOfTargetFileBytesOfLeastBits
-		UInt32 iconIndex
-		UInt32 showWund
-		UInt16 hotKey
-		UInt8 padding[10]
+		var magucka: UInt32
+		var clus[16]: UInt8
+		var flugs: LnkFlags
+		var atts: LnkAttributes
+		var timeOfCreation: UInt64
+		var timeOfModification: UInt64
+		var timeOfAccess: UInt64
+		var lengthOfTargetFileBytesOfLeastBits: UInt32
+		var iconIndex: UInt32
+		var showWund: UInt32
+		var hotKey: UInt16
+		var padding[10]: UInt8
 	}
 #pragma pack()
 

@@ -50,8 +50,8 @@ UInt8 mouseRead()
 #pragma pack(1)
 @struct
 class {
-	UInt16 limit
-	UInt64 offset
+	var limit: UInt16
+	var offset: UInt64
 } PACKED Idtr
 #pragma pack()
 
@@ -244,8 +244,8 @@ let IRQ15 = 47
 #pragma pack(1)
 @struct
 class TablePtr {
-	UInt16 limit
-	UInt64 base
+	var limit: UInt16
+	var base: UInt64
 } @packed
 #pragma pack()
 
@@ -267,12 +267,12 @@ enum GdtType : UInt8 {
 
 @struct
 class GdtDescriptor {
-	UInt16 limitLow
-	UInt16 baseLow
-	UInt8 baseMid
+	var limitLow: UInt16
+	var baseLow: UInt16
+	var baseMid: UInt8
 	enum GdtType type // Access
-	UInt8 size
-	UInt8 baseHigh
+	var size: UInt8
+	var baseHigh: UInt8
 } @packed
 
 _Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect")
@@ -307,26 +307,26 @@ _Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect")
 
 @struct
 class TssDescriptor {
-	UInt16 limitLow
-	UInt16 base_00
-	UInt8 base_16
+	var limitLow: UInt16
+	var base_00: UInt16
+	var base_16: UInt8
 	enum GdtType type
-	UInt8 size
-	UInt8 base_24
-	UInt32 base_32
-	UInt32 reserved
+	var size: UInt8
+	var base_24: UInt8
+	var base_32: UInt32
+	var reserved: UInt32
 } @packed
 
 @struct
 class TssEntry {
-	UInt32 reserved0
+	var reserved0: UInt32
 
-	UInt64 rsp[3] // stack pointers for CPL 0-2
-	UInt64 ist[8] // ist[0] is reserved
+	var rsp[3]: UInt64 // stack pointers for CPL 0-2
+	var ist[8]: UInt64 // ist[0] is reserved
 
-	UInt64 reserved1
-	UInt16 reserved2
-	UInt16 iomap_offset
+	var reserved1: UInt64
+	var reserved2: UInt16
+	var iomap_offset: UInt16
 } @packed
 
 @aligned(64) static @volatile TablePtr globalGdtr

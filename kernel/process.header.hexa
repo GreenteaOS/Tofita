@@ -40,7 +40,7 @@ class Process {
 	// TODO 32-bit
 
 	// State
-	InterruptFrame frame
+	var frame: InterruptFrame
 
 	// Filled on #PF
 	@volatile UInt64 cr2PageFaultAddress
@@ -56,8 +56,8 @@ class Process {
 
 	// Ring buffer
 	wapi.Msg *messages
-	UInt64 messagesUsed
-	Bool awaitsGetMessage
+	var messagesUsed: UInt64
+	var awaitsGetMessage: Bool
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
 }
 

@@ -273,7 +273,7 @@ fun handleMouseUp(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 			if (frameHoverState == FrameHover.Min) {}
 			if (frameHoverState == FrameHover.Max) {}
 			if (frameHoverState == FrameHover.Close) {
-				PostMessagePayload payload
+				var payload: PostMessagePayload
 
 				payload.hWnd = window.hWnd
 				payload.msg = wapi.Message.WM_CLOSE

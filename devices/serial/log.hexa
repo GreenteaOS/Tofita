@@ -50,7 +50,7 @@ let R_UART_MSR = 6
 #define B_UART_MSR_DCD (1 << 8)
 
 UInt64 kstrlen(const UInt8 *data) {
-	UInt64 r
+	var r: UInt64
 	for (r = 0; *data != 0; data++, r++)
 
 	return r
@@ -146,7 +146,7 @@ UInt64 serialPortWrite(UInt8 *buffer, size: UInt64) {
 fun serialPrintf(const WideChar *c, ...)
 
 fun serialPrintInt(n: UInt64) {
-	UInt8 buf[24]
+	var buf[24]: UInt8
 	for (UInt8 i = 0; i < 24; i++)
 		buf[i] = 0
 	UInt8 *bp = buf + 24
@@ -262,7 +262,7 @@ fun serialPrintf(const WideChar *c, ...) {
 			break
 		case 'd': {
 			var value: Int32 = va_arg(lst, int32_t)
-			UInt8 buffer[16]
+			var buffer[16]: UInt8
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			comItoA(value, buffer)
@@ -275,7 +275,7 @@ fun serialPrintf(const WideChar *c, ...) {
 		}
 		case 'u': {
 			var value: UInt32 = va_arg(lst, uint32_t)
-			UInt8 buffer[16]
+			var buffer[16]: UInt8
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			comItoA(value, buffer)

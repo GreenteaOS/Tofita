@@ -14,8 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define KERNEL32_DLL @dllExport
-#include "kernel32.hpp"
-#include "kernel32Vars.hpp"
+import "kernel32.hpp"
+import "kernel32Vars.hpp"
 
 @extern "C" {
 Void ExitProcess(exitCode: UInt32) {

@@ -25,7 +25,7 @@ Int32 @fastcall floor(float x) {
 }
 
 float @fastcall sqrt(float number) {
-	Int32 i
+	var i: Int32
 	float x2, y
 	const float threehalfs = 1.5F
 
@@ -232,7 +232,7 @@ interpolatePixel(const Bitmap32 *bitmap, const float x, const float y) {
 	let w3: UInt32 = fx1 * fy * 256.0f
 	let w4: UInt32 = fx * fy * 256.0f
 
-	PixelRGBAData result
+	var result: PixelRGBAData
 
 	// Neighboring pixels
 	let p1: PixelRGBAData = p0[0]

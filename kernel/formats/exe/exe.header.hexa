@@ -19,14 +19,14 @@
 #pragma pack(1)
 @struct
 class PeHeader {
-	UInt32 magic // PE\0\0 or 0x00004550
-	UInt16 machine
-	UInt16 numberOfSections
-	UInt32 timeDateStamp
-	UInt32 pointerToSymbolTable
-	UInt32 numberOfSymbols
-	UInt16 sizeOfOptionalHeader
-	UInt16 characteristics
+	var magic: UInt32 // PE\0\0 or 0x00004550
+	var machine: UInt16
+	var numberOfSections: UInt16
+	var timeDateStamp: UInt32
+	var pointerToSymbolTable: UInt32
+	var numberOfSymbols: UInt32
+	var sizeOfOptionalHeader: UInt16
+	var characteristics: UInt16
 } @packed
 #pragma pack()
 
@@ -36,35 +36,35 @@ _Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
 #pragma pack(1)
 @struct
 class Pe64OptionalHeader {
-	UInt16 magic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	UInt8 majorLinkerVersion
-	UInt8 minorLinkerVersion
-	UInt32 sizeOfCode
-	UInt32 sizeOfInitializedData
-	UInt32 sizeOfUninitializedData
-	UInt32 addressOfEntryPoint
-	UInt32 baseOfCode
-	UInt64 imageBase
-	UInt32 sectionAlignment
-	UInt32 fileAlignment
-	UInt16 majorOperatingSystemVersion
-	UInt16 minorOperatingSystemVersion
-	UInt16 majorImageVersion
-	UInt16 minorImageVersion
-	UInt16 majorSubsystemVersion
-	UInt16 minorSubsystemVersion
-	UInt32 win32VersionValue
-	UInt32 sizeOfImage
-	UInt32 sizeOfHeaders
-	UInt32 checkSum
-	UInt16 subsystem
-	UInt16 dllCharacteristics
-	UInt64 sizeOfStackReserve
-	UInt64 sizeOfStackCommit
-	UInt64 sizeOfHeapReserve
-	UInt64 sizeOfHeapCommit
-	UInt32 loaderFlags
-	UInt32 numberOfRvaAndSizes
+	var magic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	var majorLinkerVersion: UInt8
+	var minorLinkerVersion: UInt8
+	var sizeOfCode: UInt32
+	var sizeOfInitializedData: UInt32
+	var sizeOfUninitializedData: UInt32
+	var addressOfEntryPoint: UInt32
+	var baseOfCode: UInt32
+	var imageBase: UInt64
+	var sectionAlignment: UInt32
+	var fileAlignment: UInt32
+	var majorOperatingSystemVersion: UInt16
+	var minorOperatingSystemVersion: UInt16
+	var majorImageVersion: UInt16
+	var minorImageVersion: UInt16
+	var majorSubsystemVersion: UInt16
+	var minorSubsystemVersion: UInt16
+	var win32VersionValue: UInt32
+	var sizeOfImage: UInt32
+	var sizeOfHeaders: UInt32
+	var checkSum: UInt32
+	var subsystem: UInt16
+	var dllCharacteristics: UInt16
+	var sizeOfStackReserve: UInt64
+	var sizeOfStackCommit: UInt64
+	var sizeOfHeapReserve: UInt64
+	var sizeOfHeapCommit: UInt64
+	var loaderFlags: UInt32
+	var numberOfRvaAndSizes: UInt32
 } @packed
 #pragma pack()
 
@@ -72,52 +72,52 @@ class Pe64OptionalHeader {
 #pragma pack(1)
 @struct
 class Pe32OptionalHeader {
-	UInt16 magic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	UInt8 majorLinkerVersion
-	UInt8 minorLinkerVersion
-	UInt32 sizeOfCode
-	UInt32 sizeOfInitializedData
-	UInt32 sizeOfUninitializedData
-	UInt32 addressOfEntryPoint
-	UInt32 baseOfCode
-	UInt32 baseOfData // present only in 32-bit
-	UInt32 imageBase
-	UInt32 sectionAlignment
-	UInt32 fileAlignment
-	UInt16 majorOperatingSystemVersion
-	UInt16 minorOperatingSystemVersion
-	UInt16 majorImageVersion
-	UInt16 minorImageVersion
-	UInt16 majorSubsystemVersion
-	UInt16 minorSubsystemVersion
-	UInt32 win32VersionValue
-	UInt32 sizeOfImage
-	UInt32 sizeOfHeaders
-	UInt32 checkSum
-	UInt16 subsystem
-	UInt16 dllCharacteristics
-	UInt32 sizeOfStackReserve
-	UInt32 sizeOfStackCommit
-	UInt32 sizeOfHeapReserve
-	UInt32 sizeOfHeapCommit
-	UInt32 loaderFlags
-	UInt32 numberOfRvaAndSizes
+	var magic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	var majorLinkerVersion: UInt8
+	var minorLinkerVersion: UInt8
+	var sizeOfCode: UInt32
+	var sizeOfInitializedData: UInt32
+	var sizeOfUninitializedData: UInt32
+	var addressOfEntryPoint: UInt32
+	var baseOfCode: UInt32
+	var baseOfData: UInt32 // present only in 32-bit
+	var imageBase: UInt32
+	var sectionAlignment: UInt32
+	var fileAlignment: UInt32
+	var majorOperatingSystemVersion: UInt16
+	var minorOperatingSystemVersion: UInt16
+	var majorImageVersion: UInt16
+	var minorImageVersion: UInt16
+	var majorSubsystemVersion: UInt16
+	var minorSubsystemVersion: UInt16
+	var win32VersionValue: UInt32
+	var sizeOfImage: UInt32
+	var sizeOfHeaders: UInt32
+	var checkSum: UInt32
+	var subsystem: UInt16
+	var dllCharacteristics: UInt16
+	var sizeOfStackReserve: UInt32
+	var sizeOfStackCommit: UInt32
+	var sizeOfHeapReserve: UInt32
+	var sizeOfHeapCommit: UInt32
+	var loaderFlags: UInt32
+	var numberOfRvaAndSizes: UInt32
 } @packed
 #pragma pack()
 
 #pragma pack(1)
 @struct
 class ImageSectionHeader { // size 40 bytes
-	UInt8 name[8]
-	UInt32 virtualSize
-	UInt32 virtualAddress
-	UInt32 sizeOfRawData
-	UInt32 pointerToRawData
-	UInt32 pointerToRealocations
-	UInt32 pointerToLinenumbers
-	UInt16 numberOfRealocations
-	UInt16 numberOfLinenumbers
-	UInt32 characteristics
+	var name[8]: UInt8
+	var virtualSize: UInt32
+	var virtualAddress: UInt32
+	var sizeOfRawData: UInt32
+	var pointerToRawData: UInt32
+	var pointerToRealocations: UInt32
+	var pointerToLinenumbers: UInt32
+	var numberOfRealocations: UInt16
+	var numberOfLinenumbers: UInt16
+	var characteristics: UInt32
 } @packed
 #pragma pack()
 
@@ -141,27 +141,27 @@ let IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT = 13	// Delay Load Import Descriptors
 let IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14 // COM Runtime descriptor
 
 typedef struct _IMAGE_EXPORT_DIRECTORY {
-	UInt32 characteristics
-	UInt32 timeDateStamp
-	UInt16 majorVersion
-	UInt16 minorVersion
-	UInt32 name
-	UInt32 base
-	UInt32 numberOfFunctions
-	UInt32 numberOfNames
-	UInt32 addressOfFunctions
-	UInt32 addressOfNames
-	UInt32 addressOfNameOrdinals
+	var characteristics: UInt32
+	var timeDateStamp: UInt32
+	var majorVersion: UInt16
+	var minorVersion: UInt16
+	var name: UInt32
+	var base: UInt32
+	var numberOfFunctions: UInt32
+	var numberOfNames: UInt32
+	var addressOfFunctions: UInt32
+	var addressOfNames: UInt32
+	var addressOfNameOrdinals: UInt32
 } IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY
 
 typedef struct _IMAGE_BASE_RELOCATION {
-	UInt32 virtualAddress
-	UInt32 sizeOfBlock
+	var virtualAddress: UInt32
+	var sizeOfBlock: UInt32
 } IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION
 
 typedef struct _IMAGE_DATA_DIRECTORY {
-	UInt32 virtualAddress
-	UInt32 size
+	var virtualAddress: UInt32
+	var size: UInt32
 } IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY
 let IMAGE_SIZEOF_BASE_RELOCATION = 8
 let IMAGE_REL_BASED_ABSOLUTE = 0
@@ -171,28 +171,28 @@ let IMAGE_REL_BASED_HIGHLOW = 3
 #pragma pack(1)
 typedef struct _IMAGE_IMPORT_DESCRIPTOR {
 	//_ANONYMOUS_UNION union {
-	//	UInt32 characteristics
-	UInt32 originalFirstThunk
+	//	var characteristics: UInt32
+	var originalFirstThunk: UInt32
 	//} DUMMYUNIONNAME
-	UInt32 timeDateStamp
-	UInt32 forwarderChain
-	UInt32 name
-	UInt32 firstThunk
+	var timeDateStamp: UInt32
+	var forwarderChain: UInt32
+	var name: UInt32
+	var firstThunk: UInt32
 } IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR
 #pragma pack()
 
 typedef Void (*FARPROC)()
 
 typedef struct _IMAGE_IMPORT_BY_NAME {
-	UInt16 hint
-	UInt8 name[1]
+	var hint: UInt16
+	var name[1]: UInt8
 } IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME
 
 typedef struct _IMAGE_THUNK_DATA {
 	union {
-		UInt64 fun // address of imported fun
-		UInt32 ordinal // ordinal value of fun
-		PIMAGE_IMPORT_BY_NAME addressOfData // RVA of imported name
-		UInt32 forwarderStringl // RVA to forwarder string
+		var fun: UInt64 // address of imported fun
+		var ordinal: UInt32 // ordinal value of fun
+		var addressOfData: PIMAGE_IMPORT_BY_NAME // RVA of imported name
+		var forwarderStringl: UInt32 // RVA to forwarder string
 	} u1
 } IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA

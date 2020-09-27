@@ -21,9 +21,9 @@ Bitmap32 *textFontBitmap
 
 @struct
 class {
-	UInt16 x
-	UInt16 y
-	Float width
+	var x: UInt16
+	var y: UInt16
+	var width: Float
 } @packed TextFontList
 
 TextFontList *textFontList = null
@@ -187,7 +187,7 @@ UInt16 drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) {
 fun drawShadowText(const Char8 *text, x: Float, y: Int16) {
 	var i: UInt16 = 0
 	var xx: Float = x
-	Pixel32 color
+	var color: Pixel32
 	color.color = 0x00000000
 	color.rgba.a = 70
 	while (text[i] != 0 && i < 255 * 255) {

@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable) {
-	efi.EFI_STATUS status = systemTable.BootServices.GetMemoryMap(
+	var status: efi.EFI_STATUS = systemTable.BootServices.GetMemoryMap(
 		&efiMemoryMap.memoryMapSize, efiMemoryMap.memoryMap, &efiMemoryMap.mapKey,
 		&efiMemoryMap.descriptorSize, &efiMemoryMap.descriptorVersion)
 
@@ -27,7 +27,7 @@ fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable)
 }
 
 fun initializeFramebuffer(Framebuffer *fb, efi.EFI_SYSTEM_TABLE *systemTable) {
-	efi.EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
+	var gopGuid: efi.EFI_GUID = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
 	efi.EFI_GRAPHICS_OUTPUT_PROTOCOL *gop
 
 	systemTable.BootServices.LocateProtocol(&gopGuid, NULL, (Void **)&gop)
@@ -47,14 +47,14 @@ fun initializeFramebuffer(Framebuffer *fb, efi.EFI_SYSTEM_TABLE *systemTable) {
 
 efi.EFI_STATUS uefiAllocate(efi.EFI_BOOT_SERVICES *bootsvc, UInt64 *bytes, Void **destination) {
 	serialPrintf("[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes)
-	efi.EFI_STATUS status
+	var status: efi.EFI_STATUS
 	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
 	efi.EFI_MEMORY_TYPE allocationType =
 		efi.EfiLoaderCode // Use *Code not *Data to avoid NX-bit crash if data executed
 
 	// Round to page size
 	var pages: UInt64 = ((*bytes - 1) / PAGE_SIZE) + 1
-	efi.EFI_PHYSICAL_ADDRESS addr = (efi.EFI_PHYSICAL_ADDRESS)*destination
+	var addr: efi.EFI_PHYSICAL_ADDRESS = (efi.EFI_PHYSICAL_ADDRESS)*destination
 
 	status = bootsvc.AllocatePages(efi.AllocateAnyPages, allocationType, pages, &addr)
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {

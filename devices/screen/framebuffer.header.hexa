@@ -15,17 +15,17 @@
 
 @struct
 class {
-	UInt8 r
-	UInt8 g
-	UInt8 b
-	UInt8 a
+	var r: UInt8
+	var g: UInt8
+	var b: UInt8
+	var a: UInt8
 } @packed PixelRGBAData
 
 @struct
 class Pixel32 {
 	union {
-		PixelRGBAData rgba
-		UInt32 color
+		var rgba: PixelRGBAData
+		var color: UInt32
 	}
 }
 
@@ -33,14 +33,14 @@ _Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 
 @struct
 class Bitmap32Interim {
-	UInt16 width
-	UInt16 height
-	Pixel32 pixels[]
+	var width: UInt16
+	var height: UInt16
+	var pixels[]: Pixel32
 }
 
 @struct
 class Bitmap32 {
 	const UInt16 width
 	const UInt16 height
-	Pixel32 pixels[]
+	var pixels[]: Pixel32
 }

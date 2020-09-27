@@ -28,19 +28,19 @@ const UInt32 byteswap(x: UInt32) {
 
 #define TABLE_HEADER(signature)                                                                              \
 	static const UInt32 typeId = byteswap(signature);                                                      \
-	AcpiTableHeader header
+	var header: AcpiTableHeader
 
 @struct
 class AcpiTableHeader {
-	UInt32 type
-	UInt32 length
-	UInt8 revision
-	UInt8 checksum
-	Char8 oem_id[6]
-	Char8 oem_table[8]
-	UInt32 oem_revision
-	UInt32 creator_id
-	UInt32 creator_revision
+	var type: UInt32
+	var length: UInt32
+	var revision: UInt8
+	var checksum: UInt8
+	var oem_id[6]: Char8
+	var oem_table[8]: Char8
+	var oem_revision: UInt32
+	var creator_id: UInt32
+	var creator_revision: UInt32
 
 	Bool validate(UInt32 expectedType = 0) const
 } @packed
@@ -51,26 +51,26 @@ Bool AcpiTableHeader.validate(expectedType: UInt32) {
 
 @struct
 class AcpiMcfgEntry {
-	UInt64 base
-	UInt16 group
-	UInt8 busStart
-	UInt8 busEnd
-	UInt32 reserved
+	var base: UInt64
+	var group: UInt16
+	var busStart: UInt8
+	var busEnd: UInt8
+	var reserved: UInt32
 } @packed
 
 @struct
 class AcpiMcfg {
 	TABLE_HEADER('MCFG')
-	UInt64 reserved
-	AcpiMcfgEntry entries[0]
+	var reserved: UInt64
+	var entries[0]: AcpiMcfgEntry
 } @packed
 
 @struct
 class AcpiApic {
 	TABLE_HEADER('APIC')
-	UInt32 localAddress
-	UInt32 flags
-	UInt8 controllerData[0]
+	var localAddress: UInt32
+	var flags: UInt32
+	var controllerData[0]: UInt8
 } @packed
 
 @struct
@@ -81,25 +81,25 @@ class XSDT {
 
 @struct
 class Acpi20 {
-	UInt32 length
+	var length: UInt32
 	Physical<XSDT> xsdtAddress
-	UInt8 checksum
-	UInt8 reserved[3]
+	var checksum: UInt8
+	var reserved[3]: UInt8
 } @packed
 
 @struct
 class Acpi10 {
-	Char8 signature[8]
-	UInt8 checksum
-	Char8 oemID[6]
-	UInt8 revision
-	UInt32 rsdtAddress
+	var signature[8]: Char8
+	var checksum: UInt8
+	var oemID[6]: Char8
+	var revision: UInt8
+	var rsdtAddress: UInt32
 } @packed
 
 @struct
 class ACPI {
-	Acpi10 acpi10
-	Acpi20 acpi20
+	var acpi10: Acpi10
+	var acpi20: Acpi20
 } @packed
 
 @extern "C++" template <typename T> UInt64 acpiTableEntries(const T *t, size: UInt64) {
@@ -125,9 +125,9 @@ static inline UInt16 busAddr(bus: UInt8, device: UInt8, func: UInt8) {
 
 @struct
 class PciGroup {
-	UInt16 group
-	UInt16 busStart
-	UInt16 busEnd
+	var group: UInt16
+	var busStart: UInt16
+	var busEnd: UInt16
 	UInt32 *base
 
 	UInt32 *baseFor(bus: UInt8, device: UInt8, func: UInt8) {
@@ -209,7 +209,7 @@ class ACPIParser {
 		const Char8 *x = (Char8 *)((uint64_t)(virtualAddress))
 		const UInt8 *y = (UInt8 *)((uint64_t)(virtualAddress))
 		for (Int32 j = 0; j < 8; ++j) {
-			WideChar buffer[2]
+			var buffer[2]: WideChar
 			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?' : x[j]
 			buffer[1] = (char8_t)0
 			serialPrint(buffer)
@@ -266,7 +266,7 @@ class ACPIParser {
 	static fun loadMcfg(const acpi.AcpiMcfg *mcfg) {
 		serialPrintf("loadMcfg\n")
 		var count: UInt64 = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry))
-		acpi.PciGroup mPci[count]
+		var mPci[count]: acpi.PciGroup
 
 		for (UInt32 i = 0; i < count; ++i) {
 			const acpi.AcpiMcfgEntry &mcfge = mcfg.entries[i]

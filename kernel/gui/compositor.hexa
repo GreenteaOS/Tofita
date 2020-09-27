@@ -218,7 +218,7 @@ fun composite(startupMilliseconds: UInt64) {
 
 	drawBitmap32(wallpaper, 0, 0)
 	drawBitmap32WithAlpha(trashCan, 12, 10)
-	Pixel32 color
+	var color: Pixel32
 	color.color = 0x00000000
 	drawShadowText(u8"Recycle Bin", 8, 62)
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF

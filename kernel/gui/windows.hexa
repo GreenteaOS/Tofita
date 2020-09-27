@@ -20,7 +20,7 @@ fun drawHint(const Char8 *text, x: Int16, y: Int16) {
 	let w = 6 * 2 + measure + 1
 	let h = 20
 
-	Pixel32 color
+	var color: Pixel32
 	color.color = 0x57575757
 	drawRectangleOutline(color, x, y, w, h)
 	color.color = 0xFFFFFFFF
@@ -30,7 +30,7 @@ fun drawHint(const Char8 *text, x: Int16, y: Int16) {
 }
 
 fun shadow(x: Int16, y: Int16, darkness: UInt8) {
-	Pixel32 pixel
+	var pixel: Pixel32
 	pixel.color = 0
 	pixel.rgba.a = 0xFF - darkness
 	blendPixel(x, y, pixel)
@@ -68,7 +68,7 @@ fun drawWindowFrame(const WideChar *title, x: Int16, y: Int16, w: UInt16, h: UIn
 						 dwm.FrameHover hover, down: Bool) {
 	var shorterFrame: Bool = false // OSX style
 
-	Pixel32 color
+	var color: Pixel32
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xAA
 
 	drawVibrancedRectangle(x + 1, y + 1, w - 1, 32, true)

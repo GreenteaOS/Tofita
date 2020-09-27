@@ -15,7 +15,7 @@
 
 efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FILE_PROTOCOL *root,
 									  RamDisk *ramdisk) {
-	efi.EFI_STATUS status
+	var status: efi.EFI_STATUS
 	static efi.CHAR16 *name = (efi.CHAR16 *)"TOFITA.DAT"
 
 	efi.EFI_FILE_PROTOCOL *file = NULL
@@ -75,11 +75,11 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FIL
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
 efi.EFI_STATUS findAndLoadRamDisk(efi.EFI_BOOT_SERVICES *bootsvc, RamDisk *ramdisk) {
-	efi.EFI_STATUS status = EFI_NOT_READY
+	var status: efi.EFI_STATUS = EFI_NOT_READY
 	efi.EFI_HANDLE *handleBuffer = NULL
 	var handleCount: UInt64 = 0
 
-	efi.EFI_GUID simpleFileSystemProtocol = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
+	var simpleFileSystemProtocol: efi.EFI_GUID = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 
 	status = bootsvc.LocateHandleBuffer(efi.ByProtocol, &simpleFileSystemProtocol, NULL, &handleCount,
 										 &handleBuffer)

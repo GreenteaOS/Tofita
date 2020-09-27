@@ -14,9 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define NTDLL32_DLL @dllExport
-#include "ntdll.hpp"
-#include "../tofita32.dll/tofita32.cpp"
-#include "ntdllVars.hpp"
+import "ntdll.hpp"
+import "../tofita32.dll/tofita32.cpp"
+import "ntdllVars.hpp"
 
 @extern "C" {
 UInt64 KiFastSystemCall(rcx: UInt64, rdx: UInt64) {
