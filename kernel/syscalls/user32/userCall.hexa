@@ -50,8 +50,8 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 
 		let payload = (ShowWindowPayload *)frame.rdxArg1
 
-		const UInt64 windowId = payload.windowId
-		const Int32 nCmdShow = payload.nCmdShow
+		let windowId: UInt64 = payload.windowId
+		let nCmdShow: Int32 = payload.nCmdShow
 		var window = dwm.OverlappedWindow_find(process.pid, windowId)
 
 		if (window != null) {
@@ -106,7 +106,7 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 		if (!probeForWriteOkay((uint64_t)payload.fb, sizeof(nj.WindowFramebuffer)))
 			return false
 
-		UInt64 windowId = payload.windowId
+		var windowId: UInt64 = payload.windowId
 
 		var fb = (nj.WindowFramebuffer *)payload.fb
 		var window = dwm.OverlappedWindow_find(process.pid, windowId)
@@ -158,7 +158,7 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 		if (!probeForWriteOkay((uint64_t)payload.fb, sizeof(nj.WindowFramebuffer)))
 			return false
 
-		UInt64 windowId = payload.windowId
+		var windowId: UInt64 = payload.windowId
 
 		var fb = payload.fb
 		var window = dwm.OverlappedWindow_find(process.pid, windowId)

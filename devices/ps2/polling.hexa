@@ -27,7 +27,7 @@ fun readPS2(): UInt8 {
 
 fun pollPS2Devices(): UInt8 {
 
-	UInt8 poll = readPS2()
+	var poll: UInt8 = readPS2()
 
 	while (getBit(poll, 0) == 1) {
 		// Mouse has higher priority

@@ -14,5 +14,5 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace userCall {
-Bool userCallHandled(@volatile process.Process *process, TofitaSyscalls syscall)
+Bool userCallHandled(@volatile process.Process *process, syscall: TofitaSyscalls)
 }

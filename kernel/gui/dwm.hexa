@@ -19,8 +19,8 @@ namespace dwm {
 
 UInt8 nextDefaultWindowPosition = 0
 
-OverlappedWindow *OverlappedWindow_create(UInt64 pid) {
-	UInt64 index = 0
+OverlappedWindow *OverlappedWindow_create(pid: UInt64) {
+	var index: UInt64 = 0
 	while (index < windowsLimit - 1) {
 		index++ // Null-window not used directly
 		if (index == windowsLimit)
@@ -51,8 +51,8 @@ OverlappedWindow *OverlappedWindow_create(UInt64 pid) {
 	return window
 }
 
-OverlappedWindow *OverlappedWindow_find(UInt64 pid, UInt64 windowId) {
-	UInt64 index = 0
+OverlappedWindow *OverlappedWindow_find(pid: UInt64, windowId: UInt64) {
+	var index: UInt64 = 0
 	while (index < windowsLimit - 1) {
 		index++
 		if (index == windowsLimit)
@@ -64,8 +64,8 @@ OverlappedWindow *OverlappedWindow_find(UInt64 pid, UInt64 windowId) {
 	return null
 }
 
-OverlappedWindow *OverlappedWindow_findAnyProcessWindow(UInt64 pid) {
-	UInt64 index = 0
+OverlappedWindow *OverlappedWindow_findAnyProcessWindow(pid: UInt64) {
+	var index: UInt64 = 0
 	while (index < windowsLimit - 1) {
 		index++
 		if (index == windowsLimit)
@@ -132,12 +132,12 @@ fun initDwm() {
 	mouseY = _framebuffer.height / 2
 }
 
-FrameHover getFrameButton(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
+FrameHover getFrameButton(Int16 mouseX, mouseY: Int16, windowId: UInt64) {
 	if (windowId == 0)
 		return FrameHover.Noop
 
 	var window = &windowsList[windowId]
-	const UInt16 frameButtonsWidth = 137
+	let frameButtonsWidth: UInt16 = 137
 
 	let y = window.y
 	let x = window.x + window.width - frameButtonsWidth
@@ -148,7 +148,7 @@ FrameHover getFrameButton(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
 	let yy = y + frameHeight
 
 	if (mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy) {
-		const UInt8 diff = (mouseX - x) / 46
+		let diff: UInt8 = (mouseX - x) / 46
 		if (diff == 0)
 			return FrameHover.Min
 		if (diff == 1)
@@ -159,7 +159,7 @@ FrameHover getFrameButton(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
 	return FrameHover.Noop
 }
 
-fun handleMouseMove(Int16 mouseX, Int16 mouseY) {
+fun handleMouseMove(Int16 mouseX, mouseY: Int16) {
 	var window = &windowsList[mouseDragWindow]
 
 	if (mouseDragCapturedWindow && window.present && window.visible) {
@@ -183,7 +183,7 @@ fun handleMouseMove(Int16 mouseX, Int16 mouseY) {
 	}
 }
 
-UInt64 findWindowUnderCursor(Int16 mouseX, Int16 mouseY) {
+UInt64 findWindowUnderCursor(Int16 mouseX, mouseY: Int16) {
 	var windowId = topmostWindow
 
 	do {
@@ -209,12 +209,12 @@ UInt64 findWindowUnderCursor(Int16 mouseX, Int16 mouseY) {
 	return 0
 }
 
-fun selectMouseNextResponder(Int16 mouseX, Int16 mouseY) {
+fun selectMouseNextResponder(Int16 mouseX, mouseY: Int16) {
 	// TODO hexa unconditional recursion firstResponder = selectMouseNextResponder(mouseX, mouseY)
 	firstResponder = findWindowUnderCursor(mouseX, mouseY)
 }
 
-Bool isDraggableFrame(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
+Bool isDraggableFrame(Int16 mouseX, mouseY: Int16, windowId: UInt64) {
 	if (windowId == 0)
 		return false
 
@@ -224,7 +224,7 @@ Bool isDraggableFrame(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
 	let x = window.x
 
 	let frameHeight = 30 + 3
-	const UInt16 frameButtonsWidth = 137
+	let frameButtonsWidth: UInt16 = 137
 
 	let xx = x + window.width - frameButtonsWidth
 	let yy = y + frameHeight
@@ -236,7 +236,7 @@ Bool isDraggableFrame(Int16 mouseX, Int16 mouseY, UInt64 windowId) {
 	return false
 }
 
-fun handleMouseDown(MouseActionType type, Int16 mouseX, Int16 mouseY) {
+fun handleMouseDown(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 	selectMouseNextResponder(mouseX, mouseY)
 
 	if (firstResponder != 0 && firstResponder != topmostWindow) {
@@ -260,7 +260,7 @@ fun handleMouseDown(MouseActionType type, Int16 mouseX, Int16 mouseY) {
 		desktop.handleMouseDownDesktop(type, mouseX, mouseY)
 }
 
-fun handleMouseUp(MouseActionType type, Int16 mouseX, Int16 mouseY) {
+fun handleMouseUp(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 	if (type == MouseActionType.LeftUp)
 		mouseDragCapturedWindow = false
 

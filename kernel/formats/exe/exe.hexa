@@ -20,7 +20,7 @@ namespace exe {
 
 // TODO ntdll should have tofitaStub(){} for unresolved dll imports . log them
 
-typedef fun(__fastcall *Entry)(UInt64 entry)
+typedef fun(__fastcall *Entry)(entry: UInt64)
 
 Void *offsetPointer(Void *data, ptrdiff_t offset) {
 	return (Void *)((uint64_t)data + offset)
@@ -61,8 +61,8 @@ class Executable {
 }
 
 // TODO probe for read/write
-auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
-	RamDiskAsset asset = getRamDiskAsset(name)
+auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
+	var asset: RamDiskAsset = getRamDiskAsset(name)
 	serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data)
 	auto ptr = (UInt8 *)asset.data
 	auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
@@ -82,7 +82,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 
 	pages.mapMemory(exec.pml4, exec.nextBase, physical - (uint64_t)WholePhysicalStart, pages)
 
-	const UInt64 buffer = exec.nextBase
+	let buffer: UInt64 = exec.nextBase
 	memset((Void *)buffer, 0, peOptionalHeader.sizeOfImage) // Zeroing
 
 	exec.nextBase = exec.nextBase + pages * PAGE_SIZE
@@ -96,7 +96,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 		serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
 					 &imageSectionHeader[i].name, imageSectionHeader[i].sizeOfRawData,
 					 imageSectionHeader[i].virtualAddress)
-		UInt64 where = (uint64_t)buffer + imageSectionHeader[i].virtualAddress
+		var where: UInt64 = (uint64_t)buffer + imageSectionHeader[i].virtualAddress
 
 		tmemcpy((Void *)where,
 				(Void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
@@ -130,14 +130,14 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 
 		relocation = (PIMAGE_BASE_RELOCATION)(codeBase + directory.virtualAddress)
 		for (; relocation.virtualAddress > 0;) {
-			UInt32 i = 0
+			var i: UInt32 = 0
 			UInt8 *dest = codeBase + relocation.virtualAddress
 			UInt16 *relInfo = (UInt16 *)offsetPointer(relocation, IMAGE_SIZEOF_BASE_RELOCATION)
 			for (i = 0; i < ((relocation.sizeOfBlock - IMAGE_SIZEOF_BASE_RELOCATION) / 2); i++, relInfo++) {
 				// the upper 4 bits define the type of relocation
-				Int32 type = *relInfo >> 12
+				var type: Int32 = *relInfo >> 12
 				// the lower 12 bits define the offset
-				Int32 offset = *relInfo & 0xfff
+				var offset: Int32 = *relInfo & 0xfff
 
 				switch (type) {
 				case IMAGE_REL_BASED_ABSOLUTE:
@@ -178,17 +178,17 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 
 	for (UInt32 i = 0; i < 15; ++i) {
 		if (i == IMAGE_DIRECTORY_ENTRY_EXPORT) {
-			UInt64 codeBase = (uint64_t)buffer
+			var codeBase: UInt64 = (uint64_t)buffer
 			const ImageDataDirectory *directory = &imageDataDirectory[i]
 
 			PIMAGE_EXPORT_DIRECTORY exports
 
 			exports = (PIMAGE_EXPORT_DIRECTORY)((uint64_t)buffer + (uint64_t)directory.virtualAddress)
 
-			UInt32 i = 0
+			var i: UInt32 = 0
 			UInt32 *nameRef = (UInt32 *)(codeBase + exports.addressOfNames)
 			UInt16 *ordinal = (UInt16 *)(codeBase + exports.addressOfNameOrdinals)
-			UInt32 entry = 0
+			var entry: UInt32 = 0
 			for (i = 0; i < exports.numberOfNames; i++, nameRef++, ordinal++, entry++) {
 				let name = (const Char8 *)(codeBase + (*nameRef))
 				let idx = *ordinal
@@ -230,7 +230,7 @@ PeExportLinkedList *getProcAddress(const Char8 *name, PeExportLinkedList *root) 
 		// Step upfront, to ignore empty root
 		list = list.next
 
-		UInt16 i = 0
+		var i: UInt16 = 0
 		while (true) {
 			if ((list.name[i] == name[i]) && (name[i] == 0)) {
 				serialPrintf("[getProcAddress] import {%s} resolved to {%s}\n", name, list.name)
@@ -249,7 +249,7 @@ PeExportLinkedList *getProcAddress(const Char8 *name, PeExportLinkedList *root) 
 	return null
 }
 
-fun resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
+fun resolveDllImports(pei: PeInterim, PeExportLinkedList *root) {
 	var buffer = pei.base
 	var imageDataDirectory = pei.imageDataDirectory
 
@@ -268,7 +268,7 @@ fun resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 
 			while (pThunkOrg.u1.addressOfData != 0) {
 				Char8 *szImportName
-				UInt32 ord = 666
+				var ord: UInt32 = 666
 				auto func = (Void *)null
 
 				if ((pThunkOrg.u1.ordinal & 0x80000000) != 0) {
@@ -307,7 +307,7 @@ fun resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	}
 }
 
-auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
+auto loadExe(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 	ExeInterim ei
 
 	ei.pei = loadDll(name, root, exec)
@@ -317,7 +317,7 @@ auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 		let pages = DOWN_BYTES_TO_PAGES(ei.pei.sizeOfStackReserve) + 1
 		let physical = PhysicalAllocator.allocatePages(pages)
 
-		const UInt64 buffer = exec.nextBase
+		let buffer: UInt64 = exec.nextBase
 		pages.mapMemory(exec.pml4, exec.nextBase, physical - (uint64_t)WholePhysicalStart, pages)
 		memset((Void *)buffer, 0, ei.pei.sizeOfStackReserve) // Zeroing
 
@@ -329,11 +329,11 @@ auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	return ei
 }
 
-fun resolveExeImports(const ExeInterim ei, PeExportLinkedList *root) {
+fun resolveExeImports(ei: ExeInterim, PeExportLinkedList *root) {
 	resolveDllImports(ei.pei, root)
 }
 
-fun loadExeIntoProcess(const wchar_t *file, process.Process *process) {
+fun loadExeIntoProcess(const WideChar *file, process.Process *process) {
 	{
 		PeExportLinkedList *root =
 			(PeExportLinkedList *)PhysicalAllocator.allocateBytes(sizeof(PeExportLinkedList))
@@ -357,7 +357,7 @@ fun loadExeIntoProcess(const wchar_t *file, process.Process *process) {
 		resolveDllImports(user32, root)
 		resolveExeImports(app, root)
 
-		Entry entry = (Entry)ntdll.base
+		var entry: Entry = (Entry)ntdll.base
 		process.frame.ip = ntdll.entry // Contains crt0
 		process.frame.sp = app.stackVirtual
 		process.frame.rcxArg0 = app.pei.entry // First argument

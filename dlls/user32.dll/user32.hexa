@@ -76,8 +76,8 @@ wapi.Atom RegisterClassW(const wapi.WindowClass *wc) {
 	return (wapi.Atom)0
 }
 
-wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const wchar_t *lpClassName, const wchar_t *lpWindowName,
-						   UInt32 dwStyle, Int32 x, Int32 y, Int32 nWidth, Int32 nHeight,
+wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const WideChar *lpWindowName,
+						   UInt32 dwStyle, x: Int32, y: Int32, nWidth: Int32, nHeight: Int32,
 						   wapi.HWnd hWndParent, wapi.HMenu hMenu, wapi.HInstance hInstance,
 						   Void *lpParam) {
 	tofitaDebugLog("CreateWindowExW called")
@@ -92,7 +92,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const wchar_t *lpClassName, const wc
 		// Step upfront, to ignore empty root
 		list = list.next
 
-		UInt16 i = 0
+		var i: UInt16 = 0
 		while (true) {
 			if ((list.name[i] == name[i]) && (name[i] == 0)) {
 				tofitaDebugLog("CreateWindowExW found class {%S}\n", (uint64_t)name)
@@ -137,7 +137,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const wchar_t *lpClassName, const wc
 	payload.hWnd = hWnd
 
 	// Create native window counterpart
-	UInt64 windowId = tofitaCreateWindowEx(&payload)
+	var windowId: UInt64 = tofitaCreateWindowEx(&payload)
 
 	window.windowId = windowId
 	window.windowIsWindow = user32.windowIsWindow
@@ -151,7 +151,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const wchar_t *lpClassName, const wc
 	return hWnd
 }
 
-wapi.Bool ShowWindow(wapi.HWnd hWnd, Int32 nCmdShow) {
+wapi.Bool ShowWindow(wapi.HWnd hWnd, nCmdShow: Int32) {
 	tofitaDebugLog("ShowWindow called")
 	auto window = handleToWindow(hWnd)
 	wapi.Bool result = 0
@@ -179,7 +179,7 @@ wapi.Bool ShowWindow(wapi.HWnd hWnd, Int32 nCmdShow) {
 }
 
 // TODO take 2 or more messages at a time for better perf (this is pretty common)
-wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, UInt32 wMsgFilterMin, UInt32 wMsgFilterMax) {
+wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32) {
 	tofitaDebugLog("GetMessageW called")
 	wapi.Bool result = 1
 
@@ -257,7 +257,7 @@ wapi.HDc BeginPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
 	return (wapi.HDc)&window.fb // TODO
 }
 
-Void @fastcall setPixel(nj.WindowFramebuffer *fb, Int16 x, Int16 y, nj.Pixel32 pixel) {
+Void @fastcall setPixel(nj.WindowFramebuffer *fb, x: Int16, y: Int16, nj.Pixel32 pixel) {
 	if ((x < 0) || (y < 0))
 		return
 	if ((x > fb.width - 1) || (y > fb.height - 1))

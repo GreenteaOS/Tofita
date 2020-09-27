@@ -23,7 +23,7 @@ Void ExitProcess(UInt32 exitCode) {
 	while (true) {}
 }
 
-wapi.HLocal LocalAlloc(UInt32 flags, size_t bytes) {
+wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes) {
 	auto result = &kernel32.buffer[kernel32.bufferOffset]
 	kernel32.bufferOffset += bytes
 	// Align to 8 bytes
@@ -35,11 +35,11 @@ wapi.HLocal LocalAlloc(UInt32 flags, size_t bytes) {
 	return (wapi.HLocal)result
 }
 
-wapi.HGlobal GlobalAlloc(UInt32 flags, size_t bytes) {
+wapi.HGlobal GlobalAlloc(flags: UInt32, size_t bytes) {
 	return (wapi.HGlobal)LocalAlloc(0, bytes)
 }
 
-Void *HeapAlloc(wapi.Handle heap, UInt32 flags, size_t bytes) {
+Void *HeapAlloc(wapi.Handle heap, flags: UInt32, size_t bytes) {
 	return (Void *)LocalAlloc(0, bytes)
 }
 

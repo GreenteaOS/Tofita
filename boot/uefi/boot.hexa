@@ -45,7 +45,7 @@ efi.INTN compareGuid(efi.EFI_GUID *guid1, efi.EFI_GUID *guid2) {
 	return r
 }
 
-Void *tmemcpy(Void *dest, const Void *src, UInt64 count) {
+Void *tmemcpy(Void *dest, const Void *src, count: UInt64) {
 	UInt8 *dst8 = (UInt8 *)dest
 	UInt8 *src8 = (UInt8 *)src
 
@@ -57,7 +57,7 @@ Void *tmemcpy(Void *dest, const Void *src, UInt64 count) {
 }
 
 // Loading animation, progress 0...2
-fun drawLoading(Framebuffer *framebuffer, UInt8 progress) {
+fun drawLoading(Framebuffer *framebuffer, progress: UInt8) {
 	for (UInt8 y = 0; y < leavesHeight; y++)
 		for (UInt8 x = 0; x < leavesWidth; x++) {
 			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
@@ -70,7 +70,7 @@ fun drawLoading(Framebuffer *framebuffer, UInt8 progress) {
 
 #include "../shared/paging.cpp"
 
-Void *memset(Void *dest, Int32 e, UInt64 len) {
+Void *memset(Void *dest, e: Int32, len: UInt64) {
 	UInt8 *d = (UInt8 *)dest
 	for (UInt64 i = 0; i < len; i++, d++) {
 		*d = e
@@ -95,9 +95,9 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	systemTable.BootServices.SetWatchdogTimer(0, 0, 0, NULL)
 
 	{
-		UInt32 revision = systemTable.FirmwareRevision
-		UInt16 minor = (uint16_t)revision
-		UInt16 major = (uint16_t)(revision >> 16)
+		var revision: UInt32 = systemTable.FirmwareRevision
+		var minor: UInt16 = (uint16_t)revision
+		var major: UInt16 = (uint16_t)(revision >> 16)
 		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\n", major, minor)
 	}
 
@@ -105,7 +105,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	// after calling cr3 at the first instruction
 	// so it is safe to allocate it at random position in conventional memory
 
-	const UInt64 upper = (uint64_t)0xffff800000000000
+	let upper: UInt64 = (uint64_t)0xffff800000000000
 	Void *acpiTable = NULL
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI")
@@ -138,7 +138,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	drawLoading(&framebuffer, 0)
 	drawText("GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag "",
 			 (framebuffer.height / 4) * 3 + 64, &framebuffer)
-	const UInt16 errorY = (framebuffer.height / 4) * 3 + 64 + 32
+	let errorY: UInt16 = (framebuffer.height / 4) * 3 + 64 + 32
 
 	// Check ACPI here, after framebuffer initialization
 	while (acpiTable == NULL) {
@@ -159,7 +159,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	drawLoading(&framebuffer, 1)
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap")
-	UInt64 sizeAlloc = (ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE
+	var sizeAlloc: UInt64 = (ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE
 	EfiMemoryMap efiMemoryMap
 	efiMemoryMap.memoryMapSize = sizeof(efi.EFI_MEMORY_DESCRIPTOR) * 512
 	efiMemoryMap.memoryMap = (efi.EFI_MEMORY_DESCRIPTOR *)(ramdisk.base + sizeAlloc)
@@ -202,7 +202,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	}
 
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices")
-	UInt8 oops = 0
+	var oops: UInt8 = 0
 	status = EFI_NOT_READY
 	while (status != EFI_SUCCESS) {
 		if (oops < 10)
@@ -230,13 +230,13 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader")
 
-	RamDiskAsset asset = getRamDiskAsset("tofita.gnu")
+	var asset: RamDiskAsset = getRamDiskAsset("tofita.gnu")
 	serialPrintf("[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
 
-	const UInt64 largeBuffer = paging.conventionalAllocateLargest(&efiMemoryMap)
+	let largeBuffer: UInt64 = paging.conventionalAllocateLargest(&efiMemoryMap)
 	serialPrintf("[[[efi_main]]] large buffer allocated at %u\n", largeBuffer)
 	paging.conventionalOffset = largeBuffer
-	UInt64 mAddressOfEntryPoint = 0
+	var mAddressOfEntryPoint: UInt64 = 0
 
 	{
 		auto ptr = (UInt8 *)asset.data
@@ -255,7 +255,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 		for (UInt16 i = 0; i < peHeader.mNumberOfSections; ++i) {
 			serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
 						 imageSectionHeader[i].mSizeOfRawData)
-			UInt64 where = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress
+			var where: UInt64 = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress
 
 			tmemcpy((Void *)where,
 					(Void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].mPointerToRawData),
@@ -292,8 +292,8 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	// RAM usage bit-map
 
-	UInt64 ram = paging.getRAMSize(&params.efiMemoryMap)
-	UInt32 megs = (uint32_t)(ram / (1024 * 1024))
+	var ram: UInt64 = paging.getRAMSize(&params.efiMemoryMap)
+	var megs: UInt32 = (uint32_t)(ram / (1024 * 1024))
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 	while (megs < 768) {
 		drawText("[ERROR] Tofita requires at least 1 GB of memory [ERROR]", errorY, &framebuffer)

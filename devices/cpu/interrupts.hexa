@@ -23,13 +23,13 @@
 #define PIC_EOI 0x20	  // End-of-interrupt command code
 #define PIC_EOI_0x20 0x20 // End-of-interrupt command code
 
-UInt8 readPort(UInt16 port)
+UInt8 readPort(port: UInt16)
 fun writePort(@volatile UInt16 port, @volatile UInt8 value)
 UInt8 mouseRead()
 
 #define PACKED @packed
 
-@extern "C++" Void tmemcpy(Void *dest, const Void *src, UInt64 count) {
+@extern "C++" Void tmemcpy(Void *dest, const Void *src, count: UInt64) {
 	UInt8 *dst8 = (UInt8 *)dest
 	UInt8 *src8 = (UInt8 *)src
 
@@ -81,7 +81,7 @@ fun writePort(@volatile UInt16 port, @volatile UInt8 value) {
 fun loadIdt(@volatile Idtr *idtr)
 
 // Handling IDT
-#define IDT_SIZE 256
+let IDT_SIZE = 256
 // Records of the GDT - 16 items
 #define NULL_SEL 0x00
 //#define EMPTY_SEL 0x08
@@ -106,7 +106,7 @@ IdtEntry IDT[IDT_SIZE]
 // Handling keyboard
 @extern fun keyboardHandler()
 fun initializeKeyboard(IdtEntry *entry) {
-	UInt64 keyboardAddress = ((uint64_t)keyboardHandler)
+	var keyboardAddress: UInt64 = ((uint64_t)keyboardHandler)
 	entry.offsetLowerbits = keyboardAddress & 0xffff
 	entry.offsetHigherbits = (keyboardAddress & 0xffffffffffff0000) >> 16
 	entry.selector = SYS_CODE64_SEL
@@ -120,7 +120,7 @@ fun initializeKeyboard(IdtEntry *entry) {
 
 @extern fun mouseHandler()
 fun initializeMouse(IdtEntry *entry) {
-	UInt64 mouseAddress = ((uint64_t)mouseHandler)
+	var mouseAddress: UInt64 = ((uint64_t)mouseHandler)
 	entry.offsetLowerbits = mouseAddress & 0xffff
 	entry.offsetHigherbits = (mouseAddress & 0xffffffffffff0000) >> 16
 	entry.selector = SYS_CODE64_SEL
@@ -132,8 +132,8 @@ fun initializeMouse(IdtEntry *entry) {
 	entry.gateType = 0xe // Interrupt gate
 }
 
-fun initializeFallback(IdtEntry *entry, UInt64 fallbackHandler) {
-	UInt64 address = ((uint64_t)fallbackHandler)
+fun initializeFallback(IdtEntry *entry, fallbackHandler: UInt64) {
+	var address: UInt64 = ((uint64_t)fallbackHandler)
 	entry.offsetLowerbits = address & 0xffff
 	entry.offsetHigherbits = (address & 0xffffffffffff0000) >> 16
 	entry.selector = SYS_CODE64_SEL
@@ -165,7 +165,7 @@ arguments:
 
 Taken from http://wiki.osdev.org/8259_PIC
 */
-fun remapPic(UInt8 offset1, UInt8 offset2) {
+fun remapPic(offset1: UInt8, offset2: UInt8) {
 	serialPrintln("[cpu] begin: remap PIC")
 
 	writePort(0x20, 0x11)
@@ -205,8 +205,8 @@ Void disablePic(void) {
 	writePort(0xa1, 0xff)
 }
 
-UInt64 physicalToVirtual(UInt64 physical) {
-	UInt64 result = (uint64_t)WholePhysicalStart + (uint64_t)physical
+UInt64 physicalToVirtual(physical: UInt64) {
+	var result: UInt64 = (uint64_t)WholePhysicalStart + (uint64_t)physical
 	return result
 }
 
@@ -215,7 +215,7 @@ fun enableLocalApic() {
 	serialPrintln("[cpu] begin: enableLocalApic")
 
 	auto ptr = (UInt32 *)physicalToVirtual(0xfee000f0)
-	UInt32 val = *ptr
+	var val: UInt32 = *ptr
 	quakePrintf("APIC value is %u\n", val)
 
 	serialPrintln("[cpu] done: enableLocalApic")
@@ -224,22 +224,22 @@ fun enableLocalApic() {
 fun mouseWait(UInt8 aType)
 fun mouseWrite(UInt8 aWrite)
 UInt8 mouseRead()
-#define IRQ0 32
+let IRQ0 = 32
 #define IRQ1 0x21 // 33
-#define IRQ2 34
-#define IRQ3 35
-#define IRQ4 36
-#define IRQ5 37
-#define IRQ6 38
-#define IRQ7 39
-#define IRQ8 40
-#define IRQ9 41
-#define IRQ10 42
-#define IRQ11 43
-#define IRQ12 44 // 2c
-#define IRQ13 45
-#define IRQ14 46
-#define IRQ15 47
+let IRQ2 = 34
+let IRQ3 = 35
+let IRQ4 = 36
+let IRQ5 = 37
+let IRQ6 = 38
+let IRQ7 = 39
+let IRQ8 = 40
+let IRQ9 = 41
+let IRQ10 = 42
+let IRQ11 = 43
+let IRQ12 = 44 // 2c
+let IRQ13 = 45
+let IRQ14 = 46
+let IRQ15 = 47
 
 #pragma pack(1)
 @struct
@@ -383,7 +383,7 @@ Void anyInterruptHandler(InterruptFrame *frame) {
 // ~121 times per second
 UInt64 timerCalled = 0
 
-constexpr UInt64 stackSizeForKernelThread = 1024 * 1024
+const UInt64 stackSizeForKernelThread = 1024 * 1024
 
 fun kernelThread()
 @aligned(64) UInt8 kernelStack[stackSizeForKernelThread] = {0}
@@ -400,7 +400,7 @@ UInt8 taskBarRedraw = 0 // Re-paint task bar current time
 @volatile Bool nextIsGuiThread = true
 
 fun getNextProcess(): UInt64 {
-	UInt64 index = 1
+	var index: UInt64 = 1
 	while (index < 255) {
 		if (process.processes[index].present == true) {
 			if (process.processes[index].schedulable == true)
@@ -414,7 +414,7 @@ fun getNextProcess(): UInt64 {
 }
 
 fun markAllProcessessSchedulable() {
-	UInt64 index = 0
+	var index: UInt64 = 0
 	while (index < 255) { // TODO 256?
 		if (process.processes[index].present == true) {
 			if (process.processes[index].schedulable == true)
@@ -611,7 +611,7 @@ fun setTsr(@volatile UInt16 tsr_data)
 #define PS2_DATA_PORT 0x60
 #define PS2_CONTROL_PORT 0x64
 
-fun gdtSetEntry(UInt8 i, UInt32 base, UInt64 limit, Bool is64, enum GdtType typed) {
+fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, enum GdtType typed) {
 	GdtDescriptor *gdtd = (GdtDescriptor *)&gdtTemplate[i * 2]
 	gdtd.limitLow = limit & 0xffff
 	gdtd.size = (limit >> 16) & 0xf
@@ -627,7 +627,7 @@ fun gdtSetEntry(UInt8 i, UInt32 base, UInt64 limit, Bool is64, enum GdtType type
 }
 
 // Takes 2 GDT entries
-fun tssSetEntry(UInt8 i, UInt64 base, UInt64 limit) {
+fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
 	TssDescriptor *tssd = (TssDescriptor *)&gdtTemplate[i * 2]
 	tssd.limitLow = limit & 0xffff
 	tssd.size = (limit >> 16) & 0xf
@@ -680,7 +680,7 @@ fun dumpGDT(GdtDescriptorEx *desc) {
 fun enableInterrupts() {
 	serialPrintln("[cpu] initializing lgdt")
 
-	UInt64 sizeof_TssEntry = sizeof(globalTss)
+	var sizeof_TssEntry: UInt64 = sizeof(globalTss)
 	serialPrintf("[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry))
 
 	memset((Void *)&globalTss, 0, sizeof_TssEntry)
@@ -711,7 +711,7 @@ fun enableInterrupts() {
 	serialPrintHex((uint64_t)globalTss.rsp[2])
 	serialPrint("\n")
 
-	UInt64 tssBase = (uint64_t)(&globalTss)
+	var tssBase: UInt64 = (uint64_t)(&globalTss)
 
 	// upload
 	{
@@ -865,7 +865,7 @@ fun enablePS2Mouse() {
 	// Setup the mouse handler
 	// irq_install_handler(12, mouseHandler)
 	serialPrintln("[cpu] done: setting PS/2 mouse")
-	fun quakePrintf(const wchar_t *c, ...)
+	fun quakePrintf(const WideChar *c, ...)
 	quakePrintf("Enabled PS/2 mouse and keyboard\n")
 }
 

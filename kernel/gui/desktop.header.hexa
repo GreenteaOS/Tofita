@@ -20,7 +20,7 @@
 	var dragY = 255
 	var drag = false
 
-	fun compositeDesktop(Int16 mouseX, Int16 mouseY)
-	fun handleMouseDownDesktop(MouseActionType type, Int16 mouseX, Int16 mouseY)
-	fun handleMouseUpDesktop(MouseActionType type, Int16 mouseX, Int16 mouseY)
+	fun compositeDesktop(Int16 mouseX, mouseY: Int16)
+	fun handleMouseDownDesktop(type: MouseActionType, mouseX: Int16, mouseY: Int16)
+	fun handleMouseUpDesktop(type: MouseActionType, mouseX: Int16, mouseY: Int16)
 }

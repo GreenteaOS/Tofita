@@ -20,18 +20,18 @@
 fun initSerial(): UInt8 {
 	// Calculate divisor for baud generator
 	//    Ref_Clk_Rate / Baud_Rate / 16
-	UInt32 divisor = SERIAL_CLOCK_RATE / (SERIAL_BAUD_RATE * 16)
+	var divisor: UInt32 = SERIAL_CLOCK_RATE / (SERIAL_BAUD_RATE * 16)
 	if ((SERIAL_CLOCK_RATE % (SERIAL_BAUD_RATE * 16)) >= SERIAL_BAUD_RATE * 8) {
 		divisor++
 	}
 	// See if the serial port is already initialized
-	Bool initialized = true
+	var initialized: Bool = true
 	if ((readSerialRegister(R_UART_LCR) & 0x3F) != (SERIAL_LINE_CONTROL & 0x3F)) {
 		initialized = false
 	}
 	// Calculate current divisor
 	writeSerialRegister(R_UART_LCR, readSerialRegister(R_UART_LCR) | B_UART_LCR_DLAB)
-	UInt32 currentDivisor = readSerialRegister(R_UART_BAUD_HIGH) << 8
+	var currentDivisor: UInt32 = readSerialRegister(R_UART_BAUD_HIGH) << 8
 	currentDivisor |= (uint32_t)readSerialRegister(R_UART_BAUD_LOW)
 	writeSerialRegister(R_UART_LCR, readSerialRegister(R_UART_LCR) & ~B_UART_LCR_DLAB)
 	// Fast path

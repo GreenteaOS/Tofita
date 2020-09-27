@@ -17,7 +17,7 @@
 
 namespace pages {
 
-#define ADDRESS_BITS 12
+let ADDRESS_BITS = 12
 #define PAGE_ALIGNED @aligned(PAGE_SIZE)
 
 @struct
@@ -38,7 +38,7 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 // Since we are using 64 bit mode, the entry size
 // is 64 bits.
 
-#define PAGE_TABLE_SIZE 512
+let PAGE_TABLE_SIZE = 512
 
 // TODO delet
 // Entry in a page table
@@ -102,7 +102,7 @@ LinearAddress getLinearAddress(UInt64 virtualAddr) {
 	return *((LinearAddress *)&virtualAddr)
 }
 
-fun initializePage(PageEntry *entry, UInt64 address) {
+fun initializePage(PageEntry *entry, address: UInt64) {
 	entry.address = address >> ADDRESS_BITS
 	entry.present = 1
 	entry.writeAllowed = 1
@@ -111,7 +111,7 @@ fun initializePage(PageEntry *entry, UInt64 address) {
 	entry.accessibleByAll = 1
 }
 
-PageEntry *getPage(PageEntry *table, UInt64 entryId) {
+PageEntry *getPage(PageEntry *table, entryId: UInt64) {
 	PageEntry *entry = &table[entryId]
 
 	if (entry.present == 1) {
@@ -124,14 +124,14 @@ PageEntry *getPage(PageEntry *table, UInt64 entryId) {
 	}
 }
 
-fun map_pt(PageEntry pt[], UInt64 virtualAddr, UInt64 physicalAddr) {
+fun map_pt(PageEntry pt[], virtualAddr: UInt64, physicalAddr: UInt64) {
 	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt]
 	initializePage(entry, physicalAddr)
 }
 
 // TODO handle huge pages returned from bootloader
 #define createMapping(fromTable, toTable)                                                                    \
-	Void map_##fromTable(PageEntry fromTable[], UInt64 virtualAddr, UInt64 physicalAddr) {               \
+	Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {               \
 		PageEntry *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                    \
 		map_##toTable(toTable, virtualAddr, physicalAddr);                                                   \
 	}
@@ -143,7 +143,7 @@ createMapping(pml4, pdpt)
 #undef createMapping
 
 // Returns actual physical address from virtual address
-UInt64 resolveAddr(const PageEntry *pml4entries, UInt64 virtualAddr) {
+UInt64 resolveAddr(const PageEntry *pml4entries, virtualAddr: UInt64) {
 	auto linear = getLinearAddress(virtualAddr)
 	// pml4
 	const PageEntry *entry = &pml4entries[linear.pml4]
@@ -175,13 +175,13 @@ UInt64 resolveAddr(const PageEntry *pml4entries, UInt64 virtualAddr) {
 // TODO ^ same clang warning
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
-fun mapMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt64 physicalAddr, UInt32 pageCount) {
+fun mapMemory(PageEntry *pml4entries, virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
 	serialPrintln("[paging] mapping memory range")
 
-	UInt64 virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE
+	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * PAGE_SIZE
 
-	UInt64 vAddress = virtualAddr
-	UInt64 pAddress = physicalAddr
+	var vAddress: UInt64 = virtualAddr
+	var pAddress: UInt64 = physicalAddr
 
 	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE)
 
@@ -214,7 +214,7 @@ fun mapMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt64 physicalAddr, U
 
 // Unmaps pages without actually deallocating them, still deallocates unused page tables
 // (page tables are managed only and only here anyway)
-fun unmapMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt32 pageCount) {
+fun unmapMemory(PageEntry *pml4entries, virtualAddr: UInt64, pageCount: UInt32) {
 	// TODO do NOT unmap reserved pages, i.e. WholePhysicalStart and upper half region!
 	// TODO probably special shared buffer allocator+mapper which uses linked list
 	// way upper than WholePhysicalStart limit
@@ -222,7 +222,7 @@ fun unmapMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt32 pageCount) {
 }
 
 // Completely unmaps and deallocates pages and page tables
-fun unmapAndFreeMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt32 pageCount) {
+fun unmapAndFreeMemory(PageEntry *pml4entries, virtualAddr: UInt64, pageCount: UInt32) {
 	// TODO resolve and dealloc pages
 	unmapMemory(pml4entries, virtualAddr, pageCount)
 }
@@ -231,7 +231,7 @@ fun unmapAndFreeMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt32 pageCo
 // Just makes a copy of upper half's PML4,
 // because it is always the same between processes
 fun copyKernelMemoryMap(const PageEntry *pml4source, PageEntry *pml4destination) {
-	UInt32 i = 255 // TODO validate that this is where upper half starts
+	var i: UInt32 = 255 // TODO validate that this is where upper half starts
 	while (i < PAGE_TABLE_SIZE) {
 		pml4destination[i] = pml4source[i]
 		i++
@@ -253,7 +253,7 @@ PageEntry *freeCR3(PageEntry *pml4) {
 // Lower half
 // TODO protection ring
 // TODO lower half limit bounds check (it is less than upper starting range)
-fun mapUserspaceMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt64 physicalAddr,
+fun mapUserspaceMemory(PageEntry *pml4entries, virtualAddr: UInt64, physicalAddr: UInt64,
 							UInt32 pageCount) {}
 
 // Same as VirtualAlloc
@@ -263,5 +263,5 @@ fun mapUserspaceMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt64 physic
 // Decides automatically where to allocate
 // if virtualAddr == 0
 // Note: also allocates physical pages, i.e consumes extra memory
-fun allocUserspaceMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt32 pageCount) {}
+fun allocUserspaceMemory(PageEntry *pml4entries, virtualAddr: UInt64, pageCount: UInt32) {}
 } // namespace pages

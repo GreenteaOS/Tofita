@@ -61,7 +61,7 @@ class Process {
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
 }
 
-constexpr UInt64 ProcessLimit = 256
+const UInt64 ProcessLimit = 256
 
 // TODO dynamic allocation of this list
 Process processes[ProcessLimit] = {0}

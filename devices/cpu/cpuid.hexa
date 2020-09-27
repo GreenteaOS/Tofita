@@ -15,17 +15,17 @@
 
 @struct
 class CPUID {
-	Char8 vendorID[13] = {0}
-	Char8 brandName[48] = {0}
-	UInt32 data = 0
-	UInt32 extras = 0
+	var vendorID[13]: Char8 = {0}
+	var brandName[48]: Char8 = {0}
+	var data: UInt32 = 0
+	var extras: UInt32 = 0
 }
 
-constexpr UInt32 cpuidExtendedLevels = 0x80000000
+const UInt32 cpuidExtendedLevels = 0x80000000
 
 fun getCPUID(): CPUID {
 	CPUID result
-	UInt32 stub = 0
+	var stub: UInt32 = 0
 	amd64.cpuid(0, 0, &result.data, (UInt32 *)(&result.vendorID[0]), (UInt32 *)(&result.vendorID[8]),
 				 (UInt32 *)(&result.vendorID[4]))
 

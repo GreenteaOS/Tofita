@@ -22,12 +22,12 @@
 
 @extern "C" {
 USER32_DLL wapi.Atom RegisterClassW(const wapi.WindowClass *wc)
-USER32_DLL wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const wchar_t *lpClassName,
-									  const wchar_t *lpWindowName, UInt32 dwStyle, Int32 x, Int32 y,
-									  Int32 nWidth, Int32 nHeight, wapi.HWnd hWndParent,
+USER32_DLL wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName,
+									  const WideChar *lpWindowName, dwStyle: UInt32, x: Int32, y: Int32,
+									  Int32 nWidth, nHeight: Int32, wapi.HWnd hWndParent,
 									  wapi.HMenu hMenu, wapi.HInstance hInstance, Void *lpParam)
-USER32_DLL wapi.Bool ShowWindow(wapi.HWnd hWnd, Int32 nCmdShow)
-USER32_DLL wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, UInt32 wMsgFilterMin,
+USER32_DLL wapi.Bool ShowWindow(wapi.HWnd hWnd, nCmdShow: Int32)
+USER32_DLL wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, wMsgFilterMin: UInt32,
 								  UInt32 wMsgFilterMax)
 USER32_DLL wapi.Bool TranslateMessage(wapi.Msg *msg)
 USER32_DLL wapi.LResult DispatchMessageW(wapi.Msg *msg)

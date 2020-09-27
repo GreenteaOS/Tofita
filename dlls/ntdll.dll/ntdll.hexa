@@ -19,11 +19,11 @@
 #include "ntdllVars.hpp"
 
 @extern "C" {
-UInt64 KiFastSystemCall(UInt64 rcx, UInt64 rdx) {
+UInt64 KiFastSystemCall(rcx: UInt64, rdx: UInt64) {
 	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx)
 }
 
-Void greenteaosIsTheBest(Int32 (*entry)(), UInt64 pid) {
+Void greenteaosIsTheBest(Int32 (*entry)(), pid: UInt64) {
 	// TODO entry arguments (argv, argc)
 	// TODO init DLLs
 	// TODO PEB/TEB

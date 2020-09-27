@@ -49,7 +49,7 @@ Module *loadModule(ModuleInterim *params) {
 	for (UInt16 i = 0; i < peHeader.numberOfSections; ++i) {
 		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
 					 imageSectionHeader[i].sizeOfRawData)
-		UInt64 where = (uint64_t)base + imageSectionHeader[i].virtualAddress
+		var where: UInt64 = (uint64_t)base + imageSectionHeader[i].virtualAddress
 
 		tmemcpy((Void *)where,
 				(Void *)((uint64_t)params.dll.data + (uint64_t)imageSectionHeader[i].pointerToRawData),

@@ -16,16 +16,16 @@
 // trampoline.asm . incbin
 @extern const UInt8 binFont[]
 @extern const UInt8 binFontBitmap[]
-const UInt32 fontWidth = 512
-const UInt32 fontHeight = 32
+let fontWidth: UInt32 = 512
+let fontHeight: UInt32 = 32
 
 @extern const UInt8 binLeavesBitmap[]
-const UInt32 leavesWidth = 36
-const UInt32 leavesHeight = 25
+let leavesWidth: UInt32 = 36
+let leavesHeight: UInt32 = 25
 
 Int64 _fltused = 0
 
-fun drawPixel(Framebuffer *framebuffer, UInt32 x, UInt32 y, UInt32 color) {
+fun drawPixel(Framebuffer *framebuffer, x: UInt32, y: UInt32, color: UInt32) {
 	UInt32 *pixels = (UInt32 *)framebuffer.base
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
@@ -40,7 +40,7 @@ class UefiPixel {
 
 _Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit")
 
-UInt32 getBitmapPixel(const UInt8 *bmp, UInt32 x, UInt32 y, UInt32 width, UInt32 height) {
+UInt32 getBitmapPixel(const UInt8 *bmp, x: UInt32, y: UInt32, width: UInt32, height: UInt32) {
 	let colors = bmp + 54
 	UefiPixel pixel
 	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0]
@@ -69,20 +69,20 @@ fun initText() {
 }
 
 Float getCharAdvance(const Char8 c) {
-	TextFontList textChar = textFontList[(uint64_t)c]
+	var textChar: TextFontList = textFontList[(uint64_t)c]
 	return textChar.width
 }
 
-Float drawChar(const Char8 c, Float x, Int16 y, Framebuffer *framebuffer) {
-	TextFontList textChar = textFontList[(uint64_t)c]
+Float drawChar(c: Char8, x: Float, y: Int16, Framebuffer *framebuffer) {
+	var textChar: TextFontList = textFontList[(uint64_t)c]
 
-	Int16 xx = (int32_t)(x + 0.5)
-	UInt16 w = (int32_t)(textChar.width + 0.5)
+	var xx: Int16 = (int32_t)(x + 0.5)
+	var w: UInt16 = (int32_t)(textChar.width + 0.5)
 
 	for (UInt16 yi = 0; yi < 12; yi++)
 		for (UInt16 xi = 0; xi < w; xi++) {
-			const UInt32 atx = xx + xi
-			const UInt32 aty = y + yi
+			let atx: UInt32 = xx + xi
+			let aty: UInt32 = y + yi
 
 			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight)
 
@@ -92,16 +92,16 @@ Float drawChar(const Char8 c, Float x, Int16 y, Framebuffer *framebuffer) {
 	return textChar.width
 }
 
-fun drawText(const wchar_t *text, Int16 y, Framebuffer *framebuffer) {
-	UInt16 i = 0
+fun drawText(const WideChar *text, y: Int16, Framebuffer *framebuffer) {
+	var i: UInt16 = 0
 
 	// Get width to center text on screen
-	Float width = 0
+	var width: Float = 0
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
 		width += getCharAdvance((uint16_t)text[i] & 0xFF)
 		i++
 	}
-	Float xx = framebuffer.width / 2 - width / 2
+	var xx: Float = framebuffer.width / 2 - width / 2
 
 	i = 0
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
