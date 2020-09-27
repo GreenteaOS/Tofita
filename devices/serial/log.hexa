@@ -102,7 +102,7 @@ fun serialPortWritable(): Bool {
 }
 
 UInt64 serialPortWrite(UInt8 *buffer, size: UInt64) {
-	if (buffer == NULL) {
+	if (buffer == null) {
 		return 0
 	}
 	if (size == 0) {

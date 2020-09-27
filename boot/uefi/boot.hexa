@@ -81,7 +81,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	initText()
 
 	// Disable watchdog timer
-	systemTable.BootServices.SetWatchdogTimer(0, 0, 0, NULL)
+	systemTable.BootServices.SetWatchdogTimer(0, 0, 0, null)
 
 	{
 		var revision: UInt32 = systemTable.FirmwareRevision
@@ -95,7 +95,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	// so it is safe to allocate it at random position in conventional memory
 
 	let upper: UInt64 = (uint64_t)0xffff800000000000
-	var acpiTable: Pointer<Void> = NULL
+	var acpiTable: Pointer<Void> = null
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI")
 		var acpi20: efi.EFI_GUID = ACPI_20_TABLE_GUID
@@ -130,7 +130,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	let errorY: UInt16 = (framebuffer.height / 4) * 3 + 64 + 32
 
 	// Check ACPI here, after framebuffer initialization
-	while (acpiTable == NULL) {
+	while (acpiTable == null) {
 		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, &framebuffer)
 	}
 

@@ -18,7 +18,7 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FIL
 	var status: efi.EFI_STATUS
 	static efi.CHAR16 *name = (efi.CHAR16 *)"TOFITA.DAT"
 
-	var file: Pointer<efi.EFI_FILE_PROTOCOL> = NULL
+	var file: Pointer<efi.EFI_FILE_PROTOCOL> = null
 	status = root.Open(root, &file, (efi.CHAR16 *)name, EFI_FILE_MODE_READ,
 						EFI_FILE_READ_ONLY | EFI_FILE_HIDDEN | EFI_FILE_SYSTEM)
 
@@ -41,7 +41,7 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FIL
 	var sizeAlloc: UInt64 = (size / PAGE_SIZE + 1) * PAGE_SIZE
 	sizeAlloc += sizeof(efi.EFI_MEMORY_DESCRIPTOR) * 512 // Combined allocation for mem map
 
-	var address: Pointer<Void> = (Void *)0
+	var address: Pointer<Void> = null
 	status = uefiAllocate(bootsvc, &sizeAlloc, &address)
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\n", status,
 				 size, address)
@@ -76,12 +76,12 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FIL
 // returns EFI_SUCCESS or EFI_NOT_FOUND
 efi.EFI_STATUS findAndLoadRamDisk(efi.EFI_BOOT_SERVICES *bootsvc, RamDisk *ramdisk) {
 	var status: efi.EFI_STATUS = EFI_NOT_READY
-	var handleBuffer: Pointer<efi.EFI_HANDLE> = NULL
+	var handleBuffer: Pointer<efi.EFI_HANDLE> = null
 	var handleCount: UInt64 = 0
 
 	var simpleFileSystemProtocol: efi.EFI_GUID = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 
-	status = bootsvc.LocateHandleBuffer(efi.ByProtocol, &simpleFileSystemProtocol, NULL, &handleCount,
+	status = bootsvc.LocateHandleBuffer(efi.ByProtocol, &simpleFileSystemProtocol, null, &handleCount,
 										 &handleBuffer)
 	if (status != EFI_SUCCESS)
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] <ERROR> failed: LocateHandleBuffer %d\n", status)
@@ -91,7 +91,7 @@ efi.EFI_STATUS findAndLoadRamDisk(efi.EFI_BOOT_SERVICES *bootsvc, RamDisk *ramdi
 
 	for (UInt64 i = 0; i < handleCount; ++i) {
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] loading handle #%d of %d handles\n", i, handleCount)
-		var fileSystem: Pointer<efi.EFI_SIMPLE_FILE_SYSTEM_PROTOCOL> = NULL
+		var fileSystem: Pointer<efi.EFI_SIMPLE_FILE_SYSTEM_PROTOCOL> = null
 
 		status = bootsvc.HandleProtocol(handleBuffer[i], &simpleFileSystemProtocol, (Void **)&fileSystem)
 
@@ -104,7 +104,7 @@ efi.EFI_STATUS findAndLoadRamDisk(efi.EFI_BOOT_SERVICES *bootsvc, RamDisk *ramdi
 		}
 
 		serialPrintln("[[[efi_main.findAndLoadRamDisk]]] success: HandleProtocol found a file system")
-		var root: Pointer<efi.EFI_FILE_PROTOCOL> = NULL
+		var root: Pointer<efi.EFI_FILE_PROTOCOL> = null
 		status = fileSystem.OpenVolume(fileSystem, &root)
 		if (status != EFI_SUCCESS) {
 			serialPrintf("[[[efi_main.findAndLoadRamDisk]]] failed: OpenVolume with status %d, continue to "
