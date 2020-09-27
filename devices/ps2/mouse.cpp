@@ -146,4 +146,26 @@ function handleMousePacket() {
 }
 
 function handleMouse() {
+	// This is hack to avoid race condition in poller
+	// this way we handle mouse *only* in poller
+	// if (true) {
+	//	pollForce = true;
+	//	writePort(0xA0, 0x20);
+	//	writePort(0x20, 0x20);
+	//	return;
+	//}
+
+	// Avoid race condition
+	// polls = true;
+	// handleMousePacket();
+	// uint8_t poll = readPort(0x64);
+	// while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
+	//	// if (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
+	//	// handleMousePacket();
+	//	poll = readPort(0x64);
+	//}
+	// writePort(0xA0, 0x20);
+	// writePort(0x20, 0x20);
+	// haveToRender = 1;
+	// polls = false;
 }
