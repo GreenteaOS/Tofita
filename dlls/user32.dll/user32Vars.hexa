@@ -25,7 +25,7 @@ class ClassesLinkedList {
 ClassesLinkedList rootClass
 
 // TODO some HandleWrapper with handle type field?
-constexpr UInt16 windowIsWindow = 0xA1CE
+const UInt16 windowIsWindow = 0xA1CE
 
 @struct
 class Window {
@@ -37,7 +37,7 @@ class Window {
 	UInt64 instanceId // Random unique ID
 }
 
-constexpr UInt16 windowIsRemoteWindow = 0xA1CB
+const UInt16 windowIsRemoteWindow = 0xA1CB
 
 // Window of other process
 @struct

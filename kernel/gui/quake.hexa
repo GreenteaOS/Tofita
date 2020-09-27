@@ -23,7 +23,7 @@ UInt8 quakeRow = 0
 Float quakeAdvance = 0.0
 UInt8 quakeCommandSize = 0
 
-fun quakePrintf(const wchar_t *c, ...)
+fun quakePrintf(const WideChar *c, ...)
 
 fun quake() {
 	if (haveToQuake == 0) {
@@ -44,7 +44,7 @@ fun quake() {
 	}
 }
 
-fun quakeHandleButtonDown(UInt8 key) {
+fun quakeHandleButtonDown(key: UInt8) {
 	serialPrintf("quakeHandleButtonDown %d\n", key)
 
 	if (keyboardMap[key] == '\b' && quakeCommandSize > 0) {
@@ -56,7 +56,7 @@ fun quakeHandleButtonDown(UInt8 key) {
 		if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
 			@extern const KernelParams *paramsCache
 			quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n")
-			InitKernel start = (InitKernel)KernelVirtualBase
+			var start: InitKernel = (InitKernel)KernelVirtualBase
 			start(paramsCache) // TODO pml4, stack
 		} else if (quakeCommand[0] == 'd' && quakeCommand[1] == 'a') {
 			// Dark theme
@@ -88,20 +88,20 @@ fun quakeHandleButtonDown(UInt8 key) {
 	serialPrintf("quake command is %s\n", quakeCommand)
 }
 
-fun qsod(const wchar_t *format, const UInt64 extra, const UInt64 more) {
+fun qsod(const WideChar *format, extra: UInt64, const UInt64 more) {
 	haveToQuake = 1
 	quakePrintf("Kernel stopped working. Please, reboot.\n")
 	quakePrintf(format, extra, more)
 }
 
-UInt8 *_quakeItoA(Int32 i, UInt8 b[]) {
+UInt8 *_quakeItoA(i: Int32, b[]: UInt8) {
 	UInt8 const digit[] = "0123456789"
 	UInt8 *p = b
 	if (i < 0) {
 		*p++ = '-'
 		i *= -1
 	}
-	Int32 shifter = i
+	var shifter: Int32 = i
 	do { // Move to where representation ends
 		++p
 		shifter = shifter / 10
@@ -156,7 +156,7 @@ UInt8 __cdecl _quake_putchar(const UInt8 c) {
 }
 
 Int32 _quake_puts(const UInt8 *string) {
-	Int32 i = 0
+	var i: Int32 = 0
 	while (string[i] != 0) {
 		if (_quake_putchar(string[i]) == EOF) {
 			return EOF
@@ -166,14 +166,14 @@ Int32 _quake_puts(const UInt8 *string) {
 	return 1
 }
 
-fun quakePrintHex(UInt64 n) {
+fun quakePrintHex(n: UInt64) {
 	_quake_puts((const UInt8 *)"0x")
 	UInt8 buf[16], *bp = buf + 16
 	for (Int32 i = 0; i < 16; i++)
 		buf[i] = '0'
 	do {
 		bp--
-		UInt8 mod = n % 16
+		var mod: UInt8 = n % 16
 		if (mod < 10) {
 			*bp = '0' + mod
 		} else {
@@ -185,7 +185,7 @@ fun quakePrintHex(UInt64 n) {
 		_quake_putchar(buf[i])
 }
 
-fun quakePrintf(const wchar_t *c, ...) {
+fun quakePrintf(const WideChar *c, ...) {
 	UInt8 *s
 	va_list lst
 	va_start(lst, c)
@@ -210,7 +210,7 @@ fun quakePrintf(const wchar_t *c, ...) {
 			_quake_putchar(va_arg(lst, int32_t))
 			break
 		case 'd': {
-			Int32 value = va_arg(lst, int32_t)
+			var value: Int32 = va_arg(lst, int32_t)
 			UInt8 buffer[16]
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
@@ -223,7 +223,7 @@ fun quakePrintf(const wchar_t *c, ...) {
 			break
 		}
 		case 'u': {
-			UInt32 value = va_arg(lst, uint32_t)
+			var value: UInt32 = va_arg(lst, uint32_t)
 			UInt8 buffer[16]
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
@@ -236,7 +236,7 @@ fun quakePrintf(const wchar_t *c, ...) {
 			break
 		}
 		case '8': {
-			UInt64 value = va_arg(lst, uint64_t)
+			var value: UInt64 = va_arg(lst, uint64_t)
 			quakePrintHex(value)
 			break
 		}

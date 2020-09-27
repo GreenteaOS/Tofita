@@ -31,7 +31,7 @@ class OverlappedWindow {
 	wapi.HWnd hWnd
 
 	Bool visible
-	const wchar_t *title
+	const WideChar *title
 
 	Int16 x
 	Int16 y
@@ -46,7 +46,7 @@ class OverlappedWindow {
 	Bool fbCurrentZeta // Use to swap chain
 }
 
-constexpr UInt64 windowsLimit = 256
+const UInt64 windowsLimit = 256
 
 // TODO allocate dynamically (just use Hexa Array or something)
 OverlappedWindow windowsList[windowsLimit]
@@ -69,14 +69,14 @@ UInt64 frameHoverWindow = 0
 Bool frameHoverWindowDown = false
 FrameHover frameHoverState = FrameHover.Noop
 
-OverlappedWindow *OverlappedWindow_create(UInt64 pid)
-OverlappedWindow *OverlappedWindow_findAnyProcessWindow(UInt64 pid)
-OverlappedWindow *OverlappedWindow_find(UInt64 pid, UInt64 windowId)
+OverlappedWindow *OverlappedWindow_create(pid: UInt64)
+OverlappedWindow *OverlappedWindow_findAnyProcessWindow(pid: UInt64)
+OverlappedWindow *OverlappedWindow_find(pid: UInt64, windowId: UInt64)
 fun OverlappedWindow_detach(UInt64 windowId)
 fun OverlappedWindow_attach(UInt64 windowId)
 fun OverlappedWindow_destroy(UInt64 windowId)
 fun initDwm()
 fun handleMouseActivity()
 fun handleKeyboardActivity()
-UInt64 findWindowUnderCursor(Int16 mouseX, Int16 mouseY)
+UInt64 findWindowUnderCursor(Int16 mouseX, mouseY: Int16)
 } // namespace dwm

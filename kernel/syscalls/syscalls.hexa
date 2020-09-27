@@ -15,9 +15,9 @@
 
 #pragma once
 
-#define USER_SYSCALLS 123000
+let USER_SYSCALLS = 123000
 
-// wchar_t is UTF-16LE with -fshort-wchar
+// WideChar is UTF-16LE with -fshort-wchar
 _Static_assert(sizeof(wchar_t) == 2, "bad sizeof")
 
 enum TofitaSyscalls : UInt64 {
@@ -38,10 +38,10 @@ enum TofitaSyscalls : UInt64 {
 
 @struct
 class DebugLogPayload {
-	const wchar_t *message
+	const WideChar *message
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	UInt64 extra = 0
-	UInt64 more = 0
+	var extra: UInt64 = 0
+	var more: UInt64 = 0
 }
 
 _Static_assert(sizeof(DebugLogPayload) == 8 * 3, "bad sizeof")
@@ -69,9 +69,9 @@ class CreateWindowExPayload {
 	wapi.HWnd hWnd
 
 	// CreateWindowEx
-	const wchar_t *lpClassName
+	const WideChar *lpClassName
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	const wchar_t *lpWindowName
+	const WideChar *lpWindowName
 	UInt32 dwStyle
 	Int32 x
 	Int32 y

@@ -15,7 +15,7 @@
 
 @extern "C++" class Math {
   public
-	static Int32 round(Float value) {
+	static Int32 round(value: Float) {
 		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5))
 	}
 
@@ -36,19 +36,19 @@
 		return 1.0f / y
 	}
 
-	static Int32 min(Int32 a, Int32 b) {
+	static Int32 min(a: Int32, b: Int32) {
 		return a < b ? a : b
 	}
 
-	static Float min(Float a, Float b) {
+	static Float min(a: Float, b: Float) {
 		return a < b ? a : b
 	}
 
-	static Int32 max(Int32 a, Int32 b) {
+	static Int32 max(a: Int32, b: Int32) {
 		return a > b ? a : b
 	}
 
-	static Float max(Float a, Float b) {
+	static Float max(a: Float, b: Float) {
 		return a > b ? a : b
 	}
 }

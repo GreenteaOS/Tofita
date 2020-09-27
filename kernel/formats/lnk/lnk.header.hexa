@@ -14,8 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 @extern "C++" namespace shortcut {
-	constexpr UInt32 magic = 0x0000004C
-	constexpr UInt8 cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46}
+	const UInt32 magic = 0x0000004C
+	const UInt8 cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46}
 
 	@packed @struct
 class LnkFlags {

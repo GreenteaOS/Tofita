@@ -21,7 +21,7 @@ namespace acpi {
 
 // Types
 
-constexpr UInt32 byteswap(UInt32 x) {
+const UInt32 byteswap(x: UInt32) {
 	return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) | ((x << 8) & 0x00ff0000) |
 		   ((x << 24) & 0xff000000)
 }
@@ -102,7 +102,7 @@ class ACPI {
 	Acpi20 acpi20
 } @packed
 
-@extern "C++" template <typename T> UInt64 acpiTableEntries(const T *t, UInt64 size) {
+@extern "C++" template <typename T> UInt64 acpiTableEntries(const T *t, size: UInt64) {
 	return (t.header.length - sizeof(T)) / size
 }
 
@@ -110,16 +110,16 @@ class ACPI {
 	return t.header.validate(T.typeId)
 }
 
-static Void put_sig(Char8 *into, UInt32 type) {
+static Void put_sig(Char8 *into, type: UInt32) {
 	for (Int32 j = 0; j < 4; ++j)
 		into[j] = reinterpret_cast<Char8 *>(&type)[j]
 }
 
-@extern "C++" template <typename T> inline T *offset_pointer(T *p, UInt64 n) {
+@extern "C++" template <typename T> inline T *offset_pointer(T *p, n: UInt64) {
 	return reinterpret_cast<T *>(reinterpret_cast<uint64_t>(p) + n)
 }
 
-static inline UInt16 busAddr(UInt8 bus, UInt8 device, UInt8 func) {
+static inline UInt16 busAddr(bus: UInt8, device: UInt8, func: UInt8) {
 	return bus << 8 | device << 3 | func
 }
 
@@ -130,11 +130,11 @@ class PciGroup {
 	UInt16 busEnd
 	UInt32 *base
 
-	UInt32 *baseFor(UInt8 bus, UInt8 device, UInt8 func) {
+	UInt32 *baseFor(bus: UInt8, device: UInt8, func: UInt8) {
 		return offset_pointer(base, busAddr(bus, device, func) << 12)
 	}
 
-	Bool hasDevice(UInt8 bus, UInt8 device, UInt8 func) {
+	Bool hasDevice(bus: UInt8, device: UInt8, func: UInt8) {
 		return (*baseFor(bus, device, func) & 0xffff) != 0xffff
 	}
 }
@@ -164,7 +164,7 @@ class ACPIParser {
 
 		serialPrintf("[ACPI] revision is %d\n", acpi10.revision)
 
-		const Char8 signature[9] = u8"RSD PTR "
+		let signature[9]: Char8 = u8"RSD PTR "
 
 		for (Int32 i = 0; i < sizeof(acpi10.signature); i++)
 			if (acpi10.signature[i] != signature[i]) {
@@ -172,7 +172,7 @@ class ACPIParser {
 				return false
 			}
 
-		UInt8 checksum = 0
+		var checksum: UInt8 = 0
 		for (Int32 i = 0; i < sizeof(acpi.Acpi10); i++)
 			checksum += ((UInt8 *)acpi10)[i]
 		if (checksum != 0) {
@@ -199,8 +199,8 @@ class ACPIParser {
 	}
 
   private
-	static UInt64 physicalToVirtual(UInt64 physical) {
-		UInt64 result = (uint64_t)WholePhysicalStart + (uint64_t)physical
+	static UInt64 physicalToVirtual(physical: UInt64) {
+		var result: UInt64 = (uint64_t)WholePhysicalStart + (uint64_t)physical
 		return result
 	}
 
@@ -209,7 +209,7 @@ class ACPIParser {
 		const Char8 *x = (Char8 *)((uint64_t)(virtualAddress))
 		const UInt8 *y = (UInt8 *)((uint64_t)(virtualAddress))
 		for (Int32 j = 0; j < 8; ++j) {
-			wchar_t buffer[2]
+			WideChar buffer[2]
 			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?' : x[j]
 			buffer[1] = (char8_t)0
 			serialPrint(buffer)
@@ -223,13 +223,13 @@ class ACPIParser {
 
 		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", acpiValidate(xsdt))
 
-		Char8 sig[5] = {0, 0, 0, 0, 0}
+		var sig[5]: Char8 = {0, 0, 0, 0, 0}
 		serialPrintf("[ACPI] ACPI 2.0+ tables loading\n")
 		acpi.put_sig(sig, xsdt.header.type)
 		serialPrintf("[ACPI] Found table %s\n", sig)
 		quakePrintf("[ACPI] Found table %s, ", sig)
 
-		UInt64 numTables = acpiTableEntries(xsdt, sizeof(Void *))
+		var numTables: UInt64 = acpiTableEntries(xsdt, sizeof(Void *))
 		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)
 
 		for (UInt64 i = 0; i < numTables; ++i) {
@@ -265,7 +265,7 @@ class ACPIParser {
 
 	static fun loadMcfg(const acpi.AcpiMcfg *mcfg) {
 		serialPrintf("loadMcfg\n")
-		UInt64 count = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry))
+		var count: UInt64 = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry))
 		acpi.PciGroup mPci[count]
 
 		for (UInt32 i = 0; i < count; ++i) {
@@ -276,19 +276,19 @@ class ACPIParser {
 			mPci[i].busEnd = mcfge.busEnd
 			mPci[i].base = reinterpret_cast<UInt32 *>(mcfge.base)
 
-			Int32 num_busses = mPci[i].busEnd - mPci[i].busStart + 1
+			var num_busses: Int32 = mPci[i].busEnd - mPci[i].busStart + 1
 		}
 
 		probePci(mPci, count)
 	}
 
-	static Bool multi(acpi.PciGroup *group, UInt8 bus, UInt8 device, UInt8 func) {
+	static Bool multi(acpi.PciGroup *group, bus: UInt8, device: UInt8, func: UInt8) {
 		UInt32 *mBase = group.baseFor(bus, device, func)
 		auto mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
 		return mMulti
 	}
 
-	static fun probePci(acpi.PciGroup *mPci, UInt64 count) {
+	static fun probePci(acpi.PciGroup *mPci, count: UInt64) {
 		serialPrintf("[PCI] probePci\n")
 		for (UInt32 i = 0; i < count; ++i) {
 			acpi.PciGroup *pci = &mPci[i]

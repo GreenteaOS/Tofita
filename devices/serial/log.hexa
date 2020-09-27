@@ -17,33 +17,33 @@
 // Check `serialPrintf` to see supported features
 
 #define SERIAL_REGISTER_BASE 0x03F8
-#define SERIAL_BAUD_RATE 115200
-#define SERIAL_CLOCK_RATE 1843200
+let SERIAL_BAUD_RATE = 115200
+let SERIAL_CLOCK_RATE = 1843200
 #define SERIAL_LINE_CONTROL 0x03
-#define SERIAL_REGISTER_STRIDE 1
+let SERIAL_REGISTER_STRIDE = 1
 #define SERIAL_FIFO_CONTROL 0x07
-#define SERIAL_EXTENDED_FIFO_TX_SIZE 64
+let SERIAL_EXTENDED_FIFO_TX_SIZE = 64
 #define SERIAL_USE_HW_FLOW_CONTROL false
 #define SERIAL_DETECT_CABLE false
 
 // 16550 UART register offsets and bitfields
-#define R_UART_RXBUF 0
-#define R_UART_TXBUF 0
-#define R_UART_BAUD_LOW 0
-#define R_UART_BAUD_HIGH 1
-#define R_UART_FCR 2
+let R_UART_RXBUF = 0
+let R_UART_TXBUF = 0
+let R_UART_BAUD_LOW = 0
+let R_UART_BAUD_HIGH = 1
+let R_UART_FCR = 2
 #define B_UART_FCR_FIFOE (1 << 0)
 #define B_UART_FCR_FIFO64 (1 << 5)
-#define R_UART_LCR 3
+let R_UART_LCR = 3
 #define B_UART_LCR_DLAB (1 << 7)
-#define R_UART_MCR 4
+let R_UART_MCR = 4
 #define B_UART_MCR_DTRC (1 << 0)
 #define B_UART_MCR_RTS (1 << 1)
-#define R_UART_LSR 5
+let R_UART_LSR = 5
 #define B_UART_LSR_RXRDY (1 << 0)
 #define B_UART_LSR_TXRDY (1 << 5)
 #define B_UART_LSR_TEMT (1 << 6)
-#define R_UART_MSR 6
+let R_UART_MSR = 6
 #define B_UART_MSR_CTS (1 << 4)
 #define B_UART_MSR_DSR (1 << 6)
 #define B_UART_MSR_RI (1 << 7)
@@ -60,11 +60,11 @@ UInt8 portInb(@volatile UInt16 port)
 
 fun portOutb(@volatile UInt16 port, @volatile UInt8 value)
 
-UInt8 readSerialRegister(UInt16 offset) {
+UInt8 readSerialRegister(offset: UInt16) {
 	return portInb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE)
 }
 
-fun writeSerialRegister(UInt16 offset, UInt8 d) {
+fun writeSerialRegister(offset: UInt16, d: UInt8) {
 	portOutb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE, d)
 }
 
@@ -101,7 +101,7 @@ fun serialPortWritable(): Bool {
 	return true
 }
 
-UInt64 serialPortWrite(UInt8 *buffer, UInt64 size) {
+UInt64 serialPortWrite(UInt8 *buffer, size: UInt64) {
 	if (buffer == NULL) {
 		return 0
 	}
@@ -117,7 +117,7 @@ UInt64 serialPortWrite(UInt8 *buffer, UInt64 size) {
 		return 0
 	}
 	// Compute the maximum size of the Tx FIFO
-	UInt64 fifoSize = 1
+	var fifoSize: UInt64 = 1
 	if ((SERIAL_FIFO_CONTROL & B_UART_FCR_FIFOE) != 0) {
 		if ((SERIAL_FIFO_CONTROL & B_UART_FCR_FIFO64) == 0) {
 			fifoSize = 16
@@ -143,9 +143,9 @@ UInt64 serialPortWrite(UInt8 *buffer, UInt64 size) {
 	return size
 }
 
-fun serialPrintf(const wchar_t *c, ...)
+fun serialPrintf(const WideChar *c, ...)
 
-fun serialPrintInt(UInt64 n) {
+fun serialPrintInt(n: UInt64) {
 	UInt8 buf[24]
 	for (UInt8 i = 0; i < 24; i++)
 		buf[i] = 0
@@ -158,14 +158,14 @@ fun serialPrintInt(UInt64 n) {
 	serialPortWrite((UInt8 *)bp, buf - bp + 24)
 }
 
-fun serialPrintHex(UInt64 n) {
+fun serialPrintHex(n: UInt64) {
 	serialPrintf("0x")
 	UInt8 buf[16], *bp = buf + 16
 	for (Int32 i = 0; i < 16; i++)
 		buf[i] = '0'
 	do {
 		bp--
-		UInt8 mod = n % 16
+		var mod: UInt8 = n % 16
 		if (mod < 10) {
 			*bp = '0' + mod
 		} else {
@@ -176,7 +176,7 @@ fun serialPrintHex(UInt64 n) {
 	serialPortWrite((UInt8 *)buf, 16)
 }
 
-fun serialPrintBits(UInt64 value) {
+fun serialPrintBits(value: UInt64) {
 	serialPrintf("0b")
 	for (Int32 i = 0; i < 64; ++i) {
 		if (value & (1ull << i)) {
@@ -185,15 +185,15 @@ fun serialPrintBits(UInt64 value) {
 	}
 }
 
-Int32 __cdecl putchar(UInt8 c) {
-	UInt8 buffer[] = {c, 0}
+Int32 __cdecl putchar(c: UInt8) {
+	var buffer[]: UInt8 = {c, 0}
 	serialPortWrite(buffer, 1)
 	return c
 }
 
-#define EOF 0
+let EOF = 0
 Int32 puts(const UInt8 *string) {
-	Int32 i = 0
+	var i: Int32 = 0
 	while (string[i]) // standard c idiom for looping through a null-terminated string
 	{
 		if (putchar(string[i]) == EOF) // if we got the EOF value from writing the uint8_t
@@ -205,14 +205,14 @@ Int32 puts(const UInt8 *string) {
 	return 1 // to meet spec.
 }
 
-UInt8 *comItoA(Int64 i, UInt8 b[]) {
+UInt8 *comItoA(i: Int64, b[]: UInt8) {
 	UInt8 const digit[] = "0123456789"
 	UInt8 *p = b
 	if (i < 0) {
 		*p++ = '-'
 		i *= -1
 	}
-	Int32 shifter = i
+	var shifter: Int32 = i
 	do { // Move to where representation ends
 		++p
 		shifter = shifter / 10
@@ -225,7 +225,7 @@ UInt8 *comItoA(Int64 i, UInt8 b[]) {
 	return b
 }
 
-fun serialPrintf(const wchar_t *c, ...) {
+fun serialPrintf(const WideChar *c, ...) {
 	UInt8 *s
 	va_list lst
 	va_start(lst, c)
@@ -250,7 +250,7 @@ fun serialPrintf(const wchar_t *c, ...) {
 		} break
 		case 'S': { // ASCII of UTF-16
 			const UInt16 *string = va_arg(lst, UInt16 *)
-			UInt32 i = 0
+			var i: UInt32 = 0
 			if (string != null)
 				while (string[i] != 0) {
 					putchar(string[i] & 0xFF)
@@ -261,7 +261,7 @@ fun serialPrintf(const wchar_t *c, ...) {
 			putchar(va_arg(lst, int32_t))
 			break
 		case 'd': {
-			Int32 value = va_arg(lst, int32_t)
+			var value: Int32 = va_arg(lst, int32_t)
 			UInt8 buffer[16]
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
@@ -274,7 +274,7 @@ fun serialPrintf(const wchar_t *c, ...) {
 			break
 		}
 		case 'u': {
-			UInt32 value = va_arg(lst, uint32_t)
+			var value: UInt32 = va_arg(lst, uint32_t)
 			UInt8 buffer[16]
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
@@ -287,12 +287,12 @@ fun serialPrintf(const wchar_t *c, ...) {
 			break
 		}
 		case '8': {
-			UInt64 value = va_arg(lst, uint64_t)
+			var value: UInt64 = va_arg(lst, uint64_t)
 			serialPrintHex(value)
 			break
 		}
 		case 'b': {
-			UInt64 value = va_arg(lst, uint64_t)
+			var value: UInt64 = va_arg(lst, uint64_t)
 			serialPrintBits(value)
 			break
 		}
@@ -301,11 +301,11 @@ fun serialPrintf(const wchar_t *c, ...) {
 	}
 }
 
-fun serialPrint(const wchar_t *print) {
+fun serialPrint(const WideChar *print) {
 	serialPrintf(print)
 }
 
-fun serialPrintln(const wchar_t *print) {
+fun serialPrintln(const WideChar *print) {
 	serialPrintf(print)
 	serialPrintf("\n")
 }

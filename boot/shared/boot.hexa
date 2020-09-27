@@ -17,7 +17,7 @@
 
 // Code Hexa-style for easier porting
 
-constexpr auto null = nullptr
+const auto null = nullptr
 #define let const auto
 #define var auto
 typedef Void fun
@@ -59,7 +59,7 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof")
 // Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
 #define WholePhysicalStart (FramebufferStart + 128 * 1024 * 1024)
-#define PAGE_SIZE 4096 // 4 KiB
+let PAGE_SIZE = 4096 // 4 KiB
 
 // Helpers
 
@@ -67,17 +67,17 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof")
 class Physical {
 	UInt64 physical
 
-	static Physical<T> toPhysical(UInt64 physical) {
+	static Physical<T> toPhysical(physical: UInt64) {
 		return (Physical<T>)physical
 	}
 
 	T *toVirtual() const {
-		UInt64 result = (uint64_t)WholePhysicalStart + physical
+		var result: UInt64 = (uint64_t)WholePhysicalStart + physical
 		return (T *)result
 	}
 
-	T *toVirtualOffset(UInt64 offset) const {
-		UInt64 result = (uint64_t)WholePhysicalStart + physical + offset
+	T *toVirtualOffset(offset: UInt64) const {
+		var result: UInt64 = (uint64_t)WholePhysicalStart + physical + offset
 		return (T *)result
 	}
 }
@@ -137,5 +137,5 @@ class KernelParams {
 
 typedef fun(__fastcall *InitKernel)(const KernelParams *)
 // TODO ^ fix that in quake
-typedef fun(__fastcall *InitKernelTrampoline)(UInt64 kernelParams, UInt64 pml4, UInt64 stack,
+typedef fun(__fastcall *InitKernelTrampoline)(UInt64 kernelParams, pml4: UInt64, stack: UInt64,
 												   UInt64 entry)

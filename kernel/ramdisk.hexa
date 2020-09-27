@@ -38,7 +38,7 @@ class {
 	UInt8 *data
 } RamDiskAsset
 
-const RamDiskAsset getRamDiskAsset(const wchar_t *pathToAsset) {
+const RamDiskAsset getRamDiskAsset(const WideChar *pathToAsset) {
 	RamDiskAsset asset
 	asset.size = 0
 	asset.data = 0
@@ -51,7 +51,7 @@ const RamDiskAsset getRamDiskAsset(const wchar_t *pathToAsset) {
 		const UInt64 ramDiskAssetInfoPtr =
 			(uint64_t)_ramdisk.base + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id
 		const RamDiskAssetInfo *ramDiskAssetInfo = (const RamDiskAssetInfo *)ramDiskAssetInfoPtr
-		UInt8 found = 1
+		var found: UInt8 = 1
 
 		for (UInt8 at = 0; at < 127; at++) {
 			if (ramDiskAssetInfo.path[at] != path[at]) {

@@ -16,7 +16,7 @@
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
 UInt8 keyboardPressedState[128] = {0}
-const UInt8 keyboardMap[128] = {
+let keyboardMap[128]: UInt8 = {
 	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
 	'9',  '0', '-', '=',
@@ -63,8 +63,8 @@ const UInt8 keyboardMap[128] = {
 	0, // All other keys are undefined
 }
 
-#define STATUS_REGISTER 0x64
-#define DATA_PORT 0x60
+let STATUS_REGISTER = 0x64
+let DATA_PORT = 0x60
 
 fun handleKeyboardPacket() {
 	// serialPrint("[keyboard] intreruroror")
@@ -101,7 +101,7 @@ fun handleKeyboardPacket() {
 
 	// if (status & 0x1)
 	{
-		UInt8 keycode = readPort(DATA_PORT)
+		var keycode: UInt8 = readPort(DATA_PORT)
 
 		if (keycode < 0) {
 			// lockMouse = false
@@ -109,7 +109,7 @@ fun handleKeyboardPacket() {
 		}
 
 		if (keycode < 128) {
-			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0}
+			WideChar buffer[] = {(char8_t)keyboardMap[keycode], 0}
 			if (buffer[0] == 0)
 				buffer[0] = '?'
 			// serialPrint("[")
@@ -123,7 +123,7 @@ fun handleKeyboardPacket() {
 			}
 		} else {
 			keycode = keycode - 128
-			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0}
+			WideChar buffer[] = {(char8_t)keyboardMap[keycode], 0}
 			if (buffer[0] == 0)
 				buffer[0] = '?'
 			// serialPrint("[")

@@ -15,7 +15,7 @@
 
 namespace paging {
 
-#define ADDRESS_BITS 12
+let ADDRESS_BITS = 12
 #define PAGE_ALIGNED @aligned(PAGE_SIZE)
 #define PACKED @packed
 
@@ -38,7 +38,7 @@ _Static_assert(sizeof(paging.LinearAddress) == 8, "linear address has to have 64
 // Since we are using 64 bit mode, the entry size
 // is 64 bits.
 
-#define PAGE_TABLE_SIZE 512
+let PAGE_TABLE_SIZE = 512
 
 // Entry in a page table
 @struct
@@ -96,24 +96,24 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 
 static PageEntry *pml4entries PAGE_ALIGNED = null
 
-UInt64 conventionalAllocateNext(UInt64 bytes)
+UInt64 conventionalAllocateNext(bytes: UInt64)
 static Void *allocatePage() {
 	// TODO bounds check
 	return (Void *)conventionalAllocateNext(PAGE_SIZE)
 }
 
-static LinearAddress getLinearAddress(UInt64 address) {
+static LinearAddress getLinearAddress(address: UInt64) {
 	return *((LinearAddress *)&address)
 }
 
-static fun initializePage(PageEntry *entry, UInt64 address, UInt8 writeAllowed) {
+static fun initializePage(PageEntry *entry, address: UInt64, writeAllowed: UInt8) {
 	entry.address = address >> ADDRESS_BITS
 	entry.present = 1
 	entry.writeAllowed = (writeAllowed == 1) ? 1 : 0
 	entry.accessibleByAll = 1 // TODO
 }
 
-static fun initializePageHuge(PageEntry *entry, UInt64 address) {
+static fun initializePageHuge(PageEntry *entry, address: UInt64) {
 	entry.address = address >> ADDRESS_BITS
 	entry.present = 1
 	entry.writeAllowed = 1
@@ -121,7 +121,7 @@ static fun initializePageHuge(PageEntry *entry, UInt64 address) {
 	entry.accessibleByAll = 1 // TODO
 }
 
-static Void *getPage(PageEntry *table, UInt64 entryId, UInt8 writeAllowed) {
+static Void *getPage(PageEntry *table, entryId: UInt64, writeAllowed: UInt8) {
 	PageEntry *entry = &table[entryId]
 
 	if (entry.present == 1) {
@@ -133,18 +133,18 @@ static Void *getPage(PageEntry *table, UInt64 entryId, UInt8 writeAllowed) {
 	}
 }
 
-fun map_pt(PageEntry pt[], UInt64 virtualAddr, UInt64 physicalAddr, UInt8 writeAllowed) {
+fun map_pt(PageEntry pt[], virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
 	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt]
 	initializePage(entry, physicalAddr, writeAllowed)
 }
 
-fun map_p2huge(PageEntry pd[], UInt64 virtualAddr, UInt64 physicalAddr) {
+fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
 	PageEntry *entry = &pd[getLinearAddress(virtualAddr).pd]
 	initializePageHuge(entry, physicalAddr)
 }
 
 #define createMapping(fromTable, toTable)                                                                    \
-	static Void map_##fromTable(PageEntry fromTable[], UInt64 virtualAddr, UInt64 physicalAddr,          \
+	static Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64,          \
 								UInt8 writeAllowed) {                                                      \
 		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed);           \
 		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr, writeAllowed);                        \
@@ -156,7 +156,7 @@ createMapping(pml4, pdpt)
 #undef createMapping
 
 #define createHugeMapping(name, fromTable, calls, toTable)                                                   \
-	static Void map_##name(PageEntry fromTable[], UInt64 virtualAddr, UInt64 physicalAddr) {             \
+	static Void map_##name(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {             \
 		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1);                      \
 		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr);                                        \
 	}
@@ -165,13 +165,13 @@ createHugeMapping(p3huge, pdpt, p2huge, pd)
 createHugeMapping(p4huge, pml4, p3huge, pdpt)
 #undef createHugeMapping
 
-fun mapMemory(UInt64 virtualAddr, UInt64 physicalAddr, UInt32 pageCount, UInt8 writeAllowed) {
+fun mapMemory(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32, writeAllowed: UInt8) {
 	serialPrintln("[paging] mapping memory range")
 
-	UInt64 virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE
+	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * PAGE_SIZE
 
-	UInt64 vAddress = virtualAddr
-	UInt64 pAddress = physicalAddr
+	var vAddress: UInt64 = virtualAddr
+	var pAddress: UInt64 = physicalAddr
 
 	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE)
 
@@ -199,11 +199,11 @@ fun mapMemory(UInt64 virtualAddr, UInt64 physicalAddr, UInt32 pageCount, UInt8 w
 	}
 }
 
-fun mapMemoryHuge(UInt64 virtualAddr, UInt64 physicalAddr, UInt32 pageCount) {
-	UInt64 virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE
+fun mapMemoryHuge(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32) {
+	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * PAGE_SIZE
 
-	UInt64 vAddress = virtualAddr
-	UInt64 pAddress = physicalAddr
+	var vAddress: UInt64 = virtualAddr
+	var pAddress: UInt64 = physicalAddr
 
 	while (vAddress < virtualAddrEnd) {
 		map_p4huge(pml4entries, vAddress, pAddress)
@@ -221,12 +221,12 @@ static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.EFI_MEMORY_D
 
 UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
 	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
-	const UInt64 descriptorSize = memoryMap.descriptorSize
-	UInt64 numberOfPages = 0
+	let descriptorSize: UInt64 = memoryMap.descriptorSize
+	var numberOfPages: UInt64 = 0
 
-	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap
-	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize
-	UInt64 offset = startOfMemoryMap
+	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
+	var offset: UInt64 = startOfMemoryMap
 
 	while (offset < endOfMemoryMap) {
 		numberOfPages += descriptor.NumberOfPages
@@ -243,12 +243,12 @@ fun mapEfi(EfiMemoryMap *memoryMap) {
 	serialPrintln("[paging] mapping efi")
 
 	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
-	const UInt64 descriptorSize = memoryMap.descriptorSize
-	UInt64 sum = 0
+	let descriptorSize: UInt64 = memoryMap.descriptorSize
+	var sum: UInt64 = 0
 
-	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap
-	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize
-	UInt64 offset = startOfMemoryMap
+	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
+	var offset: UInt64 = startOfMemoryMap
 
 	while (offset < endOfMemoryMap) {
 		if (descriptor.Attribute & EFI_MEMORY_RUNTIME) {
@@ -268,14 +268,14 @@ fun mapEfi(EfiMemoryMap *memoryMap) {
 }
 
 #if 0
-UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, UInt32 pages) {
+UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, pages: UInt32) {
 	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
-	const UInt64 descriptorSize = memoryMap.descriptorSize
-	UInt64 result = 0
+	let descriptorSize: UInt64 = memoryMap.descriptorSize
+	var result: UInt64 = 0
 
-	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap
-	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize
-	UInt64 offset = startOfMemoryMap
+	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
+	var offset: UInt64 = startOfMemoryMap
 
 	while (offset < endOfMemoryMap) {
 
@@ -296,13 +296,13 @@ UInt8 buffa[1] = {0}
 
 UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
-	const UInt64 descriptorSize = memoryMap.descriptorSize
-	UInt64 result = 0
-	UInt64 largestPages = 0
+	let descriptorSize: UInt64 = memoryMap.descriptorSize
+	var result: UInt64 = 0
+	var largestPages: UInt64 = 0
 
-	UInt64 startOfMemoryMap = (uint64_t)memoryMap.memoryMap
-	UInt64 endOfMemoryMap = startOfMemoryMap + memoryMap.memoryMapSize
-	UInt64 offset = startOfMemoryMap
+	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
+	var offset: UInt64 = startOfMemoryMap
 
 	while (offset < endOfMemoryMap) {
 		// Note: > not >= cause we should have some extra space next to this
@@ -322,7 +322,7 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 }
 
 UInt64 conventionalOffset
-UInt64 conventionalAllocateNext(UInt64 bytes) {
+UInt64 conventionalAllocateNext(bytes: UInt64) {
 	let result = conventionalOffset
 	let pages = bytes / PAGE_SIZE // Math.floor
 	conventionalOffset += pages * PAGE_SIZE

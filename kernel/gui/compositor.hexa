@@ -38,7 +38,7 @@ typedef enum {
 	// TODO more options
 } WallpaperStyle
 
-fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
+fun setWallpaper(Bitmap32 *bitmap, style: WallpaperStyle) {
 
 	{
 		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size")
@@ -49,7 +49,7 @@ fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 
 		for (UInt16 y = 0; y < upscale.height; y++)
 			for (UInt16 x = 0; x < upscale.width; x++) {
-				PixelRGBAData rgba = interpolatePixel(bitmap, ((float)x * wReciprocal) * bitmap.width,
+				var rgba: PixelRGBAData = interpolatePixel(bitmap, ((float)x * wReciprocal) * bitmap.width,
 													  ((float)y * hReciprocal) * (bitmap.height - 8))
 				upscale.pixels[y * upscale.width + x].rgba = rgba
 			}
@@ -60,7 +60,7 @@ fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 
 	serialPrintln("[compositor.setWallpaper] downscale 8x")
 
-	UInt8 blurScale = 8
+	var blurScale: UInt8 = 8
 
 	Bitmap32 *downscale = allocateBitmap(bitmap.width / blurScale - 1, bitmap.height / blurScale - 1 + 8)
 
@@ -101,7 +101,7 @@ fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 			/// rgba.b = Blend255(rgba.b, 255, 168)
 
 			{
-				PixelRGBAData rgba = rgbaSource
+				var rgba: PixelRGBAData = rgbaSource
 				rgba.r = Blend255(rgba.r, 0, 168)
 				rgba.g = Blend255(rgba.g, 0, 168)
 				rgba.b = Blend255(rgba.b, 0, 168)
@@ -109,7 +109,7 @@ fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 			}
 
 			{
-				PixelRGBAData rgba = rgbaSource
+				var rgba: PixelRGBAData = rgbaSource
 				rgba.r = Blend255(rgba.r, 255, 168)
 				rgba.g = Blend255(rgba.g, 255, 168)
 				rgba.b = Blend255(rgba.b, 255, 168)
@@ -121,7 +121,7 @@ fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 	vibranceLight = upscaleLight
 }
 
-fun drawVibrancedRectangle(Int16 x, Int16 y, UInt16 width, UInt16 height, Bool dark) {
+fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, dark: Bool) {
 	let vibrance = dark ? vibranceDark : vibranceLight // Avoit non-register global access
 	for (Int16 yy = 0; yy < height; yy++) {
 		for (Int16 xx = 0; xx < width; xx++) {
@@ -133,7 +133,7 @@ fun drawVibrancedRectangle(Int16 x, Int16 y, UInt16 width, UInt16 height, Bool d
 				continue
 			if (y + yy > vibrance.height)
 				continue
-			UInt32 pixel = (y + yy) * vibrance.width + xx + x
+			var pixel: UInt32 = (y + yy) * vibrance.width + xx + x
 			setPixel(x + xx, y + yy, vibrance.pixels[pixel])
 		}
 	}
@@ -275,7 +275,7 @@ fun composite(UInt64 startupMilliseconds) {
 		uptimeHours -= 24
 	let uptimeMinutes = (uint8_t)((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000))
 
-	Bool pm = uptimeHours >= 12
+	var pm: Bool = uptimeHours >= 12
 	if (uptimeHours > 12) {
 		uptimeHours -= 12
 	}
@@ -298,11 +298,11 @@ fun composite(UInt64 startupMilliseconds) {
 fun copyToScreen() {
 	// On 64-bit platform registers are 64-bit,
 	// so lets copy two pixels at a time
-	const UInt16 height = _framebuffer.height
+	let height: UInt16 = _framebuffer.height
 	// Let's assume it is always divideable by 2
-	const UInt16 width = _framebuffer.width / 2
-	const UInt64 scanline = _framebuffer.width * 4
-	const UInt64 pixelsPerScanLine = _framebuffer.pixelsPerScanLine * 4
+	let width: UInt16 = _framebuffer.width / 2
+	let scanline: UInt64 = _framebuffer.width * 4
+	let pixelsPerScanLine: UInt64 = _framebuffer.pixelsPerScanLine * 4
 	const UInt64 *source = (const UInt64 *)((uint64_t)_pixels)
 	var destination = (UInt64 *)((uint64_t)_framebuffer.base)
 

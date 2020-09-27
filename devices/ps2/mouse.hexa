@@ -31,14 +31,14 @@ class MouseAction {
 	// TODO time stamp
 }
 
-constexpr UInt8 mouseActionsLimit = 255
+const UInt8 mouseActionsLimit = 255
 @volatile MouseAction mouseActionsZeta[mouseActionsLimit]
 @volatile MouseAction mouseActionsGama[mouseActionsLimit]
 @volatile Bool mouseActionsUseZeta = false
 @volatile UInt8 mouseActionsZetaAmount = 0
 @volatile UInt8 mouseActionsGamaAmount = 0
 
-fun pushMouseAction(MouseActionType type, Int16 mouseXdiff = 0, Int16 mouseYdiff = 0) {
+fun pushMouseAction(type: MouseActionType, Int16 mouseXdiff = 0, Int16 mouseYdiff = 0) {
 	if (mouseActionsUseZeta) {
 		if (mouseActionsZetaAmount == mouseActionsLimit)
 			return
@@ -60,7 +60,7 @@ fun pushMouseAction(MouseActionType type, Int16 mouseXdiff = 0, Int16 mouseYdiff
 	}
 }
 
-UInt8 getBit(UInt8 byte, UInt8 bit) {
+UInt8 getBit(byte: UInt8, bit: UInt8) {
 	return (byte & (1 << bit)) >> bit
 }
 
@@ -85,8 +85,8 @@ fun handleMousePacket() {
 	case 2: {
 		mouseByte[2] = mouseRead()
 
-		Int16 mouseXd = mouseByte[1]
-		Int16 mouseYd = mouseByte[2]
+		var mouseXd: Int16 = mouseByte[1]
+		var mouseYd: Int16 = mouseByte[2]
 		mouseYd = -mouseYd
 
 		// Overflow
@@ -112,9 +112,9 @@ fun handleMousePacket() {
 		if (mouseXd != 0 || mouseYd != 0)
 			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
 
-		const Bool left = getBit(mouseByte[0], 0) != 0
-		const Bool right = getBit(mouseByte[0], 1) != 0
-		const Bool middle = getBit(mouseByte[0], 2) != 0
+		let left: Bool = getBit(mouseByte[0], 0) != 0
+		let right: Bool = getBit(mouseByte[0], 1) != 0
+		let middle: Bool = getBit(mouseByte[0], 2) != 0
 
 		if (left == false && leftDown == true)
 			pushMouseAction(MouseActionType.LeftUp)

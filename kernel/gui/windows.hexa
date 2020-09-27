@@ -15,7 +15,7 @@
 
 // Window frames and some GUI elements
 
-fun drawHint(const Char8 *text, Int16 x, Int16 y) {
+fun drawHint(const Char8 *text, x: Int16, y: Int16) {
 	let measure = getTextAdvance(text)
 	let w = 6 * 2 + measure + 1
 	let h = 20
@@ -29,19 +29,19 @@ fun drawHint(const Char8 *text, Int16 x, Int16 y) {
 	drawAsciiText(text, x + 6, y + 5, color)
 }
 
-fun shadow(Int16 x, Int16 y, UInt8 darkness) {
+fun shadow(x: Int16, y: Int16, darkness: UInt8) {
 	Pixel32 pixel
 	pixel.color = 0
 	pixel.rgba.a = 0xFF - darkness
 	blendPixel(x, y, pixel)
 }
 
-auto distance(Int16 x1, Int16 y1, Int16 x2, Int16 y2) {
+auto distance(x1: Int16, y1: Int16, x2: Int16, y2: Int16) {
 	// TODO floor?
 	return Math.round(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)))
 }
 
-fun drawShadowBox(Int16 x, Int16 y, UInt16 w, UInt16 h) {
+fun drawShadowBox(x: Int16, y: Int16, w: UInt16, h: UInt16) {
 	for (Int16 iy = 0; iy < 16; ++iy)
 		for (Int16 ix = 0; ix < w; ++ix) {
 			shadow(x + ix, y - iy, 192 + iy * 4)
@@ -64,16 +64,16 @@ fun drawShadowBox(Int16 x, Int16 y, UInt16 w, UInt16 h) {
 		}
 }
 
-fun drawWindowFrame(const wchar_t *title, Int16 x, Int16 y, UInt16 w, UInt16 h, Bool active,
-						 dwm.FrameHover hover, Bool down) {
-	Bool shorterFrame = false // OSX style
+fun drawWindowFrame(const WideChar *title, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
+						 dwm.FrameHover hover, down: Bool) {
+	var shorterFrame: Bool = false // OSX style
 
 	Pixel32 color
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xAA
 
 	drawVibrancedRectangle(x + 1, y + 1, w - 1, 32, true)
 
-	// TODO " (Not responding)"
+	// TODO " (responding: Not)"
 	// TODO crop text to fit size, i.e. drawText to take optional argument
 	drawText(title, x + 8 + 4, y + 9 + 3, color)
 

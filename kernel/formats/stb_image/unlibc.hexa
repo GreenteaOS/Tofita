@@ -21,7 +21,7 @@
 #undef pow libc_pow
 #undef memcpy libc_memcpy
 
-Bitmap32 *loadPng32FromBuffer(UInt8 *data, UInt32 size) {
+Bitmap32 *loadPng32FromBuffer(UInt8 *data, size: UInt32) {
 	Int32 width, height, png_bpp
 	UInt8 *colors = stbi_load_from_memory(data, size, &width, &height, &png_bpp, 4)
 	Bitmap32 *bitmap = allocateBitmap(width, height)
@@ -31,7 +31,7 @@ Bitmap32 *loadPng32FromBuffer(UInt8 *data, UInt32 size) {
 		for (UInt16 x = 0; x < width; x++) {
 			bitmap.pixels[y * width + x].color = rgba[y * width + x]
 			// This should be fixed in framebuffer? Or PNG really BGRA?
-			UInt8 temp = bitmap.pixels[y * width + x].rgba.r
+			var temp: UInt8 = bitmap.pixels[y * width + x].rgba.r
 			bitmap.pixels[y * width + x].rgba.r = bitmap.pixels[y * width + x].rgba.b
 			bitmap.pixels[y * width + x].rgba.b = temp
 		}
