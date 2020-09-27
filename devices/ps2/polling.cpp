@@ -21,20 +21,24 @@
 // ^ this may draw polling mechanism useless (poll for flag only in scheduler)
 // ^ use hlt in scheduler
 
+uint8_t readPS2() {
+	return readPort(0x64);
+}
+
 uint8_t pollPS2Devices() {
 
-	uint8_t poll = readPort(0x64);
+	uint8_t poll = readPS2();
 
 	while (getBit(poll, 0) == 1) {
 		// Mouse has higher priority
 		while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
 			handleMousePacket();
-			poll = readPort(0x64);
+			poll = readPS2();
 		}
 
 		if (getBit(poll, 0) == 1 && getBit(poll, 5) == 0) {
 			handleKeyboardPacket();
-			poll = readPort(0x64);
+			poll = readPS2();
 		}
 	}
 

@@ -67,12 +67,44 @@ const uint8_t keyboardMap[128] = {
 #define DATA_PORT 0x60
 
 function handleKeyboardPacket() {
+	// serialPrint(L"[keyboard] intreruroror");
+	// readPort(STATUS_REGISTER);
+	// readPort(DATA_PORT);
+	// writePort(PIC1_COMMAND, PIC_EOI);
+	// return;
+	// Fixes race condition / hang,
+	// but probably not the best way to do it
+	// cause keyboard is *not* handled in the poller
+	// if (polls)
+	//	return;
 
+	// if (lockMouse)
+	//	return;
+	// while (lockMouse) {};
+	// lockMouse = true;
 
+	// uint8_t status = readPort(STATUS_REGISTER);
+
+	/// PS2 Mouse
+	// if (status & 0x20) {
+	//	//    uint8_t keycode = readPort(DATA_PORT);
+	//	//    //if (keycode < 0) {
+	//	lockMouse = false;
+	//	handleMousePacket();
+	//	return;
+	//	//    //}
+	//	//    //uint8_t buffer[] = {keyboardMap[keycode], 0};
+	//	//    uint8_t buffer[] = {'M','o','u','s','e',':', 0};
+	//	//    serialPrint(buffer);
+	//	//    serialPrint(buffer);
+	//}
+
+	// if (status & 0x1)
 	{
 		uint8_t keycode = readPort(DATA_PORT);
 
 		if (keycode < 0) {
+			// lockMouse = false;
 			return;
 		}
 
@@ -87,6 +119,7 @@ function handleKeyboardPacket() {
 			if (haveToQuake)
 				quakeHandleButtonDown(keycode);
 			else {
+				// handleKeyDown(keycode);
 			}
 		} else {
 			keycode = keycode - 128;
@@ -112,10 +145,18 @@ function handleKeyboardPacket() {
 		haveToRender = 1;
 	}
 
+	// keyDownHandler = null;
+	// if (haveToQuake)
+	//	keyDownHandler = quakeHandleButtonDown;
+
 	// EOI
 	// Disable this line if polling is used
+	// TODO @defer
 	writePort(PIC1_COMMAND, PIC_EOI);
+	// lockMouse = false;
 }
 
 function handleKeyboard() {
+	// uint8_t status = readPort(STATUS_REGISTER);
+	// pollForce = status;
 }
