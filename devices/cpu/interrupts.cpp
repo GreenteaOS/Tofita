@@ -387,7 +387,6 @@ __attribute__((aligned(64))) uint8_t guiStack[stackSizeForKernelThread] = {0};
 
 extern "C" void timerInterruptHandler(volatile InterruptFrame *frame);
 
-
 uint8_t extraMillisecond = 0;
 uint8_t taskBarRedraw = 0; // Re-paint task bar current time
 volatile bool nextIsUserProcess = false;
@@ -498,7 +497,6 @@ void yieldInterruptHandler(volatile InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 	switchToNextProcess(frame);
 }
-
 
 void timerInterruptHandler(volatile InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
@@ -816,6 +814,11 @@ function enableInterrupts() {
 	// Unmasking IRQ to support all the things
 	// but NOT keyboard
 	writePort(IRQ1, 0x00 | 0b00000010);
+	// 0xFA - timer
+	// 0xFC - timer and kb
+	// 0xFD - kb
+	// 0xFE - timer
+	// 0xFF - none
 }
 
 function enablePS2Mouse() {
