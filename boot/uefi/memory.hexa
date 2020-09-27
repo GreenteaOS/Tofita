@@ -28,7 +28,7 @@ fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable)
 
 fun initializeFramebuffer(Framebuffer *fb, efi.EFI_SYSTEM_TABLE *systemTable) {
 	var gopGuid: efi.EFI_GUID = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
-	efi.EFI_GRAPHICS_OUTPUT_PROTOCOL *gop
+	var gop: Pointer<efi.EFI_GRAPHICS_OUTPUT_PROTOCOL>
 
 	systemTable.BootServices.LocateProtocol(&gopGuid, NULL, (Void **)&gop)
 

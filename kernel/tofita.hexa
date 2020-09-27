@@ -66,7 +66,7 @@ import "hexa.cpp"
 #define int do_not_use_such_types_please
 
 Void *memset(Void *dest, e: Int32, len: UInt64) {
-	UInt8 *d = (UInt8 *)dest
+	var d: Pointer<UInt8> = (UInt8 *)dest
 	for (UInt64 i = 0; i < len; i++, d++) {
 		*d = e
 	}
@@ -232,7 +232,7 @@ fun kernelInit(const KernelParams *params) {
 	{
 		// TODO move to compositor
 		var a: RamDiskAsset = getRamDiskAsset("root/Windows/Web/Wallpaper/Tofita/default.bmp")
-		Bitmap32 *bmp = bmp.loadBmp24(&a)
+		var bmp: Pointer<Bitmap32> = bmp.loadBmp24(&a)
 		setWallpaper(bmp, Center)
 	}
 
@@ -268,7 +268,7 @@ fun kernelInit(const KernelParams *params) {
 	// Idle process
 	{
 		memset(&process.processes, 0, sizeof(process.processes)) // Zeroing
-		process.Process *idle = &process.processes[0]
+		var idle: Pointer<process.Process> = &process.processes[0]
 		idle.pml4 = pages.pml4entries // Save CR3 template to idle process
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
@@ -280,7 +280,7 @@ fun kernelInit(const KernelParams *params) {
 	// Demo
 	if (false) {
 		for (UInt8 i = 0; i < 3; ++i) {
-			process.Process *demo = process.Process_create()
+			var demo: Pointer<process.Process> = process.Process_create()
 			serialPrintf("<> pid == %u\n", demo.pid)
 			process.Process_init(demo)
 			exe.loadExeIntoProcess("desktop/wndapp.exe", demo)
@@ -350,7 +350,7 @@ fun kernelThread() {
 						serialPrintf("[[rcx=%u rdx=%u r8=%u]] ", frame.rcxArg0, frame.rdxArg1, frame.r8)
 
 						if (probeForReadOkay(frame.rdxArg1, sizeof(DebugLogPayload))) {
-							DebugLogPayload *payload = (DebugLogPayload *)frame.rdxArg1
+							var payload: Pointer<DebugLogPayload> = (DebugLogPayload *)frame.rdxArg1
 							// Note this is still very unsafe
 							if (probeForReadOkay((uint64_t)payload.message, 1)) {
 								serialPrintf(payload.message, payload.extra, payload.more)

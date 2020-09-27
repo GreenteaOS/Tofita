@@ -96,7 +96,7 @@ fun qsod(const WideChar *format, extra: UInt64, const UInt64 more) {
 
 UInt8 *_quakeItoA(i: Int32, b[]: UInt8) {
 	UInt8 const digit[] = "0123456789"
-	UInt8 *p = b
+	var p: Pointer<UInt8> = b
 	if (i < 0) {
 		*p++ = '-'
 		i *= -1
@@ -186,7 +186,7 @@ fun quakePrintHex(n: UInt64) {
 }
 
 fun quakePrintf(const WideChar *c, ...) {
-	UInt8 *s
+	var s: Pointer<UInt8>
 	va_list lst
 	va_start(lst, c)
 	while (*c != '\0') {
@@ -215,7 +215,7 @@ fun quakePrintf(const WideChar *c, ...) {
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			_quakeItoA(value, buffer)
-			UInt8 *c = buffer
+			var c: Pointer<UInt8> = buffer
 			while (*c != '\0') {
 				_quake_putchar(*c)
 				c++
@@ -228,7 +228,7 @@ fun quakePrintf(const WideChar *c, ...) {
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			_quakeItoA(value, buffer)
-			UInt8 *c = buffer
+			var c: Pointer<UInt8> = buffer
 			while (*c != '\0') {
 				_quake_putchar(*c)
 				c++

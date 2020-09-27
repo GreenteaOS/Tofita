@@ -76,7 +76,7 @@ class AcpiApic {
 @struct
 class XSDT {
 	TABLE_HEADER('XSDT')
-	AcpiTableHeader *headers[0]
+	var headers[0]: Pointer<AcpiTableHeader>
 } @packed
 
 @struct
@@ -128,7 +128,7 @@ class PciGroup {
 	var group: UInt16
 	var busStart: UInt16
 	var busEnd: UInt16
-	UInt32 *base
+	var base: Pointer<UInt32>
 
 	UInt32 *baseFor(bus: UInt8, device: UInt8, func: UInt8) {
 		return offset_pointer(base, busAddr(bus, device, func) << 12)
@@ -259,7 +259,7 @@ class ACPIParser {
 	}
 
 	static fun loadApic(const acpi.AcpiApic *apic) {
-		UInt32 *local = reinterpret_cast<UInt32 *>(apic.localAddress)
+		var local: Pointer<UInt32> = reinterpret_cast<UInt32 *>(apic.localAddress)
 		serialPrintf("loadApic\n")
 	}
 
@@ -283,7 +283,7 @@ class ACPIParser {
 	}
 
 	static Bool multi(acpi.PciGroup *group, bus: UInt8, device: UInt8, func: UInt8) {
-		UInt32 *mBase = group.baseFor(bus, device, func)
+		var mBase: Pointer<UInt32> = group.baseFor(bus, device, func)
 		var mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
 		return mMulti
 	}
@@ -291,7 +291,7 @@ class ACPIParser {
 	static fun probePci(acpi.PciGroup *mPci, count: UInt64) {
 		serialPrintf("[PCI] probePci\n")
 		for (UInt32 i = 0; i < count; ++i) {
-			acpi.PciGroup *pci = &mPci[i]
+			var pci: Pointer<acpi.PciGroup> = &mPci[i]
 			for (Int32 bus = pci.busStart; bus <= pci.busEnd; ++bus) {
 				for (Int32 dev = 0; dev < 32; ++dev) {
 					// TODO

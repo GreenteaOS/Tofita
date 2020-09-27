@@ -35,7 +35,7 @@ fun setRamDisk(const RamDisk *ramdisk) {
 @struct
 class {
 	var size: UInt32
-	UInt8 *data
+	var data: Pointer<UInt8>
 } RamDiskAsset
 
 const RamDiskAsset getRamDiskAsset(const WideChar *pathToAsset) {

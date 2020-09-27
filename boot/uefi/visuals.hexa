@@ -26,7 +26,7 @@ let leavesHeight: UInt32 = 25
 Int64 _fltused = 0
 
 fun drawPixel(Framebuffer *framebuffer, x: UInt32, y: UInt32, color: UInt32) {
-	UInt32 *pixels = (UInt32 *)framebuffer.base
+	var pixels: Pointer<UInt32> = (UInt32 *)framebuffer.base
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
 
@@ -47,7 +47,7 @@ UInt32 getBitmapPixel(const UInt8 *bmp, x: UInt32, y: UInt32, width: UInt32, hei
 	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1]
 	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2]
 	pixel.a = 0xFF
-	UInt32 *color = (UInt32 *)&pixel
+	var color: Pointer<UInt32> = (UInt32 *)&pixel
 	return *color
 }
 

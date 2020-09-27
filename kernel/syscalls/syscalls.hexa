@@ -49,7 +49,7 @@ _Static_assert(sizeof(DebugLogPayload) == 8 * 3, "bad sizeof")
 @struct
 class SwapWindowFramebufferPayload {
 	var windowId: UInt64
-	nj.WindowFramebuffer *fb
+	var fb: Pointer<nj.WindowFramebuffer>
 }
 
 _Static_assert(sizeof(SwapWindowFramebufferPayload) == 8 * 2, "bad sizeof")
@@ -80,7 +80,7 @@ class CreateWindowExPayload {
 	var hWndParent: wapi.HWnd
 	var hMenu: wapi.HMenu
 	var hInstance: wapi.HInstance
-	Void *lpParam
+	var lpParam: Pointer<Void>
 }
 
 _Static_assert(sizeof(CreateWindowExPayload) == 8 * 8 + 5 * 4 + 4, "bad sizeof")
@@ -89,15 +89,15 @@ _Static_assert(sizeof(CreateWindowExPayload) == 8 * 8 + 5 * 4 + 4, "bad sizeof")
 class PostMessagePayload {
 	var hWnd: wapi.HWnd
 	var msg: wapi.Message
-	Void *wParam
-	Void *lParam
+	var wParam: Pointer<Void>
+	var lParam: Pointer<Void>
 }
 
 _Static_assert(sizeof(PostMessagePayload) == 8 + 4 + 8 * 2 + 4, "bad sizeof")
 
 @struct
 class GetMessagePayload {
-	wapi.Msg *msg
+	var msg: Pointer<wapi.Msg>
 	var hWnd: wapi.HWnd
 	var wMsgFilterMin: UInt32
 	var wMsgFilterMax: UInt32

@@ -193,7 +193,7 @@ UInt8 *boxesForGauss(sigma: Float, n: UInt8) {
 	var m: Int8 = round(mIdeal)
 
 
-	UInt8 *sizes = (UInt8 *)PhysicalAllocator.allocateBytes(n)
+	var sizes: Pointer<UInt8> = (UInt8 *)PhysicalAllocator.allocateBytes(n)
 	for (UInt8 i = 0; i < n; i++) {
 		sizes[i] = i < m ? wl : wu
 	}
@@ -201,9 +201,9 @@ UInt8 *boxesForGauss(sigma: Float, n: UInt8) {
 }
 
 Bitmap32 *gaussBlur(Bitmap32 *bitmap, radius: Float) {
-	Bitmap32 *target = allocateBitmap(bitmap.width, bitmap.height)
+	var target: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
 
-	UInt8 *boxes = boxesForGauss(radius, 3)
+	var boxes: Pointer<UInt8> = boxesForGauss(radius, 3)
 	boxBlur(bitmap, target, bitmap.width, bitmap.height, (boxes[0] - 1) / 2)
 	boxBlur(target, bitmap, bitmap.width, bitmap.height, (boxes[1] - 1) / 2)
 	boxBlur(bitmap, target, bitmap.width, bitmap.height, (boxes[2] - 1) / 2)
