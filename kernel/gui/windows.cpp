@@ -66,6 +66,8 @@ function drawShadowBox(int16_t x, int16_t y, uint16_t w, uint16_t h) {
 
 function drawWindowFrame(const wchar_t *title, int16_t x, int16_t y, uint16_t w, uint16_t h, bool active,
 						 dwm::FrameHover hover, bool down) {
+	bool shorterFrame = false; // OSX style
+
 	Pixel32 color;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xAA;
 

@@ -16,18 +16,14 @@
 // AMD64 assembly instructions wrapper
 
 namespace amd64 {
-inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *ebx = null,
-					  uint32_t *ecx = null, uint32_t *edx = null) {
+inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx,
+					  uint32_t *edx) {
 	uint32_t a, b, c, d;
 	asm volatile("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf));
-	if (eax)
-		*eax = a;
-	if (ebx)
-		*ebx = b;
-	if (ecx)
-		*ecx = c;
-	if (edx)
-		*edx = d;
+	*eax = a;
+	*ebx = b;
+	*ecx = c;
+	*edx = d;
 }
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another

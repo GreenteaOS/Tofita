@@ -69,6 +69,7 @@ void tofitaShowWindow(uint64_t windowId, int32_t nCmdShow) {
 }
 
 wapi::Bool tofitaGetMessage(GetMessagePayload *payload) {
+	// TODO filters
 	return (wapi::Bool)tofitaFastSystemCall(TofitaSyscalls::GetMessage, (uint64_t)payload);
 }
 

@@ -20,6 +20,7 @@
 #define NTDLL32_DLL __declspec(dllimport)
 #endif
 
+// TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
 extern "C" {
 NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx);
 }

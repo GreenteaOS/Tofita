@@ -58,6 +58,12 @@ function quakeHandleButtonDown(uint8_t key) {
 			quakePrintf(L"Doing hot reload. Note: this log may be persistent between hot reloads\n");
 			InitKernel start = (InitKernel)KernelVirtualBase;
 			start(paramsCache); // TODO pml4, stack
+		} else if (quakeCommand[0] == 'd' && quakeCommand[1] == 'a') {
+			// Dark theme
+			// TODO
+		} else if (quakeCommand[0] == 'l' && quakeCommand[1] == 'i') {
+			// Light theme
+			// TODO
 		} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
 			quakePrintf(L"Hit `~` to show/hide this terminal\n", quakeCommand);
 			quakePrintf(L"Command 'reload' does quick kernel restart (without actual reboot). Note: this "
@@ -72,8 +78,8 @@ function quakeHandleButtonDown(uint8_t key) {
 		quakeCommandSize = 0;
 	}
 
-	// TODO 123 etc
-	if ((keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z') || (keyboardMap[key] == ' '))
+	if ((keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z') ||
+		(keyboardMap[key] >= '0' && keyboardMap[key] <= '9') || (keyboardMap[key] == ' '))
 		if (quakeCommandSize < 255) {
 			quakeCommand[quakeCommandSize] = keyboardMap[key];
 			quakeCommandSize++;

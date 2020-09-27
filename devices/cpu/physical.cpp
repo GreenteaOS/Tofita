@@ -22,6 +22,7 @@
 #define PAGE_FREE 0b1010
 #define PAGE_FULL 0b0101
 #define PAGE_MASK 0b1111
+// TODO mask user-mode pages differently than kernel-mode
 // TODO #define GRANULAR_PARTIAL 0b1010
 // TODO #define GRANULAR_FULL 0b1001
 #define DOWN_BYTES_TO_PAGES(bytes) ((bytes) >> 12)

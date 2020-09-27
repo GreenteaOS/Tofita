@@ -20,14 +20,15 @@ struct CPUID {
 	uint32_t extras = 0;
 };
 
-const uint32_t cpuidExtendedLevels = 0x80000000;
+constexpr uint32_t cpuidExtendedLevels = 0x80000000;
 
 CPUID getCPUID() {
 	CPUID result;
+	uint32_t stub = 0;
 	amd64::cpuid(0, 0, &result.data, (uint32_t *)(&result.vendorID[0]), (uint32_t *)(&result.vendorID[8]),
 				 (uint32_t *)(&result.vendorID[4]));
 
-	amd64::cpuid(cpuidExtendedLevels, 0, &result.extras);
+	amd64::cpuid(cpuidExtendedLevels, 0, &result.extras, &stub, &stub, &stub);
 
 	if (result.extras >= cpuidExtendedLevels + 4) {
 		amd64::cpuid(cpuidExtendedLevels + 2, 0, (uint32_t *)(&result.brandName[0]),

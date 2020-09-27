@@ -18,6 +18,9 @@
 namespace wapi {
 
 typedef void *Handle;
+// TODO ifdef 64-bit
+// (HandleSize)handle & ~(HandleSize)0b11
+typedef uint64_t HandleSize;
 typedef Handle HInstance;
 typedef Handle HIcon;
 typedef Handle HIcon;

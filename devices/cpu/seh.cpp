@@ -17,6 +17,8 @@
 
 // Tests in disasm show that this is not optimized out thanks to volatile
 
+// TODO probeCopy to local stack instead of probe->read, good for SMP
+
 volatile bool __attribute__((noinline))
 _probeForReadOkay(volatile uint64_t at, volatile const uint64_t bytes) {
 	sehProbe = true;

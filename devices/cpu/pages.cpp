@@ -39,6 +39,7 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 
 #define PAGE_TABLE_SIZE 512
 
+// TODO delet
 // Entry in a page table
 typedef struct {
 	// Is the page present in physical memory?
@@ -95,16 +96,11 @@ _Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 b
 // TODO remove this
 static PageEntry *pml4entries PAGE_ALIGNED = null;
 
-static void *allocatePage() {
-	return (void *)PhysicalAllocator::allocateOnePagePreZeroed();
-	// TODO bounds check
-}
-
-static LinearAddress getLinearAddress(uint64_t virtualAddr) {
+LinearAddress getLinearAddress(uint64_t virtualAddr) {
 	return *((LinearAddress *)&virtualAddr);
 }
 
-static function initializePage(PageEntry *entry, uint64_t address) {
+function initializePage(PageEntry *entry, uint64_t address) {
 	entry->address = address >> ADDRESS_BITS;
 	entry->present = 1;
 	entry->writeAllowed = 1;
@@ -113,14 +109,15 @@ static function initializePage(PageEntry *entry, uint64_t address) {
 	entry->accessibleByAll = 1;
 }
 
-static void *getPage(PageEntry *table, uint64_t entryId) {
+PageEntry *getPage(PageEntry *table, uint64_t entryId) {
 	PageEntry *entry = &table[entryId];
 
 	if (entry->present == 1) {
-		return (void *)((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+		return (PageEntry *)((entry->address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
 	} else {
-		void *newPage = allocatePage();
-		initializePage(entry, (uint64_t)newPage - (uint64_t)WholePhysicalStart);
+		var newPage = (PageEntry *)PhysicalAllocator::allocateOnePagePreZeroed();
+		if (newPage != null)
+			initializePage(entry, (uint64_t)newPage - (uint64_t)WholePhysicalStart);
 		return newPage;
 	}
 }
@@ -132,9 +129,9 @@ function map_pt(PageEntry pt[], uint64_t virtualAddr, uint64_t physicalAddr) {
 
 // TODO handle huge pages returned from bootloader
 #define createMapping(fromTable, toTable)                                                                    \
-	static void map_##fromTable(PageEntry fromTable[], uint64_t virtualAddr, uint64_t physicalAddr) {        \
-		void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                         \
-		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr);                                      \
+	void map_##fromTable(PageEntry fromTable[], uint64_t virtualAddr, uint64_t physicalAddr) {               \
+		PageEntry *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                    \
+		map_##toTable(toTable, virtualAddr, physicalAddr);                                                   \
 	}
 
 createMapping(pd, pt);
@@ -242,7 +239,8 @@ function copyKernelMemoryMap(const PageEntry *pml4source, PageEntry *pml4destina
 // Creates new PML4 for new process
 PageEntry *newCR3(const PageEntry *pml4source) {
 	PageEntry *pml4result = (PageEntry *)PhysicalAllocator::allocateOnePagePreZeroed();
-	copyKernelMemoryMap(pml4source, pml4result);
+	if (pml4result != null)
+		copyKernelMemoryMap(pml4source, pml4result);
 	return pml4result;
 }
 
