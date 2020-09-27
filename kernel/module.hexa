@@ -18,42 +18,42 @@
 namespace process {
 
 struct Module {
-	const char8_t *name;
-	const RamDiskAsset *dll;
-	UInt64 base;
-};
+	const char8_t *name
+	const RamDiskAsset *dll
+	UInt64 base
+}
 
 struct ModuleInterim {
-	const char8_t *name;
-	const RamDiskAsset *dll;
-};
+	const char8_t *name
+	const RamDiskAsset *dll
+}
 
 Module *loadModule(ModuleInterim *params) {
-	var module = (Module *)PhysicalAllocator.allocateBytes(sizeof(Module));
-	module.name = params.name; // TODO copy string
-	module.dll = params.dll;
+	var module = (Module *)PhysicalAllocator.allocateBytes(sizeof(Module))
+	module.name = params.name // TODO copy string
+	module.dll = params.dll
 
 	// TODO relocation? or overwrite?
-	auto ptr = (UInt8 *)params.dll.data;
-	auto peHeader = (const exe.PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
-	auto peOptionalHeader = (const exe.Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe.PeHeader));
-	void *base = (void *)peOptionalHeader.imageBase;
-	memset(base, 0, peOptionalHeader.sizeOfImage); // Zeroing
-	module.base = peOptionalHeader.imageBase;
+	auto ptr = (UInt8 *)params.dll.data
+	auto peHeader = (const exe.PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
+	auto peOptionalHeader = (const exe.Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe.PeHeader))
+	Void *base = (Void *)peOptionalHeader.imageBase
+	memset(base, 0, peOptionalHeader.sizeOfImage) // Zeroing
+	module.base = peOptionalHeader.imageBase
 
 	// Copy sections
 	auto imageSectionHeader =
-		(const exe.ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.sizeOfOptionalHeader);
+		(const exe.ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.sizeOfOptionalHeader)
 	for (UInt16 i = 0; i < peHeader.numberOfSections; ++i) {
 		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
-					 imageSectionHeader[i].sizeOfRawData);
-		UInt64 where = (uint64_t)base + imageSectionHeader[i].virtualAddress;
+					 imageSectionHeader[i].sizeOfRawData)
+		UInt64 where = (uint64_t)base + imageSectionHeader[i].virtualAddress
 
-		tmemcpy((void *)where,
-				(void *)((uint64_t)params.dll.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
-				imageSectionHeader[i].sizeOfRawData);
+		tmemcpy((Void *)where,
+				(Void *)((uint64_t)params.dll.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
+				imageSectionHeader[i].sizeOfRawData)
 	}
 
-	return module;
+	return module
 }
 } // namespace process

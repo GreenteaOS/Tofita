@@ -16,68 +16,68 @@
 // 1 byte aligned
 #pragma pack(1)
 struct PeHeader {
-	UInt32 mMagic; // PE\0\0 or 0x00004550
-	UInt16 mMachine;
-	UInt16 mNumberOfSections;
-	UInt32 mTimeDateStamp;
-	UInt32 mPointerToSymbolTable;
-	UInt32 mNumberOfSymbols;
-	UInt16 mSizeOfOptionalHeader;
-	UInt16 mCharacteristics;
-} __attribute__((packed));
+	UInt32 mMagic // PE\0\0 or 0x00004550
+	UInt16 mMachine
+	UInt16 mNumberOfSections
+	UInt32 mTimeDateStamp
+	UInt32 mPointerToSymbolTable
+	UInt32 mNumberOfSymbols
+	UInt16 mSizeOfOptionalHeader
+	UInt16 mCharacteristics
+} __attribute__((packed))
 #pragma pack()
 
-_Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect");
+_Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
 
 // 1 byte aligned
 #pragma pack(1)
 struct Pe32OptionalHeader {
-	UInt16 mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	UInt8 mMajorLinkerVersion;
-	UInt8 mMinorLinkerVersion;
-	UInt32 mSizeOfCode;
-	UInt32 mSizeOfInitializedData;
-	UInt32 mSizeOfUninitializedData;
-	UInt32 mAddressOfEntryPoint;
-	UInt32 mBaseOfCode;
-	// UInt32 mBaseOfData; // present only in 32-bit
-	UInt64 mImageBase; // UInt32 mImageBase;
-	UInt32 mSectionAlignment;
-	UInt32 mFileAlignment;
-	UInt16 mMajorOperatingSystemVersion;
-	UInt16 mMinorOperatingSystemVersion;
-	UInt16 mMajorImageVersion;
-	UInt16 mMinorImageVersion;
-	UInt16 mMajorSubsystemVersion;
-	UInt16 mMinorSubsystemVersion;
-	UInt32 mWin32VersionValue;
-	UInt32 mSizeOfImage;
-	UInt32 mSizeOfHeaders;
-	UInt32 mCheckSum;
-	UInt16 mSubsystem;
-	UInt16 mDllCharacteristics;
-	UInt64 mSizeOfStackReserve; // UInt32 mSizeOfStackReserve;
-	UInt64 mSizeOfStackCommit;  // UInt32 mSizeOfStackCommit;
-	UInt64 mSizeOfHeapReserve;  // UInt32 mSizeOfHeapReserve;
-	UInt64 mSizeOfHeapCommit;	  // UInt32 mSizeOfHeapCommit;
-	UInt32 mLoaderFlags;
-	UInt32 mNumberOfRvaAndSizes;
-} __attribute__((packed));
+	UInt16 mMagic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	UInt8 mMajorLinkerVersion
+	UInt8 mMinorLinkerVersion
+	UInt32 mSizeOfCode
+	UInt32 mSizeOfInitializedData
+	UInt32 mSizeOfUninitializedData
+	UInt32 mAddressOfEntryPoint
+	UInt32 mBaseOfCode
+	// UInt32 mBaseOfData // present only in 32-bit
+	UInt64 mImageBase // UInt32 mImageBase
+	UInt32 mSectionAlignment
+	UInt32 mFileAlignment
+	UInt16 mMajorOperatingSystemVersion
+	UInt16 mMinorOperatingSystemVersion
+	UInt16 mMajorImageVersion
+	UInt16 mMinorImageVersion
+	UInt16 mMajorSubsystemVersion
+	UInt16 mMinorSubsystemVersion
+	UInt32 mWin32VersionValue
+	UInt32 mSizeOfImage
+	UInt32 mSizeOfHeaders
+	UInt32 mCheckSum
+	UInt16 mSubsystem
+	UInt16 mDllCharacteristics
+	UInt64 mSizeOfStackReserve // UInt32 mSizeOfStackReserve
+	UInt64 mSizeOfStackCommit;  // UInt32 mSizeOfStackCommit
+	UInt64 mSizeOfHeapReserve;  // UInt32 mSizeOfHeapReserve
+	UInt64 mSizeOfHeapCommit;	  // UInt32 mSizeOfHeapCommit
+	UInt32 mLoaderFlags
+	UInt32 mNumberOfRvaAndSizes
+} __attribute__((packed))
 #pragma pack()
 
 #pragma pack(1)
 struct ImageSectionHeader { // size 40 bytes
-	UInt8 mName[8];
-	UInt32 mVirtualSize;
-	UInt32 mVirtualAddress;
-	UInt32 mSizeOfRawData;
-	UInt32 mPointerToRawData;
-	UInt32 mPointerToRealocations;
-	UInt32 mPointerToLinenumbers;
-	UInt16 mNumberOfRealocations;
-	UInt16 mNumberOfLinenumbers;
-	UInt32 mCharacteristics;
-} __attribute__((packed));
+	UInt8 mName[8]
+	UInt32 mVirtualSize
+	UInt32 mVirtualAddress
+	UInt32 mSizeOfRawData
+	UInt32 mPointerToRawData
+	UInt32 mPointerToRealocations
+	UInt32 mPointerToLinenumbers
+	UInt16 mNumberOfRealocations
+	UInt16 mNumberOfLinenumbers
+	UInt32 mCharacteristics
+} __attribute__((packed))
 #pragma pack()
 
-_Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect");
+_Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect")

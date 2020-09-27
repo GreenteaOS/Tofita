@@ -23,60 +23,60 @@
 #define PIC_EOI 0x20	  // End-of-interrupt command code
 #define PIC_EOI_0x20 0x20 // End-of-interrupt command code
 
-UInt8 readPort(UInt16 port);
-fun writePort(@volatile UInt16 port, @volatile UInt8 value);
-UInt8 mouseRead();
+UInt8 readPort(UInt16 port)
+fun writePort(@volatile UInt16 port, @volatile UInt8 value)
+UInt8 mouseRead()
 
 #define PACKED __attribute__((packed))
 
-extern "C++" void tmemcpy(void *dest, const void *src, UInt64 count) {
-	UInt8 *dst8 = (UInt8 *)dest;
-	UInt8 *src8 = (UInt8 *)src;
+extern "C++" Void tmemcpy(Void *dest, const Void *src, UInt64 count) {
+	UInt8 *dst8 = (UInt8 *)dest
+	UInt8 *src8 = (UInt8 *)src
 
 	while (count--) {
-		*dst8++ = *src8++;
+		*dst8++ = *src8++
 	}
 }
 
-extern "C++" void tmemcpy(@volatile void *dest, const @volatile void *src, @volatile UInt64 count) {
-	UInt8 *dst8 = (UInt8 *)dest;
-	UInt8 *src8 = (UInt8 *)src;
+extern "C++" Void tmemcpy(@volatile Void *dest, const @volatile Void *src, @volatile UInt64 count) {
+	UInt8 *dst8 = (UInt8 *)dest
+	UInt8 *src8 = (UInt8 *)src
 
 	while (count--) {
-		*dst8++ = *src8++;
+		*dst8++ = *src8++
 	}
 }
 
 #pragma pack(1)
 typedef struct {
-	UInt16 limit;
-	UInt64 offset;
-} PACKED Idtr;
+	UInt16 limit
+	UInt64 offset
+} PACKED Idtr
 #pragma pack()
 
-_Static_assert(sizeof(Idtr) == 10, "IDTR register has to be 80 bits long");
+_Static_assert(sizeof(Idtr) == 10, "IDTR register has to be 80 bits long")
 
 typedef struct {
-	UInt16 offsetLowerbits : 16;
-	UInt16 selector : 16;
-	UInt8 ist : 8;
-	UInt8 gateType : 4;
-	UInt8 z : 1;
-	UInt8 dpl : 2;
-	UInt8 present : 1;
-	UInt64 offsetHigherbits : 48;
-	UInt32 zero : 32;
-} PACKED IdtEntry;
+	UInt16 offsetLowerbits : 16
+	UInt16 selector : 16
+	UInt8 ist : 8
+	UInt8 gateType : 4
+	UInt8 z : 1
+	UInt8 dpl : 2
+	UInt8 present : 1
+	UInt64 offsetHigherbits : 48
+	UInt32 zero : 32
+} PACKED IdtEntry
 
 UInt8 readPort(@volatile UInt16 port) {
-	return portInb(port);
+	return portInb(port)
 }
 
 fun writePort(@volatile UInt16 port, @volatile UInt8 value) {
-	portOutb(port, value);
+	portOutb(port, value)
 }
 
-fun loadIdt(@volatile Idtr *idtr);
+fun loadIdt(@volatile Idtr *idtr)
 
 // Handling IDT
 #define IDT_SIZE 256
@@ -99,48 +99,48 @@ fun loadIdt(@volatile Idtr *idtr);
 //#define EMPTY_SEL 0x70
 //#define EMPTY_SEL 0x78
 
-IdtEntry IDT[IDT_SIZE];
+IdtEntry IDT[IDT_SIZE]
 
 // Handling keyboard
-extern fun keyboardHandler();
+extern fun keyboardHandler()
 fun initializeKeyboard(IdtEntry *entry) {
-	UInt64 keyboardAddress = ((uint64_t)keyboardHandler);
-	entry.offsetLowerbits = keyboardAddress & 0xffff;
-	entry.offsetHigherbits = (keyboardAddress & 0xffffffffffff0000) >> 16;
-	entry.selector = SYS_CODE64_SEL;
-	entry.zero = 0;
-	entry.ist = 2; // Stack
-	entry.z = 0;
-	entry.dpl = 0; // Ring 0
-	entry.present = 1;
-	entry.gateType = 0xe; // Interrupt gate
+	UInt64 keyboardAddress = ((uint64_t)keyboardHandler)
+	entry.offsetLowerbits = keyboardAddress & 0xffff
+	entry.offsetHigherbits = (keyboardAddress & 0xffffffffffff0000) >> 16
+	entry.selector = SYS_CODE64_SEL
+	entry.zero = 0
+	entry.ist = 2 // Stack
+	entry.z = 0
+	entry.dpl = 0 // Ring 0
+	entry.present = 1
+	entry.gateType = 0xe // Interrupt gate
 }
 
-extern fun mouseHandler();
+extern fun mouseHandler()
 fun initializeMouse(IdtEntry *entry) {
-	UInt64 mouseAddress = ((uint64_t)mouseHandler);
-	entry.offsetLowerbits = mouseAddress & 0xffff;
-	entry.offsetHigherbits = (mouseAddress & 0xffffffffffff0000) >> 16;
-	entry.selector = SYS_CODE64_SEL;
-	entry.zero = 0;
-	entry.ist = 2; // Stack
-	entry.z = 0;
-	entry.dpl = 0; // Ring 0
-	entry.present = 1;
-	entry.gateType = 0xe; // Interrupt gate
+	UInt64 mouseAddress = ((uint64_t)mouseHandler)
+	entry.offsetLowerbits = mouseAddress & 0xffff
+	entry.offsetHigherbits = (mouseAddress & 0xffffffffffff0000) >> 16
+	entry.selector = SYS_CODE64_SEL
+	entry.zero = 0
+	entry.ist = 2 // Stack
+	entry.z = 0
+	entry.dpl = 0 // Ring 0
+	entry.present = 1
+	entry.gateType = 0xe // Interrupt gate
 }
 
 fun initializeFallback(IdtEntry *entry, UInt64 fallbackHandler) {
-	UInt64 address = ((uint64_t)fallbackHandler);
-	entry.offsetLowerbits = address & 0xffff;
-	entry.offsetHigherbits = (address & 0xffffffffffff0000) >> 16;
-	entry.selector = SYS_CODE64_SEL;
-	entry.zero = 0;
-	entry.ist = 1; // Stack
-	entry.z = 0;
-	entry.dpl = 3; // Ring 3
-	entry.present = 1;
-	entry.gateType = 0xe; // Interrupt gate
+	UInt64 address = ((uint64_t)fallbackHandler)
+	entry.offsetLowerbits = address & 0xffff
+	entry.offsetHigherbits = (address & 0xffffffffffff0000) >> 16
+	entry.selector = SYS_CODE64_SEL
+	entry.zero = 0
+	entry.ist = 1 // Stack
+	entry.z = 0
+	entry.dpl = 3 // Ring 3
+	entry.present = 1
+	entry.gateType = 0xe // Interrupt gate
 }
 
 #define ICW1_ICW4 0x01		// ICW4 (not) needed
@@ -164,64 +164,64 @@ arguments:
 Taken from http://wiki.osdev.org/8259_PIC
 */
 fun remapPic(UInt8 offset1, UInt8 offset2) {
-	serialPrintln("[cpu] begin: remap PIC");
+	serialPrintln("[cpu] begin: remap PIC")
 
-	writePort(0x20, 0x11);
-	writePort(0xA0, 0x11);
-	writePort(0x21, 0x20);
-	writePort(0xA1, 0x28);
-	writePort(0x21, 0x04);
-	writePort(0xA1, 0x02);
-	writePort(0x21, 0x01);
-	writePort(0xA1, 0x01);
-	writePort(0x21, 0x0);
-	writePort(0xA1, 0x0);
+	writePort(0x20, 0x11)
+	writePort(0xA0, 0x11)
+	writePort(0x21, 0x20)
+	writePort(0xA1, 0x28)
+	writePort(0x21, 0x04)
+	writePort(0xA1, 0x02)
+	writePort(0x21, 0x01)
+	writePort(0xA1, 0x01)
+	writePort(0x21, 0x0)
+	writePort(0xA1, 0x0)
 
-	serialPrintln("[cpu] done: remap PIC");
+	serialPrintln("[cpu] done: remap PIC")
 }
 
 // Sets up the legacy PIC and then disables it
-void disablePic(void) {
+Void disablePic(void) {
 	/* Set ICW1 */
-	writePort(0x20, 0x11);
-	writePort(0xa0, 0x11);
+	writePort(0x20, 0x11)
+	writePort(0xa0, 0x11)
 
 	/* Set ICW2 (IRQ base offsets) */
-	writePort(0x21, 0xe0);
-	writePort(0xa1, 0xe8);
+	writePort(0x21, 0xe0)
+	writePort(0xa1, 0xe8)
 
 	/* Set ICW3 */
-	writePort(0x21, 4);
-	writePort(0xa1, 2);
+	writePort(0x21, 4)
+	writePort(0xa1, 2)
 
 	/* Set ICW4 */
-	writePort(0x21, 1);
-	writePort(0xa1, 1);
+	writePort(0x21, 1)
+	writePort(0xa1, 1)
 
 	/* Set OCW1 (interrupt masks) */
-	writePort(0x21, 0xff);
-	writePort(0xa1, 0xff);
+	writePort(0x21, 0xff)
+	writePort(0xa1, 0xff)
 }
 
 UInt64 physicalToVirtual(UInt64 physical) {
-	UInt64 result = (uint64_t)WholePhysicalStart + (uint64_t)physical;
-	return result;
+	UInt64 result = (uint64_t)WholePhysicalStart + (uint64_t)physical
+	return result
 }
 
 // TODO check for CPU feature
 fun enableLocalApic() {
-	serialPrintln("[cpu] begin: enableLocalApic");
+	serialPrintln("[cpu] begin: enableLocalApic")
 
-	auto ptr = (UInt32 *)physicalToVirtual(0xfee000f0);
-	UInt32 val = *ptr;
-	quakePrintf("APIC value is %u\n", val);
+	auto ptr = (UInt32 *)physicalToVirtual(0xfee000f0)
+	UInt32 val = *ptr
+	quakePrintf("APIC value is %u\n", val)
 
-	serialPrintln("[cpu] done: enableLocalApic");
+	serialPrintln("[cpu] done: enableLocalApic")
 }
 
-fun mouseWait(UInt8 aType);
-fun mouseWrite(UInt8 aWrite);
-UInt8 mouseRead();
+fun mouseWait(UInt8 aType)
+fun mouseWrite(UInt8 aWrite)
+UInt8 mouseRead()
 #define IRQ0 32
 #define IRQ1 0x21 // 33
 #define IRQ2 34
@@ -241,14 +241,14 @@ UInt8 mouseRead();
 
 #pragma pack(1)
 struct TablePtr {
-	UInt16 limit;
-	UInt64 base;
-} __attribute__((packed));
+	UInt16 limit
+	UInt64 base
+} __attribute__((packed))
 #pragma pack()
 
-_Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
+_Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect")
 
-fun lgdt(@volatile const TablePtr *gdt);
+fun lgdt(@volatile const TablePtr *gdt)
 
 enum GdtType : UInt8 {
 	accessed = 0x01,
@@ -260,113 +260,113 @@ enum GdtType : UInt8 {
 	ring2 = 0x40,
 	ring3 = 0x60,
 	present = 0x80
-};
+}
 
 struct GdtDescriptor {
-	UInt16 limitLow;
-	UInt16 baseLow;
-	UInt8 baseMid;
-	enum GdtType type; // Access
-	UInt8 size;
-	UInt8 baseHigh;
-} __attribute__((packed));
+	UInt16 limitLow
+	UInt16 baseLow
+	UInt8 baseMid
+	enum GdtType type // Access
+	UInt8 size
+	UInt8 baseHigh
+} __attribute__((packed))
 
-_Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect");
+_Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect")
 
 #pragma pack(1)
 struct GdtDescriptorEx {
-	UInt16 limitLow : 16;
-	UInt16 baseLow : 16;
-	UInt8 baseMid : 8;
+	UInt16 limitLow : 16
+	UInt16 baseLow : 16
+	UInt8 baseMid : 8
 	// Access
-	UInt8 accessed : 1;
+	UInt8 accessed : 1
 	UInt8 rw : 1;		   // 0 - read, 1 - read/write
-	UInt8 direction : 1; // or conform
+	UInt8 direction : 1 // or conform
 	// If 1 code in this segment can be executed from an equal or lower privilege level
 	// If 0 code in this segment can only be executed from the ring set in "privilege"
-	UInt8 execute : 1; // 1 = code, 0 = data
-	UInt8 one : 1;
-	UInt8 privilege : 2; // 0 = ring0/kernel, 3 = ring3
-	UInt8 present : 1;
+	UInt8 execute : 1 // 1 = code, 0 = data
+	UInt8 one : 1
+	UInt8 privilege : 2 // 0 = ring0/kernel, 3 = ring3
+	UInt8 present : 1
 	// Flags
-	UInt8 limit : 4;
-	UInt8 reserved : 2;
-	UInt8 zero16one32 : 1;
-	UInt8 blocks : 1;
+	UInt8 limit : 4
+	UInt8 reserved : 2
+	UInt8 zero16one32 : 1
+	UInt8 blocks : 1
 
-	UInt8 baseHigh : 8;
-} __attribute__((packed));
+	UInt8 baseHigh : 8
+} __attribute__((packed))
 #pragma pack()
 
-_Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect");
+_Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect")
 
 struct TssDescriptor {
-	UInt16 limitLow;
-	UInt16 base_00;
-	UInt8 base_16;
-	enum GdtType type;
-	UInt8 size;
-	UInt8 base_24;
-	UInt32 base_32;
-	UInt32 reserved;
-} __attribute__((packed));
+	UInt16 limitLow
+	UInt16 base_00
+	UInt8 base_16
+	enum GdtType type
+	UInt8 size
+	UInt8 base_24
+	UInt32 base_32
+	UInt32 reserved
+} __attribute__((packed))
 
 struct TssEntry {
-	UInt32 reserved0;
+	UInt32 reserved0
 
-	UInt64 rsp[3]; // stack pointers for CPL 0-2
-	UInt64 ist[8]; // ist[0] is reserved
+	UInt64 rsp[3] // stack pointers for CPL 0-2
+	UInt64 ist[8] // ist[0] is reserved
 
-	UInt64 reserved1;
-	UInt16 reserved2;
-	UInt16 iomap_offset;
-} __attribute__((packed));
+	UInt64 reserved1
+	UInt16 reserved2
+	UInt16 iomap_offset
+} __attribute__((packed))
 
-__attribute__((aligned(64))) static @volatile TablePtr globalGdtr;
-__attribute__((aligned(64))) static @volatile TssEntry globalTss;
+__attribute__((aligned(64))) static @volatile TablePtr globalGdtr
+__attribute__((aligned(64))) static @volatile TssEntry globalTss
 
 // rsp0stack = exp0 in TSS
 // Stack used by kernel to handle syscalls/interrupts
-__attribute__((aligned(64))) UInt8 rsp0stack[4096 * 32] = {0};
-__attribute__((aligned(64))) UInt8 rsp1stack[4096 * 32] = {0};
-__attribute__((aligned(64))) UInt8 rsp2stack[4096 * 32] = {0};
+__attribute__((aligned(64))) UInt8 rsp0stack[4096 * 32] = {0}
+__attribute__((aligned(64))) UInt8 rsp1stack[4096 * 32] = {0}
+__attribute__((aligned(64))) UInt8 rsp2stack[4096 * 32] = {0}
 
-__attribute__((aligned(64))) UInt8 ist0stack[4096 * 4] = {0};
-__attribute__((aligned(64))) UInt8 ist1stack[4096 * 4] = {0};
-__attribute__((aligned(64))) UInt8 ist2stack[4096 * 4] = {0};
-__attribute__((aligned(64))) UInt8 ist3stack[4096 * 4] = {0};
-__attribute__((aligned(64))) UInt8 ist4stack[4096 * 4] = {0};
-__attribute__((aligned(64))) UInt8 ist5stack[4096 * 4] = {0};
-__attribute__((aligned(64))) UInt8 ist6stack[4096 * 4] = {0};
-__attribute__((aligned(64))) UInt8 ist7stack[4096 * 4] = {0};
+__attribute__((aligned(64))) UInt8 ist0stack[4096 * 4] = {0}
+__attribute__((aligned(64))) UInt8 ist1stack[4096 * 4] = {0}
+__attribute__((aligned(64))) UInt8 ist2stack[4096 * 4] = {0}
+__attribute__((aligned(64))) UInt8 ist3stack[4096 * 4] = {0}
+__attribute__((aligned(64))) UInt8 ist4stack[4096 * 4] = {0}
+__attribute__((aligned(64))) UInt8 ist5stack[4096 * 4] = {0}
+__attribute__((aligned(64))) UInt8 ist6stack[4096 * 4] = {0}
+__attribute__((aligned(64))) UInt8 ist7stack[4096 * 4] = {0}
 
 // LLVM did the magic expected of it. It only saved registers that are clobbered by your fun (hence rax).
 // All other register are left unchanged hence there’s no need of saving and restoring them.
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
 
 // TODO: errcode is `extra` here:
-//__attribute__((aligned(64))) __attribute__((interrupt)) void unknownInterrupt(struct InterruptFrame *frame,
+//__attribute__((aligned(64))) __attribute__((interrupt)) Void unknownInterrupt(struct InterruptFrame *frame,
 // uint64_t
 // extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
-void anyInterruptHandler(InterruptFrame *frame);
+Void anyInterruptHandler(InterruptFrame *frame)
 
 // TODO remove
-__attribute__((aligned(64))) __attribute__((interrupt)) void unknownInterrupt(InterruptFrame *frame) {
+__attribute__((aligned(64))) __attribute__((interrupt)) Void unknownInterrupt(InterruptFrame *frame) {
 	// TODO Find a better way to avoid LLVM bugs
-	anyInterruptHandler(frame);
+	anyInterruptHandler(frame)
 }
 
-void anyInterruptHandler(InterruptFrame *frame) {
-	amd64.disableAllInterrupts();
+Void anyInterruptHandler(InterruptFrame *frame) {
+	amd64.disableAllInterrupts()
 #if 0
-	let stack = (InterruptStack *)((uint64_t)frame - 200);
+	let stack = (InterruptStack *)((uint64_t)frame - 200)
 
 #endif
 
 	// Enable interrupts
-	writePort(0xA0, 0x20);
-	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
+	writePort(0xA0, 0x20)
+	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20)
 
 	// Operating systems use some of the segments for internal usage.
 	// For instance GS register to access the TLS (thread local storage)
@@ -374,447 +374,447 @@ void anyInterruptHandler(InterruptFrame *frame) {
 }
 
 // ~121 times per second
-UInt64 timerCalled = 0;
+UInt64 timerCalled = 0
 
-constexpr UInt64 stackSizeForKernelThread = 1024 * 1024;
+constexpr UInt64 stackSizeForKernelThread = 1024 * 1024
 
-fun kernelThread();
-__attribute__((aligned(64))) UInt8 kernelStack[stackSizeForKernelThread] = {0};
+fun kernelThread()
+__attribute__((aligned(64))) UInt8 kernelStack[stackSizeForKernelThread] = {0}
 
-InterruptFrame guiThreadFrame;
-fun guiThread();
-__attribute__((aligned(64))) UInt8 guiStack[stackSizeForKernelThread] = {0};
+InterruptFrame guiThreadFrame
+fun guiThread()
+__attribute__((aligned(64))) UInt8 guiStack[stackSizeForKernelThread] = {0}
 
-extern "C" void timerInterruptHandler(@volatile InterruptFrame *frame);
+extern "C" Void timerInterruptHandler(@volatile InterruptFrame *frame)
 
-UInt8 extraMillisecond = 0;
-UInt8 taskBarRedraw = 0; // Re-paint task bar current time
-@volatile Bool nextIsUserProcess = false;
-@volatile Bool nextIsGuiThread = true;
+UInt8 extraMillisecond = 0
+UInt8 taskBarRedraw = 0 // Re-paint task bar current time
+@volatile Bool nextIsUserProcess = false
+@volatile Bool nextIsGuiThread = true
 
 UInt64 getNextProcess() {
-	UInt64 index = 1;
+	UInt64 index = 1
 	while (index < 255) {
 		if (process.processes[index].present == true) {
 			if (process.processes[index].schedulable == true)
 				if (process.processes[index].scheduleOnNextTick == true)
-					return index;
+					return index
 		}
-		index++;
+		index++
 	}
 
-	return 0; // Idle
+	return 0 // Idle
 }
 
 fun markAllProcessessSchedulable() {
-	UInt64 index = 0;
+	UInt64 index = 0
 	while (index < 255) { // TODO 256?
 		if (process.processes[index].present == true) {
 			if (process.processes[index].schedulable == true)
-				process.processes[index].scheduleOnNextTick = true;
+				process.processes[index].scheduleOnNextTick = true
 		}
-		index++;
+		index++
 	}
 }
 
 fun switchToKernelThread(@volatile InterruptFrame *frame) {
 	if (currentThread == THREAD_KERNEL)
-		return;
+		return
 
 	if (currentThread == THREAD_USER) {
 		// Save
-		process.Process *process = &process.processes[process.currentProcess];
-		tmemcpy(&process.frame, frame, sizeof(InterruptFrame));
+		process.Process *process = &process.processes[process.currentProcess]
+		tmemcpy(&process.frame, frame, sizeof(InterruptFrame))
 	} else if (currentThread == THREAD_GUI) {
 		// Save
-		tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
+		tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame))
 	}
 
 	// Restore
-	currentThread = THREAD_KERNEL;
-	amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
-	tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame));
+	currentThread = THREAD_KERNEL
+	amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart)
+	tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame))
 }
 
 fun switchToNextProcess(@volatile InterruptFrame *frame) {
-	@volatile var next = getNextProcess();
+	@volatile var next = getNextProcess()
 
 	if (next == 0) {
-		markAllProcessessSchedulable();
-		next = getNextProcess();
+		markAllProcessessSchedulable()
+		next = getNextProcess()
 	}
 
-	process.Process *process = &process.processes[next];
-	@volatile let old = process.currentProcess;
-	process.currentProcess = process.pid;
+	process.Process *process = &process.processes[next]
+	@volatile let old = process.currentProcess
+	process.currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
 	// another option is to save/restore CR3 used by kernel thread
-	amd64.writeCr3((uint64_t)process.pml4 - (uint64_t)WholePhysicalStart);
-	process.scheduleOnNextTick = false;
+	amd64.writeCr3((uint64_t)process.pml4 - (uint64_t)WholePhysicalStart)
+	process.scheduleOnNextTick = false
 
 	// Note: pid 0 is not real process, so keep things in kernel
 	if (next != 0) {
 		if (currentThread == THREAD_GUI) {
 			// Save
-			tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame));
+			tmemcpy(&guiThreadFrame, frame, sizeof(InterruptFrame))
 		} else if (currentThread == THREAD_USER) {
 			// Save
-			process.Process *processOld = &process.processes[old];
-			tmemcpy(&processOld.frame, frame, sizeof(InterruptFrame));
+			process.Process *processOld = &process.processes[old]
+			tmemcpy(&processOld.frame, frame, sizeof(InterruptFrame))
 		} else if (currentThread == THREAD_KERNEL) {
 			// Save
-			tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
+			tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame))
 		}
 
 		// Restore
-		currentThread = THREAD_USER;
-		tmemcpy(frame, &process.frame, sizeof(InterruptFrame));
+		currentThread = THREAD_USER
+		tmemcpy(frame, &process.frame, sizeof(InterruptFrame))
 	} else {
-		amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart);
-		switchToKernelThread(frame);
+		amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart)
+		switchToKernelThread(frame)
 	}
 }
 
 fun switchToGuiThread(@volatile InterruptFrame *frame) {
 	if (currentThread == THREAD_GUI)
-		return;
+		return
 
 	if (currentThread == THREAD_USER) {
 		// Save
-		process.Process *process = &process.processes[process.currentProcess];
-		tmemcpy(&process.frame, frame, sizeof(InterruptFrame));
+		process.Process *process = &process.processes[process.currentProcess]
+		tmemcpy(&process.frame, frame, sizeof(InterruptFrame))
 	} else if (currentThread == THREAD_KERNEL) {
 		// Save
-		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame));
+		tmemcpy(&kernelThreadFrame, frame, sizeof(InterruptFrame))
 	}
 
 	// Restore
-	currentThread = THREAD_GUI;
-	tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
+	currentThread = THREAD_GUI
+	tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame))
 }
 
-void yieldInterruptHandler(@volatile InterruptFrame *frame) {
-	amd64.disableAllInterrupts();
-	switchToNextProcess(frame);
+Void yieldInterruptHandler(@volatile InterruptFrame *frame) {
+	amd64.disableAllInterrupts()
+	switchToNextProcess(frame)
 }
 
-void timerInterruptHandler(@volatile InterruptFrame *frame) {
-	amd64.disableAllInterrupts();
+Void timerInterruptHandler(@volatile InterruptFrame *frame) {
+	amd64.disableAllInterrupts()
 
 	if (timerCalled % 121 == 0) {
-		taskBarRedraw++;
+		taskBarRedraw++
 		if (taskBarRedraw > 30) {
-			haveToRender = 1;
-			taskBarRedraw = 0;
+			haveToRender = 1
+			taskBarRedraw = 0
 		}
 	}
-	uptimeMilliseconds += 8;
+	uptimeMilliseconds += 8
 	if (extraMillisecond % 4 == 0) {
-		uptimeMilliseconds += 1; // PIT is somewhat imprecise
+		uptimeMilliseconds += 1 // PIT is somewhat imprecise
 	}
 	if (extraMillisecond % 64 == 0) {
-		uptimeMilliseconds += 1; // PIT is somewhat imprecise
+		uptimeMilliseconds += 1 // PIT is somewhat imprecise
 	}
-	extraMillisecond++;
-	timerCalled++;
+	extraMillisecond++
+	timerCalled++
 
 	// Schedule
 	if (true) {
 		if (currentThread == THREAD_INIT) {
-			// TODO hexa error == statement: currentThread == THREAD_INIT;
+			// TODO hexa error == statement: currentThread == THREAD_INIT
 			guiThreadFrame.flags = frame.flags;	// TODO
-			kernelThreadFrame.flags = frame.flags; // TODO
+			kernelThreadFrame.flags = frame.flags // TODO
 
 			// Restore
-			currentThread = THREAD_GUI;
-			tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
+			currentThread = THREAD_GUI
+			tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame))
 		} else {
 			if (currentThread == THREAD_GUI) {
 				// Just give it enough time to fimish rendering
 				// It will schedule to other process on finish
-				nextIsGuiThread = false;
+				nextIsGuiThread = false
 			} else {
 				if (nextIsGuiThread == true) {
-					nextIsGuiThread = false;
-					switchToGuiThread(frame);
+					nextIsGuiThread = false
+					switchToGuiThread(frame)
 				} else {
-					nextIsGuiThread = true;
+					nextIsGuiThread = true
 					if (nextIsUserProcess == true) {
-						switchToKernelThread(frame);
+						switchToKernelThread(frame)
 					} else {
-						switchToNextProcess(frame);
+						switchToNextProcess(frame)
 					}
-					nextIsUserProcess = !nextIsUserProcess;
+					nextIsUserProcess = !nextIsUserProcess
 				}
 			}
 		}
 	}
 	//		if (currentThread == THREAD_INIT) {
-	//			// TODO hexa error == statement: currentThread == THREAD_INIT;
+	//			// TODO hexa error == statement: currentThread == THREAD_INIT
 
 	// Enable interrupts
-	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
+	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20)
 }
 
 fun syscallInterruptHandler(InterruptFrame *frame) {
-	amd64.disableAllInterrupts();
-	@volatile process.Process *process = &process.processes[process.currentProcess];
-	process.schedulable = false;
-	@volatile let index = (TofitaSyscalls)frame.rcxArg0;
+	amd64.disableAllInterrupts()
+	@volatile process.Process *process = &process.processes[process.currentProcess]
+	process.schedulable = false
+	@volatile let index = (TofitaSyscalls)frame.rcxArg0
 
 	// No-op
 	if ((uint64_t)index < USER_SYSCALLS) {
-		process.schedulable = true;
-		return;
+		process.schedulable = true
+		return
 	}
 
-	process.syscallToHandle = index;
+	process.syscallToHandle = index
 
-	switchToKernelThread(frame);
+	switchToKernelThread(frame)
 	// TODO weird frame+8 offset if called switchToNextProcess
-	// switchToNextProcess(frame);
-	return;
+	// switchToNextProcess(frame)
+	return
 
 	if (index == TofitaSyscalls.DebugLog) {
-		serialPrintf("[[DebugLog:PID %d]] %s\n", process.currentProcess, frame.rdxArg1);
-		return;
+		serialPrintf("[[DebugLog:PID %d]] %s\n", process.currentProcess, frame.rdxArg1)
+		return
 	}
 
 	if (index == TofitaSyscalls.ExitProcess) {
-		serialPrintf("[[ExitProcess:PID %d]] %d\n", process.currentProcess, frame.rdxArg1);
+		serialPrintf("[[ExitProcess:PID %d]] %d\n", process.currentProcess, frame.rdxArg1)
 		// TODO kernel wakeup
 		// TODO destroy process
-		process.Process *process = &process.processes[process.currentProcess];
-		process.schedulable = false;
-		switchToNextProcess(frame);
-		process.present = false;
-		return;
+		process.Process *process = &process.processes[process.currentProcess]
+		process.schedulable = false
+		switchToNextProcess(frame)
+		process.present = false
+		return
 	}
 }
 
-fun setTsr(@volatile UInt16 tsr_data);
+fun setTsr(@volatile UInt16 tsr_data)
 
 // 16 records
 __attribute__((aligned(64))) static UInt32 gdtTemplate[32] = {
 	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209b00, 0x0000ffff, 0x00cf9300,
 	0x0000ffff, 0x00cffa00, 0x0000ffff, 0x00cff300, 0x00000000, 0x0020fb00, 0x00000000, 0x00000000,
 	0x60800067, 0x00008bb9, 0xfffff800, 0x00000000, 0xe0003c00, 0xff40f3fa, 0x00000000, 0x00000000,
-	0x0000ffff, 0x00cf9a00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
+	0x0000ffff, 0x00cf9a00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000}
 
 #define PS2_DATA_PORT 0x60
 #define PS2_CONTROL_PORT 0x64
 
 fun gdtSetEntry(UInt8 i, UInt32 base, UInt64 limit, Bool is64, enum GdtType typed) {
-	GdtDescriptor *gdtd = (GdtDescriptor *)&gdtTemplate[i * 2];
-	gdtd.limitLow = limit & 0xffff;
-	gdtd.size = (limit >> 16) & 0xf;
-	// gdtd.size |= (is64 ? 0xa0 : 0xc0);
-	gdtd.size |= 0xa0;
-	gdtd.size <<= 0x0D; // Long mode
+	GdtDescriptor *gdtd = (GdtDescriptor *)&gdtTemplate[i * 2]
+	gdtd.limitLow = limit & 0xffff
+	gdtd.size = (limit >> 16) & 0xf
+	// gdtd.size |= (is64 ? 0xa0 : 0xc0)
+	gdtd.size |= 0xa0
+	gdtd.size <<= 0x0D // Long mode
 
-	gdtd.baseLow = base & 0xffff;
-	gdtd.baseMid = (base >> 16) & 0xff;
-	gdtd.baseHigh = (base >> 24) & 0xff;
+	gdtd.baseLow = base & 0xffff
+	gdtd.baseMid = (base >> 16) & 0xff
+	gdtd.baseHigh = (base >> 24) & 0xff
 
-	gdtd.type = (enum GdtType)(typed | system | present);
+	gdtd.type = (enum GdtType)(typed | system | present)
 }
 
 // Takes 2 GDT entries
 fun tssSetEntry(UInt8 i, UInt64 base, UInt64 limit) {
-	TssDescriptor *tssd = (TssDescriptor *)&gdtTemplate[i * 2];
-	tssd.limitLow = limit & 0xffff;
-	tssd.size = (limit >> 16) & 0xf;
+	TssDescriptor *tssd = (TssDescriptor *)&gdtTemplate[i * 2]
+	tssd.limitLow = limit & 0xffff
+	tssd.size = (limit >> 16) & 0xf
 
-	tssd.base_00 = base & 0xffff;
-	tssd.base_16 = (base >> 16) & 0xff;
-	tssd.base_24 = (base >> 24) & 0xff;
-	tssd.base_32 = (base >> 32) & 0xffffffff;
-	tssd.reserved = 0;
+	tssd.base_00 = base & 0xffff
+	tssd.base_16 = (base >> 16) & 0xff
+	tssd.base_24 = (base >> 24) & 0xff
+	tssd.base_32 = (base >> 32) & 0xffffffff
+	tssd.reserved = 0
 
 	tssd.type = (enum GdtType)(accessed | execute | ring3 | // TODO
-								present);
+								present)
 }
 
-__attribute__((aligned(64))) Idtr cacheIdtr;
+__attribute__((aligned(64))) Idtr cacheIdtr
 
 fun dumpGDT(GdtDescriptorEx *desc) {
-	serialPrintf("[dumpGDT]");
+	serialPrintf("[dumpGDT]")
 
 	if (desc.accessed)
-		serialPrintf(" accessed");
+		serialPrintf(" accessed")
 	if (desc.rw)
-		serialPrintf(" rw");
+		serialPrintf(" rw")
 	if (desc.direction)
-		serialPrintf(" direction");
+		serialPrintf(" direction")
 	if (desc.execute)
-		serialPrintf(" execute");
+		serialPrintf(" execute")
 	if (desc.one)
-		serialPrintf(" one");
+		serialPrintf(" one")
 
 	if (desc.privilege == 0)
-		serialPrintf(" privilege=ring0");
+		serialPrintf(" privilege=ring0")
 	if (desc.privilege == 1)
-		serialPrintf(" privilege=ring1");
+		serialPrintf(" privilege=ring1")
 	if (desc.privilege == 2)
-		serialPrintf(" privilege=ring2");
+		serialPrintf(" privilege=ring2")
 	if (desc.privilege == 3)
-		serialPrintf(" privilege=ring3");
+		serialPrintf(" privilege=ring3")
 
 	if (desc.present)
-		serialPrintf(" present");
+		serialPrintf(" present")
 	if (desc.zero16one32)
-		serialPrintf(" zero16one32");
+		serialPrintf(" zero16one32")
 	if (desc.blocks)
-		serialPrintf(" pages");
+		serialPrintf(" pages")
 
-	serialPrintf("\n");
+	serialPrintf("\n")
 }
 
 fun enableInterrupts() {
-	serialPrintln("[cpu] initializing lgdt");
+	serialPrintln("[cpu] initializing lgdt")
 
-	UInt64 sizeof_TssEntry = sizeof(globalTss);
-	serialPrintf("[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry));
+	UInt64 sizeof_TssEntry = sizeof(globalTss)
+	serialPrintf("[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry))
 
-	memset((void *)&globalTss, 0, sizeof_TssEntry);
-	globalTss.iomap_offset = sizeof_TssEntry;
-	globalTss.rsp[0] = (uint64_t)&rsp0stack;
-	globalTss.rsp[1] = (uint64_t)&rsp1stack;
-	globalTss.rsp[2] = (uint64_t)&rsp2stack;
+	memset((Void *)&globalTss, 0, sizeof_TssEntry)
+	globalTss.iomap_offset = sizeof_TssEntry
+	globalTss.rsp[0] = (uint64_t)&rsp0stack
+	globalTss.rsp[1] = (uint64_t)&rsp1stack
+	globalTss.rsp[2] = (uint64_t)&rsp2stack
 	// TODO zero out stacks
 	// TODO more stacks
-	globalTss.ist[0] = (uint64_t)&ist0stack;
-	globalTss.ist[1] = (uint64_t)&ist1stack;
-	globalTss.ist[2] = (uint64_t)&ist2stack;
-	globalTss.ist[3] = (uint64_t)&ist3stack;
-	globalTss.ist[4] = (uint64_t)&ist4stack;
-	globalTss.ist[5] = (uint64_t)&ist5stack;
-	globalTss.ist[6] = (uint64_t)&ist6stack;
-	globalTss.ist[7] = (uint64_t)&ist7stack;
+	globalTss.ist[0] = (uint64_t)&ist0stack
+	globalTss.ist[1] = (uint64_t)&ist1stack
+	globalTss.ist[2] = (uint64_t)&ist2stack
+	globalTss.ist[3] = (uint64_t)&ist3stack
+	globalTss.ist[4] = (uint64_t)&ist4stack
+	globalTss.ist[5] = (uint64_t)&ist5stack
+	globalTss.ist[6] = (uint64_t)&ist6stack
+	globalTss.ist[7] = (uint64_t)&ist7stack
 
-	serialPrint("[cpu] RSP[0] points to: ");
-	serialPrintHex((uint64_t)globalTss.rsp[0]);
-	serialPrint("\n");
+	serialPrint("[cpu] RSP[0] points to: ")
+	serialPrintHex((uint64_t)globalTss.rsp[0])
+	serialPrint("\n")
 
-	serialPrint("[cpu] RSP[1] points to: ");
-	serialPrintHex((uint64_t)globalTss.rsp[1]);
-	serialPrint("\n");
+	serialPrint("[cpu] RSP[1] points to: ")
+	serialPrintHex((uint64_t)globalTss.rsp[1])
+	serialPrint("\n")
 
-	serialPrint("[cpu] RSP[2] points to: ");
-	serialPrintHex((uint64_t)globalTss.rsp[2]);
-	serialPrint("\n");
+	serialPrint("[cpu] RSP[2] points to: ")
+	serialPrintHex((uint64_t)globalTss.rsp[2])
+	serialPrint("\n")
 
-	UInt64 tssBase = (uint64_t)(&globalTss);
+	UInt64 tssBase = (uint64_t)(&globalTss)
 
 	// upload
 	{
-		tssSetEntry(8, tssBase, sizeof_TssEntry);
+		tssSetEntry(8, tssBase, sizeof_TssEntry)
 		// tssSetEntry(8, tssBase, sizeof_TssEntry - 1); TODO
 	}
 
 	if (false) {
-		let gdt = (GdtDescriptorEx *)gdtTemplate;
+		let gdt = (GdtDescriptorEx *)gdtTemplate
 		for (UInt32 i = 0; i < 16; ++i) {
 			if (i == 0)
-				continue; // Empty
+				continue // Empty
 			if (i == 8)
-				continue; // TSS
+				continue // TSS
 			if (i == 9)
-				continue; // TSS
+				continue // TSS
 			if (gdt[i].present == 0)
-				continue;
-			serialPrintf("[dumpGDT] #%u\n", i);
-			dumpGDT(&gdt[i]);
+				continue
+			serialPrintf("[dumpGDT] #%u\n", i)
+			dumpGDT(&gdt[i])
 		}
 	}
 
-	globalGdtr.limit = sizeof(gdtTemplate) - 1;
-	globalGdtr.base = (uint64_t)(&gdtTemplate[0]);
-	serialPrint("[cpu] GDTR points to: ");
-	serialPrintHex((uint64_t)&globalGdtr);
-	serialPrint("\n");
-	serialPrint("[cpu] GDT points to: ");
-	serialPrintHex((uint64_t)globalGdtr.base);
-	serialPrint("\n");
-	serialPrintf("[cpu] GDT size is %u == %u\n", globalGdtr.limit, 0x7F);
-	serialPrintln("[cpu] calling lgdt");
-	lgdt(&globalGdtr);
-	serialPrintln("[cpu] calling ltr");
+	globalGdtr.limit = sizeof(gdtTemplate) - 1
+	globalGdtr.base = (uint64_t)(&gdtTemplate[0])
+	serialPrint("[cpu] GDTR points to: ")
+	serialPrintHex((uint64_t)&globalGdtr)
+	serialPrint("\n")
+	serialPrint("[cpu] GDT points to: ")
+	serialPrintHex((uint64_t)globalGdtr.base)
+	serialPrint("\n")
+	serialPrintf("[cpu] GDT size is %u == %u\n", globalGdtr.limit, 0x7F)
+	serialPrintln("[cpu] calling lgdt")
+	lgdt(&globalGdtr)
+	serialPrintln("[cpu] calling ltr")
 	{
-		setTsr(64);
-		// setTsr(64 + 3);
+		setTsr(64)
+		// setTsr(64 + 3)
 	}
 
-	serialPrintln("[cpu] initializing unknownInterrupt");
+	serialPrintln("[cpu] initializing unknownInterrupt")
 
 	for (UInt32 i = 0; i < 286; ++i) {
-		initializeFallback(&IDT[i], (uint64_t)&unknownInterrupt);
+		initializeFallback(&IDT[i], (uint64_t)&unknownInterrupt)
 	}
 
 	// CPU exceptions
-	initializeFallback(&IDT[0x00], (uint64_t)&cpu0x00);
-	initializeFallback(&IDT[0x01], (uint64_t)&cpu0x01);
-	initializeFallback(&IDT[0x02], (uint64_t)&cpu0x02);
-	initializeFallback(&IDT[0x03], (uint64_t)&cpu0x03);
-	initializeFallback(&IDT[0x04], (uint64_t)&cpu0x04);
-	initializeFallback(&IDT[0x05], (uint64_t)&cpu0x05);
-	initializeFallback(&IDT[0x06], (uint64_t)&cpu0x06);
-	initializeFallback(&IDT[0x07], (uint64_t)&cpu0x07);
-	initializeFallback(&IDT[0x08], (uint64_t)&cpu0x08);
-	initializeFallback(&IDT[0x09], (uint64_t)&cpu0x09);
-	initializeFallback(&IDT[0x0A], (uint64_t)&cpu0x0A);
-	initializeFallback(&IDT[0x0B], (uint64_t)&cpu0x0B);
-	initializeFallback(&IDT[0x0C], (uint64_t)&cpu0x0C);
-	initializeFallback(&IDT[0x0D], (uint64_t)&cpu0x0D);
-	initializeFallback(&IDT[0x0E], (uint64_t)&cpu0x0E);
-	initializeFallback(&IDT[0x0F], (uint64_t)&cpu0x0F);
-	initializeFallback(&IDT[0x10], (uint64_t)&cpu0x10);
-	initializeFallback(&IDT[0x11], (uint64_t)&cpu0x11);
-	initializeFallback(&IDT[0x12], (uint64_t)&cpu0x12);
-	initializeFallback(&IDT[0x13], (uint64_t)&cpu0x13);
-	initializeFallback(&IDT[0x14], (uint64_t)&cpu0x14);
-	initializeFallback(&IDT[0x15], (uint64_t)&cpu0x15);
+	initializeFallback(&IDT[0x00], (uint64_t)&cpu0x00)
+	initializeFallback(&IDT[0x01], (uint64_t)&cpu0x01)
+	initializeFallback(&IDT[0x02], (uint64_t)&cpu0x02)
+	initializeFallback(&IDT[0x03], (uint64_t)&cpu0x03)
+	initializeFallback(&IDT[0x04], (uint64_t)&cpu0x04)
+	initializeFallback(&IDT[0x05], (uint64_t)&cpu0x05)
+	initializeFallback(&IDT[0x06], (uint64_t)&cpu0x06)
+	initializeFallback(&IDT[0x07], (uint64_t)&cpu0x07)
+	initializeFallback(&IDT[0x08], (uint64_t)&cpu0x08)
+	initializeFallback(&IDT[0x09], (uint64_t)&cpu0x09)
+	initializeFallback(&IDT[0x0A], (uint64_t)&cpu0x0A)
+	initializeFallback(&IDT[0x0B], (uint64_t)&cpu0x0B)
+	initializeFallback(&IDT[0x0C], (uint64_t)&cpu0x0C)
+	initializeFallback(&IDT[0x0D], (uint64_t)&cpu0x0D)
+	initializeFallback(&IDT[0x0E], (uint64_t)&cpu0x0E)
+	initializeFallback(&IDT[0x0F], (uint64_t)&cpu0x0F)
+	initializeFallback(&IDT[0x10], (uint64_t)&cpu0x10)
+	initializeFallback(&IDT[0x11], (uint64_t)&cpu0x11)
+	initializeFallback(&IDT[0x12], (uint64_t)&cpu0x12)
+	initializeFallback(&IDT[0x13], (uint64_t)&cpu0x13)
+	initializeFallback(&IDT[0x14], (uint64_t)&cpu0x14)
+	initializeFallback(&IDT[0x15], (uint64_t)&cpu0x15)
 
 	// PIC interrupts
-	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt));
-	initializeKeyboard(&IDT[IRQ1]);
-	initializeMouse(&IDT[IRQ12]);
+	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt))
+	initializeKeyboard(&IDT[IRQ1])
+	initializeMouse(&IDT[IRQ12])
 
 	// Syscalls
-	initializeFallback(&IDT[0x80], (uint64_t)(&syscallInterrupt));
-	initializeFallback(&IDT[0x81], (uint64_t)(&yieldInterrupt));
+	initializeFallback(&IDT[0x80], (uint64_t)(&syscallInterrupt))
+	initializeFallback(&IDT[0x81], (uint64_t)(&yieldInterrupt))
 
-	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1;
-	cacheIdtr.offset = (uint64_t)IDT;
+	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1
+	cacheIdtr.offset = (uint64_t)IDT
 
-	serialPrint("[cpu] IDTR points to: ");
-	serialPrintHex((uint64_t)&cacheIdtr);
-	serialPrint("\n");
-	serialPrint("[cpu] IDT points to: ");
-	serialPrintHex((uint64_t)&IDT);
-	serialPrint("\n");
+	serialPrint("[cpu] IDTR points to: ")
+	serialPrintHex((uint64_t)&cacheIdtr)
+	serialPrint("\n")
+	serialPrint("[cpu] IDT points to: ")
+	serialPrintHex((uint64_t)&IDT)
+	serialPrint("\n")
 	serialPrintf("[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, IDT_SIZE,
-				 sizeof(IdtEntry));
-	serialPrintln("[cpu] loading IDTR");
+				 sizeof(IdtEntry))
+	serialPrintln("[cpu] loading IDTR")
 	// Before you implement the IDT, make sure you have a working GDT
-	remapPic(0x20, 0x28);
-	serialPrintln("[cpu] calling lidtq");
-	loadIdt(&cacheIdtr);
+	remapPic(0x20, 0x28)
+	serialPrintln("[cpu] calling lidtq")
+	loadIdt(&cacheIdtr)
 
-	serialPrintln("[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL");
-	enterKernelMode();
+	serialPrintln("[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL")
+	enterKernelMode()
 
 	// Set PIT frequency
 	// Valid values: 57 Hz, 121 Hz, 173 Hz
 	// Next valid: `i = 174; while (Math.round(1193181 / i) != (1193181 / i)) {i++;}; console.log(i)`
-	writePort(0x43, 0x36);
-	let frequency = 1193181 / 121;
-	writePort(0x40, frequency & 0xFF);
-	writePort(0x40, (frequency >> 8) & 0xFF);
+	writePort(0x43, 0x36)
+	let frequency = 1193181 / 121
+	writePort(0x40, frequency & 0xFF)
+	writePort(0x40, (frequency >> 8) & 0xFF)
 
 	// Unmasking IRQ to support all the things
 	// but NOT keyboard
-	writePort(IRQ1, 0x00 | 0b00000010);
+	writePort(IRQ1, 0x00 | 0b00000010)
 	// 0xFA - timer
 	// 0xFC - timer and kb
 	// 0xFD - kb
@@ -823,79 +823,79 @@ fun enableInterrupts() {
 }
 
 fun enablePS2Mouse() {
-	serialPrintln("[cpu] begin: setting PS/2 mouse");
-	UInt8 _status;
+	serialPrintln("[cpu] begin: setting PS/2 mouse")
+	UInt8 _status
 	// Enable the auxiliary mouse device
-	mouseWait(1);
-	writePort(PS2_CONTROL_PORT, 0xA8);
+	mouseWait(1)
+	writePort(PS2_CONTROL_PORT, 0xA8)
 
 	/*
 
-	IOWriteB(PS2_CONTROL_PORT, 0x20);
-	ControllerConfig = IOReadB(PS2_DATA_PORT);
-	ControllerConfig |=  0x02; // Turn on IRQ12
-	ControllerConfig &= ~0x20; // Enable mouse clock line
-	IOWriteB(PS2_CONTROL_PORT, 0x60);
+	IOWriteB(PS2_CONTROL_PORT, 0x20)
+	ControllerConfig = IOReadB(PS2_DATA_PORT)
+	ControllerConfig |=  0x02 // Turn on IRQ12
+	ControllerConfig &= ~0x20 // Enable mouse clock line
+	IOWriteB(PS2_CONTROL_PORT, 0x60)
 
 	*/
 
 	// Enable the interrupts
-	mouseWait(1);
-	writePort(PS2_CONTROL_PORT, 0x20);
-	mouseWait(0);
-	_status = (readPort(PS2_DATA_PORT) | 2); // Turn on IRQ12
-	//_status &= ~0x20; // Enable mouse clock line
-	mouseWait(1);
-	writePort(PS2_CONTROL_PORT, 0x60);
-	mouseWait(1);
-	writePort(PS2_DATA_PORT, _status);
+	mouseWait(1)
+	writePort(PS2_CONTROL_PORT, 0x20)
+	mouseWait(0)
+	_status = (readPort(PS2_DATA_PORT) | 2) // Turn on IRQ12
+	//_status &= ~0x20 // Enable mouse clock line
+	mouseWait(1)
+	writePort(PS2_CONTROL_PORT, 0x60)
+	mouseWait(1)
+	writePort(PS2_DATA_PORT, _status)
 	// Tell the mouse to use default settings
-	mouseWrite(0xF6);
-	mouseRead(); // Acknowledge
+	mouseWrite(0xF6)
+	mouseRead() // Acknowledge
 	// Enable the mouse
-	mouseWrite(0xF4);
-	mouseRead(); // Acknowledge
+	mouseWrite(0xF4)
+	mouseRead() // Acknowledge
 	// Setup the mouse handler
-	// irq_install_handler(12, mouseHandler);
-	serialPrintln("[cpu] done: setting PS/2 mouse");
-	fun quakePrintf(const wchar_t *c, ...);
-	quakePrintf("Enabled PS/2 mouse and keyboard\n");
+	// irq_install_handler(12, mouseHandler)
+	serialPrintln("[cpu] done: setting PS/2 mouse")
+	fun quakePrintf(const wchar_t *c, ...)
+	quakePrintf("Enabled PS/2 mouse and keyboard\n")
 }
 
 fun mouseWait(@volatile UInt8 aType) {
-	@volatile UInt32 _timeOut = 1000000;
+	@volatile UInt32 _timeOut = 1000000
 	if (aType == 0) {
 		while (_timeOut--) // Data
 		{
 			if ((readPort(PS2_CONTROL_PORT) & 1) == 1) {
-				return;
+				return
 			}
 		}
-		return;
+		return
 	} else {
 		while (_timeOut--) // Signal
 		{
 			if ((readPort(PS2_CONTROL_PORT) & 2) == 0) {
-				return;
+				return
 			}
 		}
-		return;
+		return
 	}
 }
 
 fun mouseWrite(@volatile UInt8 aWrite) {
 	// Wait to be able to send a command
-	mouseWait(1);
+	mouseWait(1)
 	// Tell the mouse we are sending a command
-	writePort(PS2_CONTROL_PORT, 0xD4);
+	writePort(PS2_CONTROL_PORT, 0xD4)
 	// Wait for the final part
-	mouseWait(1);
+	mouseWait(1)
 	// Finally write
-	writePort(PS2_DATA_PORT, aWrite);
+	writePort(PS2_DATA_PORT, aWrite)
 }
 
 UInt8 mouseRead() {
 	// Get's response from mouse
-	mouseWait(0);
-	return readPort(PS2_DATA_PORT);
+	mouseWait(0)
+	return readPort(PS2_DATA_PORT)
 }

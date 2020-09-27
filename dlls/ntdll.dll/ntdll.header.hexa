@@ -22,5 +22,5 @@
 
 // TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
 extern "C" {
-NTDLL32_DLL UInt64 KiFastSystemCall(UInt64 rcx, UInt64 rdx);
+NTDLL32_DLL UInt64 KiFastSystemCall(UInt64 rcx, UInt64 rdx)
 }

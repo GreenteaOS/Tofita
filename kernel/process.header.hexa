@@ -20,33 +20,33 @@ namespace process {
 // so we don't have linked list of threads per process
 struct Process {
 	// Is process exists at all and fully initialized
-	@volatile Bool present;
+	@volatile Bool present
 	// TODO SoA
 
 	// Index
-	@volatile UInt64 pid;
+	@volatile UInt64 pid
 
 	// Is it allowed to make this process current
-	@volatile Bool schedulable;
+	@volatile Bool schedulable
 	// TODO combine booleans into bit/flag mask?
 
 	// Should be false after creation
-	@volatile Bool scheduleOnNextTick;
+	@volatile Bool scheduleOnNextTick
 
 	// CR3, should be page aligned
-	pages.PageEntry *@volatile pml4;
+	pages.PageEntry *@volatile pml4
 
 	// TODO 32-bit
 
 	// State
-	InterruptFrame frame;
+	InterruptFrame frame
 
 	// Filled on #PF
-	@volatile UInt64 cr2PageFaultAddress;
+	@volatile UInt64 cr2PageFaultAddress
 
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
-	@volatile TofitaSyscalls @volatile syscallToHandle; // = Noop if no actions required
+	@volatile TofitaSyscalls @volatile syscallToHandle // = Noop if no actions required
 													  // TODO do this on per-thread basis
 
 	// TODO separate syscall arguments, cause they differ in 32-bit
@@ -54,20 +54,20 @@ struct Process {
 	// oh probably
 
 	// Ring buffer
-	wapi.Msg *messages;
-	UInt64 messagesUsed;
-	Bool awaitsGetMessage;
+	wapi.Msg *messages
+	UInt64 messagesUsed
+	Bool awaitsGetMessage
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
-};
+}
 
-constexpr UInt64 ProcessLimit = 256;
+constexpr UInt64 ProcessLimit = 256
 
 // TODO dynamic allocation of this list
-Process processes[ProcessLimit] = {0};
+Process processes[ProcessLimit] = {0}
 
 // Working process pid, with restored state and active CR3
-@volatile UInt64 currentProcess = 0;
+@volatile UInt64 currentProcess = 0
 
-Bool postMessage(@volatile Process *process, PostMessagePayload *payload);
-Bool getMessage(@volatile Process *process, GetMessagePayload *payload);
+Bool postMessage(@volatile Process *process, PostMessagePayload *payload)
+Bool getMessage(@volatile Process *process, GetMessagePayload *payload)
 } // namespace process

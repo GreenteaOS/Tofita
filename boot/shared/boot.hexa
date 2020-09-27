@@ -17,10 +17,10 @@
 
 // Code Hexa-style for easier porting
 
-constexpr auto null = nullptr;
+constexpr auto null = nullptr
 #define let const auto
 #define var auto
-typedef void fun;
+typedef Void fun
 #define UInt64 uint64_t
 #define Int64 int64_t
 #define UInt32 uint32_t
@@ -31,8 +31,8 @@ typedef void fun;
 #define Pointer(to) to *
 
 // wchar_t is UTF-16LE with -fshort-wchar
-_Static_assert(sizeof(wchar_t) == 2, "bad sizeof");
-_Static_assert(sizeof(char16_t) == 2, "bad sizeof");
+_Static_assert(sizeof(wchar_t) == 2, "bad sizeof")
+_Static_assert(sizeof(char16_t) == 2, "bad sizeof")
 
 // Use uint64_t, int32_t, char8_t, etc
 
@@ -64,73 +64,73 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof");
 // Helpers
 
 extern "C++" template <typename T> struct Physical {
-	UInt64 physical;
+	UInt64 physical
 
 	static Physical<T> toPhysical(UInt64 physical) {
-		return (Physical<T>)physical;
-	};
+		return (Physical<T>)physical
+	}
 
 	T *toVirtual() const {
-		UInt64 result = (uint64_t)WholePhysicalStart + physical;
-		return (T *)result;
-	};
+		UInt64 result = (uint64_t)WholePhysicalStart + physical
+		return (T *)result
+	}
 
 	T *toVirtualOffset(UInt64 offset) const {
-		UInt64 result = (uint64_t)WholePhysicalStart + physical + offset;
-		return (T *)result;
-	};
-};
+		UInt64 result = (uint64_t)WholePhysicalStart + physical + offset
+		return (T *)result
+	}
+}
 
-_Static_assert(sizeof(Physical<char8_t>) == sizeof(uint64_t), "physical address has to have 64 bits");
+_Static_assert(sizeof(Physical<char8_t>) == sizeof(uint64_t), "physical address has to have 64 bits")
 
 // Data transferred from UEFI application into kernel loader
 
 struct EfiMemoryMap {
-	efi.EFI_MEMORY_DESCRIPTOR *memoryMap;
-	UInt64 memoryMapSize;
-	UInt64 mapKey;
-	UInt64 descriptorSize;
-	UInt32 descriptorVersion;
-};
+	efi.EFI_MEMORY_DESCRIPTOR *memoryMap
+	UInt64 memoryMapSize
+	UInt64 mapKey
+	UInt64 descriptorSize
+	UInt32 descriptorVersion
+}
 
 struct Framebuffer {
 	UInt64 base;	   // virtual address
-	UInt64 physical; // physical address
+	UInt64 physical // physical address
 	UInt32 size;	   // in bytes
-	UInt32 width;
-	UInt32 height;
-	UInt32 pixelsPerScanLine;
-};
+	UInt32 width
+	UInt32 height
+	UInt32 pixelsPerScanLine
+}
 
 struct RamDisk {
 	UInt64 base;	   // virtual address
-	UInt64 physical; // physical address
+	UInt64 physical // physical address
 	UInt32 size;	   // in bytes
-};
+}
 
 struct KernelParams {
-	UInt64 pml4;
-	UInt64 stack;
-	UInt64 physicalBuffer; // physical address of where kernel loader placed
-	UInt64 physicalBytes;
-	UInt64 physicalRamBitMaskVirtual; // virtual address of where RAM usage
+	UInt64 pml4
+	UInt64 stack
+	UInt64 physicalBuffer // physical address of where kernel loader placed
+	UInt64 physicalBytes
+	UInt64 physicalRamBitMaskVirtual // virtual address of where RAM usage
 										// bit-map stored
-	efi.EFI_HANDLE imageHandle;
-	EfiMemoryMap efiMemoryMap;
-	efi.EFI_RUNTIME_SERVICES *efiRuntimeServices = null;
-	Framebuffer framebuffer;
-	RamDisk ramdisk;
-	UInt64 acpiTablePhysical;
-	UInt64 ramBytes;
+	efi.EFI_HANDLE imageHandle
+	EfiMemoryMap efiMemoryMap
+	efi.EFI_RUNTIME_SERVICES *efiRuntimeServices = null
+	Framebuffer framebuffer
+	RamDisk ramdisk
+	UInt64 acpiTablePhysical
+	UInt64 ramBytes
 
-	efi.EFI_TIME time;
-	efi.EFI_TIME_CAPABILITIES capabilities;
+	efi.EFI_TIME time
+	efi.EFI_TIME_CAPABILITIES capabilities
 	// UInt8 isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and
 	// don't allow to login! in the sense that it looks like a security hole
 	// like "let it in without entering a login-password")
-};
+}
 
-typedef fun(__fastcall *InitKernel)(const KernelParams *);
+typedef fun(__fastcall *InitKernel)(const KernelParams *)
 // TODO ^ fix that in quake
 typedef fun(__fastcall *InitKernelTrampoline)(UInt64 kernelParams, UInt64 pml4, UInt64 stack,
-												   UInt64 entry);
+												   UInt64 entry)

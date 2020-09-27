@@ -14,96 +14,96 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // trampoline.asm . incbin
-extern const UInt8 binFont[];
-extern const UInt8 binFontBitmap[];
-const UInt32 fontWidth = 512;
-const UInt32 fontHeight = 32;
+extern const UInt8 binFont[]
+extern const UInt8 binFontBitmap[]
+const UInt32 fontWidth = 512
+const UInt32 fontHeight = 32
 
-extern const UInt8 binLeavesBitmap[];
-const UInt32 leavesWidth = 36;
-const UInt32 leavesHeight = 25;
+extern const UInt8 binLeavesBitmap[]
+const UInt32 leavesWidth = 36
+const UInt32 leavesHeight = 25
 
-int64_t _fltused = 0;
+int64_t _fltused = 0
 
 fun drawPixel(Framebuffer *framebuffer, UInt32 x, UInt32 y, UInt32 color) {
-	UInt32 *pixels = (UInt32 *)framebuffer.base;
-	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color;
+	UInt32 *pixels = (UInt32 *)framebuffer.base
+	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
 
 struct UefiPixel {
-	UInt8 b;
-	UInt8 g;
-	UInt8 r;
-	UInt8 a;
-} __attribute__((packed));
+	UInt8 b
+	UInt8 g
+	UInt8 r
+	UInt8 a
+} __attribute__((packed))
 
-_Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit");
+_Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit")
 
 UInt32 getBitmapPixel(const UInt8 *bmp, UInt32 x, UInt32 y, UInt32 width, UInt32 height) {
-	let colors = bmp + 54;
-	UefiPixel pixel;
-	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0];
-	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1];
-	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2];
-	pixel.a = 0xFF;
-	UInt32 *color = (UInt32 *)&pixel;
-	return *color;
+	let colors = bmp + 54
+	UefiPixel pixel
+	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0]
+	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1]
+	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2]
+	pixel.a = 0xFF
+	UInt32 *color = (UInt32 *)&pixel
+	return *color
 }
 
 #pragma pack(1)
 struct TextFontList {
-	UInt16 x;
-	UInt16 y;
-	double width;
-} __attribute__((packed));
+	UInt16 x
+	UInt16 y
+	double width
+} __attribute__((packed))
 #pragma pack()
 
-_Static_assert(sizeof(TextFontList) == 12, "TextFontList has to be 12 byte");
+_Static_assert(sizeof(TextFontList) == 12, "TextFontList has to be 12 byte")
 
-TextFontList *textFontList = null;
+TextFontList *textFontList = null
 
 fun initText() {
-	textFontList = (TextFontList *)binFont;
+	textFontList = (TextFontList *)binFont
 }
 
 double getCharAdvance(const char8_t c) {
-	TextFontList textChar = textFontList[(uint64_t)c];
-	return textChar.width;
+	TextFontList textChar = textFontList[(uint64_t)c]
+	return textChar.width
 }
 
 double drawChar(const char8_t c, double x, int16_t y, Framebuffer *framebuffer) {
-	TextFontList textChar = textFontList[(uint64_t)c];
+	TextFontList textChar = textFontList[(uint64_t)c]
 
-	int16_t xx = (int32_t)(x + 0.5);
-	UInt16 w = (int32_t)(textChar.width + 0.5);
+	int16_t xx = (int32_t)(x + 0.5)
+	UInt16 w = (int32_t)(textChar.width + 0.5)
 
 	for (UInt16 yi = 0; yi < 12; yi++)
 		for (UInt16 xi = 0; xi < w; xi++) {
-			const UInt32 atx = xx + xi;
-			const UInt32 aty = y + yi;
+			const UInt32 atx = xx + xi
+			const UInt32 aty = y + yi
 
-			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight);
+			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight)
 
-			drawPixel(framebuffer, atx, aty, font);
+			drawPixel(framebuffer, atx, aty, font)
 		}
 
-	return textChar.width;
+	return textChar.width
 }
 
 fun drawText(const wchar_t *text, int16_t y, Framebuffer *framebuffer) {
-	UInt16 i = 0;
+	UInt16 i = 0
 
 	// Get width to center text on screen
-	double width = 0;
+	double width = 0
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
-		width += getCharAdvance((uint16_t)text[i] & 0xFF);
-		i++;
+		width += getCharAdvance((uint16_t)text[i] & 0xFF)
+		i++
 	}
-	double xx = framebuffer.width / 2 - width / 2;
+	double xx = framebuffer.width / 2 - width / 2
 
-	i = 0;
+	i = 0
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
-		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, framebuffer);
-		i++;
+		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, framebuffer)
+		i++
 	}
 }

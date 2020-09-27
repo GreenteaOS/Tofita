@@ -16,188 +16,188 @@
 // Simple bitmap font drawing
 // Non-monospace
 
-Bitmap32 *textFontBitmap;
-extern Pixel32 *_pixels;
+Bitmap32 *textFontBitmap
+extern Pixel32 *_pixels
 
 typedef struct {
-	UInt16 x;
-	UInt16 y;
-	double width;
-} __attribute__((packed)) TextFontList;
+	UInt16 x
+	UInt16 y
+	double width
+} __attribute__((packed)) TextFontList
 
-TextFontList *textFontList = null;
+TextFontList *textFontList = null
 
 fun initText() {
-	RamDiskAsset textFont = getRamDiskAsset("ascii.tofita");
-	textFontList = (TextFontList *)textFont.data;
+	RamDiskAsset textFont = getRamDiskAsset("ascii.tofita")
+	textFontList = (TextFontList *)textFont.data
 
-	Bitmap32 *loadPng32(const RamDiskAsset *asset);
-	RamDiskAsset a = getRamDiskAsset("root/Windows/Fonts/default.png");
-	textFontBitmap = loadPng32(&a);
+	Bitmap32 *loadPng32(const RamDiskAsset *asset)
+	RamDiskAsset a = getRamDiskAsset("root/Windows/Fonts/default.png")
+	textFontBitmap = loadPng32(&a)
 }
 
 int8_t getLigatureAdvance(const char8_t left, const char8_t right) {
 	if (left == 0)
-		return 0;
+		return 0
 	if (right == 0)
-		return 0;
-	return 8;
+		return 0
+	return 8
 }
 
 double getCharAdvance(const char8_t c) {
 	if (textFontList == null)
-		return 8;
-	TextFontList textChar = textFontList[(uint64_t)c];
-	return textChar.width;
+		return 8
+	TextFontList textChar = textFontList[(uint64_t)c]
+	return textChar.width
 }
 
 UInt16 getTextAdvance(const char8_t *text) {
-	UInt16 i = 0;
-	double xx = 0;
+	UInt16 i = 0
+	double xx = 0
 	while (text[i] != 0 && i < 255 * 255) {
-		xx += textFontList[text[i]].width;
-		i++;
+		xx += textFontList[text[i]].width
+		i++
 	}
-	return xx;
+	return xx
 }
 
 double drawChar(const char8_t c, double x, int16_t y, Pixel32 color) {
-	TextFontList textChar = textFontList[(uint64_t)c];
+	TextFontList textChar = textFontList[(uint64_t)c]
 
-	int16_t xx = (int32_t)(x + 0.5);
-	UInt8 w = (int32_t)(textChar.width + 0.5);
+	int16_t xx = (int32_t)(x + 0.5)
+	UInt8 w = (int32_t)(textChar.width + 0.5)
 
 	for (UInt8 yi = 0; yi < 12; yi++)
 		for (UInt8 xi = 0; xi < w; xi++) {
-			const Int32 atx = xx + xi;
-			const Int32 aty = y + yi;
+			const Int32 atx = xx + xi
+			const Int32 aty = y + yi
 
 			if (atx >= _framebuffer.width)
-				continue;
+				continue
 			if (atx < 0)
-				continue;
+				continue
 
 			if (aty >= _framebuffer.height)
-				continue;
+				continue
 			if (aty < 0)
-				continue;
+				continue
 
 			Pixel32 font =
-				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)];
+				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)]
 
-			Pixel32 p = _pixels[aty * _framebuffer.width + atx];
-			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r);
-			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g);
-			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b);
-			_pixels[aty * _framebuffer.width + atx] = p;
+			Pixel32 p = _pixels[aty * _framebuffer.width + atx]
+			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r)
+			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g)
+			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b)
+			_pixels[aty * _framebuffer.width + atx] = p
 		}
 
-	return textChar.width;
+	return textChar.width
 }
 
 double drawAlphaChar(const char8_t c, double x, int16_t y, Pixel32 color) {
-	TextFontList textChar = textFontList[(uint64_t)c];
+	TextFontList textChar = textFontList[(uint64_t)c]
 
-	int16_t xx = (int16_t)(x + 0.5);
-	UInt8 w = (uint8_t)(textChar.width + 0.5);
+	int16_t xx = (int16_t)(x + 0.5)
+	UInt8 w = (uint8_t)(textChar.width + 0.5)
 
 	for (UInt8 yi = 0; yi < 12; yi++)
 		for (UInt8 xi = 0; xi < w; xi++) {
-			const int16_t atx = (int16_t)xx + (int16_t)xi;
-			const int16_t aty = (int16_t)y + (int16_t)yi;
+			const int16_t atx = (int16_t)xx + (int16_t)xi
+			const int16_t aty = (int16_t)y + (int16_t)yi
 
 			if (atx >= _framebuffer.width)
-				continue;
+				continue
 			if (atx < 0)
-				continue;
+				continue
 
 			if (aty >= _framebuffer.height)
-				continue;
+				continue
 			if (aty < 0)
-				continue;
+				continue
 
 			Pixel32 font =
-				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)];
+				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)]
 
-			Pixel32 p = _pixels[aty * _framebuffer.width + atx];
-			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r);
-			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g);
-			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b);
+			Pixel32 p = _pixels[aty * _framebuffer.width + atx]
+			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r)
+			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g)
+			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b)
 
 			// Grayscale
 			// TODO probably just blend color.rgb all with p.g?
-			UInt16 sum = (uint16_t)p.rgba.r + (uint16_t)p.rgba.g + (uint16_t)p.rgba.b;
-			sum = sum * 0.33;
+			UInt16 sum = (uint16_t)p.rgba.r + (uint16_t)p.rgba.g + (uint16_t)p.rgba.b
+			sum = sum * 0.33
 
-			p.rgba.r = sum;
-			p.rgba.g = sum;
-			p.rgba.b = sum;
+			p.rgba.r = sum
+			p.rgba.g = sum
+			p.rgba.b = sum
 
-			p.rgba.a = color.rgba.a;
-			blendPixel(atx, aty, p);
+			p.rgba.a = color.rgba.a
+			blendPixel(atx, aty, p)
 		}
 
-	return textChar.width;
+	return textChar.width
 }
 
 /// Returns advance after last character
 UInt16 drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color) {
-	UInt16 i = 0;
-	double xx = x;
+	UInt16 i = 0
+	double xx = x
 	while (text[i] != 0 && i < 255 * 255) {
-		xx += drawChar(text[i], xx, y, color);
-		i++;
+		xx += drawChar(text[i], xx, y, color)
+		i++
 	}
-	return xx - x;
+	return xx - x
 }
 
 /// Returns advance after last character
 UInt16 drawText(const wchar_t *text, double x, int16_t y, Pixel32 color) {
-	UInt16 i = 0;
-	double xx = x;
+	UInt16 i = 0
+	double xx = x
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
-		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, color);
-		i++;
+		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, color)
+		i++
 	}
-	return xx - x;
+	return xx - x
 }
 
 UInt16 drawIntegerText(int64_t value, double x, int16_t y, Pixel32 color) {
-	double xx = x;
+	double xx = x
 	if (value < 0) {
-		xx += drawAsciiText(u8"-", xx, y, color);
-		value = -value;
+		xx += drawAsciiText(u8"-", xx, y, color)
+		value = -value
 	}
-	const char8_t *digits[] = {u8"0", u8"1", u8"2", u8"3", u8"4", u8"5", u8"6", u8"7", u8"8", u8"9"};
-	const char8_t *chars[24] = {0};
-	UInt8 count = 0;
+	const char8_t *digits[] = {u8"0", u8"1", u8"2", u8"3", u8"4", u8"5", u8"6", u8"7", u8"8", u8"9"}
+	const char8_t *chars[24] = {0}
+	UInt8 count = 0
 	do {
-		chars[23 - count] = digits[value % 10];
-		value = (int64_t)(value / 10);
-		count++;
-	} while (value > 0);
+		chars[23 - count] = digits[value % 10]
+		value = (int64_t)(value / 10)
+		count++
+	} while (value > 0)
 	for (UInt8 i = 0; i < 24; ++i) {
 		if (chars[i] != 0)
-			xx += drawAsciiText(chars[i], xx, y, color);
+			xx += drawAsciiText(chars[i], xx, y, color)
 	}
-	return xx - x;
+	return xx - x
 }
 
 fun drawShadowText(const char8_t *text, double x, int16_t y) {
-	UInt16 i = 0;
-	double xx = x;
-	Pixel32 color;
-	color.color = 0x00000000;
-	color.rgba.a = 70;
+	UInt16 i = 0
+	double xx = x
+	Pixel32 color
+	color.color = 0x00000000
+	color.rgba.a = 70
 	while (text[i] != 0 && i < 255 * 255) {
-		char8_t ch = text[i];
+		char8_t ch = text[i]
 
-		drawAlphaChar(ch, xx + 1, y + 1, color);
-		drawAlphaChar(ch, xx + 1, y + 2, color);
+		drawAlphaChar(ch, xx + 1, y + 1, color)
+		drawAlphaChar(ch, xx + 1, y + 2, color)
 
-		drawAlphaChar(ch, xx - 1, y + 1, color);
-		xx += drawAlphaChar(ch, xx - 1, y + 2, color);
+		drawAlphaChar(ch, xx - 1, y + 1, color)
+		xx += drawAlphaChar(ch, xx - 1, y + 2, color)
 
-		i++;
+		i++
 	}
 }

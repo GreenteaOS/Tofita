@@ -14,29 +14,29 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 typedef struct {
-	UInt8 r;
-	UInt8 g;
-	UInt8 b;
-	UInt8 a;
-} __attribute__((packed)) PixelRGBAData;
+	UInt8 r
+	UInt8 g
+	UInt8 b
+	UInt8 a
+} __attribute__((packed)) PixelRGBAData
 
 struct Pixel32 {
 	union {
-		PixelRGBAData rgba;
-		UInt32 color;
-	};
-};
+		PixelRGBAData rgba
+		UInt32 color
+	}
+}
 
-_Static_assert(sizeof(Pixel32) == 4, "bad sizeof");
+_Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 
 struct Bitmap32Interim {
-	UInt16 width;
-	UInt16 height;
-	Pixel32 pixels[];
-};
+	UInt16 width
+	UInt16 height
+	Pixel32 pixels[]
+}
 
 struct Bitmap32 {
-	const UInt16 width;
-	const UInt16 height;
-	Pixel32 pixels[];
-};
+	const UInt16 width
+	const UInt16 height
+	Pixel32 pixels[]
+}

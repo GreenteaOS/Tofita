@@ -22,59 +22,59 @@
 #define abs libc_abs
 #define pow libc_pow
 
-fun libc_free(void *addr) {
+fun libc_free(Void *addr) {
 	// Do nothing for now
-	serialPrintf("[libc] libc_free\n");
+	serialPrintf("[libc] libc_free\n")
 }
 
-void *libc_malloc(UInt64 size) {
-	serialPrintf("[libc] libc_malloc of size %u\n", size);
-	return (void *)PhysicalAllocator.allocateBytes(size);
+Void *libc_malloc(UInt64 size) {
+	serialPrintf("[libc] libc_malloc of size %u\n", size)
+	return (Void *)PhysicalAllocator.allocateBytes(size)
 }
 
-void *libc_realloc(void *addr, UInt64 size) {
-	serialPrintf("[libc] libc_realloc %u of size %u\n", addr, size);
+Void *libc_realloc(Void *addr, UInt64 size) {
+	serialPrintf("[libc] libc_realloc %u of size %u\n", addr, size)
 
 	{
-		var result = PhysicalAllocator.allocateBytes(size);
-		return (void *)result;
+		var result = PhysicalAllocator.allocateBytes(size)
+		return (Void *)result
 	}
 }
 
-void *libc_memset(void *b, Int32 c, Int32 len) {
-	Int32 i;
-	UInt8 *p = (UInt8 *)b;
-	i = 0;
+Void *libc_memset(Void *b, Int32 c, Int32 len) {
+	Int32 i
+	UInt8 *p = (UInt8 *)b
+	i = 0
 	while (len > 0) {
-		*p = c;
-		p++;
-		len--;
+		*p = c
+		p++
+		len--
 	}
-	return (b);
+	return (b)
 }
 
 Int32 libc_abs(Int32 v) {
-	return v * ((v < 0) * (-1) + (v > 0));
+	return v * ((v < 0) * (-1) + (v > 0))
 }
 
 Int32 libc_pow(Int32 a, Int32 n) {
-	Int32 r = 1;
+	Int32 r = 1
 	while (n > 0) {
 		if (n & 1)
-			r *= a;
-		a *= a;
-		n >>= 1;
+			r *= a
+		a *= a
+		n >>= 1
 	}
-	return r;
+	return r
 }
 
-fun libc_memcpy(void *dest, const void *src, UInt64 n) {
-	const UInt8 *csrc = (UInt8 *)src;
-	UInt8 *cdest = (UInt8 *)dest;
+fun libc_memcpy(Void *dest, const Void *src, UInt64 n) {
+	const UInt8 *csrc = (UInt8 *)src
+	UInt8 *cdest = (UInt8 *)dest
 	for (Int32 i = 0; i < n; i++)
-		cdest[i] = csrc[i];
+		cdest[i] = csrc[i]
 }
 
-fun memcpy(void *dest, const void *src, UInt64 n) {
-	libc_memcpy(dest, src, n);
+fun memcpy(Void *dest, const Void *src, UInt64 n) {
+	libc_memcpy(dest, src, n)
 }

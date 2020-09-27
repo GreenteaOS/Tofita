@@ -18,22 +18,22 @@
 namespace amd64 {
 inline fun cpuid(UInt32 leaf, UInt32 subleaf, UInt32 *eax, UInt32 *ebx, UInt32 *ecx,
 					  UInt32 *edx) {
-	UInt32 a, b, c, d;
-	asm volatile("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf));
-	*eax = a;
-	*ebx = b;
-	*ecx = c;
-	*edx = d;
+	UInt32 a, b, c, d
+	asm volatile("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf))
+	*eax = a
+	*ebx = b
+	*ecx = c
+	*edx = d
 }
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
-fun writeCr3(UInt64 value);
+fun writeCr3(UInt64 value)
 // TODO asm("invd")
-fun halt();
-fun enableAllInterrupts();
+fun halt()
+fun enableAllInterrupts()
 // Except non-mascable
-fun disableAllInterrupts();
-fun enableAllInterruptsAndHalt();
-fun pause();
-fun yield();
+fun disableAllInterrupts()
+fun enableAllInterruptsAndHalt()
+fun pause()
+fun yield()
 } // namespace amd64

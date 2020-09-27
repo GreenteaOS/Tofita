@@ -16,32 +16,32 @@
 namespace user32 {
 struct ClassesLinkedList {
 	// TODO char16_t
-	const UInt16 *name = nullptr;
-	wapi.WindowClass wc;
-	ClassesLinkedList *next = nullptr;
-};
+	const UInt16 *name = nullptr
+	wapi.WindowClass wc
+	ClassesLinkedList *next = nullptr
+}
 
-ClassesLinkedList rootClass;
+ClassesLinkedList rootClass
 
 // TODO some HandleWrapper with handle type field?
-constexpr UInt16 windowIsWindow = 0xA1CE;
+constexpr UInt16 windowIsWindow = 0xA1CE
 
 struct Window {
-	UInt16 windowIsWindow;
-	UInt64 windowId;
-	// TODO Bool isNativeWindow;
-	wapi.WindowProcedure proc;
-	nj.WindowFramebuffer fb;
-	UInt64 instanceId; // Random unique ID
-};
+	UInt16 windowIsWindow
+	UInt64 windowId
+	// TODO Bool isNativeWindow
+	wapi.WindowProcedure proc
+	nj.WindowFramebuffer fb
+	UInt64 instanceId // Random unique ID
+}
 
-constexpr UInt16 windowIsRemoteWindow = 0xA1CB;
+constexpr UInt16 windowIsRemoteWindow = 0xA1CB
 
 // Window of other process
 struct RemoteWindow {
-	UInt16 windowIsRemoteWindow;
-	UInt64 pid;
-	wapi.HWnd hWnd;
-	UInt64 instanceId; // Random unique ID
-};
+	UInt16 windowIsRemoteWindow
+	UInt64 pid
+	wapi.HWnd hWnd
+	UInt64 instanceId // Random unique ID
+}
 } // namespace user32

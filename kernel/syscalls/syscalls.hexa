@@ -18,9 +18,9 @@
 #define USER_SYSCALLS 123000
 
 // wchar_t is UTF-16LE with -fshort-wchar
-_Static_assert(sizeof(wchar_t) == 2, "bad sizeof");
+_Static_assert(sizeof(wchar_t) == 2, "bad sizeof")
 
-enum class TofitaSyscalls : UInt64 {
+enum TofitaSyscalls : UInt64 {
 	// System
 	Noop = 0,
 	Cpu = 1,
@@ -34,67 +34,67 @@ enum class TofitaSyscalls : UInt64 {
 	GetOrCreateWindowFramebuffer,
 	SwapWindowFramebuffer,
 	ExitProcess
-};
+}
 
 struct DebugLogPayload {
-	const wchar_t *message;
+	const wchar_t *message
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	UInt64 extra = 0;
-	UInt64 more = 0;
-};
+	UInt64 extra = 0
+	UInt64 more = 0
+}
 
-_Static_assert(sizeof(DebugLogPayload) == 8 * 3, "bad sizeof");
+_Static_assert(sizeof(DebugLogPayload) == 8 * 3, "bad sizeof")
 
 struct SwapWindowFramebufferPayload {
-	UInt64 windowId;
-	nj.WindowFramebuffer *fb;
-};
+	UInt64 windowId
+	nj.WindowFramebuffer *fb
+}
 
-_Static_assert(sizeof(SwapWindowFramebufferPayload) == 8 * 2, "bad sizeof");
+_Static_assert(sizeof(SwapWindowFramebufferPayload) == 8 * 2, "bad sizeof")
 
 struct ShowWindowPayload {
-	Int32 nCmdShow;
-	UInt64 windowId;
-};
+	Int32 nCmdShow
+	UInt64 windowId
+}
 
-_Static_assert(sizeof(ShowWindowPayload) == 8 * 2, "bad sizeof");
+_Static_assert(sizeof(ShowWindowPayload) == 8 * 2, "bad sizeof")
 
 // TODO use pointer wrappers instead of raw pointers
 struct CreateWindowExPayload {
-	const wapi.WindowClass *wc;
-	wapi.HWnd hWnd;
+	const wapi.WindowClass *wc
+	wapi.HWnd hWnd
 
 	// CreateWindowEx
-	const wchar_t *lpClassName;
+	const wchar_t *lpClassName
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	const wchar_t *lpWindowName;
-	UInt32 dwStyle;
-	Int32 x;
-	Int32 y;
-	Int32 nWidth;
-	Int32 nHeight;
-	wapi.HWnd hWndParent;
-	wapi.HMenu hMenu;
-	wapi.HInstance hInstance;
-	void *lpParam;
-};
+	const wchar_t *lpWindowName
+	UInt32 dwStyle
+	Int32 x
+	Int32 y
+	Int32 nWidth
+	Int32 nHeight
+	wapi.HWnd hWndParent
+	wapi.HMenu hMenu
+	wapi.HInstance hInstance
+	Void *lpParam
+}
 
-_Static_assert(sizeof(CreateWindowExPayload) == 8 * 8 + 5 * 4 + 4, "bad sizeof");
+_Static_assert(sizeof(CreateWindowExPayload) == 8 * 8 + 5 * 4 + 4, "bad sizeof")
 
 struct PostMessagePayload {
-	wapi.HWnd hWnd;
-	wapi.Message msg;
-	void *wParam;
-	void *lParam;
-};
+	wapi.HWnd hWnd
+	wapi.Message msg
+	Void *wParam
+	Void *lParam
+}
 
-_Static_assert(sizeof(PostMessagePayload) == 8 + 4 + 8 * 2 + 4, "bad sizeof");
+_Static_assert(sizeof(PostMessagePayload) == 8 + 4 + 8 * 2 + 4, "bad sizeof")
 
 struct GetMessagePayload {
-	wapi.Msg *msg;
-	wapi.HWnd hWnd;
-	UInt32 wMsgFilterMin;
-	UInt32 wMsgFilterMax;
-};
+	wapi.Msg *msg
+	wapi.HWnd hWnd
+	UInt32 wMsgFilterMin
+	UInt32 wMsgFilterMax
+}
 
-_Static_assert(sizeof(GetMessagePayload) == 8 * 2 + 4 * 2, "bad sizeof");
+_Static_assert(sizeof(GetMessagePayload) == 8 * 2 + 4 * 2, "bad sizeof")

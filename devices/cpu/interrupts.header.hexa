@@ -15,49 +15,49 @@
 
 struct InterruptFrame {
 	// SSE
-	@volatile UInt64 xmm[8 * 2];
+	@volatile UInt64 xmm[8 * 2]
 
-	@volatile UInt64 r15;
-	@volatile UInt64 r14;
-	@volatile UInt64 r13;
-	@volatile UInt64 r12;
-	@volatile UInt64 r11;
-	@volatile UInt64 r10;
-	@volatile UInt64 r9;
-	@volatile UInt64 r8;
+	@volatile UInt64 r15
+	@volatile UInt64 r14
+	@volatile UInt64 r13
+	@volatile UInt64 r12
+	@volatile UInt64 r11
+	@volatile UInt64 r10
+	@volatile UInt64 r9
+	@volatile UInt64 r8
 
 	// Note: ECX is RCX, EAX is RAX, etc in 32-bit mode
-	@volatile UInt64 rdi;
-	@volatile UInt64 rsi;
-	@volatile UInt64 rbp;
-	@volatile UInt64 rbx;
-	@volatile UInt64 rdxArg1;
-	@volatile UInt64 rcxArg0;
-	@volatile UInt64 raxReturn;
+	@volatile UInt64 rdi
+	@volatile UInt64 rsi
+	@volatile UInt64 rbp
+	@volatile UInt64 rbx
+	@volatile UInt64 rdxArg1
+	@volatile UInt64 rcxArg0
+	@volatile UInt64 raxReturn
 
 	// IRQ index
-	@volatile UInt64 index;
+	@volatile UInt64 index
 
 	// IRQ error code
-	@volatile UInt64 code;
+	@volatile UInt64 code
 
 	@volatile UInt64 ip;	 // Instruction pointer
 	@volatile UInt64 cs;	 // Code segment
-	@volatile UInt64 flags; // RFLAGS\EFLAGS (same on AMD64 and x86)
+	@volatile UInt64 flags // RFLAGS\EFLAGS (same on AMD64 and x86)
 	@volatile UInt64 sp;	 // Stack pointer
 	@volatile UInt64 ss;	 // Stack segment
-};
+}
 
-_Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect");
+_Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect")
 
 // Scheduling
-const UInt8 THREAD_INIT = 0; // kernelMain, it will be destroyed
-const UInt8 THREAD_GUI = 1;
-const UInt8 THREAD_KERNEL = 2;
-const UInt8 THREAD_USER = 3;
+const UInt8 THREAD_INIT = 0 // kernelMain, it will be destroyed
+const UInt8 THREAD_GUI = 1
+const UInt8 THREAD_KERNEL = 2
+const UInt8 THREAD_USER = 3
 
-@volatile UInt8 currentThread = THREAD_INIT;
+@volatile UInt8 currentThread = THREAD_INIT
 
-InterruptFrame kernelThreadFrame;
+InterruptFrame kernelThreadFrame
 
-fun switchToKernelThread(@volatile InterruptFrame *frame);
+fun switchToKernelThread(@volatile InterruptFrame *frame)

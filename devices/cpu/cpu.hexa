@@ -15,34 +15,34 @@
 
 // Bindings to the .asm
 
-fun enterKernelMode();
-fun selectSegment();
-fun enterUserMode();
-fun timerInterrupt();
-fun syscallInterrupt();
-fun yieldInterrupt();
-@volatile UInt64 getCr2();
-@volatile Bool sehReturnFalse();
+fun enterKernelMode()
+fun selectSegment()
+fun enterUserMode()
+fun timerInterrupt()
+fun syscallInterrupt()
+fun yieldInterrupt()
+@volatile UInt64 getCr2()
+@volatile Bool sehReturnFalse()
 
-fun cpu0x00();
-fun cpu0x01();
-fun cpu0x02();
-fun cpu0x03();
-fun cpu0x04();
-fun cpu0x05();
-fun cpu0x06();
-fun cpu0x07();
-fun cpu0x08();
-fun cpu0x09();
-fun cpu0x0A();
-fun cpu0x0B();
-fun cpu0x0C();
-fun cpu0x0D();
-fun cpu0x0E();
-fun cpu0x0F();
-fun cpu0x10();
-fun cpu0x11();
-fun cpu0x12();
-fun cpu0x13();
-fun cpu0x14();
-fun cpu0x15();
+fun cpu0x00()
+fun cpu0x01()
+fun cpu0x02()
+fun cpu0x03()
+fun cpu0x04()
+fun cpu0x05()
+fun cpu0x06()
+fun cpu0x07()
+fun cpu0x08()
+fun cpu0x09()
+fun cpu0x0A()
+fun cpu0x0B()
+fun cpu0x0C()
+fun cpu0x0D()
+fun cpu0x0E()
+fun cpu0x0F()
+fun cpu0x10()
+fun cpu0x11()
+fun cpu0x12()
+fun cpu0x13()
+fun cpu0x14()
+fun cpu0x15()

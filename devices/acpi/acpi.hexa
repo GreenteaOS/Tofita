@@ -23,266 +23,266 @@ namespace acpi {
 
 constexpr UInt32 byteswap(UInt32 x) {
 	return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) | ((x << 8) & 0x00ff0000) |
-		   ((x << 24) & 0xff000000);
+		   ((x << 24) & 0xff000000)
 }
 
 #define TABLE_HEADER(signature)                                                                              \
 	static const UInt32 typeId = byteswap(signature);                                                      \
-	AcpiTableHeader header;
+	AcpiTableHeader header
 
 struct AcpiTableHeader {
-	UInt32 type;
-	UInt32 length;
-	UInt8 revision;
-	UInt8 checksum;
-	char8_t oem_id[6];
-	char8_t oem_table[8];
-	UInt32 oem_revision;
-	UInt32 creator_id;
-	UInt32 creator_revision;
+	UInt32 type
+	UInt32 length
+	UInt8 revision
+	UInt8 checksum
+	char8_t oem_id[6]
+	char8_t oem_table[8]
+	UInt32 oem_revision
+	UInt32 creator_id
+	UInt32 creator_revision
 
-	Bool validate(UInt32 expectedType = 0) const;
-} __attribute__((packed));
+	Bool validate(UInt32 expectedType = 0) const
+} __attribute__((packed))
 
 Bool AcpiTableHeader.validate(UInt32 expectedType) const {
-	return !expectedType || (expectedType == type);
+	return !expectedType || (expectedType == type)
 }
 
 struct AcpiMcfgEntry {
-	UInt64 base;
-	UInt16 group;
-	UInt8 busStart;
-	UInt8 busEnd;
-	UInt32 reserved;
-} __attribute__((packed));
+	UInt64 base
+	UInt16 group
+	UInt8 busStart
+	UInt8 busEnd
+	UInt32 reserved
+} __attribute__((packed))
 
 struct AcpiMcfg {
-	TABLE_HEADER('MCFG');
-	UInt64 reserved;
-	AcpiMcfgEntry entries[0];
-} __attribute__((packed));
+	TABLE_HEADER('MCFG')
+	UInt64 reserved
+	AcpiMcfgEntry entries[0]
+} __attribute__((packed))
 
 struct AcpiApic {
-	TABLE_HEADER('APIC');
-	UInt32 localAddress;
-	UInt32 flags;
-	UInt8 controllerData[0];
-} __attribute__((packed));
+	TABLE_HEADER('APIC')
+	UInt32 localAddress
+	UInt32 flags
+	UInt8 controllerData[0]
+} __attribute__((packed))
 
 struct XSDT {
-	TABLE_HEADER('XSDT');
-	AcpiTableHeader *headers[0];
-} __attribute__((packed));
+	TABLE_HEADER('XSDT')
+	AcpiTableHeader *headers[0]
+} __attribute__((packed))
 
 struct Acpi20 {
-	UInt32 length;
-	Physical<XSDT> xsdtAddress;
-	UInt8 checksum;
-	UInt8 reserved[3];
-} __attribute__((packed));
+	UInt32 length
+	Physical<XSDT> xsdtAddress
+	UInt8 checksum
+	UInt8 reserved[3]
+} __attribute__((packed))
 
 struct Acpi10 {
-	char8_t signature[8];
-	UInt8 checksum;
-	char8_t oemID[6];
-	UInt8 revision;
-	UInt32 rsdtAddress;
-} __attribute__((packed));
+	char8_t signature[8]
+	UInt8 checksum
+	char8_t oemID[6]
+	UInt8 revision
+	UInt32 rsdtAddress
+} __attribute__((packed))
 
 struct ACPI {
-	Acpi10 acpi10;
-	Acpi20 acpi20;
-} __attribute__((packed));
+	Acpi10 acpi10
+	Acpi20 acpi20
+} __attribute__((packed))
 
 extern "C++" template <typename T> UInt64 acpiTableEntries(const T *t, UInt64 size) {
-	return (t.header.length - sizeof(T)) / size;
+	return (t.header.length - sizeof(T)) / size
 }
 
 extern "C++" template <typename T> Bool acpiValidate(const T *t) {
-	return t.header.validate(T.typeId);
+	return t.header.validate(T.typeId)
 }
 
-static void put_sig(char8_t *into, UInt32 type) {
+static Void put_sig(char8_t *into, UInt32 type) {
 	for (Int32 j = 0; j < 4; ++j)
-		into[j] = reinterpret_cast<char8_t *>(&type)[j];
+		into[j] = reinterpret_cast<char8_t *>(&type)[j]
 }
 
 extern "C++" template <typename T> inline T *offset_pointer(T *p, UInt64 n) {
-	return reinterpret_cast<T *>(reinterpret_cast<uint64_t>(p) + n);
+	return reinterpret_cast<T *>(reinterpret_cast<uint64_t>(p) + n)
 }
 
 static inline UInt16 busAddr(UInt8 bus, UInt8 device, UInt8 func) {
-	return bus << 8 | device << 3 | func;
+	return bus << 8 | device << 3 | func
 }
 
 struct PciGroup {
-	UInt16 group;
-	UInt16 busStart;
-	UInt16 busEnd;
-	UInt32 *base;
+	UInt16 group
+	UInt16 busStart
+	UInt16 busEnd
+	UInt32 *base
 
 	UInt32 *baseFor(UInt8 bus, UInt8 device, UInt8 func) {
-		return offset_pointer(base, busAddr(bus, device, func) << 12);
+		return offset_pointer(base, busAddr(bus, device, func) << 12)
 	}
 
 	Bool hasDevice(UInt8 bus, UInt8 device, UInt8 func) {
-		return (*baseFor(bus, device, func) & 0xffff) != 0xffff;
+		return (*baseFor(bus, device, func) & 0xffff) != 0xffff
 	}
-};
+}
 
 } // namespace acpi
 
 class ACPIParser {
   public
 	static Bool parse(UInt64 acpiVendorTable) {
-		serialPrint("[ACPI] parsing started at physical ");
-		serialPrintHex((uint64_t)(acpiVendorTable));
-		serialPrint("\n");
+		serialPrint("[ACPI] parsing started at physical ")
+		serialPrintHex((uint64_t)(acpiVendorTable))
+		serialPrint("\n")
 
 		if (acpiVendorTable == 0) {
-			serialPrintln("[ACPI] not present at all");
-			return false;
+			serialPrintln("[ACPI] not present at all")
+			return false
 		}
 
-		auto acpiTable = (const acpi.ACPI *)physicalToVirtual(acpiVendorTable);
+		auto acpiTable = (const acpi.ACPI *)physicalToVirtual(acpiVendorTable)
 
-		auto acpi10 = &acpiTable.acpi10;
+		auto acpi10 = &acpiTable.acpi10
 
-		serialPrint("[ACPI] signature is '");
+		serialPrint("[ACPI] signature is '")
 		for (Int32 i = 0; i < sizeof(acpi10.signature); i++)
-			putchar(acpi10.signature[i]);
-		serialPrint("'\n");
+			putchar(acpi10.signature[i])
+		serialPrint("'\n")
 
-		serialPrintf("[ACPI] revision is %d\n", acpi10.revision);
+		serialPrintf("[ACPI] revision is %d\n", acpi10.revision)
 
-		const char8_t signature[9] = u8"RSD PTR ";
+		const char8_t signature[9] = u8"RSD PTR "
 
 		for (Int32 i = 0; i < sizeof(acpi10.signature); i++)
 			if (acpi10.signature[i] != signature[i]) {
-				serialPrintln("[ACPI] RSDP table signature is incorrect");
-				return false;
+				serialPrintln("[ACPI] RSDP table signature is incorrect")
+				return false
 			}
 
-		UInt8 checksum = 0;
+		UInt8 checksum = 0
 		for (Int32 i = 0; i < sizeof(acpi.Acpi10); i++)
-			checksum += ((UInt8 *)acpi10)[i];
+			checksum += ((UInt8 *)acpi10)[i]
 		if (checksum != 0) {
-			serialPrintln("[ACPI] checksum ACPI 1.0 failed");
-			return false;
+			serialPrintln("[ACPI] checksum ACPI 1.0 failed")
+			return false
 		}
 
-		let acpi20data = (const acpi.Acpi20 *)(&acpiTable.acpi20);
-		let acpi20raw = (const UInt8 *)acpi20data;
-		checksum = 0;
+		let acpi20data = (const acpi.Acpi20 *)(&acpiTable.acpi20)
+		let acpi20raw = (const UInt8 *)acpi20data
+		checksum = 0
 		for (Int32 i = 0; i < sizeof(acpi.Acpi20); i++)
-			checksum += (acpi20raw)[i];
+			checksum += (acpi20raw)[i]
 		if (checksum != 0) {
-			serialPrintln("[ACPI] checksum ACPI 2.0 failed");
-			return false;
+			serialPrintln("[ACPI] checksum ACPI 2.0 failed")
+			return false
 		}
 
-		auto xsdt = acpiTable.acpi20.xsdtAddress.toVirtual();
+		auto xsdt = acpiTable.acpi20.xsdtAddress.toVirtual()
 
-		loadXsdt(xsdt);
+		loadXsdt(xsdt)
 
-		serialPrintln("[ACPI] loaded");
-		return true;
+		serialPrintln("[ACPI] loaded")
+		return true
 	}
 
   private
 	static UInt64 physicalToVirtual(UInt64 physical) {
-		UInt64 result = (uint64_t)WholePhysicalStart + (uint64_t)physical;
-		return result;
+		UInt64 result = (uint64_t)WholePhysicalStart + (uint64_t)physical
+		return result
 	}
 
-	static fun dump32(const char8_t *msg, const void *virtualAddress) {
-		serialPrintf("\n[DUMP] %s: ", msg);
-		const char8_t *x = (char8_t *)((uint64_t)(virtualAddress));
-		const UInt8 *y = (UInt8 *)((uint64_t)(virtualAddress));
+	static fun dump32(const char8_t *msg, const Void *virtualAddress) {
+		serialPrintf("\n[DUMP] %s: ", msg)
+		const char8_t *x = (char8_t *)((uint64_t)(virtualAddress))
+		const UInt8 *y = (UInt8 *)((uint64_t)(virtualAddress))
 		for (Int32 j = 0; j < 8; ++j) {
-			wchar_t buffer[2];
-			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?' : x[j];
-			buffer[1] = (char8_t)0;
-			serialPrint(buffer);
+			wchar_t buffer[2]
+			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?' : x[j]
+			buffer[1] = (char8_t)0
+			serialPrint(buffer)
 		}
-		serialPrint("\n");
+		serialPrint("\n")
 	}
 
 	static fun loadXsdt(const acpi.XSDT *xsdt) {
 		if (xsdt == null)
-			return;
+			return
 
-		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", acpiValidate(xsdt));
+		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", acpiValidate(xsdt))
 
-		char8_t sig[5] = {0, 0, 0, 0, 0};
-		serialPrintf("[ACPI] ACPI 2.0+ tables loading\n");
-		acpi.put_sig(sig, xsdt.header.type);
-		serialPrintf("[ACPI] Found table %s\n", sig);
-		quakePrintf("[ACPI] Found table %s, ", sig);
+		char8_t sig[5] = {0, 0, 0, 0, 0}
+		serialPrintf("[ACPI] ACPI 2.0+ tables loading\n")
+		acpi.put_sig(sig, xsdt.header.type)
+		serialPrintf("[ACPI] Found table %s\n", sig)
+		quakePrintf("[ACPI] Found table %s, ", sig)
 
-		UInt64 numTables = acpiTableEntries(xsdt, sizeof(void *));
-		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables);
+		UInt64 numTables = acpiTableEntries(xsdt, sizeof(Void *))
+		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)
 
 		for (UInt64 i = 0; i < numTables; ++i) {
-			auto header = (const acpi.AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt.headers[i]);
+			auto header = (const acpi.AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt.headers[i])
 
-			acpi.put_sig(sig, header.type);
-			serialPrintf("[ACPI] Found table %s\n", sig);
-			quakePrintf("found table %s, ", sig);
+			acpi.put_sig(sig, header.type)
+			serialPrintf("[ACPI] Found table %s\n", sig)
+			quakePrintf("found table %s, ", sig)
 
-			serialPrintf("[ACPI] acpiValidate(header) %d\n", header.validate());
+			serialPrintf("[ACPI] acpiValidate(header) %d\n", header.validate())
 
 			switch (header.type) {
 			case acpi.AcpiApic.typeId:
-				loadApic((const acpi.AcpiApic *)(header));
-				break;
+				loadApic((const acpi.AcpiApic *)(header))
+				break
 
 			case acpi.AcpiMcfg.typeId:
-				loadMcfg((const acpi.AcpiMcfg *)(header));
-				break;
+				loadMcfg((const acpi.AcpiMcfg *)(header))
+				break
 
 			default:
-				break;
+				break
 			}
 		}
 
-		quakePrintf("done.\n");
+		quakePrintf("done.\n")
 	}
 
 	static fun loadApic(const acpi.AcpiApic *apic) {
-		UInt32 *local = reinterpret_cast<UInt32 *>(apic.localAddress);
-		serialPrintf("loadApic\n");
+		UInt32 *local = reinterpret_cast<UInt32 *>(apic.localAddress)
+		serialPrintf("loadApic\n")
 	}
 
 	static fun loadMcfg(const acpi.AcpiMcfg *mcfg) {
-		serialPrintf("loadMcfg\n");
-		UInt64 count = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry));
-		acpi.PciGroup mPci[count];
+		serialPrintf("loadMcfg\n")
+		UInt64 count = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry))
+		acpi.PciGroup mPci[count]
 
 		for (UInt32 i = 0; i < count; ++i) {
-			const acpi.AcpiMcfgEntry &mcfge = mcfg.entries[i];
+			const acpi.AcpiMcfgEntry &mcfge = mcfg.entries[i]
 
-			mPci[i].group = mcfge.group;
-			mPci[i].busStart = mcfge.busStart;
-			mPci[i].busEnd = mcfge.busEnd;
-			mPci[i].base = reinterpret_cast<UInt32 *>(mcfge.base);
+			mPci[i].group = mcfge.group
+			mPci[i].busStart = mcfge.busStart
+			mPci[i].busEnd = mcfge.busEnd
+			mPci[i].base = reinterpret_cast<UInt32 *>(mcfge.base)
 
-			Int32 num_busses = mPci[i].busEnd - mPci[i].busStart + 1;
+			Int32 num_busses = mPci[i].busEnd - mPci[i].busStart + 1
 		}
 
-		probePci(mPci, count);
+		probePci(mPci, count)
 	}
 
 	static Bool multi(acpi.PciGroup *group, UInt8 bus, UInt8 device, UInt8 func) {
-		UInt32 *mBase = group.baseFor(bus, device, func);
-		auto mMulti = ((mBase[3] >> 16) & 0x80) == 0x80;
-		return mMulti;
+		UInt32 *mBase = group.baseFor(bus, device, func)
+		auto mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
+		return mMulti
 	}
 
 	static fun probePci(acpi.PciGroup *mPci, UInt64 count) {
-		serialPrintf("[PCI] probePci\n");
+		serialPrintf("[PCI] probePci\n")
 		for (UInt32 i = 0; i < count; ++i) {
-			acpi.PciGroup *pci = &mPci[i];
+			acpi.PciGroup *pci = &mPci[i]
 			for (Int32 bus = pci.busStart; bus <= pci.busEnd; ++bus) {
 				for (Int32 dev = 0; dev < 32; ++dev) {
 					// TODO
@@ -290,18 +290,18 @@ class ACPIParser {
 			}
 		}
 	}
-};
+}
 
 // Management
 
 /// `false` if failed to do so
 /// TODO `poweroff` quake command
 Bool shutdownComputer() {
-	return false;
+	return false
 }
 
 /// `false` if failed to do so
 /// TODO `reboot` quake command
 Bool rebootComputer() {
-	return false;
+	return false
 }

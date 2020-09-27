@@ -16,7 +16,7 @@
 namespace efi {
 static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.EFI_MEMORY_DESCRIPTOR *descriptor,
 														   UInt64 descriptorSize) {
-	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize;
-	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc;
+	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
+	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
 }
 } // namespace efi

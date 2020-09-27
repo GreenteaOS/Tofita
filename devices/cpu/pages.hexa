@@ -21,15 +21,15 @@ namespace pages {
 #define PAGE_ALIGNED __attribute__((aligned(PAGE_SIZE)))
 
 typedef struct {
-	UInt16 offset : 12;
-	UInt16 pt : 9;
-	UInt16 pd : 9;
-	UInt16 pdpt : 9;
-	UInt16 pml4 : 9;
-	UInt16 reserved : 16;
-} PACKED LinearAddress;
+	UInt16 offset : 12
+	UInt16 pt : 9
+	UInt16 pd : 9
+	UInt16 pdpt : 9
+	UInt16 pml4 : 9
+	UInt16 reserved : 16
+} PACKED LinearAddress
 
-_Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to have 64 bits");
+_Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to have 64 bits")
 
 // 512 entries * 8 bytes = 4 KiB
 // PML4 size = PDP size = PD size = PT size
@@ -43,28 +43,28 @@ _Static_assert(sizeof(LinearAddress) == sizeof(uint64_t), "linear address has to
 // Entry in a page table
 typedef struct {
 	// Is the page present in physical memory?
-	UInt8 present : 1;
+	UInt8 present : 1
 
 	// Pages are read-only by default
-	UInt8 writeAllowed : 1;
+	UInt8 writeAllowed : 1
 
 	// Pages are only accessible by supervisor by default
-	UInt8 accessibleByAll : 1;
+	UInt8 accessibleByAll : 1
 
 	// Write through abilities of the page
-	UInt8 writeThrough : 1;
+	UInt8 writeThrough : 1
 
 	// If set, the page will not be cached
-	UInt8 cacheDisabled : 1;
+	UInt8 cacheDisabled : 1
 
 	// Was the page accessed?
-	UInt8 accessed : 1;
+	UInt8 accessed : 1
 
 	// Has the page been written to? Only applicable for PTE.
-	UInt8 dirty : 1;
+	UInt8 dirty : 1
 
 	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
-	UInt8 largePage : 1;
+	UInt8 largePage : 1
 
 	// Prevent the translations cache from updating
 	// the address in cache if CR3 is reset.
@@ -73,99 +73,99 @@ typedef struct {
 	// enable this feature.
 	//
 	// Only applicable for PTE
-	UInt8 global : 1;
+	UInt8 global : 1
 
 	// Not used by the processor
-	UInt8 metadata : 3;
+	UInt8 metadata : 3
 
 	// Physical address of the child table/page
-	UInt64 address : 40;
+	UInt64 address : 40
 
 	// Not used by the processor
-	UInt8 metadata2 : 7;
+	UInt8 metadata2 : 7
 
 	// Only applicable for PTE
-	UInt8 protectionKey : 4;
+	UInt8 protectionKey : 4
 
 	// Disable execution of code from this page
-	UInt8 disableExecution : 1;
-} PACKED PageEntryz;
+	UInt8 disableExecution : 1
+} PACKED PageEntryz
 
-_Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits");
+_Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits")
 
 // TODO remove this
-static PageEntry *pml4entries PAGE_ALIGNED = null;
+static PageEntry *pml4entries PAGE_ALIGNED = null
 
 LinearAddress getLinearAddress(UInt64 virtualAddr) {
-	return *((LinearAddress *)&virtualAddr);
+	return *((LinearAddress *)&virtualAddr)
 }
 
 fun initializePage(PageEntry *entry, UInt64 address) {
-	entry.address = address >> ADDRESS_BITS;
-	entry.present = 1;
-	entry.writeAllowed = 1;
+	entry.address = address >> ADDRESS_BITS
+	entry.present = 1
+	entry.writeAllowed = 1
 
 	// TODO
-	entry.accessibleByAll = 1;
+	entry.accessibleByAll = 1
 }
 
 PageEntry *getPage(PageEntry *table, UInt64 entryId) {
-	PageEntry *entry = &table[entryId];
+	PageEntry *entry = &table[entryId]
 
 	if (entry.present == 1) {
-		return (PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+		return (PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
 	} else {
-		var newPage = (PageEntry *)PhysicalAllocator.allocateOnePagePreZeroed();
+		var newPage = (PageEntry *)PhysicalAllocator.allocateOnePagePreZeroed()
 		if (newPage != null)
-			initializePage(entry, (uint64_t)newPage - (uint64_t)WholePhysicalStart);
-		return newPage;
+			initializePage(entry, (uint64_t)newPage - (uint64_t)WholePhysicalStart)
+		return newPage
 	}
 }
 
 fun map_pt(PageEntry pt[], UInt64 virtualAddr, UInt64 physicalAddr) {
-	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt];
-	initializePage(entry, physicalAddr);
+	PageEntry *entry = &pt[getLinearAddress(virtualAddr).pt]
+	initializePage(entry, physicalAddr)
 }
 
 // TODO handle huge pages returned from bootloader
 #define createMapping(fromTable, toTable)                                                                    \
-	void map_##fromTable(PageEntry fromTable[], UInt64 virtualAddr, UInt64 physicalAddr) {               \
+	Void map_##fromTable(PageEntry fromTable[], UInt64 virtualAddr, UInt64 physicalAddr) {               \
 		PageEntry *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                    \
 		map_##toTable(toTable, virtualAddr, physicalAddr);                                                   \
 	}
 
-createMapping(pd, pt);
-createMapping(pdpt, pd);
-createMapping(pml4, pdpt);
+createMapping(pd, pt)
+createMapping(pdpt, pd)
+createMapping(pml4, pdpt)
 
 #undef createMapping
 
 // Returns actual physical address from virtual address
 UInt64 resolveAddr(const PageEntry *pml4entries, UInt64 virtualAddr) {
-	auto linear = getLinearAddress(virtualAddr);
+	auto linear = getLinearAddress(virtualAddr)
 	// pml4
-	const PageEntry *entry = &pml4entries[linear.pml4];
+	const PageEntry *entry = &pml4entries[linear.pml4]
 	if (entry.present == 0)
-		return PHYSICAL_NOT_FOUND;
-	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+		return PHYSICAL_NOT_FOUND
+	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
 	// pdpt
-	entry = &entry[linear.pdpt];
+	entry = &entry[linear.pdpt]
 	if (entry.present == 0)
-		return PHYSICAL_NOT_FOUND;
+		return PHYSICAL_NOT_FOUND
 	// TODO handle mega pages
-	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
 	// pd
-	entry = &entry[linear.pd];
+	entry = &entry[linear.pd]
 	if (entry.present == 0)
-		return PHYSICAL_NOT_FOUND;
+		return PHYSICAL_NOT_FOUND
 	if (entry.largePage == 1)
-		return (entry.address << ADDRESS_BITS) + linear.pt * 4096 + linear.offset;
-	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart);
+		return (entry.address << ADDRESS_BITS) + linear.pt * 4096 + linear.offset
+	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
 	// pt
-	entry = &entry[linear.pt];
+	entry = &entry[linear.pt]
 	if (entry.present == 0)
-		return PHYSICAL_NOT_FOUND;
-	return (entry.address << ADDRESS_BITS) + linear.offset;
+		return PHYSICAL_NOT_FOUND
+	return (entry.address << ADDRESS_BITS) + linear.offset
 }
 
 // TODO return error code (as enum)
@@ -174,40 +174,40 @@ UInt64 resolveAddr(const PageEntry *pml4entries, UInt64 virtualAddr) {
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
 fun mapMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt64 physicalAddr, UInt32 pageCount) {
-	serialPrintln("[paging] mapping memory range");
+	serialPrintln("[paging] mapping memory range")
 
-	UInt64 virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
+	UInt64 virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE
 
-	UInt64 vAddress = virtualAddr;
-	UInt64 pAddress = physicalAddr;
+	UInt64 vAddress = virtualAddr
+	UInt64 pAddress = physicalAddr
 
-	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE);
+	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE)
 
-	serialPrint("[paging.range] virtual address = ");
-	serialPrintHex((uint64_t)(virtualAddr));
-	serialPrint("\n");
+	serialPrint("[paging.range] virtual address = ")
+	serialPrintHex((uint64_t)(virtualAddr))
+	serialPrint("\n")
 
-	serialPrint("[paging.range] physical address = ");
-	serialPrintHex((uint64_t)(physicalAddr));
-	serialPrint("\n");
+	serialPrint("[paging.range] physical address = ")
+	serialPrintHex((uint64_t)(physicalAddr))
+	serialPrint("\n")
 
-	serialPrint("[paging.range] page count = ");
-	serialPrintHex((uint64_t)(pageCount));
-	serialPrint("\n");
+	serialPrint("[paging.range] page count = ")
+	serialPrintHex((uint64_t)(pageCount))
+	serialPrint("\n")
 
-	serialPrint("[paging.range] virtual address end = ");
-	serialPrintHex((uint64_t)(virtualAddrEnd));
-	serialPrint("\n");
+	serialPrint("[paging.range] virtual address end = ")
+	serialPrintHex((uint64_t)(virtualAddrEnd))
+	serialPrint("\n")
 
 	while (vAddress < virtualAddrEnd) {
-		map_pml4(pml4entries, vAddress, pAddress);
+		map_pml4(pml4entries, vAddress, pAddress)
 
-		vAddress += PAGE_SIZE;
-		pAddress += PAGE_SIZE;
+		vAddress += PAGE_SIZE
+		pAddress += PAGE_SIZE
 	}
 
 	// TODO rethink where to call this
-	amd64.writeCr3((uint64_t)pml4entries - (uint64_t)WholePhysicalStart);
+	amd64.writeCr3((uint64_t)pml4entries - (uint64_t)WholePhysicalStart)
 }
 
 // Unmaps pages without actually deallocating them, still deallocates unused page tables
@@ -222,26 +222,26 @@ fun unmapMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt32 pageCount) {
 // Completely unmaps and deallocates pages and page tables
 fun unmapAndFreeMemory(PageEntry *pml4entries, UInt64 virtualAddr, UInt32 pageCount) {
 	// TODO resolve and dealloc pages
-	unmapMemory(pml4entries, virtualAddr, pageCount);
+	unmapMemory(pml4entries, virtualAddr, pageCount)
 }
 
 // Upper half
 // Just makes a copy of upper half's PML4,
 // because it is always the same between processes
 fun copyKernelMemoryMap(const PageEntry *pml4source, PageEntry *pml4destination) {
-	UInt32 i = 255; // TODO validate that this is where upper half starts
+	UInt32 i = 255 // TODO validate that this is where upper half starts
 	while (i < PAGE_TABLE_SIZE) {
-		pml4destination[i] = pml4source[i];
-		i++;
+		pml4destination[i] = pml4source[i]
+		i++
 	}
 }
 
 // Creates new PML4 for new process
 PageEntry *newCR3(const PageEntry *pml4source) {
-	PageEntry *pml4result = (PageEntry *)PhysicalAllocator.allocateOnePagePreZeroed();
+	PageEntry *pml4result = (PageEntry *)PhysicalAllocator.allocateOnePagePreZeroed()
 	if (pml4result != null)
-		copyKernelMemoryMap(pml4source, pml4result);
-	return pml4result;
+		copyKernelMemoryMap(pml4source, pml4result)
+	return pml4result
 }
 
 PageEntry *freeCR3(PageEntry *pml4) {
