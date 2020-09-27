@@ -34,26 +34,26 @@
 // Globals
 
 // For syscalls & scheduler
-@volatile pages.PageEntry *@volatile pml4kernelThread = null;
+@volatile pages.PageEntry *@volatile pml4kernelThread = null
 
 // Flag to keep in kernel mode and not switch to user mode
-@volatile Bool kernelBusy = false;
+@volatile Bool kernelBusy = false
 
 // Avoids PIT-triggered rendering
 // This is not a best solution
-@volatile Bool haveToRender = true;
+@volatile Bool haveToRender = true
 
-UInt64 uptimeMilliseconds = 0;
+UInt64 uptimeMilliseconds = 0
 
 // Forward for global usage
-fun drawVibrancedRectangle(int16_t x, int16_t y, UInt16 width, UInt16 height, Bool dark = true);
-struct Pixel32;
+fun drawVibrancedRectangle(int16_t x, int16_t y, UInt16 width, UInt16 height, Bool dark = true)
+struct Pixel32
 
 // TODO refactor to .hpp!
-UInt16 drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color);
-fun quakePrintf(const wchar_t *c, ...);
-fun guiThread();
-fun kernelThread();
-fun guiThreadStart();
-fun kernelThreadStart();
-fun kernelThreadLoop();
+UInt16 drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color)
+fun quakePrintf(const wchar_t *c, ...)
+fun guiThread()
+fun kernelThread()
+fun guiThreadStart()
+fun kernelThreadStart()
+fun kernelThreadLoop()

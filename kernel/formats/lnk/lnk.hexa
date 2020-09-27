@@ -16,10 +16,10 @@
 extern "C++" namespace shortcut {
 	Bool validate(const UInt8 *data, const UInt64 bytes) {
 		if (bytes < sizeof(Lnk))
-			return false;
-		let lnk = (Lnk *)data;
+			return false
+		let lnk = (Lnk *)data
 		if (lnk.magucka != magic)
-			return false;
-		return true;
+			return false
+		return true
 	}
 }

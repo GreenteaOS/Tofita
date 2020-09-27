@@ -14,24 +14,24 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 UInt64 String.length(const wchar_t *source) {
-	let string = (const UInt16 *)source;
-	UInt32 i = 0;
+	let string = (const UInt16 *)source
+	UInt32 i = 0
 	while (string[i] != 0) {
-		i++;
+		i++
 	}
-	return i * 2 + 2;
+	return i * 2 + 2
 }
 
 const wchar_t *String.duplicate(const wchar_t *source) {
-	let bytes = length(source);
-	var result = (UInt16 *)allocateBytes(bytes);
-	let string = (const UInt16 *)source;
+	let bytes = length(source)
+	var result = (UInt16 *)allocateBytes(bytes)
+	let string = (const UInt16 *)source
 
-	UInt32 i = 0;
+	UInt32 i = 0
 	while (string[i] != 0) {
-		result[i] = string[i];
-		i++;
+		result[i] = string[i]
+		i++
 	}
 
-	return (const wchar_t *)result;
+	return (const wchar_t *)result
 }

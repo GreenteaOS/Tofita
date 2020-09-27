@@ -15,157 +15,157 @@
 
 // PS/2 Mouse
 
-@volatile UInt8 mouseCycle = 0;
-@volatile UInt8 mouseByte[3] = {0};
+@volatile UInt8 mouseCycle = 0
+@volatile UInt8 mouseByte[3] = {0}
 
 // Note: those are controlled by driver
-@volatile Bool leftDown = false;
-@volatile Bool rightDown = false;
-@volatile Bool middleDown = false;
+@volatile Bool leftDown = false
+@volatile Bool rightDown = false
+@volatile Bool middleDown = false
 
 struct MouseAction {
-	int16_t mouseXdiff;
-	int16_t mouseYdiff;
-	MouseActionType type;
+	int16_t mouseXdiff
+	int16_t mouseYdiff
+	MouseActionType type
 	// TODO time stamp
-};
+}
 
-constexpr UInt8 mouseActionsLimit = 255;
-@volatile MouseAction mouseActionsZeta[mouseActionsLimit];
-@volatile MouseAction mouseActionsGama[mouseActionsLimit];
-@volatile Bool mouseActionsUseZeta = false;
-@volatile UInt8 mouseActionsZetaAmount = 0;
-@volatile UInt8 mouseActionsGamaAmount = 0;
+constexpr UInt8 mouseActionsLimit = 255
+@volatile MouseAction mouseActionsZeta[mouseActionsLimit]
+@volatile MouseAction mouseActionsGama[mouseActionsLimit]
+@volatile Bool mouseActionsUseZeta = false
+@volatile UInt8 mouseActionsZetaAmount = 0
+@volatile UInt8 mouseActionsGamaAmount = 0
 
 fun pushMouseAction(MouseActionType type, int16_t mouseXdiff = 0, int16_t mouseYdiff = 0) {
 	if (mouseActionsUseZeta) {
 		if (mouseActionsZetaAmount == mouseActionsLimit)
-			return;
+			return
 
-		mouseActionsZeta[mouseActionsZetaAmount].mouseXdiff = mouseXdiff;
-		mouseActionsZeta[mouseActionsZetaAmount].mouseYdiff = mouseYdiff;
-		mouseActionsZeta[mouseActionsZetaAmount].type = type;
+		mouseActionsZeta[mouseActionsZetaAmount].mouseXdiff = mouseXdiff
+		mouseActionsZeta[mouseActionsZetaAmount].mouseYdiff = mouseYdiff
+		mouseActionsZeta[mouseActionsZetaAmount].type = type
 
-		mouseActionsZetaAmount++;
+		mouseActionsZetaAmount++
 	} else {
 		if (mouseActionsGamaAmount == mouseActionsLimit)
-			return;
+			return
 
-		mouseActionsGama[mouseActionsGamaAmount].mouseXdiff = mouseXdiff;
-		mouseActionsGama[mouseActionsGamaAmount].mouseYdiff = mouseYdiff;
-		mouseActionsGama[mouseActionsGamaAmount].type = type;
+		mouseActionsGama[mouseActionsGamaAmount].mouseXdiff = mouseXdiff
+		mouseActionsGama[mouseActionsGamaAmount].mouseYdiff = mouseYdiff
+		mouseActionsGama[mouseActionsGamaAmount].type = type
 
-		mouseActionsGamaAmount++;
+		mouseActionsGamaAmount++
 	}
 }
 
 UInt8 getBit(UInt8 byte, UInt8 bit) {
-	return (byte & (1 << bit)) >> bit;
+	return (byte & (1 << bit)) >> bit
 }
 
 fun handleMousePacket() {
-	while (lockMouse) {};
-	lockMouse = true;
+	while (lockMouse) {}
+	lockMouse = true
 
 	switch (mouseCycle) {
 	case 0: {
-		mouseByte[0] = mouseRead();
+		mouseByte[0] = mouseRead()
 		if ((mouseByte[0] & 0x08) != 0) {
-			mouseCycle++; // Only accept this as the first byte if the "must be 1" bit is set
+			mouseCycle++ // Only accept this as the first byte if the "must be 1" bit is set
 		}
-		// mouseCycle++;
-		break;
-	};
+		// mouseCycle++
+		break
+	}
 	case 1: {
-		mouseByte[1] = mouseRead();
-		mouseCycle++;
-		break;
-	};
+		mouseByte[1] = mouseRead()
+		mouseCycle++
+		break
+	}
 	case 2: {
-		mouseByte[2] = mouseRead();
+		mouseByte[2] = mouseRead()
 
-		int16_t mouseXd = mouseByte[1];
-		int16_t mouseYd = mouseByte[2];
-		mouseYd = -mouseYd;
+		int16_t mouseXd = mouseByte[1]
+		int16_t mouseYd = mouseByte[2]
+		mouseYd = -mouseYd
 
 		// Overflow
 		if (getBit(mouseByte[0], 6) != 0)
-			mouseXd = 0;
+			mouseXd = 0
 		else if (getBit(mouseByte[0], 4) != 0)
-			mouseXd -= (int16_t)0x100;
+			mouseXd -= (int16_t)0x100
 
 		if (getBit(mouseByte[0], 7) != 0)
-			mouseYd = 0;
+			mouseYd = 0
 		else if (getBit(mouseByte[0], 5) != 0)
-			mouseYd += (int16_t)0x100;
+			mouseYd += (int16_t)0x100
 
-		mouseCycle = 0;
+		mouseCycle = 0
 
 		// Ignore all state changes until message pool is ready
 		// Otherwise we will have situaion like DOWN-UP-UP instead of D-U-D-U
 		if (mouseActionsUseZeta && mouseActionsZetaAmount == mouseActionsLimit)
-			break;
+			break
 		if (!mouseActionsUseZeta && mouseActionsGamaAmount == mouseActionsLimit)
-			break;
+			break
 
 		if (mouseXd != 0 || mouseYd != 0)
-			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd);
+			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
 
-		const Bool left = getBit(mouseByte[0], 0) != 0;
-		const Bool right = getBit(mouseByte[0], 1) != 0;
-		const Bool middle = getBit(mouseByte[0], 2) != 0;
+		const Bool left = getBit(mouseByte[0], 0) != 0
+		const Bool right = getBit(mouseByte[0], 1) != 0
+		const Bool middle = getBit(mouseByte[0], 2) != 0
 
 		if (left == false && leftDown == true)
-			pushMouseAction(MouseActionType.LeftUp);
+			pushMouseAction(MouseActionType.LeftUp)
 		if (left == true && leftDown == false)
-			pushMouseAction(MouseActionType.LeftDown);
+			pushMouseAction(MouseActionType.LeftDown)
 
 		if (right == false && rightDown == true)
-			pushMouseAction(MouseActionType.RightUp);
+			pushMouseAction(MouseActionType.RightUp)
 		if (right == true && rightDown == false)
-			pushMouseAction(MouseActionType.RightDown);
+			pushMouseAction(MouseActionType.RightDown)
 
 		if (middle == false && middleDown == true)
-			pushMouseAction(MouseActionType.MiddleUp);
+			pushMouseAction(MouseActionType.MiddleUp)
 		if (middle == true && middleDown == false)
-			pushMouseAction(MouseActionType.MiddleDown);
+			pushMouseAction(MouseActionType.MiddleDown)
 
-		leftDown = left;
-		rightDown = right;
-		middleDown = middle;
+		leftDown = left
+		rightDown = right
+		middleDown = middle
 
-		break;
-	};
+		break
+	}
 	}
 
 	// EOI
 	// Disable those lines if polling is used
-	writePort(0xA0, 0x20);
-	writePort(0x20, 0x20);
-	lockMouse = false;
+	writePort(0xA0, 0x20)
+	writePort(0x20, 0x20)
+	lockMouse = false
 }
 
 fun handleMouse() {
 	// This is hack to avoid race condition in poller
 	// this way we handle mouse *only* in poller
 	// if (true) {
-	//	pollForce = true;
-	//	writePort(0xA0, 0x20);
-	//	writePort(0x20, 0x20);
-	//	return;
+	//	pollForce = true
+	//	writePort(0xA0, 0x20)
+	//	writePort(0x20, 0x20)
+	//	return
 	//}
 
 	// Avoid race condition
-	// polls = true;
-	// handleMousePacket();
-	// UInt8 poll = readPort(0x64);
+	// polls = true
+	// handleMousePacket()
+	// UInt8 poll = readPort(0x64)
 	// while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
 	//	// if (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
-	//	// handleMousePacket();
-	//	poll = readPort(0x64);
+	//	// handleMousePacket()
+	//	poll = readPort(0x64)
 	//}
-	// writePort(0xA0, 0x20);
-	// writePort(0x20, 0x20);
-	// haveToRender = 1;
-	// polls = false;
+	// writePort(0xA0, 0x20)
+	// writePort(0x20, 0x20)
+	// haveToRender = 1
+	// polls = false
 }

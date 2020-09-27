@@ -101,17 +101,17 @@ fun packAssets(config: Config) {
 			ramDiskSize += fs.statSync(asset).size
 		}
 
-		ramDiskSize += 4 // UInt32 ramDiskChecksum;
-		ramDiskSize += 4 // UInt32 ramDiskSize;
-		ramDiskSize += 4 // UInt32 assetsCount;
+		ramDiskSize += 4 // UInt32 ramDiskChecksum
+		ramDiskSize += 4 // UInt32 ramDiskSize
+		ramDiskSize += 4 // UInt32 assetsCount
 		ramDiskSize += ( //struct assetDefinition
 			//{
-			256 + //	UInt8 path[256];
-			4 + //	    UInt32 size;
-			4 //	    UInt32 offsetFromRamDiskFirstByte; // NOT relative to `data`
-			//};
+			256 + //	UInt8 path[256]
+			4 + //	    UInt32 size
+			4 //	    UInt32 offsetFromRamDiskFirstByte // NOT relative to `data`
+			//}
 		) * assetName.length
-		//uint8_t* data;
+		//uint8_t* data
 
 		// Round upto 4 bytes
 		ramDiskSize = Math.ceil(ramDiskSize / 4) * 4

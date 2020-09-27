@@ -21,32 +21,32 @@
 
 @volatile Bool @noInline
 _probeForReadOkay(@volatile UInt64 at, @volatile const UInt64 bytes) {
-	sehProbe = true;
+	sehProbe = true
 	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
-	@volatile const UInt8 *ptr = (@volatile const UInt8 *)at;
+	@volatile const UInt8 *ptr = (@volatile const UInt8 *)at
 	for (UInt64 i = 0; i < bytes; ++i) {
-		at += ptr[i];
+		at += ptr[i]
 	}
-	sehProbe = false;
-	return true;
+	sehProbe = false
+	return true
 }
 
 @volatile Bool (*@volatile const probeForReadOkay)(@volatile UInt64 at,
-												 @volatile const UInt64 bytes) = _probeForReadOkay;
+												 @volatile const UInt64 bytes) = _probeForReadOkay
 
 @volatile Bool @noInline
 _probeForWriteOkay(@volatile const UInt64 at, @volatile const UInt64 bytes) {
-	sehProbe = true;
+	sehProbe = true
 	// TODO per-page not per-byte
-	@volatile UInt8 *ptr = (@volatile UInt8 *)at;
+	@volatile UInt8 *ptr = (@volatile UInt8 *)at
 	// TODO i also as volatile?
 	for (UInt64 i = 0; i < bytes; ++i) {
-		ptr[i] = ptr[i];
+		ptr[i] = ptr[i]
 	}
-	sehProbe = false;
-	return true;
+	sehProbe = false
+	return true
 }
 
 @volatile Bool (*@volatile const probeForWriteOkay)(@volatile const UInt64 at,
-												  @volatile const UInt64 bytes) = _probeForWriteOkay;
+												  @volatile const UInt64 bytes) = _probeForWriteOkay

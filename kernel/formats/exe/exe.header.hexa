@@ -18,106 +18,106 @@ namespace exe {
 // 1 byte aligned
 #pragma pack(1)
 struct PeHeader {
-	UInt32 magic; // PE\0\0 or 0x00004550
-	UInt16 machine;
-	UInt16 numberOfSections;
-	UInt32 timeDateStamp;
-	UInt32 pointerToSymbolTable;
-	UInt32 numberOfSymbols;
-	UInt16 sizeOfOptionalHeader;
-	UInt16 characteristics;
-} __attribute__((packed));
+	UInt32 magic // PE\0\0 or 0x00004550
+	UInt16 machine
+	UInt16 numberOfSections
+	UInt32 timeDateStamp
+	UInt32 pointerToSymbolTable
+	UInt32 numberOfSymbols
+	UInt16 sizeOfOptionalHeader
+	UInt16 characteristics
+} __attribute__((packed))
 #pragma pack()
 
-_Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect");
+_Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
 
 // 1 byte aligned
 #pragma pack(1)
 struct Pe64OptionalHeader {
-	UInt16 magic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	UInt8 majorLinkerVersion;
-	UInt8 minorLinkerVersion;
-	UInt32 sizeOfCode;
-	UInt32 sizeOfInitializedData;
-	UInt32 sizeOfUninitializedData;
-	UInt32 addressOfEntryPoint;
-	UInt32 baseOfCode;
-	UInt64 imageBase;
-	UInt32 sectionAlignment;
-	UInt32 fileAlignment;
-	UInt16 majorOperatingSystemVersion;
-	UInt16 minorOperatingSystemVersion;
-	UInt16 majorImageVersion;
-	UInt16 minorImageVersion;
-	UInt16 majorSubsystemVersion;
-	UInt16 minorSubsystemVersion;
-	UInt32 win32VersionValue;
-	UInt32 sizeOfImage;
-	UInt32 sizeOfHeaders;
-	UInt32 checkSum;
-	UInt16 subsystem;
-	UInt16 dllCharacteristics;
-	UInt64 sizeOfStackReserve;
-	UInt64 sizeOfStackCommit;
-	UInt64 sizeOfHeapReserve;
-	UInt64 sizeOfHeapCommit;
-	UInt32 loaderFlags;
-	UInt32 numberOfRvaAndSizes;
-} __attribute__((packed));
+	UInt16 magic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	UInt8 majorLinkerVersion
+	UInt8 minorLinkerVersion
+	UInt32 sizeOfCode
+	UInt32 sizeOfInitializedData
+	UInt32 sizeOfUninitializedData
+	UInt32 addressOfEntryPoint
+	UInt32 baseOfCode
+	UInt64 imageBase
+	UInt32 sectionAlignment
+	UInt32 fileAlignment
+	UInt16 majorOperatingSystemVersion
+	UInt16 minorOperatingSystemVersion
+	UInt16 majorImageVersion
+	UInt16 minorImageVersion
+	UInt16 majorSubsystemVersion
+	UInt16 minorSubsystemVersion
+	UInt32 win32VersionValue
+	UInt32 sizeOfImage
+	UInt32 sizeOfHeaders
+	UInt32 checkSum
+	UInt16 subsystem
+	UInt16 dllCharacteristics
+	UInt64 sizeOfStackReserve
+	UInt64 sizeOfStackCommit
+	UInt64 sizeOfHeapReserve
+	UInt64 sizeOfHeapCommit
+	UInt32 loaderFlags
+	UInt32 numberOfRvaAndSizes
+} __attribute__((packed))
 #pragma pack()
 
 // 1 byte aligned
 #pragma pack(1)
 struct Pe32OptionalHeader {
-	UInt16 magic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	UInt8 majorLinkerVersion;
-	UInt8 minorLinkerVersion;
-	UInt32 sizeOfCode;
-	UInt32 sizeOfInitializedData;
-	UInt32 sizeOfUninitializedData;
-	UInt32 addressOfEntryPoint;
-	UInt32 baseOfCode;
-	UInt32 baseOfData; // present only in 32-bit
-	UInt32 imageBase;
-	UInt32 sectionAlignment;
-	UInt32 fileAlignment;
-	UInt16 majorOperatingSystemVersion;
-	UInt16 minorOperatingSystemVersion;
-	UInt16 majorImageVersion;
-	UInt16 minorImageVersion;
-	UInt16 majorSubsystemVersion;
-	UInt16 minorSubsystemVersion;
-	UInt32 win32VersionValue;
-	UInt32 sizeOfImage;
-	UInt32 sizeOfHeaders;
-	UInt32 checkSum;
-	UInt16 subsystem;
-	UInt16 dllCharacteristics;
-	UInt32 sizeOfStackReserve;
-	UInt32 sizeOfStackCommit;
-	UInt32 sizeOfHeapReserve;
-	UInt32 sizeOfHeapCommit;
-	UInt32 loaderFlags;
-	UInt32 numberOfRvaAndSizes;
-} __attribute__((packed));
+	UInt16 magic // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	UInt8 majorLinkerVersion
+	UInt8 minorLinkerVersion
+	UInt32 sizeOfCode
+	UInt32 sizeOfInitializedData
+	UInt32 sizeOfUninitializedData
+	UInt32 addressOfEntryPoint
+	UInt32 baseOfCode
+	UInt32 baseOfData // present only in 32-bit
+	UInt32 imageBase
+	UInt32 sectionAlignment
+	UInt32 fileAlignment
+	UInt16 majorOperatingSystemVersion
+	UInt16 minorOperatingSystemVersion
+	UInt16 majorImageVersion
+	UInt16 minorImageVersion
+	UInt16 majorSubsystemVersion
+	UInt16 minorSubsystemVersion
+	UInt32 win32VersionValue
+	UInt32 sizeOfImage
+	UInt32 sizeOfHeaders
+	UInt32 checkSum
+	UInt16 subsystem
+	UInt16 dllCharacteristics
+	UInt32 sizeOfStackReserve
+	UInt32 sizeOfStackCommit
+	UInt32 sizeOfHeapReserve
+	UInt32 sizeOfHeapCommit
+	UInt32 loaderFlags
+	UInt32 numberOfRvaAndSizes
+} __attribute__((packed))
 #pragma pack()
 
 #pragma pack(1)
 struct ImageSectionHeader { // size 40 bytes
-	UInt8 name[8];
-	UInt32 virtualSize;
-	UInt32 virtualAddress;
-	UInt32 sizeOfRawData;
-	UInt32 pointerToRawData;
-	UInt32 pointerToRealocations;
-	UInt32 pointerToLinenumbers;
-	UInt16 numberOfRealocations;
-	UInt16 numberOfLinenumbers;
-	UInt32 characteristics;
-} __attribute__((packed));
+	UInt8 name[8]
+	UInt32 virtualSize
+	UInt32 virtualAddress
+	UInt32 sizeOfRawData
+	UInt32 pointerToRawData
+	UInt32 pointerToRealocations
+	UInt32 pointerToLinenumbers
+	UInt16 numberOfRealocations
+	UInt16 numberOfLinenumbers
+	UInt32 characteristics
+} __attribute__((packed))
 #pragma pack()
 
-_Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect");
+_Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect")
 
 #define IMAGE_DIRECTORY_ENTRY_EXPORT 0	  // Export Directory
 #define IMAGE_DIRECTORY_ENTRY_IMPORT 1	  // Import Directory
@@ -137,28 +137,28 @@ _Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect");
 #define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR 14 // COM Runtime descriptor
 
 typedef struct _IMAGE_EXPORT_DIRECTORY {
-	UInt32 characteristics;
-	UInt32 timeDateStamp;
-	UInt16 majorVersion;
-	UInt16 minorVersion;
-	UInt32 name;
-	UInt32 base;
-	UInt32 numberOfFunctions;
-	UInt32 numberOfNames;
-	UInt32 addressOfFunctions;
-	UInt32 addressOfNames;
-	UInt32 addressOfNameOrdinals;
-} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY;
+	UInt32 characteristics
+	UInt32 timeDateStamp
+	UInt16 majorVersion
+	UInt16 minorVersion
+	UInt32 name
+	UInt32 base
+	UInt32 numberOfFunctions
+	UInt32 numberOfNames
+	UInt32 addressOfFunctions
+	UInt32 addressOfNames
+	UInt32 addressOfNameOrdinals
+} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY
 
 typedef struct _IMAGE_BASE_RELOCATION {
-	UInt32 virtualAddress;
-	UInt32 sizeOfBlock;
-} IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION;
+	UInt32 virtualAddress
+	UInt32 sizeOfBlock
+} IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION
 
 typedef struct _IMAGE_DATA_DIRECTORY {
-	UInt32 virtualAddress;
-	UInt32 size;
-} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
+	UInt32 virtualAddress
+	UInt32 size
+} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY
 #define IMAGE_SIZEOF_BASE_RELOCATION 8
 #define IMAGE_REL_BASED_ABSOLUTE 0
 #define IMAGE_REL_BASED_DIR64 10
@@ -167,30 +167,30 @@ typedef struct _IMAGE_DATA_DIRECTORY {
 #pragma pack(1)
 typedef struct _IMAGE_IMPORT_DESCRIPTOR {
 	//_ANONYMOUS_UNION union {
-	//	UInt32 characteristics;
-	UInt32 originalFirstThunk;
-	//} DUMMYUNIONNAME;
-	UInt32 timeDateStamp;
-	UInt32 forwarderChain;
-	UInt32 name;
-	UInt32 firstThunk;
-} IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR;
+	//	UInt32 characteristics
+	UInt32 originalFirstThunk
+	//} DUMMYUNIONNAME
+	UInt32 timeDateStamp
+	UInt32 forwarderChain
+	UInt32 name
+	UInt32 firstThunk
+} IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR
 #pragma pack()
 
-typedef void (*FARPROC)();
+typedef Void (*FARPROC)()
 
 typedef struct _IMAGE_IMPORT_BY_NAME {
-	UInt16 hint;
-	UInt8 name[1];
-} IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME;
+	UInt16 hint
+	UInt8 name[1]
+} IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME
 
 typedef struct _IMAGE_THUNK_DATA {
 	union {
 		UInt64 fun;					 // address of imported fun
 		UInt32 ordinal;					 // ordinal value of fun
-		PIMAGE_IMPORT_BY_NAME addressOfData; // RVA of imported name
+		PIMAGE_IMPORT_BY_NAME addressOfData // RVA of imported name
 		UInt32 forwarderStringl;			 // RVA to forwarder string
-	} u1;
-} IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA;
+	} u1
+} IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA
 
 } // namespace exe

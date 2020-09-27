@@ -15,24 +15,24 @@
 
 // SEH exceptions
 
-@volatile Bool sehProbe = false;
+@volatile Bool sehProbe = false
 
 // This is a fascinating way to not allow compiler to optimize return value
-extern @volatile Bool (*@volatile const probeForReadOkay)(@volatile UInt64 at, @volatile const UInt64 bytes);
+extern @volatile Bool (*@volatile const probeForReadOkay)(@volatile UInt64 at, @volatile const UInt64 bytes)
 extern @volatile Bool (*@volatile const probeForWriteOkay)(@volatile const UInt64 at,
-														 @volatile const UInt64 bytes);
+														 @volatile const UInt64 bytes)
 
 // TODO template wrappers
 /*
 <T>
 class UserRead {
-	const *T t;
-	probeForReadOkay return t;
+	const *T t
+	probeForReadOkay return t
 }
 
 class UserReadWrite {
-	*T t;
-	probeForWriteOkay return t;
+	*T t
+	probeForWriteOkay return t
 }
 
 */

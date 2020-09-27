@@ -14,47 +14,47 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 struct CPUID {
-	char8_t vendorID[13] = {0};
-	char8_t brandName[48] = {0};
-	UInt32 data = 0;
-	UInt32 extras = 0;
-};
+	char8_t vendorID[13] = {0}
+	char8_t brandName[48] = {0}
+	UInt32 data = 0
+	UInt32 extras = 0
+}
 
-constexpr UInt32 cpuidExtendedLevels = 0x80000000;
+constexpr UInt32 cpuidExtendedLevels = 0x80000000
 
 CPUID getCPUID() {
-	CPUID result;
-	UInt32 stub = 0;
+	CPUID result
+	UInt32 stub = 0
 	amd64.cpuid(0, 0, &result.data, (UInt32 *)(&result.vendorID[0]), (UInt32 *)(&result.vendorID[8]),
-				 (UInt32 *)(&result.vendorID[4]));
+				 (UInt32 *)(&result.vendorID[4]))
 
-	amd64.cpuid(cpuidExtendedLevels, 0, &result.extras, &stub, &stub, &stub);
+	amd64.cpuid(cpuidExtendedLevels, 0, &result.extras, &stub, &stub, &stub)
 
 	if (result.extras >= cpuidExtendedLevels + 4) {
 		amd64.cpuid(cpuidExtendedLevels + 2, 0, (UInt32 *)(&result.brandName[0]),
 					 (UInt32 *)(&result.brandName[4]), (UInt32 *)(&result.brandName[8]),
-					 (UInt32 *)(&result.brandName[12]));
+					 (UInt32 *)(&result.brandName[12]))
 		amd64.cpuid(cpuidExtendedLevels + 3, 0, (UInt32 *)(&result.brandName[16]),
 					 (UInt32 *)(&result.brandName[20]), (UInt32 *)(&result.brandName[24]),
-					 (UInt32 *)(&result.brandName[28]));
+					 (UInt32 *)(&result.brandName[28]))
 		amd64.cpuid(cpuidExtendedLevels + 4, 0, (UInt32 *)(&result.brandName[32]),
 					 (UInt32 *)(&result.brandName[36]), (UInt32 *)(&result.brandName[40]),
-					 (UInt32 *)(&result.brandName[44]));
+					 (UInt32 *)(&result.brandName[44]))
 	}
 
-	var i = 0;
+	var i = 0
 	while (i++ < sizeof(result.brandName))
 		if (result.brandName[i] == '\r')
-			result.brandName[i] = 0;
+			result.brandName[i] = 0
 		else if (result.brandName[i] == '\n')
-			result.brandName[i] = 0;
+			result.brandName[i] = 0
 
-	i = 0;
+	i = 0
 	while (i++ < sizeof(result.vendorID))
 		if (result.vendorID[i] == '\r')
-			result.vendorID[i] = 0;
+			result.vendorID[i] = 0
 		else if (result.vendorID[i] == '\n')
-			result.vendorID[i] = 0;
+			result.vendorID[i] = 0
 
-	return result;
+	return result
 }

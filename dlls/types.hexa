@@ -17,52 +17,52 @@
 
 namespace wapi {
 
-typedef void *Handle;
+typedef Void *Handle
 // TODO ifdef 64-bit
 // (HandleSize)handle & ~(HandleSize)0b11
-typedef UInt64 HandleSize;
-typedef Handle HInstance;
-typedef Handle HIcon;
-typedef Handle HIcon;
-typedef Handle HBrush;
-typedef Handle HCursor;
-typedef Handle HLocal;
-typedef Handle HGlobal;
-typedef Handle HWnd;
-typedef Handle HMenu;
-typedef Handle HDc;
+typedef UInt64 HandleSize
+typedef Handle HInstance
+typedef Handle HIcon
+typedef Handle HIcon
+typedef Handle HBrush
+typedef Handle HCursor
+typedef Handle HLocal
+typedef Handle HGlobal
+typedef Handle HWnd
+typedef Handle HMenu
+typedef Handle HDc
 
-typedef void *LResult;
+typedef Void *LResult
 
 // TODO LResult as enum?
 #define ERROR_SUCCESS ((wapi.LResult)0)
 #define ERROR_INVALID_HANDLE ((wapi.LResult)6)
 #define INVALID_HANDLE_VALUE ((wapi.Handle)-1)
 
-typedef Int32 Bool;
+typedef Int32 Bool
 
 // LONG is signed 32-bit int32_t
 
 // Similiar to handle, has nothing to do with async atomic memory access
-typedef UInt16 Atom;
+typedef UInt16 Atom
 
 struct Rect {
-	Int32 left;
-	Int32 top;
-	Int32 right;
-	Int32 bottom;
-};
+	Int32 left
+	Int32 top
+	Int32 right
+	Int32 bottom
+}
 
 struct PaintStruct {
-	HDc hdc;
-	Bool fErase;
-	Rect rcPaint;
-	Bool fRestore;
-	Bool fIncUpdate;
-	UInt8 rgbReserved[32];
-};
+	HDc hdc
+	Bool fErase
+	Rect rcPaint
+	Bool fRestore
+	Bool fIncUpdate
+	UInt8 rgbReserved[32]
+}
 
-enum class Message : UInt32 {
+enum Message : UInt32 {
 	WM_NULL = 0x0000,
 	WM_CREATE = 0x0001,
 	WM_DESTROY = 0x0002,
@@ -147,41 +147,41 @@ enum class Message : UInt32 {
 	WM_MBUTTONDOWN = 0x0207,
 	WM_MBUTTONUP = 0x0208,
 	WM_SIZING = 0x0214
-};
+}
 
 struct Point {
-	Int32 x;
-	Int32 y;
-};
+	Int32 x
+	Int32 y
+}
 
 struct Msg {
-	HWnd hwnd;
-	Message message;
-	void *wParam;
-	void *lParam;
-	UInt32 time;
-	Point pt;
-	UInt32 lPrivate;
-};
+	HWnd hwnd
+	Message message
+	Void *wParam
+	Void *lParam
+	UInt32 time
+	Point pt
+	UInt32 lPrivate
+}
 
-_Static_assert(sizeof(Msg) == 48, "bad sizeof");
+_Static_assert(sizeof(Msg) == 48, "bad sizeof")
 
-typedef LResult (*WindowProcedure)(HWnd hWnd, Message uMsg, void *wParam, void *lParam);
+typedef LResult (*WindowProcedure)(HWnd hWnd, Message uMsg, Void *wParam, Void *lParam)
 
 struct WindowClass {
-	UInt32 style;
-	WindowProcedure lpfnWndProc;
-	Int32 cbClsExtra;
-	Int32 cbWndExtra;
-	HInstance hInstance;
-	HIcon hIcon;
-	HCursor hCursor;
-	HBrush hbrBackground;
-	const wchar_t *lpszMenuName;
-	const wchar_t *lpszClassName;
-};
+	UInt32 style
+	WindowProcedure lpfnWndProc
+	Int32 cbClsExtra
+	Int32 cbWndExtra
+	HInstance hInstance
+	HIcon hIcon
+	HCursor hCursor
+	HBrush hbrBackground
+	const wchar_t *lpszMenuName
+	const wchar_t *lpszClassName
+}
 
-_Static_assert(sizeof(WindowClass) == 72, "bad sizeof");
+_Static_assert(sizeof(WindowClass) == 72, "bad sizeof")
 
 #define SW_HIDE 0
 #define SW_SHOWNORMAL 1
@@ -206,25 +206,25 @@ namespace tofi {} // namespace tofi
 namespace nj {
 
 typedef struct {
-	UInt8 r;
-	UInt8 g;
-	UInt8 b;
-	UInt8 a;
-} __attribute__((packed)) PixelRGBAData;
+	UInt8 r
+	UInt8 g
+	UInt8 b
+	UInt8 a
+} __attribute__((packed)) PixelRGBAData
 
 struct Pixel32 {
 	union {
-		PixelRGBAData rgba;
-		UInt32 color;
-	};
-};
+		PixelRGBAData rgba
+		UInt32 color
+	}
+}
 
-_Static_assert(sizeof(Pixel32) == 4, "bad sizeof");
+_Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 
 struct WindowFramebuffer {
-	Pixel32 *pixels;
-	UInt16 width;
-	UInt16 height;
-};
+	Pixel32 *pixels
+	UInt16 width
+	UInt16 height
+}
 
 } // namespace nj

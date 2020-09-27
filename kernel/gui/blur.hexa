@@ -17,158 +17,158 @@
 
 Int32 __attribute__((fastcall)) floor(float x) {
 	if (x >= 0) {
-		return (int32_t)x;
+		return (int32_t)x
 	} else {
-		Int32 y = (int32_t)x;
-		return ((float)y == x) ? y : y - 1;
+		Int32 y = (int32_t)x
+		return ((float)y == x) ? y : y - 1
 	}
 }
 
 float __attribute__((fastcall)) sqrt(float number) {
-	Int32 i;
-	float x2, y;
-	const float threehalfs = 1.5F;
+	Int32 i
+	float x2, y
+	const float threehalfs = 1.5F
 
-	x2 = number * 0.5F;
-	y = number;
+	x2 = number * 0.5F
+	y = number
 	i = *(Int32 *)&y;		   // floating point bit level hacking [sic]
-	i = 0x5f3759df - (i >> 1); // Newton's approximation
-	y = *(float *)&i;
-	y = y * (threehalfs - (x2 * y * y)); // 1st iteration
-	y = y * (threehalfs - (x2 * y * y)); // 2nd iteration
-	y = y * (threehalfs - (x2 * y * y)); // 3rd iteration
+	i = 0x5f3759df - (i >> 1) // Newton's approximation
+	y = *(float *)&i
+	y = y * (threehalfs - (x2 * y * y)) // 1st iteration
+	y = y * (threehalfs - (x2 * y * y)) // 2nd iteration
+	y = y * (threehalfs - (x2 * y * y)) // 3rd iteration
 
-	return 1.0f / y;
+	return 1.0f / y
 }
 
 fun __attribute__((fastcall))
 boxBlurT(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
-	double iarr = (double)1.0 / (radius + radius + 1);
+	double iarr = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < width; i++) {
-		UInt32 ti = i;
-		UInt32 li = ti;
-		UInt32 ri = ti + radius * width;
+		UInt32 ti = i
+		UInt32 li = ti
+		UInt32 ri = ti + radius * width
 
-		PixelRGBAData fv = source.pixels[ti].rgba;
-		PixelRGBAData lv = source.pixels[ti + width * (height - 1)].rgba;
+		PixelRGBAData fv = source.pixels[ti].rgba
+		PixelRGBAData lv = source.pixels[ti + width * (height - 1)].rgba
 
-		UInt16 val_r = fv.r * (radius + 1);
-		UInt16 val_g = fv.g * (radius + 1);
-		UInt16 val_b = fv.b * (radius + 1);
+		UInt16 val_r = fv.r * (radius + 1)
+		UInt16 val_g = fv.g * (radius + 1)
+		UInt16 val_b = fv.b * (radius + 1)
 
 		for (UInt8 j = 0; j < radius; j++) {
-			PixelRGBAData pixel = source.pixels[ti + j * width].rgba;
-			val_r += pixel.r;
-			val_g += pixel.g;
-			val_b += pixel.b;
+			PixelRGBAData pixel = source.pixels[ti + j * width].rgba
+			val_r += pixel.r
+			val_g += pixel.g
+			val_b += pixel.b
 		}
 
 		for (UInt8 j = 0; j <= radius; j++) {
-			PixelRGBAData pixel = source.pixels[ri].rgba;
-			val_r += (pixel.r - fv.r);
-			val_g += (pixel.g - fv.g);
-			val_b += (pixel.b - fv.b);
+			PixelRGBAData pixel = source.pixels[ri].rgba
+			val_r += (pixel.r - fv.r)
+			val_g += (pixel.g - fv.g)
+			val_b += (pixel.b - fv.b)
 
-			target.pixels[ti].rgba.r = val_r * iarr;
-			target.pixels[ti].rgba.g = val_g * iarr;
-			target.pixels[ti].rgba.b = val_b * iarr;
+			target.pixels[ti].rgba.r = val_r * iarr
+			target.pixels[ti].rgba.g = val_g * iarr
+			target.pixels[ti].rgba.b = val_b * iarr
 
-			ri += width;
-			ti += width;
+			ri += width
+			ti += width
 		}
 
 		for (UInt8 j = radius + 1; j < height - radius; j++) {
-			PixelRGBAData pixel_ri = source.pixels[ri].rgba;
-			PixelRGBAData pixel_li = source.pixels[li].rgba;
+			PixelRGBAData pixel_ri = source.pixels[ri].rgba
+			PixelRGBAData pixel_li = source.pixels[li].rgba
 
-			val_r += (pixel_ri.r - pixel_li.r);
-			val_g += (pixel_ri.g - pixel_li.g);
-			val_b += (pixel_ri.b - pixel_li.b);
+			val_r += (pixel_ri.r - pixel_li.r)
+			val_g += (pixel_ri.g - pixel_li.g)
+			val_b += (pixel_ri.b - pixel_li.b)
 
-			target.pixels[ti].rgba.r = val_r * iarr;
-			target.pixels[ti].rgba.g = val_g * iarr;
-			target.pixels[ti].rgba.b = val_b * iarr;
+			target.pixels[ti].rgba.r = val_r * iarr
+			target.pixels[ti].rgba.g = val_g * iarr
+			target.pixels[ti].rgba.b = val_b * iarr
 
-			li += width;
-			ri += width;
-			ti += width;
+			li += width
+			ri += width
+			ti += width
 		}
 
 		for (UInt16 j = height - radius; j < height; j++) {
-			PixelRGBAData pixel = source.pixels[li].rgba;
+			PixelRGBAData pixel = source.pixels[li].rgba
 
-			val_r += (lv.r + pixel.r);
-			val_g += (lv.g + pixel.g);
-			val_b += (lv.b + pixel.b);
+			val_r += (lv.r + pixel.r)
+			val_g += (lv.g + pixel.g)
+			val_b += (lv.b + pixel.b)
 
-			target.pixels[ti].rgba.r = val_r * iarr;
-			target.pixels[ti].rgba.g = val_g * iarr;
-			target.pixels[ti].rgba.b = val_b * iarr;
+			target.pixels[ti].rgba.r = val_r * iarr
+			target.pixels[ti].rgba.g = val_g * iarr
+			target.pixels[ti].rgba.b = val_b * iarr
 
-			li += width;
-			ti += width;
+			li += width
+			ti += width
 		}
 	}
 }
 
 fun __attribute__((fastcall))
 boxBlurH(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
-	double iarr = (double)1.0 / (radius + radius + 1);
+	double iarr = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < height; i++) {
-		UInt32 ti = i * width;
-		UInt32 li = ti;
-		UInt32 ri = ti + radius;
-		PixelRGBAData fv = source.pixels[ti].rgba;
-		PixelRGBAData lv = source.pixels[ti + width - 1].rgba;
+		UInt32 ti = i * width
+		UInt32 li = ti
+		UInt32 ri = ti + radius
+		PixelRGBAData fv = source.pixels[ti].rgba
+		PixelRGBAData lv = source.pixels[ti + width - 1].rgba
 
-		UInt16 val_r = fv.r * (radius + 1);
-		UInt16 val_g = fv.g * (radius + 1);
-		UInt16 val_b = fv.b * (radius + 1);
+		UInt16 val_r = fv.r * (radius + 1)
+		UInt16 val_g = fv.g * (radius + 1)
+		UInt16 val_b = fv.b * (radius + 1)
 
 		for (UInt8 j = 0; j < radius; j++) {
-			PixelRGBAData pixel = source.pixels[ti + j].rgba;
-			val_r += pixel.r;
-			val_g += pixel.g;
-			val_b += pixel.b;
+			PixelRGBAData pixel = source.pixels[ti + j].rgba
+			val_r += pixel.r
+			val_g += pixel.g
+			val_b += pixel.b
 		}
 
 		for (UInt8 j = 0; j <= radius; j++) {
-			PixelRGBAData pixel = source.pixels[ri++].rgba;
-			val_r += (pixel.r - fv.r);
-			val_g += (pixel.g - fv.g);
-			val_b += (pixel.b - fv.b);
+			PixelRGBAData pixel = source.pixels[ri++].rgba
+			val_r += (pixel.r - fv.r)
+			val_g += (pixel.g - fv.g)
+			val_b += (pixel.b - fv.b)
 
-			target.pixels[ti].rgba.r = val_r * iarr;
-			target.pixels[ti].rgba.g = val_g * iarr;
-			target.pixels[ti].rgba.b = val_b * iarr;
-			ti++;
+			target.pixels[ti].rgba.r = val_r * iarr
+			target.pixels[ti].rgba.g = val_g * iarr
+			target.pixels[ti].rgba.b = val_b * iarr
+			ti++
 		}
 
 		for (UInt8 j = radius + 1; j < width - radius; j++) {
-			PixelRGBAData pixel_ri = source.pixels[ri++].rgba;
-			PixelRGBAData pixel_li = source.pixels[li++].rgba;
+			PixelRGBAData pixel_ri = source.pixels[ri++].rgba
+			PixelRGBAData pixel_li = source.pixels[li++].rgba
 
-			val_r += (pixel_ri.r - pixel_li.r);
-			val_g += (pixel_ri.g - pixel_li.g);
-			val_b += (pixel_ri.b - pixel_li.b);
+			val_r += (pixel_ri.r - pixel_li.r)
+			val_g += (pixel_ri.g - pixel_li.g)
+			val_b += (pixel_ri.b - pixel_li.b)
 
-			target.pixels[ti].rgba.r = val_r * iarr;
-			target.pixels[ti].rgba.g = val_g * iarr;
-			target.pixels[ti].rgba.b = val_b * iarr;
-			ti++;
+			target.pixels[ti].rgba.r = val_r * iarr
+			target.pixels[ti].rgba.g = val_g * iarr
+			target.pixels[ti].rgba.b = val_b * iarr
+			ti++
 		}
 
 		for (UInt16 j = width - radius; j < width; j++) {
-			PixelRGBAData pixel = source.pixels[li++].rgba;
+			PixelRGBAData pixel = source.pixels[li++].rgba
 
-			val_r += (lv.r - pixel.r);
-			val_g += (lv.g - pixel.g);
-			val_b += (lv.b - pixel.b);
+			val_r += (lv.r - pixel.r)
+			val_g += (lv.g - pixel.g)
+			val_b += (lv.b - pixel.b)
 
-			target.pixels[ti].rgba.r = val_r * iarr;
-			target.pixels[ti].rgba.g = val_g * iarr;
-			target.pixels[ti].rgba.b = val_b * iarr;
-			ti++;
+			target.pixels[ti].rgba.r = val_r * iarr
+			target.pixels[ti].rgba.g = val_g * iarr
+			target.pixels[ti].rgba.b = val_b * iarr
+			ti++
 		}
 	}
 }
@@ -176,75 +176,75 @@ boxBlurH(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 
 fun __attribute__((fastcall))
 boxBlur(Bitmap32 *source, Bitmap32 *target, UInt16 width, UInt16 height, UInt8 radius) {
 	for (UInt32 i = 0; i < source.width * source.height; i++)
-		target.pixels[i].color = source.pixels[i].color;
-	boxBlurH(target, source, width, height, radius);
-	boxBlurT(source, target, width, height, radius);
+		target.pixels[i].color = source.pixels[i].color
+	boxBlurH(target, source, width, height, radius)
+	boxBlurT(source, target, width, height, radius)
 }
 
 UInt8 *boxesForGauss(double sigma, UInt8 n) {
-	double wIdeal = sqrt((12 * sigma * sigma / n) + 1); // Ideal averaging filter width
-	UInt8 wl = (uint8_t)floor(wIdeal);
+	double wIdeal = sqrt((12 * sigma * sigma / n) + 1) // Ideal averaging filter width
+	UInt8 wl = (uint8_t)floor(wIdeal)
 	if (wl % 2 == 0)
-		wl--;
-	UInt8 wu = wl + 2;
+		wl--
+	UInt8 wu = wl + 2
 
-	double mIdeal = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4);
+	double mIdeal = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
 #define round(x) ((x) >= 0 ? (int64_t)((x) + 0.5) : (int64_t)((x)-0.5))
-	int8_t m = round(mIdeal);
+	int8_t m = round(mIdeal)
 #undef round
 
-	UInt8 *sizes = (UInt8 *)PhysicalAllocator.allocateBytes(n);
+	UInt8 *sizes = (UInt8 *)PhysicalAllocator.allocateBytes(n)
 	for (UInt8 i = 0; i < n; i++) {
-		sizes[i] = i < m ? wl : wu;
+		sizes[i] = i < m ? wl : wu
 	}
-	return sizes;
+	return sizes
 }
 
 Bitmap32 *gaussBlur(Bitmap32 *bitmap, double radius) {
-	Bitmap32 *target = allocateBitmap(bitmap.width, bitmap.height);
+	Bitmap32 *target = allocateBitmap(bitmap.width, bitmap.height)
 
-	UInt8 *boxes = boxesForGauss(radius, 3);
-	boxBlur(bitmap, target, bitmap.width, bitmap.height, (boxes[0] - 1) / 2);
-	boxBlur(target, bitmap, bitmap.width, bitmap.height, (boxes[1] - 1) / 2);
-	boxBlur(bitmap, target, bitmap.width, bitmap.height, (boxes[2] - 1) / 2);
+	UInt8 *boxes = boxesForGauss(radius, 3)
+	boxBlur(bitmap, target, bitmap.width, bitmap.height, (boxes[0] - 1) / 2)
+	boxBlur(target, bitmap, bitmap.width, bitmap.height, (boxes[1] - 1) / 2)
+	boxBlur(bitmap, target, bitmap.width, bitmap.height, (boxes[2] - 1) / 2)
 
-	// TODO freeFromBuffer(3, boxes);
-	return target;
+	// TODO freeFromBuffer(3, boxes)
+	return target
 }
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
 PixelRGBAData __attribute__((fastcall))
 interpolatePixel(const Bitmap32 *bitmap, const float x, const float y) {
-	const UInt16 px = (uint16_t)x; // Same as floor(x)
-	const UInt16 py = (uint16_t)y; // Same as floor(y)
-	const UInt16 stride = bitmap.width;
-	const PixelRGBAData *data = (const PixelRGBAData *)bitmap.pixels;
-	const PixelRGBAData *p0 = &data[px + py * stride]; // pointer to first pixel
+	const UInt16 px = (uint16_t)x // Same as floor(x)
+	const UInt16 py = (uint16_t)y // Same as floor(y)
+	const UInt16 stride = bitmap.width
+	const PixelRGBAData *data = (const PixelRGBAData *)bitmap.pixels
+	const PixelRGBAData *p0 = &data[px + py * stride] // pointer to first pixel
 
 	// Calculate the weights
-	const float fx = x - px;
-	const float fy = y - py;
-	const float fx1 = 1.0f - fx;
-	const float fy1 = 1.0f - fy;
+	const float fx = x - px
+	const float fy = y - py
+	const float fx1 = 1.0f - fx
+	const float fy1 = 1.0f - fy
 
-	const UInt32 w1 = fx1 * fy1 * 256.0f;
-	const UInt32 w2 = fx * fy1 * 256.0f;
-	const UInt32 w3 = fx1 * fy * 256.0f;
-	const UInt32 w4 = fx * fy * 256.0f;
+	const UInt32 w1 = fx1 * fy1 * 256.0f
+	const UInt32 w2 = fx * fy1 * 256.0f
+	const UInt32 w3 = fx1 * fy * 256.0f
+	const UInt32 w4 = fx * fy * 256.0f
 
-	PixelRGBAData result;
+	PixelRGBAData result
 
 	// Neighboring pixels
-	const PixelRGBAData p1 = p0[0];
-	const PixelRGBAData p2 = p0[1];
-	const PixelRGBAData p3 = p0[stride];
-	const PixelRGBAData p4 = p0[1 + stride];
+	const PixelRGBAData p1 = p0[0]
+	const PixelRGBAData p2 = p0[1]
+	const PixelRGBAData p3 = p0[stride]
+	const PixelRGBAData p4 = p0[1 + stride]
 
 	// Weighted sum of pixels
-	result.r = (p1.r * w1 + p2.r * w2 + p3.r * w3 + p4.r * w4) >> 8;
-	result.g = (p1.g * w1 + p2.g * w2 + p3.g * w3 + p4.g * w4) >> 8;
-	result.b = (p1.b * w1 + p2.b * w2 + p3.b * w3 + p4.b * w4) >> 8;
-	result.a = (p1.a * w1 + p2.a * w2 + p3.a * w3 + p4.a * w4) >> 8;
+	result.r = (p1.r * w1 + p2.r * w2 + p3.r * w3 + p4.r * w4) >> 8
+	result.g = (p1.g * w1 + p2.g * w2 + p3.g * w3 + p4.g * w4) >> 8
+	result.b = (p1.b * w1 + p2.b * w2 + p3.b * w3 + p4.b * w4) >> 8
+	result.a = (p1.a * w1 + p2.a * w2 + p3.a * w3 + p4.a * w4) >> 8
 
-	return result;
+	return result
 }

@@ -15,7 +15,7 @@
 
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
-UInt8 keyboardPressedState[128] = {0};
+UInt8 keyboardPressedState[128] = {0}
 const UInt8 keyboardMap[128] = {
 	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
@@ -61,102 +61,102 @@ const UInt8 keyboardMap[128] = {
 	0, // F11 Key
 	0, // F12 Key
 	0, // All other keys are undefined
-};
+}
 
 #define STATUS_REGISTER 0x64
 #define DATA_PORT 0x60
 
 fun handleKeyboardPacket() {
-	// serialPrint("[keyboard] intreruroror");
-	// readPort(STATUS_REGISTER);
-	// readPort(DATA_PORT);
-	// writePort(PIC1_COMMAND, PIC_EOI);
-	// return;
+	// serialPrint("[keyboard] intreruroror")
+	// readPort(STATUS_REGISTER)
+	// readPort(DATA_PORT)
+	// writePort(PIC1_COMMAND, PIC_EOI)
+	// return
 	// Fixes race condition / hang,
 	// but probably not the best way to do it
 	// cause keyboard is *not* handled in the poller
 	// if (polls)
-	//	return;
+	//	return
 
 	// if (lockMouse)
-	//	return;
-	// while (lockMouse) {};
-	// lockMouse = true;
+	//	return
+	// while (lockMouse) {}
+	// lockMouse = true
 
-	// UInt8 status = readPort(STATUS_REGISTER);
+	// UInt8 status = readPort(STATUS_REGISTER)
 
 	/// PS2 Mouse
 	// if (status & 0x20) {
-	//	//    UInt8 keycode = readPort(DATA_PORT);
+	//	//    UInt8 keycode = readPort(DATA_PORT)
 	//	//    //if (keycode < 0) {
-	//	lockMouse = false;
-	//	handleMousePacket();
-	//	return;
+	//	lockMouse = false
+	//	handleMousePacket()
+	//	return
 	//	//    //}
-	//	//    //UInt8 buffer[] = {keyboardMap[keycode], 0};
-	//	//    UInt8 buffer[] = {'M','o','u','s','e',':', 0};
-	//	//    serialPrint(buffer);
-	//	//    serialPrint(buffer);
+	//	//    //UInt8 buffer[] = {keyboardMap[keycode], 0}
+	//	//    UInt8 buffer[] = {'M','o','u','s','e',':', 0}
+	//	//    serialPrint(buffer)
+	//	//    serialPrint(buffer)
 	//}
 
 	// if (status & 0x1)
 	{
-		UInt8 keycode = readPort(DATA_PORT);
+		UInt8 keycode = readPort(DATA_PORT)
 
 		if (keycode < 0) {
-			// lockMouse = false;
-			return;
+			// lockMouse = false
+			return
 		}
 
 		if (keycode < 128) {
-			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
+			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0}
 			if (buffer[0] == 0)
-				buffer[0] = '?';
-			// serialPrint("[");
-			// serialPrint(buffer);
-			// serialPrintf(" down] %d\n", keycode);
-			keyboardPressedState[keycode] = 1;
+				buffer[0] = '?'
+			// serialPrint("[")
+			// serialPrint(buffer)
+			// serialPrintf(" down] %d\n", keycode)
+			keyboardPressedState[keycode] = 1
 			if (haveToQuake)
-				quakeHandleButtonDown(keycode);
+				quakeHandleButtonDown(keycode)
 			else {
-				// handleKeyDown(keycode);
+				// handleKeyDown(keycode)
 			}
 		} else {
-			keycode = keycode - 128;
-			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
+			keycode = keycode - 128
+			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0}
 			if (buffer[0] == 0)
-				buffer[0] = '?';
-			// serialPrint("[");
-			// serialPrint(buffer);
-			// serialPrintf(" up] %d\n", keycode + 128);
-			keyboardPressedState[keycode] = 0;
+				buffer[0] = '?'
+			// serialPrint("[")
+			// serialPrint(buffer)
+			// serialPrintf(" up] %d\n", keycode + 128)
+			keyboardPressedState[keycode] = 0
 		}
 
 		// if (status & 0x20) {
-		//    UInt8 buffer[] = {'M', 0};
-		//    serialPrint(buffer);
+		//    UInt8 buffer[] = {'M', 0}
+		//    serialPrint(buffer)
 		//}
 	}
 
 	// Note: Quake terminal has higher priority than kernel itself
 	if (keyboardPressedState[41]) {
-		haveToQuake = !haveToQuake;
+		haveToQuake = !haveToQuake
 		// TODO DWM
-		haveToRender = 1;
+		haveToRender = 1
 	}
 
-	// keyDownHandler = null;
+	// keyDownHandler = null
 	// if (haveToQuake)
-	//	keyDownHandler = quakeHandleButtonDown;
+	//	keyDownHandler = quakeHandleButtonDown
 
 	// EOI
 	// Disable this line if polling is used
 	// TODO @defer
-	writePort(PIC1_COMMAND, PIC_EOI);
-	// lockMouse = false;
+	writePort(PIC1_COMMAND, PIC_EOI)
+	// lockMouse = false
 }
 
 fun handleKeyboard() {
-	// UInt8 status = readPort(STATUS_REGISTER);
-	// pollForce = status;
+	// UInt8 status = readPort(STATUS_REGISTER)
+	// pollForce = status
 }

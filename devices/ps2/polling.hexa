@@ -22,25 +22,25 @@
 // ^ use hlt in scheduler
 
 UInt8 readPS2() {
-	return readPort(0x64);
+	return readPort(0x64)
 }
 
 UInt8 pollPS2Devices() {
 
-	UInt8 poll = readPS2();
+	UInt8 poll = readPS2()
 
 	while (getBit(poll, 0) == 1) {
 		// Mouse has higher priority
 		while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
-			handleMousePacket();
-			poll = readPS2();
+			handleMousePacket()
+			poll = readPS2()
 		}
 
 		if (getBit(poll, 0) == 1 && getBit(poll, 5) == 0) {
-			handleKeyboardPacket();
-			poll = readPS2();
+			handleKeyboardPacket()
+			poll = readPS2()
 		}
 	}
 
-	return 0;
+	return 0
 }

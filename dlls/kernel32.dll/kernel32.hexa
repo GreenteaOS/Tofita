@@ -18,30 +18,30 @@
 #include "kernel32Vars.hpp"
 
 extern "C" {
-void ExitProcess(UInt32 exitCode) {
-	tofitaExitProcess(exitCode);
-	while (true) {};
+Void ExitProcess(UInt32 exitCode) {
+	tofitaExitProcess(exitCode)
+	while (true) {}
 }
 
 wapi.HLocal LocalAlloc(UInt32 flags, size_t bytes) {
-	auto result = &kernel32.buffer[kernel32.bufferOffset];
-	kernel32.bufferOffset += bytes;
+	auto result = &kernel32.buffer[kernel32.bufferOffset]
+	kernel32.bufferOffset += bytes
 	// Align to 8 bytes
 	// Because handle has some bits reserved for tags
 	// TODO how many bits exactly?
 	// TODO also pre-align at CRT startup, cause section may be misaligned
 	while (kernel32.bufferOffset % 8 != 0)
-		kernel32.bufferOffset++;
-	return (wapi.HLocal)result;
+		kernel32.bufferOffset++
+	return (wapi.HLocal)result
 }
 
 wapi.HGlobal GlobalAlloc(UInt32 flags, size_t bytes) {
-	return (wapi.HGlobal)LocalAlloc(0, bytes);
+	return (wapi.HGlobal)LocalAlloc(0, bytes)
 }
 
-void *HeapAlloc(wapi.Handle heap, UInt32 flags, size_t bytes) {
-	return (void *)LocalAlloc(0, bytes);
+Void *HeapAlloc(wapi.Handle heap, UInt32 flags, size_t bytes) {
+	return (Void *)LocalAlloc(0, bytes)
 }
 
-__attribute__((fastcall)) void _DllMainCRTStartup() {}
+__attribute__((fastcall)) Void _DllMainCRTStartup() {}
 }
