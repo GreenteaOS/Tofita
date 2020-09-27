@@ -98,6 +98,14 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 				imageSectionHeader[i].sizeOfRawData);
 	}
 
+	// TODO
+	{
+		uint32_t (*func)() =
+			(uint32_t(*)())((uint64_t)buffer + (uint64_t)peOptionalHeader->addressOfEntryPoint);
+		if (peOptionalHeader->addressOfEntryPoint == 4128)
+			serialPrintf(L"[[[IMAGE_DIRECTORY_ENTRY_EXPORT]]] calling _DllMainCRTStartup == %d\n", func());
+	}
+
 	auto imageDataDirectory =
 		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(Pe64OptionalHeader));
 
@@ -349,7 +357,6 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 		process->frame.sp = app.stackVirtual;
 		process->frame.rcxArg0 = app.pei.entry; // First argument
 	}
-
 }
 
 } // namespace exe
