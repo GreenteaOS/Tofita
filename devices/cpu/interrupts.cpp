@@ -549,6 +549,8 @@ void timerInterruptHandler(volatile InterruptFrame *frame) {
 			}
 		}
 	}
+	//		if (currentThread == THREAD_INIT) {
+	//			// TODO hexa error == statement: currentThread == THREAD_INIT;
 
 	// Enable interrupts
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
@@ -588,7 +590,6 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 		process->present = false;
 		return;
 	}
-
 }
 
 function setTsr(volatile uint16_t tsr_data);
