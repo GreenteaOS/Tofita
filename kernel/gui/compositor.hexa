@@ -29,7 +29,7 @@ Bitmap32 *notepad48
 Bitmap32 *link
 cursor.Cursor *cur = null
 
-UInt16 startupAnimation = 0
+var startupAnimation: UInt16 = 0
 
 typedef enum {
 	Center,

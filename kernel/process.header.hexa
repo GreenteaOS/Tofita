@@ -64,7 +64,7 @@ class Process {
 const UInt64 ProcessLimit = 256
 
 // TODO dynamic allocation of this list
-Process processes[ProcessLimit] = {0}
+var processes[ProcessLimit]: Process = {0}
 
 // Working process pid, with restored state and active CR3
 @volatile UInt64 currentProcess = 0

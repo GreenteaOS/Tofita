@@ -15,4 +15,4 @@
 
 // TODO replace to virtual alloc
 UInt8 buffer[1024 * 1024] = {0}
-UInt32 bufferOffset = 0
+var bufferOffset: UInt32 = 0

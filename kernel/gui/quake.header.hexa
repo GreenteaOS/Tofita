@@ -15,6 +15,6 @@
 
 // Quake-style console with ~
 
-UInt8 haveToQuake = 0
+var haveToQuake: UInt8 = 0
 fun quakeHandleButtonDown(key: UInt8)
 fun qsod(const WideChar *format, extra: UInt64, const UInt64 more)

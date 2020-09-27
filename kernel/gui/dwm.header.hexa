@@ -18,7 +18,7 @@
 
 
 // Zero for system GUI (like taskbar)
-UInt64 firstResponder = 0 // Active window to catch keyboard input
+var firstResponder: UInt64 = 0 // Active window to catch keyboard input
 
 @struct
 class OverlappedWindow {
@@ -51,13 +51,13 @@ const UInt64 windowsLimit = 256
 // TODO allocate dynamically (just use Hexa Array or something)
 OverlappedWindow windowsList[windowsLimit]
 
-UInt64 rootWindow = 0
-UInt64 topmostWindow = 0
+var rootWindow: UInt64 = 0
+var topmostWindow: UInt64 = 0
 
-Bool mouseDragCapturedWindow = false
-UInt64 mouseDragWindow = 0
-Int16 mouseDragLastX = 0
-Int16 mouseDragLastY = 0
+var mouseDragCapturedWindow: Bool = false
+var mouseDragWindow: UInt64 = 0
+var mouseDragLastX: Int16 = 0
+var mouseDragLastY: Int16 = 0
 
 // Note: those are controlled by DWM
 @volatile Int16 mouseX = 256
@@ -65,9 +65,9 @@ Int16 mouseDragLastY = 0
 
 enum FrameHover : UInt8 { Noop = 0, Min, Max, Close }
 
-UInt64 frameHoverWindow = 0
-Bool frameHoverWindowDown = false
-FrameHover frameHoverState = FrameHover.Noop
+var frameHoverWindow: UInt64 = 0
+var frameHoverWindowDown: Bool = false
+var frameHoverState: FrameHover = FrameHover.Noop
 
 OverlappedWindow *OverlappedWindow_create(pid: UInt64)
 OverlappedWindow *OverlappedWindow_findAnyProcessWindow(pid: UInt64)
