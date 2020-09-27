@@ -20,7 +20,7 @@
 	}
 
 	static float sqrt(float number) {
-		Int32 i
+		var i: Int32
 		float x2, y
 		const float threehalfs = 1.5F
 

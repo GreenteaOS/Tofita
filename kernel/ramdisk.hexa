@@ -15,16 +15,16 @@
 
 @struct
 class {
-	UInt32 ramDiskChecksum
-	UInt32 ramDiskSize
-	UInt32 assetsCount
+	var ramDiskChecksum: UInt32
+	var ramDiskSize: UInt32
+	var assetsCount: UInt32
 } RamDiskInfo
 
 @struct
 class {
-	UInt16 path[128]
-	UInt32 size
-	UInt32 offsetFromRamDiskFirstByte
+	var path[128]: UInt16
+	var size: UInt32
+	var offsetFromRamDiskFirstByte: UInt32
 } RamDiskAssetInfo
 
 static const RamDisk *_ramdisk
@@ -34,12 +34,12 @@ fun setRamDisk(const RamDisk *ramdisk) {
 
 @struct
 class {
-	UInt32 size
+	var size: UInt32
 	UInt8 *data
 } RamDiskAsset
 
 const RamDiskAsset getRamDiskAsset(const WideChar *pathToAsset) {
-	RamDiskAsset asset
+	var asset: RamDiskAsset
 	asset.size = 0
 	asset.data = 0
 	const UInt16 *path = (const UInt16 *)pathToAsset

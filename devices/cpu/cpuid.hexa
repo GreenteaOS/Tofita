@@ -24,7 +24,7 @@ class CPUID {
 const UInt32 cpuidExtendedLevels = 0x80000000
 
 fun getCPUID(): CPUID {
-	CPUID result
+	var result: CPUID
 	var stub: UInt32 = 0
 	amd64.cpuid(0, 0, &result.data, (UInt32 *)(&result.vendorID[0]), (UInt32 *)(&result.vendorID[8]),
 				 (UInt32 *)(&result.vendorID[4]))

@@ -109,7 +109,7 @@ fun handleKeyboardPacket() {
 		}
 
 		if (keycode < 128) {
-			WideChar buffer[] = {(char8_t)keyboardMap[keycode], 0}
+			var buffer[]: WideChar = {(char8_t)keyboardMap[keycode], 0}
 			if (buffer[0] == 0)
 				buffer[0] = '?'
 			// serialPrint("[")
@@ -123,7 +123,7 @@ fun handleKeyboardPacket() {
 			}
 		} else {
 			keycode = keycode - 128
-			WideChar buffer[] = {(char8_t)keyboardMap[keycode], 0}
+			var buffer[]: WideChar = {(char8_t)keyboardMap[keycode], 0}
 			if (buffer[0] == 0)
 				buffer[0] = '?'
 			// serialPrint("[")

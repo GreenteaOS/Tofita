@@ -25,9 +25,9 @@
 
 @struct
 class MouseAction {
-	Int16 mouseXdiff
-	Int16 mouseYdiff
-	MouseActionType type
+	var mouseXdiff: Int16
+	var mouseYdiff: Int16
+	var type: MouseActionType
 	// TODO time stamp
 }
 

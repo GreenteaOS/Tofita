@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+
 
 
 
@@ -48,20 +48,20 @@ typedef UInt16 Atom
 
 @struct
 class Rect {
-	Int32 left
-	Int32 top
-	Int32 right
-	Int32 bottom
+	var left: Int32
+	var top: Int32
+	var right: Int32
+	var bottom: Int32
 }
 
 @struct
 class PaintStruct {
-	HDc hdc
-	Bool fErase
-	Rect rcPaint
-	Bool fRestore
-	Bool fIncUpdate
-	UInt8 rgbReserved[32]
+	var hdc: HDc
+	var fErase: Bool
+	var rcPaint: Rect
+	var fRestore: Bool
+	var fIncUpdate: Bool
+	var rgbReserved[32]: UInt8
 }
 
 enum Message : UInt32 {
@@ -153,19 +153,19 @@ enum Message : UInt32 {
 
 @struct
 class Point {
-	Int32 x
-	Int32 y
+	var x: Int32
+	var y: Int32
 }
 
 @struct
 class Msg {
-	HWnd hwnd
-	Message message
+	var hwnd: HWnd
+	var message: Message
 	Void *wParam
 	Void *lParam
-	UInt32 time
-	Point pt
-	UInt32 lPrivate
+	var time: UInt32
+	var pt: Point
+	var lPrivate: UInt32
 }
 
 _Static_assert(sizeof(Msg) == 48, "bad sizeof")
@@ -174,14 +174,14 @@ typedef LResult (*WindowProcedure)(HWnd hWnd, uMsg: Message, Void *wParam, Void 
 
 @struct
 class WindowClass {
-	UInt32 style
-	WindowProcedure lpfnWndProc
-	Int32 cbClsExtra
-	Int32 cbWndExtra
-	HInstance hInstance
-	HIcon hIcon
-	HCursor hCursor
-	HBrush hbrBackground
+	var style: UInt32
+	var lpfnWndProc: WindowProcedure
+	var cbClsExtra: Int32
+	var cbWndExtra: Int32
+	var hInstance: HInstance
+	var hIcon: HIcon
+	var hCursor: HCursor
+	var hbrBackground: HBrush
 	const WideChar *lpszMenuName
 	const WideChar *lpszClassName
 }
@@ -212,17 +212,17 @@ let SW_MAX = 11
 
 @struct
 class {
-	UInt8 r
-	UInt8 g
-	UInt8 b
-	UInt8 a
+	var r: UInt8
+	var g: UInt8
+	var b: UInt8
+	var a: UInt8
 } @packed PixelRGBAData
 
 @struct
 class Pixel32 {
 	union {
-		PixelRGBAData rgba
-		UInt32 color
+		var rgba: PixelRGBAData
+		var color: UInt32
 	}
 }
 
@@ -231,6 +231,6 @@ _Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 @struct
 class WindowFramebuffer {
 	Pixel32 *pixels
-	UInt16 width
-	UInt16 height
+	var width: UInt16
+	var height: UInt16
 }

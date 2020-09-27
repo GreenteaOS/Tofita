@@ -15,7 +15,7 @@
 
 // Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
 
-#include "log.cpp"
+import "log.cpp"
 
 fun initSerial(): UInt8 {
 	// Calculate divisor for baud generator

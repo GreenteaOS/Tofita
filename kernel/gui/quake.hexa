@@ -31,7 +31,7 @@ fun quake() {
 	}
 
 	drawVibrancedRectangle(0, 0, _framebuffer.width, quakeHeight)
-	Pixel32 color
+	var color: Pixel32
 	color.color = 0x126099FF
 	lineHorizontal(color, 0, quakeHeight, _framebuffer.width)
 	// color.rgba.r = color.rgba.g = color.rgba.b = 48
@@ -211,7 +211,7 @@ fun quakePrintf(const WideChar *c, ...) {
 			break
 		case 'd': {
 			var value: Int32 = va_arg(lst, int32_t)
-			UInt8 buffer[16]
+			var buffer[16]: UInt8
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			_quakeItoA(value, buffer)
@@ -224,7 +224,7 @@ fun quakePrintf(const WideChar *c, ...) {
 		}
 		case 'u': {
 			var value: UInt32 = va_arg(lst, uint32_t)
-			UInt8 buffer[16]
+			var buffer[16]: UInt8
 			for (UInt8 i = 0; i < 16; i++)
 				buffer[i] = 0
 			_quakeItoA(value, buffer)

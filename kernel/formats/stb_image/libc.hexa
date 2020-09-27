@@ -42,7 +42,7 @@ Void *libc_realloc(Void *addr, size: UInt64) {
 }
 
 Void *libc_memset(Void *b, c: Int32, len: Int32) {
-	Int32 i
+	var i: Int32
 	UInt8 *p = (UInt8 *)b
 	i = 0
 	while (len > 0) {

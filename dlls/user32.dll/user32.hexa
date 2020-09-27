@@ -14,9 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define USER32_DLL @dllExport
-#include "user32.hpp"
-#include "user32Vars.hpp"
-#include "../kernel32.dll/kernel32.hpp"
+import "user32.hpp"
+import "user32Vars.hpp"
+import "../kernel32.dll/kernel32.hpp"
 
 // Utils
 
@@ -114,7 +114,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 	}
 
 	// Prepare for syscall
-	CreateWindowExPayload payload
+	var payload: CreateWindowExPayload
 
 	payload.wc = wc
 
@@ -154,7 +154,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 wapi.Bool ShowWindow(wapi.HWnd hWnd, nCmdShow: Int32) {
 	tofitaDebugLog("ShowWindow called")
 	var window = handleToWindow(hWnd)
-	wapi.Bool result = 0
+	var result: wapi.Bool = 0
 	if (window != null) {
 		switch (nCmdShow) {
 		case SW_HIDE: {
@@ -181,9 +181,9 @@ wapi.Bool ShowWindow(wapi.HWnd hWnd, nCmdShow: Int32) {
 // TODO take 2 or more messages at a time for better perf (this is pretty common)
 wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32) {
 	tofitaDebugLog("GetMessageW called")
-	wapi.Bool result = 1
+	var result: wapi.Bool = 1
 
-	GetMessagePayload payload
+	var payload: GetMessagePayload
 	payload.msg = msg
 	payload.hWnd = hWnd
 	payload.wMsgFilterMin = wMsgFilterMin
@@ -207,7 +207,7 @@ wapi.Bool TranslateMessage(wapi.Msg *msg) {
 
 wapi.LResult DispatchMessageW(wapi.Msg *msg) {
 	tofitaDebugLog("DispatchMessageW called")
-	wapi.LResult result = 0
+	var result: wapi.LResult = 0
 	if (msg.hwnd != null) {
 		var window = handleToWindow(msg.hwnd)
 		if (window == null)
@@ -227,7 +227,7 @@ wapi.LResult DispatchMessageW(wapi.Msg *msg) {
 }
 
 wapi.Bool PostMessage(wapi.HWnd hWnd, wapi.Message msg, Void *wParam, Void *lParam) {
-	PostMessagePayload payload
+	var payload: PostMessagePayload
 	payload.hWnd = hWnd
 	payload.msg = msg
 	payload.wParam = wParam
@@ -270,7 +270,7 @@ Int32 FillRect(wapi.HDc dc, const wapi.Rect *lprc, wapi.HBrush brush) {
 
 	var fb = (nj.WindowFramebuffer *)dc
 
-	nj.Pixel32 color
+	var color: nj.Pixel32
 	color.color = 0xFFAA0000
 
 	for (Int16 y = lprc.top; y < lprc.bottom; y++) {

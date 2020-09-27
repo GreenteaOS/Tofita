@@ -17,7 +17,7 @@
 
 @extern "C++"
 	fun compositeDesktop(Int16 mouseX, mouseY: Int16) {
-		Pixel32 color
+		var color: Pixel32
 		color.rgba.r = color.rgba.g = color.rgba.b = 0xFF
 		color.rgba.a = 64
 

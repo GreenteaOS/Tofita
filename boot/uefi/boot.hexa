@@ -15,24 +15,13 @@
 
 // Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
 
-@extern "C" {
-
-
-#include <efi.hpp>
-}
-
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdarg.h>
-
-#include "../shared/boot.hpp"
-#include "../../devices/serial/init.cpp"
-#include "memory.cpp"
-#include "ramdisk.cpp"
-#include "pe.cpp"
-#include "visuals.cpp"
-#include "../../kernel/ramdisk.cpp"
+import "../shared/boot.hpp"
+import "../../devices/serial/init.cpp"
+import "memory.cpp"
+import "ramdisk.cpp"
+import "pe.cpp"
+import "visuals.cpp"
+import "../../kernel/ramdisk.cpp"
 
 efi.INTN compareGuid(efi.EFI_GUID *guid1, efi.EFI_GUID *guid2) {
 	efi.INT32 *g1, *g2, r
@@ -68,7 +57,7 @@ fun drawLoading(Framebuffer *framebuffer, progress: UInt8) {
 		}
 }
 
-#include "../shared/paging.cpp"
+import "../shared/paging.cpp"
 
 Void *memset(Void *dest, e: Int32, len: UInt64) {
 	UInt8 *d = (UInt8 *)dest
@@ -109,8 +98,8 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	Void *acpiTable = NULL
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI")
-		efi.EFI_GUID acpi20 = ACPI_20_TABLE_GUID
-		efi.EFI_GUID acpi = ACPI_TABLE_GUID
+		var acpi20: efi.EFI_GUID = ACPI_20_TABLE_GUID
+		var acpi: efi.EFI_GUID = ACPI_TABLE_GUID
 
 		for (UInt64 i = 0; i < systemTable.NumberOfTableEntries; i++) {
 			efi.EFI_CONFIGURATION_TABLE *efiTable = &systemTable.ConfigurationTable[i]
@@ -130,10 +119,10 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 		serialPrintln("[[[efi_main]]] done: ACPI")
 	}
 
-	efi.EFI_STATUS status = EFI_NOT_READY
+	var status: efi.EFI_STATUS = EFI_NOT_READY
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer")
-	Framebuffer framebuffer
+	var framebuffer: Framebuffer
 	initializeFramebuffer(&framebuffer, systemTable)
 	drawLoading(&framebuffer, 0)
 	drawText("GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag "",
@@ -151,7 +140,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
-	RamDisk ramdisk
+	var ramdisk: RamDisk
 	status = findAndLoadRamDisk(systemTable.BootServices, &ramdisk)
 	while (status != EFI_SUCCESS) {
 		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, &framebuffer)
@@ -160,7 +149,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap")
 	var sizeAlloc: UInt64 = (ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE
-	EfiMemoryMap efiMemoryMap
+	var efiMemoryMap: EfiMemoryMap
 	efiMemoryMap.memoryMapSize = sizeof(efi.EFI_MEMORY_DESCRIPTOR) * 512
 	efiMemoryMap.memoryMap = (efi.EFI_MEMORY_DESCRIPTOR *)(ramdisk.base + sizeAlloc)
 	{
@@ -173,12 +162,12 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	fillMemoryMap(&efiMemoryMap, systemTable)
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap")
 
-	efi.EFI_TIME time
+	var time: efi.EFI_TIME
 	time.Year = 2020
-	efi.EFI_TIME_CAPABILITIES capabilities
+	var capabilities: efi.EFI_TIME_CAPABILITIES
 	{
 		serialPrintln("[[[efi_main]]] begin: GetTime")
-		efi.EFI_STATUS status = systemTable.RuntimeServices.GetTime(&time, &capabilities)
+		var status: efi.EFI_STATUS = systemTable.RuntimeServices.GetTime(&time, &capabilities)
 		while (status != EFI_SUCCESS) {
 			serialPrintln("[[[efi_main]]] <ERROR> GetTime")
 			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, &framebuffer)

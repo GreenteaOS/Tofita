@@ -21,7 +21,7 @@
 class Module {
 	const Char8 *name
 	const RamDiskAsset *dll
-	UInt64 base
+	var base: UInt64
 }
 
 @struct

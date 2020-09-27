@@ -28,35 +28,35 @@ Void *offsetPointer(Void *data, ptrdiff_t offset) {
 
 @struct
 class ImageDataDirectory {
-	UInt32 virtualAddress
-	UInt32 size
+	var virtualAddress: UInt32
+	var size: UInt32
 }
 
 @struct
 class PeInterim {
 	Void *base
-	UInt64 entry // _DllMainCRTStartup
+	var entry: UInt64 // _DllMainCRTStartup
 	const ImageDataDirectory *imageDataDirectory
-	UInt64 sizeOfStackReserve
+	var sizeOfStackReserve: UInt64
 }
 
 @struct
 class ExeInterim {
-	PeInterim pei
-	UInt64 stackVirtual
+	var pei: PeInterim
+	var stackVirtual: UInt64
 }
 
 @struct
 class PeExportLinkedList {
 	const Char8 *name
-	UInt64 ptr
+	var ptr: UInt64
 	PeExportLinkedList *next
-	UInt8 hash
+	var hash: UInt8
 }
 
 @struct
 class Executable {
-	UInt64 nextBase
+	var nextBase: UInt64
 	pages.PageEntry *pml4
 }
 
@@ -119,7 +119,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 	if (delta != 0) {
 		UInt8 *codeBase = (UInt8 *)buffer
 
-		PIMAGE_BASE_RELOCATION relocation
+		var relocation: PIMAGE_BASE_RELOCATION
 
 		PIMAGE_DATA_DIRECTORY directory =
 			(PIMAGE_DATA_DIRECTORY)&imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC]
@@ -181,7 +181,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 			var codeBase: UInt64 = (uint64_t)buffer
 			const ImageDataDirectory *directory = &imageDataDirectory[i]
 
-			PIMAGE_EXPORT_DIRECTORY exports
+			var exports: PIMAGE_EXPORT_DIRECTORY
 
 			exports = (PIMAGE_EXPORT_DIRECTORY)((uint64_t)buffer + (uint64_t)directory.virtualAddress)
 
@@ -210,7 +210,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 		}
 	}
 
-	PeInterim pei
+	var pei: PeInterim
 
 	pei.base = (Void *)buffer
 	pei.entry = (uint64_t)buffer + (uint64_t)peOptionalHeader.addressOfEntryPoint
@@ -308,7 +308,7 @@ fun resolveDllImports(pei: PeInterim, PeExportLinkedList *root) {
 }
 
 auto loadExe(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
-	ExeInterim ei
+	var ei: ExeInterim
 
 	ei.pei = loadDll(name, root, exec)
 
@@ -341,7 +341,7 @@ fun loadExeIntoProcess(const WideChar *file, process.Process *process) {
 		root.name = null
 		root.ptr = 0
 
-		Executable exec
+		var exec: Executable
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
 
