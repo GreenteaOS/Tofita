@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace userCall {
 Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls syscall) {
 	@volatile var frame = &process.frame
 
@@ -206,4 +205,3 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 
 	return false
 }
-Call

@@ -15,13 +15,13 @@
 
 // Quake-style console with ~
 
-UInt8 quakeHeight = 255
-Char8 quakeCommand[256] = {0}
-Char8 quakeLines[17][256] = {0}
-UInt8 quakeLine = 0
-UInt8 quakeRow = 0
-Float quakeAdvance = 0.0
-UInt8 quakeCommandSize = 0
+var quakeHeight: UInt8 = 255
+var quakeCommand[256]: Char8 = {0}
+var quakeLines[17][256]: Char8 = {0}
+var quakeLine: UInt8 = 0
+var quakeRow: UInt8 = 0
+var quakeAdvance: Float = 0.0
+var quakeCommandSize: UInt8 = 0
 
 fun quakePrintf(const WideChar *c, ...)
 

@@ -43,7 +43,7 @@
 // This is not a best solution
 @volatile Bool haveToRender = true
 
-UInt64 uptimeMilliseconds = 0
+var uptimeMilliseconds: UInt64 = 0
 
 // Forward for global usage
 fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, Bool dark = true)

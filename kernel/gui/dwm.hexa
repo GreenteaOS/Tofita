@@ -17,7 +17,7 @@
 
 
 
-UInt8 nextDefaultWindowPosition = 0
+var nextDefaultWindowPosition: UInt8 = 0
 
 OverlappedWindow *OverlappedWindow_create(pid: UInt64) {
 	var index: UInt64 = 0

@@ -15,7 +15,7 @@
 
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
-UInt8 keyboardPressedState[128] = {0}
+var keyboardPressedState[128]: UInt8 = {0}
 let keyboardMap[128]: UInt8 = {
 	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9

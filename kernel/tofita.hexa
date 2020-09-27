@@ -129,7 +129,7 @@ Void ___chkstk_ms(){}
 #include "syscalls/user32/userCall.cpp"
 
 const KernelParams *paramsCache = null
-UInt64 startupMilliseconds = 0
+var startupMilliseconds: UInt64 = 0
 
 fun kernelInit(const KernelParams *params) {
 	serialPrintln("<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(

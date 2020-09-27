@@ -381,7 +381,7 @@ Void anyInterruptHandler(InterruptFrame *frame) {
 }
 
 // ~121 times per second
-UInt64 timerCalled = 0
+var timerCalled: UInt64 = 0
 
 const UInt64 stackSizeForKernelThread = 1024 * 1024
 
@@ -394,8 +394,8 @@ fun guiThread()
 
 @extern "C" Void timerInterruptHandler(@volatile InterruptFrame *frame)
 
-UInt8 extraMillisecond = 0
-UInt8 taskBarRedraw = 0 // Re-paint task bar current time
+var extraMillisecond: UInt8 = 0
+var taskBarRedraw: UInt8 = 0 // Re-paint task bar current time
 @volatile Bool nextIsUserProcess = false
 @volatile Bool nextIsGuiThread = true
 

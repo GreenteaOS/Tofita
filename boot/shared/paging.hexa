@@ -146,8 +146,8 @@ fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
 #define createMapping(fromTable, toTable)                                                                    \
 	static Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64,          \
 								UInt8 writeAllowed) {                                                      \
-		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed);           \
-		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr, writeAllowed);                        \
+		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed)           \
+		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr, writeAllowed)                        \
 	}
 
 createMapping(pd, pt)
@@ -156,8 +156,8 @@ createMapping(pml4, pdpt)
 
 #define createHugeMapping(name, fromTable, calls, toTable)                                                   \
 	static Void map_##name(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {             \
-		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1);                      \
-		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr);                                        \
+		Void *toTable = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1)                      \
+		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr)                                        \
 	}
 
 createHugeMapping(p3huge, pdpt, p2huge, pd)
@@ -290,7 +290,7 @@ UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, pages: UInt32) {
 }
 #end
 
-UInt8 buffa[1] = {0}
+var buffa[1]: UInt8 = {0}
 
 UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
