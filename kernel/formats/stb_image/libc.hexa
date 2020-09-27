@@ -22,28 +22,28 @@
 #define abs libc_abs
 #define pow libc_pow
 
-function libc_free(void *addr) {
+fun libc_free(void *addr) {
 	// Do nothing for now
-	serialPrintf(L"[libc] libc_free\n");
+	serialPrintf("[libc] libc_free\n");
 }
 
-void *libc_malloc(uint64_t size) {
-	serialPrintf(L"[libc] libc_malloc of size %u\n", size);
-	return (void *)PhysicalAllocator::allocateBytes(size);
+void *libc_malloc(UInt64 size) {
+	serialPrintf("[libc] libc_malloc of size %u\n", size);
+	return (void *)PhysicalAllocator.allocateBytes(size);
 }
 
-void *libc_realloc(void *addr, uint64_t size) {
-	serialPrintf(L"[libc] libc_realloc %u of size %u\n", addr, size);
+void *libc_realloc(void *addr, UInt64 size) {
+	serialPrintf("[libc] libc_realloc %u of size %u\n", addr, size);
 
 	{
-		var result = PhysicalAllocator::allocateBytes(size);
+		var result = PhysicalAllocator.allocateBytes(size);
 		return (void *)result;
 	}
 }
 
-void *libc_memset(void *b, int32_t c, int32_t len) {
-	int32_t i;
-	uint8_t *p = (uint8_t *)b;
+void *libc_memset(void *b, Int32 c, Int32 len) {
+	Int32 i;
+	UInt8 *p = (UInt8 *)b;
 	i = 0;
 	while (len > 0) {
 		*p = c;
@@ -53,12 +53,12 @@ void *libc_memset(void *b, int32_t c, int32_t len) {
 	return (b);
 }
 
-int32_t libc_abs(int32_t v) {
+Int32 libc_abs(Int32 v) {
 	return v * ((v < 0) * (-1) + (v > 0));
 }
 
-int32_t libc_pow(int32_t a, int32_t n) {
-	int32_t r = 1;
+Int32 libc_pow(Int32 a, Int32 n) {
+	Int32 r = 1;
 	while (n > 0) {
 		if (n & 1)
 			r *= a;
@@ -68,13 +68,13 @@ int32_t libc_pow(int32_t a, int32_t n) {
 	return r;
 }
 
-function libc_memcpy(void *dest, const void *src, uint64_t n) {
-	const uint8_t *csrc = (uint8_t *)src;
-	uint8_t *cdest = (uint8_t *)dest;
-	for (int32_t i = 0; i < n; i++)
+fun libc_memcpy(void *dest, const void *src, UInt64 n) {
+	const UInt8 *csrc = (UInt8 *)src;
+	UInt8 *cdest = (UInt8 *)dest;
+	for (Int32 i = 0; i < n; i++)
 		cdest[i] = csrc[i];
 }
 
-function memcpy(void *dest, const void *src, uint64_t n) {
+fun memcpy(void *dest, const void *src, UInt64 n) {
 	libc_memcpy(dest, src, n);
 }

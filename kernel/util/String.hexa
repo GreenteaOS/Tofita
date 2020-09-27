@@ -13,21 +13,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-uint64_t String::length(const wchar_t *source) {
-	let string = (const uint16_t *)source;
-	uint32_t i = 0;
+UInt64 String.length(const wchar_t *source) {
+	let string = (const UInt16 *)source;
+	UInt32 i = 0;
 	while (string[i] != 0) {
 		i++;
 	}
 	return i * 2 + 2;
 }
 
-const wchar_t *String::duplicate(const wchar_t *source) {
+const wchar_t *String.duplicate(const wchar_t *source) {
 	let bytes = length(source);
-	var result = (uint16_t *)allocateBytes(bytes);
-	let string = (const uint16_t *)source;
+	var result = (UInt16 *)allocateBytes(bytes);
+	let string = (const UInt16 *)source;
 
-	uint32_t i = 0;
+	UInt32 i = 0;
 	while (string[i] != 0) {
 		result[i] = string[i];
 		i++;

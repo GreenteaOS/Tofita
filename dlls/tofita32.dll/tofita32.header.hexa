@@ -26,20 +26,20 @@
 extern "C" {
 // Tofita
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
-TOFITA32_DLL uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx = 0);
-__attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub();
-TOFITA32_DLL void tofitaDebugLog(const wchar_t *message, uint64_t extra = 0, uint64_t more = 0);
+TOFITA32_DLL UInt64 tofitaFastSystemCall(TofitaSyscalls rcx, UInt64 rdx = 0);
+__attribute__((fastcall)) TOFITA32_DLL UInt32 tofitaFastStub();
+TOFITA32_DLL void tofitaDebugLog(const wchar_t *message, UInt64 extra = 0, UInt64 more = 0);
 
 // Kernel32
-TOFITA32_DLL void tofitaExitProcess(uint32_t exitCode);
+TOFITA32_DLL void tofitaExitProcess(UInt32 exitCode);
 
 // User32
-TOFITA32_DLL uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload);
-TOFITA32_DLL void tofitaShowWindow(uint64_t windowId, int32_t nCmdShow);
-TOFITA32_DLL wapi::Bool tofitaGetMessage(GetMessagePayload *payload);
-TOFITA32_DLL wapi::Bool tofitaPostMessage(PostMessagePayload *payload);
+TOFITA32_DLL UInt64 tofitaCreateWindowEx(CreateWindowExPayload *payload);
+TOFITA32_DLL void tofitaShowWindow(UInt64 windowId, Int32 nCmdShow);
+TOFITA32_DLL wapi.Bool tofitaGetMessage(GetMessagePayload *payload);
+TOFITA32_DLL wapi.Bool tofitaPostMessage(PostMessagePayload *payload);
 
 // NjRAA
-TOFITA32_DLL void njraaGetOrCreateWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb);
-TOFITA32_DLL void njraaSwapWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb);
+TOFITA32_DLL void njraaGetOrCreateWindowFramebuffer(UInt64 windowId, nj.WindowFramebuffer *fb);
+TOFITA32_DLL void njraaSwapWindowFramebuffer(UInt64 windowId, nj.WindowFramebuffer *fb);
 }

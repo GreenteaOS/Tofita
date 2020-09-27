@@ -13,47 +13,47 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// trampoline.asm -> incbin
-extern const uint8_t binFont[];
-extern const uint8_t binFontBitmap[];
-const uint32_t fontWidth = 512;
-const uint32_t fontHeight = 32;
+// trampoline.asm . incbin
+extern const UInt8 binFont[];
+extern const UInt8 binFontBitmap[];
+const UInt32 fontWidth = 512;
+const UInt32 fontHeight = 32;
 
-extern const uint8_t binLeavesBitmap[];
-const uint32_t leavesWidth = 36;
-const uint32_t leavesHeight = 25;
+extern const UInt8 binLeavesBitmap[];
+const UInt32 leavesWidth = 36;
+const UInt32 leavesHeight = 25;
 
 int64_t _fltused = 0;
 
-function drawPixel(Framebuffer *framebuffer, uint32_t x, uint32_t y, uint32_t color) {
-	uint32_t *pixels = (uint32_t *)framebuffer->base;
-	pixels[(y * framebuffer->pixelsPerScanLine) + x] = color;
+fun drawPixel(Framebuffer *framebuffer, UInt32 x, UInt32 y, UInt32 color) {
+	UInt32 *pixels = (UInt32 *)framebuffer.base;
+	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color;
 }
 
 struct UefiPixel {
-	uint8_t b;
-	uint8_t g;
-	uint8_t r;
-	uint8_t a;
+	UInt8 b;
+	UInt8 g;
+	UInt8 r;
+	UInt8 a;
 } __attribute__((packed));
 
 _Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit");
 
-uint32_t getBitmapPixel(const uint8_t *bmp, uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+UInt32 getBitmapPixel(const UInt8 *bmp, UInt32 x, UInt32 y, UInt32 width, UInt32 height) {
 	let colors = bmp + 54;
 	UefiPixel pixel;
 	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0];
 	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1];
 	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2];
 	pixel.a = 0xFF;
-	uint32_t *color = (uint32_t *)&pixel;
+	UInt32 *color = (UInt32 *)&pixel;
 	return *color;
 }
 
 #pragma pack(1)
 struct TextFontList {
-	uint16_t x;
-	uint16_t y;
+	UInt16 x;
+	UInt16 y;
 	double width;
 } __attribute__((packed));
 #pragma pack()
@@ -62,7 +62,7 @@ _Static_assert(sizeof(TextFontList) == 12, "TextFontList has to be 12 byte");
 
 TextFontList *textFontList = null;
 
-function initText() {
+fun initText() {
 	textFontList = (TextFontList *)binFont;
 }
 
@@ -75,12 +75,12 @@ double drawChar(const char8_t c, double x, int16_t y, Framebuffer *framebuffer) 
 	TextFontList textChar = textFontList[(uint64_t)c];
 
 	int16_t xx = (int32_t)(x + 0.5);
-	uint16_t w = (int32_t)(textChar.width + 0.5);
+	UInt16 w = (int32_t)(textChar.width + 0.5);
 
-	for (uint16_t yi = 0; yi < 12; yi++)
-		for (uint16_t xi = 0; xi < w; xi++) {
-			const uint32_t atx = xx + xi;
-			const uint32_t aty = y + yi;
+	for (UInt16 yi = 0; yi < 12; yi++)
+		for (UInt16 xi = 0; xi < w; xi++) {
+			const UInt32 atx = xx + xi;
+			const UInt32 aty = y + yi;
 
 			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight);
 
@@ -90,8 +90,8 @@ double drawChar(const char8_t c, double x, int16_t y, Framebuffer *framebuffer) 
 	return textChar.width;
 }
 
-function drawText(const wchar_t *text, int16_t y, Framebuffer *framebuffer) {
-	uint16_t i = 0;
+fun drawText(const wchar_t *text, int16_t y, Framebuffer *framebuffer) {
+	UInt16 i = 0;
 
 	// Get width to center text on screen
 	double width = 0;
@@ -99,7 +99,7 @@ function drawText(const wchar_t *text, int16_t y, Framebuffer *framebuffer) {
 		width += getCharAdvance((uint16_t)text[i] & 0xFF);
 		i++;
 	}
-	double xx = framebuffer->width / 2 - width / 2;
+	double xx = framebuffer.width / 2 - width / 2;
 
 	i = 0;
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {

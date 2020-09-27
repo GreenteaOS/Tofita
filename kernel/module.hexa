@@ -20,7 +20,7 @@ namespace process {
 struct Module {
 	const char8_t *name;
 	const RamDiskAsset *dll;
-	uint64_t base;
+	UInt64 base;
 };
 
 struct ModuleInterim {
@@ -29,28 +29,28 @@ struct ModuleInterim {
 };
 
 Module *loadModule(ModuleInterim *params) {
-	var module = (Module *)PhysicalAllocator::allocateBytes(sizeof(Module));
-	module->name = params->name; // TODO copy string
-	module->dll = params->dll;
+	var module = (Module *)PhysicalAllocator.allocateBytes(sizeof(Module));
+	module.name = params.name; // TODO copy string
+	module.dll = params.dll;
 
 	// TODO relocation? or overwrite?
-	auto ptr = (uint8_t *)params->dll->data;
-	auto peHeader = (const exe::PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
-	auto peOptionalHeader = (const exe::Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe::PeHeader));
-	void *base = (void *)peOptionalHeader->imageBase;
-	memset(base, 0, peOptionalHeader->sizeOfImage); // Zeroing
-	module->base = peOptionalHeader->imageBase;
+	auto ptr = (UInt8 *)params.dll.data;
+	auto peHeader = (const exe.PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
+	auto peOptionalHeader = (const exe.Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe.PeHeader));
+	void *base = (void *)peOptionalHeader.imageBase;
+	memset(base, 0, peOptionalHeader.sizeOfImage); // Zeroing
+	module.base = peOptionalHeader.imageBase;
 
 	// Copy sections
 	auto imageSectionHeader =
-		(const exe::ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->sizeOfOptionalHeader);
-	for (uint16_t i = 0; i < peHeader->numberOfSections; ++i) {
-		serialPrintf(L"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
+		(const exe.ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.sizeOfOptionalHeader);
+	for (UInt16 i = 0; i < peHeader.numberOfSections; ++i) {
+		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
 					 imageSectionHeader[i].sizeOfRawData);
-		uint64_t where = (uint64_t)base + imageSectionHeader[i].virtualAddress;
+		UInt64 where = (uint64_t)base + imageSectionHeader[i].virtualAddress;
 
 		tmemcpy((void *)where,
-				(void *)((uint64_t)params->dll->data + (uint64_t)imageSectionHeader[i].pointerToRawData),
+				(void *)((uint64_t)params.dll.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
 				imageSectionHeader[i].sizeOfRawData);
 	}
 

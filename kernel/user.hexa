@@ -21,7 +21,7 @@ namespace user {
 // Note: Toast sandbox has it's own set of users
 struct User {
 	const char8_t *name;
-	sandbox::Sandbox *sandbox;
+	sandbox.Sandbox *sandbox;
 };
 
 } // namespace user

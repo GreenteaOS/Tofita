@@ -18,28 +18,28 @@
 #include "kernel32Vars.hpp"
 
 extern "C" {
-void ExitProcess(uint32_t exitCode) {
+void ExitProcess(UInt32 exitCode) {
 	tofitaExitProcess(exitCode);
 	while (true) {};
 }
 
-wapi::HLocal LocalAlloc(uint32_t flags, size_t bytes) {
-	auto result = &kernel32::buffer[kernel32::bufferOffset];
-	kernel32::bufferOffset += bytes;
+wapi.HLocal LocalAlloc(UInt32 flags, size_t bytes) {
+	auto result = &kernel32.buffer[kernel32.bufferOffset];
+	kernel32.bufferOffset += bytes;
 	// Align to 8 bytes
 	// Because handle has some bits reserved for tags
 	// TODO how many bits exactly?
 	// TODO also pre-align at CRT startup, cause section may be misaligned
-	while (kernel32::bufferOffset % 8 != 0)
-		kernel32::bufferOffset++;
-	return (wapi::HLocal)result;
+	while (kernel32.bufferOffset % 8 != 0)
+		kernel32.bufferOffset++;
+	return (wapi.HLocal)result;
 }
 
-wapi::HGlobal GlobalAlloc(uint32_t flags, size_t bytes) {
-	return (wapi::HGlobal)LocalAlloc(0, bytes);
+wapi.HGlobal GlobalAlloc(UInt32 flags, size_t bytes) {
+	return (wapi.HGlobal)LocalAlloc(0, bytes);
 }
 
-void *HeapAlloc(wapi::Handle heap, uint32_t flags, size_t bytes) {
+void *HeapAlloc(wapi.Handle heap, UInt32 flags, size_t bytes) {
 	return (void *)LocalAlloc(0, bytes);
 }
 

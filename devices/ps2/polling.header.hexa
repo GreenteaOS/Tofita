@@ -13,6 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const uint8_t PollingPS2SomethingHappened = 1;
-const uint8_t PollingPS2NothingHappened = 0;
-uint8_t pollPS2Devices();
+const UInt8 PollingPS2SomethingHappened = 1;
+const UInt8 PollingPS2NothingHappened = 0;
+UInt8 pollPS2Devices();

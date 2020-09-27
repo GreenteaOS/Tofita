@@ -14,9 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace efi {
-static const efi::EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi::EFI_MEMORY_DESCRIPTOR *descriptor,
-														   uint64_t descriptorSize) {
-	const uint8_t *desc = ((const uint8_t *)descriptor) + descriptorSize;
-	return (const efi::EFI_MEMORY_DESCRIPTOR *)desc;
+static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.EFI_MEMORY_DESCRIPTOR *descriptor,
+														   UInt64 descriptorSize) {
+	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize;
+	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc;
 }
 } // namespace efi

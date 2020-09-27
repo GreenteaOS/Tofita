@@ -20,7 +20,7 @@ namespace wapi {
 typedef void *Handle;
 // TODO ifdef 64-bit
 // (HandleSize)handle & ~(HandleSize)0b11
-typedef uint64_t HandleSize;
+typedef UInt64 HandleSize;
 typedef Handle HInstance;
 typedef Handle HIcon;
 typedef Handle HIcon;
@@ -35,22 +35,22 @@ typedef Handle HDc;
 typedef void *LResult;
 
 // TODO LResult as enum?
-#define ERROR_SUCCESS ((wapi::LResult)0)
-#define ERROR_INVALID_HANDLE ((wapi::LResult)6)
-#define INVALID_HANDLE_VALUE ((wapi::Handle)-1)
+#define ERROR_SUCCESS ((wapi.LResult)0)
+#define ERROR_INVALID_HANDLE ((wapi.LResult)6)
+#define INVALID_HANDLE_VALUE ((wapi.Handle)-1)
 
-typedef int32_t Bool;
+typedef Int32 Bool;
 
 // LONG is signed 32-bit int32_t
 
 // Similiar to handle, has nothing to do with async atomic memory access
-typedef uint16_t Atom;
+typedef UInt16 Atom;
 
 struct Rect {
-	int32_t left;
-	int32_t top;
-	int32_t right;
-	int32_t bottom;
+	Int32 left;
+	Int32 top;
+	Int32 right;
+	Int32 bottom;
 };
 
 struct PaintStruct {
@@ -59,10 +59,10 @@ struct PaintStruct {
 	Rect rcPaint;
 	Bool fRestore;
 	Bool fIncUpdate;
-	uint8_t rgbReserved[32];
+	UInt8 rgbReserved[32];
 };
 
-enum class Message : uint32_t {
+enum class Message : UInt32 {
 	WM_NULL = 0x0000,
 	WM_CREATE = 0x0001,
 	WM_DESTROY = 0x0002,
@@ -150,8 +150,8 @@ enum class Message : uint32_t {
 };
 
 struct Point {
-	int32_t x;
-	int32_t y;
+	Int32 x;
+	Int32 y;
 };
 
 struct Msg {
@@ -159,9 +159,9 @@ struct Msg {
 	Message message;
 	void *wParam;
 	void *lParam;
-	uint32_t time;
+	UInt32 time;
 	Point pt;
-	uint32_t lPrivate;
+	UInt32 lPrivate;
 };
 
 _Static_assert(sizeof(Msg) == 48, "bad sizeof");
@@ -169,10 +169,10 @@ _Static_assert(sizeof(Msg) == 48, "bad sizeof");
 typedef LResult (*WindowProcedure)(HWnd hWnd, Message uMsg, void *wParam, void *lParam);
 
 struct WindowClass {
-	uint32_t style;
+	UInt32 style;
 	WindowProcedure lpfnWndProc;
-	int32_t cbClsExtra;
-	int32_t cbWndExtra;
+	Int32 cbClsExtra;
+	Int32 cbWndExtra;
 	HInstance hInstance;
 	HIcon hIcon;
 	HCursor hCursor;
@@ -206,16 +206,16 @@ namespace tofi {} // namespace tofi
 namespace nj {
 
 typedef struct {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-	uint8_t a;
+	UInt8 r;
+	UInt8 g;
+	UInt8 b;
+	UInt8 a;
 } __attribute__((packed)) PixelRGBAData;
 
 struct Pixel32 {
 	union {
 		PixelRGBAData rgba;
-		uint32_t color;
+		UInt32 color;
 	};
 };
 
@@ -223,8 +223,8 @@ _Static_assert(sizeof(Pixel32) == 4, "bad sizeof");
 
 struct WindowFramebuffer {
 	Pixel32 *pixels;
-	uint16_t width;
-	uint16_t height;
+	UInt16 width;
+	UInt16 height;
 };
 
 } // namespace nj

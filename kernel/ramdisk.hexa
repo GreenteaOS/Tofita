@@ -14,59 +14,59 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 typedef struct {
-	uint32_t ramDiskChecksum;
-	uint32_t ramDiskSize;
-	uint32_t assetsCount;
+	UInt32 ramDiskChecksum;
+	UInt32 ramDiskSize;
+	UInt32 assetsCount;
 } RamDiskInfo;
 
 typedef struct {
-	uint16_t path[128];
-	uint32_t size;
-	uint32_t offsetFromRamDiskFirstByte;
+	UInt16 path[128];
+	UInt32 size;
+	UInt32 offsetFromRamDiskFirstByte;
 } RamDiskAssetInfo;
 
 static const RamDisk *_ramdisk;
-function setRamDisk(const RamDisk *ramdisk) {
+fun setRamDisk(const RamDisk *ramdisk) {
 	_ramdisk = ramdisk;
 }
 
 typedef struct {
-	uint32_t size;
-	uint8_t *data;
+	UInt32 size;
+	UInt8 *data;
 } RamDiskAsset;
 
 const RamDiskAsset getRamDiskAsset(const wchar_t *pathToAsset) {
 	RamDiskAsset asset;
 	asset.size = 0;
 	asset.data = 0;
-	const uint16_t *path = (const uint16_t *)pathToAsset;
+	const UInt16 *path = (const UInt16 *)pathToAsset;
 
-	const RamDiskInfo *ramDiskInfo = (const RamDiskInfo *)_ramdisk->base;
+	const RamDiskInfo *ramDiskInfo = (const RamDiskInfo *)_ramdisk.base;
 
-	for (uint32_t id = 0; id < ramDiskInfo->assetsCount; id++) {
+	for (UInt32 id = 0; id < ramDiskInfo.assetsCount; id++) {
 		// Pointer arithmetic like a boss
-		const uint64_t ramDiskAssetInfoPtr =
-			(uint64_t)_ramdisk->base + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id;
+		const UInt64 ramDiskAssetInfoPtr =
+			(uint64_t)_ramdisk.base + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id;
 		const RamDiskAssetInfo *ramDiskAssetInfo = (const RamDiskAssetInfo *)ramDiskAssetInfoPtr;
-		uint8_t found = 1;
+		UInt8 found = 1;
 
-		for (uint8_t at = 0; at < 127; at++) {
-			if (ramDiskAssetInfo->path[at] != path[at]) {
+		for (UInt8 at = 0; at < 127; at++) {
+			if (ramDiskAssetInfo.path[at] != path[at]) {
 				found = 0;
 				break;
 			}
-			if (ramDiskAssetInfo->path[at] == 0)
+			if (ramDiskAssetInfo.path[at] == 0)
 				break;
 		}
 
 		if (found) {
-			asset.size = ramDiskAssetInfo->size;
-			asset.data = (uint8_t *)((uint64_t)_ramdisk->base + ramDiskAssetInfo->offsetFromRamDiskFirstByte);
+			asset.size = ramDiskAssetInfo.size;
+			asset.data = (UInt8 *)((uint64_t)_ramdisk.base + ramDiskAssetInfo.offsetFromRamDiskFirstByte);
 			return asset;
 		}
 	}
 
-	serialPrintf(L"[ramdisk.getRamDiskAsset] asset '%S' not found in %d assets\n", path,
-				 ramDiskInfo->assetsCount);
+	serialPrintf("[ramdisk.getRamDiskAsset] asset '%S' not found in %d assets\n", path,
+				 ramDiskInfo.assetsCount);
 	return asset;
 }

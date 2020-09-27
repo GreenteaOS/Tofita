@@ -15,8 +15,8 @@
 
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
-uint8_t keyboardPressedState[128] = {0};
-const uint8_t keyboardMap[128] = {
+UInt8 keyboardPressedState[128] = {0};
+const UInt8 keyboardMap[128] = {
 	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
 	'9',  '0', '-', '=',
@@ -66,8 +66,8 @@ const uint8_t keyboardMap[128] = {
 #define STATUS_REGISTER 0x64
 #define DATA_PORT 0x60
 
-function handleKeyboardPacket() {
-	// serialPrint(L"[keyboard] intreruroror");
+fun handleKeyboardPacket() {
+	// serialPrint("[keyboard] intreruroror");
 	// readPort(STATUS_REGISTER);
 	// readPort(DATA_PORT);
 	// writePort(PIC1_COMMAND, PIC_EOI);
@@ -83,25 +83,25 @@ function handleKeyboardPacket() {
 	// while (lockMouse) {};
 	// lockMouse = true;
 
-	// uint8_t status = readPort(STATUS_REGISTER);
+	// UInt8 status = readPort(STATUS_REGISTER);
 
 	/// PS2 Mouse
 	// if (status & 0x20) {
-	//	//    uint8_t keycode = readPort(DATA_PORT);
+	//	//    UInt8 keycode = readPort(DATA_PORT);
 	//	//    //if (keycode < 0) {
 	//	lockMouse = false;
 	//	handleMousePacket();
 	//	return;
 	//	//    //}
-	//	//    //uint8_t buffer[] = {keyboardMap[keycode], 0};
-	//	//    uint8_t buffer[] = {'M','o','u','s','e',':', 0};
+	//	//    //UInt8 buffer[] = {keyboardMap[keycode], 0};
+	//	//    UInt8 buffer[] = {'M','o','u','s','e',':', 0};
 	//	//    serialPrint(buffer);
 	//	//    serialPrint(buffer);
 	//}
 
 	// if (status & 0x1)
 	{
-		uint8_t keycode = readPort(DATA_PORT);
+		UInt8 keycode = readPort(DATA_PORT);
 
 		if (keycode < 0) {
 			// lockMouse = false;
@@ -112,9 +112,9 @@ function handleKeyboardPacket() {
 			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0)
 				buffer[0] = '?';
-			// serialPrint(L"[");
+			// serialPrint("[");
 			// serialPrint(buffer);
-			// serialPrintf(L" down] %d\n", keycode);
+			// serialPrintf(" down] %d\n", keycode);
 			keyboardPressedState[keycode] = 1;
 			if (haveToQuake)
 				quakeHandleButtonDown(keycode);
@@ -126,14 +126,14 @@ function handleKeyboardPacket() {
 			wchar_t buffer[] = {(char8_t)keyboardMap[keycode], 0};
 			if (buffer[0] == 0)
 				buffer[0] = '?';
-			// serialPrint(L"[");
+			// serialPrint("[");
 			// serialPrint(buffer);
-			// serialPrintf(L" up] %d\n", keycode + 128);
+			// serialPrintf(" up] %d\n", keycode + 128);
 			keyboardPressedState[keycode] = 0;
 		}
 
 		// if (status & 0x20) {
-		//    uint8_t buffer[] = {'M', 0};
+		//    UInt8 buffer[] = {'M', 0};
 		//    serialPrint(buffer);
 		//}
 	}
@@ -156,7 +156,7 @@ function handleKeyboardPacket() {
 	// lockMouse = false;
 }
 
-function handleKeyboard() {
-	// uint8_t status = readPort(STATUS_REGISTER);
+fun handleKeyboard() {
+	// UInt8 status = readPort(STATUS_REGISTER);
 	// pollForce = status;
 }

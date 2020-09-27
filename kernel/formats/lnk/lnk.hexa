@@ -14,11 +14,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 extern "C++" namespace shortcut {
-	bool validate(const uint8_t *data, const uint64_t bytes) {
+	Bool validate(const UInt8 *data, const UInt64 bytes) {
 		if (bytes < sizeof(Lnk))
 			return false;
 		let lnk = (Lnk *)data;
-		if (lnk->magucka != magic)
+		if (lnk.magucka != magic)
 			return false;
 		return true;
 	}

@@ -27,9 +27,9 @@ Bitmap32 *trashCan;
 Bitmap32 *notepad16;
 Bitmap32 *notepad48;
 Bitmap32 *link;
-cursor::Cursor *cur = null;
+cursor.Cursor *cur = null;
 
-uint16_t startupAnimation = 0;
+UInt16 startupAnimation = 0;
 
 typedef enum {
 	Center,
@@ -38,62 +38,62 @@ typedef enum {
 	// TODO more options
 } WallpaperStyle;
 
-function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
+fun setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 
 	{
-		serialPrintln(L"[compositor.setWallpaper] upscale wallpaper to screen size");
-		Bitmap32 *upscale = allocateBitmap(_framebuffer->width, _framebuffer->height);
+		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size");
+		Bitmap32 *upscale = allocateBitmap(_framebuffer.width, _framebuffer.height);
 
-		float hReciprocal = 1.0f / (float)_framebuffer->height;
-		float wReciprocal = 1.0f / (float)_framebuffer->width;
+		float hReciprocal = 1.0f / (float)_framebuffer.height;
+		float wReciprocal = 1.0f / (float)_framebuffer.width;
 
-		for (uint16_t y = 0; y < upscale->height; y++)
-			for (uint16_t x = 0; x < upscale->width; x++) {
-				PixelRGBAData rgba = interpolatePixel(bitmap, ((float)x * wReciprocal) * bitmap->width,
-													  ((float)y * hReciprocal) * (bitmap->height - 8));
-				upscale->pixels[y * upscale->width + x].rgba = rgba;
+		for (UInt16 y = 0; y < upscale.height; y++)
+			for (UInt16 x = 0; x < upscale.width; x++) {
+				PixelRGBAData rgba = interpolatePixel(bitmap, ((float)x * wReciprocal) * bitmap.width,
+													  ((float)y * hReciprocal) * (bitmap.height - 8));
+				upscale.pixels[y * upscale.width + x].rgba = rgba;
 			}
 
 		wallpaper = upscale;
 		bitmap = wallpaper;
 	}
 
-	serialPrintln(L"[compositor.setWallpaper] downscale 8x");
+	serialPrintln("[compositor.setWallpaper] downscale 8x");
 
-	uint8_t blurScale = 8;
+	UInt8 blurScale = 8;
 
-	Bitmap32 *downscale = allocateBitmap(bitmap->width / blurScale - 1, bitmap->height / blurScale - 1 + 8);
+	Bitmap32 *downscale = allocateBitmap(bitmap.width / blurScale - 1, bitmap.height / blurScale - 1 + 8);
 
-	for (uint32_t y = 0; y < downscale->height - 8; y++)
-		for (uint32_t x = 0; x < downscale->width; x++)
-			downscale->pixels[y * downscale->width + x].color =
-				bitmap->pixels[y * bitmap->width * blurScale + x * blurScale].color;
+	for (UInt32 y = 0; y < downscale.height - 8; y++)
+		for (UInt32 x = 0; x < downscale.width; x++)
+			downscale.pixels[y * downscale.width + x].color =
+				bitmap.pixels[y * bitmap.width * blurScale + x * blurScale].color;
 
 	// Fix
-	for (uint32_t y = downscale->height - 8; y < downscale->height; y++)
-		for (uint32_t x = 0; x < downscale->width; x++)
-			downscale->pixels[y * downscale->width + x].color =
-				bitmap->pixels[bitmap->width * (bitmap->height - 1) + x * blurScale].color;
+	for (UInt32 y = downscale.height - 8; y < downscale.height; y++)
+		for (UInt32 x = 0; x < downscale.width; x++)
+			downscale.pixels[y * downscale.width + x].color =
+				bitmap.pixels[bitmap.width * (bitmap.height - 1) + x * blurScale].color;
 
-	serialPrintln(L"[compositor.setWallpaper] blur");
+	serialPrintln("[compositor.setWallpaper] blur");
 
 	Bitmap32 *blur = gaussBlur(downscale, 4);
 
-	serialPrintln(L"[compositor.setWallpaper] upscale 8x");
+	serialPrintln("[compositor.setWallpaper] upscale 8x");
 
 	// Upscale
-	Bitmap32 *upscaleLight = allocateBitmap(bitmap->width, bitmap->height);
-	Bitmap32 *upscaleDark = allocateBitmap(bitmap->width, bitmap->height);
+	Bitmap32 *upscaleLight = allocateBitmap(bitmap.width, bitmap.height);
+	Bitmap32 *upscaleDark = allocateBitmap(bitmap.width, bitmap.height);
 	Bitmap32 *upscale = upscaleDark;
 
-	float hReciprocal = 1.0f / (float)upscale->height;
-	float wReciprocal = 1.0f / (float)upscale->width;
+	float hReciprocal = 1.0f / (float)upscale.height;
+	float wReciprocal = 1.0f / (float)upscale.width;
 
-	for (uint16_t y = 0; y < upscale->height; y++)
-		for (uint16_t x = 0; x < upscale->width; x++) {
+	for (UInt16 y = 0; y < upscale.height; y++)
+		for (UInt16 x = 0; x < upscale.width; x++) {
 			PixelRGBAData rgbaSource =
-				interpolatePixel(downscale, ((float)x * wReciprocal) * downscale->width,
-								 ((float)y * hReciprocal) * (downscale->height - 8));
+				interpolatePixel(downscale, ((float)x * wReciprocal) * downscale.width,
+								 ((float)y * hReciprocal) * (downscale.height - 8));
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
 			/// rgba.r = Blend255(rgba.r, 255, 168);
@@ -105,7 +105,7 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 				rgba.r = Blend255(rgba.r, 0, 168);
 				rgba.g = Blend255(rgba.g, 0, 168);
 				rgba.b = Blend255(rgba.b, 0, 168);
-				upscaleDark->pixels[y * upscale->width + x].rgba = rgba;
+				upscaleDark.pixels[y * upscale.width + x].rgba = rgba;
 			}
 
 			{
@@ -113,7 +113,7 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 				rgba.r = Blend255(rgba.r, 255, 168);
 				rgba.g = Blend255(rgba.g, 255, 168);
 				rgba.b = Blend255(rgba.b, 255, 168);
-				upscaleLight->pixels[y * upscale->width + x].rgba = rgba;
+				upscaleLight.pixels[y * upscale.width + x].rgba = rgba;
 			}
 		}
 
@@ -121,94 +121,94 @@ function setWallpaper(Bitmap32 *bitmap, WallpaperStyle style) {
 	vibranceLight = upscaleLight;
 }
 
-function drawVibrancedRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height, bool dark) {
+fun drawVibrancedRectangle(int16_t x, int16_t y, UInt16 width, UInt16 height, Bool dark) {
 	let vibrance = dark ? vibranceDark : vibranceLight; // Avoit non-register global access
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
 			if (x + xx < 0)
 				continue;
-			if (x + xx > vibrance->width)
+			if (x + xx > vibrance.width)
 				continue;
 			if (y + yy < 0)
 				continue;
-			if (y + yy > vibrance->height)
+			if (y + yy > vibrance.height)
 				continue;
-			uint32_t pixel = (y + yy) * vibrance->width + xx + x;
-			setPixel(x + xx, y + yy, vibrance->pixels[pixel]);
+			UInt32 pixel = (y + yy) * vibrance.width + xx + x;
+			setPixel(x + xx, y + yy, vibrance.pixels[pixel]);
 		}
 	}
 }
 
 Bitmap32 *doublebuffer;
-function initializeCompositor() {
-	serialPrintln(L"[compositor.initializeCompositor] begin");
-	doublebuffer = allocateBitmap(_framebuffer->width, _framebuffer->height);
-	_pixels = doublebuffer->pixels;
+fun initializeCompositor() {
+	serialPrintln("[compositor.initializeCompositor] begin");
+	doublebuffer = allocateBitmap(_framebuffer.width, _framebuffer.height);
+	_pixels = doublebuffer.pixels;
 
 	Bitmap32 *loadPng32(const RamDiskAsset *asset);
 
-	let a = getRamDiskAsset(L"root/Windows/Resources/Icons/leaves.png");
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/leaves.png");
 	leaves = loadPng32(&a);
 
-	let b = getRamDiskAsset(L"root/Windows/Resources/Icons/trash-empty48.png");
+	let b = getRamDiskAsset("root/Windows/Resources/Icons/trash-empty48.png");
 	trashCan = loadPng32(&b);
 
-	let c = getRamDiskAsset(L"root/Windows/Resources/Icons/notepad.ico_48x48.png");
+	let c = getRamDiskAsset("root/Windows/Resources/Icons/notepad.ico_48x48.png");
 	notepad48 = loadPng32(&c);
 
-	let d = getRamDiskAsset(L"root/Windows/Resources/Icons/notepad.ico_16x16.png");
+	let d = getRamDiskAsset("root/Windows/Resources/Icons/notepad.ico_16x16.png");
 	notepad16 = loadPng32(&d);
 
-	let e = getRamDiskAsset(L"root/Windows/Resources/Icons/link.png");
+	let e = getRamDiskAsset("root/Windows/Resources/Icons/link.png");
 	link = loadPng32(&e);
 
-	let asset = getRamDiskAsset(L"root/Windows/Cursors/aero_arrow.cur");
-	cur = cursor::loadCursor(&asset);
+	let asset = getRamDiskAsset("root/Windows/Cursors/aero_arrow.cur");
+	cur = cursor.loadCursor(&asset);
 
-	serialPrintln(L"[compositor.initializeCompositor] done");
+	serialPrintln("[compositor.initializeCompositor] done");
 }
 
-function compositeWindows() {
-	var i = dwm::rootWindow;
+fun compositeWindows() {
+	var i = dwm.rootWindow;
 	// Avoid infinite loop
-	for (uint16_t loop = 0; loop < dwm::windowsLimit; ++loop) {
-		let window = &dwm::windowsList[i];
+	for (UInt16 loop = 0; loop < dwm.windowsLimit; ++loop) {
+		let window = &dwm.windowsList[i];
 
-		if (i != 0 && window->present && window->visible) {
-			let hover = dwm::frameHoverWindow == i ? dwm::frameHoverState : dwm::FrameHover::Noop;
+		if (i != 0 && window.present && window.visible) {
+			let hover = dwm.frameHoverWindow == i ? dwm.frameHoverState : dwm.FrameHover.Noop;
 
-			drawWindowFrame(window->title ? window->title : L"Greentea OS", window->x, window->y,
-							window->width + 2, window->height + 34, dwm::firstResponder == i, hover,
-							dwm::frameHoverWindowDown);
+			drawWindowFrame(window.title ? window.title : "Greentea OS", window.x, window.y,
+							window.width + 2, window.height + 34, dwm.firstResponder == i, hover,
+							dwm.frameHoverWindowDown);
 
 			let frameHeight = 30 + 3;
 			let frameWidth = 1;
 
-			if (window->fbZeta != null && window->fbGama != null) {
+			if (window.fbZeta != null && window.fbGama != null) {
 
-				drawBitmap32(window->fbCurrentZeta ? window->fbZeta : window->fbGama, window->x + frameWidth,
-							 window->y + frameHeight);
+				drawBitmap32(window.fbCurrentZeta ? window.fbZeta : window.fbGama, window.x + frameWidth,
+							 window.y + frameHeight);
 			} else {
-				drawVibrancedRectangle(window->x + frameWidth, window->y + frameHeight, window->width,
-									   window->height, true);
+				drawVibrancedRectangle(window.x + frameWidth, window.y + frameHeight, window.width,
+									   window.height, true);
 			}
 		}
 
-		i = dwm::windowsList[i].nextId;
+		i = dwm.windowsList[i].nextId;
 		if (i == 0)
 			break;
 	}
 }
 
-function composite(uint64_t startupMilliseconds) {
+fun composite(UInt64 startupMilliseconds) {
 	// TODO not best place for this
-	dwm::handleMouseActivity();
-	dwm::handleKeyboardActivity();
+	dwm.handleMouseActivity();
+	dwm.handleKeyboardActivity();
 
-	let mouseX = dwm::mouseX;
-	let mouseY = dwm::mouseY;
+	let mouseX = dwm.mouseX;
+	let mouseY = dwm.mouseY;
 
-	var _framebuffer = ::_framebuffer; // Faster access
+	var _framebuffer = ._framebuffer; // Faster access
 
 	// Startup animation
 	if (startupAnimation < 2000) {
@@ -235,23 +235,23 @@ function composite(uint64_t startupMilliseconds) {
 	};
 
 	// Desktop below everything
-	desktop::compositeDesktop(mouseX, mouseY);
+	desktop.compositeDesktop(mouseX, mouseY);
 
 	// Windows below taskbar
 	compositeWindows();
 
 	// Taskbar
-	let animationTaskbarY = Math::min(startupAnimation / 1555.0, 1.0) * 30;
-	drawVibrancedRectangle(0, _framebuffer->height - animationTaskbarY, _framebuffer->width, 30);
+	let animationTaskbarY = Math.min(startupAnimation / 1555.0, 1.0) * 30;
+	drawVibrancedRectangle(0, _framebuffer.height - animationTaskbarY, _framebuffer.width, 30);
 
-	let taskbarY = _framebuffer->height + 30 - animationTaskbarY * 2.0;
+	let taskbarY = _framebuffer.height + 30 - animationTaskbarY * 2.0;
 
 	// Start button
 	color.rgba.a = 128;
 	color.rgba.a = 100;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x61;
-	if (mouseX < 40 && mouseY > (_framebuffer->height - 30))
+	if (mouseX < 40 && mouseY > (_framebuffer.height - 30))
 		drawRectangleWithAlpha(color, 0, taskbarY, 40, 30);
 	drawBitmap32WithAlpha(leaves, 2, taskbarY + 2);
 
@@ -262,10 +262,10 @@ function composite(uint64_t startupMilliseconds) {
 	// Tray | line
 	color.color = 0x00000000;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x66;
-	drawRectangle(color, _framebuffer->width - 4, taskbarY, 1, 30);
+	drawRectangle(color, _framebuffer.width - 4, taskbarY, 1, 30);
 
-	var trayButtonX = _framebuffer->width - 20 - 16;
-	trayButtonX = _framebuffer->width - 80;
+	var trayButtonX = _framebuffer.width - 20 - 16;
+	trayButtonX = _framebuffer.width - 80;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0x11;
 	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 
@@ -275,7 +275,7 @@ function composite(uint64_t startupMilliseconds) {
 		uptimeHours -= 24;
 	let uptimeMinutes = (uint8_t)((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000));
 
-	bool pm = uptimeHours >= 12;
+	Bool pm = uptimeHours >= 12;
 	if (uptimeHours > 12) {
 		uptimeHours -= 12;
 	}
@@ -295,23 +295,23 @@ function composite(uint64_t startupMilliseconds) {
 	quake();
 }
 
-function copyToScreen() {
+fun copyToScreen() {
 	// On 64-bit platform registers are 64-bit,
 	// so lets copy two pixels at a time
-	const uint16_t height = _framebuffer->height;
+	const UInt16 height = _framebuffer.height;
 	// Let's assume it is always divideable by 2
-	const uint16_t width = _framebuffer->width / 2;
-	const uint64_t scanline = _framebuffer->width * 4;
-	const uint64_t pixelsPerScanLine = _framebuffer->pixelsPerScanLine * 4;
-	const uint64_t *source = (const uint64_t *)((uint64_t)_pixels);
-	var destination = (uint64_t *)((uint64_t)_framebuffer->base);
+	const UInt16 width = _framebuffer.width / 2;
+	const UInt64 scanline = _framebuffer.width * 4;
+	const UInt64 pixelsPerScanLine = _framebuffer.pixelsPerScanLine * 4;
+	const UInt64 *source = (const UInt64 *)((uint64_t)_pixels);
+	var destination = (UInt64 *)((uint64_t)_framebuffer.base);
 
-	for (uint16_t y = 0; y < height; y += 1) {
-		for (uint16_t x = 0; x < width; x += 1) {
+	for (UInt16 y = 0; y < height; y += 1) {
+		for (UInt16 x = 0; x < width; x += 1) {
 			destination[x] = source[x];
 		}
 
-		source = (const uint64_t *)(((uint64_t)source) + scanline);
-		destination = (uint64_t *)(((uint64_t)destination) + pixelsPerScanLine);
+		source = (const UInt64 *)(((uint64_t)source) + scanline);
+		destination = (UInt64 *)(((uint64_t)destination) + pixelsPerScanLine);
 	}
 }

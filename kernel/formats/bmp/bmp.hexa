@@ -15,7 +15,7 @@
 
 module
 
-function loadBitMap24(buffer: Buffer) {
+fun loadBitMap24(buffer: Buffer) {
 	let bmp = {
 		width: buffer.readUInt32LE(18),
 		height: buffer.readUInt32LE(22),

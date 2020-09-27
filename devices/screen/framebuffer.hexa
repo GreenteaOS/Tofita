@@ -23,60 +23,60 @@ Framebuffer *_framebuffer;
 // Avoid one level of pointer indirection
 Pixel32 *_pixels;
 
-Bitmap32 *allocateBitmap(uint16_t width, uint16_t height) {
-	var result = (Bitmap32Interim *)PhysicalAllocator::allocateBytes(sizeof(uint16_t) * 2 +
+Bitmap32 *allocateBitmap(UInt16 width, UInt16 height) {
+	var result = (Bitmap32Interim *)PhysicalAllocator.allocateBytes(sizeof(uint16_t) * 2 +
 																	 sizeof(Pixel32) * width * height);
-	result->width = width;
-	result->height = height;
+	result.width = width;
+	result.height = height;
 	return (Bitmap32 *)result;
 }
 
-function setFramebuffer(const Framebuffer *framebuffer) {
+fun setFramebuffer(const Framebuffer *framebuffer) {
 	_framebuffer = const_cast<Framebuffer *>(framebuffer);
-	_pixels = (Pixel32 *)_framebuffer->base;
+	_pixels = (Pixel32 *)_framebuffer.base;
 }
 
 // Very fast, but not precise, alpha multiply
 #define Mul255(a255, c255) (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
 #define Blend255(target, color, alpha) (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
-function __attribute__((fastcall)) blendPixel(int16_t x, int16_t y, Pixel32 pixel) {
-	var _framebuffer = ::_framebuffer; // Faster access
-	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1) || (x < 0) || (y < 0))
+fun __attribute__((fastcall)) blendPixel(int16_t x, int16_t y, Pixel32 pixel) {
+	var _framebuffer = ._framebuffer; // Faster access
+	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
 		return;
-	Pixel32 p = _pixels[y * _framebuffer->width + x];
+	Pixel32 p = _pixels[y * _framebuffer.width + x];
 
 	p.rgba.r = Mul255(pixel.rgba.a, pixel.rgba.r) + Mul255(255 - pixel.rgba.a, p.rgba.r);
 	p.rgba.g = Mul255(pixel.rgba.a, pixel.rgba.g) + Mul255(255 - pixel.rgba.a, p.rgba.g);
 	p.rgba.b = Mul255(pixel.rgba.a, pixel.rgba.b) + Mul255(255 - pixel.rgba.a, p.rgba.b);
 
-	_pixels[y * _framebuffer->width + x] = p;
+	_pixels[y * _framebuffer.width + x] = p;
 }
 
-function __attribute__((fastcall)) setPixel(int16_t x, int16_t y, Pixel32 pixel) {
-	var _framebuffer = ::_framebuffer; // Faster access
-	if ((x > _framebuffer->width - 1) || (y > _framebuffer->height - 1) || (x < 0) || (y < 0))
+fun __attribute__((fastcall)) setPixel(int16_t x, int16_t y, Pixel32 pixel) {
+	var _framebuffer = ._framebuffer; // Faster access
+	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
 		return;
-	_pixels[y * _framebuffer->width + x] = pixel;
+	_pixels[y * _framebuffer.width + x] = pixel;
 }
 
-function drawBitmap32WithAlpha(Bitmap32 *bitmap, uint16_t x, uint16_t y) {
-	for (int16_t yy = 0; yy < bitmap->height; yy++) {
-		for (int16_t xx = 0; xx < bitmap->width; xx++) {
-			blendPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
+fun drawBitmap32WithAlpha(Bitmap32 *bitmap, UInt16 x, UInt16 y) {
+	for (int16_t yy = 0; yy < bitmap.height; yy++) {
+		for (int16_t xx = 0; xx < bitmap.width; xx++) {
+			blendPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx]);
 		}
 	}
 }
 
-function drawBitmap32(Bitmap32 *bitmap, uint16_t x, uint16_t y) {
-	for (int16_t yy = 0; yy < bitmap->height; yy++) {
-		for (int16_t xx = 0; xx < bitmap->width; xx++) {
-			setPixel(x + xx, y + yy, bitmap->pixels[yy * bitmap->width + xx]);
+fun drawBitmap32(Bitmap32 *bitmap, UInt16 x, UInt16 y) {
+	for (int16_t yy = 0; yy < bitmap.height; yy++) {
+		for (int16_t xx = 0; xx < bitmap.width; xx++) {
+			setPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx]);
 		}
 	}
 }
 
-function drawRectangleWithAlpha(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+fun drawRectangleWithAlpha(Pixel32 color, UInt16 x, UInt16 y, UInt16 width, UInt16 height) {
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
 			blendPixel(x + xx, y + yy, color);
@@ -84,7 +84,7 @@ function drawRectangleWithAlpha(Pixel32 color, uint16_t x, uint16_t y, uint16_t 
 	}
 }
 
-function drawRectangle(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+fun drawRectangle(Pixel32 color, UInt16 x, UInt16 y, UInt16 width, UInt16 height) {
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
 			setPixel(x + xx, y + yy, color);
@@ -92,7 +92,7 @@ function drawRectangle(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, ui
 	}
 }
 
-function drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+fun drawRectangleOutline(Pixel32 color, UInt16 x, UInt16 y, UInt16 width, UInt16 height) {
 	for (int16_t yy = 0; yy < height; yy++) {
 		for (int16_t xx = 0; xx < width; xx++) {
 			// Rendering left and far right points sequentally should be
@@ -104,7 +104,7 @@ function drawRectangleOutline(Pixel32 color, uint16_t x, uint16_t y, uint16_t wi
 	}
 }
 
-function line45smooth(Pixel32 color, int16_t x, int16_t y, int16_t width, int16_t mod) {
+fun line45smooth(Pixel32 color, int16_t x, int16_t y, int16_t width, int16_t mod) {
 	color.rgba.a = 98;
 	int16_t xx = 0;
 	for (int16_t xi = 0; xi < width - 1; xi++) {
@@ -117,26 +117,26 @@ function line45smooth(Pixel32 color, int16_t x, int16_t y, int16_t width, int16_
 	setPixel(xx + x, y + width - 1, color);
 }
 
-function lineHorizontal(Pixel32 color, int16_t x, int16_t y, uint16_t rightLength) {
-	for (uint16_t i = 0; i < rightLength; ++i) {
+fun lineHorizontal(Pixel32 color, int16_t x, int16_t y, UInt16 rightLength) {
+	for (UInt16 i = 0; i < rightLength; ++i) {
 		setPixel(x + i, y, color);
 	}
 }
 
-function lineHorizontalWithAlpha(Pixel32 color, int16_t x, int16_t y, uint16_t rightLength) {
-	for (uint16_t i = 0; i < rightLength; ++i) {
+fun lineHorizontalWithAlpha(Pixel32 color, int16_t x, int16_t y, UInt16 rightLength) {
+	for (UInt16 i = 0; i < rightLength; ++i) {
 		blendPixel(x + i, y, color);
 	}
 }
 
-function lineVertical(Pixel32 color, int16_t x, int16_t y, uint16_t bottomLength) {
-	for (uint16_t i = 0; i < bottomLength; ++i) {
+fun lineVertical(Pixel32 color, int16_t x, int16_t y, UInt16 bottomLength) {
+	for (UInt16 i = 0; i < bottomLength; ++i) {
 		setPixel(x, y + i, color);
 	}
 }
 
-function lineVerticalWithAlpha(Pixel32 color, int16_t x, int16_t y, uint16_t bottomLength) {
-	for (uint16_t i = 0; i < bottomLength; ++i) {
+fun lineVerticalWithAlpha(Pixel32 color, int16_t x, int16_t y, UInt16 bottomLength) {
+	for (UInt16 i = 0; i < bottomLength; ++i) {
 		blendPixel(x, y + i, color);
 	}
 }

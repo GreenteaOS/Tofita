@@ -16,7 +16,7 @@
 // Desktop (i.e. icons)
 
 extern "C++" namespace desktop {
-	function compositeDesktop(int16_t mouseX, int16_t mouseY) {
+	fun compositeDesktop(int16_t mouseX, int16_t mouseY) {
 		Pixel32 color;
 		color.rgba.r = color.rgba.g = color.rgba.b = 0xFF;
 		color.rgba.a = 64;
@@ -33,7 +33,7 @@ extern "C++" namespace desktop {
 		}
 	}
 
-	function handleMouseDownDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY) {
+	fun handleMouseDownDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 		if (drag == false) {
 			dragX = mouseX;
 			dragY = mouseY;
@@ -41,7 +41,7 @@ extern "C++" namespace desktop {
 		drag = true;
 	}
 
-	function handleMouseUpDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY) {
+	fun handleMouseUpDesktop(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 		drag = false;
 	}
 }
