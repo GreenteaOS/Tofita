@@ -21,7 +21,7 @@
 
 #ifndef TOFITA32_DLL
 #define TOFITA32_DLL __declspec(dllimport)
-#endif
+#end
 
 @extern "C" {
 // Tofita

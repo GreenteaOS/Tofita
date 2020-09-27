@@ -13,10 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace efi {
+
 static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.EFI_MEMORY_DESCRIPTOR *descriptor,
 														   UInt64 descriptorSize) {
 	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
 	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
 }
-} // namespace efi

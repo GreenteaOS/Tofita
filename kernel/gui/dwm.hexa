@@ -15,7 +15,7 @@
 
 // Desktop window manager (i.e. GUI logic)
 
-namespace dwm {
+
 
 UInt8 nextDefaultWindowPosition = 0
 
@@ -354,4 +354,3 @@ fun handleMouseActivity() {
 fun handleKeyboardActivity() {
 	// TODO
 }
-} // namespace dwm

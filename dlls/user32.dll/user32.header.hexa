@@ -18,7 +18,7 @@
 
 #ifndef USER32_DLL
 #define USER32_DLL __declspec(dllimport)
-#endif
+#end
 
 @extern "C" {
 USER32_DLL wapi.Atom RegisterClassW(const wapi.WindowClass *wc)

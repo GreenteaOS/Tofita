@@ -15,7 +15,7 @@
 
 // Implementation of hybrid kernel modules
 // Modules are .dll files
-namespace process {
+
 
 @struct
 class Module {
@@ -58,4 +58,3 @@ Module *loadModule(ModuleInterim *params) {
 
 	return module
 }
-} // namespace process

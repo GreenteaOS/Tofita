@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace exe {
+
 
 // 1 byte aligned
 #pragma pack(1)
@@ -196,5 +196,3 @@ typedef struct _IMAGE_THUNK_DATA {
 		UInt32 forwarderStringl // RVA to forwarder string
 	} u1
 } IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA
-
-} // namespace exe

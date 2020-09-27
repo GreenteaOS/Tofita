@@ -15,7 +15,7 @@
 
 // AMD64 pages format and map/unmap internal implementation
 
-namespace pages {
+
 
 let ADDRESS_BITS = 12
 #define PAGE_ALIGNED @aligned(PAGE_SIZE)
@@ -115,11 +115,11 @@ PageEntry *getPage(PageEntry *table, entryId: UInt64) {
 	PageEntry *entry = &table[entryId]
 
 	if (entry.present == 1) {
-		return (PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
+		return (PageEntry *)((entry.address << ADDRESS_BITS) + (WholePhysicalStart as! UInt64))
 	} else {
 		var newPage = (PageEntry *)PhysicalAllocator.allocateOnePagePreZeroed()
 		if (newPage != null)
-			initializePage(entry, (uint64_t)newPage - (uint64_t)WholePhysicalStart)
+			initializePage(entry, (uint64_t)newPage - (WholePhysicalStart as! UInt64))
 		return newPage
 	}
 }
@@ -140,7 +140,7 @@ createMapping(pd, pt)
 createMapping(pdpt, pd)
 createMapping(pml4, pdpt)
 
-#undef createMapping
+
 
 // Returns actual physical address from virtual address
 UInt64 resolveAddr(const PageEntry *pml4entries, virtualAddr: UInt64) {
@@ -149,20 +149,20 @@ UInt64 resolveAddr(const PageEntry *pml4entries, virtualAddr: UInt64) {
 	const PageEntry *entry = &pml4entries[linear.pml4]
 	if (entry.present == 0)
 		return PHYSICAL_NOT_FOUND
-	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
+	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (WholePhysicalStart as! UInt64))
 	// pdpt
 	entry = &entry[linear.pdpt]
 	if (entry.present == 0)
 		return PHYSICAL_NOT_FOUND
 	// TODO handle mega pages
-	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
+	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (WholePhysicalStart as! UInt64))
 	// pd
 	entry = &entry[linear.pd]
 	if (entry.present == 0)
 		return PHYSICAL_NOT_FOUND
 	if (entry.largePage == 1)
 		return (entry.address << ADDRESS_BITS) + linear.pt * 4096 + linear.offset
-	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (uint64_t)WholePhysicalStart)
+	entry = (const PageEntry *)((entry.address << ADDRESS_BITS) + (WholePhysicalStart as! UInt64))
 	// pt
 	entry = &entry[linear.pt]
 	if (entry.present == 0)
@@ -209,7 +209,7 @@ fun mapMemory(PageEntry *pml4entries, virtualAddr: UInt64, physicalAddr: UInt64,
 	}
 
 	// TODO rethink where to call this
-	amd64.writeCr3((uint64_t)pml4entries - (uint64_t)WholePhysicalStart)
+	amd64.writeCr3((uint64_t)pml4entries - (WholePhysicalStart as! UInt64))
 }
 
 // Unmaps pages without actually deallocating them, still deallocates unused page tables
@@ -264,4 +264,3 @@ fun mapUserspaceMemory(PageEntry *pml4entries, virtualAddr: UInt64, physicalAddr
 // if virtualAddr == 0
 // Note: also allocates physical pages, i.e consumes extra memory
 fun allocUserspaceMemory(PageEntry *pml4entries, virtualAddr: UInt64, pageCount: UInt32) {}
-} // namespace pages

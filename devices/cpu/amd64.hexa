@@ -15,7 +15,7 @@
 
 // AMD64 assembly instructions wrapper
 
-namespace amd64 {
+
 inline fun cpuid(leaf: UInt32, subleaf: UInt32, UInt32 *eax, UInt32 *ebx, UInt32 *ecx,
 					  UInt32 *edx) {
 	UInt32 a, b, c, d
@@ -36,4 +36,3 @@ fun disableAllInterrupts()
 fun enableAllInterruptsAndHalt()
 fun pause()
 fun yield()
-} // namespace amd64

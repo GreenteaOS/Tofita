@@ -121,7 +121,7 @@ class PhysicalAllocator {
 	}
 
 // Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
-#undef PAGE_RESERVED
+
 
 	// 31-bit addressable, first 2 GB of RAM
 	// Required by some hardware
@@ -134,7 +134,7 @@ class PhysicalAllocator {
 		if (last != PHYSICAL_NOT_FOUND) {
 			let where = last
 			last = PHYSICAL_NOT_FOUND
-			return where * PAGE_SIZE + (uint64_t)WholePhysicalStart
+			return where * PAGE_SIZE + (WholePhysicalStart as! UInt64)
 		}
 
 		var i: UInt64 = 0
@@ -143,7 +143,7 @@ class PhysicalAllocator {
 		while (i < steps) {
 			if (buffer[i] == PAGE_FREE) {
 				buffer[i] = PAGE_FULL
-				return i * PAGE_SIZE + (uint64_t)WholePhysicalStart
+				return i * PAGE_SIZE + (WholePhysicalStart as! UInt64)
 			}
 
 			i++
@@ -230,7 +230,7 @@ class PhysicalAllocator {
 				i--
 				buffer[largestAt + i] = PAGE_FULL
 			}
-			return largestAt * PAGE_SIZE + (uint64_t)WholePhysicalStart
+			return largestAt * PAGE_SIZE + (WholePhysicalStart as! UInt64)
 		}
 
 		serialPrintf("[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages)
@@ -256,7 +256,7 @@ class PhysicalAllocator {
 	}
 
 	static fun freeOnePage(physical: UInt64) {
-		let where = DOWN_BYTES_TO_PAGES(physical - (uint64_t)WholePhysicalStart)
+		let where = DOWN_BYTES_TO_PAGES(physical - (WholePhysicalStart as! UInt64))
 		// Bounds check
 		if (physical <= WholePhysicalStart || where > count)
 			return
@@ -290,9 +290,9 @@ class PhysicalAllocator {
 	}
 }
 
-#undef PAGE_FULL
-#undef PAGE_FREE
-#undef PAGE_MASK
+
+
+
 UInt8 *PhysicalAllocator.buffer
 UInt64 PhysicalAllocator.count
 UInt64 PhysicalAllocator.last

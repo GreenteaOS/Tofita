@@ -15,7 +15,7 @@
 
 #pragma once
 
-namespace wapi {
+
 
 typedef Void *Handle
 // TODO ifdef 64-bit
@@ -204,11 +204,11 @@ let SW_SHOWDEFAULT = 10
 let SW_FORCEMINIMIZE = 11
 let SW_MAX = 11
 
-} // namespace wapi
 
-namespace tofi {} // namespace tofi
 
-namespace nj {
+
+
+
 
 @struct
 class {
@@ -234,5 +234,3 @@ class WindowFramebuffer {
 	UInt16 width
 	UInt16 height
 }
-
-} // namespace nj

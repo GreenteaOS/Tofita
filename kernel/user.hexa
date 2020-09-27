@@ -15,7 +15,7 @@
 
 // Multiuser support
 
-namespace user {
+
 
 // A "user" is the one we can login into
 // Note: Toast sandbox has it's own set of users
@@ -24,5 +24,3 @@ class User {
 	const Char8 *name
 	sandbox.Sandbox *sandbox
 }
-
-} // namespace user

@@ -17,7 +17,7 @@
 
 @extern "C" {
 
-namespace efi {
+
 #include <efi.hpp>
 }
 
@@ -348,9 +348,9 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	// Convert addresses to upper half
 
-	stack = (uint64_t)WholePhysicalStart + stack
-	params.physicalRamBitMaskVirtual = (uint64_t)WholePhysicalStart + params.physicalRamBitMaskVirtual
-	params = (KernelParams *)((uint64_t)WholePhysicalStart + (uint64_t)params)
+	stack = (WholePhysicalStart as! UInt64) + stack
+	params.physicalRamBitMaskVirtual = (WholePhysicalStart as! UInt64) + params.physicalRamBitMaskVirtual
+	params = (KernelParams *)((WholePhysicalStart as! UInt64) + (uint64_t)params)
 
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader")
 

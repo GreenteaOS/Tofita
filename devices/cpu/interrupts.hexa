@@ -206,7 +206,7 @@ Void disablePic(void) {
 }
 
 UInt64 physicalToVirtual(physical: UInt64) {
-	var result: UInt64 = (uint64_t)WholePhysicalStart + (uint64_t)physical
+	var result: UInt64 = (WholePhysicalStart as! UInt64) + (uint64_t)physical
 	return result
 }
 
@@ -366,10 +366,10 @@ Void anyInterruptHandler(InterruptFrame *frame)
 
 Void anyInterruptHandler(InterruptFrame *frame) {
 	amd64.disableAllInterrupts()
-#if 0
+#if false
 	let stack = (InterruptStack *)((uint64_t)frame - 200)
 
-#endif
+#end
 
 	// Enable interrupts
 	writePort(0xA0, 0x20)
@@ -439,7 +439,7 @@ fun switchToKernelThread(@volatile InterruptFrame *frame) {
 
 	// Restore
 	currentThread = THREAD_KERNEL
-	amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart)
+	amd64.writeCr3((uint64_t)pml4kernelThread - (WholePhysicalStart as! UInt64))
 	tmemcpy(frame, &kernelThreadFrame, sizeof(InterruptFrame))
 }
 
@@ -456,7 +456,7 @@ fun switchToNextProcess(@volatile InterruptFrame *frame) {
 	process.currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
 	// another option is to save/restore CR3 used by kernel thread
-	amd64.writeCr3((uint64_t)process.pml4 - (uint64_t)WholePhysicalStart)
+	amd64.writeCr3((uint64_t)process.pml4 - (WholePhysicalStart as! UInt64))
 	process.scheduleOnNextTick = false
 
 	// Note: pid 0 is not real process, so keep things in kernel
@@ -477,7 +477,7 @@ fun switchToNextProcess(@volatile InterruptFrame *frame) {
 		currentThread = THREAD_USER
 		tmemcpy(frame, &process.frame, sizeof(InterruptFrame))
 	} else {
-		amd64.writeCr3((uint64_t)pml4kernelThread - (uint64_t)WholePhysicalStart)
+		amd64.writeCr3((uint64_t)pml4kernelThread - (WholePhysicalStart as! UInt64))
 		switchToKernelThread(frame)
 	}
 }
@@ -792,7 +792,7 @@ fun enableInterrupts() {
 	initializeFallback(&IDT[0x81], (uint64_t)(&yieldInterrupt))
 
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1
-	cacheIdtr.offset = (uint64_t)IDT
+	cacheIdtr.offset = (IDT as! UInt64)
 
 	serialPrint("[cpu] IDTR points to: ")
 	serialPrintHex((uint64_t)&cacheIdtr)
