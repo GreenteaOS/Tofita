@@ -21,3 +21,18 @@ volatile bool sehProbe = false;
 extern volatile bool (*volatile const probeForReadOkay)(volatile uint64_t at, volatile const uint64_t bytes);
 extern volatile bool (*volatile const probeForWriteOkay)(volatile const uint64_t at,
 														 volatile const uint64_t bytes);
+
+// TODO template wrappers
+/*
+<T>
+class UserRead {
+	const *T t;
+	probeForReadOkay return t;
+}
+
+class UserReadWrite {
+	*T t;
+	probeForWriteOkay return t;
+}
+
+*/

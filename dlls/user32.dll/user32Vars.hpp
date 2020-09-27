@@ -32,5 +32,16 @@ struct Window {
 	// TODO bool isNativeWindow;
 	wapi::WindowProcedure proc;
 	nj::WindowFramebuffer fb;
+	uint64_t instanceId; // Random unique ID
+};
+
+constexpr uint16_t windowIsRemoteWindow = 0xA1CB;
+
+// Window of other process
+struct RemoteWindow {
+	uint16_t windowIsRemoteWindow;
+	uint64_t pid;
+	wapi::HWnd hWnd;
+	uint64_t instanceId; // Random unique ID
 };
 } // namespace user32

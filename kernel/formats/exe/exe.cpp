@@ -54,6 +54,7 @@ struct Executable {
 	pages::PageEntry *pml4;
 };
 
+// TODO probe for read/write
 auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	RamDiskAsset asset = getRamDiskAsset(name);
 	serialPrintf(L"[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data);
@@ -210,7 +211,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 // Search only selected .dll only within the user provided dlls
 PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root) {
 	PeExportLinkedList *list = root;
-
+	// TODO compute crc for faster .dll import names lookup
 	while (list->next != null) {
 		// Step upfront, to ignore empty root
 		list = list->next;

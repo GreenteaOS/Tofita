@@ -68,13 +68,13 @@ int32_t libc_pow(int32_t a, int32_t n) {
 	return r;
 }
 
-function libc_memcpy(void *dest, void *src, uint64_t n) {
+function libc_memcpy(void *dest, const void *src, uint64_t n) {
 	const uint8_t *csrc = (uint8_t *)src;
 	uint8_t *cdest = (uint8_t *)dest;
 	for (int32_t i = 0; i < n; i++)
 		cdest[i] = csrc[i];
 }
 
-function memcpy(void *dest, void *src, uint64_t n) {
+function memcpy(void *dest, const void *src, uint64_t n) {
 	libc_memcpy(dest, src, n);
 }

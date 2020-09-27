@@ -252,6 +252,8 @@ function mapEfi(EfiMemoryMap *memoryMap) {
 		if (descriptor->Attribute & EFI_MEMORY_RUNTIME) {
 			// TODO pointer fixups
 			// TODO should be RW or RO?
+			// Note: in VirtualBox, PhysicalStart seems way beyound RAM bounds
+			// Seems like fixup should be applied only if PhysicalStart < ramBytes?
 			mapMemory(descriptor->PhysicalStart, descriptor->PhysicalStart, descriptor->NumberOfPages, 1);
 			sum += descriptor->NumberOfPages;
 		}
@@ -329,6 +331,8 @@ uint64_t conventionalAllocateNext(uint64_t bytes) {
 
 function mapFramebuffer(const Framebuffer *fb) {
 	let framebufferBase = fb->base;
+	// TODO map with hugepages!!!
+	// TODO map ALL with EPIC pages?
 	mapMemory(FramebufferStart, (uint64_t)framebufferBase, fb->size / PAGE_SIZE + 1, 1);
 }
 } // namespace paging
