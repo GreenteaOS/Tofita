@@ -23,6 +23,12 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 
 		var payload = (CreateWindowExPayload *)frame->rdxArg1;
 
+		if (probeForReadOkay((uint64_t)payload->lpClassName, 16))
+			serialPrintf(L"<> lpClassName == %S\n", payload->lpClassName);
+
+		if (probeForReadOkay((uint64_t)payload->lpWindowName, 16))
+			serialPrintf(L"<> lpWindowName == %S\n", payload->lpWindowName);
+
 		var window = dwm::OverlappedWindow_create(process->pid);
 
 		window->hWnd = payload->hWnd;
@@ -72,6 +78,7 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 		if (frame->raxReturn) {
 			process->schedulable = true;
 		} else {
+			// process->syscallToHandle = TofitaSyscalls::GetMessage;
 			process->awaitsGetMessage = true;
 		}
 
@@ -126,6 +133,17 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 			}
 		}
 
+		//		if (window != null) {
+		//			var pixelsKernel = window->fbKernel->pixels;
+		//			var pixelsUser = window->fbUser->pixels;
+		//			let count = window->fbKernel->width * window->fbKernel->height;
+		//			for (uint32_t i = 0; i < count; ++i)
+		//			{
+		//				pixelsKernel[i] = pixelsUser[i];
+		//			}
+		//		}
+
+		// frame->raxReturn = 0;
 		process->schedulable = true;
 		return true;
 	}
@@ -154,6 +172,9 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 			let height = (uint32_t)window->height;
 
 			let bytes = width * height * sizeof(Pixel32);
+			// serialPrintln(L"[GetOrCreateWindowFramebuffer.allocateBytes]");
+			// window->fbZeta.pixels = (nj::Pixel32 *)PhysicalAllocator::allocateBytes(bytes);
+			// window->fbGama.pixels = (nj::Pixel32 *)PhysicalAllocator::allocateBytes(bytes);
 
 			// TODO client width
 			window->fbZeta = allocateBitmap(width, height);
@@ -162,6 +183,10 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 			memset((void *)window->fbZeta->pixels, 0x33, bytes);
 			memset((void *)window->fbGama->pixels, 0x33, bytes);
 
+			// window->fbZeta.width = width; // TODO client width
+			// window->fbZeta.height = height;
+			// window->fbGama.width = width; // TODO client width
+			// window->fbGama.height = height;
 		}
 
 		if (window->fbCurrentZeta) {
@@ -174,6 +199,7 @@ bool userCallHandled(volatile process::Process *process, const TofitaSyscalls sy
 			fb->height = window->fbGama->height;
 		}
 
+		// frame->raxReturn = 0;
 		process->schedulable = true;
 		return true;
 	}
