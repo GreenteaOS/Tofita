@@ -42,7 +42,7 @@ float @fastcall sqrt(float number) {
 }
 
 fun @fastcall
-boxBlurT(Bitmap32 *source, Bitmap32 *target, width: UInt16, height: UInt16, radius: UInt8) {
+boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	var iarr: Float = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < width; i++) {
 		var ti: UInt32 = i
@@ -112,7 +112,7 @@ boxBlurT(Bitmap32 *source, Bitmap32 *target, width: UInt16, height: UInt16, radi
 }
 
 fun @fastcall
-boxBlurH(Bitmap32 *source, Bitmap32 *target, width: UInt16, height: UInt16, radius: UInt8) {
+boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	var iarr: Float = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < height; i++) {
 		var ti: UInt32 = i * width
@@ -174,7 +174,7 @@ boxBlurH(Bitmap32 *source, Bitmap32 *target, width: UInt16, height: UInt16, radi
 }
 
 fun @fastcall
-boxBlur(Bitmap32 *source, Bitmap32 *target, width: UInt16, height: UInt16, radius: UInt8) {
+boxBlur(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	for (UInt32 i = 0; i < source.width * source.height; i++)
 		target.pixels[i].color = source.pixels[i].color
 	boxBlurH(target, source, width, height, radius)
@@ -200,7 +200,7 @@ UInt8 *boxesForGauss(sigma: Float, n: UInt8) {
 	return sizes
 }
 
-Bitmap32 *gaussBlur(Bitmap32 *bitmap, radius: Float) {
+Bitmap32 *gaussBlur(bitmap: Pointer<Bitmap32>, radius: Float) {
 	var target: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
 
 	var boxes: Pointer<UInt8> = boxesForGauss(radius, 3)
@@ -214,12 +214,12 @@ Bitmap32 *gaussBlur(Bitmap32 *bitmap, radius: Float) {
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
 PixelRGBAData @fastcall
-interpolatePixel(const Bitmap32 *bitmap, const float x, const float y) {
+interpolatePixel(bitmap: ConstPointer<Bitmap32>, const float x, const float y) {
 	let px: UInt16 = (uint16_t)x // Same as floor(x)
 	let py: UInt16 = (uint16_t)y // Same as floor(y)
 	let stride: UInt16 = bitmap.width
 	const PixelRGBAData *data = (const PixelRGBAData *)bitmap.pixels
-	const PixelRGBAData *p0 = &data[px + py * stride] // pointer to first pixel
+	const PixelRGBAData *p0 = Pointer.of(data[px + py * stride]) // pointer to first pixel
 
 	// Calculate the weights
 	const float fx = x - px

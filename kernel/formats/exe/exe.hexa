@@ -22,8 +22,8 @@
 
 typedef fun(__fastcall *Entry)(entry: UInt64)
 
-Void *offsetPointer(Void *data, ptrdiff_t offset) {
-	return (Void *)((uint64_t)data + offset)
+Void *offsetPointer(data: VoidPointer, ptrdiff_t offset) {
+	return (Void *)((data as! UInt64) + offset)
 }
 
 @struct
@@ -61,13 +61,13 @@ class Executable {
 }
 
 // TODO probe for read/write
-auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
+auto loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, exec: Pointer<Executable>) {
 	var asset: RamDiskAsset = getRamDiskAsset(name)
 	serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data)
 	var ptr = (UInt8 *)asset.data
-	var peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
+	var peHeader = (const PeHeader *)((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256)
 	serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
-	var peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader))
+	var peOptionalHeader = (const Pe64OptionalHeader *)((peHeader as! UInt64) + sizeof(PeHeader))
 	serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
 				 0x020B)
 	serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
@@ -89,40 +89,40 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 
 	// Copy sections
 	var imageSectionHeader =
-		(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.sizeOfOptionalHeader)
+		(const ImageSectionHeader *)((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader)
 
 	// TODO copy PE headers?
 	for (UInt16 i = 0; i < peHeader.numberOfSections; ++i) {
 		serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
-					 &imageSectionHeader[i].name, imageSectionHeader[i].sizeOfRawData,
+					 Pointer.of(imageSectionHeader[i].name), imageSectionHeader[i].sizeOfRawData,
 					 imageSectionHeader[i].virtualAddress)
-		var where: UInt64 = (uint64_t)buffer + imageSectionHeader[i].virtualAddress
+		var where: UInt64 = (buffer as! UInt64) + imageSectionHeader[i].virtualAddress
 
 		tmemcpy((Void *)where,
-				(Void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
+				(Void *)((asset.data as! UInt64) + (imageSectionHeader[i].pointerToRawData as! UInt64)),
 				imageSectionHeader[i].sizeOfRawData)
 	}
 
 	// TODO
 	{
 		UInt32 (*func)() =
-			(uint32_t(*)())((uint64_t)buffer + (uint64_t)peOptionalHeader.addressOfEntryPoint)
+			(uint32_t(*)())((buffer as! UInt64) + (peOptionalHeader.addressOfEntryPoint as! UInt64))
 		if (peOptionalHeader.addressOfEntryPoint == 4128)
 			serialPrintf("[[[IMAGE_DIRECTORY_ENTRY_EXPORT]]] calling _DllMainCRTStartup == %d\n", func())
 	}
 
 	var imageDataDirectory =
-		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(Pe64OptionalHeader))
+		(const ImageDataDirectory *)((peOptionalHeader as! UInt64) + sizeof(Pe64OptionalHeader))
 
 	// Relocate EXE or DLL to a new base
-	ptrdiff_t delta = (uint64_t)buffer - (uint64_t)peOptionalHeader.imageBase
+	ptrdiff_t delta = (buffer as! UInt64) - (peOptionalHeader.imageBase as! UInt64)
 	if (delta != 0) {
 		var codeBase: Pointer<UInt8> = (UInt8 *)buffer
 
 		var relocation: PIMAGE_BASE_RELOCATION
 
 		PIMAGE_DATA_DIRECTORY directory =
-			(PIMAGE_DATA_DIRECTORY)&imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC]
+			(PIMAGE_DATA_DIRECTORY)Pointer.of(imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC])
 
 		if (directory.size == 0) {
 			// return (delta == 0)
@@ -155,7 +155,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 					//#ifdef _WIN64
 				case IMAGE_REL_BASED_DIR64: {
 					var patchAddr64: Pointer<UInt64> = (UInt64 *)(dest + offset)
-					*patchAddr64 += (uint64_t)delta
+					*patchAddr64 += (delta as! UInt64)
 				} break
 					//#endif
 
@@ -178,12 +178,12 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 
 	for (UInt32 i = 0; i < 15; ++i) {
 		if (i == IMAGE_DIRECTORY_ENTRY_EXPORT) {
-			var codeBase: UInt64 = (uint64_t)buffer
-			const ImageDataDirectory *directory = &imageDataDirectory[i]
+			var codeBase: UInt64 = (buffer as! UInt64)
+			const ImageDataDirectory *directory = Pointer.of(imageDataDirectory[i])
 
 			var exports: PIMAGE_EXPORT_DIRECTORY
 
-			exports = (PIMAGE_EXPORT_DIRECTORY)((uint64_t)buffer + (uint64_t)directory.virtualAddress)
+			exports = (PIMAGE_EXPORT_DIRECTORY)((buffer as! UInt64) + (directory.virtualAddress as! UInt64))
 
 			var i: UInt32 = 0
 			var nameRef: Pointer<UInt32> = (UInt32 *)(codeBase + exports.addressOfNames)
@@ -202,7 +202,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 					(PeExportLinkedList *)PhysicalAllocator.allocateBytes(sizeof(PeExportLinkedList))
 				list.next = null
 				list.name = name
-				list.ptr = (uint64_t)func
+				list.ptr = (func as! UInt64)
 
 				tail.next = list
 				tail = tail.next
@@ -213,7 +213,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 	var pei: PeInterim
 
 	pei.base = (Void *)buffer
-	pei.entry = (uint64_t)buffer + (uint64_t)peOptionalHeader.addressOfEntryPoint
+	pei.entry = (buffer as! UInt64) + (peOptionalHeader.addressOfEntryPoint as! UInt64)
 	pei.imageDataDirectory = imageDataDirectory
 	pei.sizeOfStackReserve = peOptionalHeader.sizeOfStackReserve
 
@@ -223,7 +223,7 @@ auto loadDll(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 // TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
 // may be moved between versions.
 // Search only selected .dll only within the user provided dlls
-PeExportLinkedList *getProcAddress(const Char8 *name, PeExportLinkedList *root) {
+PeExportLinkedList *getProcAddress(name: ConstPointer<Char8>, root: Pointer<PeExportLinkedList>) {
 	var list: Pointer<PeExportLinkedList> = root
 	// TODO compute crc for faster .dll import names lookup
 	while (list.next != null) {
@@ -249,22 +249,22 @@ PeExportLinkedList *getProcAddress(const Char8 *name, PeExportLinkedList *root) 
 	return null
 }
 
-fun resolveDllImports(pei: PeInterim, PeExportLinkedList *root) {
+fun resolveDllImports(pei: PeInterim, root: Pointer<PeExportLinkedList>) {
 	var buffer = pei.base
 	var imageDataDirectory = pei.imageDataDirectory
 
 	// Imports
 	{
 		UInt8 *at =
-			(UInt8 *)((uint64_t)buffer + imageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].virtualAddress)
+			(UInt8 *)((buffer as! UInt64) + imageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].virtualAddress)
 		var iid = (IMAGE_IMPORT_DESCRIPTOR *)at
 
 		// DLL
 		while (iid.originalFirstThunk != 0) {
-			var szName: Pointer<Char8> = (Char8 *)((uint64_t)buffer + iid.name)
-			var pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid.originalFirstThunk)
+			var szName: Pointer<Char8> = (Char8 *)((buffer as! UInt64) + iid.name)
+			var pThunkOrg = (IMAGE_THUNK_DATA *)((buffer as! UInt64) + iid.originalFirstThunk)
 			var funcRef: Pointer<FARPROC>
-			funcRef = (FARPROC *)((uint64_t)buffer + iid.firstThunk)
+			funcRef = (FARPROC *)((buffer as! UInt64) + iid.firstThunk)
 
 			while (pThunkOrg.u1.addressOfData != 0) {
 				var szImportName: Pointer<Char8>
@@ -278,8 +278,8 @@ fun resolveDllImports(pei: PeInterim, PeExportLinkedList *root) {
 								 szName, ord, pThunkOrg.u1.fun)
 				} else {
 					IMAGE_IMPORT_BY_NAME *pIBN =
-						(IMAGE_IMPORT_BY_NAME *)((uint64_t)buffer +
-												 (uint64_t)((uint64_t)pThunkOrg.u1.addressOfData &
+						(IMAGE_IMPORT_BY_NAME *)((buffer as! UInt64) +
+												 (uint64_t)((pThunkOrg.u1.addressOfData as! UInt64) &
 															0xffffffff))
 					ord = pIBN.hint
 					szImportName = (Char8 *)pIBN.name
@@ -307,7 +307,7 @@ fun resolveDllImports(pei: PeInterim, PeExportLinkedList *root) {
 	}
 }
 
-auto loadExe(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
+auto loadExe(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, exec: Pointer<Executable>) {
 	var ei: ExeInterim
 
 	ei.pei = loadDll(name, root, exec)
@@ -329,11 +329,11 @@ auto loadExe(const WideChar *name, PeExportLinkedList *root, Executable *exec) {
 	return ei
 }
 
-fun resolveExeImports(ei: ExeInterim, PeExportLinkedList *root) {
+fun resolveExeImports(ei: ExeInterim, root: Pointer<PeExportLinkedList>) {
 	resolveDllImports(ei.pei, root)
 }
 
-fun loadExeIntoProcess(const WideChar *file, process.Process *process) {
+fun loadExeIntoProcess(const file: Pointer<WideChar>, process.process: Pointer<Process>) {
 	{
 		PeExportLinkedList *root =
 			(PeExportLinkedList *)PhysicalAllocator.allocateBytes(sizeof(PeExportLinkedList))
@@ -345,11 +345,11 @@ fun loadExeIntoProcess(const WideChar *file, process.Process *process) {
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
 
-		var app = loadExe(file, root, &exec)
-		var ntdll = loadDll("desktop/ntdll.dll", root, &exec) // TODO proper path!!!
-		var kernel32 = loadDll("desktop/kernel32.dll", root, &exec)
-		var gdi32 = loadDll("desktop/gdi32.dll", root, &exec)
-		var user32 = loadDll("desktop/user32.dll", root, &exec)
+		var app = loadExe(file, root, Pointer.of(exec))
+		var ntdll = loadDll("desktop/ntdll.dll", root, Pointer.of(exec)) // TODO proper path!!!
+		var kernel32 = loadDll("desktop/kernel32.dll", root, Pointer.of(exec))
+		var gdi32 = loadDll("desktop/gdi32.dll", root, Pointer.of(exec))
+		var user32 = loadDll("desktop/user32.dll", root, Pointer.of(exec))
 
 		resolveDllImports(ntdll, root)
 		resolveDllImports(kernel32, root)

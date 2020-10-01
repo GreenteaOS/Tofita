@@ -15,4 +15,4 @@
 
 // Read the RDTSC timer
 
-Void rdtscTicks(@volatile UInt64 *result)
+Void rdtscTicks(@volatile result: Pointer<UInt64>)

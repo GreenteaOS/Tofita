@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls syscall) {
-	@volatile var frame = &process.frame
+Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSyscalls syscall) {
+	@volatile var frame = Pointer.of(process.frame)
 
 	if (syscall == TofitaSyscalls.CreateWindowEx) {
 		if (!probeForReadOkay(frame.rdxArg1, sizeof(CreateWindowExPayload)))
@@ -22,10 +22,10 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 
 		var payload = (CreateWindowExPayload *)frame.rdxArg1
 
-		if (probeForReadOkay((uint64_t)payload.lpClassName, 16))
+		if (probeForReadOkay((payload.lpClassName as! UInt64), 16))
 			serialPrintf("<> lpClassName == %S\n", payload.lpClassName)
 
-		if (probeForReadOkay((uint64_t)payload.lpWindowName, 16))
+		if (probeForReadOkay((payload.lpWindowName as! UInt64), 16))
 			serialPrintf("<> lpWindowName == %S\n", payload.lpWindowName)
 
 		var window = dwm.OverlappedWindow_create(process.pid)
@@ -33,7 +33,7 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 		window.hWnd = payload.hWnd
 
 		// TODO proper probe method, probably separate probeForWideCharOkay
-		if (probeForReadOkay((uint64_t)payload.lpWindowName, 8)) {
+		if (probeForReadOkay((payload.lpWindowName as! UInt64), 8)) {
 			window.title = String.duplicate(payload.lpWindowName)
 		}
 
@@ -68,7 +68,7 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 
 		var payload = (GetMessagePayload *)frame.rdxArg1
 
-		if (!probeForWriteOkay((uint64_t)payload.msg, sizeof(wapi.Msg)))
+		if (!probeForWriteOkay((payload.msg as! UInt64), sizeof(wapi.Msg)))
 			return false
 
 		frame.raxReturn = process.getMessage(process, payload)
@@ -102,7 +102,7 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 
 		let payload = (SwapWindowFramebufferPayload *)frame.rdxArg1
 
-		if (!probeForWriteOkay((uint64_t)payload.fb, sizeof(nj.WindowFramebuffer)))
+		if (!probeForWriteOkay((payload.fb as! UInt64), sizeof(nj.WindowFramebuffer)))
 			return false
 
 		var windowId: UInt64 = payload.windowId
@@ -120,13 +120,13 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 		if (window.fbZeta != null) {
 			window.fbCurrentZeta = !window.fbCurrentZeta
 			if (window.fbCurrentZeta) {
-				tmemcpy((Void *)&window.fbZeta.pixels, (const Void *)&window.fbGama.pixels, bytes)
-				fb.pixels = (nj.Pixel32 *)&window.fbZeta.pixels
+				tmemcpy((Void *)Pointer.of(window.fbZeta.pixels), (const Void *)Pointer.of(window.fbGama.pixels), bytes)
+				fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbZeta.pixels)
 				fb.width = window.fbZeta.width
 				fb.height = window.fbZeta.height
 			} else {
-				tmemcpy((Void *)&window.fbGama.pixels, (const Void *)&window.fbZeta.pixels, bytes)
-				fb.pixels = (nj.Pixel32 *)&window.fbGama.pixels
+				tmemcpy((Void *)Pointer.of(window.fbGama.pixels), (const Void *)Pointer.of(window.fbZeta.pixels), bytes)
+				fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbGama.pixels)
 				fb.width = window.fbGama.width
 				fb.height = window.fbGama.height
 			}
@@ -154,7 +154,7 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 		let payload = (SwapWindowFramebufferPayload *)frame.rdxArg1
 
 		// TODO probeForWriteOkay alias taking pointer probeForWriteAtOkay
-		if (!probeForWriteOkay((uint64_t)payload.fb, sizeof(nj.WindowFramebuffer)))
+		if (!probeForWriteOkay((payload.fb as! UInt64), sizeof(nj.WindowFramebuffer)))
 			return false
 
 		var windowId: UInt64 = payload.windowId
@@ -189,11 +189,11 @@ Bool userCallHandled(@volatile process.Process *process, const TofitaSyscalls sy
 		}
 
 		if (window.fbCurrentZeta) {
-			fb.pixels = (nj.Pixel32 *)&window.fbZeta.pixels
+			fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbZeta.pixels)
 			fb.width = window.fbZeta.width
 			fb.height = window.fbZeta.height
 		} else {
-			fb.pixels = (nj.Pixel32 *)&window.fbGama.pixels
+			fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbGama.pixels)
 			fb.width = window.fbGama.width
 			fb.height = window.fbGama.height
 		}

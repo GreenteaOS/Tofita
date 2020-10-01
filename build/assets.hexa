@@ -106,7 +106,7 @@ fun packAssets(config: Config) {
 		ramDiskSize += 4 // UInt32 assetsCount
 		ramDiskSize += ( //struct assetDefinition
 			//{
-			256 + //	UInt8 path[256]
+			256 + //	var path[256]: UInt8
 			4 + //	    UInt32 size
 			4 //	    UInt32 offsetFromRamDiskFirstByte // NOT relative to `data`
 			//}

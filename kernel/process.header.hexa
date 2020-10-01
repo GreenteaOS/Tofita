@@ -25,7 +25,7 @@ class Process {
 	// TODO SoA
 
 	// Index
-	@volatile UInt64 pid
+	@volatile pid: UInt64
 
 	// Is it allowed to make this process current
 	@volatile Bool schedulable
@@ -43,7 +43,7 @@ class Process {
 	var frame: InterruptFrame
 
 	// Filled on #PF
-	@volatile UInt64 cr2PageFaultAddress
+	@volatile cr2PageFaultAddress: UInt64
 
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
@@ -67,7 +67,7 @@ const UInt64 ProcessLimit = 256
 var processes[ProcessLimit]: Process = {0}
 
 // Working process pid, with restored state and active CR3
-@volatile UInt64 currentProcess = 0
+@volatile currentProcess: UInt64 = 0
 
-Bool postMessage(@volatile Process *process, PostMessagePayload *payload)
-Bool getMessage(@volatile Process *process, GetMessagePayload *payload)
+Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessagePayload>)
+Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessagePayload>)

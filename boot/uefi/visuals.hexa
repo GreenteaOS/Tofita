@@ -25,7 +25,7 @@ let leavesHeight: UInt32 = 25
 
 Int64 _fltused = 0
 
-fun drawPixel(Framebuffer *framebuffer, x: UInt32, y: UInt32, color: UInt32) {
+fun drawPixel(framebuffer: Pointer<Framebuffer>, x: UInt32, y: UInt32, color: UInt32) {
 	var pixels: Pointer<UInt32> = (UInt32 *)framebuffer.base
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
@@ -40,14 +40,14 @@ class UefiPixel {
 
 _Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit")
 
-UInt32 getBitmapPixel(const UInt8 *bmp, x: UInt32, y: UInt32, width: UInt32, height: UInt32) {
+UInt32 getBitmapPixel(const bmp: Pointer<UInt8>, x: UInt32, y: UInt32, width: UInt32, height: UInt32) {
 	let colors = bmp + 54
 	var pixel: UefiPixel
 	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0]
 	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1]
 	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2]
 	pixel.a = 0xFF
-	var color: Pointer<UInt32> = (UInt32 *)&pixel
+	var color: Pointer<UInt32> = (UInt32 *)Pointer.of(pixel)
 	return *color
 }
 
@@ -69,12 +69,12 @@ fun initText() {
 }
 
 Float getCharAdvance(const Char8 c) {
-	var textChar: TextFontList = textFontList[(uint64_t)c]
+	var textChar: TextFontList = textFontList[(c] as! UInt64)
 	return textChar.width
 }
 
-Float drawChar(c: Char8, x: Float, y: Int16, Framebuffer *framebuffer) {
-	var textChar: TextFontList = textFontList[(uint64_t)c]
+Float drawChar(c: Char8, x: Float, y: Int16, framebuffer: Pointer<Framebuffer>) {
+	var textChar: TextFontList = textFontList[(c] as! UInt64)
 
 	var xx: Int16 = (int32_t)(x + 0.5)
 	var w: UInt16 = (int32_t)(textChar.width + 0.5)
@@ -92,7 +92,7 @@ Float drawChar(c: Char8, x: Float, y: Int16, Framebuffer *framebuffer) {
 	return textChar.width
 }
 
-fun drawText(const WideChar *text, y: Int16, Framebuffer *framebuffer) {
+fun drawText(const text: Pointer<WideChar>, y: Int16, framebuffer: Pointer<Framebuffer>) {
 	var i: UInt16 = 0
 
 	// Get width to center text on screen

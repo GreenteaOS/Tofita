@@ -26,21 +26,21 @@ const UInt32 cpuidExtendedLevels = 0x80000000
 fun getCPUID(): CPUID {
 	var result: CPUID
 	var stub: UInt32 = 0
-	amd64.cpuid(0, 0, &result.data, (UInt32 *)(&result.vendorID[0]), (UInt32 *)(&result.vendorID[8]),
-				 (UInt32 *)(&result.vendorID[4]))
+	amd64.cpuid(0, 0, Pointer.of(result.data), (UInt32 *)(Pointer.of(result.vendorID[0])), (UInt32 *)(Pointer.of(result.vendorID[8])),
+				 (UInt32 *)(Pointer.of(result.vendorID[4])))
 
-	amd64.cpuid(cpuidExtendedLevels, 0, &result.extras, &stub, &stub, &stub)
+	amd64.cpuid(cpuidExtendedLevels, 0, Pointer.of(result.extras), Pointer.of(stub), Pointer.of(stub), Pointer.of(stub))
 
 	if (result.extras >= cpuidExtendedLevels + 4) {
-		amd64.cpuid(cpuidExtendedLevels + 2, 0, (UInt32 *)(&result.brandName[0]),
-					 (UInt32 *)(&result.brandName[4]), (UInt32 *)(&result.brandName[8]),
-					 (UInt32 *)(&result.brandName[12]))
-		amd64.cpuid(cpuidExtendedLevels + 3, 0, (UInt32 *)(&result.brandName[16]),
-					 (UInt32 *)(&result.brandName[20]), (UInt32 *)(&result.brandName[24]),
-					 (UInt32 *)(&result.brandName[28]))
-		amd64.cpuid(cpuidExtendedLevels + 4, 0, (UInt32 *)(&result.brandName[32]),
-					 (UInt32 *)(&result.brandName[36]), (UInt32 *)(&result.brandName[40]),
-					 (UInt32 *)(&result.brandName[44]))
+		amd64.cpuid(cpuidExtendedLevels + 2, 0, (UInt32 *)(Pointer.of(result.brandName[0])),
+					 (UInt32 *)(Pointer.of(result.brandName[4])), (UInt32 *)(Pointer.of(result.brandName[8])),
+					 (UInt32 *)(Pointer.of(result.brandName[12])))
+		amd64.cpuid(cpuidExtendedLevels + 3, 0, (UInt32 *)(Pointer.of(result.brandName[16])),
+					 (UInt32 *)(Pointer.of(result.brandName[20])), (UInt32 *)(Pointer.of(result.brandName[24])),
+					 (UInt32 *)(Pointer.of(result.brandName[28])))
+		amd64.cpuid(cpuidExtendedLevels + 4, 0, (UInt32 *)(Pointer.of(result.brandName[32])),
+					 (UInt32 *)(Pointer.of(result.brandName[36])), (UInt32 *)(Pointer.of(result.brandName[40])),
+					 (UInt32 *)(Pointer.of(result.brandName[44])))
 	}
 
 	var i = 0

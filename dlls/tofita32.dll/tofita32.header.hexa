@@ -28,18 +28,18 @@ import "../../kernel/syscalls/syscalls.hpp"
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 TOFITA32_DLL UInt64 tofitaFastSystemCall(rcx: TofitaSyscalls, UInt64 rdx = 0)
 @fastcall TOFITA32_DLL UInt32 tofitaFastStub()
-TOFITA32_DLL Void tofitaDebugLog(const WideChar *message, UInt64 extra = 0, UInt64 more = 0)
+TOFITA32_DLL Void tofitaDebugLog(const message: Pointer<WideChar>, UInt64 extra = 0, UInt64 more = 0)
 
 // Kernel32
 TOFITA32_DLL Void tofitaExitProcess(exitCode: UInt32)
 
 // User32
-TOFITA32_DLL UInt64 tofitaCreateWindowEx(CreateWindowExPayload *payload)
+TOFITA32_DLL UInt64 tofitaCreateWindowEx(payload: Pointer<CreateWindowExPayload>)
 TOFITA32_DLL Void tofitaShowWindow(UInt64 windowId, nCmdShow: Int32)
-TOFITA32_DLL wapi.Bool tofitaGetMessage(GetMessagePayload *payload)
-TOFITA32_DLL wapi.Bool tofitaPostMessage(PostMessagePayload *payload)
+TOFITA32_DLL wapi.Bool tofitaGetMessage(payload: Pointer<GetMessagePayload>)
+TOFITA32_DLL wapi.Bool tofitaPostMessage(payload: Pointer<PostMessagePayload>)
 
 // NjRAA
-TOFITA32_DLL Void njraaGetOrCreateWindowFramebuffer(UInt64 windowId, nj.WindowFramebuffer *fb)
-TOFITA32_DLL Void njraaSwapWindowFramebuffer(UInt64 windowId, nj.WindowFramebuffer *fb)
+TOFITA32_DLL Void njraaGetOrCreateWindowFramebuffer(UInt64 windowId, nj.fb: Pointer<WindowFramebuffer>)
+TOFITA32_DLL Void njraaSwapWindowFramebuffer(UInt64 windowId, nj.fb: Pointer<WindowFramebuffer>)
 }

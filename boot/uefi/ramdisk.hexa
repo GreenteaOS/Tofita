@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FILE_PROTOCOL *root,
-									  RamDisk *ramdisk) {
+efi.EFI_STATUS loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, efi.root: Pointer<EFI_FILE_PROTOCOL>,
+									  ramdisk: Pointer<RamDisk>) {
 	var status: efi.EFI_STATUS
 	static efi.CHAR16 *name = (efi.CHAR16 *)"TOFITA.DAT"
 
 	var file: Pointer<efi.EFI_FILE_PROTOCOL> = null
-	status = root.Open(root, &file, (efi.CHAR16 *)name, EFI_FILE_MODE_READ,
+	status = root.Open(root, Pointer.of(file), (efi.CHAR16 *)name, EFI_FILE_MODE_READ,
 						EFI_FILE_READ_ONLY | EFI_FILE_HIDDEN | EFI_FILE_SYSTEM)
 
 	if (status == EFI_NOT_FOUND)
@@ -32,7 +32,7 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FIL
 
 	efi.EFI_GUID GenericFileInfo = EFI_FILE_INFO_ID
 
-	status = file.GetInfo(file, &GenericFileInfo, &infoSize, info)
+	status = file.GetInfo(file, &GenericFileInfo, Pointer.of(infoSize), info)
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: GetInfo %d\n", status)
 
 	var size: UInt64 = ((efi.EFI_FILE_INFO *)info).FileSize
@@ -42,14 +42,14 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FIL
 	sizeAlloc += sizeof(efi.EFI_MEMORY_DESCRIPTOR) * 512 // Combined allocation for mem map
 
 	var address: Pointer<Void> = null
-	status = uefiAllocate(bootsvc, &sizeAlloc, &address)
+	status = uefiAllocate(bootsvc, Pointer.of(sizeAlloc), Pointer.of(address))
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\n", status,
 				 size, address)
 
 	if (status != EFI_SUCCESS)
 		return status
 
-	status = file.Read(file, &size, address)
+	status = file.Read(file, Pointer.of(size), address)
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Read %d\n", status)
 
 	status = file.Close(file)
@@ -67,22 +67,22 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.EFI_BOOT_SERVICES *bootsvc, efi.EFI_FIL
 		serialPrintln(
 			"[[[efi_main.loadRamDiskFromVolume]]] <ERROR> checksum is incorrect, disk may be corrupted!")
 
-	ramdisk.base = (uint64_t)address
+	ramdisk.base = (address as! UInt64)
 	ramdisk.size = size
 
 	return EFI_SUCCESS
 }
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
-efi.EFI_STATUS findAndLoadRamDisk(efi.EFI_BOOT_SERVICES *bootsvc, RamDisk *ramdisk) {
+efi.EFI_STATUS findAndLoadRamDisk(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ramdisk: Pointer<RamDisk>) {
 	var status: efi.EFI_STATUS = EFI_NOT_READY
 	var handleBuffer: Pointer<efi.EFI_HANDLE> = null
 	var handleCount: UInt64 = 0
 
 	var simpleFileSystemProtocol: efi.EFI_GUID = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID
 
-	status = bootsvc.LocateHandleBuffer(efi.ByProtocol, &simpleFileSystemProtocol, null, &handleCount,
-										 &handleBuffer)
+	status = bootsvc.LocateHandleBuffer(efi.ByProtocol, Pointer.of(simpleFileSystemProtocol), null, Pointer.of(handleCount),
+										 Pointer.of(handleBuffer))
 	if (status != EFI_SUCCESS)
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] <ERROR> failed: LocateHandleBuffer %d\n", status)
 	else
@@ -93,7 +93,7 @@ efi.EFI_STATUS findAndLoadRamDisk(efi.EFI_BOOT_SERVICES *bootsvc, RamDisk *ramdi
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] loading handle #%d of %d handles\n", i, handleCount)
 		var fileSystem: Pointer<efi.EFI_SIMPLE_FILE_SYSTEM_PROTOCOL> = null
 
-		status = bootsvc.HandleProtocol(handleBuffer[i], &simpleFileSystemProtocol, (Void **)&fileSystem)
+		status = bootsvc.HandleProtocol(handleBuffer[i], Pointer.of(simpleFileSystemProtocol), (Void **)Pointer.of(fileSystem))
 
 		if (status != EFI_SUCCESS) {
 			serialPrintf(
@@ -105,7 +105,7 @@ efi.EFI_STATUS findAndLoadRamDisk(efi.EFI_BOOT_SERVICES *bootsvc, RamDisk *ramdi
 
 		serialPrintln("[[[efi_main.findAndLoadRamDisk]]] success: HandleProtocol found a file system")
 		var root: Pointer<efi.EFI_FILE_PROTOCOL> = null
-		status = fileSystem.OpenVolume(fileSystem, &root)
+		status = fileSystem.OpenVolume(fileSystem, Pointer.of(root))
 		if (status != EFI_SUCCESS) {
 			serialPrintf("[[[efi_main.findAndLoadRamDisk]]] failed: OpenVolume with status %d, continue to "
 						 "the next one\n",

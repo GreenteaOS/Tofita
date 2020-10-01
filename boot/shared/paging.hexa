@@ -103,17 +103,17 @@ static Void *allocatePage() {
 }
 
 static LinearAddress getLinearAddress(address: UInt64) {
-	return *((LinearAddress *)&address)
+	return *((LinearAddress *)Pointer.of(address))
 }
 
-static fun initializePage(PageEntry *entry, address: UInt64, writeAllowed: UInt8) {
+static fun initializePage(entry: Pointer<PageEntry>, address: UInt64, writeAllowed: UInt8) {
 	entry.address = address >> ADDRESS_BITS
 	entry.present = 1
 	entry.writeAllowed = (writeAllowed == 1) ? 1 : 0
 	entry.accessibleByAll = 1 // TODO
 }
 
-static fun initializePageHuge(PageEntry *entry, address: UInt64) {
+static fun initializePageHuge(entry: Pointer<PageEntry>, address: UInt64) {
 	entry.address = address >> ADDRESS_BITS
 	entry.present = 1
 	entry.writeAllowed = 1
@@ -121,25 +121,25 @@ static fun initializePageHuge(PageEntry *entry, address: UInt64) {
 	entry.accessibleByAll = 1 // TODO
 }
 
-static Void *getPage(PageEntry *table, entryId: UInt64, writeAllowed: UInt8) {
-	var entry: Pointer<PageEntry> = &table[entryId]
+static Void *getPage(table: Pointer<PageEntry>, entryId: UInt64, writeAllowed: UInt8) {
+	var entry: Pointer<PageEntry> = Pointer.of(table[entryId])
 
 	if (entry.present == 1) {
 		return (Void *)(entry.address << ADDRESS_BITS)
 	} else {
 		var newPage: Pointer<Void> = allocatePage()
-		initializePage(entry, (uint64_t)newPage, writeAllowed)
+		initializePage(entry, (newPage as! UInt64), writeAllowed)
 		return newPage
 	}
 }
 
 fun map_pt(PageEntry pt[], virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
-	var entry: Pointer<PageEntry> = &pt[getLinearAddress(virtualAddr).pt]
+	var entry: Pointer<PageEntry> = Pointer.of(pt[getLinearAddress(virtualAddr).pt])
 	initializePage(entry, physicalAddr, writeAllowed)
 }
 
 fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
-	var entry: Pointer<PageEntry> = &pd[getLinearAddress(virtualAddr).pd]
+	var entry: Pointer<PageEntry> = Pointer.of(pd[getLinearAddress(virtualAddr).pd])
 	initializePageHuge(entry, physicalAddr)
 }
 
@@ -211,7 +211,7 @@ fun mapMemoryHuge(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32) {
 	}
 }
 
-static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.EFI_MEMORY_DESCRIPTOR *descriptor,
+static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.descriptor: Pointer<EFI_MEMORY_DESCRIPTOR>,
 														   UInt64 descriptorSize) {
 	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
 	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
@@ -222,7 +222,7 @@ UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
 	var numberOfPages: UInt64 = 0
 
-	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
@@ -244,7 +244,7 @@ fun mapEfi(EfiMemoryMap *memoryMap) {
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
 	var sum: UInt64 = 0
 
-	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
@@ -271,7 +271,7 @@ UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, pages: UInt32) {
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
 	var result: UInt64 = 0
 
-	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
@@ -298,7 +298,7 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	var result: UInt64 = 0
 	var largestPages: UInt64 = 0
 
-	var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
@@ -329,9 +329,9 @@ UInt64 conventionalAllocateNext(bytes: UInt64) {
 	return result
 }
 
-fun mapFramebuffer(const Framebuffer *fb) {
+fun mapFramebuffer(fb: ConstPointer<Framebuffer>) {
 	let framebufferBase = fb.base
 	// TODO map with hugepages!!!
 	// TODO map ALL with EPIC pages?
-	mapMemory(FramebufferStart, (uint64_t)framebufferBase, fb.size / PAGE_SIZE + 1, 1)
+	mapMemory(FramebufferStart, (framebufferBase as! UInt64), fb.size / PAGE_SIZE + 1, 1)
 }

@@ -110,9 +110,9 @@ class ACPI {
 	return t.header.validate(T.typeId)
 }
 
-static Void put_sig(Char8 *into, type: UInt32) {
+static Void put_sig(into: Pointer<Char8>, type: UInt32) {
 	for (Int32 j = 0; j < 4; ++j)
-		into[j] = reinterpret_cast<Char8 *>(&type)[j]
+		into[j] = reinterpret_cast<Char8 *>(Pointer.of(type))[j]
 }
 
 @extern "C++" template <typename T> inline T *offset_pointer(T *p, n: UInt64) {
@@ -155,7 +155,7 @@ class ACPIParser {
 
 		var acpiTable = (const acpi.ACPI *)physicalToVirtual(acpiVendorTable)
 
-		var acpi10 = &acpiTable.acpi10
+		var acpi10 = Pointer.of(acpiTable.acpi10)
 
 		serialPrint("[ACPI] signature is '")
 		for (Int32 i = 0; i < sizeof(acpi10.signature); i++)
@@ -180,7 +180,7 @@ class ACPIParser {
 			return false
 		}
 
-		let acpi20data = (const acpi.Acpi20 *)(&acpiTable.acpi20)
+		let acpi20data = (const acpi.Acpi20 *)(Pointer.of(acpiTable.acpi20))
 		let acpi20raw = (const UInt8 *)acpi20data
 		checksum = 0
 		for (Int32 i = 0; i < sizeof(acpi.Acpi20); i++)
@@ -200,11 +200,11 @@ class ACPIParser {
 
   private
 	static UInt64 physicalToVirtual(physical: UInt64) {
-		var result: UInt64 = (WholePhysicalStart as! UInt64) + (uint64_t)physical
+		var result: UInt64 = (WholePhysicalStart as! UInt64) + (physical as! UInt64)
 		return result
 	}
 
-	static fun dump32(const Char8 *msg, const Void *virtualAddress) {
+	static fun dump32(msg: ConstPointer<Char8>, const Void *virtualAddress) {
 		serialPrintf("\n[DUMP] %s: ", msg)
 		const Char8 *x = (Char8 *)((uint64_t)(virtualAddress))
 		const UInt8 *y = (UInt8 *)((uint64_t)(virtualAddress))
@@ -217,7 +217,7 @@ class ACPIParser {
 		serialPrint("\n")
 	}
 
-	static fun loadXsdt(const acpi.XSDT *xsdt) {
+	static fun loadXsdt(const acpi.xsdt: Pointer<XSDT>) {
 		if (xsdt == null)
 			return
 
@@ -233,7 +233,7 @@ class ACPIParser {
 		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)
 
 		for (UInt64 i = 0; i < numTables; ++i) {
-			var header = (const acpi.AcpiTableHeader *)physicalToVirtual((uint64_t)xsdt.headers[i])
+			var header = (const acpi.AcpiTableHeader *)physicalToVirtual((xsdt.headers[i] as! UInt64))
 
 			acpi.put_sig(sig, header.type)
 			serialPrintf("[ACPI] Found table %s\n", sig)
@@ -258,18 +258,18 @@ class ACPIParser {
 		quakePrintf("done.\n")
 	}
 
-	static fun loadApic(const acpi.AcpiApic *apic) {
+	static fun loadApic(const acpi.apic: Pointer<AcpiApic>) {
 		var local: Pointer<UInt32> = reinterpret_cast<UInt32 *>(apic.localAddress)
 		serialPrintf("loadApic\n")
 	}
 
-	static fun loadMcfg(const acpi.AcpiMcfg *mcfg) {
+	static fun loadMcfg(const acpi.mcfg: Pointer<AcpiMcfg>) {
 		serialPrintf("loadMcfg\n")
 		var count: UInt64 = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry))
 		var mPci[count]: acpi.PciGroup
 
 		for (UInt32 i = 0; i < count; ++i) {
-			const acpi.AcpiMcfgEntry &mcfge = mcfg.entries[i]
+			const acpi.AcpiMcfgEntry *mcfge = Pointer.of(mcfg.entries[i])
 
 			mPci[i].group = mcfge.group
 			mPci[i].busStart = mcfge.busStart
@@ -282,7 +282,7 @@ class ACPIParser {
 		probePci(mPci, count)
 	}
 
-	static Bool multi(acpi.PciGroup *group, bus: UInt8, device: UInt8, func: UInt8) {
+	static Bool multi(acpi.group: Pointer<PciGroup>, bus: UInt8, device: UInt8, func: UInt8) {
 		var mBase: Pointer<UInt32> = group.baseFor(bus, device, func)
 		var mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
 		return mMulti
@@ -291,7 +291,7 @@ class ACPIParser {
 	static fun probePci(acpi.PciGroup *mPci, count: UInt64) {
 		serialPrintf("[PCI] probePci\n")
 		for (UInt32 i = 0; i < count; ++i) {
-			var pci: Pointer<acpi.PciGroup> = &mPci[i]
+			var pci: Pointer<acpi.PciGroup> = Pointer.of(mPci[i])
 			for (Int32 bus = pci.busStart; bus <= pci.busEnd; ++bus) {
 				for (Int32 dev = 0; dev < 32; ++dev) {
 					// TODO

@@ -16,37 +16,37 @@
 @struct
 class InterruptFrame {
 	// SSE
-	@volatile UInt64 xmm[8 * 2]
+	@volatile xmm[8: UInt64 * 2]
 
-	@volatile UInt64 r15
-	@volatile UInt64 r14
-	@volatile UInt64 r13
-	@volatile UInt64 r12
-	@volatile UInt64 r11
-	@volatile UInt64 r10
-	@volatile UInt64 r9
-	@volatile UInt64 r8
+	@volatile r15: UInt64
+	@volatile r14: UInt64
+	@volatile r13: UInt64
+	@volatile r12: UInt64
+	@volatile r11: UInt64
+	@volatile r10: UInt64
+	@volatile r9: UInt64
+	@volatile r8: UInt64
 
 	// Note: ECX is RCX, EAX is RAX, etc in 32-bit mode
-	@volatile UInt64 rdi
-	@volatile UInt64 rsi
-	@volatile UInt64 rbp
-	@volatile UInt64 rbx
-	@volatile UInt64 rdxArg1
-	@volatile UInt64 rcxArg0
-	@volatile UInt64 raxReturn
+	@volatile rdi: UInt64
+	@volatile rsi: UInt64
+	@volatile rbp: UInt64
+	@volatile rbx: UInt64
+	@volatile rdxArg1: UInt64
+	@volatile rcxArg0: UInt64
+	@volatile raxReturn: UInt64
 
 	// IRQ index
-	@volatile UInt64 index
+	@volatile index: UInt64
 
 	// IRQ error code
-	@volatile UInt64 code
+	@volatile code: UInt64
 
-	@volatile UInt64 ip // Instruction pointer
-	@volatile UInt64 cs // Code segment
-	@volatile UInt64 flags // RFLAGS\EFLAGS (same on AMD64 and x86)
-	@volatile UInt64 sp // Stack pointer
-	@volatile UInt64 ss // Stack segment
+	@volatile ip: UInt64 // Instruction pointer
+	@volatile cs: UInt64 // Code segment
+	@volatile flags: UInt64 // RFLAGS\EFLAGS (same on AMD64 and x86)
+	@volatile sp: UInt64 // Stack pointer
+	@volatile ss: UInt64 // Stack segment
 }
 
 _Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect")
@@ -61,4 +61,4 @@ const UInt8 THREAD_USER = 3
 
 InterruptFrame kernelThreadFrame
 
-fun switchToKernelThread(@volatile InterruptFrame *frame)
+fun switchToKernelThread(@volatile frame: Pointer<InterruptFrame>)

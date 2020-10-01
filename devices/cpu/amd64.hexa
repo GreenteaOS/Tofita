@@ -16,8 +16,8 @@
 // AMD64 assembly instructions wrapper
 
 
-inline fun cpuid(leaf: UInt32, subleaf: UInt32, UInt32 *eax, UInt32 *ebx, UInt32 *ecx,
-					  UInt32 *edx) {
+inline fun cpuid(leaf: UInt32, subleaf: UInt32, eax: Pointer<UInt32>, ebx: Pointer<UInt32>, ecx: Pointer<UInt32>,
+					  edx: Pointer<UInt32>) {
 	UInt32 a, b, c, d
 	asm volatile("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf))
 	*eax = a

@@ -38,7 +38,7 @@ typedef enum {
 	// TODO more options
 } WallpaperStyle
 
-fun setWallpaper(Bitmap32 *bitmap, style: WallpaperStyle) {
+fun setWallpaper(bitmap: Pointer<Bitmap32>, style: WallpaperStyle) {
 
 	{
 		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size")
@@ -145,7 +145,7 @@ fun initializeCompositor() {
 	doublebuffer = allocateBitmap(_framebuffer.width, _framebuffer.height)
 	_pixels = doublebuffer.pixels
 
-	Bitmap32 *loadPng32(const RamDiskAsset *asset)
+	Bitmap32 *loadPng32(const asset: Pointer<RamDiskAsset>)
 
 	let a = getRamDiskAsset("root/Windows/Resources/Icons/leaves.png")
 	leaves = loadPng32(&a)
@@ -163,7 +163,7 @@ fun initializeCompositor() {
 	link = loadPng32(&e)
 
 	let asset = getRamDiskAsset("root/Windows/Cursors/aero_arrow.cur")
-	cur = cursor.loadCursor(&asset)
+	cur = cursor.loadCursor(Pointer.of(asset))
 
 	serialPrintln("[compositor.initializeCompositor] done")
 }
@@ -172,7 +172,7 @@ fun compositeWindows() {
 	var i = dwm.rootWindow
 	// Avoid infinite loop
 	for (UInt16 loop = 0; loop < dwm.windowsLimit; ++loop) {
-		let window = &dwm.windowsList[i]
+		let window = Pointer.of(dwm.windowsList[i])
 
 		if (i != 0 && window.present && window.visible) {
 			let hover = dwm.frameHoverWindow == i ? dwm.frameHoverState : dwm.FrameHover.Noop
@@ -303,15 +303,15 @@ fun copyToScreen() {
 	let width: UInt16 = _framebuffer.width / 2
 	let scanline: UInt64 = _framebuffer.width * 4
 	let pixelsPerScanLine: UInt64 = _framebuffer.pixelsPerScanLine * 4
-	const UInt64 *source = (const UInt64 *)((uint64_t)_pixels)
-	var destination = (UInt64 *)((uint64_t)_framebuffer.base)
+	const UInt64 *source = (const UInt64 *)((_pixels as! UInt64))
+	var destination = (UInt64 *)((_framebuffer.base as! UInt64))
 
 	for (UInt16 y = 0; y < height; y += 1) {
 		for (UInt16 x = 0; x < width; x += 1) {
 			destination[x] = source[x]
 		}
 
-		source = (const UInt64 *)(((uint64_t)source) + scanline)
-		destination = (UInt64 *)(((uint64_t)destination) + pixelsPerScanLine)
+		source = (const UInt64 *)(((source as! UInt64)) + scanline)
+		destination = (UInt64 *)(((destination as! UInt64)) + pixelsPerScanLine)
 	}
 }

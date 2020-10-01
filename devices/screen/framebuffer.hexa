@@ -31,7 +31,7 @@ Bitmap32 *allocateBitmap(width: UInt16, height: UInt16) {
 	return (Bitmap32 *)result
 }
 
-fun setFramebuffer(const Framebuffer *framebuffer) {
+fun setFramebuffer(framebuffer: ConstPointer<Framebuffer>) {
 	_framebuffer = const_cast<Framebuffer *>(framebuffer)
 	_pixels = (Pixel32 *)_framebuffer.base
 }
@@ -60,7 +60,7 @@ fun @fastcall setPixel(x: Int16, y: Int16, pixel: Pixel32) {
 	_pixels[y * _framebuffer.width + x] = pixel
 }
 
-fun drawBitmap32WithAlpha(Bitmap32 *bitmap, x: UInt16, y: UInt16) {
+fun drawBitmap32WithAlpha(bitmap: Pointer<Bitmap32>, x: UInt16, y: UInt16) {
 	for (Int16 yy = 0; yy < bitmap.height; yy++) {
 		for (Int16 xx = 0; xx < bitmap.width; xx++) {
 			blendPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
@@ -68,7 +68,7 @@ fun drawBitmap32WithAlpha(Bitmap32 *bitmap, x: UInt16, y: UInt16) {
 	}
 }
 
-fun drawBitmap32(Bitmap32 *bitmap, x: UInt16, y: UInt16) {
+fun drawBitmap32(bitmap: Pointer<Bitmap32>, x: UInt16, y: UInt16) {
 	for (Int16 yy = 0; yy < bitmap.height; yy++) {
 		for (Int16 xx = 0; xx < bitmap.width; xx++) {
 			setPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])

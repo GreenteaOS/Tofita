@@ -15,6 +15,6 @@
 
 @extern "C++" class String {
   public
-	static UInt64 length(const WideChar *source)
-	static const WideChar *duplicate(const WideChar *source)
+	static UInt64 length(const source: Pointer<WideChar>)
+	static const WideChar *duplicate(const source: Pointer<WideChar>)
 }

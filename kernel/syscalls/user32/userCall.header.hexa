@@ -13,4 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-Bool userCallHandled(@volatile process.Process *process, syscall: TofitaSyscalls)
+Bool userCallHandled(@volatile process.process: Pointer<Process>, syscall: TofitaSyscalls)

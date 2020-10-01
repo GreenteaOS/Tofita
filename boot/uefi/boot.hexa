@@ -23,20 +23,19 @@ import "pe.cpp"
 import "visuals.cpp"
 import "../../kernel/ramdisk.cpp"
 
-efi.INTN compareGuid(efi.EFI_GUID *guid1, efi.EFI_GUID *guid2) {
-	efi.INT32 *g1, *g2, r
-	g1 = (efi.INT32 *)guid1
-	g2 = (efi.INT32 *)guid2
-	r = g1[0] - g2[0]
+fun compareGuid(efi.guid1: Pointer<EFI_GUID>, efi.guid2: Pointer<EFI_GUID>): efi.INTN {
+	let g1: Pointer<efi.INT32> = guid1 as! Pointer<efi.INT32>
+	let g2: Pointer<efi.INT32> = guid2 as! Pointer<efi.INT32>
+	var r: efi.INT32 = g1[0] - g2[0]
 	r |= g1[1] - g2[1]
 	r |= g1[2] - g2[2]
 	r |= g1[3] - g2[3]
 	return r
 }
 
-Void *tmemcpy(Void *dest, const Void *src, count: UInt64) {
-	var dst8: Pointer<UInt8> = (UInt8 *)dest
-	var src8: Pointer<UInt8> = (UInt8 *)src
+fun tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64): VoidPointer {
+	var dst8 = dest as! Pointer<UInt8>
+	var src8 = src as! Pointer<UInt8>
 
 	while (count--) {
 		*dst8++ = *src8++
@@ -46,7 +45,7 @@ Void *tmemcpy(Void *dest, const Void *src, count: UInt64) {
 }
 
 // Loading animation, progress 0...2
-fun drawLoading(Framebuffer *framebuffer, progress: UInt8) {
+fun drawLoading(framebuffer: Pointer<Framebuffer>, progress: UInt8) {
 	for (UInt8 y = 0; y < leavesHeight; y++)
 		for (UInt8 x = 0; x < leavesWidth; x++) {
 			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
@@ -59,8 +58,8 @@ fun drawLoading(Framebuffer *framebuffer, progress: UInt8) {
 
 import "../shared/paging.cpp"
 
-Void *memset(Void *dest, e: Int32, len: UInt64) {
-	var d: Pointer<UInt8> = (UInt8 *)dest
+fun memset(dest: VoidPointer, e: Int32, len: UInt64): VoidPointer {
+	var d = dest as! Pointer<UInt8>
 	for (UInt64 i = 0; i < len; i++, d++) {
 		*d = e
 	}
@@ -68,15 +67,15 @@ Void *memset(Void *dest, e: Int32, len: UInt64) {
 }
 
 // CR3 trampoline
-@extern "C" fun @fastcall
-trampolineCR3(@volatile UInt64 kernelParams, @volatile UInt64 pml4, @volatile UInt64 stack,
-			  @volatile UInt64 entry)
+@extern @rename("trampolineCR3") @fastcall fun
+trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile stack: UInt64,
+			  @volatile entry: UInt64)
 
 // Entry point
-efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *systemTable) {
+fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TABLE>): efi.EFI_STATUS {
 	initSerial()
-	serialPrint("\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(
-		versionMinor) " " versionName " UEFI bootloader. Welcome!\n")
+	serialPrint("\n[[[efi_main]]] Tofita " + versionMajor + "." +
+		versionMinor + " " + versionName + " UEFI bootloader. Welcome!\n")
 
 	initText()
 
@@ -85,8 +84,8 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	{
 		var revision: UInt32 = systemTable.FirmwareRevision
-		var minor: UInt16 = (uint16_t)revision
-		var major: UInt16 = (uint16_t)(revision >> 16)
+		var minor: UInt16 = revision as! UInt16
+		var major: UInt16 = (revision >> 16) as! UInt16
 		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\n", major, minor)
 	}
 
@@ -94,7 +93,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	// after calling cr3 at the first instruction
 	// so it is safe to allocate it at random position in conventional memory
 
-	let upper: UInt64 = (uint64_t)0xffff800000000000
+	let upper: UInt64 = 0xffff800000000000 as! UInt64
 	var acpiTable: Pointer<Void> = null
 	{
 		serialPrintln("[[[efi_main]]] begin: ACPI")
@@ -102,12 +101,12 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 		var acpi: efi.EFI_GUID = ACPI_TABLE_GUID
 
 		for (UInt64 i = 0; i < systemTable.NumberOfTableEntries; i++) {
-			var efiTable: Pointer<efi.EFI_CONFIGURATION_TABLE> = &systemTable.ConfigurationTable[i]
-			if (0 == compareGuid(&efiTable.VendorGuid, &acpi20)) { // Prefer ACPI 2.0
+			var efiTable: Pointer<efi.EFI_CONFIGURATION_TABLE> = Pointer.of(systemTable.ConfigurationTable[i])
+			if (0 == compareGuid(Pointer.of(efiTable.VendorGuid), Pointer.of(acpi20))) { // Prefer ACPI 2.0
 				acpiTable = efiTable.VendorTable
 				serialPrintln("[[[efi_main]]] found: ACPI 2.0")
 				break
-			} else if (0 == compareGuid(&efiTable.VendorGuid, &acpi)) {
+			} else if (0 == compareGuid(Pointer.of(efiTable.VendorGuid), Pointer.of(acpi))) {
 				// acpiTable = (Void *)((intptr_t)efiTable.VendorTable | 0x1) // LSB high
 				// ACPI 2.0 is required by Tofita
 				// So we don't need to support ACPI 1.0
@@ -123,15 +122,15 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer")
 	var framebuffer: Framebuffer
-	initializeFramebuffer(&framebuffer, systemTable)
-	drawLoading(&framebuffer, 0)
-	drawText("GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag "",
-			 (framebuffer.height / 4) * 3 + 64, &framebuffer)
+	initializeFramebuffer(Pointer.of(framebuffer), systemTable)
+	drawLoading(Pointer.of(framebuffer), 0)
+	drawText("GreenteaOS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag,
+			 (framebuffer.height / 4) * 3 + 64, Pointer.of(framebuffer))
 	let errorY: UInt16 = (framebuffer.height / 4) * 3 + 64 + 32
 
 	// Check ACPI here, after framebuffer initialization
 	while (acpiTable == null) {
-		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, &framebuffer)
+		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, Pointer.of(framebuffer))
 	}
 
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
@@ -141,11 +140,11 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	// Initial RAM disk
 	var ramdisk: RamDisk
-	status = findAndLoadRamDisk(systemTable.BootServices, &ramdisk)
+	status = findAndLoadRamDisk(systemTable.BootServices, Pointer.of(ramdisk))
 	while (status != EFI_SUCCESS) {
-		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, &framebuffer)
+		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, Pointer.of(framebuffer))
 	}
-	drawLoading(&framebuffer, 1)
+	drawLoading(Pointer.of(framebuffer), 1)
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap")
 	var sizeAlloc: UInt64 = (ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE
@@ -159,7 +158,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 			b[i] = paging.buffa[0]
 		}
 	}
-	fillMemoryMap(&efiMemoryMap, systemTable)
+	fillMemoryMap(Pointer.of(efiMemoryMap), systemTable)
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap")
 
 	var time: efi.EFI_TIME
@@ -167,10 +166,10 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	var capabilities: efi.EFI_TIME_CAPABILITIES
 	{
 		serialPrintln("[[[efi_main]]] begin: GetTime")
-		var status: efi.EFI_STATUS = systemTable.RuntimeServices.GetTime(&time, &capabilities)
+		var status: efi.EFI_STATUS = systemTable.RuntimeServices.GetTime(Pointer.of(time), Pointer.of(capabilities))
 		while (status != EFI_SUCCESS) {
 			serialPrintln("[[[efi_main]]] <ERROR> GetTime")
-			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, &framebuffer)
+			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, Pointer.of(framebuffer))
 		}
 
 		{
@@ -197,7 +196,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 		if (oops < 10)
 			serialPrintln("[[[efi_main]]] try: ExitBootServices")
 		if (oops == 100) {
-			drawText("Loading...", errorY, &framebuffer)
+			drawText("Loading...", errorY, Pointer.of(framebuffer))
 			serialPrintln("[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices")
 			serialPrintln("[[[efi_main]]] <ERROR?> system may or may not start")
 			oops = 200
@@ -215,23 +214,23 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	}
 	serialPrintln("[[[efi_main]]] done: ExitBootServices")
 
-	setRamDisk(&ramdisk)
+	setRamDisk(Pointer.of(ramdisk))
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader")
 
 	var asset: RamDiskAsset = getRamDiskAsset("tofita.gnu")
 	serialPrintf("[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
 
-	let largeBuffer: UInt64 = paging.conventionalAllocateLargest(&efiMemoryMap)
+	let largeBuffer: UInt64 = paging.conventionalAllocateLargest(Pointer.of(efiMemoryMap))
 	serialPrintf("[[[efi_main]]] large buffer allocated at %u\n", largeBuffer)
 	paging.conventionalOffset = largeBuffer
 	var mAddressOfEntryPoint: UInt64 = 0
 
 	{
 		var ptr = (UInt8 *)asset.data
-		var peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
+		var peHeader = (const PeHeader *)((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256)
 		serialPrintf("PE header signature 'PE' == '%s'\n", peHeader)
-		var peOptionalHeader = (const Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader))
+		var peOptionalHeader = (const Pe32OptionalHeader *)((peHeader as! UInt64) + sizeof(PeHeader))
 		serialPrintf("PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.mMagic,
 					 0x020B)
 		serialPrintf("PE32(+) size of image == %d\n", peOptionalHeader.mSizeOfImage)
@@ -240,14 +239,14 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 		// Copy sections
 		var imageSectionHeader =
-			(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.mSizeOfOptionalHeader)
+			(const ImageSectionHeader *)((peOptionalHeader as! UInt64) + peHeader.mSizeOfOptionalHeader)
 		for (UInt16 i = 0; i < peHeader.mNumberOfSections; ++i) {
-			serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
+			serialPrintf("Copy section [%d] named '%s' of size %d\n", i, Pointer.of(imageSectionHeader[i].mName),
 						 imageSectionHeader[i].mSizeOfRawData)
-			var where: UInt64 = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress
+			var where: UInt64 = (kernelBase as! UInt64) + imageSectionHeader[i].mVirtualAddress
 
 			tmemcpy((Void *)where,
-					(Void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].mPointerToRawData),
+					(Void *)((asset.data as! UInt64) + (imageSectionHeader[i].mPointerToRawData as! UInt64)),
 					imageSectionHeader[i].mSizeOfRawData)
 		}
 
@@ -256,7 +255,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	var params: Pointer<KernelParams> = (KernelParams *)paging.conventionalAllocateNext(sizeof(KernelParams))
 	{
-		var b: Pointer<UInt8> = (UInt8 *)params
+		var b = params as! ArrayPointer<UInt8>
 		for (UInt64 i = 0; i < sizeof(KernelParams); ++i) {
 			b[i] = paging.buffa[0]
 		}
@@ -269,7 +268,7 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
 	var stack = paging.conventionalAllocateNext(1024 * 1024) + 1024 * 1024
 	{
-		var b: Pointer<UInt8> = (UInt8 *)(stack - 1024 * 1024)
+		var b = (stack - 1024 * 1024) as! ArrayPointer<UInt8>
 		for (UInt64 i = 0; i < 1024 * 1024; ++i) {
 			b[i] = paging.buffa[0]
 		}
@@ -281,11 +280,11 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 
 	// RAM usage bit-map
 
-	var ram: UInt64 = paging.getRAMSize(&params.efiMemoryMap)
+	var ram: UInt64 = paging.getRAMSize(Pointer.of(params.efiMemoryMap))
 	var megs: UInt32 = (uint32_t)(ram / (1024 * 1024))
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 	while (megs < 768) {
-		drawText("[ERROR] Tofita requires at least 1 GB of memory [ERROR]", errorY, &framebuffer)
+		drawText("[ERROR] Tofita requires at least 1 GB of memory [ERROR]", errorY, Pointer.of(framebuffer))
 		serialPrintf("Tofita requires at least 1 GB of memory\n")
 	}
 	params.ramBytes = ram
@@ -309,14 +308,14 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	paging.mapMemory(upper, largeBuffer, (paging.conventionalOffset - largeBuffer) / PAGE_SIZE + 1, 1)
 
 	// Note: framebuffer is *not* within physical memory
-	paging.mapFramebuffer(&params.framebuffer)
-	drawLoading(&framebuffer, 2)
-	paging.mapEfi(&params.efiMemoryMap)
+	paging.mapFramebuffer(Pointer.of(params.framebuffer))
+	drawLoading(Pointer.of(framebuffer), 2)
+	paging.mapEfi(Pointer.of(params.efiMemoryMap))
 	paging.mapMemoryHuge(WholePhysicalStart, 0, ram / PAGE_SIZE)
 
 	let startFunction = (InitKernelTrampoline)(paging.conventionalOffset + PAGE_SIZE)
-	tmemcpy((Void *)startFunction, &trampolineCR3, 32)
-	paging.mapMemory((uint64_t)startFunction, (uint64_t)startFunction, 1, 0)
+	tmemcpy((Void *)startFunction, Pointer.of(trampolineCR3), 32)
+	paging.mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0)
 
 	// Fix virtual addresses
 
@@ -326,28 +325,28 @@ efi.EFI_STATUS efi_main(efi.EFI_HANDLE imageHandle, efi.EFI_SYSTEM_TABLE *system
 	params.ramdisk.physical = params.ramdisk.base
 	params.ramdisk.base = WholePhysicalStart + params.ramdisk.physical
 
-	params.pml4 = (uint64_t)paging.pml4entries // physical address for CPU
+	params.pml4 = (paging.pml4entries as! UInt64) // physical address for CPU
 	params.stack = stack // physical address for stack overflow detection
 	params.physicalBuffer = largeBuffer
 	params.physicalBytes = paging.conventionalOffset - largeBuffer
 	params.efiRuntimeServices = systemTable.RuntimeServices
 	params.acpiTablePhysical = (uint64_t)(acpiTable)
 	params.efiMemoryMap.memoryMap =
-		(efi.EFI_MEMORY_DESCRIPTOR *)(WholePhysicalStart + (uint64_t)params.efiMemoryMap.memoryMap)
+		(efi.EFI_MEMORY_DESCRIPTOR *)(WholePhysicalStart + (params.efiMemoryMap.memoryMap as! UInt64))
 
 	// Convert addresses to upper half
 
 	stack = (WholePhysicalStart as! UInt64) + stack
 	params.physicalRamBitMaskVirtual = (WholePhysicalStart as! UInt64) + params.physicalRamBitMaskVirtual
-	params = (KernelParams *)((WholePhysicalStart as! UInt64) + (uint64_t)params)
+	params = (KernelParams *)((WholePhysicalStart as! UInt64) + (params as! UInt64))
 
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader")
 
 	serialPrint("[[[efi_main]]] CR3 points to: ")
-	serialPrintHex((uint64_t)paging.pml4entries)
+	serialPrintHex((paging.pml4entries as! UInt64))
 	serialPrint("\n")
 
-	startFunction((uint64_t)params, (uint64_t)paging.pml4entries, stack, upper + mAddressOfEntryPoint)
+	startFunction((params as! UInt64), (paging.pml4entries as! UInt64), stack, upper + mAddressOfEntryPoint)
 
 	return EFI_SUCCESS
 }

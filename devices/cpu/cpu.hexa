@@ -21,7 +21,7 @@ fun enterUserMode()
 fun timerInterrupt()
 fun syscallInterrupt()
 fun yieldInterrupt()
-@volatile UInt64 getCr2()
+@volatile getCr2: UInt64()
 @volatile Bool sehReturnFalse()
 
 fun cpu0x00()

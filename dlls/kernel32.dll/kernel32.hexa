@@ -24,7 +24,7 @@ Void ExitProcess(exitCode: UInt32) {
 }
 
 wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes) {
-	var result = &kernel32.buffer[kernel32.bufferOffset]
+	var result = Pointer.of(kernel32.buffer[kernel32.bufferOffset])
 	kernel32.bufferOffset += bytes
 	// Align to 8 bytes
 	// Because handle has some bits reserved for tags

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-UInt64 String.length(const WideChar *source) {
+UInt64 String.length(const source: Pointer<WideChar>) {
 	let string = (const UInt16 *)source
 	var i: UInt32 = 0
 	while (string[i] != 0) {
@@ -22,7 +22,7 @@ UInt64 String.length(const WideChar *source) {
 	return i * 2 + 2
 }
 
-const WideChar *String.duplicate(const WideChar *source) {
+const WideChar *String.duplicate(const source: Pointer<WideChar>) {
 	let bytes = length(source)
 	var result = (UInt16 *)allocateBytes(bytes)
 	let string = (const UInt16 *)source
