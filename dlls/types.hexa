@@ -157,7 +157,7 @@ class Point {
 	var y: Int32
 }
 
-@struct
+@struct @sizeOf(48)
 class Msg {
 	var hwnd: HWnd
 	var message: Message
@@ -168,11 +168,9 @@ class Msg {
 	var lPrivate: UInt32
 }
 
-_Static_assert(sizeof(Msg) == 48, "bad sizeof")
-
 typedef LResult (*WindowProcedure)(HWnd hWnd, uMsg: Message, Void *wParam, Void *lParam)
 
-@struct
+@struct @sizeOf(72)
 class WindowClass {
 	var style: UInt32
 	var lpfnWndProc: WindowProcedure
@@ -185,8 +183,6 @@ class WindowClass {
 	const WideChar *lpszMenuName
 	const WideChar *lpszClassName
 }
-
-_Static_assert(sizeof(WindowClass) == 72, "bad sizeof")
 
 let SW_HIDE = 0
 let SW_SHOWNORMAL = 1
@@ -204,29 +200,21 @@ let SW_SHOWDEFAULT = 10
 let SW_FORCEMINIMIZE = 11
 let SW_MAX = 11
 
-
-
-
-
-
-
-@struct
-class {
+@struct @packed
+class PixelRGBAData {
 	var r: UInt8
 	var g: UInt8
 	var b: UInt8
 	var a: UInt8
-} @packed PixelRGBAData
+}
 
-@struct
+@struct @sizeOf(4)
 class Pixel32 {
 	union {
 		var rgba: PixelRGBAData
 		var color: UInt32
 	}
 }
-
-_Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 
 @struct
 class WindowFramebuffer {

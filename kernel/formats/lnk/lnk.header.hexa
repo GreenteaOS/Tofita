@@ -13,61 +13,51 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@extern "C++"
-	const UInt32 magic = 0x0000004C
-	const UInt8 cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46}
+const UInt32 magic = 0x0000004C
+const UInt8 cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46}
 
-	@packed @struct
+@packed @struct @sizeOf(4)
 class LnkFlags {
-		UInt8 shellItemIdListIsPresent : 1
-		UInt8 pointsToFileOrDirectory : 1
-		UInt8 hasDescription : 1
-		UInt8 hasRelativePath : 1
-		UInt8 hasWorkingDirectory : 1
-		UInt8 hasCommandLineArguments : 1
-		UInt8 hasCustomIcon : 1
-		UInt32 padding : 25
-	}
+	UInt8 shellItemIdListIsPresent : 1
+	UInt8 pointsToFileOrDirectory : 1
+	UInt8 hasDescription : 1
+	UInt8 hasRelativePath : 1
+	UInt8 hasWorkingDirectory : 1
+	UInt8 hasCommandLineArguments : 1
+	UInt8 hasCustomIcon : 1
+	UInt32 padding : 25
+}
 
-	_Static_assert(sizeof(LnkFlags) == 4, "bad sizeof")
-
-	@packed @struct
+@packed @struct @sizeOf(4)
 class LnkAttributes {
-		UInt8 readOnly : 1
-		UInt8 hidden : 1
-		UInt8 systemFile : 1
-		UInt8 volumeLabel : 1
-		UInt8 directory : 1
-		UInt8 targetArchiveChanged : 1
-		UInt8 encrypted : 1
-		UInt8 none : 1
-		UInt8 temporary : 1
-		UInt8 sparseFile : 1
-		UInt8 hasReparsePointData : 1
-		UInt8 compressed : 1
-		UInt8 offline : 1
-		UInt32 padding : 19
-	}
+	UInt8 readOnly : 1
+	UInt8 hidden : 1
+	UInt8 systemFile : 1
+	UInt8 volumeLabel : 1
+	UInt8 directory : 1
+	UInt8 targetArchiveChanged : 1
+	UInt8 encrypted : 1
+	UInt8 none : 1
+	UInt8 temporary : 1
+	UInt8 sparseFile : 1
+	UInt8 hasReparsePointData : 1
+	UInt8 compressed : 1
+	UInt8 offline : 1
+	UInt32 padding : 19
+}
 
-	_Static_assert(sizeof(LnkAttributes) == 4, "bad sizeof")
-
-#pragma pack(1)
-	@packed @struct
+@packed @struct @sizeOf(0x0000004C)
 class Lnk {
-		var magucka: UInt32
-		var clus[16]: UInt8
-		var flugs: LnkFlags
-		var atts: LnkAttributes
-		var timeOfCreation: UInt64
-		var timeOfModification: UInt64
-		var timeOfAccess: UInt64
-		var lengthOfTargetFileBytesOfLeastBits: UInt32
-		var iconIndex: UInt32
-		var showWund: UInt32
-		var hotKey: UInt16
-		var padding[10]: UInt8
-	}
-#pragma pack()
-
-	_Static_assert(sizeof(Lnk) == 0x0000004C, "bad sizeof")
+	var magucka: UInt32
+	var clus[16]: UInt8
+	var flugs: LnkFlags
+	var atts: LnkAttributes
+	var timeOfCreation: UInt64
+	var timeOfModification: UInt64
+	var timeOfAccess: UInt64
+	var lengthOfTargetFileBytesOfLeastBits: UInt32
+	var iconIndex: UInt32
+	var showWund: UInt32
+	var hotKey: UInt16
+	var padding[10]: UInt8
 }

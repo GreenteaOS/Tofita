@@ -85,7 +85,7 @@ auto loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, e
 	let buffer: UInt64 = exec.nextBase
 	memset((Void *)buffer, 0, peOptionalHeader.sizeOfImage) // Zeroing
 
-	exec.nextBase = exec.nextBase + pages * PAGE_SIZE
+	exec.nextBase = exec.nextBase + pages * pageSize
 
 	// Copy sections
 	var imageSectionHeader =
@@ -321,7 +321,7 @@ auto loadExe(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, e
 		pages.mapMemory(exec.pml4, exec.nextBase, physical - (WholePhysicalStart as! UInt64), pages)
 		memset((Void *)buffer, 0, ei.pei.sizeOfStackReserve) // Zeroing
 
-		exec.nextBase = exec.nextBase + pages * PAGE_SIZE
+		exec.nextBase = exec.nextBase + pages * pageSize
 
 		ei.stackVirtual = buffer
 	}

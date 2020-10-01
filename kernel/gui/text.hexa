@@ -19,12 +19,12 @@
 Bitmap32 *textFontBitmap
 @extern Pixel32 *_pixels
 
-@struct
-class {
+@struct @packed
+class TextFontList {
 	var x: UInt16
 	var y: UInt16
 	var width: Float
-} @packed TextFontList
+}
 
 TextFontList *textFontList = null
 

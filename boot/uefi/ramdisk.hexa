@@ -38,7 +38,7 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ef
 	var size: UInt64 = ((efi.EFI_FILE_INFO *)info).FileSize
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] FileSize %d\n", size)
 
-	var sizeAlloc: UInt64 = (size / PAGE_SIZE + 1) * PAGE_SIZE
+	var sizeAlloc: UInt64 = (size / pageSize + 1) * pageSize
 	sizeAlloc += sizeof(efi.EFI_MEMORY_DESCRIPTOR) * 512 // Combined allocation for mem map
 
 	var address: Pointer<Void> = null

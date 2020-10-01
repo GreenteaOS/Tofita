@@ -13,11 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define PACKED @packed
-
-
-@struct
-class {
+@struct @packed @sizeOf(8)
+class PageEntry {
 	// Is the page present in physical memory?
 	UInt8 present : 1
 
@@ -65,6 +62,4 @@ class {
 
 	// Disable execution of code from this page
 	UInt8 disableExecution : 1
-} PACKED PageEntry
-
-_Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits")
+}

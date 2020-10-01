@@ -15,11 +15,11 @@
 
 let PIC1 = 0x20 // IO base address for main PIC
 let PIC2 = 0xA0 // IO base address for secondary PIC
-#define PIC1_COMMAND PIC1
+let PIC1_COMMAND PIC1
 let PIC1_COMMAND_0x20 = 0x20
-#define PIC1_DATA (PIC1 + 1)
-#define PIC2_COMMAND PIC2
-#define PIC2_DATA (PIC2 + 1)
+let PIC1_DATA (PIC1 + 1)
+let PIC2_COMMAND PIC2
+let PIC2_DATA (PIC2 + 1)
 let PIC_EOI = 0x20	  // End-of-interrupt command code
 let PIC_EOI_0x20 = 0x20 // End-of-interrupt command code
 
@@ -27,9 +27,7 @@ UInt8 readPort(port: UInt16)
 fun writePort(@volatile UInt16 port, @volatile UInt8 value)
 UInt8 mouseRead()
 
-#define PACKED @packed
-
-@extern "C++" Void tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64) {
+Void tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64) {
 	var dst8: Pointer<UInt8> = (UInt8 *)dest
 	var src8: Pointer<UInt8> = (UInt8 *)src
 
@@ -38,7 +36,7 @@ UInt8 mouseRead()
 	}
 }
 
-@extern "C++" Void tmemcpy(@volatile dest: VoidPointer, const @volatile src: VoidPointer, @volatile count: UInt64) {
+Void tmemcpy(@volatile dest: VoidPointer, const @volatile src: VoidPointer, @volatile count: UInt64) {
 	var dst8: Pointer<UInt8> = (UInt8 *)dest
 	var src8: Pointer<UInt8> = (UInt8 *)src
 
@@ -47,18 +45,14 @@ UInt8 mouseRead()
 	}
 }
 
-#pragma pack(1)
-@struct
-class {
+@struct @packed @sizeOf(10)
+class Idtr {
 	var limit: UInt16
 	var offset: UInt64
-} PACKED Idtr
-#pragma pack()
+}
 
-_Static_assert(sizeof(Idtr) == 10, "IDTR register has to be 80 bits long")
-
-@struct
-class {
+@struct @packed
+class IdtEntry {
 	UInt16 offsetLowerbits : 16
 	UInt16 selector : 16
 	UInt8 ist : 8
@@ -68,7 +62,7 @@ class {
 	UInt8 present : 1
 	UInt64 offsetHigherbits : 48
 	UInt32 zero : 32
-} PACKED IdtEntry
+}
 
 UInt8 readPort(@volatile UInt16 port) {
 	return portInb(port)
@@ -183,7 +177,7 @@ fun remapPic(offset1: UInt8, offset2: UInt8) {
 }
 
 // Sets up the legacy PIC and then disables it
-Void disablePic(void) {
+fun disablePic() {
 	/* Set ICW1 */
 	writePort(0x20, 0x11)
 	writePort(0xa0, 0x11)
@@ -205,7 +199,7 @@ Void disablePic(void) {
 	writePort(0xa1, 0xff)
 }
 
-UInt64 physicalToVirtual(physical: UInt64) {
+fun physicalToVirtual(physical: UInt64): UInt64 {
 	var result: UInt64 = (WholePhysicalStart as! UInt64) + (physical as! UInt64)
 	return result
 }
@@ -223,7 +217,7 @@ fun enableLocalApic() {
 
 fun mouseWait(aType: UInt8)
 fun mouseWrite(aWrite: UInt8)
-UInt8 mouseRead()
+fun mouseRead(): UInt8
 let IRQ0 = 32
 let IRQ1 = 0x21 // 33
 let IRQ2 = 34
@@ -241,15 +235,11 @@ let IRQ13 = 45
 let IRQ14 = 46
 let IRQ15 = 47
 
-#pragma pack(1)
-@struct
+@struct @packed @sizeOf(10)
 class TablePtr {
 	var limit: UInt16
 	var base: UInt64
-} @packed
-#pragma pack()
-
-_Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect")
+}
 
 fun lgdt(@volatile const gdt: Pointer<TablePtr>)
 
@@ -265,7 +255,7 @@ enum GdtType : UInt8 {
 	present = 0x80
 }
 
-@struct
+@struct @packed @sizeOf(8)
 class GdtDescriptor {
 	var limitLow: UInt16
 	var baseLow: UInt16
@@ -273,12 +263,9 @@ class GdtDescriptor {
 	enum GdtType type // Access
 	var size: UInt8
 	var baseHigh: UInt8
-} @packed
+}
 
-_Static_assert(sizeof(GdtDescriptor) == 8, "sizeof is incorrect")
-
-#pragma pack(1)
-@struct
+@struct @packed @sizeOf(8)
 class GdtDescriptorEx {
 	UInt16 limitLow : 16
 	UInt16 baseLow : 16
@@ -300,12 +287,9 @@ class GdtDescriptorEx {
 	UInt8 blocks : 1
 
 	UInt8 baseHigh : 8
-} @packed
-#pragma pack()
+}
 
-_Static_assert(sizeof(GdtDescriptorEx) == 8, "sizeof is incorrect")
-
-@struct
+@struct @packed
 class TssDescriptor {
 	var limitLow: UInt16
 	var base_00: UInt16
@@ -315,9 +299,9 @@ class TssDescriptor {
 	var base_24: UInt8
 	var base_32: UInt32
 	var reserved: UInt32
-} @packed
+}
 
-@struct
+@struct @packed
 class TssEntry {
 	var reserved0: UInt32
 
@@ -327,7 +311,7 @@ class TssEntry {
 	var reserved1: UInt64
 	var reserved2: UInt16
 	var iomap_offset: UInt16
-} @packed
+}
 
 @aligned(64) static @volatile TablePtr globalGdtr
 @aligned(64) static @volatile TssEntry globalTss

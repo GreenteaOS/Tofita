@@ -16,8 +16,7 @@
 
 
 // 1 byte aligned
-#pragma pack(1)
-@struct
+@struct @packed @sizeOf(24)
 class PeHeader {
 	var magic: UInt32 // PE\0\0 or 0x00004550
 	var machine: UInt16
@@ -27,14 +26,10 @@ class PeHeader {
 	var numberOfSymbols: UInt32
 	var sizeOfOptionalHeader: UInt16
 	var characteristics: UInt16
-} @packed
-#pragma pack()
-
-_Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
+}
 
 // 1 byte aligned
-#pragma pack(1)
-@struct
+@struct @packed
 class Pe64OptionalHeader {
 	var magic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
 	var majorLinkerVersion: UInt8
@@ -65,12 +60,10 @@ class Pe64OptionalHeader {
 	var sizeOfHeapCommit: UInt64
 	var loaderFlags: UInt32
 	var numberOfRvaAndSizes: UInt32
-} @packed
-#pragma pack()
+}
 
 // 1 byte aligned
-#pragma pack(1)
-@struct
+@struct @packed
 class Pe32OptionalHeader {
 	var magic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
 	var majorLinkerVersion: UInt8
@@ -102,13 +95,11 @@ class Pe32OptionalHeader {
 	var sizeOfHeapCommit: UInt32
 	var loaderFlags: UInt32
 	var numberOfRvaAndSizes: UInt32
-} @packed
-#pragma pack()
+}
 
-#pragma pack(1)
-@struct
+@struct @packed @sizeOf(40)
 class ImageSectionHeader { // size 40 bytes
-	var name[8]: UInt8
+	var name: UInt64
 	var virtualSize: UInt32
 	var virtualAddress: UInt32
 	var sizeOfRawData: UInt32
@@ -118,10 +109,7 @@ class ImageSectionHeader { // size 40 bytes
 	var numberOfRealocations: UInt16
 	var numberOfLinenumbers: UInt16
 	var characteristics: UInt32
-} @packed
-#pragma pack()
-
-_Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect")
+}
 
 let IMAGE_DIRECTORY_ENTRY_EXPORT = 0	  // Export Directory
 let IMAGE_DIRECTORY_ENTRY_IMPORT = 1	  // Import Directory

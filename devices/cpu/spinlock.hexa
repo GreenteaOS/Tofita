@@ -15,7 +15,7 @@
 
 // Based on https://forum.osdev.org/viewtopic.php?f=8&t=30052
 
-@struct
+@struct @sizeOf(4)
 class Spinlock {
   private
 	// TODO is it faster to use uint8_t?
@@ -37,5 +37,3 @@ class Spinlock {
 		__sync_lock_release(Pointer.of(value))
 	}
 }
-
-_Static_assert(sizeof(Spinlock) == 4, "sizeof is incorrect")
