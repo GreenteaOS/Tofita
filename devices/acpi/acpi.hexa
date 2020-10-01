@@ -200,7 +200,7 @@ class ACPIParser {
 
   private
 	static UInt64 physicalToVirtual(physical: UInt64) {
-		var result: UInt64 = (WholePhysicalStart as! UInt64) + (physical as! UInt64)
+		var result: UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
 		return result
 	}
 

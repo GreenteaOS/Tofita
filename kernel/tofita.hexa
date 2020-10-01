@@ -58,7 +58,7 @@ Int32 wcslen(const WideChar *string_) {
 Void free(ptr: Pointer<Void>) {
 	serialPrintf("<Hexa> free\n")
 }
-typedef Void FILE
+declare FILE = Void
 #define HEXA_MAIN mainHexa
 #define HEXA_NEW(z) malloc(z)
 import "hexa.cpp"
@@ -77,7 +77,7 @@ fun memzero(dest: VoidPointer, len: UInt64) {
 	memset(dest, 0, len)
 }
 
-Void ___chkstk_ms(){}
+fun ___chkstk_ms(): Void {}
 
 import "util/Math.cpp"
 import "util/String.cpp"
@@ -139,7 +139,7 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	// PhysicalAllocator.init(Pointer.of(params.efiMemoryMap), params.physicalRamBitMaskVirtual,
 	// DOWN_BYTES_TO_PAGES(params.ramBytes))
 	PhysicalAllocator.init(params)
-	pages.pml4entries = (pages.PageEntry *)((WholePhysicalStart as! UInt64) + (uint64_t)(params.pml4))
+	pages.pml4entries = (pages.PageEntry *)((wholePhysicalStart as! UInt64) + (uint64_t)(params.pml4))
 
 	if (false) {
 		pages.mapMemory(pages.pml4entries, 4096, 4096, 256)
@@ -151,14 +151,14 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 		serialPrintf("<> %8 == %8\n", (uint64_t)(4096 * 10 + 123),
 					 pages.resolveAddr(pages.pml4entries, 4096 * 20 + 123))
 		serialPrintf("<> %8 == %8\n", (uint64_t)(0),
-					 pages.resolveAddr(pages.pml4entries, (WholePhysicalStart as! UInt64)))
+					 pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64)))
 		serialPrintf("<> %8 == %8\n", (uint64_t)(0 + 123),
-					 pages.resolveAddr(pages.pml4entries, (WholePhysicalStart as! UInt64) + 123))
+					 pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64) + 123))
 		serialPrintf("<> %8 == %8\n", (uint64_t)(0 + 4096),
-					 pages.resolveAddr(pages.pml4entries, (WholePhysicalStart as! UInt64) + 4096))
+					 pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64) + 4096))
 		serialPrintf(
 			"<> %8 == %8\n", (uint64_t)(0 + 4096 * 1000 + 123),
-			pages.resolveAddr(pages.pml4entries, (WholePhysicalStart as! UInt64) + 4096 * 1000 + 123))
+			pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64) + 4096 * 1000 + 123))
 		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576),
 					 pages.resolveAddr(pages.pml4entries, (uint64_t)0xffff800000000000))
 		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576 + 123),
@@ -172,11 +172,11 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 		// serialPrint("==\n")
 		// serialPrintHex(pages.resolveAddr(4096 * 20))
 		// serialPrint("\n")
-		// serialPrintHex(pages.resolveAddr((WholePhysicalStart as! UInt64)))
+		// serialPrintHex(pages.resolveAddr((wholePhysicalStart as! UInt64)))
 		// serialPrint("\n")
-		// serialPrintHex(pages.resolveAddr((WholePhysicalStart as! UInt64) + 8888))
+		// serialPrintHex(pages.resolveAddr((wholePhysicalStart as! UInt64) + 8888))
 		// serialPrint("\n")
-		// serialPrintHex(pages.resolveAddr((WholePhysicalStart as! UInt64) + 4096 * 1000))
+		// serialPrintHex(pages.resolveAddr((wholePhysicalStart as! UInt64) + 4096 * 1000))
 		// serialPrint("\n")
 		// serialPrintHex(pages.resolveAddr((uint64_t)0xffff800000000000))
 		// serialPrint("\n")
@@ -341,7 +341,7 @@ fun kernelThread() {
 					// Select pml4 to work within current process memory
 					// Remember pml4 for proper restore from scheduling
 					pml4kernelThread = process.pml4
-					amd64.writeCr3((pml4kernelThread as! UInt64) - (WholePhysicalStart as! UInt64))
+					amd64.writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 					// TODO refactor to separate syscall handler per-DLL
 
@@ -365,7 +365,7 @@ fun kernelThread() {
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = process.processes[0].pml4
-						amd64.writeCr3((pml4kernelThread as! UInt64) - (WholePhysicalStart as! UInt64))
+						amd64.writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 						// Deallocate process
 						process.Process_destroy(process)
@@ -384,7 +384,7 @@ fun kernelThread() {
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = process.processes[0].pml4
-						amd64.writeCr3((pml4kernelThread as! UInt64) - (WholePhysicalStart as! UInt64))
+						amd64.writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 						// Deallocate process
 						process.Process_destroy(process)

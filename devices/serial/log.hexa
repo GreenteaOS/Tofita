@@ -16,38 +16,38 @@
 // Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
 // Check `serialPrintf` to see supported features
 
-let SERIAL_REGISTER_BASE = 0x03F8
-let SERIAL_BAUD_RATE = 115200
-let SERIAL_CLOCK_RATE = 1843200
-let SERIAL_LINE_CONTROL = 0x03
-let SERIAL_REGISTER_STRIDE = 1
-let SERIAL_FIFO_CONTROL = 0x07
-let SERIAL_EXTENDED_FIFO_TX_SIZE = 64
-let SERIAL_USE_HW_FLOW_CONTROL = false
-let SERIAL_DETECT_CABLE = false
+let serial_register_base = 0x03F8
+let serial_baud_rate = 115200
+let serial_clock_rate = 1843200
+let serial_line_control = 0x03
+let serial_register_stride = 1
+let serial_fifo_control = 0x07
+let serial_extended_fifo_tx_size = 64
+let serial_use_hw_flow_control = false
+let serial_detect_cable = false
 
 // 16550 UART register offsets and bitfields
-let R_UART_RXBUF = 0
-let R_UART_TXBUF = 0
-let R_UART_BAUD_LOW = 0
-let R_UART_BAUD_HIGH = 1
-let R_UART_FCR = 2
-let B_UART_FCR_FIFOE = (1 << 0)
-let B_UART_FCR_FIFO64 = (1 << 5)
-let R_UART_LCR = 3
-let B_UART_LCR_DLAB = (1 << 7)
-let R_UART_MCR = 4
-let B_UART_MCR_DTRC = (1 << 0)
-let B_UART_MCR_RTS = (1 << 1)
-let R_UART_LSR = 5
-let B_UART_LSR_RXRDY = (1 << 0)
-let B_UART_LSR_TXRDY = (1 << 5)
-let B_UART_LSR_TEMT = (1 << 6)
-let R_UART_MSR = 6
-let B_UART_MSR_CTS = (1 << 4)
-let B_UART_MSR_DSR = (1 << 6)
-let B_UART_MSR_RI = (1 << 7)
-let B_UART_MSR_DCD = (1 << 8)
+let r_uart_rxbuf = 0
+let r_uart_txbuf = 0
+let r_uart_baud_low = 0
+let r_uart_baud_high = 1
+let r_uart_fcr = 2
+let b_uart_fcr_fifoe = (1 << 0)
+let b_uart_fcr_fifo64 = (1 << 5)
+let r_uart_lcr = 3
+let b_uart_lcr_dlab = (1 << 7)
+let r_uart_mcr = 4
+let b_uart_mcr_dtrc = (1 << 0)
+let b_uart_mcr_rts = (1 << 1)
+let r_uart_lsr = 5
+let b_uart_lsr_rxrdy = (1 << 0)
+let b_uart_lsr_txrdy = (1 << 5)
+let b_uart_lsr_temt = (1 << 6)
+let r_uart_msr = 6
+let b_uart_msr_cts = (1 << 4)
+let b_uart_msr_dsr = (1 << 6)
+let b_uart_msr_ri = (1 << 7)
+let b_uart_msr_dcd = (1 << 8)
 
 UInt64 kstrlen(const data: Pointer<UInt8>) {
 	var r: UInt64
@@ -191,14 +191,14 @@ Int32 __cdecl putchar(c: UInt8) {
 	return c
 }
 
-let EOF = 0
+let eof = 0
 Int32 puts(const string: Pointer<UInt8>) {
 	var i: Int32 = 0
 	while (string[i]) // standard c idiom for looping through a null-terminated string
 	{
-		if (putchar(string[i]) == EOF) // if we got the EOF value from writing the uint8_t
+		if (putchar(string[i]) == eof) // if we got the EOF value from writing the uint8_t
 		{
-			return EOF
+			return eof
 		}
 		i++
 	}

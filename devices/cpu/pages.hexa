@@ -55,11 +55,11 @@ fun getPage(table: Pointer<PageEntry>, entryId: UInt64): Pointer<PageEntry> {
 	var entry: Pointer<PageEntry> = Pointer.of(table[entryId])
 
 	if (entry.present == 1) {
-		return ((entry.address << addressBits) + (WholePhysicalStart as! UInt64)) as! Pointer<PageEntry>
+		return ((entry.address << addressBits) + (wholePhysicalStart as! UInt64)) as! Pointer<PageEntry>
 	} else {
 		var newPage = PhysicalAllocator.allocateOnePagePreZeroed() as! Pointer<PageEntry>
 		if (newPage != null)
-			initializePage(entry, (newPage as! UInt64) - (WholePhysicalStart as! UInt64))
+			initializePage(entry, (newPage as! UInt64) - (wholePhysicalStart as! UInt64))
 		return newPage
 	}
 }
@@ -87,20 +87,20 @@ fun resolveAddr(const pml4entries: Pointer<PageEntry>, virtualAddr: UInt64): UIn
 	const PageEntry *entry = Pointer.of(pml4entries[linear.pml4])
 	if (entry.present == 0)
 		return PHYSICAL_NOT_FOUND
-	entry = (const PageEntry *)((entry.address << addressBits) + (WholePhysicalStart as! UInt64))
+	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
 	// pdpt
 	entry = Pointer.of(entry[linear.pdpt])
 	if (entry.present == 0)
 		return PHYSICAL_NOT_FOUND
 	// TODO handle mega pages
-	entry = (const PageEntry *)((entry.address << addressBits) + (WholePhysicalStart as! UInt64))
+	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
 	// pd
 	entry = Pointer.of(entry[linear.pd])
 	if (entry.present == 0)
 		return PHYSICAL_NOT_FOUND
 	if (entry.largePage == 1)
 		return (entry.address << addressBits) + linear.pt * 4096 + linear.offset
-	entry = (const PageEntry *)((entry.address << addressBits) + (WholePhysicalStart as! UInt64))
+	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
 	// pt
 	entry = Pointer.of(entry[linear.pt])
 	if (entry.present == 0)
@@ -147,15 +147,15 @@ fun mapMemory(pml4entries: Pointer<PageEntry>, virtualAddr: UInt64, physicalAddr
 	}
 
 	// TODO rethink where to call this
-	amd64.writeCr3((pml4entries as! UInt64) - (WholePhysicalStart as! UInt64))
+	amd64.writeCr3((pml4entries as! UInt64) - (wholePhysicalStart as! UInt64))
 }
 
 // Unmaps pages without actually deallocating them, still deallocates unused page tables
 // (page tables are managed only and only here anyway)
 fun unmapMemory(pml4entries: Pointer<PageEntry>, virtualAddr: UInt64, pageCount: UInt32) {
-	// TODO do NOT unmap reserved pages, i.e. WholePhysicalStart and upper half region!
+	// TODO do NOT unmap reserved pages, i.e. wholePhysicalStart and upper half region!
 	// TODO probably special shared buffer allocator+mapper which uses linked list
-	// way upper than WholePhysicalStart limit
+	// way upper than wholePhysicalStart limit
 	// TODO
 }
 

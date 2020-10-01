@@ -111,24 +111,24 @@ class ImageSectionHeader { // size 40 bytes
 	var characteristics: UInt32
 }
 
-let IMAGE_DIRECTORY_ENTRY_EXPORT = 0	  // Export Directory
-let IMAGE_DIRECTORY_ENTRY_IMPORT = 1	  // Import Directory
-let IMAGE_DIRECTORY_ENTRY_RESOURCE = 2  // Resource Directory
-let IMAGE_DIRECTORY_ENTRY_EXCEPTION = 3 // Exception Directory
-let IMAGE_DIRECTORY_ENTRY_SECURITY = 4  // Security Directory
-let IMAGE_DIRECTORY_ENTRY_BASERELOC = 5 // Base Relocation Table
-let IMAGE_DIRECTORY_ENTRY_DEBUG = 6	  // Debug Directory
-//      IMAGE_DIRECTORY_ENTRY_COPYRIGHT       7   // (usage: X86)
-let IMAGE_DIRECTORY_ENTRY_ARCHITECTURE = 7	// Architecture Specific Data
-let IMAGE_DIRECTORY_ENTRY_GLOBALPTR = 8		// RVA of GP
-let IMAGE_DIRECTORY_ENTRY_TLS = 9				// TLS Directory
-let IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG = 10	// Load Configuration Directory
-let IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT = 11	// Bound Import Directory in headers
-let IMAGE_DIRECTORY_ENTRY_IAT = 12			// Import Address Table
-let IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT = 13	// Delay Load Import Descriptors
-let IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14 // COM Runtime descriptor
+let image_directory_entry_export = 0	  // Export Directory
+let image_directory_entry_import = 1	  // Import Directory
+let image_directory_entry_resource = 2  // Resource Directory
+let image_directory_entry_exception = 3 // Exception Directory
+let image_directory_entry_security = 4  // Security Directory
+let image_directory_entry_basereloc = 5 // Base Relocation Table
+let image_directory_entry_debug = 6	  // Debug Directory
+//      image_directory_entry_copyright       7   // (usage: X86)
+let image_directory_entry_architecture = 7	// Architecture Specific Data
+let image_directory_entry_globalptr = 8		// RVA of GP
+let image_directory_entry_tls = 9				// TLS Directory
+let image_directory_entry_load_config = 10	// Load Configuration Directory
+let image_directory_entry_bound_import = 11	// Bound Import Directory in headers
+let image_directory_entry_iat = 12			// Import Address Table
+let image_directory_entry_delay_import = 13	// Delay Load Import Descriptors
+let image_directory_entry_com_descriptor = 14 // COM Runtime descriptor
 
-typedef struct _IMAGE_EXPORT_DIRECTORY {
+@struct class _IMAGE_EXPORT_DIRECTORY {
 	var characteristics: UInt32
 	var timeDateStamp: UInt32
 	var majorVersion: UInt16
@@ -142,22 +142,21 @@ typedef struct _IMAGE_EXPORT_DIRECTORY {
 	var addressOfNameOrdinals: UInt32
 } IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY
 
-typedef struct _IMAGE_BASE_RELOCATION {
+@struct class _IMAGE_BASE_RELOCATION {
 	var virtualAddress: UInt32
 	var sizeOfBlock: UInt32
 } IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION
 
-typedef struct _IMAGE_DATA_DIRECTORY {
+@struct class _IMAGE_DATA_DIRECTORY {
 	var virtualAddress: UInt32
 	var size: UInt32
 } IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY
-let IMAGE_SIZEOF_BASE_RELOCATION = 8
-let IMAGE_REL_BASED_ABSOLUTE = 0
-let IMAGE_REL_BASED_DIR64 = 10
-let IMAGE_REL_BASED_HIGHLOW = 3
+let image_sizeof_base_relocation = 8
+let image_rel_based_absolute = 0
+let image_rel_based_dir64 = 10
+let image_rel_based_highlow = 3
 
-#pragma pack(1)
-typedef struct _IMAGE_IMPORT_DESCRIPTOR {
+@struct @packed class _IMAGE_IMPORT_DESCRIPTOR {
 	//_ANONYMOUS_UNION union {
 	//	var characteristics: UInt32
 	var originalFirstThunk: UInt32
@@ -167,16 +166,15 @@ typedef struct _IMAGE_IMPORT_DESCRIPTOR {
 	var name: UInt32
 	var firstThunk: UInt32
 } IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR
-#pragma pack()
 
-typedef Void (*FARPROC)()
+declare FARPROC = () => Void
 
-typedef struct _IMAGE_IMPORT_BY_NAME {
+@struct class _IMAGE_IMPORT_BY_NAME {
 	var hint: UInt16
 	var name[1]: UInt8
 } IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME
 
-typedef struct _IMAGE_THUNK_DATA {
+@struct class _IMAGE_THUNK_DATA {
 	union {
 		var fun: UInt64 // address of imported fun
 		var ordinal: UInt32 // ordinal value of fun

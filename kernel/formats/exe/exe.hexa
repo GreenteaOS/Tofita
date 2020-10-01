@@ -22,7 +22,7 @@
 
 typedef fun(__fastcall *Entry)(entry: UInt64)
 
-Void *offsetPointer(data: VoidPointer, ptrdiff_t offset) {
+fun offsetPointer(data: VoidPointer, ptrdiff_t offset): VoidPointer {
 	return (Void *)((data as! UInt64) + offset)
 }
 
@@ -61,7 +61,7 @@ class Executable {
 }
 
 // TODO probe for read/write
-auto loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, exec: Pointer<Executable>) {
+fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, exec: Pointer<Executable>) {
 	var asset: RamDiskAsset = getRamDiskAsset(name)
 	serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data)
 	var ptr = (UInt8 *)asset.data
@@ -80,7 +80,7 @@ auto loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, e
 		exec.nextBase = peOptionalHeader.imageBase
 	}
 
-	pages.mapMemory(exec.pml4, exec.nextBase, physical - (WholePhysicalStart as! UInt64), pages)
+	pages.mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
 
 	let buffer: UInt64 = exec.nextBase
 	memset((Void *)buffer, 0, peOptionalHeader.sizeOfImage) // Zeroing
@@ -318,7 +318,7 @@ auto loadExe(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, e
 		let physical = PhysicalAllocator.allocatePages(pages)
 
 		let buffer: UInt64 = exec.nextBase
-		pages.mapMemory(exec.pml4, exec.nextBase, physical - (WholePhysicalStart as! UInt64), pages)
+		pages.mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
 		memset((Void *)buffer, 0, ei.pei.sizeOfStackReserve) // Zeroing
 
 		exec.nextBase = exec.nextBase + pages * pageSize

@@ -13,24 +13,24 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let PHYSICAL_NOT_FOUND = 0
+let physical_not_found = 0
 // A lot of non-zero bits
 // i.e. good in case of cosmic rays or something
 // Completely reserved by hardware and kernel executable image
 // Anything that is not defined considered to be PAGE_RESERVED
-let PAGE_RESERVED = 0xFF
-let PAGE_FREE = 0b1010
-let PAGE_FULL = 0b0101
-let PAGE_MASK = 0b1111
+let page_reserved = 0xFF
+let page_free = 0b1010
+let page_full = 0b0101
+let page_mask = 0b1111
 // TODO mask user-mode pages differently than kernel-mode
-// TODO let GRANULAR_PARTIAL = 0b1010
-// TODO let GRANULAR_FULL = 0b1001
-@inline fun DOWN_BYTES_TO_PAGES(bytes) return ((bytes) >> 12)
+// TODO let granular_partial = 0b1010
+// TODO let granular_full = 0b1001
+@inline fun down_bytes_to_pages(bytes) return ((bytes) >> 12)
 // 4095 >> 12 == 0
 // 4096 >> 12 == 1
 // 8191 >> 12 == 1
 // 8192 >> 12 == 2
-let KERNEL_RESERVED_PAGES = 4096
+let kernel_reserved_pages = 4096
 // == 16 megabytes
 // ^ this amount of memory cannot be allocated by user process
 // to avoid system crash on our of memory
@@ -40,7 +40,7 @@ class PhysicalAllocator {
 	// Approx. 1 megabyte per each 4 gygabyte of RAM
 	static UInt8 *buffer // TODO use bits, not bytes
 	static UInt64 count
-	static UInt64 countUser // count - KERNEL_RESERVED_PAGES
+	static UInt64 countUser // count - kernel_reserved_pages
 	static UInt64 available
 	static UInt64 last
 
@@ -49,11 +49,11 @@ class PhysicalAllocator {
 	static fun init(const params: Pointer<KernelParams>) {
 		buffer = (UInt8 *)params.physicalRamBitMaskVirtual
 		const EfiMemoryMap *memoryMap = Pointer.of(params.efiMemoryMap)
-		count = DOWN_BYTES_TO_PAGES(params.ramBytes)
-		countUser = count - KERNEL_RESERVED_PAGES
-		last = PHYSICAL_NOT_FOUND
+		count = down_bytes_to_pages(params.ramBytes)
+		countUser = count - kernel_reserved_pages
+		last = physical_not_found
 
-		memset((Void *)buffer, PAGE_RESERVED, count)
+		memset((Void *)buffer, page_reserved, count)
 
 		// Reserve UEFI memory map
 		{
@@ -66,11 +66,11 @@ class PhysicalAllocator {
 			var offset: UInt64 = startOfMemoryMap
 
 			while (offset < endOfMemoryMap) {
-				let kind = (descriptor.Type == efi.EfiConventionalMemory) ? PAGE_FREE : PAGE_RESERVED
-				let where = DOWN_BYTES_TO_PAGES(descriptor.PhysicalStart)
+				let kind = (descriptor.Type == efi.EfiConventionalMemory) ? page_free : page_reserved
+				let where = down_bytes_to_pages(descriptor.PhysicalStart)
 				let steps = descriptor.NumberOfPages
 
-				if (kind == PAGE_RESERVED)
+				if (kind == page_reserved)
 					serialPrintf("[physical] Reserve %u pages from %u page\n", steps, where)
 
 				var i: UInt64 = where
@@ -85,14 +85,14 @@ class PhysicalAllocator {
 			}
 		}
 
-		reserveOnePage(PHYSICAL_NOT_FOUND) // Ensure special case
+		reserveOnePage(physical_not_found) // Ensure special case
 
 		// Reserve bootloader buffer
 		{
 			var physical: UInt64 = params.physicalBuffer
 			serialPrintf("[physical] Reserve %u bytes at %u of bootloader buffer\n", params.physicalBytes,
 						 physical)
-			var i: UInt64 = DOWN_BYTES_TO_PAGES(params.physicalBytes) + 1
+			var i: UInt64 = down_bytes_to_pages(params.physicalBytes) + 1
 			while (i > 0) {
 				i--
 				reserveOnePage(physical + i * pageSize)
@@ -104,7 +104,7 @@ class PhysicalAllocator {
 			var i: UInt64 = count
 			while (i > 0) {
 				i--
-				if (buffer[i] == PAGE_FREE)
+				if (buffer[i] == page_free)
 					available++
 			}
 
@@ -114,10 +114,10 @@ class PhysicalAllocator {
 
 	// Note: takes real physical address, without mapped offset
 	static fun reserveOnePage(physical: UInt64) {
-		let where = DOWN_BYTES_TO_PAGES(physical)
-		buffer[where] = PAGE_RESERVED
+		let where = down_bytes_to_pages(physical)
+		buffer[where] = page_reserved
 		if (last == where)
-			last = PHYSICAL_NOT_FOUND
+			last = physical_not_found
 	}
 
 // Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
@@ -131,31 +131,31 @@ class PhysicalAllocator {
 
 	// Returns physical 64-bit address, not page number
 	static UInt64 allocateOnePage() {
-		if (last != PHYSICAL_NOT_FOUND) {
+		if (last != physical_not_found) {
 			let where = last
-			last = PHYSICAL_NOT_FOUND
-			return where * pageSize + (WholePhysicalStart as! UInt64)
+			last = physical_not_found
+			return where * pageSize + (wholePhysicalStart as! UInt64)
 		}
 
 		var i: UInt64 = 0
 		// TODO fast large-step outer search with uint64_t
 		var steps: UInt64 = count // Avoid non-register access
 		while (i < steps) {
-			if (buffer[i] == PAGE_FREE) {
-				buffer[i] = PAGE_FULL
-				return i * pageSize + (WholePhysicalStart as! UInt64)
+			if (buffer[i] == page_free) {
+				buffer[i] = page_full
+				return i * pageSize + (wholePhysicalStart as! UInt64)
 			}
 
 			i++
 		}
 
 		serialPrintf("[physical] allocateOnePage == PHYSICAL_NOT_FOUND\n")
-		return PHYSICAL_NOT_FOUND
+		return physical_not_found
 	}
 
 	static UInt64 allocateOnePagePreZeroed() {
 		var result = allocateOnePage()
-		if (result != PHYSICAL_NOT_FOUND)
+		if (result != physical_not_found)
 			memset((Void *)result, 0, pageSize)
 		return result
 	}
@@ -165,9 +165,9 @@ class PhysicalAllocator {
 	// TODO each process should have some private extra pages (1 megabyte)
 	// ^ means that available_now = (available - 1mb * process_count)
 	static UInt64 allocateSafeUserspaceOnePagePreZeroed() {
-		if (available > KERNEL_RESERVED_PAGES)
+		if (available > kernel_reserved_pages)
 			return allocateOnePagePreZeroed()
-		return PHYSICAL_NOT_FOUND
+		return physical_not_found
 	}
 
 	// TODO faster
@@ -175,7 +175,7 @@ class PhysicalAllocator {
 		// 0 or 1 == 1 page anyway
 		if (pages < 2)
 			return allocateOnePage()
-		last = PHYSICAL_NOT_FOUND
+		last = physical_not_found
 
 		// Find largest free block
 		var largest: UInt64 = 0
@@ -201,7 +201,7 @@ class PhysicalAllocator {
 				//	current++
 				//}
 
-				if (buffer[i] == PAGE_FREE) {
+				if (buffer[i] == page_free) {
 					if (current == 0)
 						currentAt = i
 					current++
@@ -214,7 +214,7 @@ class PhysicalAllocator {
 					break
 				}
 
-				if (buffer[i] != PAGE_FREE) {
+				if (buffer[i] != page_free) {
 					current = 0
 				}
 
@@ -228,19 +228,19 @@ class PhysicalAllocator {
 			var i: UInt64 = pages
 			while (i > 0) {
 				i--
-				buffer[largestAt + i] = PAGE_FULL
+				buffer[largestAt + i] = page_full
 			}
-			return largestAt * pageSize + (WholePhysicalStart as! UInt64)
+			return largestAt * pageSize + (wholePhysicalStart as! UInt64)
 		}
 
 		serialPrintf("[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages)
-		return PHYSICAL_NOT_FOUND
+		return physical_not_found
 	}
 
 	// Current granularity: 4096 bytes
 	static UInt64 allocateBytes(bytes: UInt64) {
 		// TODO
-		return allocatePages(DOWN_BYTES_TO_PAGES(bytes) + 1)
+		return allocatePages(down_bytes_to_pages(bytes) + 1)
 	}
 
 	// Current granularity: xxx bytes
@@ -252,17 +252,17 @@ class PhysicalAllocator {
 		// and quickly deallocate if memory is not enough for apps/kernel
 		// (maybe even in semi-automated way within this memory allocator)
 		// (another very small bitmask for disk caches?)
-		return allocatePages(DOWN_BYTES_TO_PAGES(bytes) + 1)
+		return allocatePages(down_bytes_to_pages(bytes) + 1)
 	}
 
 	static fun freeOnePage(physical: UInt64) {
-		let where = DOWN_BYTES_TO_PAGES(physical - (WholePhysicalStart as! UInt64))
+		let where = down_bytes_to_pages(physical - (wholePhysicalStart as! UInt64))
 		// Bounds check
-		if (physical <= WholePhysicalStart || where > count)
+		if (physical <= wholePhysicalStart || where > count)
 			return
 		// Cosmic rays
-		if (buffer[where] == PAGE_FULL)
-			buffer[where] = PAGE_FREE
+		if (buffer[where] == page_full)
+			buffer[where] = page_free
 		last = where
 	}
 
@@ -273,7 +273,7 @@ class PhysicalAllocator {
 
 	static fun freeBytes(physical: UInt64, bytes: UInt64) {
 		// TODO
-		freePages(physical, DOWN_BYTES_TO_PAGES(bytes) + 1)
+		freePages(physical, down_bytes_to_pages(bytes) + 1)
 	}
 
 	// Same mechanics as in garbage collector

@@ -31,12 +31,12 @@ cursor.Cursor *cur = null
 
 var startupAnimation: UInt16 = 0
 
-typedef enum {
-	Center,
-	Stretch,
+enum WallpaperStyle : UInt8 {
+	Center
+	Stretch
 	Fill
 	// TODO more options
-} WallpaperStyle
+}
 
 fun setWallpaper(bitmap: Pointer<Bitmap32>, style: WallpaperStyle) {
 

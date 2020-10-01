@@ -13,15 +13,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let PIC1 = 0x20 // IO base address for main PIC
-let PIC2 = 0xA0 // IO base address for secondary PIC
-let PIC1_COMMAND PIC1
-let PIC1_COMMAND_0x20 = 0x20
-let PIC1_DATA (PIC1 + 1)
-let PIC2_COMMAND PIC2
-let PIC2_DATA (PIC2 + 1)
-let PIC_EOI = 0x20	  // End-of-interrupt command code
-let PIC_EOI_0x20 = 0x20 // End-of-interrupt command code
+let pic1 = 0x20 // io base address for main pic
+let pic2 = 0xa0 // io base address for secondary pic
+let pic1_command = pic1
+let pic1_command_0x20 = 0x20
+let pic1_data = (pic1 + 1)
+let pic2_command = pic2
+let pic2_data = (pic2 + 1)
+let pic_eoi = 0x20	  // end-of-interrupt command code
+let pic_eoi_0x20 = 0x20 // end-of-interrupt command code
 
 UInt8 readPort(port: UInt16)
 fun writePort(@volatile UInt16 port, @volatile UInt8 value)
@@ -75,27 +75,27 @@ fun writePort(@volatile UInt16 port, @volatile UInt8 value) {
 fun loadIdt(@volatile idtr: Pointer<Idtr>)
 
 // Handling IDT
-let IDT_SIZE = 256
+let idt_size = 256
 // Records of the GDT - 16 items
-let NULL_SEL = 0x00
-//let EMPTY_SEL = 0x08
-let SYS_CODE64_SEL = 0x10 // Execute/Read
-let SYS_DATA32_SEL = 0x18 // Read/Write
+let null_sel = 0x00
+//let empty_sel = 0x08
+let sys_code64_sel = 0x10 // Execute/Read
+let sys_data32_sel = 0x18 // Read/Write
 // Layout expected by SYSRET
-let USER_CODE32_SEL = 0x20 // Execute/Read
-let USER_DATA32_SEL = 0x28 // Read/Write
-let USER_CODE64_SEL = 0x30 // Execute/Read
-//let EMPTY_SEL = 0x38
-//let TSS_SEL = 0x40 // Index = 8
-//let TSS_SEL = 0x48
-//let USER_DATA32_SEL = 0x50 // Read/Write
-//let EMPTY_SEL = 0x58
-let SYS_CODE32_SEL = 0x60 // Execute/Read
-//let EMPTY_SEL = 0x68
-//let EMPTY_SEL = 0x70
-//let EMPTY_SEL = 0x78
+let user_code32_sel = 0x20 // Execute/Read
+let user_data32_sel = 0x28 // Read/Write
+let user_code64_sel = 0x30 // Execute/Read
+//let empty_sel = 0x38
+//let tss_sel = 0x40 // Index = 8
+//let tss_sel = 0x48
+//let user_data32_sel = 0x50 // Read/Write
+//let empty_sel = 0x58
+let sys_code32_sel = 0x60 // Execute/Read
+//let empty_sel = 0x68
+//let empty_sel = 0x70
+//let empty_sel = 0x78
 
-IdtEntry IDT[IDT_SIZE]
+IdtEntry IDT[idt_size]
 
 // Handling keyboard
 @extern fun keyboardHandler()
@@ -103,13 +103,14 @@ fun initializeKeyboard(entry: Pointer<IdtEntry>) {
 	var keyboardAddress: UInt64 = ((keyboardHandler as! UInt64))
 	entry.offsetLowerbits = keyboardAddress & 0xffff
 	entry.offsetHigherbits = (keyboardAddress & 0xffffffffffff0000) >> 16
-	entry.selector = SYS_CODE64_SEL
+	entry.selector = sys_code64_sel
 	entry.zero = 0
 	entry.ist = 2 // Stack
 	entry.z = 0
 	entry.dpl = 0 // Ring 0
 	entry.present = 1
 	entry.gateType = 0xe // Interrupt gate
+	// TODO fix vscode: 0xe is invalid, valid only oxE
 }
 
 @extern fun mouseHandler()
@@ -117,7 +118,7 @@ fun initializeMouse(entry: Pointer<IdtEntry>) {
 	var mouseAddress: UInt64 = ((mouseHandler as! UInt64))
 	entry.offsetLowerbits = mouseAddress & 0xffff
 	entry.offsetHigherbits = (mouseAddress & 0xffffffffffff0000) >> 16
-	entry.selector = SYS_CODE64_SEL
+	entry.selector = sys_code64_sel
 	entry.zero = 0
 	entry.ist = 2 // Stack
 	entry.z = 0
@@ -130,7 +131,7 @@ fun initializeFallback(entry: Pointer<IdtEntry>, fallbackHandler: UInt64) {
 	var address: UInt64 = ((fallbackHandler as! UInt64))
 	entry.offsetLowerbits = address & 0xffff
 	entry.offsetHigherbits = (address & 0xffffffffffff0000) >> 16
-	entry.selector = SYS_CODE64_SEL
+	entry.selector = sys_code64_sel
 	entry.zero = 0
 	entry.ist = 1 // Stack
 	entry.z = 0
@@ -139,17 +140,17 @@ fun initializeFallback(entry: Pointer<IdtEntry>, fallbackHandler: UInt64) {
 	entry.gateType = 0xe // Interrupt gate
 }
 
-let ICW1_ICW4 = 0x01		// ICW4 (not) needed
-let ICW1_SINGLE = 0x02	// Single (cascade) mode
-let ICW1_INTERVAL4 = 0x04 // Call address interval 4 (8)
-let ICW1_LEVEL = 0x08		// Level triggered (edge) mode
-let ICW1_INIT = 0x10		// Initialization - required!
+let icw1_icw4 = 0x01		// ICW4 (not) needed
+let icw1_single = 0x02	// Single (cascade) mode
+let icw1_interval4 = 0x04 // Call address interval 4 (8)
+let icw1_level = 0x08		// Level triggered (edge) mode
+let icw1_init = 0x10		// Initialization - required!
 
-let ICW4_8086 = 0x01			// 8086/88 (MCS-80/85) mode
-let ICW4_AUTO = 0x02			// Auto (normal) EOI
-let ICW4_BUF_SECONDARY = 0x08 // Buffered mode/secondary
-let ICW4_BUF_MASTER = 0x0C	// Buffered mode/primary
-let ICW4_SFNM = 0x10			// Special fully nested (not)
+let icw4_8086 = 0x01			// 8086/88 (MCS-80/85) mode
+let icw4_auto = 0x02			// Auto (normal) EOI
+let icw4_buf_secondary = 0x08 // Buffered mode/secondary
+let icw4_buf_master = 0x0C	// Buffered mode/primary
+let icw4_sfnm = 0x10			// Special fully nested (not)
 
 /*
 arguments:
@@ -200,7 +201,7 @@ fun disablePic() {
 }
 
 fun physicalToVirtual(physical: UInt64): UInt64 {
-	var result: UInt64 = (WholePhysicalStart as! UInt64) + (physical as! UInt64)
+	var result: UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
 	return result
 }
 
@@ -218,22 +219,22 @@ fun enableLocalApic() {
 fun mouseWait(aType: UInt8)
 fun mouseWrite(aWrite: UInt8)
 fun mouseRead(): UInt8
-let IRQ0 = 32
-let IRQ1 = 0x21 // 33
-let IRQ2 = 34
-let IRQ3 = 35
-let IRQ4 = 36
-let IRQ5 = 37
-let IRQ6 = 38
-let IRQ7 = 39
-let IRQ8 = 40
-let IRQ9 = 41
-let IRQ10 = 42
-let IRQ11 = 43
-let IRQ12 = 44 // 2c
-let IRQ13 = 45
-let IRQ14 = 46
-let IRQ15 = 47
+let irq0 = 32
+let irq1 = 0x21 // 33
+let irq2 = 34
+let irq3 = 35
+let irq4 = 36
+let irq5 = 37
+let irq6 = 38
+let irq7 = 39
+let irq8 = 40
+let irq9 = 41
+let irq10 = 42
+let irq11 = 43
+let irq12 = 44 // 2c
+let irq13 = 45
+let irq14 = 46
+let irq15 = 47
 
 @struct @packed @sizeOf(10)
 class TablePtr {
@@ -423,7 +424,7 @@ fun switchToKernelThread(@volatile frame: Pointer<InterruptFrame>) {
 
 	// Restore
 	currentThread = THREAD_KERNEL
-	amd64.writeCr3((pml4kernelThread as! UInt64) - (WholePhysicalStart as! UInt64))
+	amd64.writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 	tmemcpy(frame, Pointer.of(kernelThreadFrame), sizeof(InterruptFrame))
 }
 
@@ -440,7 +441,7 @@ fun switchToNextProcess(@volatile frame: Pointer<InterruptFrame>) {
 	process.currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
 	// another option is to save/restore CR3 used by kernel thread
-	amd64.writeCr3((process.pml4 as! UInt64) - (WholePhysicalStart as! UInt64))
+	amd64.writeCr3((process.pml4 as! UInt64) - (wholePhysicalStart as! UInt64))
 	process.scheduleOnNextTick = false
 
 	// Note: pid 0 is not real process, so keep things in kernel
@@ -461,7 +462,7 @@ fun switchToNextProcess(@volatile frame: Pointer<InterruptFrame>) {
 		currentThread = THREAD_USER
 		tmemcpy(frame, Pointer.of(process.frame), sizeof(InterruptFrame))
 	} else {
-		amd64.writeCr3((pml4kernelThread as! UInt64) - (WholePhysicalStart as! UInt64))
+		amd64.writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 		switchToKernelThread(frame)
 	}
 }
