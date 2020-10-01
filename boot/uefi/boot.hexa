@@ -147,7 +147,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	drawLoading(Pointer.of(framebuffer), 1)
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap")
-	var sizeAlloc: UInt64 = (ramdisk.size / PAGE_SIZE + 1) * PAGE_SIZE
+	var sizeAlloc: UInt64 = (ramdisk.size / pageSize + 1) * pageSize
 	var efiMemoryMap: EfiMemoryMap
 	efiMemoryMap.memoryMapSize = sizeof(efi.EFI_MEMORY_DESCRIPTOR) * 512
 	efiMemoryMap.memoryMap = (efi.EFI_MEMORY_DESCRIPTOR *)(ramdisk.base + sizeAlloc)
@@ -291,7 +291,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	params.physicalRamBitMaskVirtual = paging.conventionalAllocateNext(ram >> 12)
 
 	paging.pml4entries =
-		(paging.PageEntry *)paging.conventionalAllocateNext(sizeof(paging.PageEntry) * PAGE_TABLE_SIZE)
+		(paging.PageEntry *)paging.conventionalAllocateNext(sizeof(paging.PageEntry) * pageTableSize)
 
 	{
 		var b: Pointer<UInt8> = (UInt8 *)paging.pml4entries
@@ -305,15 +305,15 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 
 	serialPrintln("[[[efi_main]]] mapping pages for kernel loader")
 
-	paging.mapMemory(upper, largeBuffer, (paging.conventionalOffset - largeBuffer) / PAGE_SIZE + 1, 1)
+	paging.mapMemory(upper, largeBuffer, (paging.conventionalOffset - largeBuffer) / pageSize + 1, 1)
 
 	// Note: framebuffer is *not* within physical memory
 	paging.mapFramebuffer(Pointer.of(params.framebuffer))
 	drawLoading(Pointer.of(framebuffer), 2)
 	paging.mapEfi(Pointer.of(params.efiMemoryMap))
-	paging.mapMemoryHuge(WholePhysicalStart, 0, ram / PAGE_SIZE)
+	paging.mapMemoryHuge(WholePhysicalStart, 0, ram / pageSize)
 
-	let startFunction = (InitKernelTrampoline)(paging.conventionalOffset + PAGE_SIZE)
+	let startFunction = (InitKernelTrampoline)(paging.conventionalOffset + pageSize)
 	tmemcpy((Void *)startFunction, Pointer.of(trampolineCR3), 32)
 	paging.mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0)
 

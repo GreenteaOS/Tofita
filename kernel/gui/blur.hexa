@@ -15,16 +15,16 @@
 
 // Based on the http://blog.ivank.net/fastest-gaussian-blur.html
 
-Int32 @fastcall floor(float x) {
+@fastcall fun floor(x: Float32): Int32 {
 	if (x >= 0) {
-		return (int32_t)x
+		return x as! Int32
 	} else {
-		var y: Int32 = (int32_t)x
+		var y: Int32 = x as! Int32
 		return ((float)y == x) ? y : y - 1
 	}
 }
 
-float @fastcall sqrt(float number) {
+@fastcall fun sqrt(number: Float32): Float32 {
 	var i: Int32
 	float x2, y
 	const float threehalfs = 1.5F
@@ -41,7 +41,7 @@ float @fastcall sqrt(float number) {
 	return 1.0f / y
 }
 
-fun @fastcall
+@fastcall fun
 boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	var iarr: Float = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < width; i++) {
@@ -111,7 +111,7 @@ boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 	}
 }
 
-fun @fastcall
+@fastcall fun
 boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	var iarr: Float = (double)1.0 / (radius + radius + 1)
 	for (UInt16 i = 0; i < height; i++) {
@@ -173,7 +173,7 @@ boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 	}
 }
 
-fun @fastcall
+@fastcall fun
 boxBlur(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	for (UInt32 i = 0; i < source.width * source.height; i++)
 		target.pixels[i].color = source.pixels[i].color
@@ -181,7 +181,7 @@ boxBlur(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, hei
 	boxBlurT(source, target, width, height, radius)
 }
 
-UInt8 *boxesForGauss(sigma: Float, n: UInt8) {
+fun boxesForGauss(sigma: Float, n: UInt8): Pointer<UInt8> {
 	var wIdeal: Float = sqrt((12 * sigma * sigma / n) + 1) // Ideal averaging filter width
 	var wl: UInt8 = (uint8_t)floor(wIdeal)
 	if (wl % 2 == 0)
@@ -189,7 +189,7 @@ UInt8 *boxesForGauss(sigma: Float, n: UInt8) {
 	var wu: UInt8 = wl + 2
 
 	var mIdeal: Float = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
-#define round(x) ((x) >= 0 ? (int64_t)((x) + 0.5) : (int64_t)((x)-0.5))
+ 	fun round(x) return ((x) >= 0 ? (int64_t)((x) + 0.5) : (int64_t)((x)-0.5))
 	var m: Int8 = round(mIdeal)
 
 
@@ -200,7 +200,7 @@ UInt8 *boxesForGauss(sigma: Float, n: UInt8) {
 	return sizes
 }
 
-Bitmap32 *gaussBlur(bitmap: Pointer<Bitmap32>, radius: Float) {
+fun gaussBlur(bitmap: Pointer<Bitmap32>, radius: Float): Pointer<Bitmap32> {
 	var target: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
 
 	var boxes: Pointer<UInt8> = boxesForGauss(radius, 3)
@@ -213,26 +213,26 @@ Bitmap32 *gaussBlur(bitmap: Pointer<Bitmap32>, radius: Float) {
 }
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
-PixelRGBAData @fastcall
-interpolatePixel(bitmap: ConstPointer<Bitmap32>, const float x, const float y) {
-	let px: UInt16 = (uint16_t)x // Same as floor(x)
-	let py: UInt16 = (uint16_t)y // Same as floor(y)
+@fastcall fun
+interpolatePixel(bitmap: ConstPointer<Bitmap32>, x: Float32, y: Float32): PixelRGBAData {
+	let px: UInt16 = x as! UInt16 // Same as floor(x)
+	let py: UInt16 = y as! UInt16 // Same as floor(y)
 	let stride: UInt16 = bitmap.width
 	const PixelRGBAData *data = (const PixelRGBAData *)bitmap.pixels
 	const PixelRGBAData *p0 = Pointer.of(data[px + py * stride]) // pointer to first pixel
 
 	// Calculate the weights
-	const float fx = x - px
-	const float fy = y - py
-	const float fx1 = 1.0f - fx
-	const float fy1 = 1.0f - fy
+	let fx: Float32 = x - px
+	let fy: Float32 = y - py
+	let fx1: Float32 = 1.0f32 - fx
+	let fy1: Float32 = 1.0f32 - fy
 
-	let w1: UInt32 = fx1 * fy1 * 256.0f
-	let w2: UInt32 = fx * fy1 * 256.0f
-	let w3: UInt32 = fx1 * fy * 256.0f
-	let w4: UInt32 = fx * fy * 256.0f
+	let w1: UInt32 = fx1 * fy1 * 256.0f32
+	let w2: UInt32 = fx * fy1 * 256.0f32
+	let w3: UInt32 = fx1 * fy * 256.0f32
+	let w4: UInt32 = fx * fy * 256.0f32
 
-	var result: PixelRGBAData
+	var result = new PixelRGBAData()
 
 	// Neighboring pixels
 	let p1: PixelRGBAData = p0[0]

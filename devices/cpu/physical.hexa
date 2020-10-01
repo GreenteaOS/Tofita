@@ -25,7 +25,7 @@ let PAGE_MASK = 0b1111
 // TODO mask user-mode pages differently than kernel-mode
 // TODO let GRANULAR_PARTIAL = 0b1010
 // TODO let GRANULAR_FULL = 0b1001
-#define DOWN_BYTES_TO_PAGES(bytes) ((bytes) >> 12)
+@inline fun DOWN_BYTES_TO_PAGES(bytes) return ((bytes) >> 12)
 // 4095 >> 12 == 0
 // 4096 >> 12 == 1
 // 8191 >> 12 == 1
@@ -95,7 +95,7 @@ class PhysicalAllocator {
 			var i: UInt64 = DOWN_BYTES_TO_PAGES(params.physicalBytes) + 1
 			while (i > 0) {
 				i--
-				reserveOnePage(physical + i * PAGE_SIZE)
+				reserveOnePage(physical + i * pageSize)
 			}
 		}
 
@@ -134,7 +134,7 @@ class PhysicalAllocator {
 		if (last != PHYSICAL_NOT_FOUND) {
 			let where = last
 			last = PHYSICAL_NOT_FOUND
-			return where * PAGE_SIZE + (WholePhysicalStart as! UInt64)
+			return where * pageSize + (WholePhysicalStart as! UInt64)
 		}
 
 		var i: UInt64 = 0
@@ -143,7 +143,7 @@ class PhysicalAllocator {
 		while (i < steps) {
 			if (buffer[i] == PAGE_FREE) {
 				buffer[i] = PAGE_FULL
-				return i * PAGE_SIZE + (WholePhysicalStart as! UInt64)
+				return i * pageSize + (WholePhysicalStart as! UInt64)
 			}
 
 			i++
@@ -156,7 +156,7 @@ class PhysicalAllocator {
 	static UInt64 allocateOnePagePreZeroed() {
 		var result = allocateOnePage()
 		if (result != PHYSICAL_NOT_FOUND)
-			memset((Void *)result, 0, PAGE_SIZE)
+			memset((Void *)result, 0, pageSize)
 		return result
 	}
 
@@ -230,7 +230,7 @@ class PhysicalAllocator {
 				i--
 				buffer[largestAt + i] = PAGE_FULL
 			}
-			return largestAt * PAGE_SIZE + (WholePhysicalStart as! UInt64)
+			return largestAt * pageSize + (WholePhysicalStart as! UInt64)
 		}
 
 		serialPrintf("[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages)

@@ -30,7 +30,7 @@ const UInt32 byteswap(x: UInt32) {
 	static const UInt32 typeId = byteswap(signature);                                                      \
 	var header: AcpiTableHeader
 
-@struct
+@struct @packed
 class AcpiTableHeader {
 	var type: UInt32
 	var length: UInt32
@@ -43,64 +43,64 @@ class AcpiTableHeader {
 	var creator_revision: UInt32
 
 	Bool validate(UInt32 expectedType = 0) const
-} @packed
+}
 
 Bool AcpiTableHeader.validate(expectedType: UInt32) {
 	return !expectedType || (expectedType == type)
 }
 
-@struct
+@struct @packed
 class AcpiMcfgEntry {
 	var base: UInt64
 	var group: UInt16
 	var busStart: UInt8
 	var busEnd: UInt8
 	var reserved: UInt32
-} @packed
+}
 
-@struct
+@struct @packed
 class AcpiMcfg {
 	TABLE_HEADER('MCFG')
 	var reserved: UInt64
 	var entries[0]: AcpiMcfgEntry
-} @packed
+}
 
-@struct
+@struct @packed
 class AcpiApic {
 	TABLE_HEADER('APIC')
 	var localAddress: UInt32
 	var flags: UInt32
 	var controllerData[0]: UInt8
-} @packed
+}
 
-@struct
+@struct @packed
 class XSDT {
 	TABLE_HEADER('XSDT')
 	var headers[0]: Pointer<AcpiTableHeader>
-} @packed
+}
 
-@struct
+@struct @packed
 class Acpi20 {
 	var length: UInt32
 	Physical<XSDT> xsdtAddress
 	var checksum: UInt8
 	var reserved[3]: UInt8
-} @packed
+}
 
-@struct
+@struct @packed
 class Acpi10 {
 	var signature[8]: Char8
 	var checksum: UInt8
 	var oemID[6]: Char8
 	var revision: UInt8
 	var rsdtAddress: UInt32
-} @packed
+}
 
-@struct
+@struct @packed
 class ACPI {
 	var acpi10: Acpi10
 	var acpi20: Acpi20
-} @packed
+}
 
 @extern "C++" template <typename T> UInt64 acpiTableEntries(const T *t, size: UInt64) {
 	return (t.header.length - sizeof(T)) / size

@@ -13,13 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+let addressBits = 12
 
-
-let ADDRESS_BITS = 12
-#define PAGE_ALIGNED @aligned(PAGE_SIZE)
-#define PACKED @packed
-
-@struct
+@struct @packed @sizeOf(8)
 class LinearAddress {
 	unsigned long long offset : 12
 	unsigned long long pt : 9
@@ -27,10 +23,7 @@ class LinearAddress {
 	unsigned long long pdpt : 9
 	unsigned long long pml4 : 9
 	unsigned long long reserved : 16
-} @packed
-
-_Static_assert(sizeof(uint64_t) == 8, "UInt64 has to have 64 bits")
-_Static_assert(sizeof(paging.LinearAddress) == 8, "linear address has to have 64 bits")
+}
 
 // 512 entries * 8 bytes = 4 KiB
 // PML4 size = PDP size = PD size = PT size
@@ -38,11 +31,11 @@ _Static_assert(sizeof(paging.LinearAddress) == 8, "linear address has to have 64
 // Since we are using 64 bit mode, the entry size
 // is 64 bits.
 
-let PAGE_TABLE_SIZE = 512
+let pageTableSize = 512
 
 // Entry in a page table
-@struct
-class {
+@struct @packed @sizeOf(8)
+class PageEntry {
 	// Is the page present in physical memory?
 	unsigned long long present : 1
 
@@ -90,42 +83,39 @@ class {
 
 	// Disable execution of code from this page
 	unsigned long long disableExecution : 1
-} PACKED PageEntry
-
-_Static_assert(sizeof(PageEntry) == sizeof(uint64_t), "page entry has to be 64 bits")
-
-static PageEntry *pml4entries PAGE_ALIGNED = null
-
-UInt64 conventionalAllocateNext(bytes: UInt64)
-static Void *allocatePage() {
-	// TODO bounds check
-	return (Void *)conventionalAllocateNext(PAGE_SIZE)
 }
 
-static LinearAddress getLinearAddress(address: UInt64) {
+var pml4entries: Pointer<PageEntry> = null
+
+Void *allocatePage() {
+	// TODO bounds check
+	return (Void *)conventionalAllocateNext(pageSize)
+}
+
+LinearAddress getLinearAddress(address: UInt64) {
 	return *((LinearAddress *)Pointer.of(address))
 }
 
-static fun initializePage(entry: Pointer<PageEntry>, address: UInt64, writeAllowed: UInt8) {
-	entry.address = address >> ADDRESS_BITS
+fun initializePage(entry: Pointer<PageEntry>, address: UInt64, writeAllowed: UInt8) {
+	entry.address = address >> addressBits
 	entry.present = 1
 	entry.writeAllowed = (writeAllowed == 1) ? 1 : 0
 	entry.accessibleByAll = 1 // TODO
 }
 
-static fun initializePageHuge(entry: Pointer<PageEntry>, address: UInt64) {
-	entry.address = address >> ADDRESS_BITS
+fun initializePageHuge(entry: Pointer<PageEntry>, address: UInt64) {
+	entry.address = address >> addressBits
 	entry.present = 1
 	entry.writeAllowed = 1
 	entry.largePage = 1
 	entry.accessibleByAll = 1 // TODO
 }
 
-static Void *getPage(table: Pointer<PageEntry>, entryId: UInt64, writeAllowed: UInt8) {
+Void *getPage(table: Pointer<PageEntry>, entryId: UInt64, writeAllowed: UInt8) {
 	var entry: Pointer<PageEntry> = Pointer.of(table[entryId])
 
 	if (entry.present == 1) {
-		return (Void *)(entry.address << ADDRESS_BITS)
+		return (Void *)(entry.address << addressBits)
 	} else {
 		var newPage: Pointer<Void> = allocatePage()
 		initializePage(entry, (newPage as! UInt64), writeAllowed)
@@ -144,7 +134,7 @@ fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
 }
 
 #define createMapping(fromTable, toTable)                                                                    \
-	static Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64,          \
+	Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64,          \
 								UInt8 writeAllowed) {                                                      \
 		var toTable: Pointer<Void> = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed)           \
 		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr, writeAllowed)                        \
@@ -155,7 +145,7 @@ createMapping(pdpt, pd)
 createMapping(pml4, pdpt)
 
 #define createHugeMapping(name, fromTable, calls, toTable)                                                   \
-	static Void map_##name(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {             \
+	Void map_##name(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {             \
 		var toTable: Pointer<Void> = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1)                      \
 		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr)                                        \
 	}
@@ -166,12 +156,12 @@ createHugeMapping(p4huge, pml4, p3huge, pdpt)
 fun mapMemory(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32, writeAllowed: UInt8) {
 	serialPrintln("[paging] mapping memory range")
 
-	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * PAGE_SIZE
+	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
 
 	var vAddress: UInt64 = virtualAddr
 	var pAddress: UInt64 = physicalAddr
 
-	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * PAGE_SIZE)
+	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * pageSize)
 
 	serialPrint("[paging.range] virtual address = ")
 	serialPrintHex((uint64_t)(virtualAddr))
@@ -192,13 +182,13 @@ fun mapMemory(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32, write
 	while (vAddress < virtualAddrEnd) {
 		map_pml4(pml4entries, vAddress, pAddress, writeAllowed)
 
-		vAddress += PAGE_SIZE
-		pAddress += PAGE_SIZE
+		vAddress += pageSize
+		pAddress += pageSize
 	}
 }
 
 fun mapMemoryHuge(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32) {
-	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * PAGE_SIZE
+	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
 
 	var vAddress: UInt64 = virtualAddr
 	var pAddress: UInt64 = physicalAddr
@@ -206,12 +196,12 @@ fun mapMemoryHuge(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32) {
 	while (vAddress < virtualAddrEnd) {
 		map_p4huge(pml4entries, vAddress, pAddress)
 
-		vAddress += PAGE_SIZE * 512
-		pAddress += PAGE_SIZE * 512
+		vAddress += pageSize * 512
+		pAddress += pageSize * 512
 	}
 }
 
-static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.descriptor: Pointer<EFI_MEMORY_DESCRIPTOR>,
+const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.descriptor: Pointer<EFI_MEMORY_DESCRIPTOR>,
 														   UInt64 descriptorSize) {
 	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
 	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
@@ -233,7 +223,7 @@ UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize)
 	}
 
-	return numberOfPages * PAGE_SIZE
+	return numberOfPages * pageSize
 }
 
 // TODO this should be reconsidered (i.e. pointer fixups)
@@ -279,7 +269,7 @@ UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, pages: UInt32) {
 
 		if ((descriptor.Type == efi.EfiConventionalMemory) && (descriptor.NumberOfPages >= (pages + 1))) {
 			serialPrintf("[paging] success allocate %d pages\n", pages)
-			result = ((descriptor.PhysicalStart / PAGE_SIZE) * PAGE_SIZE + PAGE_SIZE)
+			result = ((descriptor.PhysicalStart / pageSize) * pageSize + pageSize)
 		}
 
 		offset += descriptorSize
@@ -314,7 +304,7 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	}
 
 	serialPrintf("[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
-				 (uint32_t)(largestPages * PAGE_SIZE), largestPages)
+				 (uint32_t)(largestPages * pageSize), largestPages)
 
 	return result
 }
@@ -322,10 +312,10 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 UInt64 conventionalOffset
 UInt64 conventionalAllocateNext(bytes: UInt64) {
 	let result = conventionalOffset
-	let pages = bytes / PAGE_SIZE // Math.floor
-	conventionalOffset += pages * PAGE_SIZE
-	if ((bytes - (pages * PAGE_SIZE)) > 0)
-		conventionalOffset += PAGE_SIZE
+	let pages = bytes / pageSize // Math.floor
+	conventionalOffset += pages * pageSize
+	if ((bytes - (pages * pageSize)) > 0)
+		conventionalOffset += pageSize
 	return result
 }
 
@@ -333,5 +323,5 @@ fun mapFramebuffer(fb: ConstPointer<Framebuffer>) {
 	let framebufferBase = fb.base
 	// TODO map with hugepages!!!
 	// TODO map ALL with EPIC pages?
-	mapMemory(FramebufferStart, (framebufferBase as! UInt64), fb.size / PAGE_SIZE + 1, 1)
+	mapMemory(FramebufferStart, (framebufferBase as! UInt64), fb.size / pageSize + 1, 1)
 }

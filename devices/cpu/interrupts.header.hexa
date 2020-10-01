@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@struct
+@struct @sizeOf(0xb0 + 128)
 class InterruptFrame {
 	// SSE
 	@volatile xmm[8: UInt64 * 2]
@@ -48,8 +48,6 @@ class InterruptFrame {
 	@volatile sp: UInt64 // Stack pointer
 	@volatile ss: UInt64 // Stack segment
 }
-
-_Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect")
 
 // Scheduling
 const UInt8 THREAD_INIT = 0 // kernelMain, it will be destroyed

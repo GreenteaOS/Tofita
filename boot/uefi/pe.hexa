@@ -14,8 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // 1 byte aligned
-#pragma pack(1)
-@struct
+@struct @packed @sizeOf(24)
 class PeHeader {
 	var mMagic: UInt32 // PE\0\0 or 0x00004550
 	var mMachine: UInt16
@@ -25,14 +24,10 @@ class PeHeader {
 	var mNumberOfSymbols: UInt32
 	var mSizeOfOptionalHeader: UInt16
 	var mCharacteristics: UInt16
-} @packed
-#pragma pack()
-
-_Static_assert(sizeof(PeHeader) == 24, "sizeof is incorrect")
+}
 
 // 1 byte aligned
-#pragma pack(1)
-@struct
+@struct @packed
 class Pe32OptionalHeader {
 	var mMagic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
 	var mMajorLinkerVersion: UInt8
@@ -64,11 +59,9 @@ class Pe32OptionalHeader {
 	var mSizeOfHeapCommit: UInt64 // UInt32 mSizeOfHeapCommit
 	var mLoaderFlags: UInt32
 	var mNumberOfRvaAndSizes: UInt32
-} @packed
-#pragma pack()
+}
 
-#pragma pack(1)
-@struct
+@struct @packed @sizeOf(40)
 class ImageSectionHeader { // size 40 bytes
 	var mName[8]: UInt8
 	var mVirtualSize: UInt32
@@ -80,7 +73,4 @@ class ImageSectionHeader { // size 40 bytes
 	var mNumberOfRealocations: UInt16
 	var mNumberOfLinenumbers: UInt16
 	var mCharacteristics: UInt32
-} @packed
-#pragma pack()
-
-_Static_assert(sizeof(ImageSectionHeader) == 40, "sizeof is incorrect")
+}

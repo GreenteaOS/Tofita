@@ -13,23 +13,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@struct
-class {
+@struct @packed
+class PixelRGBAData {
 	var r: UInt8
 	var g: UInt8
 	var b: UInt8
 	var a: UInt8
-} @packed PixelRGBAData
+}
 
-@struct
+@struct @sizeOf(4)
 class Pixel32 {
 	union {
 		var rgba: PixelRGBAData
 		var color: UInt32
 	}
 }
-
-_Static_assert(sizeof(Pixel32) == 4, "bad sizeof")
 
 @struct
 class Bitmap32Interim {

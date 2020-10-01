@@ -30,15 +30,13 @@ fun drawPixel(framebuffer: Pointer<Framebuffer>, x: UInt32, y: UInt32, color: UI
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
 
-@struct
+@struct @packed @sizeOf(4)
 class UefiPixel {
 	var b: UInt8
 	var g: UInt8
 	var r: UInt8
 	var a: UInt8
-} @packed
-
-_Static_assert(sizeof(UefiPixel) == 4, "UefiPixel has to be 32 bit")
+}
 
 UInt32 getBitmapPixel(const bmp: Pointer<UInt8>, x: UInt32, y: UInt32, width: UInt32, height: UInt32) {
 	let colors = bmp + 54
@@ -51,16 +49,12 @@ UInt32 getBitmapPixel(const bmp: Pointer<UInt8>, x: UInt32, y: UInt32, width: UI
 	return *color
 }
 
-#pragma pack(1)
-@struct
+@struct @packed @sizeOf(12)
 class TextFontList {
 	var x: UInt16
 	var y: UInt16
 	var width: Float
-} @packed
-#pragma pack()
-
-_Static_assert(sizeof(TextFontList) == 12, "TextFontList has to be 12 byte")
+}
 
 TextFontList *textFontList = null
 

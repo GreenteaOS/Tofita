@@ -32,22 +32,22 @@ let R_UART_TXBUF = 0
 let R_UART_BAUD_LOW = 0
 let R_UART_BAUD_HIGH = 1
 let R_UART_FCR = 2
-#define B_UART_FCR_FIFOE (1 << 0)
-#define B_UART_FCR_FIFO64 (1 << 5)
+let B_UART_FCR_FIFOE = (1 << 0)
+let B_UART_FCR_FIFO64 = (1 << 5)
 let R_UART_LCR = 3
-#define B_UART_LCR_DLAB (1 << 7)
+let B_UART_LCR_DLAB = (1 << 7)
 let R_UART_MCR = 4
-#define B_UART_MCR_DTRC (1 << 0)
-#define B_UART_MCR_RTS (1 << 1)
+let B_UART_MCR_DTRC = (1 << 0)
+let B_UART_MCR_RTS = (1 << 1)
 let R_UART_LSR = 5
-#define B_UART_LSR_RXRDY (1 << 0)
-#define B_UART_LSR_TXRDY (1 << 5)
-#define B_UART_LSR_TEMT (1 << 6)
+let B_UART_LSR_RXRDY = (1 << 0)
+let B_UART_LSR_TXRDY = (1 << 5)
+let B_UART_LSR_TEMT = (1 << 6)
 let R_UART_MSR = 6
-#define B_UART_MSR_CTS (1 << 4)
-#define B_UART_MSR_DSR (1 << 6)
-#define B_UART_MSR_RI (1 << 7)
-#define B_UART_MSR_DCD (1 << 8)
+let B_UART_MSR_CTS = (1 << 4)
+let B_UART_MSR_DSR = (1 << 6)
+let B_UART_MSR_RI = (1 << 7)
+let B_UART_MSR_DCD = (1 << 8)
 
 UInt64 kstrlen(const data: Pointer<UInt8>) {
 	var r: UInt64
