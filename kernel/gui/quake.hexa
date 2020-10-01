@@ -23,7 +23,7 @@ var quakeRow: UInt8 = 0
 var quakeAdvance: Float = 0.0
 var quakeCommandSize: UInt8 = 0
 
-fun quakePrintf(const WideChar *c, ...)
+fun quakePrintf(const c: Pointer<WideChar>, ...)
 
 fun quake() {
 	if (haveToQuake == 0) {
@@ -88,7 +88,7 @@ fun quakeHandleButtonDown(key: UInt8) {
 	serialPrintf("quake command is %s\n", quakeCommand)
 }
 
-fun qsod(const WideChar *format, extra: UInt64, const UInt64 more) {
+fun qsod(const format: Pointer<WideChar>, extra: UInt64, const UInt64 more) {
 	haveToQuake = 1
 	quakePrintf("Kernel stopped working. Please, reboot.\n")
 	quakePrintf(format, extra, more)
@@ -155,7 +155,7 @@ UInt8 __cdecl _quake_putchar(const UInt8 c) {
 	return EOF
 }
 
-Int32 _quake_puts(const UInt8 *string) {
+Int32 _quake_puts(const string: Pointer<UInt8>) {
 	var i: Int32 = 0
 	while (string[i] != 0) {
 		if (_quake_putchar(string[i]) == EOF) {
@@ -185,7 +185,7 @@ fun quakePrintHex(n: UInt64) {
 		_quake_putchar(buf[i])
 }
 
-fun quakePrintf(const WideChar *c, ...) {
+fun quakePrintf(const c: Pointer<WideChar>, ...) {
 	var s: Pointer<UInt8>
 	va_list lst
 	va_start(lst, c)

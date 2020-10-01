@@ -28,7 +28,7 @@ class {
 } RamDiskAssetInfo
 
 static const RamDisk *_ramdisk
-fun setRamDisk(const RamDisk *ramdisk) {
+fun setRamDisk(const ramdisk: Pointer<RamDisk>) {
 	_ramdisk = ramdisk
 }
 
@@ -49,7 +49,7 @@ const RamDiskAsset getRamDiskAsset(const WideChar *pathToAsset) {
 	for (UInt32 id = 0; id < ramDiskInfo.assetsCount; id++) {
 		// Pointer arithmetic like a boss
 		const UInt64 ramDiskAssetInfoPtr =
-			(uint64_t)_ramdisk.base + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id
+			(_ramdisk.base as! UInt64) + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id
 		const RamDiskAssetInfo *ramDiskAssetInfo = (const RamDiskAssetInfo *)ramDiskAssetInfoPtr
 		var found: UInt8 = 1
 
@@ -64,7 +64,7 @@ const RamDiskAsset getRamDiskAsset(const WideChar *pathToAsset) {
 
 		if (found) {
 			asset.size = ramDiskAssetInfo.size
-			asset.data = (UInt8 *)((uint64_t)_ramdisk.base + ramDiskAssetInfo.offsetFromRamDiskFirstByte)
+			asset.data = (UInt8 *)((_ramdisk.base as! UInt64) + ramDiskAssetInfo.offsetFromRamDiskFirstByte)
 			return asset
 		}
 	}

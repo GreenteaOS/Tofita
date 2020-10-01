@@ -20,7 +20,7 @@
 // TODO probeCopy to local stack instead of probe.read, good for SMP
 
 @volatile Bool @noInline
-_probeForReadOkay(@volatile UInt64 at, @volatile const UInt64 bytes) {
+_probeForReadOkay(@volatile at: UInt64, @volatile const UInt64 bytes) {
 	sehProbe = true
 	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
@@ -32,7 +32,7 @@ _probeForReadOkay(@volatile UInt64 at, @volatile const UInt64 bytes) {
 	return true
 }
 
-@volatile Bool (*@volatile const probeForReadOkay)(@volatile UInt64 at,
+@volatile Bool (*@volatile const probeForReadOkay)(@volatile at: UInt64,
 												 @volatile const UInt64 bytes) = _probeForReadOkay
 
 @volatile Bool @noInline

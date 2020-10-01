@@ -32,7 +32,7 @@ fun initText() {
 	var textFont: RamDiskAsset = getRamDiskAsset("ascii.tofita")
 	textFontList = (TextFontList *)textFont.data
 
-	Bitmap32 *loadPng32(const RamDiskAsset *asset)
+	Bitmap32 *loadPng32(const asset: Pointer<RamDiskAsset>)
 	var a: RamDiskAsset = getRamDiskAsset("root/Windows/Fonts/default.png")
 	textFontBitmap = loadPng32(&a)
 }
@@ -48,11 +48,11 @@ Int8 getLigatureAdvance(left: Char8, const Char8 right) {
 Float getCharAdvance(const Char8 c) {
 	if (textFontList == null)
 		return 8
-	var textChar: TextFontList = textFontList[(uint64_t)c]
+	var textChar: TextFontList = textFontList[(c] as! UInt64)
 	return textChar.width
 }
 
-UInt16 getTextAdvance(const Char8 *text) {
+UInt16 getTextAdvance(text: ConstPointer<Char8>) {
 	var i: UInt16 = 0
 	var xx: Float = 0
 	while (text[i] != 0 && i < 255 * 255) {
@@ -63,7 +63,7 @@ UInt16 getTextAdvance(const Char8 *text) {
 }
 
 Float drawChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
-	var textChar: TextFontList = textFontList[(uint64_t)c]
+	var textChar: TextFontList = textFontList[(c] as! UInt64)
 
 	var xx: Int16 = (int32_t)(x + 0.5)
 	var w: UInt8 = (int32_t)(textChar.width + 0.5)
@@ -97,7 +97,7 @@ Float drawChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 }
 
 Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
-	var textChar: TextFontList = textFontList[(uint64_t)c]
+	var textChar: TextFontList = textFontList[(c] as! UInt64)
 
 	var xx: Int16 = (int16_t)(x + 0.5)
 	var w: UInt8 = (uint8_t)(textChar.width + 0.5)
@@ -142,7 +142,7 @@ Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 }
 
 /// Returns advance after last character
-UInt16 drawAsciiText(const Char8 *text, x: Float, y: Int16, color: Pixel32) {
+UInt16 drawAsciiText(text: ConstPointer<Char8>, x: Float, y: Int16, color: Pixel32) {
 	var i: UInt16 = 0
 	var xx: Float = x
 	while (text[i] != 0 && i < 255 * 255) {
@@ -153,7 +153,7 @@ UInt16 drawAsciiText(const Char8 *text, x: Float, y: Int16, color: Pixel32) {
 }
 
 /// Returns advance after last character
-UInt16 drawText(const WideChar *text, x: Float, y: Int16, color: Pixel32) {
+UInt16 drawText(const text: Pointer<WideChar>, x: Float, y: Int16, color: Pixel32) {
 	var i: UInt16 = 0
 	var xx: Float = x
 	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
@@ -184,7 +184,7 @@ UInt16 drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) {
 	return xx - x
 }
 
-fun drawShadowText(const Char8 *text, x: Float, y: Int16) {
+fun drawShadowText(text: ConstPointer<Char8>, x: Float, y: Int16) {
 	var i: UInt16 = 0
 	var xx: Float = x
 	var color: Pixel32

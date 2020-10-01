@@ -49,7 +49,7 @@ let R_UART_MSR = 6
 #define B_UART_MSR_RI (1 << 7)
 #define B_UART_MSR_DCD (1 << 8)
 
-UInt64 kstrlen(const UInt8 *data) {
+UInt64 kstrlen(const data: Pointer<UInt8>) {
 	var r: UInt64
 	for (r = 0; *data != 0; data++, r++)
 
@@ -101,7 +101,7 @@ fun serialPortWritable(): Bool {
 	return true
 }
 
-UInt64 serialPortWrite(UInt8 *buffer, size: UInt64) {
+UInt64 serialPortWrite(buffer: Pointer<UInt8>, size: UInt64) {
 	if (buffer == null) {
 		return 0
 	}
@@ -143,7 +143,7 @@ UInt64 serialPortWrite(UInt8 *buffer, size: UInt64) {
 	return size
 }
 
-fun serialPrintf(const WideChar *c, ...)
+fun serialPrintf(const c: Pointer<WideChar>, ...)
 
 fun serialPrintInt(n: UInt64) {
 	var buf[24]: UInt8
@@ -192,7 +192,7 @@ Int32 __cdecl putchar(c: UInt8) {
 }
 
 let EOF = 0
-Int32 puts(const UInt8 *string) {
+Int32 puts(const string: Pointer<UInt8>) {
 	var i: Int32 = 0
 	while (string[i]) // standard c idiom for looping through a null-terminated string
 	{
@@ -225,7 +225,7 @@ UInt8 *comItoA(i: Int64, b[]: UInt8) {
 	return b
 }
 
-fun serialPrintf(const WideChar *c, ...) {
+fun serialPrintf(const c: Pointer<WideChar>, ...) {
 	var s: Pointer<UInt8>
 	va_list lst
 	va_start(lst, c)
@@ -301,11 +301,11 @@ fun serialPrintf(const WideChar *c, ...) {
 	}
 }
 
-fun serialPrint(const WideChar *print) {
+fun serialPrint(const print: Pointer<WideChar>) {
 	serialPrintf(print)
 }
 
-fun serialPrintln(const WideChar *print) {
+fun serialPrintln(const print: Pointer<WideChar>) {
 	serialPrintf(print)
 	serialPrintf("\n")
 }

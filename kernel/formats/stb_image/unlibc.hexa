@@ -21,9 +21,9 @@
 #undef pow libc_pow
 #undef memcpy libc_memcpy
 
-Bitmap32 *loadPng32FromBuffer(UInt8 *data, size: UInt32) {
+Bitmap32 *loadPng32FromBuffer(data: Pointer<UInt8>, size: UInt32) {
 	Int32 width, height, png_bpp
-	var colors: Pointer<UInt8> = stbi_load_from_memory(data, size, &width, &height, &png_bpp, 4)
+	var colors: Pointer<UInt8> = stbi_load_from_memory(data, size, Pointer.of(width), Pointer.of(height), Pointer.of(png_bpp), 4)
 	var bitmap: Pointer<Bitmap32> = allocateBitmap(width, height)
 
 	var rgba: Pointer<UInt32> = (UInt32 *)colors
@@ -39,6 +39,6 @@ Bitmap32 *loadPng32FromBuffer(UInt8 *data, size: UInt32) {
 	return bitmap
 }
 
-Bitmap32 *loadPng32(const RamDiskAsset *asset) {
+Bitmap32 *loadPng32(const asset: Pointer<RamDiskAsset>) {
 	return loadPng32FromBuffer(asset.data, asset.size)
 }

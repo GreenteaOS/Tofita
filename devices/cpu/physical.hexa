@@ -46,9 +46,9 @@ class PhysicalAllocator {
 
   public
 	// static fun init(const EfiMemoryMap *memoryMap, bufferVirtual: UInt64, ramPages: UInt64) {
-	static fun init(const KernelParams *params) {
+	static fun init(const params: Pointer<KernelParams>) {
 		buffer = (UInt8 *)params.physicalRamBitMaskVirtual
-		const EfiMemoryMap *memoryMap = &params.efiMemoryMap
+		const EfiMemoryMap *memoryMap = Pointer.of(params.efiMemoryMap)
 		count = DOWN_BYTES_TO_PAGES(params.ramBytes)
 		countUser = count - KERNEL_RESERVED_PAGES
 		last = PHYSICAL_NOT_FOUND
@@ -61,7 +61,7 @@ class PhysicalAllocator {
 			let descriptorSize: UInt64 = memoryMap.descriptorSize
 			var numberOfPages: UInt64 = 0
 
-			var startOfMemoryMap: UInt64 = (uint64_t)memoryMap.memoryMap
+			var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 			var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 			var offset: UInt64 = startOfMemoryMap
 

@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 @extern "C++"
-	Bool validate(const UInt8 *data, const UInt64 bytes) {
+	Bool validate(const data: Pointer<UInt8>, const UInt64 bytes) {
 		if (bytes < sizeof(Lnk))
 			return false
 		let lnk = (Lnk *)data

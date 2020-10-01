@@ -15,8 +15,8 @@
 
 fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable) {
 	var status: efi.EFI_STATUS = systemTable.BootServices.GetMemoryMap(
-		&efiMemoryMap.memoryMapSize, efiMemoryMap.memoryMap, &efiMemoryMap.mapKey,
-		&efiMemoryMap.descriptorSize, &efiMemoryMap.descriptorVersion)
+		Pointer.of(efiMemoryMap.memoryMapSize), efiMemoryMap.memoryMap, Pointer.of(efiMemoryMap.mapKey),
+		Pointer.of(efiMemoryMap.descriptorSize), Pointer.of(efiMemoryMap.descriptorVersion))
 
 	if (status != EFI_SUCCESS) {
 		serialPrint("[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n")
@@ -26,11 +26,11 @@ fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable)
 				 efiMemoryMap.memoryMapSize, efiMemoryMap.descriptorSize)
 }
 
-fun initializeFramebuffer(Framebuffer *fb, efi.EFI_SYSTEM_TABLE *systemTable) {
+fun initializeFramebuffer(fb: Pointer<Framebuffer>, efi.EFI_SYSTEM_TABLE *systemTable) {
 	var gopGuid: efi.EFI_GUID = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
 	var gop: Pointer<efi.EFI_GRAPHICS_OUTPUT_PROTOCOL>
 
-	systemTable.BootServices.LocateProtocol(&gopGuid, null, (Void **)&gop)
+	systemTable.BootServices.LocateProtocol(Pointer.of(gopGuid), null, (Void **)Pointer.of(gop))
 
 	fb.base = gop.Mode.FrameBufferBase
 	fb.size = gop.Mode.FrameBufferSize
@@ -45,7 +45,7 @@ fun initializeFramebuffer(Framebuffer *fb, efi.EFI_SYSTEM_TABLE *systemTable) {
 	gop.SetMode(gop, gop.Mode.Mode)
 }
 
-efi.EFI_STATUS uefiAllocate(efi.EFI_BOOT_SERVICES *bootsvc, UInt64 *bytes, Void **destination) {
+efi.EFI_STATUS uefiAllocate(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, bytes: Pointer<UInt64>, Void **destination) {
 	serialPrintf("[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes)
 	var status: efi.EFI_STATUS
 	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
@@ -56,7 +56,7 @@ efi.EFI_STATUS uefiAllocate(efi.EFI_BOOT_SERVICES *bootsvc, UInt64 *bytes, Void 
 	var pages: UInt64 = ((*bytes - 1) / PAGE_SIZE) + 1
 	var addr: efi.EFI_PHYSICAL_ADDRESS = (efi.EFI_PHYSICAL_ADDRESS)*destination
 
-	status = bootsvc.AllocatePages(efi.AllocateAnyPages, allocationType, pages, &addr)
+	status = bootsvc.AllocatePages(efi.AllocateAnyPages, allocationType, pages, Pointer.of(addr))
 	if (status == EFI_NOT_FOUND || status == EFI_OUT_OF_RESOURCES) {
 		serialPrintf("[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
 					 *bytes)

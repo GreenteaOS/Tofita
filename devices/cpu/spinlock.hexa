@@ -25,7 +25,7 @@ class Spinlock {
 	fun inline lock() {
 		// TODO UInt8 tries = 255
 		// TODO yield to another process
-		while (!__sync_bool_compare_and_swap(&value, 0, 1)) {
+		while (!__sync_bool_compare_and_swap(Pointer.of(value), 0, 1)) {
 			while (value) {
 				amd64.pause()
 			}
@@ -34,7 +34,7 @@ class Spinlock {
 
 	// TODO C++20 inline attribute
 	fun inline unlock() {
-		__sync_lock_release(&value)
+		__sync_lock_release(Pointer.of(value))
 	}
 }
 

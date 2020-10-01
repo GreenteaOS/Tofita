@@ -30,7 +30,7 @@ user32.Window *handleToWindow(hWnd: wapi.HWnd) {
 	return (user32.Window *)hWnd
 }
 
-wapi.HWnd windowToHandle(user32.Window *window) {
+wapi.HWnd windowToHandle(user32.window: Pointer<Window>) {
 	// TODO offset ptr 8-byte aligned + reserved space
 	// os it fits into upper half of virtual space
 	return (wapi.HWnd)window
@@ -39,7 +39,7 @@ wapi.HWnd windowToHandle(user32.Window *window) {
 // WAPI
 @extern "C" {
 
-wapi.Atom RegisterClassW(const wapi.WindowClass *wc) {
+wapi.Atom RegisterClassW(const wapi.wc: Pointer<WindowClass>) {
 	tofitaDebugLog("RegisterClassW called")
 
 	// TODO use libc func utf16le
@@ -54,7 +54,7 @@ wapi.Atom RegisterClassW(const wapi.WindowClass *wc) {
 			break
 	}
 
-	var tail = &user32.rootClass
+	var tail = Pointer.of(user32.rootClass)
 	while (tail.next != null)
 		tail = tail.next
 
@@ -83,7 +83,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 	tofitaDebugLog("CreateWindowExW called")
 
 	// Find class
-	var *list = &user32.rootClass
+	var *list = Pointer.of(user32.rootClass)
 	var name = lpClassName
 	var found = false
 	const wapi.WindowClass *wc = null
@@ -95,9 +95,9 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 		var i: UInt16 = 0
 		while (true) {
 			if ((list.name[i] == name[i]) && (name[i] == 0)) {
-				tofitaDebugLog("CreateWindowExW found class {%S}\n", (uint64_t)name)
+				tofitaDebugLog("CreateWindowExW found class {%S}\n", (name as! UInt64))
 				found = true
-				wc = &list.wc
+				wc = Pointer.of(list.wc)
 				break
 			}
 			if (list.name[i] == name[i]) {
@@ -137,7 +137,7 @@ wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName, const W
 	payload.hWnd = hWnd
 
 	// Create native window counterpart
-	var windowId: UInt64 = tofitaCreateWindowEx(&payload)
+	var windowId: UInt64 = tofitaCreateWindowEx(Pointer.of(payload))
 
 	window.windowId = windowId
 	window.windowIsWindow = user32.windowIsWindow
@@ -179,7 +179,7 @@ wapi.Bool ShowWindow(wapi.HWnd hWnd, nCmdShow: Int32) {
 }
 
 // TODO take 2 or more messages at a time for better perf (this is pretty common)
-wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32) {
+wapi.Bool GetMessageW(wapi.msg: Pointer<Msg>, wapi.HWnd hWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32) {
 	tofitaDebugLog("GetMessageW called")
 	var result: wapi.Bool = 1
 
@@ -188,7 +188,7 @@ wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, wMsgFilterMin: UInt32, wMsg
 	payload.hWnd = hWnd
 	payload.wMsgFilterMin = wMsgFilterMin
 	payload.wMsgFilterMax = wMsgFilterMax
-	tofitaGetMessage(&payload)
+	tofitaGetMessage(Pointer.of(payload))
 
 	// Stop iteration
 	if (msg.message == wapi.Message.WM_QUIT)
@@ -198,14 +198,14 @@ wapi.Bool GetMessageW(wapi.Msg *msg, wapi.HWnd hWnd, wMsgFilterMin: UInt32, wMsg
 	return result
 }
 
-wapi.Bool TranslateMessage(wapi.Msg *msg) {
+wapi.Bool TranslateMessage(wapi.msg: Pointer<Msg>) {
 	tofitaDebugLog("TranslateMessage called")
 	// TODO
 	tofitaDebugLog("TranslateMessage done")
 	return 0
 }
 
-wapi.LResult DispatchMessageW(wapi.Msg *msg) {
+wapi.LResult DispatchMessageW(wapi.msg: Pointer<Msg>) {
 	tofitaDebugLog("DispatchMessageW called")
 	var result: wapi.LResult = 0
 	if (msg.hwnd != null) {
@@ -232,7 +232,7 @@ wapi.Bool PostMessage(wapi.HWnd hWnd, wapi.Message msg, Void *wParam, Void *lPar
 	payload.msg = msg
 	payload.wParam = wParam
 	payload.lParam = lParam
-	return tofitaPostMessage(&payload)
+	return tofitaPostMessage(Pointer.of(payload))
 }
 
 Void PostQuitMessage(nExitCode: Int32) {
@@ -242,22 +242,22 @@ Void PostQuitMessage(nExitCode: Int32) {
 	// TODO ERROR_SUCCESS
 }
 
-wapi.HDc BeginPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
+wapi.HDc BeginPaint(wapi.HWnd hWnd, wapi.ps: Pointer<PaintStruct>) {
 	tofitaDebugLog("BeginPaint called")
 	var window = handleToWindow(hWnd)
 	if (window == null)
 		return null
 	// We do this every time, cause window may be resized
-	njraaGetOrCreateWindowFramebuffer(window.windowId, &window.fb)
+	njraaGetOrCreateWindowFramebuffer(window.windowId, Pointer.of(window.fb))
 	ps.rcPaint.left = 0
 	ps.rcPaint.top = 0
 	ps.rcPaint.right = window.fb.width
 	ps.rcPaint.bottom = window.fb.height
 	tofitaDebugLog("BeginPaint done")
-	return (wapi.HDc)&window.fb // TODO
+	return (wapi.HDc)Pointer.of(window.fb) // TODO
 }
 
-Void @fastcall setPixel(nj.WindowFramebuffer *fb, x: Int16, y: Int16, nj.Pixel32 pixel) {
+Void @fastcall setPixel(nj.fb: Pointer<WindowFramebuffer>, x: Int16, y: Int16, nj.Pixel32 pixel) {
 	if ((x < 0) || (y < 0))
 		return
 	if ((x > fb.width - 1) || (y > fb.height - 1))
@@ -265,7 +265,7 @@ Void @fastcall setPixel(nj.WindowFramebuffer *fb, x: Int16, y: Int16, nj.Pixel32
 	fb.pixels[y * fb.width + x] = pixel
 }
 
-Int32 FillRect(wapi.HDc dc, const wapi.Rect *lprc, wapi.HBrush brush) {
+Int32 FillRect(wapi.HDc dc, const wapi.lprc: Pointer<Rect>, wapi.HBrush brush) {
 	tofitaDebugLog("FillRect called")
 
 	var fb = (nj.WindowFramebuffer *)dc
@@ -283,12 +283,12 @@ Int32 FillRect(wapi.HDc dc, const wapi.Rect *lprc, wapi.HBrush brush) {
 	return 1
 }
 
-wapi.Bool EndPaint(wapi.HWnd hWnd, wapi.PaintStruct *ps) {
+wapi.Bool EndPaint(wapi.HWnd hWnd, wapi.ps: Pointer<PaintStruct>) {
 	tofitaDebugLog("EndPaint called")
 	var window = handleToWindow(hWnd)
 	if (window == null)
 		return 0
-	njraaSwapWindowFramebuffer(window.windowId, &window.fb)
+	njraaSwapWindowFramebuffer(window.windowId, Pointer.of(window.fb))
 	tofitaDebugLog("EndPaint done")
 	return 1
 }

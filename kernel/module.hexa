@@ -30,29 +30,29 @@ class ModuleInterim {
 	const RamDiskAsset *dll
 }
 
-Module *loadModule(ModuleInterim *params) {
+Module *loadModule(params: Pointer<ModuleInterim>) {
 	var module = (Module *)PhysicalAllocator.allocateBytes(sizeof(Module))
 	module.name = params.name // TODO copy string
 	module.dll = params.dll
 
 	// TODO relocation? or overwrite?
 	var ptr = (UInt8 *)params.dll.data
-	var peHeader = (const exe.PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256)
-	var peOptionalHeader = (const exe.Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe.PeHeader))
+	var peHeader = (const exe.PeHeader *)((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256)
+	var peOptionalHeader = (const exe.Pe32OptionalHeader *)((peHeader as! UInt64) + sizeof(exe.PeHeader))
 	var base: Pointer<Void> = (Void *)peOptionalHeader.imageBase
 	memset(base, 0, peOptionalHeader.sizeOfImage) // Zeroing
 	module.base = peOptionalHeader.imageBase
 
 	// Copy sections
 	var imageSectionHeader =
-		(const exe.ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader.sizeOfOptionalHeader)
+		(const exe.ImageSectionHeader *)((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader)
 	for (UInt16 i = 0; i < peHeader.numberOfSections; ++i) {
-		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].name,
+		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, Pointer.of(imageSectionHeader[i].name),
 					 imageSectionHeader[i].sizeOfRawData)
-		var where: UInt64 = (uint64_t)base + imageSectionHeader[i].virtualAddress
+		var where: UInt64 = (base as! UInt64) + imageSectionHeader[i].virtualAddress
 
 		tmemcpy((Void *)where,
-				(Void *)((uint64_t)params.dll.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
+				(Void *)((params.dll.data as! UInt64) + (imageSectionHeader[i].pointerToRawData as! UInt64)),
 				imageSectionHeader[i].sizeOfRawData)
 	}
 

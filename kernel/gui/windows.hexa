@@ -15,7 +15,7 @@
 
 // Window frames and some GUI elements
 
-fun drawHint(const Char8 *text, x: Int16, y: Int16) {
+fun drawHint(text: ConstPointer<Char8>, x: Int16, y: Int16) {
 	let measure = getTextAdvance(text)
 	let w = 6 * 2 + measure + 1
 	let h = 20
@@ -64,7 +64,7 @@ fun drawShadowBox(x: Int16, y: Int16, w: UInt16, h: UInt16) {
 		}
 }
 
-fun drawWindowFrame(const WideChar *title, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
+fun drawWindowFrame(const title: Pointer<WideChar>, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
 						 dwm.FrameHover hover, down: Bool) {
 	var shorterFrame: Bool = false // OSX style
 

@@ -22,7 +22,7 @@
 #define abs libc_abs
 #define pow libc_pow
 
-fun libc_free(Void *addr) {
+fun libc_free(addr: Pointer<Void>) {
 	// Do nothing for now
 	serialPrintf("[libc] libc_free\n")
 }
@@ -32,7 +32,7 @@ Void *libc_malloc(size: UInt64) {
 	return (Void *)PhysicalAllocator.allocateBytes(size)
 }
 
-Void *libc_realloc(Void *addr, size: UInt64) {
+Void *libc_realloc(addr: VoidPointer, size: UInt64) {
 	serialPrintf("[libc] libc_realloc %u of size %u\n", addr, size)
 
 	{
@@ -41,7 +41,7 @@ Void *libc_realloc(Void *addr, size: UInt64) {
 	}
 }
 
-Void *libc_memset(Void *b, c: Int32, len: Int32) {
+Void *libc_memset(b: VoidPointer, c: Int32, len: Int32) {
 	var i: Int32
 	var p: Pointer<UInt8> = (UInt8 *)b
 	i = 0
@@ -68,13 +68,13 @@ Int32 libc_pow(a: Int32, n: Int32) {
 	return r
 }
 
-fun libc_memcpy(Void *dest, const Void *src, n: UInt64) {
+fun libc_memcpy(dest: VoidPointer, src: ConstVoidPointer, n: UInt64) {
 	const UInt8 *csrc = (UInt8 *)src
 	var cdest: Pointer<UInt8> = (UInt8 *)dest
 	for (Int32 i = 0; i < n; i++)
 		cdest[i] = csrc[i]
 }
 
-fun memcpy(Void *dest, const Void *src, n: UInt64) {
+fun memcpy(dest: VoidPointer, src: ConstVoidPointer, n: UInt64) {
 	libc_memcpy(dest, src, n)
 }

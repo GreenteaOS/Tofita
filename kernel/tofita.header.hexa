@@ -50,8 +50,8 @@ fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, Bo
 struct Pixel32
 
 // TODO refactor to .hpp!
-UInt16 drawAsciiText(const Char8 *text, x: Float, y: Int16, color: Pixel32)
-fun quakePrintf(const WideChar *c, ...)
+UInt16 drawAsciiText(text: ConstPointer<Char8>, x: Float, y: Int16, color: Pixel32)
+fun quakePrintf(const c: Pointer<WideChar>, ...)
 fun guiThread()
 fun kernelThread()
 fun guiThreadStart()
