@@ -63,8 +63,8 @@ let keyboardMap[128]: UInt8 = {
 	0, // All other keys are undefined
 }
 
-let STATUS_REGISTER = 0x64
-let DATA_PORT = 0x60
+let status_register = 0x64
+let data_port = 0x60
 
 fun handleKeyboardPacket() {
 	// serialPrint("[keyboard] intreruroror")

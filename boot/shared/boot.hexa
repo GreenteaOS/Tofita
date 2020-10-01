@@ -16,14 +16,14 @@
 // Constants
 
 // Start of kernel sections in memory
-let KernelVirtualBase = (uint64_t)0xffff800000000000
-let FramebufferStart = (KernelVirtualBase + 768 * 1024 * 1024)
-// TODO: no need for mapping FramebufferStart if WholePhysicalStart used
+let kernelVirtualBase = 0xffff800000000000u64
+let framebufferStart = (kernelVirtualBase + 768 * 1024 * 1024)
+// TODO: no need for mapping framebufferStart if wholePhysicalStart used
 // TODO proper dynamically computed numbers
 
-// Mapping of 1:1 of physical memory as virtual = physical + WholePhysicalStart
+// Mapping of 1:1 of physical memory as virtual = physical + wholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-let WholePhysicalStart = (FramebufferStart + 128 * 1024 * 1024)
+let wholePhysicalStart = (framebufferStart + 128 * 1024 * 1024)
 let pageSize = 4096 // 4 KiB
 
 // Helpers
@@ -32,18 +32,18 @@ let pageSize = 4096 // 4 KiB
 class Physical<T> {
 	var physical: UInt64
 
-	static Physical<T> toPhysical(physical: UInt64) {
-		return (Physical<T>)physical
+	static fun toPhysical(physical: UInt64): Physical<T> {
+		return physical as! Physical<T>
 	}
 
-	T *toVirtual() {
-		var result: UInt64 = (WholePhysicalStart as! UInt64) + physical
-		return (T *)result
+	fun toVirtual(): Pointer<T> {
+		var result: UInt64 = (wholePhysicalStart as! UInt64) + physical
+		return result as! Pointer<T>
 	}
 
-	T *toVirtualOffset(offset: UInt64) {
-		var result: UInt64 = (WholePhysicalStart as! UInt64) + physical + offset
-		return (T *)result
+	fun toVirtualOffset(offset: UInt64): Pointer<T> {
+		var result: UInt64 = (wholePhysicalStart as! UInt64) + physical + offset
+		return result as! Pointer<T>
 	}
 }
 
@@ -98,7 +98,7 @@ class KernelParams {
 	// like "let it in without entering a login-password")
 }
 
-typedef fun(__fastcall *InitKernel)(const KernelParams *)
+declare InitKernel = @fastcall (params: ConstPointer<KernelParams>) => Void
 // TODO ^ fix that in quake
-typedef fun(__fastcall *InitKernelTrampoline)(UInt64 kernelParams, pml4: UInt64, stack: UInt64,
-												   UInt64 entry)
+declare InitKernelTrampoline = @fastcall (kernelParams: UInt64, pml4: UInt64, stack: UInt64,
+												entry: UInt64) => Void

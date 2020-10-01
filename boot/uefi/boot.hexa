@@ -311,7 +311,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	paging.mapFramebuffer(Pointer.of(params.framebuffer))
 	drawLoading(Pointer.of(framebuffer), 2)
 	paging.mapEfi(Pointer.of(params.efiMemoryMap))
-	paging.mapMemoryHuge(WholePhysicalStart, 0, ram / pageSize)
+	paging.mapMemoryHuge(wholePhysicalStart, 0, ram / pageSize)
 
 	let startFunction = (InitKernelTrampoline)(paging.conventionalOffset + pageSize)
 	tmemcpy((Void *)startFunction, Pointer.of(trampolineCR3), 32)
@@ -320,10 +320,10 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	// Fix virtual addresses
 
 	params.framebuffer.physical = params.framebuffer.base
-	params.framebuffer.base = FramebufferStart
+	params.framebuffer.base = framebufferStart
 
 	params.ramdisk.physical = params.ramdisk.base
-	params.ramdisk.base = WholePhysicalStart + params.ramdisk.physical
+	params.ramdisk.base = wholePhysicalStart + params.ramdisk.physical
 
 	params.pml4 = (paging.pml4entries as! UInt64) // physical address for CPU
 	params.stack = stack // physical address for stack overflow detection
@@ -332,13 +332,13 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	params.efiRuntimeServices = systemTable.RuntimeServices
 	params.acpiTablePhysical = (uint64_t)(acpiTable)
 	params.efiMemoryMap.memoryMap =
-		(efi.EFI_MEMORY_DESCRIPTOR *)(WholePhysicalStart + (params.efiMemoryMap.memoryMap as! UInt64))
+		(efi.EFI_MEMORY_DESCRIPTOR *)(wholePhysicalStart + (params.efiMemoryMap.memoryMap as! UInt64))
 
 	// Convert addresses to upper half
 
-	stack = (WholePhysicalStart as! UInt64) + stack
-	params.physicalRamBitMaskVirtual = (WholePhysicalStart as! UInt64) + params.physicalRamBitMaskVirtual
-	params = (KernelParams *)((WholePhysicalStart as! UInt64) + (params as! UInt64))
+	stack = (wholePhysicalStart as! UInt64) + stack
+	params.physicalRamBitMaskVirtual = (wholePhysicalStart as! UInt64) + params.physicalRamBitMaskVirtual
+	params = (KernelParams *)((wholePhysicalStart as! UInt64) + (params as! UInt64))
 
 	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader")
 

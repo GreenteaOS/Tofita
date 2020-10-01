@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let USER_SYSCALLS = 123000
+let user_syscalls = 123000
 
 enum TofitaSyscalls : UInt64 {
 	// System
@@ -21,7 +21,7 @@ enum TofitaSyscalls : UInt64 {
 	Cpu = 1,
 
 	// User
-	DebugLog = USER_SYSCALLS,
+	DebugLog = user_syscalls,
 	CreateWindowEx,
 	ShowWindow,
 	GetMessage,

@@ -16,47 +16,47 @@
 @struct @sizeOf(0xb0 + 128)
 class InterruptFrame {
 	// SSE
-	@volatile xmm[8: UInt64 * 2]
+	@volatile var xmm[8: UInt64 * 2]
 
-	@volatile r15: UInt64
-	@volatile r14: UInt64
-	@volatile r13: UInt64
-	@volatile r12: UInt64
-	@volatile r11: UInt64
-	@volatile r10: UInt64
-	@volatile r9: UInt64
-	@volatile r8: UInt64
+	@volatile var r15: UInt64
+	@volatile var r14: UInt64
+	@volatile var r13: UInt64
+	@volatile var r12: UInt64
+	@volatile var r11: UInt64
+	@volatile var r10: UInt64
+	@volatile var r9: UInt64
+	@volatile var r8: UInt64
 
 	// Note: ECX is RCX, EAX is RAX, etc in 32-bit mode
-	@volatile rdi: UInt64
-	@volatile rsi: UInt64
-	@volatile rbp: UInt64
-	@volatile rbx: UInt64
-	@volatile rdxArg1: UInt64
-	@volatile rcxArg0: UInt64
-	@volatile raxReturn: UInt64
+	@volatile var rdi: UInt64
+	@volatile var rsi: UInt64
+	@volatile var rbp: UInt64
+	@volatile var rbx: UInt64
+	@volatile var rdxArg1: UInt64
+	@volatile var rcxArg0: UInt64
+	@volatile var raxReturn: UInt64
 
 	// IRQ index
-	@volatile index: UInt64
+	@volatile var index: UInt64
 
 	// IRQ error code
-	@volatile code: UInt64
+	@volatile var code: UInt64
 
-	@volatile ip: UInt64 // Instruction pointer
-	@volatile cs: UInt64 // Code segment
-	@volatile flags: UInt64 // RFLAGS\EFLAGS (same on AMD64 and x86)
-	@volatile sp: UInt64 // Stack pointer
-	@volatile ss: UInt64 // Stack segment
+	@volatile var ip: UInt64 // Instruction pointer
+	@volatile var cs: UInt64 // Code segment
+	@volatile var flags: UInt64 // RFLAGS\EFLAGS (same on AMD64 and x86)
+	@volatile var sp: UInt64 // Stack pointer
+	@volatile var ss: UInt64 // Stack segment
 }
 
 // Scheduling
-const UInt8 THREAD_INIT = 0 // kernelMain, it will be destroyed
-const UInt8 THREAD_GUI = 1
-const UInt8 THREAD_KERNEL = 2
-const UInt8 THREAD_USER = 3
+let thread_init: UInt8 = 0 // kernelMain, it will be destroyed
+let thread_gui: UInt8 = 1
+let thread_kernel: UInt8 = 2
+let thread_user: UInt8 = 3
 
-@volatile UInt8 currentThread = THREAD_INIT
+@volatile var currentThread: UInt8 = thread_init
 
-InterruptFrame kernelThreadFrame
+var kernelThreadFrame = new InterruptFrame()
 
 fun switchToKernelThread(@volatile frame: Pointer<InterruptFrame>)

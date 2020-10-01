@@ -323,5 +323,5 @@ fun mapFramebuffer(fb: ConstPointer<Framebuffer>) {
 	let framebufferBase = fb.base
 	// TODO map with hugepages!!!
 	// TODO map ALL with EPIC pages?
-	mapMemory(FramebufferStart, (framebufferBase as! UInt64), fb.size / pageSize + 1, 1)
+	mapMemory(framebufferStart, (framebufferBase as! UInt64), fb.size / pageSize + 1, 1)
 }

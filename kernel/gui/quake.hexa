@@ -56,7 +56,7 @@ fun quakeHandleButtonDown(key: UInt8) {
 		if (quakeCommand[0] == 'r' && quakeCommand[1] == 'e') {
 			@extern const KernelParams *paramsCache
 			quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n")
-			var start: InitKernel = (InitKernel)KernelVirtualBase
+			var start: InitKernel = (InitKernel)kernelVirtualBase
 			start(paramsCache) // TODO pml4, stack
 		} else if (quakeCommand[0] == 'd' && quakeCommand[1] == 'a') {
 			// Dark theme
