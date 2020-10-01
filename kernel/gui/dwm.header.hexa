@@ -31,7 +31,7 @@ class OverlappedWindow {
 	var hWnd: wapi.HWnd
 
 	var visible: Bool
-	const WideChar *title
+	var title: ConstWideCharPointer
 
 	var x: Int16
 	var y: Int16

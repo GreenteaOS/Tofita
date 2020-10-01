@@ -22,8 +22,8 @@ import "../tofita32.dll/tofita32.hpp"
 
 @extern "C" {
 USER32_DLL wapi.Atom RegisterClassW(const wapi.wc: Pointer<WindowClass>)
-USER32_DLL wapi.HWnd CreateWindowExW(UInt32 dwExStyle, const WideChar *lpClassName,
-									  const WideChar *lpWindowName, dwStyle: UInt32, x: Int32, y: Int32,
+USER32_DLL wapi.HWnd CreateWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer,
+									  lpWindowName: ConstWideCharPointer, dwStyle: UInt32, x: Int32, y: Int32,
 									  Int32 nWidth, nHeight: Int32, wapi.HWnd hWndParent,
 									  wapi.HMenu hMenu, wapi.HInstance hInstance, Void *lpParam)
 USER32_DLL wapi.Bool ShowWindow(wapi.HWnd hWnd, nCmdShow: Int32)

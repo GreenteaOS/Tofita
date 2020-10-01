@@ -48,7 +48,7 @@ Void *malloc(bytes: UInt64) {
 }
 // Void memcpy(...){}
 fun memcpy(dest: VoidPointer, src: ConstVoidPointer, n: UInt64)
-Int32 wcslen(const WideChar *string_) {
+Int32 wcslen(string_: ConstWideCharPointer) {
 	serialPrintf("<Hexa> wcslen\n")
 	var i: Int32 = 0
 	while (string_[i] != '\0')
