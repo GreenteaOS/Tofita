@@ -38,7 +38,7 @@ class {
 	var data: Pointer<UInt8>
 } RamDiskAsset
 
-const RamDiskAsset getRamDiskAsset(const WideChar *pathToAsset) {
+const RamDiskAsset getRamDiskAsset(pathToAsset: ConstWideCharPointer) {
 	var asset: RamDiskAsset
 	asset.size = 0
 	asset.data = 0

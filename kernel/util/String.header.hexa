@@ -13,8 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@extern "C++" class String {
-  public
-	static UInt64 length(const source: Pointer<WideChar>)
-	static const WideChar *duplicate(const source: Pointer<WideChar>)
+class String {
+	static fun length(const source: Pointer<WideChar>): UInt64
+	static fun duplicate(const source: Pointer<WideChar>): ConstWideCharPointer
 }

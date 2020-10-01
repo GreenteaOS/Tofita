@@ -17,23 +17,23 @@ let user_syscalls = 123000
 
 enum TofitaSyscalls : UInt64 {
 	// System
-	Noop = 0,
-	Cpu = 1,
+	Noop = 0
+	Cpu = 1
 
 	// User
-	DebugLog = user_syscalls,
-	CreateWindowEx,
-	ShowWindow,
-	GetMessage,
-	PostMessage,
-	GetOrCreateWindowFramebuffer,
-	SwapWindowFramebuffer,
+	DebugLog = user_syscalls
+	CreateWindowEx
+	ShowWindow
+	GetMessage
+	PostMessage
+	GetOrCreateWindowFramebuffer
+	SwapWindowFramebuffer
 	ExitProcess
 }
 
 @struct @sizeOf(8 * 3)
 class DebugLogPayload {
-	const WideChar *message
+	var message: ConstWideCharPointer
 	// TODO count chars at userspace, and transfer as length for SEH probing
 	var extra: UInt64 = 0
 	var more: UInt64 = 0
@@ -58,9 +58,9 @@ class CreateWindowExPayload {
 	var hWnd: wapi.HWnd
 
 	// CreateWindowEx
-	const WideChar *lpClassName
+	var lpClassName: ConstWideCharPointer
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	const WideChar *lpWindowName
+	var lpWindowName: ConstWideCharPointer
 	var dwStyle: UInt32
 	var x: Int32
 	var y: Int32
