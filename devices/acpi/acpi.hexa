@@ -145,7 +145,7 @@ class ACPIParser {
   public
 	static Bool parse(acpiVendorTable: UInt64) {
 		serialPrint("[ACPI] parsing started at physical ")
-		serialPrintHex((uint64_t)(acpiVendorTable))
+		serialPrintHex(acpiVendorTable as! UInt64)
 		serialPrint("\n")
 
 		if (acpiVendorTable == 0) {
@@ -206,8 +206,8 @@ class ACPIParser {
 
 	static fun dump32(msg: ConstPointer<Char8>, const Void *virtualAddress) {
 		serialPrintf("\n[DUMP] %s: ", msg)
-		const Char8 *x = (Char8 *)((uint64_t)(virtualAddress))
-		const UInt8 *y = (UInt8 *)((uint64_t)(virtualAddress))
+		const Char8 *x = (Char8 *)(virtualAddress as! UInt64)
+		const UInt8 *y = (UInt8 *)(virtualAddress as! UInt64)
 		for (Int32 j = 0; j < 8; ++j) {
 			var buffer[2]: WideChar
 			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?' : x[j]
@@ -250,7 +250,7 @@ class ACPIParser {
 				loadMcfg((const acpi.AcpiMcfg *)(header))
 				break
 
-			default:
+			case _:
 				break
 			}
 		}

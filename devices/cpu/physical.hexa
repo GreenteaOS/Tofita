@@ -44,7 +44,6 @@ class PhysicalAllocator {
 	static UInt64 available
 	static UInt64 last
 
-  public
 	// static fun init(const EfiMemoryMap *memoryMap, bufferVirtual: UInt64, ramPages: UInt64) {
 	static fun init(const params: Pointer<KernelParams>) {
 		buffer = (UInt8 *)params.physicalRamBitMaskVirtual

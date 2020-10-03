@@ -101,43 +101,43 @@ IdtEntry IDT[idt_size]
 @extern fun keyboardHandler()
 fun initializeKeyboard(entry: Pointer<IdtEntry>) {
 	var keyboardAddress: UInt64 = ((keyboardHandler as! UInt64))
-	entry.offsetLowerbits = keyboardAddress & 0xffff
-	entry.offsetHigherbits = (keyboardAddress & 0xffffffffffff0000) >> 16
+	entry.offsetLowerbits = keyboardAddress & 0xFFFF
+	entry.offsetHigherbits = (keyboardAddress & 0xFFFFFFFFFFFF0000) >> 16
 	entry.selector = sys_code64_sel
 	entry.zero = 0
 	entry.ist = 2 // Stack
 	entry.z = 0
 	entry.dpl = 0 // Ring 0
 	entry.present = 1
-	entry.gateType = 0xe // Interrupt gate
+	entry.gateType = 0xE // Interrupt gate
 	// TODO fix vscode: 0xe is invalid, valid only oxE
 }
 
 @extern fun mouseHandler()
 fun initializeMouse(entry: Pointer<IdtEntry>) {
 	var mouseAddress: UInt64 = ((mouseHandler as! UInt64))
-	entry.offsetLowerbits = mouseAddress & 0xffff
-	entry.offsetHigherbits = (mouseAddress & 0xffffffffffff0000) >> 16
+	entry.offsetLowerbits = mouseAddress & 0xFFFF
+	entry.offsetHigherbits = (mouseAddress & 0xFFFFFFFFFFFF0000) >> 16
 	entry.selector = sys_code64_sel
 	entry.zero = 0
 	entry.ist = 2 // Stack
 	entry.z = 0
 	entry.dpl = 0 // Ring 0
 	entry.present = 1
-	entry.gateType = 0xe // Interrupt gate
+	entry.gateType = 0xE // Interrupt gate
 }
 
 fun initializeFallback(entry: Pointer<IdtEntry>, fallbackHandler: UInt64) {
 	var address: UInt64 = ((fallbackHandler as! UInt64))
-	entry.offsetLowerbits = address & 0xffff
-	entry.offsetHigherbits = (address & 0xffffffffffff0000) >> 16
+	entry.offsetLowerbits = address & 0xFFFF
+	entry.offsetHigherbits = (address & 0xFFFFFFFFFFFF0000) >> 16
 	entry.selector = sys_code64_sel
 	entry.zero = 0
 	entry.ist = 1 // Stack
 	entry.z = 0
 	entry.dpl = 3 // Ring 3
 	entry.present = 1
-	entry.gateType = 0xe // Interrupt gate
+	entry.gateType = 0xE // Interrupt gate
 }
 
 let icw1_icw4 = 0x01		// ICW4 (not) needed
@@ -181,23 +181,23 @@ fun remapPic(offset1: UInt8, offset2: UInt8) {
 fun disablePic() {
 	/* Set ICW1 */
 	writePort(0x20, 0x11)
-	writePort(0xa0, 0x11)
+	writePort(0xA0, 0x11)
 
 	/* Set ICW2 (IRQ base offsets) */
-	writePort(0x21, 0xe0)
-	writePort(0xa1, 0xe8)
+	writePort(0x21, 0xE0)
+	writePort(0xA1, 0xE8)
 
 	/* Set ICW3 */
 	writePort(0x21, 4)
-	writePort(0xa1, 2)
+	writePort(0xA1, 2)
 
 	/* Set ICW4 */
 	writePort(0x21, 1)
-	writePort(0xa1, 1)
+	writePort(0xA1, 1)
 
 	/* Set OCW1 (interrupt masks) */
-	writePort(0x21, 0xff)
-	writePort(0xa1, 0xff)
+	writePort(0x21, 0xFF)
+	writePort(0xA1, 0xFF)
 }
 
 fun physicalToVirtual(physical: UInt64): UInt64 {
@@ -209,15 +209,15 @@ fun physicalToVirtual(physical: UInt64): UInt64 {
 fun enableLocalApic() {
 	serialPrintln("[cpu] begin: enableLocalApic")
 
-	var ptr = (UInt32 *)physicalToVirtual(0xfee000f0)
+	var ptr = (UInt32 *)physicalToVirtual(0xFEE000F0)
 	var val: UInt32 = *ptr
 	quakePrintf("APIC value is %u\n", val)
 
 	serialPrintln("[cpu] done: enableLocalApic")
 }
 
-fun mouseWait(aType: UInt8)
-fun mouseWrite(aWrite: UInt8)
+fun mouseWait(aType: UInt8): Void
+fun mouseWrite(aWrite: UInt8): Void
 fun mouseRead(): UInt8
 let irq0 = 32
 let irq1 = 0x21 // 33
@@ -242,18 +242,18 @@ class TablePtr {
 	var base: UInt64
 }
 
-fun lgdt(@volatile const gdt: Pointer<TablePtr>)
+declare fun lgdt(@volatile gdt: ConstPointer<TablePtr>)
 
 enum GdtType : UInt8 {
-	accessed = 0x01,
-	read_write = 0x02,
-	conforming = 0x04,
-	execute = 0x08,
-	system = 0x10,
-	ring1 = 0x20,
-	ring2 = 0x40,
-	ring3 = 0x60,
-	present = 0x80
+	Accessed = 0x01
+	Read_write = 0x02
+	Conforming = 0x04
+	Execute = 0x08
+	System = 0x10
+	Ring1 = 0x20
+	Ring2 = 0x40
+	Ring3 = 0x60
+	Present = 0x80
 }
 
 @struct @packed @sizeOf(8)
@@ -584,50 +584,51 @@ fun syscallInterruptHandler(frame: Pointer<InterruptFrame>) {
 	}
 }
 
-fun setTsr(@volatile UInt16 tsr_data)
+declare fun setTsr(@volatile tsr_data: UInt16)
 
 // 16 records
-@aligned(64) static UInt32 gdtTemplate[32] = {
-	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209b00, 0x0000ffff, 0x00cf9300,
-	0x0000ffff, 0x00cffa00, 0x0000ffff, 0x00cff300, 0x00000000, 0x0020fb00, 0x00000000, 0x00000000,
-	0x60800067, 0x00008bb9, 0xfffff800, 0x00000000, 0xe0003c00, 0xff40f3fa, 0x00000000, 0x00000000,
-	0x0000ffff, 0x00cf9a00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000}
+@aligned(64) let gdtTemplate[32]: UInt32 = [
+	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209B00, 0x0000FFFF, 0x00CF9300,
+	0x0000FFFF, 0x00CFFA00, 0x0000FFFF, 0x00CFF300, 0x00000000, 0x0020FB00, 0x00000000, 0x00000000,
+	0x60800067, 0x00008BB9, 0xFFFFF800, 0x00000000, 0xE0003C00, 0xFF40F3FA, 0x00000000, 0x00000000,
+	0x0000FFFF, 0x00CF9A00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+]
 
 let PS2_DATA_PORT = 0x60
 let PS2_CONTROL_PORT = 0x64
 
 fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, enum GdtType typed) {
 	var gdtd: Pointer<GdtDescriptor> = (GdtDescriptor *)Pointer.of(gdtTemplate[i * 2])
-	gdtd.limitLow = limit & 0xffff
-	gdtd.size = (limit >> 16) & 0xf
+	gdtd.limitLow = limit & 0xFFFF
+	gdtd.size = (limit >> 16) & 0xF
 	// gdtd.size |= (is64 ? 0xa0 : 0xc0)
-	gdtd.size |= 0xa0
+	gdtd.size |= 0xA0
 	gdtd.size <<= 0x0D // Long mode
 
-	gdtd.baseLow = base & 0xffff
-	gdtd.baseMid = (base >> 16) & 0xff
-	gdtd.baseHigh = (base >> 24) & 0xff
+	gdtd.baseLow = base & 0xFFFF
+	gdtd.baseMid = (base >> 16) & 0xFF
+	gdtd.baseHigh = (base >> 24) & 0xFF
 
-	gdtd.type = (enum GdtType)(typed | system | present)
+	gdtd.type = (typed | system | present) as! GdtType
 }
 
 // Takes 2 GDT entries
 fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
 	var tssd: Pointer<TssDescriptor> = (TssDescriptor *)Pointer.of(gdtTemplate[i * 2])
-	tssd.limitLow = limit & 0xffff
-	tssd.size = (limit >> 16) & 0xf
+	tssd.limitLow = limit & 0xFFFF
+	tssd.size = (limit >> 16) & 0xF
 
-	tssd.base_00 = base & 0xffff
-	tssd.base_16 = (base >> 16) & 0xff
-	tssd.base_24 = (base >> 24) & 0xff
-	tssd.base_32 = (base >> 32) & 0xffffffff
+	tssd.base_00 = base & 0xFFFF
+	tssd.base_16 = (base >> 16) & 0xFF
+	tssd.base_24 = (base >> 24) & 0xFF
+	tssd.base_32 = (base >> 32) & 0xFFFFFFFF
 	tssd.reserved = 0
 
-	tssd.type = (enum GdtType)(accessed | execute | ring3 | // TODO
-								present)
+	tssd.type = (accessed | execute | ring3 | // TODO
+								present) as! GdtType
 }
 
-@aligned(64) Idtr cacheIdtr
+@aligned(64) var cacheIdtr: Idtr
 
 fun dumpGDT(desc: Pointer<GdtDescriptorEx>) {
 	serialPrintf("[dumpGDT]")
@@ -668,21 +669,21 @@ fun enableInterrupts() {
 	var sizeof_TssEntry: UInt64 = sizeof(globalTss)
 	serialPrintf("[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry))
 
-	memset((Void *)Pointer.of(globalTss), 0, sizeof_TssEntry)
+	memset(Pointer.of(globalTss) as! VoidPointer, 0, sizeof_TssEntry)
 	globalTss.iomap_offset = sizeof_TssEntry
-	globalTss.rsp[0] = (uint64_t)Pointer.of(rsp0stack)
-	globalTss.rsp[1] = (uint64_t)Pointer.of(rsp1stack)
-	globalTss.rsp[2] = (uint64_t)Pointer.of(rsp2stack)
+	globalTss.rsp[0] = Pointer.of(rsp0stack) as! UInt64
+	globalTss.rsp[1] = Pointer.of(rsp1stack) as! UInt64
+	globalTss.rsp[2] = Pointer.of(rsp2stack) as! UInt64
 	// TODO zero out stacks
 	// TODO more stacks
-	globalTss.ist[0] = (uint64_t)Pointer.of(ist0stack)
-	globalTss.ist[1] = (uint64_t)Pointer.of(ist1stack)
-	globalTss.ist[2] = (uint64_t)Pointer.of(ist2stack)
-	globalTss.ist[3] = (uint64_t)Pointer.of(ist3stack)
-	globalTss.ist[4] = (uint64_t)Pointer.of(ist4stack)
-	globalTss.ist[5] = (uint64_t)Pointer.of(ist5stack)
-	globalTss.ist[6] = (uint64_t)Pointer.of(ist6stack)
-	globalTss.ist[7] = (uint64_t)Pointer.of(ist7stack)
+	globalTss.ist[0] = Pointer.of(ist0stack) as! UInt64
+	globalTss.ist[1] = Pointer.of(ist1stack) as! UInt64
+	globalTss.ist[2] = Pointer.of(ist2stack) as! UInt64
+	globalTss.ist[3] = Pointer.of(ist3stack) as! UInt64
+	globalTss.ist[4] = Pointer.of(ist4stack) as! UInt64
+	globalTss.ist[5] = Pointer.of(ist5stack) as! UInt64
+	globalTss.ist[6] = Pointer.of(ist6stack) as! UInt64
+	globalTss.ist[7] = Pointer.of(ist7stack) as! UInt64
 
 	serialPrint("[cpu] RSP[0] points to: ")
 	serialPrintHex((globalTss.rsp[0] as! UInt64))
@@ -696,7 +697,7 @@ fun enableInterrupts() {
 	serialPrintHex((globalTss.rsp[2] as! UInt64))
 	serialPrint("\n")
 
-	var tssBase: UInt64 = (uint64_t)(Pointer.of(globalTss))
+	var tssBase: UInt64 = Pointer.of(globalTss) as! UInt64
 
 	// upload
 	{
@@ -705,8 +706,8 @@ fun enableInterrupts() {
 	}
 
 	if (false) {
-		let gdt = (GdtDescriptorEx *)gdtTemplate
-		for (UInt32 i = 0; i < 16; ++i) {
+		let gdt = gdtTemplate as! Pointer<GdtDescriptorEx>
+		for (i in 16) {
 			if (i == 0)
 				continue // Empty
 			if (i == 8)
@@ -721,9 +722,9 @@ fun enableInterrupts() {
 	}
 
 	globalGdtr.limit = sizeof(gdtTemplate) - 1
-	globalGdtr.base = (uint64_t)(Pointer.of(gdtTemplate[0]))
+	globalGdtr.base = Pointer.of(gdtTemplate[0]) as! UInt64
 	serialPrint("[cpu] GDTR points to: ")
-	serialPrintHex((uint64_t)Pointer.of(globalGdtr))
+	serialPrintHex(Pointer.of(globalGdtr) as! UInt64)
 	serialPrint("\n")
 	serialPrint("[cpu] GDT points to: ")
 	serialPrintHex((globalGdtr.base as! UInt64))
@@ -740,50 +741,50 @@ fun enableInterrupts() {
 	serialPrintln("[cpu] initializing unknownInterrupt")
 
 	for (UInt32 i = 0; i < 286; ++i) {
-		initializeFallback(&IDT[i], (uint64_t)Pointer.of(unknownInterrupt))
+		initializeFallback(&IDT[i], Pointer.of(unknownInterrupt) as! UInt64)
 	}
 
 	// CPU exceptions
-	initializeFallback(&IDT[0x00], (uint64_t)Pointer.of(cpu0x00))
-	initializeFallback(&IDT[0x01], (uint64_t)Pointer.of(cpu0x01))
-	initializeFallback(&IDT[0x02], (uint64_t)Pointer.of(cpu0x02))
-	initializeFallback(&IDT[0x03], (uint64_t)Pointer.of(cpu0x03))
-	initializeFallback(&IDT[0x04], (uint64_t)Pointer.of(cpu0x04))
-	initializeFallback(&IDT[0x05], (uint64_t)Pointer.of(cpu0x05))
-	initializeFallback(&IDT[0x06], (uint64_t)Pointer.of(cpu0x06))
-	initializeFallback(&IDT[0x07], (uint64_t)Pointer.of(cpu0x07))
-	initializeFallback(&IDT[0x08], (uint64_t)Pointer.of(cpu0x08))
-	initializeFallback(&IDT[0x09], (uint64_t)Pointer.of(cpu0x09))
-	initializeFallback(&IDT[0x0A], (uint64_t)Pointer.of(cpu0x0A))
-	initializeFallback(&IDT[0x0B], (uint64_t)Pointer.of(cpu0x0B))
-	initializeFallback(&IDT[0x0C], (uint64_t)Pointer.of(cpu0x0C))
-	initializeFallback(&IDT[0x0D], (uint64_t)Pointer.of(cpu0x0D))
-	initializeFallback(&IDT[0x0E], (uint64_t)Pointer.of(cpu0x0E))
-	initializeFallback(&IDT[0x0F], (uint64_t)Pointer.of(cpu0x0F))
-	initializeFallback(&IDT[0x10], (uint64_t)Pointer.of(cpu0x10))
-	initializeFallback(&IDT[0x11], (uint64_t)Pointer.of(cpu0x11))
-	initializeFallback(&IDT[0x12], (uint64_t)Pointer.of(cpu0x12))
-	initializeFallback(&IDT[0x13], (uint64_t)Pointer.of(cpu0x13))
-	initializeFallback(&IDT[0x14], (uint64_t)Pointer.of(cpu0x14))
-	initializeFallback(&IDT[0x15], (uint64_t)Pointer.of(cpu0x15))
+	initializeFallback(&IDT[0x00], Pointer.of(cpu0x00) as! UInt64)
+	initializeFallback(&IDT[0x01], Pointer.of(cpu0x01) as! UInt64)
+	initializeFallback(&IDT[0x02], Pointer.of(cpu0x02) as! UInt64)
+	initializeFallback(&IDT[0x03], Pointer.of(cpu0x03) as! UInt64)
+	initializeFallback(&IDT[0x04], Pointer.of(cpu0x04) as! UInt64)
+	initializeFallback(&IDT[0x05], Pointer.of(cpu0x05) as! UInt64)
+	initializeFallback(&IDT[0x06], Pointer.of(cpu0x06) as! UInt64)
+	initializeFallback(&IDT[0x07], Pointer.of(cpu0x07) as! UInt64)
+	initializeFallback(&IDT[0x08], Pointer.of(cpu0x08) as! UInt64)
+	initializeFallback(&IDT[0x09], Pointer.of(cpu0x09) as! UInt64)
+	initializeFallback(&IDT[0x0A], Pointer.of(cpu0x0A) as! UInt64)
+	initializeFallback(&IDT[0x0B], Pointer.of(cpu0x0B) as! UInt64)
+	initializeFallback(&IDT[0x0C], Pointer.of(cpu0x0C) as! UInt64)
+	initializeFallback(&IDT[0x0D], Pointer.of(cpu0x0D) as! UInt64)
+	initializeFallback(&IDT[0x0E], Pointer.of(cpu0x0E) as! UInt64)
+	initializeFallback(&IDT[0x0F], Pointer.of(cpu0x0F) as! UInt64)
+	initializeFallback(&IDT[0x10], Pointer.of(cpu0x10) as! UInt64)
+	initializeFallback(&IDT[0x11], Pointer.of(cpu0x11) as! UInt64)
+	initializeFallback(&IDT[0x12], Pointer.of(cpu0x12) as! UInt64)
+	initializeFallback(&IDT[0x13], Pointer.of(cpu0x13) as! UInt64)
+	initializeFallback(&IDT[0x14], Pointer.of(cpu0x14) as! UInt64)
+	initializeFallback(&IDT[0x15], Pointer.of(cpu0x15) as! UInt64)
 
 	// PIC interrupts
-	initializeFallback(&IDT[IRQ0], (uint64_t)(Pointer.of(timerInterrupt)))
+	initializeFallback(&IDT[IRQ0], Pointer.of(timerInterrupt) as! UInt64)
 	initializeKeyboard(&IDT[IRQ1])
 	initializeMouse(&IDT[IRQ12])
 
 	// Syscalls
-	initializeFallback(&IDT[0x80], (uint64_t)(Pointer.of(syscallInterrupt)))
-	initializeFallback(&IDT[0x81], (uint64_t)(Pointer.of(yieldInterrupt)))
+	initializeFallback(&IDT[0x80], Pointer.of(syscallInterrupt) as! UInt64)
+	initializeFallback(&IDT[0x81], Pointer.of(yieldInterrupt) as! UInt64)
 
 	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1
-	cacheIdtr.offset = (IDT as! UInt64)
+	cacheIdtr.offset = IDT as! UInt64
 
 	serialPrint("[cpu] IDTR points to: ")
-	serialPrintHex((uint64_t)Pointer.of(cacheIdtr))
+	serialPrintHex(Pointer.of(cacheIdtr) as! UInt64)
 	serialPrint("\n")
 	serialPrint("[cpu] IDT points to: ")
-	serialPrintHex((uint64_t)&IDT)
+	serialPrintHex(Pointer.of(IDT) as! UInt64)
 	serialPrint("\n")
 	serialPrintf("[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, IDT_SIZE,
 				 sizeof(IdtEntry))

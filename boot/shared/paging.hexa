@@ -164,19 +164,19 @@ fun mapMemory(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32, write
 	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * pageSize)
 
 	serialPrint("[paging.range] virtual address = ")
-	serialPrintHex((uint64_t)(virtualAddr))
+	serialPrintHex(virtualAddr as! UInt64)
 	serialPrint("\n")
 
 	serialPrint("[paging.range] physical address = ")
-	serialPrintHex((uint64_t)(physicalAddr))
+	serialPrintHex(physicalAddr as! UInt64))
 	serialPrint("\n")
 
 	serialPrint("[paging.range] page count = ")
-	serialPrintHex((uint64_t)(pageCount))
+	serialPrintHex(pageCount as! UInt64)
 	serialPrint("\n")
 
 	serialPrint("[paging.range] virtual address end = ")
-	serialPrintHex((uint64_t)(virtualAddrEnd))
+	serialPrintHex(virtualAddrEnd as! UInt64)
 	serialPrint("\n")
 
 	while (vAddress < virtualAddrEnd) {
@@ -187,7 +187,7 @@ fun mapMemory(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32, write
 	}
 }
 
-fun mapMemoryHuge(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32) {
+fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
 	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
 
 	var vAddress: UInt64 = virtualAddr
@@ -202,7 +202,7 @@ fun mapMemoryHuge(UInt64 virtualAddr, physicalAddr: UInt64, pageCount: UInt32) {
 }
 
 const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.descriptor: Pointer<EFI_MEMORY_DESCRIPTOR>,
-														   UInt64 descriptorSize) {
+														   descriptorSize: UInt64) {
 	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
 	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
 }

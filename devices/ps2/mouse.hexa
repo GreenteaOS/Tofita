@@ -15,13 +15,13 @@
 
 // PS/2 Mouse
 
-@volatile UInt8 mouseCycle = 0
+@volatile var mouseCycle: UInt8 = 0
 @volatile UInt8 mouseByte[3] = {0}
 
 // Note: those are controlled by driver
-@volatile Bool leftDown = false
-@volatile Bool rightDown = false
-@volatile Bool middleDown = false
+@volatile var leftDown = false
+@volatile var rightDown = false
+@volatile var middleDown = false
 
 @struct
 class MouseAction {
