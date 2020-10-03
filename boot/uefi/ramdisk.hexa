@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-efi.EFI_STATUS loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, efi.root: Pointer<EFI_FILE_PROTOCOL>,
-									  ramdisk: Pointer<RamDisk>) {
+fun loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, efi.root: Pointer<EFI_FILE_PROTOCOL>,
+									  ramdisk: Pointer<RamDisk>): efi.EFI_STATUS {
 	var status: efi.EFI_STATUS
-	static efi.CHAR16 *name = (efi.CHAR16 *)"TOFITA.DAT"
+	efi.CHAR16 *name = (efi.CHAR16 *)"TOFITA.DAT"
 
 	var file: Pointer<efi.EFI_FILE_PROTOCOL> = null
 	status = root.Open(root, Pointer.of(file), (efi.CHAR16 *)name, EFI_FILE_MODE_READ,
@@ -67,14 +67,14 @@ efi.EFI_STATUS loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ef
 		serialPrintln(
 			"[[[efi_main.loadRamDiskFromVolume]]] <ERROR> checksum is incorrect, disk may be corrupted!")
 
-	ramdisk.base = (address as! UInt64)
+	ramdisk.base = address as! UInt64
 	ramdisk.size = size
 
 	return EFI_SUCCESS
 }
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
-efi.EFI_STATUS findAndLoadRamDisk(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ramdisk: Pointer<RamDisk>) {
+fun findAndLoadRamDisk(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ramdisk: Pointer<RamDisk>): efi.EFI_STATUS {
 	var status: efi.EFI_STATUS = EFI_NOT_READY
 	var handleBuffer: Pointer<efi.EFI_HANDLE> = null
 	var handleCount: UInt64 = 0

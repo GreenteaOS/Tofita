@@ -124,19 +124,19 @@ fun mapMemory(pml4entries: Pointer<PageEntry>, virtualAddr: UInt64, physicalAddr
 	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * pageSize)
 
 	serialPrint("[paging.range] virtual address = ")
-	serialPrintHex((uint64_t)(virtualAddr))
+	serialPrintHex(virtualAddr as! UInt64)
 	serialPrint("\n")
 
 	serialPrint("[paging.range] physical address = ")
-	serialPrintHex((uint64_t)(physicalAddr))
+	serialPrintHex(physicalAddr as! UInt64)
 	serialPrint("\n")
 
 	serialPrint("[paging.range] page count = ")
-	serialPrintHex((uint64_t)(pageCount))
+	serialPrintHex(pageCount as! UInt64)
 	serialPrint("\n")
 
 	serialPrint("[paging.range] virtual address end = ")
-	serialPrintHex((uint64_t)(virtualAddrEnd))
+	serialPrintHex(virtualAddrEnd as! UInt64)
 	serialPrint("\n")
 
 	while (vAddress < virtualAddrEnd) {

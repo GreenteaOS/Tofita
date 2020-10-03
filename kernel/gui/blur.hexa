@@ -20,7 +20,7 @@
 		return x as! Int32
 	} else {
 		var y: Int32 = x as! Int32
-		return ((float)y == x) ? y : y - 1
+		return ((y as! Float32) == x) ? y : y - 1
 	}
 }
 

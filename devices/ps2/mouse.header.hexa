@@ -16,17 +16,16 @@
 // PS/2 Mouse
 
 enum MouseActionType : UInt8 {
-	Noop = 0,
-	LeftDown,
-	LeftUp,
-	RightDown,
-	RightUp,
-	MiddleDown,
-	MiddleUp,
-	// TODO ScrollFromUser,
-	// TODO ScrollToUser,
+	Noop = 0
+	LeftDown
+	LeftUp
+	RightDown
+	RightUp
+	MiddleDown
+	MiddleUp
+	// TODO ScrollFromUser
+	// TODO ScrollToUser
 	Moved
 }
 
-@volatile Bool lockMouse = false
-fun handleMousePacket()
+@volatile var lockMouse = false

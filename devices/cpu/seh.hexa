@@ -33,7 +33,7 @@ _probeForReadOkay(@volatile at: UInt64, @volatile const UInt64 bytes) {
 }
 
 @volatile Bool (*@volatile const probeForReadOkay)(@volatile at: UInt64,
-												 @volatile const UInt64 bytes) = _probeForReadOkay
+												 @volatile bytes: UInt64) = _probeForReadOkay
 
 @volatile Bool @noInline
 _probeForWriteOkay(@volatile const UInt64 at, @volatile const UInt64 bytes) {
@@ -48,5 +48,5 @@ _probeForWriteOkay(@volatile const UInt64 at, @volatile const UInt64 bytes) {
 	return true
 }
 
-@volatile Bool (*@volatile const probeForWriteOkay)(@volatile const UInt64 at,
-												  @volatile const UInt64 bytes) = _probeForWriteOkay
+@volatile Bool (*@volatile const probeForWriteOkay)(@volatile at: UInt64,
+												  @volatile bytes: UInt64) = _probeForWriteOkay

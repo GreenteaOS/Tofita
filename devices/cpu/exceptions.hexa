@@ -17,7 +17,7 @@
 
 Void exceptionHandler(InterruptFrame *const frame) {
 	// Page fault
-	@volatile cr2: UInt64 = 0
+	@volatile var cr2: UInt64 = 0
 	if (frame.index == 0x0E)
 		cr2 = getCr2()
 

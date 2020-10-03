@@ -17,12 +17,10 @@
 
 @struct @sizeOf(4)
 class Spinlock {
-  private
 	// TODO is it faster to use uint8_t?
-	@volatile UInt32 value
+	@volatile private var value: UInt32 = 0
 
-  public
-	fun inline lock() {
+	@inline fun lock() {
 		// TODO UInt8 tries = 255
 		// TODO yield to another process
 		while (!__sync_bool_compare_and_swap(Pointer.of(value), 0, 1)) {
@@ -33,7 +31,7 @@ class Spinlock {
 	}
 
 	// TODO C++20 inline attribute
-	fun inline unlock() {
+	@inline fun unlock() {
 		__sync_lock_release(Pointer.of(value))
 	}
 }
