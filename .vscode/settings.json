@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        ".vscode": true
+    },
+    "files.trimFinalNewlines": true,
+    "html.format.maxPreserveNewLines": 1,
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    "html.format.endWithNewline": true
+}
