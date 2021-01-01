@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module
-
 declare class Config {
 	let tempFolder: String
 	let versionMajor: Int
@@ -47,12 +45,14 @@ fun packFonts(config: Config) {
 		let size = 256 * charSize // Just ASCII for now
 		let buffer = Buffer.alloc(size) // zeroed
 
-		for (ascii in 256) {
-			for (char in chars) if (char.code == ascii) {
-				var offset = charSize * ascii
-				offset = buffer.writeUInt16LE(char.x, offset)
-				offset = buffer.writeUInt16LE(char.y, offset)
-				offset = buffer.writeDoubleLE(char.width, offset)
+		for ascii in 256 {
+			for char in chars {
+				if char.code == ascii {
+					var offset = charSize * ascii
+					offset = buffer.writeUInt16LE(char.x, offset)
+					offset = buffer.writeUInt16LE(char.y, offset)
+					offset = buffer.writeDoubleLE(char.width, offset)
+				}
 			}
 		}
 
@@ -69,7 +69,7 @@ fun packAssets(config: Config) {
 		assetName.push('tofita.gnu')
 		assetPath.push(config.tempFolder + '\\tofita\\tofita.exe')
 
-		for (dll in dlls) {
+		for dll in dlls {
 			assetName.push('desktop/' + dll + '.dll')
 			assetPath.push(config.tempFolder + '\\tofita\\\(dll).dll')
 		}
@@ -97,7 +97,7 @@ fun packAssets(config: Config) {
 
 		// Compute RAM disk size
 		var ramDiskSize = 0
-		for (asset in assetPath) {
+		for asset in assetPath {
 			ramDiskSize += fs.statSync(asset).size
 		}
 
@@ -124,7 +124,7 @@ fun packAssets(config: Config) {
 		let assetInfoSize = 256 + 4 + 4
 		var assetInfoOffset = 4 + 4 + 4
 		var assetDataOffset = ramDiskSize
-		for (i in assetName.length) {
+		for i in assetName.length {
 			let asset = assetName[i]
 			let path = assetPath[i]
 			let assetSize = fs.statSync(path).size

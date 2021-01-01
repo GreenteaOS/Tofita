@@ -1,25 +1,25 @@
 {
 	"name": "Tofita Build Script",
-	"files": [
-		"assets.hexa",
-		"main.hexa"
+	"entry": "main",
+	"global": [
+		"assets"
 	],
-	"define":
-	{},
+	"define": {},
 	"license": "LGPL-3.0-only",
 	"author": "Oleg (PeyTy)",
 	"targets": [
-	{
-		"name": "default",
-		"generator": "js",
-		"output": "../build.js",
-		"options": ["nodejs"]
-	}],
-	"target":
-	{
-		"include": [],
-		"instance":
 		{
+			"name": "default",
+			"generator": "js",
+			"output": "../build.js",
+			"options": [
+				"nodejs"
+			]
+		}
+	],
+	"target": {
+		"include": [],
+		"instance": {
 			"generatePackageJson": false
 		},
 		"generator": "JavaScript"
