@@ -217,12 +217,13 @@ for task in tasks {
 				fs.copyFileSync(
 					'..\\Teapot\\mtools\\disk-template.img',
 					config.tempFolder + '\\tofita\\DISK.IMG')
+				for cmd in [
+					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI',
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI/BOOT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.ico ::/autorun.ico',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.inf ::/autorun.inf'
-				for cmd in [
 				] {
 					require('child_process').execSync(
 						cmd, { stdio: 'inherit' }
