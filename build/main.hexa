@@ -27,7 +27,9 @@ fun deleteFolderRecursive(path, noRemoveSelf) {
 			}
 		})
 		// Fixes some random errors
-		if (noRemoveSelf != true) fs.rmdirSync(path)
+		if (noRemoveSelf != true) {
+			fs.rmdirSync(path)
+		}
 	}
 }
 
@@ -37,15 +39,21 @@ let llvm = 'LLVM-10.0.0'
 tasks.shift()
 tasks.shift()
 
-if (tasks.length == 0) console.log('No tasks defined')
+if (tasks.length == 0) {
+	console.log('No tasks defined')
+}
 
-for (task in tasks) {
-	switch (task) {
+for task in tasks {
+	switch task {
 		case 'build':
 			{
 				// Cleanup
-				if (!fs.existsSync(config.tempFolder + '\\tofita')) fs.mkdirSync(config.tempFolder + '\\tofita')
+				if !fs.existsSync(config.tempFolder + '\\tofita') {
+					fs.mkdirSync(config.tempFolder + '\\tofita')
+				}
+
 				deleteFolderRecursive(config.tempFolder + '\\tofita', noRemoveSelf: true)
+
 				// Create directory tofita/iso/EFI/BOOT/
 				let dirs = [
 					'\\tofita',
@@ -53,12 +61,18 @@ for (task in tasks) {
 					'\\tofita\\iso\\EFI',
 					'\\tofita\\iso\\EFI\\BOOT'
 				]
-				for (dir in dirs)
-					if (!fs.existsSync(config.tempFolder + dir))
+
+				for dir in dirs {
+					if !fs.existsSync(config.tempFolder + dir) {
 						fs.mkdirSync(config.tempFolder + dir)
+					}
+				}
+
 				// Assets
 				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
-				if (fs.existsSync(assets)) fs.unlinkSync(assets)
+				if fs.existsSync(assets) {
+					fs.unlinkSync(assets)
+				}
 
 				// CR3 TRAMPOLINE
 
@@ -117,11 +131,13 @@ for (task in tasks) {
 				)
 
 				// TODO 32-bit
-				for (i in dlls.length) {
+				for i in dlls.length {
 
 					// TODO refactor
 					var asm = ' '
-					if (dlls[i] == 'ntdll') asm = config.tempFolder + '/tofita/tofita64.asm.obj '
+					if (dlls[i] == 'ntdll') {
+						asm = config.tempFolder + '/tofita/tofita64.asm.obj '
+					}
 
 					require('child_process').execSync(
 						[
@@ -201,16 +217,17 @@ for (task in tasks) {
 				fs.copyFileSync(
 					'..\\Teapot\\mtools\\disk-template.img',
 					config.tempFolder + '\\tofita\\DISK.IMG')
-				for (cmd in [
-					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI',
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI/BOOT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.ico ::/autorun.ico',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.inf ::/autorun.inf'
-				]) require('child_process').execSync(
-					cmd, { stdio: 'inherit' }
-				)
+				for cmd in [
+				] {
+					require('child_process').execSync(
+						cmd, { stdio: 'inherit' }
+					)
+				}
 				// Create disk image
 				fs.copyFileSync(
 					config.tempFolder + '\\tofita\\disk.img',
@@ -243,8 +260,7 @@ for (task in tasks) {
 							if (fs.lstatSync(curPath).isDirectory()) {
 								formatFolderRecursive(curPath)
 							} else {
-								if (curPath.indexOf('external/') == -1)
-								if (curPath.endsWith('.cpp') || curPath.endsWith('.hpp')) {
+								if curPath.indexOf('external/') == -1, curPath.endsWith('.cpp') || curPath.endsWith('.hpp') {
 									files.push(curPath)
 								}
 							}
