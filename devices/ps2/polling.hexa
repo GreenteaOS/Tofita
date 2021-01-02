@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2021  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,6 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Passively check for PS/2 updates
+
+let pollingPS2SomethingHappened = 1u8
+let pollingPS2NothingHappened = 0u8
 
 // TODO set xchng flag in IDT PS/2 interrupt, for avoiding polling in this case
 // ^ clean that flag at the pollPS2Devices end to avoid racing

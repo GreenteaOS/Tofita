@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2021  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /// Shared memory allocator for Hexa projects
-module
 
 let defaultReserveMegabytes = #if bits64 4096 #else 128 #end
 let reserveAtVirtualMegabyte = #if bits64 4096*4096*4 #else (4096/4)*3 - (defaultReserveMegabytes*2) #end
