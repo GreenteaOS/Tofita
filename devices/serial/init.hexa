@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2021  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -36,7 +36,7 @@ fun initSerial(): UInt8 {
 	writeSerialRegister(R_UART_LCR, readSerialRegister(R_UART_LCR) & ~B_UART_LCR_DLAB)
 	// Fast path
 	initialized = initialized && currentDivisor == divisor
-	if (initialized) {
+	if initialized {
 		return 1
 	}
 	// Wait for the serial port to be ready.

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2021  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,8 +16,6 @@
 // ACPI 2.0 is required by Tofita
 // So we don't need to support ACPI 1.0
 // TODO check if more generic table ST.ConfigurationTable viable
-
-
 
 // Types
 

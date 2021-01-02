@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2021  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -159,7 +159,7 @@ fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, ex
 				} break
 					//#endif
 
-				default:
+				case _:
 					serialPrintf("[loadDLL] Unknown relocation: %d\n", type)
 					break
 				}
