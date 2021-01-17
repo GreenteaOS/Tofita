@@ -2,18 +2,17 @@
 
 ![Tofita Logo](docs/logo.png?raw=true)
 
-All-new kernel for [Greentea OS](https://github.com/GreenteaOS) — [read Tofita wiki](https://greenteaos.github.io/wiki/tofita.html)
+All-new kernel for the [Greentea OS](https://github.com/GreenteaOS)
 
-[![Telegram Channel](https://img.shields.io/badge/Telegram-Greentea%20NEWS-blue.svg)](https://telegram.me/greenteaos_news)
+[![Telegram Channel](https://img.shields.io/badge/Telegram-Greentea%20NEWS-blue.svg)](https://t.me/s/greenteaos_news)
 [![Telegram Chatroom](https://img.shields.io/badge/Telegram-Greentea%20OS-blue.svg)](https://telegram.me/greenteaos)
 [![Join the chat at Discord!](https://img.shields.io/badge/Discord-Join%20Chat-677bc4.svg)](https://discord.gg/UGZq8GB)
 [![GPL License](https://img.shields.io/badge/License-GNU%20LGPLv3-green.svg?style=flat)](https://github.com/GreenteaOS/Tofita/blob/kawaii/LICENSE)
 [![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
 [![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 [![Language Top](https://img.shields.io/github/languages/top/GreenteaOS/Tofita.svg?colorB=green)](https://github.com/hexalang/hexa)
-[![TODO](https://img.shields.io/badge/!-TODO-0f9d58.svg?style=flat)](https://github.com/GreenteaOS/Tofita/search?q=TODO&unscoped_q=TODO&type=Code)
 
-Greentea OS is aimed to provide full operating system environment
+Greentea OS is aimed to provide complete operating system compatible with existing apps
 
 ![Screenshot](https://raw.githubusercontent.com/GreenteaOS/Greentea/master/Images/screenshot.jpg)
 
@@ -28,10 +27,8 @@ Greentea OS is aimed to provide full operating system environment
  - PS/2 keyboard
  - COM-port debug output
  - Initial RAM disk for LiveCD/LiveUSB and installer
- - Tested on:
+ - Tested on those VMs:
    - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
-   - Intel Sandy Bridge `(socket 1155)`
-   - AMD APU `A10`
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
    - WMware Workstation `(Other 64-bit, Virtualize Intel VT-x/EPT or AMD-V/RVI, Firmware type - UEFI)`
  - Hybrid performance-oriented kernel

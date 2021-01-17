@@ -36,7 +36,6 @@ let kernel_reserved_pages = 4096
 // to avoid system crash on our of memory
 
 class PhysicalAllocator {
-  private
 	// Approx. 1 megabyte per each 4 gygabyte of RAM
 	static UInt8 *buffer // TODO use bits, not bytes
 	static UInt64 count
@@ -64,7 +63,7 @@ class PhysicalAllocator {
 			var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 			var offset: UInt64 = startOfMemoryMap
 
-			while (offset < endOfMemoryMap) {
+			while offset < endOfMemoryMap {
 				let kind = (descriptor.Type == efi.EfiConventionalMemory) ? page_free : page_reserved
 				let where = down_bytes_to_pages(descriptor.PhysicalStart)
 				let steps = descriptor.NumberOfPages
@@ -73,7 +72,7 @@ class PhysicalAllocator {
 					serialPrintf("[physical] Reserve %u pages from %u page\n", steps, where)
 
 				var i: UInt64 = where
-				while (i < steps) {
+				while i < steps {
 					// TODO bounds check - may be not in physycal area
 					buffer[i] = kind
 					i++
@@ -92,7 +91,7 @@ class PhysicalAllocator {
 			serialPrintf("[physical] Reserve %u bytes at %u of bootloader buffer\n", params.physicalBytes,
 						 physical)
 			var i: UInt64 = down_bytes_to_pages(params.physicalBytes) + 1
-			while (i > 0) {
+			while i > 0 {
 				i--
 				reserveOnePage(physical + i * pageSize)
 			}
@@ -101,7 +100,7 @@ class PhysicalAllocator {
 		{
 			available = 0
 			var i: UInt64 = count
-			while (i > 0) {
+			while i > 0 {
 				i--
 				if (buffer[i] == page_free)
 					available++
@@ -172,8 +171,10 @@ class PhysicalAllocator {
 	// TODO faster
 	static UInt64 allocatePages(pages: UInt64) {
 		// 0 or 1 == 1 page anyway
-		if (pages < 2)
+		if (pages < 2) {
 			return allocateOnePage()
+		}
+
 		last = physical_not_found
 
 		// Find largest free block
@@ -257,11 +258,15 @@ class PhysicalAllocator {
 	static fun freeOnePage(physical: UInt64) {
 		let where = down_bytes_to_pages(physical - (wholePhysicalStart as! UInt64))
 		// Bounds check
-		if (physical <= wholePhysicalStart || where > count)
+		if (physical <= wholePhysicalStart || where > count) {
 			return
+		}
+
 		// Cosmic rays
-		if (buffer[where] == page_full)
+		if (buffer[where] == page_full) {
 			buffer[where] = page_free
+		}
+
 		last = where
 	}
 
@@ -288,15 +293,6 @@ class PhysicalAllocator {
 		// TODO return amount of freed pages
 	}
 }
-
-
-
-
-UInt8 *PhysicalAllocator.buffer
-UInt64 PhysicalAllocator.count
-UInt64 PhysicalAllocator.last
-UInt64 PhysicalAllocator.available
-UInt64 PhysicalAllocator.countUser
 
 UInt64 allocateBytes(bytes: UInt64) {
 	return PhysicalAllocator.allocateBytes(bytes)

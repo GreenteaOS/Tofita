@@ -22,8 +22,9 @@ fun loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, efi.root: Poi
 	status = root.Open(root, Pointer.of(file), (efi.CHAR16 *)name, EFI_FILE_MODE_READ,
 						EFI_FILE_READ_ONLY | EFI_FILE_HIDDEN | EFI_FILE_SYSTEM)
 
-	if (status == EFI_NOT_FOUND)
+	if (status == EFI_NOT_FOUND) {
 		return status
+	}
 
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Open %d\n", status)
 
@@ -46,8 +47,9 @@ fun loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, efi.root: Poi
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\n", status,
 				 size, address)
 
-	if (status != EFI_SUCCESS)
+	if (status != EFI_SUCCESS) {
 		return status
+	}
 
 	status = file.Read(file, Pointer.of(size), address)
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] status: Read %d\n", status)
@@ -63,9 +65,10 @@ fun loadRamDiskFromVolume(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, efi.root: Poi
 		checksum = uints[i] & 0xFFFF ^ checksum
 
 	serialPrintf("[[[efi_main.loadRamDiskFromVolume]]] checksum: %d expected: %d\n", checksum, uints[0])
-	if (checksum != uints[0])
+	if (checksum != uints[0]) {
 		serialPrintln(
 			"[[[efi_main.loadRamDiskFromVolume]]] <ERROR> checksum is incorrect, disk may be corrupted!")
+	}
 
 	ramdisk.base = address as! UInt64
 	ramdisk.size = size
@@ -83,11 +86,12 @@ fun findAndLoadRamDisk(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ramdisk: Pointer
 
 	status = bootsvc.LocateHandleBuffer(efi.ByProtocol, Pointer.of(simpleFileSystemProtocol), null, Pointer.of(handleCount),
 										 Pointer.of(handleBuffer))
-	if (status != EFI_SUCCESS)
+	if (status != EFI_SUCCESS) {
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] <ERROR> failed: LocateHandleBuffer %d\n", status)
-	else
+	} else {
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] success: LocateHandleBuffer, got %d handles\n",
 					 handleCount)
+	}
 
 	for (UInt64 i = 0; i < handleCount; ++i) {
 		serialPrintf("[[[efi_main.findAndLoadRamDisk]]] loading handle #%d of %d handles\n", i, handleCount)
@@ -98,6 +102,7 @@ fun findAndLoadRamDisk(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ramdisk: Pointer
 		if (status != EFI_SUCCESS) {
 			serialPrintf(
 				"[[[efi_main.findAndLoadRamDisk]]] HandleProtocol got a non-file system (status %d, handle "
+				+
 				"%d), continue\n",
 				status, i)
 			continue
@@ -108,6 +113,7 @@ fun findAndLoadRamDisk(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ramdisk: Pointer
 		status = fileSystem.OpenVolume(fileSystem, Pointer.of(root))
 		if (status != EFI_SUCCESS) {
 			serialPrintf("[[[efi_main.findAndLoadRamDisk]]] failed: OpenVolume with status %d, continue to "
+						 +
 						 "the next one\n",
 						 status)
 			continue
@@ -117,6 +123,7 @@ fun findAndLoadRamDisk(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, ramdisk: Pointer
 		if (status != EFI_SUCCESS) {
 			serialPrintf(
 				"[[[efi_main.findAndLoadRamDisk]]] failed: loadRamDiskFromVolume with status %d, continue "
+				+
 				"to the next one\n",
 				status)
 			continue

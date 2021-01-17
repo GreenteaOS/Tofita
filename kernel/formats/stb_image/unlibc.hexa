@@ -13,14 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#undef free libc_free
-#undef malloc libc_malloc
-#undef realloc libc_realloc
-#undef memset libc_memset
-#undef abs libc_abs
-#undef pow libc_pow
-#undef memcpy libc_memcpy
-
 Bitmap32 *loadPng32FromBuffer(data: Pointer<UInt8>, size: UInt32) {
 	Int32 width, height, png_bpp
 	var colors: Pointer<UInt8> = stbi_load_from_memory(data, size, Pointer.of(width), Pointer.of(height), Pointer.of(png_bpp), 4)

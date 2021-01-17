@@ -105,7 +105,6 @@ for task in tasks {
 					].join(''), { stdio: 'inherit' }
 				)
 
-				// TODO get rid of .asm in tofita
 				require('child_process').execSync(
 					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
 					config.tempFolder + '\\tofita\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }

@@ -21,8 +21,9 @@
 
 	static float sqrt(float number) {
 		var i: Int32
-		float x2, y
 		const float threehalfs = 1.5F
+		var x2: Float32
+		var y: Float32
 
 		x2 = number * 0.5F
 		y = number
@@ -36,19 +37,19 @@
 		return 1.0f / y
 	}
 
-	static Int32 min(a: Int32, b: Int32) {
+	static fun min(a: Int32, b: Int32): Int32 {
 		return a < b ? a : b
 	}
 
-	static Float min(a: Float, b: Float) {
+	static fun min(a: Float32, b: Float32): Float32 {
 		return a < b ? a : b
 	}
 
-	static Int32 max(a: Int32, b: Int32) {
+	static fun max(a: Int32, b: Int32): Int32 {
 		return a > b ? a : b
 	}
 
-	static Float max(a: Float, b: Float) {
+	static fun max(a: Float32, b: Float32): Float32 {
 		return a > b ? a : b
 	}
 }

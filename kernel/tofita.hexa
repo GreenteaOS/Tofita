@@ -179,20 +179,6 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	if (sizeof(UInt8 *) == 8)
 		serialPrintln("<Tofita> void*: 8 bytes")
 
-#ifdef __cplusplus
-	serialPrintln("<Tofita> __cplusplus")
-#else
-	serialPrintln("<Tofita> !__cplusplus")
-#end
-
-#if defined(__clang__)
-	serialPrintln("<Tofita> __clang__")
-#elif defined(__GNUC__) || defined(__GNUG__)
-	serialPrintln("<Tofita> __GNUC__")
-#elif defined(_MSC_VER)
-	serialPrintln("<Tofita> _MSC_VER")
-#end
-
 	disablePic()
 	enableInterrupts()
 	enablePS2Mouse()
@@ -292,12 +278,12 @@ fun switchToUserProcess() {
 	// TODO
 	var next = getNextProcess()
 
-	if (next == 0) {
+	if next == 0 {
 		markAllProcessessSchedulable()
 		next = getNextProcess()
 	}
 
-	if (next == 0) {
+	if next == 0 {
 		// serialPrintln("<Tofita> [halt]")
 		// amd64.enableAllInterruptsAndHalt() // Nothing to do
 	}
@@ -318,7 +304,7 @@ fun kernelThread() {
 	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)Pointer.of(switchToNextProcess), 1))
 
 	while (true) {
-		@volatile index: UInt64 = 1 // Idle process ignored
+		@volatile var index: UInt64 = 1 // Idle process ignored
 		while (index < 255) {		 // TODO
 			@volatile process.Process *process = Pointer.of(process.processes[index])
 			if (process.present == true) {
@@ -364,12 +350,15 @@ fun kernelThread() {
 						process.present = false
 
 						// Page fault
-						if (frame.index == 0x0E)
+						if (frame.index == 0x0E) {
 							quakePrintf("#PF at %8\n", process.cr2PageFaultAddress)
-						if (frame.index == 0x0D)
+						}
+						if (frame.index == 0x0D) {
 							quakePrintf("#GPF at %8\n", frame.ip)
-						if (frame.index == 0x03)
+						}
+						if (frame.index == 0x03) {
 							quakePrintf("#BP at %8\n", frame.ip)
+						}
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = process.processes[0].pml4
@@ -431,7 +420,7 @@ fun guiThread() {
 	}
 }
 
-fun kernelMain(const params: Pointer<KernelParams>) {
+fun kernelMain(params: ConstPointer<KernelParams>) {
 	kernelInit(params)
 	mainHexa(0, null)
 	__sync_synchronize()
@@ -447,5 +436,4 @@ fun kernelMain(const params: Pointer<KernelParams>) {
 	}
 	// TODO hexa: error if code present in unreachable block
 	// (no break/continue/throw)
-}
 }

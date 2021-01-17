@@ -37,11 +37,11 @@ import "gui/quake.hpp"
 @volatile pages.PageEntry *@volatile pml4kernelThread = null
 
 // Flag to keep in kernel mode and not switch to user mode
-@volatile Bool kernelBusy = false
+@volatile var kernelBusy = false
 
 // Avoids PIT-triggered rendering
 // This is not a best solution
-@volatile Bool haveToRender = true
+@volatile var haveToRender = true
 
 var uptimeMilliseconds: UInt64 = 0
 
