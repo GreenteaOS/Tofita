@@ -18,8 +18,9 @@
 Void exceptionHandler(InterruptFrame *const frame) {
 	// Page fault
 	@volatile var cr2: UInt64 = 0
-	if (frame.index == 0x0E)
+	if (frame.index == 0x0E) {
 		cr2 = getCr2()
+	}
 
 	if (currentThread == THREAD_USER) {
 		@volatile process.Process *process = Pointer.of(process.processes[process.currentProcess])

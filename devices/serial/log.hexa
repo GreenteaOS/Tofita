@@ -81,8 +81,8 @@ fun serialPortWritable(): Bool {
 			//    0    1   No cable connected.                       Wait
 			//    1    0   Cable connected, but not clear to send.   Wait
 			//    1    1   Cable connected, and clear to send.       Transmit
-			return (Bool)((readSerialRegister(R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) ==
-						  (B_UART_MSR_DSR | B_UART_MSR_CTS))
+			return ((readSerialRegister(R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) ==
+						  (B_UART_MSR_DSR | B_UART_MSR_CTS)) as! Bool
 		} else {
 			// Wait for both DSR and CTS to be set OR for DSR to be clear.
 			//   DSR is set if a cable is connected.
@@ -94,8 +94,8 @@ fun serialPortWritable(): Bool {
 			//    0    1   No cable connected.                       Transmit
 			//    1    0   Cable connected, but not clear to send.   Wait
 			//    1    1   Cable connected, and clar to send.        Transmit
-			return (Bool)((readSerialRegister(R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) !=
-						  (B_UART_MSR_DSR))
+			return ((readSerialRegister(R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) !=
+						  (B_UART_MSR_DSR)) as! Bool
 		}
 	}
 	return true
@@ -110,9 +110,9 @@ UInt64 serialPortWrite(buffer: Pointer<UInt8>, size: UInt64) {
 		//
 		// Wait for both the transmit FIFO and shift register empty.
 		while ((readSerialRegister(R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) !=
-			   (B_UART_LSR_TEMT | B_UART_LSR_TXRDY))
+			   (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) {}
 
-		while (!serialPortWritable())
+		while (!serialPortWritable()) {}
 
 		return 0
 	}
@@ -128,12 +128,12 @@ UInt64 serialPortWrite(buffer: Pointer<UInt8>, size: UInt64) {
 	while (size != 0) {
 		// Wait for the serial port to be ready, to make sure both the transmit FIFO
 		// and shift register empty.
-		while ((readSerialRegister(R_UART_LSR) & B_UART_LSR_TEMT) == 0)
+		while ((readSerialRegister(R_UART_LSR) & B_UART_LSR_TEMT) == 0) {}
 
 		// Fill then entire Tx FIFO
 		for (UInt64 index = 0; index < fifoSize && size != 0; index++, size--, buffer++) {
 			// Wait for the hardware flow control signal
-			while (!serialPortWritable())
+			while (!serialPortWritable()) {}
 
 			// Write byte to the transmit buffer.
 			writeSerialRegister(R_UART_TXBUF, *buffer)
@@ -145,7 +145,7 @@ UInt64 serialPortWrite(buffer: Pointer<UInt8>, size: UInt64) {
 
 fun serialPrintf(const c: Pointer<WideChar>, ...)
 
-fun serialPrintInt(n: UInt64) {
+fun serialPrintInt(n: UInt64): Void {
 	var buf[24]: UInt8
 	for (UInt8 i = 0; i < 24; i++)
 		buf[i] = 0
@@ -158,7 +158,7 @@ fun serialPrintInt(n: UInt64) {
 	serialPortWrite((UInt8 *)bp, buf - bp + 24)
 }
 
-fun serialPrintHex(n: UInt64) {
+fun serialPrintHex(n: UInt64): Void {
 	serialPrintf("0x")
 	UInt8 buf[16], *bp = buf + 16
 	for (Int32 i = 0; i < 16; i++)
@@ -176,7 +176,7 @@ fun serialPrintHex(n: UInt64) {
 	serialPortWrite((UInt8 *)buf, 16)
 }
 
-fun serialPrintBits(value: UInt64) {
+fun serialPrintBits(value: UInt64): Void {
 	serialPrintf("0b")
 	for (Int32 i = 0; i < 64; ++i) {
 		if (value & (1ull << i)) {

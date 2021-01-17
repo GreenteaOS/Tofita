@@ -15,7 +15,10 @@
 
 // Desktop (i.e. icons)
 
-@extern "C++"
+var dragX = 255
+var dragY = 255
+var drag = false
+
 	fun compositeDesktop(Int16 mouseX, mouseY: Int16) {
 		var color: Pixel32
 		color.rgba.r = color.rgba.g = color.rgba.b = 0xFF

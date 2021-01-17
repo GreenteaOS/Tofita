@@ -23,7 +23,7 @@ let fontHeight: UInt32 = 32
 let leavesWidth: UInt32 = 36
 let leavesHeight: UInt32 = 25
 
-Int64 _fltused = 0
+let _fltused: Int64 = 0
 
 fun drawPixel(framebuffer: Pointer<Framebuffer>, x: UInt32, y: UInt32, color: UInt32) {
 	var pixels: Pointer<UInt32> = (UInt32 *)framebuffer.base

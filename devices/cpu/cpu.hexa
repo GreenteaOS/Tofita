@@ -15,7 +15,6 @@
 
 // Bindings to the .asm
 
-@volatile Bool sehReturnFalse()
 declare fun enterKernelMode()
 declare fun selectSegment()
 declare fun enterUserMode()
@@ -23,6 +22,7 @@ declare fun timerInterrupt()
 declare fun syscallInterrupt()
 declare fun yieldInterrupt()
 @volatile declare fun getCr2(): UInt64
+@volatile declare fun sehReturnFalse(): Bool
 
 declare fun cpu0x00()
 declare fun cpu0x01()

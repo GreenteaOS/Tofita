@@ -56,8 +56,6 @@ fun drawLoading(framebuffer: Pointer<Framebuffer>, progress: UInt8) {
 		}
 }
 
-import "../shared/paging.cpp"
-
 fun memset(dest: VoidPointer, e: Int32, len: UInt64): VoidPointer {
 	var d = dest as! Pointer<UInt8>
 	for (UInt64 i = 0; i < len; i++, d++) {
@@ -162,7 +160,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap")
 
 	var time: efi.EFI_TIME
-	time.Year = 2020
+	time.Year = 2021
 	var capabilities: efi.EFI_TIME_CAPABILITIES
 	{
 		serialPrintln("[[[efi_main]]] begin: GetTime")
@@ -174,6 +172,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 
 		{
 			serialPrintf("[[[efi_main]]] EFI_TIME Year=%d Month=%d Day=%d Hour=%d Minute=%d Second=%d "
+						 +
 						 "Nanosecond=%d TimeZone=%d Daylight=%d\n",
 						 time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second,
 						 time.Nanosecond, time.TimeZone, time.Daylight)
@@ -181,10 +180,11 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 			serialPrintf("[[[efi_main]]] EFI_TIME_CAPABILITIES Resolution=%d Accuracy=%d SetsToZero=%d\n",
 						 capabilities.Resolution, capabilities.Accuracy, capabilities.SetsToZero)
 
-			// Set 2020 as least valid, so security/HTTPS certificates at least partially work
+			// Set 2021 as least valid, so security/HTTPS certificates at least partially work
 			// and file system is not messed
-			if (time.Year < 2020)
-				time.Year = 2020
+			if (time.Year < 2021) {
+				time.Year = 2021
+			}
 		}
 		serialPrintln("[[[efi_main]]] done: GetTime")
 	}
@@ -193,17 +193,21 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	var oops: UInt8 = 0
 	status = EFI_NOT_READY
 	while (status != EFI_SUCCESS) {
-		if (oops < 10)
+		if oops < 10 {
 			serialPrintln("[[[efi_main]]] try: ExitBootServices")
-		if (oops == 100) {
+		}
+
+		if oops == 100 {
 			drawText("Loading...", errorY, Pointer.of(framebuffer))
 			serialPrintln("[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices")
 			serialPrintln("[[[efi_main]]] <ERROR?> system may or may not start")
 			oops = 200
 		}
-		if (oops < 100) {
+
+		if oops < 100 {
 			oops++
 		}
+
 		status = systemTable.BootServices.ExitBootServices(imageHandle, efiMemoryMap.mapKey)
 	}
 
@@ -283,10 +287,12 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	var ram: UInt64 = paging.getRAMSize(Pointer.of(params.efiMemoryMap))
 	var megs: UInt32 = (uint32_t)(ram / (1024 * 1024))
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
+
 	while (megs < 768) {
 		drawText("[ERROR] Tofita requires at least 1 GB of memory [ERROR]", errorY, Pointer.of(framebuffer))
 		serialPrintf("Tofita requires at least 1 GB of memory\n")
 	}
+
 	params.ramBytes = ram
 	params.physicalRamBitMaskVirtual = paging.conventionalAllocateNext(ram >> 12)
 
@@ -294,8 +300,8 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 		(paging.PageEntry *)paging.conventionalAllocateNext(sizeof(paging.PageEntry) * pageTableSize)
 
 	{
-		var b: Pointer<UInt8> = (UInt8 *)paging.pml4entries
 		for (UInt64 i = 0; i < paging.conventionalOffset; ++i) {
+		var b = paging.pml4entries as! Pointer<UInt8>
 			// TODO faster with uint64_t
 			b[i] = paging.buffa[0]
 		}
@@ -330,7 +336,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	params.physicalBuffer = largeBuffer
 	params.physicalBytes = paging.conventionalOffset - largeBuffer
 	params.efiRuntimeServices = systemTable.RuntimeServices
-	params.acpiTablePhysical = (uint64_t)(acpiTable)
+	params.acpiTablePhysical = acpiTable as! UInt64
 	params.efiMemoryMap.memoryMap =
 		(efi.EFI_MEMORY_DESCRIPTOR *)(wholePhysicalStart + (params.efiMemoryMap.memoryMap as! UInt64))
 
@@ -349,5 +355,4 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	startFunction((params as! UInt64), (paging.pml4entries as! UInt64), stack, upper + mAddressOfEntryPoint)
 
 	return EFI_SUCCESS
-}
 }

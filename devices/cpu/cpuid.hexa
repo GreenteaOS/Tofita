@@ -45,17 +45,19 @@ fun getCPUID(): CPUID {
 
 	var i = 0
 	while (i++ < sizeof(result.brandName))
-		if (result.brandName[i] == '\r')
+		if (result.brandName[i] == '\r') {
 			result.brandName[i] = 0
-		else if (result.brandName[i] == '\n')
+		} else if (result.brandName[i] == '\n') {
 			result.brandName[i] = 0
+		}
 
 	i = 0
 	while (i++ < sizeof(result.vendorID))
-		if (result.vendorID[i] == '\r')
+		if (result.vendorID[i] == '\r') {
 			result.vendorID[i] = 0
-		else if (result.vendorID[i] == '\n')
+		} else if (result.vendorID[i] == '\n') {
 			result.vendorID[i] = 0
+		}
 
 	return result
 }

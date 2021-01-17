@@ -15,6 +15,20 @@
 
 // PS/2 Mouse
 
+enum MouseActionType : UInt8 {
+	Noop = 0
+	LeftDown
+	LeftUp
+	RightDown
+	RightUp
+	MiddleDown
+	MiddleUp
+	// TODO ScrollFromUser
+	// TODO ScrollToUser
+	Moved
+}
+
+@volatile var lockMouse = false
 @volatile var mouseCycle: UInt8 = 0
 @volatile UInt8 mouseByte[3] = {0}
 
@@ -31,17 +45,18 @@ class MouseAction {
 	// TODO time stamp
 }
 
-const UInt8 mouseActionsLimit = 255
+let mouseActionsLimit: UInt8 = 255
 @volatile MouseAction mouseActionsZeta[mouseActionsLimit]
 @volatile MouseAction mouseActionsGama[mouseActionsLimit]
-@volatile Bool mouseActionsUseZeta = false
-@volatile UInt8 mouseActionsZetaAmount = 0
-@volatile UInt8 mouseActionsGamaAmount = 0
+@volatile var mouseActionsUseZeta = false
+@volatile var mouseActionsZetaAmount: UInt8 = 0
+@volatile var mouseActionsGamaAmount: UInt8 = 0
 
 fun pushMouseAction(type: MouseActionType, Int16 mouseXdiff = 0, Int16 mouseYdiff = 0) {
 	if (mouseActionsUseZeta) {
-		if (mouseActionsZetaAmount == mouseActionsLimit)
+		if (mouseActionsZetaAmount == mouseActionsLimit) {
 			return
+		}
 
 		mouseActionsZeta[mouseActionsZetaAmount].mouseXdiff = mouseXdiff
 		mouseActionsZeta[mouseActionsZetaAmount].mouseYdiff = mouseYdiff
@@ -49,8 +64,9 @@ fun pushMouseAction(type: MouseActionType, Int16 mouseXdiff = 0, Int16 mouseYdif
 
 		mouseActionsZetaAmount++
 	} else {
-		if (mouseActionsGamaAmount == mouseActionsLimit)
+		if (mouseActionsGamaAmount == mouseActionsLimit) {
 			return
+		}
 
 		mouseActionsGama[mouseActionsGamaAmount].mouseXdiff = mouseXdiff
 		mouseActionsGama[mouseActionsGamaAmount].mouseYdiff = mouseYdiff
@@ -60,7 +76,7 @@ fun pushMouseAction(type: MouseActionType, Int16 mouseXdiff = 0, Int16 mouseYdif
 	}
 }
 
-UInt8 getBit(byte: UInt8, bit: UInt8) {
+fun getBit(byte: UInt8, bit: UInt8): UInt8 {
 	return (byte & (1 << bit)) >> bit
 }
 
@@ -109,8 +125,9 @@ fun handleMousePacket() {
 		if (!mouseActionsUseZeta && mouseActionsGamaAmount == mouseActionsLimit)
 			break
 
-		if (mouseXd != 0 || mouseYd != 0)
+		if (mouseXd != 0 || mouseYd != 0) {
 			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
+		}
 
 		let left: Bool = getBit(mouseByte[0], 0) != 0
 		let right: Bool = getBit(mouseByte[0], 1) != 0

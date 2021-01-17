@@ -36,11 +36,12 @@ section .head
 
 global trampolineCR3
 trampolineCR3:
+
 cli ; Disable interrupts
 ;mov cr3, rsi ; UNIX
 ;o64 jmp rcx ; UNIX
 
-mov cr3, rdx ; Tofita
+mov cr3, rdx ; Tofita upper-half paging
 
 mov rsp, r8
 push 0 ; Signal end of stack with 0 return address
@@ -49,8 +50,10 @@ push 0 ; problems
 push 0
 mov rbp, rsp ; Frame
 
+; Enter main [with rcx]
 o64 call r9
 
+; COM write
 global portOutb
 portOutb:
     mov rax, rdx
@@ -58,6 +61,7 @@ portOutb:
     out dx, al
     ret
 
+; COM read
 global portInb
 portInb:
     mov rdx, rcx

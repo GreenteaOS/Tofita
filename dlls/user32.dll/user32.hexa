@@ -20,14 +20,14 @@ import "../kernel32.dll/kernel32.hpp"
 
 // Utils
 
-user32.Window *handleToWindow(hWnd: wapi.HWnd) {
+fun handleToWindow(hWnd: wapi.HWnd): Pointer<user32.Window> {
 	if (hWnd == null)
 		return null // TODO return desktop
 	if (hWnd == INVALID_HANDLE_VALUE)
 		return null
 	if (((user32.Window *)hWnd).windowIsWindow != user32.windowIsWindow)
 		return null
-	return hWnd as! user32.Window *
+	return hWnd as! Pointer<user32.Window>
 }
 
 fun windowToHandle(user32.window: Pointer<Window>): wapi.HWnd {
@@ -83,7 +83,7 @@ fun createWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer, lpWindo
 	tofitaDebugLog("CreateWindowExW called")
 
 	// Find class
-	var *list = Pointer.of(user32.rootClass)
+	var list = Pointer.of(user32.rootClass)
 	var name = lpClassName
 	var found = false
 	const wapi.WindowClass *wc = null
@@ -108,9 +108,9 @@ fun createWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer, lpWindo
 		}
 	}
 
-	if (!found) {
+	if !found {
 		tofitaDebugLog("CreateWindowExW not found return")
-		return (wapi.HWnd) null
+		return null
 	}
 
 	// Prepare for syscall
@@ -152,7 +152,7 @@ fun createWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer, lpWindo
 }
 
 @rename('ShowWindow')
-fun showWindow(wapi.HWnd hWnd, nCmdShow: Int32): wapi.Bool {
+fun showWindow(hWnd: wapi.HWnd, nCmdShow: Int32): wapi.Bool {
 	tofitaDebugLog("ShowWindow called")
 	var window = handleToWindow(hWnd)
 	var result: wapi.Bool = 0
@@ -170,7 +170,7 @@ fun showWindow(wapi.HWnd hWnd, nCmdShow: Int32): wapi.Bool {
 			result = 1
 			break
 		}
-		default: {
+		case _: {
 			// TODO
 		}
 		}
@@ -181,7 +181,7 @@ fun showWindow(wapi.HWnd hWnd, nCmdShow: Int32): wapi.Bool {
 
 // TODO take 2 or more messages at a time for better perf (this is pretty common)
 @rename('GetMessageW')
-fun getMessageW(wapi.msg: Pointer<Msg>, wapi.HWnd hWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32): wapi.Bool {
+fun getMessageW(msg: Pointer<wapi.Msg>, hWnd: wapi.HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32): wapi.Bool {
 	tofitaDebugLog("GetMessageW called")
 	var result: wapi.Bool = 1
 
@@ -201,7 +201,7 @@ fun getMessageW(wapi.msg: Pointer<Msg>, wapi.HWnd hWnd, wMsgFilterMin: UInt32, w
 }
 
 @rename('TranslateMessage')
-fun translateMessage(wapi.msg: Pointer<Msg>): wapi.Bool {
+fun translateMessage(msg: Pointer<wapi.Msg>): wapi.Bool {
 	tofitaDebugLog("TranslateMessage called")
 	// TODO
 	tofitaDebugLog("TranslateMessage done")
@@ -209,7 +209,7 @@ fun translateMessage(wapi.msg: Pointer<Msg>): wapi.Bool {
 }
 
 @rename('DispatchMessageW')
-fun dispatchMessageW(wapi.msg: Pointer<Msg>): wapi.LResult {
+fun dispatchMessageW(msg: Pointer<wapi.Msg>): wapi.LResult {
 	tofitaDebugLog("DispatchMessageW called")
 	var result: wapi.LResult = 0
 	if (msg.hwnd != null) {
@@ -231,7 +231,7 @@ fun dispatchMessageW(wapi.msg: Pointer<Msg>): wapi.LResult {
 }
 
 @rename('PostMessage')
-fun postMessage(wapi.HWnd hWnd, wapi.Message msg, Void *wParam, Void *lParam): wapi.Bool {
+fun postMessage(hWnd: wapi.HWnd, msg: wapi.Message, wParam: VoidPointer, lParam: VoidPointer): wapi.Bool {
 	var payload: PostMessagePayload
 	payload.hWnd = hWnd
 	payload.msg = msg
@@ -243,7 +243,7 @@ fun postMessage(wapi.HWnd hWnd, wapi.Message msg, Void *wParam, Void *lParam): w
 @rename('PostQuitMessage')
 fun postQuitMessage(nExitCode: Int32): Void {
 	tofitaDebugLog("PostQuitMessage called")
-	PostMessage(null, wapi.Message.WM_QUIT, (Void *)nExitCode, null)
+	PostMessage(null, wapi.Message.WM_QUIT, nExitCode as! VoidPointer, null)
 	tofitaDebugLog("PostQuitMessage done")
 	// TODO ERROR_SUCCESS
 }
@@ -273,7 +273,7 @@ fun beginPaint(wapi.HWnd hWnd, wapi.ps: Pointer<PaintStruct>): wapi.HDc {
 }
 
 @rename('FillRect')
-fun fillRect(wapi.HDc dc, const wapi.lprc: Pointer<Rect>, wapi.HBrush brush): Int32 {
+fun fillRect(dc: wapi.HDc, lprc: ConstPointer<wapi.Rect>, brush: wapi.HBrush): Int32 {
 	tofitaDebugLog("FillRect called")
 
 	var fb = (nj.WindowFramebuffer *)dc
@@ -292,7 +292,7 @@ fun fillRect(wapi.HDc dc, const wapi.lprc: Pointer<Rect>, wapi.HBrush brush): In
 }
 
 @rename('EndPaint')
-fun endPaint(wapi.HWnd hWnd, wapi.ps: Pointer<PaintStruct>): wapi.Bool {
+fun endPaint(hWnd: wapi.HWnd, ps: Pointer<wapi.PaintStruct>): wapi.Bool {
 	tofitaDebugLog("EndPaint called")
 	var window = handleToWindow(hWnd)
 	if (window == null)

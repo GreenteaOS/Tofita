@@ -23,11 +23,7 @@ let pic2_data = (pic2 + 1)
 let pic_eoi = 0x20	  // end-of-interrupt command code
 let pic_eoi_0x20 = 0x20 // end-of-interrupt command code
 
-UInt8 readPort(port: UInt16)
-fun writePort(@volatile UInt16 port, @volatile UInt8 value)
-UInt8 mouseRead()
-
-Void tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64) {
+fun tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64): Void {
 	var dst8: Pointer<UInt8> = (UInt8 *)dest
 	var src8: Pointer<UInt8> = (UInt8 *)src
 
@@ -36,7 +32,7 @@ Void tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64) {
 	}
 }
 
-Void tmemcpy(@volatile dest: VoidPointer, const @volatile src: VoidPointer, @volatile count: UInt64) {
+fun tmemcpy(@volatile dest: VoidPointer, const @volatile src: VoidPointer, @volatile count: UInt64): Void {
 	var dst8: Pointer<UInt8> = (UInt8 *)dest
 	var src8: Pointer<UInt8> = (UInt8 *)src
 
@@ -64,11 +60,11 @@ class IdtEntry {
 	UInt32 zero : 32
 }
 
-UInt8 readPort(@volatile UInt16 port) {
+fun readPort(@volatile port: UInt16): UInt8 {
 	return portInb(port)
 }
 
-fun writePort(@volatile UInt16 port, @volatile UInt8 value) {
+fun writePort(@volatile port: UInt16, @volatile value: UInt8) {
 	portOutb(port, value)
 }
 
@@ -216,9 +212,6 @@ fun enableLocalApic() {
 	serialPrintln("[cpu] done: enableLocalApic")
 }
 
-fun mouseWait(aType: UInt8): Void
-fun mouseWrite(aWrite: UInt8): Void
-fun mouseRead(): UInt8
 let irq0 = 32
 let irq1 = 0x21 // 33
 let irq2 = 34
@@ -261,7 +254,7 @@ class GdtDescriptor {
 	var limitLow: UInt16
 	var baseLow: UInt16
 	var baseMid: UInt8
-	enum GdtType type // Access
+	var type: GdtType // Access
 	var size: UInt8
 	var baseHigh: UInt8
 }
@@ -295,7 +288,7 @@ class TssDescriptor {
 	var limitLow: UInt16
 	var base_00: UInt16
 	var base_16: UInt8
-	enum GdtType type
+	var type: GdtType
 	var size: UInt8
 	var base_24: UInt8
 	var base_32: UInt32
@@ -314,8 +307,8 @@ class TssEntry {
 	var iomap_offset: UInt16
 }
 
-@aligned(64) static @volatile TablePtr globalGdtr
-@aligned(64) static @volatile TssEntry globalTss
+@aligned(64) @volatile var globalGdtr: TablePtr
+@aligned(64) @volatile var globalTss: TssEntry
 
 // rsp0stack = exp0 in TSS
 // Stack used by kernel to handle syscalls/interrupts

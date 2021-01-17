@@ -239,7 +239,7 @@ fun mapEfi(EfiMemoryMap *memoryMap) {
 	var offset: UInt64 = startOfMemoryMap
 
 	while (offset < endOfMemoryMap) {
-		if (descriptor.Attribute & EFI_MEMORY_RUNTIME) {
+		if descriptor.Attribute & EFI_MEMORY_RUNTIME {
 			// TODO pointer fixups
 			// TODO should be RW or RO?
 			// Note: in VirtualBox, PhysicalStart seems way beyound RAM bounds
@@ -265,7 +265,7 @@ UInt64 conventionalAllocate(EfiMemoryMap *memoryMap, pages: UInt32) {
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
-	while (offset < endOfMemoryMap) {
+	while offset < endOfMemoryMap {
 
 		if ((descriptor.Type == efi.EfiConventionalMemory) && (descriptor.NumberOfPages >= (pages + 1))) {
 			serialPrintf("[paging] success allocate %d pages\n", pages)
@@ -292,9 +292,9 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
-	while (offset < endOfMemoryMap) {
+	while offset < endOfMemoryMap {
 		// Note: > not >= cause we should have some extra space next to this
-		if ((descriptor.Type == efi.EfiConventionalMemory) && (descriptor.NumberOfPages > largestPages)) {
+		if descriptor.Type == efi.EfiConventionalMemory, descriptor.NumberOfPages > largestPages {
 			largestPages = descriptor.NumberOfPages
 			result = descriptor.PhysicalStart
 		}
@@ -309,13 +309,14 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	return result
 }
 
-UInt64 conventionalOffset
-UInt64 conventionalAllocateNext(bytes: UInt64) {
+var conventionalOffset: UInt64 = 0;
+fun conventionalAllocateNext(bytes: UInt64): UInt64 {
 	let result = conventionalOffset
 	let pages = bytes / pageSize // Math.floor
 	conventionalOffset += pages * pageSize
-	if ((bytes - (pages * pageSize)) > 0)
+	if (bytes - (pages * pageSize)) > 0 {
 		conventionalOffset += pageSize
+	}
 	return result
 }
 

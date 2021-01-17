@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// Entry in a page table
 @struct @packed @sizeOf(8)
 class PageEntry {
 	// Is the page present in physical memory?

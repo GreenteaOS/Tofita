@@ -22,6 +22,7 @@ var quakeLine: UInt8 = 0
 var quakeRow: UInt8 = 0
 var quakeAdvance: Float = 0.0
 var quakeCommandSize: UInt8 = 0
+var haveToQuake: UInt8 = 0
 
 fun quakePrintf(const c: Pointer<WideChar>, ...)
 

@@ -62,10 +62,12 @@ efi.EFI_STATUS uefiAllocate(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, bytes: Poin
 					 *bytes)
 	}
 
-	if (status != EFI_SUCCESS)
+	if (status != EFI_SUCCESS) {
 		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, "
+					 +
 					 "status %d\n",
 					 *bytes, pages, allocationType, status)
+	}
 
 	*bytes = pages * pageSize
 	*destination = (Void *)addr

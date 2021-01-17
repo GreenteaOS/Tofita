@@ -32,7 +32,7 @@ fun initSerial(): UInt8 {
 	// Calculate current divisor
 	writeSerialRegister(R_UART_LCR, readSerialRegister(R_UART_LCR) | B_UART_LCR_DLAB)
 	var currentDivisor: UInt32 = readSerialRegister(R_UART_BAUD_HIGH) << 8
-	currentDivisor |= (uint32_t)readSerialRegister(R_UART_BAUD_LOW)
+	currentDivisor |= readSerialRegister(R_UART_BAUD_LOW) as! UInt32
 	writeSerialRegister(R_UART_LCR, readSerialRegister(R_UART_LCR) & ~B_UART_LCR_DLAB)
 	// Fast path
 	initialized = initialized && currentDivisor == divisor
@@ -42,7 +42,7 @@ fun initSerial(): UInt8 {
 	// Wait for the serial port to be ready.
 	// Verify that both the transmit FIFO and the shift register are empty.
 	while ((readSerialRegister(R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) !=
-		   (B_UART_LSR_TEMT | B_UART_LSR_TXRDY))
+		   (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) {}
 
 	// Configure baud rate
 	writeSerialRegister(R_UART_LCR, B_UART_LCR_DLAB)
@@ -50,11 +50,11 @@ fun initSerial(): UInt8 {
 	writeSerialRegister(R_UART_BAUD_LOW, (uint8_t)(divisor & 0xff))
 	// Clear DLAB and configure Data Bits, Parity, and Stop Bits.
 	// Strip reserved bits from PcdSerialLineControl
-	writeSerialRegister(R_UART_LCR, (uint8_t)(SERIAL_LINE_CONTROL & 0x3F))
+	writeSerialRegister(R_UART_LCR, (SERIAL_LINE_CONTROL & 0x3F) as! UInt8)
 	// Enable and reset FIFOs
 	// Strip reserved bits from PcdSerialFifoControl
 	writeSerialRegister(R_UART_FCR, 0x00)
-	writeSerialRegister(R_UART_FCR, (uint8_t)(SERIAL_LINE_CONTROL & (B_UART_FCR_FIFOE | B_UART_FCR_FIFO64)))
+	writeSerialRegister(R_UART_FCR, (SERIAL_LINE_CONTROL & (B_UART_FCR_FIFOE | B_UART_FCR_FIFO64)) as! UInt8)
 	// Put Modem Control Register(MCR) into its reset state of 0x00.
 	writeSerialRegister(R_UART_MCR, 0x00)
 	return 1
