@@ -40,7 +40,18 @@ $RECYCLE.BIN/
 # Shortcuts
 *.lnk
 
-# temporary files which can be created if a process still has a handle open of a deleted file
+# Junk
+*.c
+*.h
+*.cpp
+*.cxx
+*.hpp
+*.S
+*.s
+*.o
+*.a
+
+# Temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
 # KDE directory preferences
 .directory
