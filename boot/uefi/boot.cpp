@@ -204,6 +204,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// Check ACPI here, after framebuffer initialization
 	while (acpiTable == NULL) {
 		drawText(L"[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, &framebuffer);
+		serialPrintf(L"");
 	}
 
 	// TODO Validate ACPI signatures here instead of kernel
@@ -262,6 +263,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		serialPrintf(L"[[[efi_main]]] Found %d CPUs\n", cpus);
 		while (cpus < 2) {
 			drawText(L"[ERROR] Tofita requires multi-core CPU [ERROR]", errorY, &framebuffer);
+			serialPrintf(L"");
 		};
 	}
 
@@ -275,6 +277,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	status = findAndLoadRamDisk(systemTable->BootServices, &ramdisk);
 	while (status != EFI_SUCCESS) {
 		drawText(L"[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, &framebuffer);
+		serialPrintf(L"");
 	}
 	drawLoading(&framebuffer, 1);
 
