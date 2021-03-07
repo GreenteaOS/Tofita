@@ -83,6 +83,67 @@ extern "C" function __attribute__((fastcall))
 trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
 			  volatile uint64_t entry);
 
+struct ACPITableHeader {
+	uint32_t type;
+	uint32_t length;
+	uint8_t revision;
+	uint8_t checksum;
+	char8_t oem_id[6];
+	char8_t oem_table[8];
+	uint32_t oem_revision;
+	uint32_t creator_id;
+	uint32_t creator_revision;
+} __attribute__((packed));
+_Static_assert(sizeof(ACPITableHeader) == 36, "ACPITableHeader must be 36 bytes");
+
+#pragma pack(1)
+extern "C++"
+struct XSDT {
+	ACPITableHeader header;
+	ACPITableHeader *headers[1];
+
+	template <typename T> static uint64_t acpiTableEntries(const T *t, uint64_t size) {
+		return (t->header.length - sizeof(T)) / size;
+	}
+
+	static constexpr uint32_t byteswap(uint32_t x) {
+		return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) | ((x << 8) & 0x00ff0000) |
+			((x << 24) & 0xff000000);
+	}
+
+	static void putSig(char8_t *into, uint32_t type) {
+		for (int32_t j = 0; j < 4; ++j)
+			into[j] = reinterpret_cast<char8_t *>(&type)[j];
+	}
+} __attribute__((packed));
+#pragma pack()
+
+extern "C++"
+template<uint32_t s, uint32_t t> struct check_size {
+  static_assert(s == t, "wrong size");
+};
+check_size<sizeof(XSDT), sizeof(ACPITableHeader) + 8> _XSDT;
+
+struct APIC {
+	ACPITableHeader header;
+	uint32_t localAddress;
+	uint32_t flags;
+	uint8_t controllerData[0];
+} __attribute__((packed));
+
+struct ACPI {
+	char8_t signature[8];
+	uint8_t checksum10;
+	char8_t oemID[6];
+	uint8_t revision;
+	uint32_t rsdtAddress;
+
+	uint32_t length;
+	uint64_t xsdtAddress;
+	uint8_t checksum20;
+	uint8_t reserved[3];
+};
+
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
@@ -143,6 +204,65 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	// Check ACPI here, after framebuffer initialization
 	while (acpiTable == NULL) {
 		drawText(L"[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, &framebuffer);
+	}
+
+	// TODO Validate ACPI signatures here instead of kernel
+	// Validate this is a multi-core CPU with Local APICs
+	{
+		// TODO If bit 1 in the flags field is set then you need to mask all the 8259 PIC's interrupts, but you should probably do this anyway.
+
+		const ACPI* tables = (ACPI *)acpiTable;
+		auto xsdt = (const XSDT *)((uint64_t)tables->xsdtAddress);
+		char8_t sig[5] = {0, 0, 0, 0, 0};
+		XSDT::putSig(sig, xsdt->header.type);
+		serialPrintf(L"[[[efi_main]]] XSDT table is %s\n", sig);
+
+		uint16_t cpus = 0;
+		uint64_t numTables = XSDT::acpiTableEntries(xsdt, sizeof(void *));
+		let apicSignature = XSDT::byteswap('APIC');
+
+		serialPrintf(L"[[[efi_main]]] XSDT has %d tables\n", numTables);
+
+		for (uint64_t i = 0; i < numTables; ++i) {
+			auto header = (const ACPITableHeader *)((uint64_t)xsdt->headers[i]);
+
+			XSDT::putSig(sig, header->type);
+			serialPrintf(L"[[[efi_main]]] Found table %s\n", sig);
+
+			switch (header->type) {
+			case apicSignature:
+				{
+					auto apic = (const APIC *)header;
+					let count = XSDT::acpiTableEntries(apic, 1);
+					uint8_t const *data = apic->controllerData;
+					uint8_t const *end = data + count;
+
+					while (data < end) {
+						const uint8_t type = data[0];
+						const uint8_t length = data[1];
+
+						switch (type) {
+							case 0:
+								// TODO If flags bit 0 is set the CPU is able to be enabled, if it is not set you need to check bit 1.
+								// If that one is set you can still enable it, if it is not the CPU can not be enabled and the OS should not try.
+								cpus++;
+								break;
+						}
+
+						data += length;
+					}
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		serialPrintf(L"[[[efi_main]]] Found %d CPUs\n", cpus);
+		while (cpus < 2) {
+			drawText(L"[ERROR] Tofita requires multi-core CPU [ERROR]", errorY, &framebuffer);
+		};
 	}
 
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
