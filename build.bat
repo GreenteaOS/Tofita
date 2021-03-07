@@ -1,26 +1,23 @@
 @echo off
-color 0B
-echo [Welcome to Tofita!]
+echo [32mWelcome to the Greentea OS! Support us at https://www.patreon.com/PeyTy and https://greenteaos.github.io/donate/
+echo [0m
 cd /d %~dp0
 cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
-node build.js clang-format
 node build.js build
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
-color 0A
-echo [Success]
 ::node build.js vbox
+echo [36m[Success][0m
 ::node tools\vbox.js
 ::node tools\listen.js
 ::node tools\pipe.js
 goto done
 :somethingbad
-color 0C
-echo [Exiting on error]
+echo [37m[41m[Exiting on error][0m
 :done
 :: Clear error code
 set errorlevel=0

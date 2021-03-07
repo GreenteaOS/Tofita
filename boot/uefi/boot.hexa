@@ -122,7 +122,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	var framebuffer: Framebuffer
 	initializeFramebuffer(Pointer.of(framebuffer), systemTable)
 	drawLoading(Pointer.of(framebuffer), 0)
-	drawText("GreenteaOS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag,
+	drawText("Greentea OS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag,
 			 (framebuffer.height / 4) * 3 + 64, Pointer.of(framebuffer))
 	let errorY: UInt16 = (framebuffer.height / 4) * 3 + 64 + 32
 

@@ -1,5 +1,4 @@
 # Tofita
-
 build.js
 node_modules
 
@@ -50,6 +49,8 @@ $RECYCLE.BIN/
 *.s
 *.o
 *.a
+*:encryptable
+report.*.json
 
 # Temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
