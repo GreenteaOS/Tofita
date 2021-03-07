@@ -118,11 +118,7 @@ struct XSDT {
 } __attribute__((packed));
 #pragma pack()
 
-extern "C++"
-template<uint32_t s, uint32_t t> struct check_size {
-  static_assert(s == t, "wrong size");
-};
-check_size<sizeof(XSDT), sizeof(ACPITableHeader) + 8> _XSDT;
+SIZEOF(XSDT, sizeof(ACPITableHeader) + 8)
 
 struct APIC {
 	ACPITableHeader header;
