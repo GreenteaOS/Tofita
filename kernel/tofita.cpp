@@ -131,8 +131,7 @@ const KernelParams *paramsCache = null;
 uint64_t startupMilliseconds = 0;
 
 function kernelInit(const KernelParams *params) {
-	serialPrintln(L"<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
-		versionMinor) " " versionTag " kernel loaded and operational");
+	serialPrintln(L"<Tofita> Greentea OS kernel loaded and operational");
 	serialPrintf(L"<Tofita> CR3 points to: %8\n", (uint64_t)params->pml4);
 	paramsCache = params;
 	// PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual,
@@ -210,8 +209,7 @@ function kernelInit(const KernelParams *params) {
 	initText();
 	initializeCompositor();
 
-	quakePrintf(L"GreenteaOS " versionName
-				" " STR(versionMajor) "." STR(versionMinor) " " versionTag " loaded and operational\n");
+	quakePrintf(L"Greentea OS loaded and operational\n");
 
 	// enableLocalApic();
 

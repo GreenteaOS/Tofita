@@ -15,10 +15,6 @@
 
 declare class Config {
 	let tempFolder: String
-	let versionMajor: Int
-	let versionMinor: Int
-	let versionName: String
-	let versionTag: String
 }
 
 let dlls = [
@@ -143,7 +139,7 @@ fun packAssets(config: Config) {
 			var checksum = 0
 			// Start from 1, coz 0 contains original checksum
 			var i = 1
-			while (i < Math.round(ramDiskSize / 4)) {
+			while i < Math.round(ramDiskSize / 4) {
 				// Well, needs better checksum... JavaScript messes with numbers
 				checksum = buffer.readUInt32LE(i * 4) & 0xFFFF ^ checksum
 				i++

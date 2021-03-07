@@ -6,7 +6,10 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "build.bat",
+            "command": "wine start build.bat",
+            "windows": {
+                "command": ".\\build.bat"
+            },
             "presentation": {
                 "echo": true,
                 "reveal": "always",

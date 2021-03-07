@@ -121,8 +121,7 @@ const KernelParams *paramsCache = null
 var startupMilliseconds: UInt64 = 0
 
 fun kernelInit(const params: Pointer<KernelParams>) {
-	serialPrintln("<Tofita> GreenteaOS " versionName " " STR(versionMajor) "." STR(
-		versionMinor) " " versionTag " kernel loaded and operational")
+	serialPrintln("<Tofita> Greentea OS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag + " kernel loaded and operational")
 	serialPrintf("<Tofita> CR3 points to: %8\n", (params.pml4 as! UInt64))
 	paramsCache = params
 	// PhysicalAllocator.init(Pointer.of(params.efiMemoryMap), params.physicalRamBitMaskVirtual,
@@ -186,8 +185,7 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	initText()
 	initializeCompositor()
 
-	quakePrintf("GreenteaOS " versionName
-				" " STR(versionMajor) "." STR(versionMinor) " " versionTag " loaded and operational\n")
+	quakePrintf("Greentea OS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag + " loaded and operational\n")
 
 	// enableLocalApic()
 

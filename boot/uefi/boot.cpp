@@ -136,7 +136,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	Framebuffer framebuffer;
 	initializeFramebuffer(&framebuffer, systemTable);
 	drawLoading(&framebuffer, 0);
-	drawText(L"GreenteaOS " versionName " " STR(versionMajor) "." STR(versionMinor) " " versionTag "",
+	drawText(L"Greentea OS",
 			 (framebuffer.height / 4) * 3 + 64, &framebuffer);
 	const uint16_t errorY = (framebuffer.height / 4) * 3 + 64 + 32;
 

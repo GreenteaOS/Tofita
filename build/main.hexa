@@ -159,7 +159,7 @@ for task in tasks {
 						[
 							'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
 							'/verbose /DLL /WX /MACHINE:X64 ',
-							[for (dep in deps[i]) config.tempFolder + '/tofita/' + dep + '.lib '].join(''),
+							[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.lib '].join(''),
 							config.tempFolder + '/tofita/' + dlls[i] + '_dll.obj ',
 							asm,
 							'/out:',
