@@ -94,6 +94,8 @@ struct ACPI {
 	Acpi20 acpi20;
 } __attribute__((packed));
 
+SIZEOF(ACPI, sizeof(Acpi10) + sizeof(Acpi20))
+
 extern "C++" template <typename T> uint64_t acpiTableEntries(const T *t, uint64_t size) {
 	return (t->header.length - sizeof(T)) / size;
 }
