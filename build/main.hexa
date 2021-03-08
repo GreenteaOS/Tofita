@@ -206,6 +206,9 @@ for task in tasks {
 				fs.copyFileSync(
 					config.tempFolder + '\\tofita\\loader.efi',
 					config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI')
+			}
+		case 'iso':
+			{
 				fs.copyFileSync(
 					'assets\\autorun.ico',
 					config.tempFolder + '\\tofita\\iso\\autorun.ico')
