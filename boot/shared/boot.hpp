@@ -32,9 +32,9 @@ typedef void function;
 
 extern "C++"
 template<typename T, uint32_t s, uint32_t t> struct checkSize {
-  static_assert(s == t, "wrong size");
+	static_assert(s == t, "wrong size");
 };
-#define SIZEOF(T, SIZE) checkSize<T, sizeof(T), SIZE> __SIZEOF__##T;
+#define SIZEOF(T, SIZE) namespace sizeofChecks { checkSize<T, sizeof(T), SIZE> __SIZEOF__##T; }
 
 // wchar_t is UTF-16LE with -fshort-wchar
 _Static_assert(sizeof(wchar_t) == 2, "bad sizeof");
