@@ -101,7 +101,14 @@ bool serialPortWritable() {
 	return true;
 }
 
+// Speeds up virtual machines
+volatile bool disableSerial = false;
+
 uint64_t serialPortWrite(uint8_t *buffer, uint64_t size) {
+	if (disableSerial) {
+		return 0;
+	}
+
 	if (buffer == NULL) {
 		return 0;
 	}
