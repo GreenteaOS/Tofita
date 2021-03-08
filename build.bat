@@ -6,7 +6,7 @@ cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
-node build.js build
+node build.js build iso
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
