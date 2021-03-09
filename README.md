@@ -45,13 +45,9 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 - Multicore modern 64-bit CPU (most AMD and Intel CPUs from 2009 and newer)
 - [Read more](https://greenteaos.github.io/wiki/cpus.html)
 
-[![Give a star](docs/star.png?raw=true)
+[![Give a star](docs/star.png?raw=true)Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
 
-Give some attention for Tofita be noticed](https://github.com/GreenteaOS/Tofita/stargazers)
-
-[![Become a patron](docs/patreon.png?raw=true)
-
-Help to hire developers and buy hardware](https://www.patreon.com/PeyTy)
+[![Become a patron](docs/patreon.png?raw=true)Help to hire developers and buy hardware](https://www.patreon.com/PeyTy)
 
 ## Tools
 
