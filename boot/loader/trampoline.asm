@@ -34,6 +34,11 @@ section .head
 ; xmm0, xmm1, xmm2, xmm3 for floating point arguments
 ; rax - returned value
 
+; Tofita 32-bit fastcall
+; ecx - first argument
+; edx - second argument
+; eax - returned value
+
 global trampolineCR3
 trampolineCR3:
 

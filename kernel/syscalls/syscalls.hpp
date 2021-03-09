@@ -20,7 +20,7 @@
 // wchar_t is UTF-16LE with -fshort-wchar
 _Static_assert(sizeof(wchar_t) == 2, "bad sizeof");
 
-enum class TofitaSyscalls : uint64_t {
+enum class TofitaSyscalls : uint32_t {
 	// System
 	Noop = 0,
 	Cpu = 1,
@@ -36,8 +36,43 @@ enum class TofitaSyscalls : uint64_t {
 	ExitProcess
 };
 
+// Used to make payloads same size in 32/64 bit
+extern "C++" template <typename T> struct Ref {
+private:
+	uint64_t userMemory;
+
+public:
+    operator uint64_t() const { return userMemory; }
+    operator T*() const { return (T*)userMemory; }
+    Ref() = default;
+    Ref(T* from) {
+    	userMemory = (uint64_t)from;
+    }
+};
+
+_Static_assert(sizeof(Ref<uint8_t>) == 8, "bad sizeof");
+
+// Non-pointer 64-bit values, like HWND
+extern "C++" template <typename T> struct Hold {
+private:
+	uint64_t userValue;
+
+public:
+    operator uint64_t() const { return userValue; }
+    operator T() const { return (T)userValue; }
+    Hold() = default;
+    Hold(T from) {
+    	userValue = (uint64_t)from;
+    }
+};
+
+_Static_assert(sizeof(Hold<uint8_t>) == 8, "bad sizeof");
+
+// Use pointer wrappers instead of raw pointers
+#pragma pack(push, 8)
+
 struct DebugLogPayload {
-	const wchar_t *message;
+	Ref<const wchar_t> message;
 	// TODO count chars at userspace, and transfer as length for SEH probing
 	uint64_t extra = 0;
 	uint64_t more = 0;
@@ -59,42 +94,43 @@ struct ShowWindowPayload {
 
 _Static_assert(sizeof(ShowWindowPayload) == 8 * 2, "bad sizeof");
 
-// TODO use pointer wrappers instead of raw pointers
 struct CreateWindowExPayload {
-	const wapi::WindowClass *wc;
-	wapi::HWnd hWnd;
+	Ref<const wapi::WindowClass> wc;
+	Hold<wapi::HWnd> hWnd;
 
 	// CreateWindowEx
-	const wchar_t *lpClassName;
+	Ref<const wchar_t> lpClassName;
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	const wchar_t *lpWindowName;
+	Ref<const wchar_t> lpWindowName;
 	uint32_t dwStyle;
 	int32_t x;
 	int32_t y;
 	int32_t nWidth;
 	int32_t nHeight;
-	wapi::HWnd hWndParent;
-	wapi::HMenu hMenu;
-	wapi::HInstance hInstance;
-	void *lpParam;
+	Hold<wapi::HWnd> hWndParent;
+	Hold<wapi::HMenu> hMenu;
+	Hold<wapi::HInstance> hInstance;
+	Ref<void> lpParam;
 };
 
 _Static_assert(sizeof(CreateWindowExPayload) == 8 * 8 + 5 * 4 + 4, "bad sizeof");
 
 struct PostMessagePayload {
-	wapi::HWnd hWnd;
+	Hold<wapi::HWnd> hWnd;
 	wapi::Message msg;
-	void *wParam;
-	void *lParam;
+	Ref<void> wParam;
+	Ref<void> lParam;
 };
 
 _Static_assert(sizeof(PostMessagePayload) == 8 + 4 + 8 * 2 + 4, "bad sizeof");
 
 struct GetMessagePayload {
-	wapi::Msg *msg;
-	wapi::HWnd hWnd;
+	Ref<wapi::Msg> msg;
+	Hold<wapi::HWnd> hWnd;
 	uint32_t wMsgFilterMin;
 	uint32_t wMsgFilterMax;
 };
 
 _Static_assert(sizeof(GetMessagePayload) == 8 * 2 + 4 * 2, "bad sizeof");
+
+#pragma pack(pop)

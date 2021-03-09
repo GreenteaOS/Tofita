@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Constants
+// Constants: shared data from the bootloader to the kernel
 
 // Start of kernel sections in memory
 let kernelVirtualBase = 0xffff800000000000u64

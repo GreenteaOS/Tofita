@@ -66,8 +66,12 @@ fun packAssets(config: Config) {
 		assetPath.push(config.tempFolder + '\\tofita\\tofita.exe')
 
 		for dll in dlls {
-			assetName.push('desktop/' + dll + '.dll')
-			assetPath.push(config.tempFolder + '\\tofita\\\(dll).dll')
+			// TODO \ not werks in js assetName.push(`C:\Windows\System32\` + dll + '.dll')
+			assetName.push(`C:\\Windows\\System32\\` + dll + '.dll')
+			assetPath.push(config.tempFolder + '\\tofita\\\(dll).64.dll')
+
+			assetName.push(`C:\\Windows\\SysWOW64\\` + dll + '.dll')
+			assetPath.push(config.tempFolder + '\\tofita\\\(dll).32.dll')
 		}
 
 		packFonts(config)

@@ -25,7 +25,6 @@
 %define CODE (USER_CODE64_SEL + 3)
 %define CODEWoW (USER_CODE32_SEL + 3)
 
-global enterUserModeWoW; 32-bit mode TODO CODEWoW
 global enterUserMode; 64-bit mode
 enterUserMode:
 	cli
@@ -240,6 +239,9 @@ registerStorageSize equ (0x78 + 128)
 	cmp rax, 0x03
 	jne .noSwapGs
 	swapgs
+
+	; TODO save/restore DS?
+	mov ds, [rsp + InterruptFrame.ss]
 .noSwapGs:
 %endmacro
 

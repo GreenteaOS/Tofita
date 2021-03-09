@@ -16,13 +16,14 @@
 // Loads EXE and DLL files
 // TODO 32-bit loader
 
+extern "C++" {
 namespace exe {
 
 // TODO ntdll should have tofitaStub(){} for unresolved dll imports -> log them
 
 typedef function(__fastcall *Entry)(uint64_t entry);
 
-void *offsetPointer(void *data, ptrdiff_t offset) {
+void *offsetPointer(const void *data, ptrdiff_t offset) {
 	return (void *)((uint64_t)data + offset);
 }
 
@@ -36,6 +37,7 @@ struct PeInterim {
 	uint64_t entry; // _DllMainCRTStartup
 	const ImageDataDirectory *imageDataDirectory;
 	uint64_t sizeOfStackReserve;
+	bool is64bit;
 };
 
 struct ExeInterim {
@@ -56,15 +58,12 @@ struct Executable {
 };
 
 // TODO probe for read/write
-auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
-	RamDiskAsset asset = getRamDiskAsset(name);
-	serialPrintf(L"[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data);
+template<typename SIZE, typename HEADER>
+auto loadDllAsset(RamDiskAsset asset, const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	auto ptr = (uint8_t *)asset.data;
 	auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
-	serialPrintf(L"[loadDLL] PE header signature 'PE' == '%s'\n", peHeader);
-	auto peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader));
-	serialPrintf(L"[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->magic,
-				 0x020B);
+	auto peOptionalHeader = (const HEADER *)((uint64_t)peHeader + sizeof(PeHeader));
+
 	serialPrintf(L"[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader->sizeOfImage);
 
 	let pages = DOWN_BYTES_TO_PAGES(peOptionalHeader->sizeOfImage) + 1;
@@ -107,23 +106,23 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	}
 
 	auto imageDataDirectory =
-		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(Pe64OptionalHeader));
+		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(HEADER));
 
 	// Relocate EXE or DLL to a new base
 	ptrdiff_t delta = (uint64_t)buffer - (uint64_t)peOptionalHeader->imageBase;
 	if (delta != 0) {
 		uint8_t *codeBase = (uint8_t *)buffer;
 
-		PIMAGE_BASE_RELOCATION relocation;
+		const IMAGE_BASE_RELOCATION *relocation;
 
-		PIMAGE_DATA_DIRECTORY directory =
-			(PIMAGE_DATA_DIRECTORY)&imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+		auto directory =
+			(const IMAGE_DATA_DIRECTORY*)&imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
 
 		if (directory->size == 0) {
 			// return (delta == 0);
 		}
 
-		relocation = (PIMAGE_BASE_RELOCATION)(codeBase + directory->virtualAddress);
+		relocation = (const IMAGE_BASE_RELOCATION*)(codeBase + directory->virtualAddress);
 		for (; relocation->virtualAddress > 0;) {
 			uint32_t i = 0;
 			uint8_t *dest = codeBase + relocation->virtualAddress;
@@ -148,6 +147,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 					break;
 
 					//#ifdef _WIN64
+					// TODO x32
 				case IMAGE_REL_BASED_DIR64: {
 					uint64_t *patchAddr64 = (uint64_t *)(dest + offset);
 					*patchAddr64 += (uint64_t)delta;
@@ -161,7 +161,7 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 			}
 
 			// advance to next relocation block
-			relocation = (PIMAGE_BASE_RELOCATION)offsetPointer(relocation, relocation->sizeOfBlock);
+			relocation = (const IMAGE_BASE_RELOCATION*)offsetPointer(relocation, relocation->sizeOfBlock);
 		}
 	}
 
@@ -176,9 +176,9 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 			uint64_t codeBase = (uint64_t)buffer;
 			const ImageDataDirectory *directory = &imageDataDirectory[i];
 
-			PIMAGE_EXPORT_DIRECTORY exports;
+			const IMAGE_EXPORT_DIRECTORY *exports;
 
-			exports = (PIMAGE_EXPORT_DIRECTORY)((uint64_t)buffer + (uint64_t)directory->virtualAddress);
+			exports = (const IMAGE_EXPORT_DIRECTORY*)((uint64_t)buffer + (uint64_t)directory->virtualAddress);
 
 			uint32_t i = 0;
 			uint32_t *nameRef = (uint32_t *)(codeBase + exports->addressOfNames);
@@ -211,8 +211,31 @@ auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	pei.entry = (uint64_t)buffer + (uint64_t)peOptionalHeader->addressOfEntryPoint;
 	pei.imageDataDirectory = imageDataDirectory;
 	pei.sizeOfStackReserve = peOptionalHeader->sizeOfStackReserve;
+	pei.is64bit = sizeof(SIZE) == sizeof(uint64_t);
 
 	return pei;
+}
+
+auto loadDll(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
+	RamDiskAsset asset = getRamDiskAsset(name);
+	serialPrintf(L"[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name, asset.size, asset.data);
+
+	auto ptr = (uint8_t *)asset.data;
+	auto peHeader = (const PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
+	serialPrintf(L"[loadDLL] PE header signature 'PE' == '%s'\n", peHeader);
+
+	auto peOptionalHeader = (const Pe64OptionalHeader *)((uint64_t)peHeader + sizeof(PeHeader));
+
+	serialPrintf(L"[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader->magic,
+				 0x020B);
+
+	auto is64bit = peOptionalHeader->magic == 0x020B;
+
+	if (is64bit) {
+		return loadDllAsset<uint64_t, Pe64OptionalHeader>(asset, name, root, exec);
+	} else {
+		return loadDllAsset<uint32_t, Pe32OptionalHeader>(asset, name, root, exec);
+	}
 }
 
 // TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
@@ -244,6 +267,7 @@ PeExportLinkedList *getProcAddress(const char8_t *name, PeExportLinkedList *root
 	return null;
 }
 
+template<typename SIZE>
 function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	var buffer = pei.base;
 	var imageDataDirectory = pei.imageDataDirectory;
@@ -252,19 +276,18 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	{
 		uint8_t *at =
 			(uint8_t *)((uint64_t)buffer + imageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].virtualAddress);
-		auto iid = (IMAGE_IMPORT_DESCRIPTOR *)at;
+		auto iid = (const IMAGE_IMPORT_DESCRIPTOR *)at;
 
 		// DLL
 		while (iid->originalFirstThunk != 0) {
 			char8_t *szName = (char8_t *)((uint64_t)buffer + iid->name);
-			auto pThunkOrg = (IMAGE_THUNK_DATA *)((uint64_t)buffer + iid->originalFirstThunk);
-			FARPROC *funcRef;
-			funcRef = (FARPROC *)((uint64_t)buffer + iid->firstThunk);
+			auto pThunkOrg = (const IMAGE_THUNK_DATA<SIZE> *)((uint64_t)buffer + iid->originalFirstThunk);
+			auto funcRef = (SIZE *)((uint64_t)buffer + iid->firstThunk);
 
 			while (pThunkOrg->u1.addressOfData != 0) {
 				char8_t *szImportName;
 				uint32_t ord = 666;
-				auto func = (void *)null;
+				SIZE func = 0;
 
 				if ((pThunkOrg->u1.ordinal & 0x80000000) != 0) {
 					ord = pThunkOrg->u1.ordinal & 0xffff;
@@ -272,8 +295,8 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 								 L"IMPLEMENTED YET!\n",
 								 szName, ord, pThunkOrg->u1.function);
 				} else {
-					IMAGE_IMPORT_BY_NAME *pIBN =
-						(IMAGE_IMPORT_BY_NAME *)((uint64_t)buffer +
+					const IMAGE_IMPORT_BY_NAME *pIBN =
+						(const IMAGE_IMPORT_BY_NAME *)((uint64_t)buffer +
 												 (uint64_t)((uint64_t)pThunkOrg->u1.addressOfData &
 															0xffffffff));
 					ord = pIBN->hint;
@@ -282,17 +305,17 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 								 szImportName, ord, pThunkOrg->u1.function);
 
 					// Resolve import
-					func = null;
+					func = 0;
 
 					PeExportLinkedList *proc = getProcAddress(szImportName, root);
 
 					if (proc != null) {
-						func = (void *)proc->ptr;
+						func = (SIZE)proc->ptr;
 					} else
-						func = (void *)getProcAddress(u8"tofitaFastStub", root)->ptr;
+						func = (SIZE)getProcAddress(u8"tofitaFastStub", root)->ptr;
 				}
 
-				*funcRef = (FARPROC)func;
+				*funcRef = (SIZE)func;
 				pThunkOrg++;
 				funcRef++;
 			}
@@ -324,8 +347,9 @@ auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	return ei;
 }
 
+template<typename SIZE>
 function resolveExeImports(const ExeInterim ei, PeExportLinkedList *root) {
-	resolveDllImports(ei.pei, root);
+	resolveDllImports<SIZE>(ei.pei, root);
 }
 
 function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
@@ -341,16 +365,43 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 		exec.pml4 = process->pml4;
 
 		auto app = loadExe(file, root, &exec);
-		auto ntdll = loadDll(L"desktop/ntdll.dll", root, &exec); // TODO proper path!!!
-		auto kernel32 = loadDll(L"desktop/kernel32.dll", root, &exec);
-		auto gdi32 = loadDll(L"desktop/gdi32.dll", root, &exec);
-		auto user32 = loadDll(L"desktop/user32.dll", root, &exec);
+		auto is64bit = app.pei.is64bit;
 
-		resolveDllImports(ntdll, root);
-		resolveDllImports(kernel32, root);
-		resolveDllImports(gdi32, root);
-		resolveDllImports(user32, root);
-		resolveExeImports(app, root);
+		// Dependencies
+		// TODO proper system path!!! + Windows 7 order of search
+		// TODO respect ENV PATH
+		#define BIT32 L"C:\\Windows\\SysWOW64\\"
+		#define BIT64 L"C:\\Windows\\System32\\"
+		#define BIT(DLL) (is64bit?BIT64 DLL:BIT32 DLL)
+
+		auto ntdll = loadDll(BIT(L"ntdll.dll"), root, &exec);
+		auto kernel32 = loadDll(BIT(L"kernel32.dll"), root, &exec);
+		auto gdi32 = loadDll(BIT(L"gdi32.dll"), root, &exec);
+		auto user32 = loadDll(BIT(L"user32.dll"), root, &exec);
+
+		#undef BIT32
+		#undef BIT64
+		#undef BIT
+
+		if (is64bit) {
+			resolveDllImports<uint64_t>(ntdll, root);
+			resolveDllImports<uint64_t>(kernel32, root);
+			resolveDllImports<uint64_t>(gdi32, root);
+			resolveDllImports<uint64_t>(user32, root);
+			resolveExeImports<uint64_t>(app, root);
+
+			process->is64bit = true;
+			process->frame.cs = USER_CODE64_SEL + 3;
+		} else {
+			resolveDllImports<uint32_t>(ntdll, root);
+			resolveDllImports<uint32_t>(kernel32, root);
+			resolveDllImports<uint32_t>(gdi32, root);
+			resolveDllImports<uint32_t>(user32, root);
+			resolveExeImports<uint32_t>(app, root);
+
+			process->is64bit = false;
+			process->frame.cs = USER_CODE32_SEL + 3;
+		}
 
 		Entry entry = (Entry)ntdll.base;
 		process->frame.ip = ntdll.entry; // Contains crt0
@@ -360,3 +411,5 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 }
 
 } // namespace exe
+
+}

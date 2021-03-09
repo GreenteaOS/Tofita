@@ -143,8 +143,7 @@ struct ACPI {
 // Entry point
 efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
 	initSerial();
-	serialPrint(L"\n[[[efi_main]]] Tofita " STR(versionMajor) "." STR(
-		versionMinor) " " versionName " UEFI bootloader. Welcome!\n");
+	serialPrint(L"\n[[[efi_main]]] Tofita " versionName " UEFI bootloader. Welcome!\n");
 
 	initText();
 
@@ -193,7 +192,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	Framebuffer framebuffer;
 	initializeFramebuffer(&framebuffer, systemTable);
 	drawLoading(&framebuffer, 0);
-	drawText(L"Greentea OS",
+	drawText(L"Greentea OS" " " versionName,
 			 (framebuffer.height / 4) * 3 + 64, &framebuffer);
 	const uint16_t errorY = (framebuffer.height / 4) * 3 + 64 + 32;
 

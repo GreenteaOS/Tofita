@@ -39,6 +39,11 @@ let llvm = 'LLVM-10.0.0'
 tasks.shift()
 tasks.shift()
 
+let today = new Date()
+let month = today.getMonth()
+let versionRolling = today.getFullYear() * 10000 + month * 100 + today.getDate()
+let versionName = today.getFullYear() + '.' + month + '.' + today.getDate()
+
 if (tasks.length == 0) {
 	console.log('No tasks defined')
 }
@@ -86,13 +91,12 @@ for task in tasks {
 				require('child_process').execSync(
 					[
 						'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
-						'-D versionMajor=' + config.versionMajor + ' ',
-						'-D versionMinor=' + config.versionMinor + ' ',
-						'-D versionName=\\"' + config.versionName + '\\" ',
-						'-D versionTag=\\"' + config.versionTag + '\\" ',
+						'-D versionRolling=' + versionRolling + ' ',
+						'-D versionName=\\"' + versionName + '\\" ',
 						'-mtune=nocona -fno-stack-protector -fshort-wchar -w -mno-red-zone ',
 						'-fno-stack-check ',
 						'-fvisibility=hidden ',
+						'-Dbit64 ',
 						'-ffreestanding ',
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
 						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
@@ -129,44 +133,59 @@ for task in tasks {
 					config.tempFolder + '\\tofita\\tofita64.asm.obj dlls\\tofita32.dll\\tofita64.asm', { stdio: 'inherit' }
 				)
 
-				// TODO 32-bit
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win32 -o ' +
+					config.tempFolder + '\\tofita\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm', { stdio: 'inherit' }
+				)
+
+				fun buildDLLs(bit: String, arch: String) {
 				for i in dlls.length {
 
 					// TODO refactor
 					var asm = ' '
 					if (dlls[i] == 'ntdll') {
-						asm = config.tempFolder + '/tofita/tofita64.asm.obj '
+						asm = config.tempFolder + '/tofita/tofita\(bit).asm.obj '
 					}
 
 					require('child_process').execSync(
 						[
 							'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
-							'-m64 -target x86_64-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
+							'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
 							'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w ',
 							'-Wimplicit-function-declaration -O2 -c ',
 							'-mtune=nocona -fno-stack-protector -mno-red-zone ',
+							'-fno-rtti -fno-exceptions -fvisibility=default ',
 							'-fno-stack-check ',
+							'-Dbit\(bit) ',
 							'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
 							'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
 							'-std=c++2a ',
 							'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
 							'-o ',
-							config.tempFolder + '/tofita/' + dlls[i] + '_dll.obj'
+							config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj'
 						].join(''), { stdio: 'inherit' }
 					)
+
+					// Bruh
+					let machine = (bit == '32') ? '86' : '64'
 
 					require('child_process').execSync(
 						[
 							'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
-							'/verbose /DLL /WX /MACHINE:X64 ',
-							[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.lib '].join(''),
-							config.tempFolder + '/tofita/' + dlls[i] + '_dll.obj ',
+							'/verbose /DLL /WX /MACHINE:X\(machine) ',
+							[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.' + bit + '.lib '].join(''),
+							config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj ',
 							asm,
 							'/out:',
-							config.tempFolder + '/tofita/' + dlls[i] + '.dll'
+							config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '.dll'
 						].join(''), { stdio: 'inherit' }
 					)
 				}
+				}
+
+				// 64-bit & 32-bit WoW64
+				buildDLLs('64', 'x86_64')
+				buildDLLs('32', 'i686')
 
 				// UEFI
 
@@ -177,10 +196,8 @@ for task in tasks {
 						'-O2 -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-D versionMajor=' + config.versionMajor + ' ',
-						'-D versionMinor=' + config.versionMinor + ' ',
-						'-D versionName=\\"' + config.versionName + '\\" ',
-						'-D versionTag=\\"' + config.versionTag + '\\" ',
+						'-D versionRolling=' + versionRolling + ' ',
+						'-D versionName=\\"' + versionName + '\\" ',
 
 						'-fshort-wchar -mno-red-zone -Os',
 						' -c ',

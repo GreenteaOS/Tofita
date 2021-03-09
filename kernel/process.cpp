@@ -20,6 +20,7 @@ function Process_init(Process *process) {
 	process->schedulable = false;						// Not yet ready
 	process->scheduleOnNextTick = false;				// Prevent DoS attack
 	memset(&process->frame, 0, sizeof(InterruptFrame)); // Zeroing
+	process->is64bit = true;
 	process->frame.cs = USER_CODE64_SEL + 3;
 	process->frame.ss = USER_DATA32_SEL + 3;
 	// process->frame.flags = 0x002; // No interrupts

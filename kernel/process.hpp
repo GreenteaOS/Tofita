@@ -36,8 +36,6 @@ struct Process {
 	// CR3, should be page aligned
 	pages::PageEntry *volatile pml4;
 
-	// TODO 32-bit
-
 	// State
 	InterruptFrame frame;
 
@@ -58,6 +56,9 @@ struct Process {
 	uint64_t messagesUsed;
 	bool awaitsGetMessage;
 	// TODO bool wmQuit/wmPaint for lowest-priority must-never-lost messages
+
+	// 32-bit
+	bool is64bit;
 };
 
 constexpr uint64_t ProcessLimit = 256;

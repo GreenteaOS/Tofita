@@ -149,10 +149,17 @@ enum class Message : uint32_t {
 	WM_SIZING = 0x0214
 };
 
+extern "C++"
+template<typename T, uint16_t s, uint16_t t> struct checkSize {
+    static_assert(s == t, "wrong size");
+};
+#define SIZEOF(T, SIZE) namespace sizeofChecks { checkSize<T, sizeof(T), SIZE> __SIZEOF__##T; }
+
 struct Point {
 	int32_t x;
 	int32_t y;
 };
+SIZEOF(Point, 8)
 
 struct Msg {
 	HWnd hwnd;
@@ -161,12 +168,29 @@ struct Msg {
 	void *lParam;
 	uint32_t time;
 	Point pt;
+
+#ifdef bit64
+	// Hidden under _MAC, safe to use? Why it is than sizeof(48) in MSVC
+	// Documentation explicitly assumes it anyway
 	uint32_t lPrivate;
+#endif
 };
 
+#ifdef bit64
 _Static_assert(sizeof(Msg) == 48, "bad sizeof");
+#else
+SIZEOF(HWnd, 4)
+SIZEOF(Message, 4)
+SIZEOF(Msg, 28)
+#endif
 
+#ifdef bit64
 typedef LResult (*WindowProcedure)(HWnd hWnd, Message uMsg, void *wParam, void *lParam);
+#else
+// TODO MUST support both cdecl and stdcall (or fastcall?) cause some apps do it
+// ^ use Linux convention to pass all args + func pointer, and build frame from asm & jmp
+typedef LResult (__stdcall *WindowProcedure)(HWnd hWnd, Message uMsg, void *wParam, void *lParam);
+#endif
 
 struct WindowClass {
 	uint32_t style;
@@ -181,7 +205,11 @@ struct WindowClass {
 	const wchar_t *lpszClassName;
 };
 
+#ifdef bit64
 _Static_assert(sizeof(WindowClass) == 72, "bad sizeof");
+#else
+_Static_assert(sizeof(WindowClass) == 40, "bad sizeof");
+#endif
 
 #define SW_HIDE 0
 #define SW_SHOWNORMAL 1

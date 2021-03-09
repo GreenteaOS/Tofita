@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define USER32_DLL __declspec(dllexport)
+#ifdef bit64
+	#define USER32_DLL __declspec(dllexport)
+#else
+	#define USER32_DLL __declspec(dllexport) __stdcall
+#endif
+
 #include "user32.hpp"
 #include "user32Vars.hpp"
 #include "../kernel32.dll/kernel32.hpp"
@@ -310,6 +315,12 @@ wapi::LResult DefWindowProcW(wapi::HWnd hWnd, wapi::Message uMsg, void *wParam, 
 }
 }
 
+#ifdef bit64
 extern "C" __attribute__((fastcall)) void _DllMainCRTStartup() {
 	user32::rootClass.next = nullptr;
 }
+#else
+extern "C" __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+	user32::rootClass.next = nullptr;
+}
+#endif

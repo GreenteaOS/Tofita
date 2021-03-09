@@ -17,10 +17,14 @@
 #include "../types.hpp"
 
 #ifndef NTDLL32_DLL
-#define NTDLL32_DLL __declspec(dllimport)
+	#ifdef bit64
+		#define NTDLL32_DLL __declspec(dllimport)
+	#else
+		#define NTDLL32_DLL __declspec(dllimport) __stdcall
+	#endif
 #endif
 
 // TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
 extern "C" {
-NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx);
+NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) asm("KiFastSystemCall");
 }

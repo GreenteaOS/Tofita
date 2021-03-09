@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+extern "C++" {
 namespace exe {
 
 // 1 byte aligned
@@ -148,17 +149,17 @@ typedef struct _IMAGE_EXPORT_DIRECTORY {
 	uint32_t addressOfFunctions;
 	uint32_t addressOfNames;
 	uint32_t addressOfNameOrdinals;
-} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY;
+} IMAGE_EXPORT_DIRECTORY;
 
 typedef struct _IMAGE_BASE_RELOCATION {
 	uint32_t virtualAddress;
 	uint32_t sizeOfBlock;
-} IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION;
+} IMAGE_BASE_RELOCATION;
 
 typedef struct _IMAGE_DATA_DIRECTORY {
 	uint32_t virtualAddress;
 	uint32_t size;
-} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
+} IMAGE_DATA_DIRECTORY;
 #define IMAGE_SIZEOF_BASE_RELOCATION 8
 #define IMAGE_REL_BASED_ABSOLUTE 0
 #define IMAGE_REL_BASED_DIR64 10
@@ -174,7 +175,7 @@ typedef struct _IMAGE_IMPORT_DESCRIPTOR {
 	uint32_t forwarderChain;
 	uint32_t name;
 	uint32_t firstThunk;
-} IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR;
+} IMAGE_IMPORT_DESCRIPTOR;
 #pragma pack()
 
 typedef void (*FARPROC)();
@@ -182,15 +183,18 @@ typedef void (*FARPROC)();
 typedef struct _IMAGE_IMPORT_BY_NAME {
 	uint16_t hint;
 	uint8_t name[1];
-} IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME;
+} IMAGE_IMPORT_BY_NAME;
 
-typedef struct _IMAGE_THUNK_DATA {
+template<typename SIZE>
+struct IMAGE_THUNK_DATA {
 	union {
-		uint64_t function;					 // address of imported function
+		SIZE function;				   	 // address of imported function
 		uint32_t ordinal;					 // ordinal value of function
-		PIMAGE_IMPORT_BY_NAME addressOfData; // RVA of imported name
+		SIZE addressOfData; // RVA of imported name
+		// ^ IMAGE_IMPORT_BY_NAME*
 		uint32_t forwarderStringl;			 // RVA to forwarder string
 	} u1;
-} IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA;
+};
 
 } // namespace exe
+}

@@ -16,7 +16,11 @@
 #include "../ntdll.dll/ntdll.hpp"
 
 #ifndef GDI32_DLL
-#define GDI32_DLL __declspec(dllimport)
+	#ifdef bit64
+		#define GDI32_DLL __declspec(dllimport)
+	#else
+		#define GDI32_DLL __declspec(dllimport) __stdcall
+	#endif
 #endif
 
 extern "C" {}

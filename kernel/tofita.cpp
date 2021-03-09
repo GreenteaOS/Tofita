@@ -343,7 +343,11 @@ function kernelThread() {
 					// TODO refactor to separate syscall handler per-DLL
 
 					if (syscall == TofitaSyscalls::DebugLog) {
-						serialPrintf(L"[[DebugLog:PID %d]] ", index);
+						if (process->is64bit) {
+							serialPrintf(L"[[DebugLog:PID %d]] ", index);
+						} else {
+							serialPrintf(L"[[DebugLog:PID %d (32-bit)]] ", index);
+						}
 						serialPrintf(L"[[rcx=%u rdx=%u r8=%u]] ", frame->rcxArg0, frame->rdxArg1, frame->r8);
 
 						if (probeForReadOkay(frame->rdxArg1, sizeof(DebugLogPayload))) {

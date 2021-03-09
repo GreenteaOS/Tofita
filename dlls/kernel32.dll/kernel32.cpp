@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define KERNEL32_DLL __declspec(dllexport)
+#ifdef bit64
+	#define KERNEL32_DLL __declspec(dllexport)
+#else
+	#define KERNEL32_DLL __declspec(dllexport) __stdcall
+#endif
+
 #include "kernel32.hpp"
 #include "kernel32Vars.hpp"
 
@@ -43,5 +48,9 @@ void *HeapAlloc(wapi::Handle heap, uint32_t flags, size_t bytes) {
 	return (void *)LocalAlloc(0, bytes);
 }
 
+#ifdef bit64
 __attribute__((fastcall)) void _DllMainCRTStartup() {}
+#else
+__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {}
+#endif
 }

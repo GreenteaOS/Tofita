@@ -13,10 +13,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define GDI32_DLL __declspec(dllexport)
+#ifdef bit64
+	#define GDI32_DLL __declspec(dllexport)
+#else
+	#define GDI32_DLL __declspec(dllexport) __stdcall
+#endif
+
 #include "gdi32.hpp"
 #include "gdi32Vars.hpp"
 
-extern "C" {
-__attribute__((fastcall)) void _DllMainCRTStartup() {}
+#ifdef bit64
+extern "C" __attribute__((fastcall)) void _DllMainCRTStartup() {
 }
+#else
+extern "C" __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+}
+#endif

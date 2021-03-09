@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define TOFITA32_DLL __declspec(dllexport)
+#define TOFITA32_DLL __declspec(dllexport) __attribute__((fastcall))
 #include "tofita32.hpp"
 #include "tofita32Vars.hpp"
 
@@ -24,10 +24,18 @@ uint32_t tofitaFastStub() {
 }
 
 // External
+#ifdef bit64
 uint64_t tofitaFastSystemCallWrapper(TofitaSyscalls rcx, uint64_t rdx);
+#else
+uint32_t __attribute__((fastcall)) tofitaFastSystemCallWrapper(TofitaSyscalls rcx, uint32_t rdx);
+#endif
 
 // Return value is placed into RAX
+#ifdef bit64
 uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx) {
+#else
+uint32_t tofitaFastSystemCall(TofitaSyscalls rcx, uint32_t rdx) {
+#endif
 	return tofitaFastSystemCallWrapper(rcx, rdx);
 }
 

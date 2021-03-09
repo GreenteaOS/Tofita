@@ -17,7 +17,11 @@
 #include "../tofita32.dll/tofita32.hpp"
 
 #ifndef KERNEL32_DLL
-#define KERNEL32_DLL __declspec(dllimport)
+	#ifdef bit64
+		#define KERNEL32_DLL __declspec(dllimport)
+	#else
+		#define KERNEL32_DLL __declspec(dllimport) __stdcall
+	#endif
 #endif
 
 extern "C" {
