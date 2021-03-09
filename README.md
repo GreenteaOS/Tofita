@@ -18,25 +18,18 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 
 ## Features
 
- - UEFI 64-bit boot
- - 64-bit x86 oriented
- - Colorful graphics with transparency and double buffering
+ - UEFI 64-bit x86 hybrid performance-oriented kernel
  - Quake-style terminal (hit `~` to show/hide)
  - Desktop GUI
- - PS/2 mouse
- - PS/2 keyboard
- - COM-port debug output
- - Initial RAM disk for LiveCD/LiveUSB and installer
  - Tested on those VMs:
    - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
    - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
    - WMware Workstation `(Other 64-bit, Virtualize Intel VT-x/EPT or AMD-V/RVI, Firmware type - UEFI)`
- - Hybrid performance-oriented kernel
+   - QEMU with KVM or WHPX `(-bios OVMF.fd -m 2048 -serial stdio -vga std -machine pc-q35-2.10 -smp 2)`
  - Very low on resources, just 1 GB RAM minimum required
  - Isolation and containerization of everything
- - ACPI 2.0, CPUID, SEH-style memory probing in syscalls
- - Preemptive multitasking/multithreading (both kernel and userspace)
  - Exclusively only multi-core CPUs
+ - NjRAA graphics stack
 
 ## GreenteaOS (Tofita) system requirements
 
