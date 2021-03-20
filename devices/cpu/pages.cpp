@@ -251,8 +251,14 @@ PageEntry *freeCR3(PageEntry *pml4) {
 // Lower half
 // TODO protection ring
 // TODO lower half limit bounds check (it is less than upper starting range)
-function mapUserspaceMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr,
-							uint32_t pageCount) {}
+bool mapUserspaceMemory(
+	PageEntry *pml4entries,
+	uint64_t virtualAddr,
+	uint64_t physicalAddr,
+	uint32_t pageCount,
+	AddressAwareness limits
+) {
+}
 
 // Same as VirtualAlloc
 // TODO protection ring

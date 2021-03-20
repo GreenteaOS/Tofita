@@ -400,6 +400,7 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			resolveExeImports<uint32_t>(app, root);
 
 			process->is64bit = false;
+			process->limits = pages::AddressAwareness::Bit32limit2GB;
 			process->frame.cs = USER_CODE32_SEL + 3;
 		}
 

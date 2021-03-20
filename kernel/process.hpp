@@ -59,6 +59,7 @@ struct Process {
 
 	// 32-bit
 	bool is64bit;
+	pages::AddressAwareness limits;
 };
 
 constexpr uint64_t ProcessLimit = 256;

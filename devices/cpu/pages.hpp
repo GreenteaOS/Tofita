@@ -16,6 +16,15 @@
 #define PACKED __attribute__((gcc_struct, packed))
 
 namespace pages {
+
+enum class AddressAwareness : uint8_t {
+	Bit32limit2GB = 0x0000, // Default
+	Bit32limit3GB = 0x0001, // Large address aware (compatibility mode)
+	Bit32limit4GB = 0x0002, // Large address aware on 64-bit kernels
+	Bit64limit8TB = 0x0003, // Default
+	Bit64limit128TB = 0x0004, // Default on newer kernels (compatibility mode)
+};
+
 typedef struct {
 	// Is the page present in physical memory?
 	uint8_t present : 1;
