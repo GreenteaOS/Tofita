@@ -50,14 +50,44 @@ if (tasks.length == 0) {
 
 for task in tasks {
 	switch task {
-		case 'build':
+		case 'clean':
 			{
-				// Cleanup
 				if !fs.existsSync(config.tempFolder + '\\tofita') {
 					fs.mkdirSync(config.tempFolder + '\\tofita')
 				}
 
+				// Cleanup
 				deleteFolderRecursive(config.tempFolder + '\\tofita', noRemoveSelf: true)
+			}
+		case 'asm':
+			{
+				// CR3 TRAMPOLINE
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
+					config.tempFolder + '/tofita/trampoline.o boot\\loader\\trampoline.asm', { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
+					config.tempFolder + '\\tofita\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
+				)
+
+				// DLL
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
+					config.tempFolder + '\\tofita\\tofita64.asm.obj dlls\\tofita32.dll\\tofita64.asm', { stdio: 'inherit' }
+				)
+
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f win32 -o ' +
+					config.tempFolder + '\\tofita\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm', { stdio: 'inherit' }
+				)
+			}
+		case 'build':
+			{
+				if !fs.existsSync(config.tempFolder + '\\tofita') {
+					fs.mkdirSync(config.tempFolder + '\\tofita')
+				}
 
 				// Create directory tofita/iso/EFI/BOOT/
 				let dirs = [
@@ -78,16 +108,7 @@ for task in tasks {
 				if fs.existsSync(assets) {
 					fs.unlinkSync(assets)
 				}
-
-				// CR3 TRAMPOLINE
-
-				require('child_process').execSync(
-					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
-					config.tempFolder + '/tofita/trampoline.o boot\\loader\\trampoline.asm', { stdio: 'inherit' }
-				)
-
 				// KERNEL
-
 				require('child_process').execSync(
 					[
 						'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
@@ -110,11 +131,6 @@ for task in tasks {
 				)
 
 				require('child_process').execSync(
-					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
-					config.tempFolder + '\\tofita\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
-				)
-
-				require('child_process').execSync(
 					[
 						'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
 						'/verbose /WX /MACHINE:X64 /entry:kernelMain /SUBSYSTEM:CONSOLE ',
@@ -127,17 +143,6 @@ for task in tasks {
 				)
 
 				// DLL
-
-				require('child_process').execSync(
-					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +
-					config.tempFolder + '\\tofita\\tofita64.asm.obj dlls\\tofita32.dll\\tofita64.asm', { stdio: 'inherit' }
-				)
-
-				require('child_process').execSync(
-					'..\\Teapot\\nasm-2.14.02\\nasm -f win32 -o ' +
-					config.tempFolder + '\\tofita\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm', { stdio: 'inherit' }
-				)
-
 				fun buildDLLs(bit: String, arch: String) {
 				for i in dlls.length {
 

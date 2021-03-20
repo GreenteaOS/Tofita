@@ -6,12 +6,12 @@ cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
-node build.js build iso
+node build.js clean asm build iso
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
-::node build.js vbox
 echo [36m[Success][0m
+::node build.js vbox
 ::node tools\vbox.js
 ::node tools\listen.js
 ::node tools\pipe.js
