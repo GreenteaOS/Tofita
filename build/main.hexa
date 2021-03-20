@@ -50,7 +50,7 @@ if (tasks.length == 0) {
 
 for task in tasks {
 	switch task {
-		case 'clean':
+		case 'init':
 			{
 				if !fs.existsSync(config.tempFolder + '\\tofita') {
 					fs.mkdirSync(config.tempFolder + '\\tofita')
@@ -58,6 +58,26 @@ for task in tasks {
 
 				// Cleanup
 				deleteFolderRecursive(config.tempFolder + '\\tofita', noRemoveSelf: true)
+
+				// Create directory tofita/iso/EFI/BOOT/
+				let dirs = [
+					'\\tofita',
+					'\\tofita\\iso',
+					'\\tofita\\iso\\EFI',
+					'\\tofita\\iso\\EFI\\BOOT'
+				]
+
+				for dir in dirs {
+					if !fs.existsSync(config.tempFolder + dir) {
+						fs.mkdirSync(config.tempFolder + dir)
+					}
+				}
+
+				// Assets
+				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
+				if fs.existsSync(assets) {
+					fs.unlinkSync(assets)
+				}
 			}
 		case 'asm':
 			{
@@ -83,31 +103,95 @@ for task in tasks {
 					config.tempFolder + '\\tofita\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm', { stdio: 'inherit' }
 				)
 			}
-		case 'build':
+		case 'uefi':
 			{
-				if !fs.existsSync(config.tempFolder + '\\tofita') {
-					fs.mkdirSync(config.tempFolder + '\\tofita')
-				}
+				// UEFI
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
+						'-target x86_64-pc-win32-coff -fno-stack-protector ',
+						'-O2 -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
+						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG ',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
+						'-D versionRolling=' + versionRolling + ' ',
+						'-D versionName=\\"' + versionName + '\\" ',
 
-				// Create directory tofita/iso/EFI/BOOT/
-				let dirs = [
-					'\\tofita',
-					'\\tofita\\iso',
-					'\\tofita\\iso\\EFI',
-					'\\tofita\\iso\\EFI\\BOOT'
-				]
+						'-fshort-wchar -mno-red-zone -Os',
+						' -c ',
+						'boot/uefi/boot.cpp',
+						' -o ',
+						config.tempFolder + '/tofita/miniefi.o'
+					].join(''), { stdio: 'inherit' }
+				)
 
-				for dir in dirs {
-					if !fs.existsSync(config.tempFolder + dir) {
-						fs.mkdirSync(config.tempFolder + dir)
+				require('child_process').execSync(
+					[
+						'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
+						'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
+						config.tempFolder + '/tofita/trampoline.o ',
+						config.tempFolder + '/tofita/miniefi.o ',
+						' -out:',
+						config.tempFolder + '/tofita/iso/EFI/BOOT/BOOTX64.EFI'
+					].join(''), { stdio: 'inherit' }
+				)
+			}
+		case 'dll':
+			{
+				// DLL
+				fun buildDLLs(bit: String, arch: String) {
+					for i in dlls.length {
+
+						// TODO refactor
+						var asm = ' '
+						if (dlls[i] == 'ntdll') {
+							asm = config.tempFolder + '/tofita/tofita\(bit).asm.obj '
+						}
+
+						require('child_process').execSync(
+							[
+								'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
+								'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
+								'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w ',
+								'-Wimplicit-function-declaration -O2 -c ',
+								'-mtune=nocona -fno-stack-protector -mno-red-zone ',
+								'-fno-rtti -fno-exceptions -fvisibility=default ',
+								'-fno-stack-check ',
+								'-Dbit\(bit) ',
+								'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
+								'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
+								'-std=c++2a ',
+								'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
+								'-o ',
+								config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj'
+							].join(''), { stdio: 'inherit' }
+						)
+
+						// Bruh
+						let machine = (bit == '32') ? '86' : '64'
+
+						require('child_process').execSync(
+							[
+								// TODO -fno-underscoring
+								// TODO -visibility=hidden
+								// TODO check if `/kill-at` keeps `@` from `asm()`
+								'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
+								'/verbose /DLL /WX /MACHINE:X\(machine) ',
+								[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.' + bit + '.lib '].join(''),
+								config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj ',
+								asm,
+								'/out:',
+								config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '.dll'
+							].join(''), { stdio: 'inherit' }
+						)
 					}
 				}
 
-				// Assets
-				let assets = config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'
-				if fs.existsSync(assets) {
-					fs.unlinkSync(assets)
-				}
+				// 64-bit & 32-bit WoW64
+				buildDLLs('64', 'x86_64')
+				buildDLLs('32', 'i686')
+			}
+		case 'build':
+			{
 				// KERNEL
 				require('child_process').execSync(
 					[
@@ -142,92 +226,7 @@ for task in tasks {
 					].join(''), { stdio: 'inherit' }
 				)
 
-				// DLL
-				fun buildDLLs(bit: String, arch: String) {
-				for i in dlls.length {
-
-					// TODO refactor
-					var asm = ' '
-					if (dlls[i] == 'ntdll') {
-						asm = config.tempFolder + '/tofita/tofita\(bit).asm.obj '
-					}
-
-					require('child_process').execSync(
-						[
-							'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
-							'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
-							'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w ',
-							'-Wimplicit-function-declaration -O2 -c ',
-							'-mtune=nocona -fno-stack-protector -mno-red-zone ',
-							'-fno-rtti -fno-exceptions -fvisibility=default ',
-							'-fno-stack-check ',
-							'-Dbit\(bit) ',
-							'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
-							'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
-							'-std=c++2a ',
-							'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
-							'-o ',
-							config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj'
-						].join(''), { stdio: 'inherit' }
-					)
-
-					// Bruh
-					let machine = (bit == '32') ? '86' : '64'
-
-					require('child_process').execSync(
-						[
-							'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
-							'/verbose /DLL /WX /MACHINE:X\(machine) ',
-							[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.' + bit + '.lib '].join(''),
-							config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj ',
-							asm,
-							'/out:',
-							config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '.dll'
-						].join(''), { stdio: 'inherit' }
-					)
-				}
-				}
-
-				// 64-bit & 32-bit WoW64
-				buildDLLs('64', 'x86_64')
-				buildDLLs('32', 'i686')
-
-				// UEFI
-
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\\(llvm)\\bin\\clang.exe ',
-						'-target x86_64-pc-win32-coff -fno-stack-protector ',
-						'-O2 -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
-						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-D versionRolling=' + versionRolling + ' ',
-						'-D versionName=\\"' + versionName + '\\" ',
-
-						'-fshort-wchar -mno-red-zone -Os',
-						' -c ',
-						'boot/uefi/boot.cpp',
-						' -o ',
-						config.tempFolder + '/tofita/miniefi.o'
-					].join(''), { stdio: 'inherit' }
-				)
-
-				require('child_process').execSync(
-					[
-						'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
-						'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
-						config.tempFolder + '/tofita/trampoline.o ',
-						config.tempFolder + '/tofita/miniefi.o ',
-						' -out:',
-						config.tempFolder + '/tofita/loader.efi'
-					].join(''), { stdio: 'inherit' }
-				)
-
 				packAssets(config) // Loader
-
-				fs.copyFileSync(
-					config.tempFolder + '\\tofita\\loader.efi',
-					config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI')
 			}
 		case 'iso':
 			{
@@ -244,7 +243,7 @@ for task in tasks {
 				for cmd in [
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI',
 					'..\\Teapot\\mtools\\mmd.exe -i ' + config.tempFolder + '\\tofita\\disk.img ::/EFI/BOOT',
-					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\loader.efi ::/EFI/BOOT/BOOTx64.EFI',
+					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.ico ::/autorun.ico',
 					'..\\Teapot\\mtools\\mcopy.exe -i ' + config.tempFolder + '\\tofita\\disk.img assets\\autorun.inf ::/autorun.inf'

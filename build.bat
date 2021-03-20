@@ -6,7 +6,7 @@ cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
-node build.js clean asm build iso
+node build.js init asm uefi dll build iso
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
