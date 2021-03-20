@@ -153,7 +153,9 @@ extern "C++"
 template<typename T, uint16_t s, uint16_t t> struct checkSize {
     static_assert(s == t, "wrong size");
 };
-#define SIZEOF(T, SIZE) namespace sizeofChecks { checkSize<T, sizeof(T), SIZE> __SIZEOF__##T; }
+#define SIZEOF(T, SIZE) namespace sizeofChecks { wapi::checkSize<T, sizeof(T), SIZE> __SIZEOF__##T; }
+
+SIZEOF(Message, 4)
 
 struct Point {
 	int32_t x;
@@ -177,11 +179,11 @@ struct Msg {
 };
 
 #ifdef bit64
-_Static_assert(sizeof(Msg) == 48, "bad sizeof");
+SIZEOF(Msg, 48)
+SIZEOF(HWnd, 8)
 #else
-SIZEOF(HWnd, 4)
-SIZEOF(Message, 4)
 SIZEOF(Msg, 28)
+SIZEOF(HWnd, 4)
 #endif
 
 #ifdef bit64
@@ -247,7 +249,7 @@ struct Pixel32 {
 	};
 };
 
-_Static_assert(sizeof(Pixel32) == 4, "bad sizeof");
+SIZEOF(Pixel32, 4)
 
 struct WindowFramebuffer {
 	Pixel32 *pixels;

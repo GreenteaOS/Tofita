@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2021  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -35,38 +35,6 @@ enum class TofitaSyscalls : uint32_t {
 	SwapWindowFramebuffer,
 	ExitProcess
 };
-
-// Used to make payloads same size in 32/64 bit
-extern "C++" template <typename T> struct Ref {
-private:
-	uint64_t userMemory;
-
-public:
-    operator uint64_t() const { return userMemory; }
-    operator T*() const { return (T*)userMemory; }
-    Ref() = default;
-    Ref(T* from) {
-    	userMemory = (uint64_t)from;
-    }
-};
-
-_Static_assert(sizeof(Ref<uint8_t>) == 8, "bad sizeof");
-
-// Non-pointer 64-bit values, like HWND
-extern "C++" template <typename T> struct Hold {
-private:
-	uint64_t userValue;
-
-public:
-    operator uint64_t() const { return userValue; }
-    operator T() const { return (T)userValue; }
-    Hold() = default;
-    Hold(T from) {
-    	userValue = (uint64_t)from;
-    }
-};
-
-_Static_assert(sizeof(Hold<uint8_t>) == 8, "bad sizeof");
 
 // Use pointer wrappers instead of raw pointers
 #pragma pack(push, 8)

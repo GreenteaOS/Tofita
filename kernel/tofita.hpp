@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2021  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +15,7 @@
 
 #include "../devices/cpu/physical.hpp"
 #include "util/String.hpp"
+#include "../dlls/wrappers.hpp"
 #include "../dlls/types.hpp"
 #include "../devices/screen/framebuffer.hpp"
 #include "../devices/ps2/mouse.hpp"
