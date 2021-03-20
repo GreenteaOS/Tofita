@@ -107,6 +107,10 @@ function initializePage(PageEntry *entry, uint64_t address) {
 
 	// TODO
 	entry->accessibleByAll = 1;
+
+	// in page creation it is just zero, no need for &
+	// page = page & 0b000000000011111111111111 // all but flags
+	// page = page | flags // all but flags
 }
 
 PageEntry *getPage(PageEntry *table, uint64_t entryId) {
@@ -251,6 +255,7 @@ PageEntry *freeCR3(PageEntry *pml4) {
 // Lower half
 // TODO protection ring
 // TODO lower half limit bounds check (it is less than upper starting range)
+// TODO @mustCheckReturn (bool)
 bool mapUserspaceMemory(
 	PageEntry *pml4entries,
 	uint64_t virtualAddr,
@@ -258,14 +263,64 @@ bool mapUserspaceMemory(
 	uint32_t pageCount,
 	AddressAwareness limits
 ) {
+	// TODO use uint64_t for pageCount to avoid integer casting problems in C++
+	// TODO distinct type for PagesCount
+	let upper = virtualAddr + ((uint64_t)pageCount * (uint64_t)4096);
+
+	// 128 TB
+	// TODO rethink limits considering AddressAwareness
+	let upperBound = (uint64_t)0x7FFFFFFFFFFF;
+
+	// At least protect the kernel
+	if (upper >= upperBound) return false;
+	if (pageCount == 0) return false;
+	if (virtualAddr < 4096) return false;
+
+	mapMemory(pml4entries, virtualAddr, physicalAddr, pageCount);
+	return true;
 }
 
-// Same as VirtualAlloc
 // TODO protection ring
 // TODO respect WoW limits
 // TODO VirtualAllocEx-like behavior (i.e. alloc for other processes, not only current)
 // Decides automatically where to allocate
 // if virtualAddr == 0
-// Note: also allocates physical pages, i.e consumes extra memory
-function allocUserspaceMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint32_t pageCount) {}
+// Does NOT allocate physical memory for the requested range
+// Returns 0 if requested pointer is occupied
+uint64_t findUserspaceMemory(
+	PageEntry *pml4entries,
+	uint64_t virtualAddr,
+	uint32_t pageCount,
+	AddressAwareness limits
+) {
+	serialPrintln(L"[findUserspaceMemory] begin");
+	let upperBound = (uint64_t)0x7FFFFFFFFFFF;
+
+	// TODO return 0 if virtualAddr not page aligned (virtualAddr & ADDRESS_BITS != 0)
+
+	// Yeah, brute force PML4 for now
+	uint64_t pageFirstByte = virtualAddr == 0? 4096 : virtualAddr;
+	bool cycle = virtualAddr == 0;
+
+	while (cycle && pageFirstByte < upperBound) {
+		uint64_t found = 0;
+		uint64_t result = pageFirstByte;
+		// TODO create isMapped function
+		while (resolveAddr(pml4entries, pageFirstByte) == PHYSICAL_NOT_FOUND) {
+			found++;
+			if (found == pageCount) {
+				serialPrintln(L"[findUserspaceMemory] success");
+				return result;
+			}
+			pageFirstByte += 4096;
+		}
+
+		while (resolveAddr(pml4entries, pageFirstByte) != PHYSICAL_NOT_FOUND) {
+			pageFirstByte += 4096;
+		}
+	}
+
+	serialPrintln(L"[findUserspaceMemory] fail");
+	return 0;
+}
 } // namespace pages
