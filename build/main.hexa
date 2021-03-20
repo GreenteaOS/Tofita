@@ -62,14 +62,16 @@ for task in tasks {
 				// Create directory tofita/iso/EFI/BOOT/
 				let dirs = [
 					'\\tofita',
-					'\\tofita\\iso',
-					'\\tofita\\iso\\EFI',
-					'\\tofita\\iso\\EFI\\BOOT'
+					'\\iso',
+					'\\EFI',
+					'\\BOOT'
 				]
 
+				var path = config.tempFolder
 				for dir in dirs {
-					if !fs.existsSync(config.tempFolder + dir) {
-						fs.mkdirSync(config.tempFolder + dir)
+					path += dir
+					if !fs.existsSync(path) {
+						fs.mkdirSync(path)
 					}
 				}
 
