@@ -92,7 +92,7 @@ function loadIdt(volatile Idtr *idtr);
 //#define EMPTY_SEL 0x38
 //#define TSS_SEL 0x40 // Index = 8
 //#define TSS_SEL 0x48
-//#define USER_DATA32_SEL 0x50 // Read/Write
+#define USER_PEB32_SEL 0x50 // Read/Write
 //#define EMPTY_SEL 0x58
 #define SYS_CODE32_SEL 0x60 // Execute/Read
 //#define EMPTY_SEL 0x68

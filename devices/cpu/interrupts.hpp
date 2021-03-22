@@ -46,9 +46,10 @@ struct InterruptFrame {
 	volatile uint64_t flags; // RFLAGS\EFLAGS (same on AMD64 and x86)
 	volatile uint64_t sp;	 // Stack pointer
 	volatile uint64_t ss;	 // Stack segment
+	volatile uint64_t fs;	 // 32-bit PEB
 };
 
-_Static_assert(sizeof(InterruptFrame) == 0xb0 + 128, "sizeof is incorrect");
+_Static_assert(sizeof(InterruptFrame) == 0xb0 + 128 + 8, "sizeof is incorrect");
 
 // Scheduling
 const uint8_t THREAD_INIT = 0; // kernelMain, it will be destroyed

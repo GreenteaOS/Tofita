@@ -32,10 +32,11 @@ uint32_t __attribute__((fastcall)) tofitaFastSystemCallWrapper(TofitaSyscalls rc
 
 // Return value is placed into RAX
 #ifdef bit64
-uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx) {
+uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx)
 #else
-uint32_t tofitaFastSystemCall(TofitaSyscalls rcx, uint32_t rdx) {
+uint32_t tofitaFastSystemCall(TofitaSyscalls rcx, uint32_t rdx)
 #endif
+{
 	return tofitaFastSystemCallWrapper(rcx, rdx);
 }
 

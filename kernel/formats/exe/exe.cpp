@@ -344,6 +344,16 @@ auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 		ei.stackVirtual = buffer;
 	}
 
+	// Allocate PEB
+	{
+		let pages = 1;
+		let physical = PhysicalAllocator::allocateOnePagePreZeroed();
+		let where = (uint64_t)0x00000000FFFAE000; // From GDT
+		// TODO TEB 000007FF`FFFAE000 on 64-bit?
+
+		pages::mapMemory(exec->pml4, where, physical - (uint64_t)WholePhysicalStart, pages);
+	}
+
 	return ei;
 }
 

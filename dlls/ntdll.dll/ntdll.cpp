@@ -27,9 +27,7 @@ extern "C" {
 uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
 	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
 }
-}
 
-extern "C" {
 #ifdef bit64
 	// TODO Hehe just use uint32_t for PIDs
 	void __attribute__((fastcall)) greenteaosIsTheBest(int32_t (*entry)(), uint64_t pid)

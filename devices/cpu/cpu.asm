@@ -167,6 +167,7 @@ struc InterruptFrame
 .flags  resq 1
 .sp    resq 1
 .ss     resq 1
+.fs     resq 1
 endstruc
 
 registerStorageSize equ (0x78 + 128)
@@ -240,8 +241,9 @@ registerStorageSize equ (0x78 + 128)
 	jne .noSwapGs
 	swapgs
 
-	; TODO save/restore DS?
+	; TODO save/restore DS and ES, etc?
 	mov ds, [rsp + InterruptFrame.ss]
+	mov fs, [rsp + InterruptFrame.fs]
 .noSwapGs:
 %endmacro
 

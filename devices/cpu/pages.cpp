@@ -177,7 +177,7 @@ uint64_t resolveAddr(const PageEntry *pml4entries, uint64_t virtualAddr) {
 // TODO ^ same clang warning
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
-function mapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
+function mapMemoryNoCR3(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	serialPrintln(L"[paging] mapping memory range");
 
 	uint64_t virtualAddrEnd = virtualAddr + pageCount * PAGE_SIZE;
@@ -209,8 +209,11 @@ function mapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physic
 		vAddress += PAGE_SIZE;
 		pAddress += PAGE_SIZE;
 	}
+}
 
+function mapMemory(PageEntry *pml4entries, uint64_t virtualAddr, uint64_t physicalAddr, uint32_t pageCount) {
 	// TODO rethink where to call this
+	mapMemoryNoCR3(pml4entries, virtualAddr, physicalAddr, pageCount);
 	amd64::writeCr3((uint64_t)pml4entries - (uint64_t)WholePhysicalStart);
 }
 

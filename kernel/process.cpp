@@ -24,6 +24,7 @@ function Process_init(Process *process) {
 	process->limits = pages::AddressAwareness::Bit64limit8TB;
 	process->frame.cs = USER_CODE64_SEL + 3;
 	process->frame.ss = USER_DATA32_SEL + 3;
+	process->frame.fs = USER_PEB32_SEL + 3;
 	// process->frame.flags = 0x002; // No interrupts
 	process->frame.flags = 0x202;
 	process->syscallToHandle = TofitaSyscalls::Noop;
