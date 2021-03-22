@@ -115,6 +115,7 @@ for task in tasks {
 						'-O2 -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG ',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
+						'-DUEFI_BOOT_LOADER ',
 						'-D versionRolling=' + versionRolling + ' ',
 						'-D versionName=\\"' + versionName + '\\" ',
 

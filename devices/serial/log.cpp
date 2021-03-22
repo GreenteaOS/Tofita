@@ -232,6 +232,13 @@ uint8_t *comItoA(int64_t i, uint8_t b[]) {
 	return b;
 }
 
+#ifdef UEFI_BOOT_LOADER
+	#define probeForReadOkay(ptr, bytes) 1
+	const uint8_t sehLogError[] = "<STRING IS NULL>";
+#else
+	const uint8_t sehLogError[] = "<STRING IS NULL OR SEH ERROR>";
+#endif
+
 function serialPrintf(const wchar_t *c, ...) {
 	uint8_t *s;
 	va_list lst;
@@ -252,17 +259,23 @@ function serialPrintf(const wchar_t *c, ...) {
 		switch (*c) {
 		case 's': { // ASCII of UTF-8
 			const uint8_t *string = va_arg(lst, uint8_t *);
-			if (string != null)
+			if (string != null && probeForReadOkay((uint64_t)string, 1)) {
 				puts(string);
+			} else {
+				puts(sehLogError);
+			}
 		} break;
 		case 'S': { // ASCII of UTF-16
 			const uint16_t *string = va_arg(lst, uint16_t *);
 			uint32_t i = 0;
-			if (string != null)
+			if (string != null && probeForReadOkay((uint64_t)string, 2)) {
 				while (string[i] != 0) {
 					putchar(string[i] & 0xFF);
 					i++;
 				}
+			} else {
+				puts(sehLogError);
+			}
 		} break;
 		case 'c':
 			putchar(va_arg(lst, int32_t));
