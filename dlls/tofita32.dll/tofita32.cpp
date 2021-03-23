@@ -13,13 +13,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define TOFITA32_DLL __declspec(dllexport) __attribute__((fastcall))
+#define TOFITA32_DLL __declspec(dllexport)
 #include "tofita32.hpp"
 #include "tofita32Vars.hpp"
 
 extern "C" {
 // High performance function, that does completely nothing
-uint32_t tofitaFastStub() {
+uint32_t tofitaFastStub(uint64_t rcx, uint64_t rdx) {
+	tofitaDebugLog(L"--> tofitaFastStub --> rcx=%8 rdx=%8", rcx, rdx);
+	return 0;
+}
+
+uint32_t tofitaStdStub(void* arg) {
+	tofitaDebugLog(L"--> tofitaStdStub --> arg=%8", (uint64_t)arg);
 	return 0;
 }
 

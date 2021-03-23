@@ -140,6 +140,13 @@ for task in tasks {
 			}
 		case 'dll':
 			{
+				// Yeah, just Clang bug
+				let linkFixups = [
+					'*eaveCriticalSection',
+					'*oadLibraryExW',
+					'*CMapStringW'
+				]
+
 				// DLL
 				fun buildDLLs(bit: String, arch: String) {
 					for i in dlls.length {
@@ -149,6 +156,8 @@ for task in tasks {
 						if (dlls[i] == 'ntdll') {
 							asm = config.tempFolder + '/tofita/tofita\(bit).asm.obj '
 						}
+
+						let outobj = config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj'
 
 						require('child_process').execSync(
 							[
@@ -165,9 +174,23 @@ for task in tasks {
 								'-std=c++2a ',
 								'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
 								'-o ',
-								config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj'
+								outobj
 							].join(''), { stdio: 'inherit' }
 						)
+
+						// Fixup
+						let inbuf = fs.readFileSync(outobj)
+
+						for fix in linkFixups {
+							let index = inbuf.indexOf(fix)
+
+							if index > 0 {
+								inbuf[index] = 'L'.charCodeAt(0)
+								inbuf[inbuf.indexOf(fix)] = 'L'.charCodeAt(0)
+							}
+						}
+
+						fs.writeFileSync(outobj, inbuf)
 
 						// Bruh
 						let machine = (bit == '32') ? '86' : '64'
@@ -180,7 +203,7 @@ for task in tasks {
 								'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
 								'/verbose /DLL /WX /MACHINE:X\(machine) ',
 								[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.' + bit + '.lib '].join(''),
-								config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj ',
+								outobj + ' ',
 								asm,
 								'/out:',
 								config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '.dll'

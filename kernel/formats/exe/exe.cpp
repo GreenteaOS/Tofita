@@ -271,6 +271,7 @@ template<typename SIZE>
 function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	var buffer = pei.base;
 	var imageDataDirectory = pei.imageDataDirectory;
+	let is64bit = pei.is64bit;
 
 	// Imports
 	{
@@ -312,7 +313,10 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 					if (proc != null) {
 						func = (SIZE)proc->ptr;
 					} else
-						func = (SIZE)getProcAddress(u8"tofitaFastStub", root)->ptr;
+						func = (SIZE)getProcAddress(
+							is64bit? u8"tofitaFastStub" : u8"tofitaStdStub",
+							root
+						)->ptr;
 				}
 
 				*funcRef = (SIZE)func;
@@ -410,6 +414,8 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			resolveExeImports<uint32_t>(app, root);
 
 			process->is64bit = false;
+			// TODO IMAGE_FILE_LARGE_ADDRESS_AWARE
+			// TODO IMAGE_FILE_LARGE_ADDRESS_AWARE with compatibility mode (3 GB, 128 TB)
 			process->limits = pages::AddressAwareness::Bit32limit2GB;
 			process->frame.cs = USER_CODE32_SEL + 3;
 		}

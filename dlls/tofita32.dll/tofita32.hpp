@@ -20,7 +20,7 @@
 #include "../../kernel/syscalls/syscalls.hpp"
 
 #ifndef TOFITA32_DLL
-#define TOFITA32_DLL __declspec(dllimport) __attribute__((fastcall))
+#define TOFITA32_DLL __declspec(dllimport)
 #endif
 
 extern "C" {
@@ -33,7 +33,9 @@ TOFITA32_DLL uint64_t tofitaFastSystemCall(TofitaSyscalls rcx, uint64_t rdx = 0)
 __attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastSystemCall(TofitaSyscalls rcx, uint32_t rdx = 0);
 #endif
 
-__attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub();
+__attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub(uint64_t rcx, uint64_t rdx) asm("tofitaFastStub");
+__stdcall TOFITA32_DLL uint32_t tofitaStdStub(void* arg) asm("tofitaStdStub");
+
 TOFITA32_DLL void tofitaDebugLog(const wchar_t *message, uint64_t extra = 0, uint64_t more = 0);
 
 // Kernel32
