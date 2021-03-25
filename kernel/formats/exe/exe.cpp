@@ -91,19 +91,14 @@ auto loadDllAsset(RamDiskAsset asset, const wchar_t *name, PeExportLinkedList *r
 					 &imageSectionHeader[i].name, imageSectionHeader[i].sizeOfRawData,
 					 imageSectionHeader[i].virtualAddress);
 		uint64_t where = (uint64_t)buffer + imageSectionHeader[i].virtualAddress;
+		auto size = imageSectionHeader[i].sizeOfRawData;
 
+		if (size > 0)
 		tmemcpy((void *)where,
 				(void *)((uint64_t)asset.data + (uint64_t)imageSectionHeader[i].pointerToRawData),
-				imageSectionHeader[i].sizeOfRawData);
+				size);
 	}
 
-	// TODO
-	{
-		uint32_t (*func)() =
-			(uint32_t(*)())((uint64_t)buffer + (uint64_t)peOptionalHeader->addressOfEntryPoint);
-		if (peOptionalHeader->addressOfEntryPoint == 4128)
-			serialPrintf(L"[[[IMAGE_DIRECTORY_ENTRY_EXPORT]]] calling _DllMainCRTStartup == %d\n", func());
-	}
 
 	auto imageDataDirectory =
 		(const ImageDataDirectory *)((uint64_t)peOptionalHeader + sizeof(HEADER));
@@ -430,6 +425,21 @@ function resolveExeImports(const ExeInterim ei, PeExportLinkedList *root) {
 	resolveDllImports<SIZE>(ei.pei, root);
 }
 
+template<typename SIZE>
+function addDllEntry(uint64_t physical, SIZE entry) {
+	SIZE max = 511; // TODO any other limits?
+	// TODO ^ 32-bit limit is x2
+	SIZE* count = (SIZE*)physical;
+
+	if (count[0] >= 511) {
+		// TODO error
+		return;
+	}
+
+	count[0] = count[0] + 1;
+	count[count[0]] = entry;
+}
+
 function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 	{
 		PeExportLinkedList *root =
@@ -445,6 +455,9 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 		auto app = loadExe(file, root, &exec);
 		auto is64bit = app.pei.is64bit;
 
+		// DLL entry points
+		let dllEntries = PhysicalAllocator::allocateOnePagePreZeroed();
+
 		// Dependencies
 		// TODO proper system path!!! + Windows 7 order of search
 		// TODO respect ENV PATH
@@ -452,6 +465,7 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 		#define BIT64 L"C:\\Windows\\System32\\"
 		#define BIT(DLL) (is64bit?BIT64 DLL:BIT32 DLL)
 
+		// TODO cache NTDLL/etc parsing results
 		auto ntdll = loadDll(BIT(L"ntdll.dll"), root, &exec);
 		auto kernel32 = loadDll(BIT(L"kernel32.dll"), root, &exec);
 		auto gdi32 = loadDll(BIT(L"gdi32.dll"), root, &exec);
@@ -466,6 +480,10 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			resolveDllImports<uint64_t>(kernel32, root);
 			resolveDllImports<uint64_t>(gdi32, root);
 			resolveDllImports<uint64_t>(user32, root);
+
+			addDllEntry(dllEntries, kernel32.entry);
+			addDllEntry(dllEntries, gdi32.entry);
+			addDllEntry(dllEntries, user32.entry);
 
 			resolveExeImports<uint64_t>(app, root);
 
@@ -486,10 +504,19 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			process->frame.cs = USER_CODE32_SEL + 3;
 		}
 
-		Entry entry = (Entry)ntdll.base;
+		uint64_t whereEntries = pages::findUserspaceMemory(
+			process->pml4,
+			0,
+			1,
+			process->limits
+		);
+
+		pages::mapMemory(process->pml4, whereEntries, dllEntries - (uint64_t)WholePhysicalStart, 1);
+
 		process->frame.ip = ntdll.entry; // Contains crt0
 		process->frame.sp = app.stackVirtual;
 		process->frame.rcxArg0 = app.pei.entry; // First argument
+		process->frame.r8 = whereEntries; // Third argument
 	}
 }
 
