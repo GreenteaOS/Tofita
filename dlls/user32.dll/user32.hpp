@@ -25,6 +25,7 @@
 #endif
 
 extern "C" {
+USER32_DLL wapi::Bool DestroyWindow(wapi::HWnd hWnd) asm("DestroyWindow");
 USER32_DLL wapi::Atom RegisterClassW(const wapi::WindowClass *wc) asm("RegisterClassW");
 USER32_DLL wapi::HWnd CreateWindowExW(uint32_t dwExStyle, const wchar_t *lpClassName,
 									  const wchar_t *lpWindowName, uint32_t dwStyle, int32_t x, int32_t y,

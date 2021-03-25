@@ -30,6 +30,7 @@ user32::Window *handleToWindow(wapi::HWnd hWnd) {
 		return nullptr; // TODO return desktop
 	if (hWnd == INVALID_HANDLE_VALUE)
 		return nullptr;
+	// TODO SEH try read
 	if (((user32::Window *)hWnd)->windowIsWindow != user32::windowIsWindow)
 		return nullptr;
 	return (user32::Window *)hWnd;
@@ -42,6 +43,7 @@ wapi::HWnd windowToHandle(user32::Window *window) {
 }
 
 // WAPI
+// TODO not required when asm(name) used
 extern "C" {
 
 wapi::Atom RegisterClassW(const wapi::WindowClass *wc) {
@@ -215,8 +217,9 @@ wapi::LResult DispatchMessageW(wapi::Msg *msg) {
 	wapi::LResult result = 0;
 	if (msg->hwnd != nullptr) {
 		auto window = handleToWindow(msg->hwnd);
-		if (window == nullptr)
+		if (window == nullptr) {
 			return 0;
+		}
 		// ERROR_INVALID_HANDLE;
 		if (msg->message == wapi::Message::WM_PAINT) {
 			result = window->proc(msg->hwnd, msg->message, msg->wParam, msg->lParam);
@@ -315,12 +318,28 @@ wapi::LResult DefWindowProcW(wapi::HWnd hWnd, wapi::Message uMsg, void *wParam, 
 }
 }
 
+wapi::Bool DestroyWindow(wapi::HWnd hWnd) {
+	tofitaDebugLog(L"DestroyWindow called");
+	auto window = handleToWindow(hWnd);
+	if (window == nullptr)
+		return 0;
+	// TODO probably should be async post?
+	window->proc(hWnd, wapi::Message::WM_DESTROY, 0, 0);
+	window->proc(hWnd, wapi::Message::WM_NCDESTROY, 0, 0);
+	tofitaDebugLog(L"DestroyWindow done");
+	return 0;
+}
+
+void startup() {
+	user32::rootClass.next = nullptr;
+}
+
 #ifdef bit64
 extern "C" __attribute__((fastcall)) void _DllMainCRTStartup() {
-	user32::rootClass.next = nullptr;
+	startup();
 }
 #else
 extern "C" __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
-	user32::rootClass.next = nullptr;
+	startup();
 }
 #endif
