@@ -22,7 +22,7 @@ global @tofitaFastSystemCallWrapper@8
 	int 0x80
 	ret
 
-extern @greenteaosIsTheBest@8
+extern greenteaosIsTheBest
 global __DllMainCRTStartup@12
 __DllMainCRTStartup@12:
 
@@ -37,4 +37,4 @@ __DllMainCRTStartup@12:
 	push 0
 	push ebp
 	mov ebp, esp
-	call @greenteaosIsTheBest@8
+	call greenteaosIsTheBest

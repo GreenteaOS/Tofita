@@ -22,10 +22,17 @@
 #include "gdi32.hpp"
 #include "gdi32Vars.hpp"
 
+void startup() {
+	tofitaDebugLog(L"gdi32.dll startup done");
+}
+
 #ifdef bit64
 extern "C" __attribute__((fastcall)) void _DllMainCRTStartup() {
+	startup();
 }
 #else
+// TODO must take proper arguments on 32-bit (like DLL_ATTACH)
 extern "C" __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+	startup();
 }
 #endif

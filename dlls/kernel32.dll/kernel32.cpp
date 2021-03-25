@@ -52,9 +52,17 @@ void *malloc(size_t bytes) {
 	return (void *)LocalAlloc(0, bytes);
 }
 
+void startup() {
+	tofitaDebugLog(L"kernel32.dll startup done");
+}
+
 #ifdef bit64
-__attribute__((fastcall)) void _DllMainCRTStartup() {}
+__attribute__((fastcall)) void _DllMainCRTStartup() {
+	startup();
+}
 #else
-__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {}
+__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+	startup();
+}
 #endif
 }

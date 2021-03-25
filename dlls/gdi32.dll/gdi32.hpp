@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "../ntdll.dll/ntdll.hpp"
+#include "../tofita32.dll/tofita32.hpp"
 
 #ifndef GDI32_DLL
 	#ifdef bit64

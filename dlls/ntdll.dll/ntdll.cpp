@@ -335,12 +335,18 @@ STUB(_isnan)
 STUB(free)
 
 #ifdef bit64
-	// TODO Hehe just use uint32_t for PIDs
-	void __attribute__((fastcall)) greenteaosIsTheBest(int32_t (*entry)(), uint64_t pid)
+	#define CONV
 #else // __cdecl __stdcall
-	void __attribute__((fastcall)) greenteaosIsTheBest(int32_t (__cdecl *entry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow), uint32_t pid)
+	#define CONV __cdecl
 #endif
-{
+
+// DWORD == uint32_t
+typedef bool(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
+typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow);
+
+// TODO Hehe just use uint32_t for PIDs
+void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, void* dllEntries) asm("greenteaosIsTheBest");
+void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, void* dllEntries) {
 	// TODO entry arguments (argv, argc)
 	// TODO init DLLs
 	// TODO PEB/TEB
@@ -349,20 +355,24 @@ STUB(free)
 	_wcmdln = L"_wcmdln";
 
 	#ifdef bit64
-		tofitaDebugLog(L"64-bit CRT ready for PID %u", pid);
+		tofitaDebugLog(L"64-bit CRT ready for PID %u", (uint64_t)pid);
 	#else
-		tofitaDebugLog(L"32-bit CRT ready for PID %u", pid);
+		tofitaDebugLog(L"32-bit CRT ready for PID %u", (uint64_t)pid);
 	#endif
 
-	if (entry != nullptr)
-		tofitaDebugLog(L"entry != nullptr OK for PID %u at %u", pid, (uint32_t)entry);
-	if (entry == nullptr)
-		tofitaDebugLog(L"entry == nullptr ERROR for PID %u", pid);
-#ifdef bit64
-	tofitaExitProcess(entry());
-#else
+	auto count = (size_t*)dllEntries;
+	auto dllMains = (DllEntry*)dllEntries;
+	size_t i = 0;
+	auto DLL_PROCESS_ATTACH = 1;
+
+	while (i < count[0]) {
+		i++;
+		dllMains[i](nullptr, DLL_PROCESS_ATTACH, nullptr);
+	}
+
+	tofitaDebugLog(L"Done DLLs");
+
 	tofitaExitProcess(entry(nullptr, nullptr, nullptr, 0));
-#endif
 	while (true) {};
 }
 }

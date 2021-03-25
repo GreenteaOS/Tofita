@@ -36,7 +36,7 @@ __attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastSystemCall(TofitaSysca
 __attribute__((fastcall)) TOFITA32_DLL uint32_t tofitaFastStub(uint64_t rcx, uint64_t rdx) asm("tofitaFastStub");
 __stdcall TOFITA32_DLL uint32_t tofitaStdStub(void* arg) asm("tofitaStdStub");
 
-TOFITA32_DLL void tofitaDebugLog(const wchar_t *message, uint64_t extra = 0, uint64_t more = 0);
+TOFITA32_DLL void tofitaDebugLog(const wchar_t *message, uint64_t extra = 0, uint64_t more = 0) asm("tofitaDebugLog");
 
 // Kernel32
 TOFITA32_DLL void tofitaExitProcess(uint32_t exitCode);

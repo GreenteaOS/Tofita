@@ -332,6 +332,7 @@ wapi::Bool DestroyWindow(wapi::HWnd hWnd) {
 
 void startup() {
 	user32::rootClass.next = nullptr;
+	tofitaDebugLog(L"user32.dll startup done");
 }
 
 #ifdef bit64
