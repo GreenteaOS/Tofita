@@ -48,6 +48,10 @@ void *HeapAlloc(wapi::Handle heap, uint32_t flags, size_t bytes) {
 	return (void *)LocalAlloc(0, bytes);
 }
 
+void *malloc(size_t bytes) {
+	return (void *)LocalAlloc(0, bytes);
+}
+
 #ifdef bit64
 __attribute__((fastcall)) void _DllMainCRTStartup() {}
 #else

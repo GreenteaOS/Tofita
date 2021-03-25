@@ -377,11 +377,11 @@ function kernelThread() {
 
 						// Page fault
 						if (frame->index == 0x0E)
-							quakePrintf(L"#PF at %8, ip at %8\n", process->cr2PageFaultAddress, frame->ip);
+							quakePrintf(L"#PF CR2 %8, IP %8\n", process->cr2PageFaultAddress, frame->ip);
 						if (frame->index == 0x0D)
 							quakePrintf(L"#GPF at %8\n", frame->ip);
 						if (frame->index == 0x03)
-							quakePrintf(L"#BP at %8\n", frame->ip);
+							quakePrintf(L"#BP IP %8\n", frame->ip);
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = process::processes[0].pml4;

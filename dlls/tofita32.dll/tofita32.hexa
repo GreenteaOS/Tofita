@@ -15,8 +15,8 @@
 
 /// Shared memory allocator for Hexa projects
 
-let defaultReserveMegabytes = #if bits64 4096 #else 128 #end
-let reserveAtVirtualMegabyte = #if bits64 4096*4096*4 #else (4096/4)*3 - (defaultReserveMegabytes*2) #end
+let defaultReserveMegabytes = #if bit64 4096 #else 128 #end
+let reserveAtVirtualMegabyte = #if bit64 4096*4096*4 #else (4096/4)*3 - (defaultReserveMegabytes*2) #end
 
 fun reserveIgnore(megabytes: UInt16) {
 	// Nothing, already did reserve
@@ -30,12 +30,12 @@ fun reserve(megabytes: UInt16) {
 	wrapFree = free
 }
 
-fun allocate(size: UInt32): #if bits64 UInt64 #else UInt32 #end {
+fun allocate(size: UInt32): #if bit64 UInt64 #else UInt32 #end {
 	// TODO
 	return 0
 }
 
-fun allocateFirst(size: UInt32): #if bits64 UInt64 #else UInt32 #end {
+fun allocateFirst(size: UInt32): #if bit64 UInt64 #else UInt32 #end {
 	reserve(defaultReserveMegabytes)
 	return allocate(size)
 }
@@ -73,6 +73,6 @@ fun tofitaHexaAllocate(size: UInt32) {
 
 @draft
 @dllExport('tofitaHexaAllocate')
-fun tofitaHexaFree(pointer: #if bits64 UInt64 #else UInt32 #end, size: UInt32) {
+fun tofitaHexaFree(pointer: #if bit64 UInt64 #else UInt32 #end, size: UInt32) {
 	return wrapFree(pointer, size)
 }

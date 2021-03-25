@@ -21,7 +21,7 @@ class CPUID {
 	var extras: UInt32 = 0
 }
 
-const UInt32 cpuidExtendedLevels = 0x80000000
+let cpuidExtendedLevels: UInt32 = 0x80000000
 
 fun getCPUID(): CPUID {
 	var result: CPUID

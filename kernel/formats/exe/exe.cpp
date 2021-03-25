@@ -329,10 +329,45 @@ function resolveDllImports(PeInterim pei, PeExportLinkedList *root) {
 	}
 }
 
+// 64-bit
+struct TIB64 {
+	uint64_t ExceptionList;
+	uint64_t StackBase;
+	uint64_t StackLimit;
+	uint64_t SubSystemTib;
+	union
+	{
+	  uint64_t FiberData;
+	  uint64_t Version;
+	};
+	uint64_t ArbitraryUserPointer;
+	uint64_t Self; // *TIB64
+};
+
+_Static_assert(sizeof(TIB64) == 56, "sizeof is incorrect");
+
+// 32-bit
+struct TIB32 {
+	uint32_t ExceptionList;
+	uint32_t StackBase;
+	uint32_t StackLimit;
+	uint32_t SubSystemTib;
+	union
+	{
+	  uint32_t FiberData;
+	  uint32_t Version;
+	};
+	uint32_t ArbitraryUserPointer;
+	uint32_t Self; // *TIB32
+};
+
+_Static_assert(sizeof(TIB32) == 28, "sizeof is incorrect");
+
 auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 	ExeInterim ei;
 
 	ei.pei = loadDll(name, root, exec);
+	auto is64bit = ei.pei.is64bit;
 
 	// Allocate stack
 	{
@@ -355,7 +390,36 @@ auto loadExe(const wchar_t *name, PeExportLinkedList *root, Executable *exec) {
 		let where = (uint64_t)0x00000000FFFAE000; // From GDT
 		// TODO TEB 000007FF`FFFAE000 on 64-bit?
 
+		// TODO map upfront, to make this page occupied for proper relocation
 		pages::mapMemory(exec->pml4, where, physical - (uint64_t)WholePhysicalStart, pages);
+
+		if (is64bit) {
+			auto tib = (TIB64*)physical;
+			tib->Self = where;
+			tib->ExceptionList = where;
+			tib->StackBase = where;
+			tib->StackLimit = where;
+			tib->SubSystemTib = where;
+			tib->ArbitraryUserPointer = where;
+
+			// PEB - Process Environment Block
+			let physicalPEB = PhysicalAllocator::allocateOnePagePreZeroed();
+			pages::mapMemory(exec->pml4, where + 4096, physicalPEB - (uint64_t)WholePhysicalStart, 1);
+			auto wherePEB = physical + 0x60;
+			auto wherePEBaddr = (uint64_t*)wherePEB;
+			wherePEBaddr[0] = where + 4096;
+
+			auto processParameters = (uint64_t*)(physicalPEB + 0x20);
+			processParameters[0] = where + 4096 + 256;
+		} else {
+			auto tib = (TIB32*)physical;
+			tib->Self = (uint32_t)where;
+			tib->ExceptionList = (uint32_t)where;
+			tib->StackBase = (uint32_t)where;
+			tib->StackLimit = (uint32_t)where;
+			tib->SubSystemTib = (uint32_t)where;
+			tib->ArbitraryUserPointer = (uint32_t)where;
+		}
 	}
 
 	return ei;
@@ -402,6 +466,7 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			resolveDllImports<uint64_t>(kernel32, root);
 			resolveDllImports<uint64_t>(gdi32, root);
 			resolveDllImports<uint64_t>(user32, root);
+
 			resolveExeImports<uint64_t>(app, root);
 
 			process->is64bit = true;
@@ -411,6 +476,7 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			resolveDllImports<uint32_t>(kernel32, root);
 			resolveDllImports<uint32_t>(gdi32, root);
 			resolveDllImports<uint32_t>(user32, root);
+
 			resolveExeImports<uint32_t>(app, root);
 
 			process->is64bit = false;
