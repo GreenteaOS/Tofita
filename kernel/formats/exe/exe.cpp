@@ -470,6 +470,7 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 		auto kernel32 = loadDll(BIT(L"kernel32.dll"), root, &exec);
 		auto gdi32 = loadDll(BIT(L"gdi32.dll"), root, &exec);
 		auto user32 = loadDll(BIT(L"user32.dll"), root, &exec);
+		auto advapi32 = loadDll(BIT(L"advapi32.dll"), root, &exec);
 
 		#undef BIT32
 		#undef BIT64
@@ -480,10 +481,12 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			resolveDllImports<uint64_t>(kernel32, root);
 			resolveDllImports<uint64_t>(gdi32, root);
 			resolveDllImports<uint64_t>(user32, root);
+			resolveDllImports<uint64_t>(advapi32, root);
 
 			addDllEntry(dllEntries, kernel32.entry);
 			addDllEntry(dllEntries, gdi32.entry);
 			addDllEntry(dllEntries, user32.entry);
+			addDllEntry(dllEntries, advapi32.entry);
 
 			resolveExeImports<uint64_t>(app, root);
 
@@ -494,6 +497,9 @@ function loadExeIntoProcess(const wchar_t *file, process::Process *process) {
 			resolveDllImports<uint32_t>(kernel32, root);
 			resolveDllImports<uint32_t>(gdi32, root);
 			resolveDllImports<uint32_t>(user32, root);
+			resolveDllImports<uint32_t>(advapi32, root);
+
+			// TODO addDllEntry
 
 			resolveExeImports<uint32_t>(app, root);
 

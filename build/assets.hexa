@@ -22,14 +22,16 @@ let dlls = [
 	'ntdll',
 	'kernel32',
 	'gdi32',
-	'user32'
+	'user32',
+	'advapi32'
 ]
 
 let deps: [[String]] = [
 	[],
 	['ntdll'],
 	['ntdll', 'kernel32'],
-	['ntdll', 'kernel32', 'gdi32']
+	['ntdll', 'kernel32', 'gdi32'],
+	['ntdll', 'kernel32']
 ]
 
 fun packFonts(config: Config) {

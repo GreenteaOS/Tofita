@@ -142,6 +142,25 @@ for task in tasks {
 			{
 				// Yeah, just Clang bug
 				let linkFixups = [
+					'*CMapStringA',
+					'*oadImageW',
+					'*oadLibraryA',
+					'*oadLibraryW',
+					'*oadMenuW',
+					'*oadStringW',
+					'*ocalFree',
+					'*ocalReAlloc',
+					'*ockFile',
+					'*ineTo',
+					'*oadBitmapW',
+					'*oadCursorW',
+					'*oadIconW',
+					'*oadMenuA',
+					'*oadResource',
+					'*ocalLock',
+					'*ocalSize',
+					'*ocalUnlock',
+					'*ockResource',
 					'*eaveCriticalSection',
 					'*oadLibraryExW',
 					'*CMapStringW'
