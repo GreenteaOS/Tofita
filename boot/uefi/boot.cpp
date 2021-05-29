@@ -413,9 +413,9 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 	uint64_t ram = paging::getRAMSize(&params->efiMemoryMap);
 	uint32_t megs = (uint32_t)(ram / (1024 * 1024));
 	serialPrintf(L"[paging] available RAM is ~%u megabytes\n", megs);
-	while (megs < 768) {
-		drawText(L"[ERROR] Tofita requires at least 1 GB of memory [ERROR]", errorY, &framebuffer);
-		serialPrintf(L"Tofita requires at least 1 GB of memory\n");
+	while (megs < 1234) {
+		drawText(L"[ERROR] Tofita requires at least 2 GB of memory [ERROR]", errorY, &framebuffer);
+		serialPrintf(L"Tofita requires at least 2 GB of memory\n");
 	}
 	params->ramBytes = ram;
 	params->physicalRamBitMaskVirtual = paging::conventionalAllocateNext(ram >> 12);

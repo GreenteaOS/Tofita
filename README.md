@@ -10,7 +10,7 @@ All-new kernel for the [Greentea OS](https://github.com/GreenteaOS)
 [![GPL License](https://img.shields.io/badge/License-GNU%20LGPLv3-green.svg?style=flat)](https://github.com/GreenteaOS/Tofita/blob/kawaii/LICENSE)
 [![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
 [![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
-[![Language Top](https://img.shields.io/github/languages/top/GreenteaOS/Tofita.svg?colorB=green)](https://github.com/hexalang/hexa)
+[![Made with Hexa](https://img.shields.io/badge/Code-Hexa-FF7F50.svg?style=flat)](https://github.com/hexalang/hexa)
 
 Greentea OS is aimed to provide complete operating system compatible with existing apps
 
@@ -18,22 +18,22 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 
 ## Features
 
- - UEFI 64-bit x86 hybrid performance-oriented kernel
- - Quake-style terminal (hit `~` to show/hide)
- - Desktop GUI
- - Tested on those VMs:
-   - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
-   - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
-   - WMware Workstation `(Other 64-bit, Virtualize Intel VT-x/EPT or AMD-V/RVI, Firmware type - UEFI)`
-   - QEMU with KVM or WHPX `(-accel [kvm or whpx] -bios OVMF.fd -m 2048 -serial stdio -vga std -machine pc-q35-2.10 -smp 2)`
- - Very low on resources, just 1 GB RAM minimum required
- - Isolation and containerization of everything
- - Exclusively only multi-core CPUs
- - NjRAA graphics stack
+- UEFI 64-bit x86 hybrid performance-oriented kernel
+- Quake-style terminal (hit `~` to show/hide)
+- Desktop GUI
+- Tested on those VMs:
+  - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
+  - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
+  - WMware Workstation `(Other 64-bit, Virtualize Intel VT-x/EPT or AMD-V/RVI, Firmware type - UEFI)`
+  - QEMU with KVM or WHPX `(-accel [kvm or whpx] -bios OVMF.fd -m 2048 -serial stdio -vga std -machine pc-q35-2.10 -smp 2)`
+- Very low on resources, just 2 GB RAM minimum required
+- Isolation and containerization of everything
+- Exclusively only multi-core CPUs
+- NjRAA graphics stack
 
 ## GreenteaOS (Tofita) system requirements
 
-- 1 GB RAM
+- 2 GB RAM
 - Motherboard with UEFI, SATA (AHCI) or NVMe, PCIe and USB 2.0+
 - Multicore modern 64-bit CPU (most AMD and Intel CPUs from 2009 and newer)
 - [Read more](https://greenteaos.github.io/wiki/cpus.html)
@@ -118,10 +118,10 @@ the Free Software Foundation, version 3 of the License.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 [More information about legal issues](https://github.com/GreenteaOS/Greentea/blob/master/README.md#license)

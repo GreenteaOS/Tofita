@@ -288,9 +288,9 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	var megs: UInt32 = (uint32_t)(ram / (1024 * 1024))
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
-	while (megs < 768) {
-		drawText("[ERROR] Tofita requires at least 1 GB of memory [ERROR]", errorY, Pointer.of(framebuffer))
-		serialPrintf("Tofita requires at least 1 GB of memory\n")
+	while megs < 1234 {
+		drawText("[ERROR] Tofita requires at least 2 GB of memory [ERROR]", errorY, Pointer.of(framebuffer))
+		serialPrintf("Tofita requires at least 2 GB of memory\n")
 	}
 
 	params.ramBytes = ram
