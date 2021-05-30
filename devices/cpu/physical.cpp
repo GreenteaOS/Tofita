@@ -129,6 +129,10 @@ class PhysicalAllocator {
 	// static uint64_t allocateDmaPage2G() {}
 	// TODO fill pages in reverse so I can traverse bitmap from zero?
 
+	static function resetCounter() {
+		last = PHYSICAL_NOT_FOUND;
+	}
+
 	// Returns physical 64-bit address, not page number
 	static uint64_t allocateOnePage() {
 		if (last != PHYSICAL_NOT_FOUND) {

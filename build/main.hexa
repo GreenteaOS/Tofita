@@ -94,6 +94,12 @@ for task in tasks {
 					config.tempFolder + '\\tofita\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
 				)
 
+				// SMP TRAPEZE
+				require('child_process').execSync(
+					'..\\Teapot\\nasm-2.14.02\\nasm -f bin -o ' +
+					config.tempFolder + '/tofita/trapeze.bin devices\\cpu\\trapeze.asm', { stdio: 'inherit' }
+				)
+
 				// DLL
 				require('child_process').execSync(
 					'..\\Teapot\\nasm-2.14.02\\nasm -f win64 -o ' +

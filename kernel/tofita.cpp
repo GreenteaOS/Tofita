@@ -137,6 +137,16 @@ function kernelInit(const KernelParams *params) {
 	// PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual,
 	// DOWN_BYTES_TO_PAGES(params->ramBytes));
 	PhysicalAllocator::init(params);
+	PhysicalAllocator::resetCounter();
+	let trapeze_ = PhysicalAllocator::allocateOnePage();
+	let trapeze = PhysicalAllocator::allocatePages(8); // Bootloader
+	let trapezePhysical = trapeze - (uint64_t)WholePhysicalStart;
+	if (trapezePhysical > 1068032) {
+		serialPrintln(L"<Tofita> cannot allocate trapeze under 1 MB");
+		while (true) {}
+	}
+
+	let available = PhysicalAllocator::getAvailablePages() * 4096;
 	pages::pml4entries = (pages::PageEntry *)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
 
 	if (false) {
@@ -216,7 +226,16 @@ function kernelInit(const KernelParams *params) {
 	CPUID cpuid = getCPUID();
 
 	uint32_t megs = Math::round((double)params->ramBytes / (1024.0 * 1024.0));
-	quakePrintf(L"[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs);
+	uint32_t availableMegs = Math::round((double)available / (1024.0 * 1024.0));
+	quakePrintf(L"[CPU] %s %s %d MB RAM (%d MB usable)\n", cpuid.vendorID, cpuid.brandName, megs, availableMegs);
+
+	// SMP trapeze
+	{
+		RamDiskAsset asset = getRamDiskAsset(L"trapeze.tofita");
+		serialPrintf(L"Copy trapeze %d bytes\n", asset.size);
+		uint64_t trapeze = (uint64_t)0x8000 + (uint64_t)WholePhysicalStart;
+		tmemcpy((void*)trapeze, (const void*)asset.data, asset.size);
+	}
 
 	if (!ACPIParser::parse(params->acpiTablePhysical)) {
 		quakePrintf(L"ACPI is *not* loaded\n");
@@ -379,7 +398,7 @@ function kernelThread() {
 						if (frame->index == 0x0E)
 							quakePrintf(L"#PF CR2 %8, IP %8\n", process->cr2PageFaultAddress, frame->ip);
 						if (frame->index == 0x0D)
-							quakePrintf(L"#GPF at %8\n", frame->ip);
+							quakePrintf(L"#GPF IP %8\n", frame->ip);
 						if (frame->index == 0x03)
 							quakePrintf(L"#BP IP %8\n", frame->ip);
 

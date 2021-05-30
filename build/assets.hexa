@@ -67,6 +67,9 @@ fun packAssets(config: Config) {
 		assetName.push('tofita.gnu')
 		assetPath.push(config.tempFolder + '\\tofita\\tofita.exe')
 
+		assetName.push('trapeze.tofita')
+		assetPath.push(config.tempFolder + '\\tofita\\trapeze.bin')
+
 		for dll in dlls {
 			// TODO \ not werks in js assetName.push(`C:\Windows\System32\` + dll + '.dll')
 			assetName.push(`C:\\Windows\\System32\\` + dll + '.dll')
