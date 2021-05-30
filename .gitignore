@@ -60,3 +60,4 @@ report.*.json
 .Trash-*
 tools/gos-devlist.txt
 assets/desktop
+OVMF.fd
