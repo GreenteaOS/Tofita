@@ -32,7 +32,7 @@ _probeForReadOkay(volatile uint64_t at, volatile const uint64_t bytes) {
 	return true;
 }
 
-volatile bool (*volatile const probeForReadOkay)(volatile uint64_t at,
+volatile bool (__fastcall *volatile const probeForReadOkay)(volatile uint64_t at,
 												 volatile const uint64_t bytes) = _probeForReadOkay;
 
 volatile bool __attribute__((noinline))
@@ -48,5 +48,5 @@ _probeForWriteOkay(volatile const uint64_t at, volatile const uint64_t bytes) {
 	return true;
 }
 
-volatile bool (*volatile const probeForWriteOkay)(volatile const uint64_t at,
+volatile bool (__fastcall *volatile const probeForWriteOkay)(volatile const uint64_t at,
 												  volatile const uint64_t bytes) = _probeForWriteOkay;

@@ -747,8 +747,8 @@ function enableInterrupts() {
 
 	serialPrintln(L"[cpu] initializing unknownInterrupt");
 
-	for (uint32_t i = 0; i < 286; ++i) {
-		initializeFallback(&IDT[i], (uint64_t)&unknownInterrupt);
+	for (uint32_t i = 0; i < IDT_SIZE; ++i) {
+		initializeFallback(&IDT[i], (uint64_t)&spuriousInterrupt);
 	}
 
 	// CPU exceptions
@@ -777,6 +777,7 @@ function enableInterrupts() {
 
 	// PIC interrupts
 	initializeFallback(&IDT[IRQ0], (uint64_t)(&timerInterrupt));
+	initializeFallback(&IDT[0xFF], (uint64_t)(&spuriousInterrupt));
 	initializeKeyboard(&IDT[IRQ1]);
 	initializeMouse(&IDT[IRQ12]);
 

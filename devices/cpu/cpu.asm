@@ -310,6 +310,11 @@ defineIRQnoCode 0x00, yieldInterrupt, yieldInterruptPrelude, yieldInterruptHandl
 defineIRQnoCode 0x00, keyboardHandler, keyboardInterruptPrelude, handleKeyboard
 defineIRQnoCode 0x00, mouseHandler, mouseInterruptPrelude, handleMouse
 
+global spuriousInterrupt
+spuriousInterrupt:
+	iretq
+	nop
+
 ; CPU exceptions
 defineIRQHandler exceptionHandler, exceptionPrelude
 

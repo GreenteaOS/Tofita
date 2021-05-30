@@ -32,7 +32,7 @@ void exceptionHandler(InterruptFrame *const frame) {
 		volatile process::Process *process = &process::processes[0];
 		process->cr2PageFaultAddress = cr2;
 		qsod(L"THREAD_GUI unhandled CPU exception: index = %u, code = %8\n", frame->index, frame->code);
-	} else if (currentThread == THREAD_KERNEL) {
+	} else if (currentThread != THREAD_USER) {
 		// SEH
 		if (sehProbe) {
 			frame->ip = (uint64_t)&sehReturnFalse;
@@ -43,6 +43,6 @@ void exceptionHandler(InterruptFrame *const frame) {
 		frame->ip = (uint64_t)&kernelThreadLoop;
 		volatile process::Process *process = &process::processes[0];
 		process->cr2PageFaultAddress = cr2;
-		qsod(L"THREAD_KERNEL unhandled CPU exception: index = %u, code = %8\n", frame->index, frame->code);
+		qsod(L"NON-THREAD_USER unhandled CPU exception: index = %u, code = %8\n", frame->index, frame->code);
 	}
 }

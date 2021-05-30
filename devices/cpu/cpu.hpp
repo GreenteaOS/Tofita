@@ -20,6 +20,7 @@ function selectSegment();
 function enterUserMode();
 function timerInterrupt();
 function syscallInterrupt();
+function spuriousInterrupt();
 function yieldInterrupt();
 volatile uint64_t getCr2();
 volatile bool sehReturnFalse();

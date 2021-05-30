@@ -43,8 +43,6 @@ global trampolineCR3
 trampolineCR3:
 
 cli ; Disable interrupts
-;mov cr3, rsi ; UNIX
-;o64 jmp rcx ; UNIX
 
 mov cr3, rdx ; Tofita upper-half paging
 
@@ -54,6 +52,19 @@ push 0 ; and a few extra entries in case of stack
 push 0 ; problems
 push 0
 mov rbp, rsp ; Frame
+
+; TODO Reset state
+;cld ; Clear direction flag
+;; Clear registers
+;xor rax, rax
+;xor rdx, rdx
+;xor rdi, rdi
+;xor rsi, rsi
+;xor r8, r8
+;xor xmm0, xmm0
+;xor xmm1, xmm1
+;xor xmm2, xmm2
+;xor xmm3, xmm3
 
 ; Enter main [with rcx]
 o64 call r9
