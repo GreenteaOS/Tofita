@@ -21,33 +21,39 @@ default abs ; All addresses are relative to 0x00008000
 org 0x00008000 ; Known absolute address in NON-virtual memory
 section .head ; Required for proper linking, but no sections actually created
 
+%define PADDING 8
+
+%define uint8_t db
+%define uint16_t dw
+%define uint32_t dd
+%define uint64_t dq
+
 ; Entry point
 ; Not exported: entered by absolute address
 use16
 arguments:
+    ; Disable interrupts
+    cli
     ; Avoid interpreting arguments by the CPU
     jmp short realModeApStart
 
     ; Known padding
-    times 8 - ($ - arguments) nop
+    times PADDING - ($ - arguments) nop
 
     ; This memory overwitten directly as a way to pass parameters
-    .ready: dq 0 ; TODO Unused
-    .cpuIndex: dq 0 ; Current CPU core number
-    .pageTable: dq 0 ; PML4
-    .stackStart: dq 0 ; TODO Unused
-    .stackEnd: dq 0 ; Stack used by CRT
-    .code: dq 0 ; Entry point
-    ; TODO GDT
+    .ready: uint64_t 0 ; TODO Unused
+    .cpuIndex: uint64_t 0 ; Current CPU core number
+    .pageTable: uint32_t 0 ; PML4
+    .padding: uint32_t 0 ; TODO Unused
+    .stackStart: uint64_t 0 ; TODO Unused
+    .stackEnd: uint64_t 0 ; Stack used by CRT
+    .code: uint64_t 0 ; Entry point
 
 ; TODO GDT SEGMENTS
 
 ; Actual AP entry point body
 use16
 realModeApStart:
-    ; Disable interrupts
-    cli
-
     ; Segment selectors
     xor ax, ax
     mov ds, ax
@@ -59,7 +65,7 @@ realModeApStart:
 
     ; Physical pointer to PML4
     ; At this point only 32-bit thus some workarounds required
-    ; TODO ^ seems like possible to write only 4-level table in lover-half or emded it's copy just right here
+    mov edi, [arguments.pageTable]
     mov cr3, edi
 
     ; Enable FPU
@@ -118,8 +124,6 @@ longModeApStart:
 
     ; TODO handle ABI properly
     mov rdi, arguments.cpuIndex
-
-    mov qword [arguments.ready], 1
 
     push 0 ; Signal end of stack with 0 return address
     push 0 ; and a few extra entries in case of stack
