@@ -254,6 +254,26 @@ class ACPIParser {
 	static function loadApic(const acpi::AcpiApic *apic) {
 		uint32_t *local = reinterpret_cast<uint32_t *>(apic->localAddress);
 		serialPrintf(L"loadApic\n");
+	static volatile uint64_t coresAP;
+	static Spinlock apLock;
+
+	static function apStart() {
+		// TODO seems useless, cause main CPU waits for SIPIs anyway
+		apLock.lock();
+
+		// TODO IDT
+		let core = coresAP + 1;
+		quakePrintf(L"CPU #%u initialized, ", core);
+		amd64::disableAllInterrupts();
+		coresAP++;
+		apLock.unlock();
+
+		while (true) {
+			amd64::halt();
+			amd64::pause();
+		};
+	}
+
 	}
 
 	static function loadMcfg(const acpi::AcpiMcfg *mcfg) {
@@ -293,6 +313,9 @@ class ACPIParser {
 		}
 	}
 };
+
+volatile uint64_t ACPIParser::coresAP = 1;
+Spinlock ACPIParser::apLock;
 
 // Management
 
