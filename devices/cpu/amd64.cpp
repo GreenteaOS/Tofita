@@ -26,6 +26,33 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *
 	*edx = d;
 }
 
+enum class MSR : uint32_t {
+	IA32_APIC_BASE = 27,
+};
+
+uint64_t rdmsr(MSR addr) {
+	uint32_t low, high;
+	__asm__ __volatile__ ("rdmsr" : "=a"(low), "=d"(high) : "c"(addr));
+	return (static_cast<uint64_t>(high) << 32) | low;
+}
+
+void wrmsr(MSR addr, uint64_t value) {
+	uint32_t low = value & 0xffffffff;
+	uint32_t high = value >> 32;
+	__asm__ __volatile__ ("wrmsr" :: "c"(addr), "a"(low), "d"(high));
+}
+
+extern "C++" template <typename T>
+inline T readFrom(uint64_t pointer) {
+	return *reinterpret_cast<const T volatile *>(pointer);
+}
+
+extern "C++" template <typename T>
+inline void writeTo(uint64_t pointer, T value) {
+	auto dest = reinterpret_cast<T volatile*>(pointer);
+	*dest = value;
+}
+
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
 function writeCr3(uint64_t value);
 // TODO asm("invd")
