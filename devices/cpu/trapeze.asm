@@ -41,15 +41,16 @@ arguments:
     times PADDING - ($ - arguments) nop
 
     ; This memory overwitten directly as a way to pass parameters
-    .ready: uint64_t 0 ; TODO Unused
+    .padding: uint64_t 0 ; TODO Unused
     .cpuIndex: uint64_t 0 ; Current CPU core number
     .pageTable: uint32_t 0 ; PML4
-    .padding: uint32_t 0 ; TODO Unused
+    .unused: uint32_t 0 ; TODO Unused
     .stackStart: uint64_t 0 ; TODO Unused
     .stackEnd: uint64_t 0 ; Stack used by CRT
     .code: uint64_t 0 ; Entry point
 
-; TODO GDT SEGMENTS
+%define SYS_CODE64_SEL 0x10
+%define SYS_DATA32_SEL 0x18
 
 ; Actual AP entry point body
 use16
@@ -106,12 +107,12 @@ realModeApStart:
     mov cr0, ebx
 
     ; Far jump to enable Long Mode and load CS with 64 bit segment
-    jmp gdt.kernel_code:longModeApStart
+    jmp SYS_CODE64_SEL:longModeApStart
 
 ; Now registers and pointers are 64-bit
 use64
 longModeApStart:
-    mov rax, gdt.kernelModeDataSegment
+    mov rax, SYS_DATA32_SEL
     ; TODO Separate segments for executable memory and data
     mov ds, rax
     mov es, rax
@@ -133,3 +134,42 @@ longModeApStart:
 
     mov rax, [arguments.code]
     o64 call rax
+
+gdtr:
+    .size uint16_t 127
+    .offset uint64_t gdtTemplate
+
+; TODO copy actual template in realtime
+gdtTemplate:
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00209b00
+    uint32_t 0x0000ffff
+    uint32_t 0x00cf9300
+    uint32_t 0x0000ffff
+    uint32_t 0x00cffa00
+    uint32_t 0x0000ffff
+    uint32_t 0x00cff300
+    uint32_t 0x00000000
+    uint32_t 0x0020fb00
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x60800067
+    uint32_t 0x00008bb9
+    uint32_t 0xfffff800
+    uint32_t 0x00000000
+    uint32_t 0xe0003c00
+    uint32_t 0xff40f3fa
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x0000ffff
+    uint32_t 0x00cf9a00
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00000000
+    uint32_t 0x00000000
