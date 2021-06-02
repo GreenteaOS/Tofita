@@ -444,6 +444,118 @@ class ACPIParser {
 		ioApicSetEntry(virtualIOapic, acpiRemapIrq(IRQ_TIMER), INT_TIMER);
 
 		localApicOut(LAPIC_EOI, 0);
+		// SMP
+		// We will fill trapeze arguments dynamically by updating it's binary
+		uint64_t trapeze = 0x8000 + (uint64_t)WholePhysicalStart;
+		let trapezePhysical = trapeze - (uint64_t)WholePhysicalStart;
+		pages::mapMemory(pages::pml4entries, trapeze, trapezePhysical, 1);
+		pages::mapMemory(pages::pml4entries, 0x8000 - 4096, 0x8000 - 4096, 16);
+		// TODO unmap later
+
+		auto ready = trapeze + 8;
+		auto cpu_id = ready + 8;
+		auto page_table = cpu_id + 8;
+
+		auto stack_start = page_table + 8;
+		auto stack_end = stack_start + 8;
+		auto code = stack_end + 8;
+
+		auto pml4 = code + 8;
+
+		data = apic->controllerData;
+		let _count = acpiTableEntries(apic, 1);
+		end = data + _count;
+		uint8_t bsp = 0; // TODO (get from lapic MSR?)
+
+		bool x2 = false; // TODO
+
+		while (data < end) {
+
+			uint32_t volatile * local = reinterpret_cast<uint32_t *>(0);
+			const uint8_t type = data[0];
+			const uint8_t length = data[1];
+
+			switch (type) {
+				case 0:
+					uint64_t position = (uint64_t)data;
+					uint8_t cpuid = amd64::readFrom<uint8_t>(position + 2);
+					uint8_t lapicid = amd64::readFrom<uint8_t>(position + 3);
+					uint8_t flags = amd64::readFrom<uint8_t>(position + 4);
+
+					if (bsp == cpuid) {
+						break;
+					}
+
+					if ((flags & 0x1) == 0) {
+						break;
+					}
+
+					// Allocate per-core stack
+					// TODO decide on stack size (global var)
+					let _stack_start = PhysicalAllocator::allocatePages(64);
+					let _stack_end = stack_start + 64 * 4096;
+
+					// TODO ensure PML4 & GDT within 4G or even 2G (uint32_t)
+
+					uint64_t pml4 = (uint64_t)((uint64_t)pages::pml4entries - (uint64_t)WholePhysicalStart);
+					amd64::writeTo<volatile uint64_t>(ready + 0, pml4);
+					amd64::writeTo<volatile uint64_t>(cpu_id, cpuid);
+					amd64::writeTo<volatile uint32_t>(page_table, (uint32_t)((uint64_t)pages::pml4entries - (uint64_t)WholePhysicalStart));
+					auto gtdat = (uint32_t)((uint64_t)&globalGdtr - (uint64_t)WholePhysicalStart);
+					amd64::writeTo<volatile uint32_t>(page_table + 4, gtdat);
+					amd64::writeTo<volatile uint64_t>(stack_start, _stack_start);
+					amd64::writeTo<volatile uint64_t>(stack_end, _stack_end);
+					amd64::writeTo<volatile uint64_t>(code, (uint64_t)&apStart);
+
+					__sync_synchronize();
+
+					// Send INIT IPI
+					{
+						uint64_t icr = 0x4500;
+						if (x2) {
+						} else {
+							uint32_t apic_id = lapicid;
+							localApicOut(LAPIC_ICRHI, apic_id << ICR_DESTINATION_SHIFT);
+							localApicOut(LAPIC_ICRLO, ICR_INIT | ICR_PHYSICAL
+								| ICR_ASSERT | ICR_EDGE | ICR_NO_SHORTHAND);
+
+								while (localApicIn(LAPIC_ICRLO) & ICR_SEND_PENDING) {};
+						}
+					}
+
+					volatile auto currentCoresAP = coresAP;
+
+					// Send START IPI
+					{
+						uint64_t TRAMPOLINE = 0x8000;
+						let ap_segment = (TRAMPOLINE >> 12) & (uint64_t)0xFF;
+						uint64_t icr = (uint64_t)0x4600 | ap_segment;
+
+						if (x2) {
+						} else {
+							icr |= ((uint64_t)cpuid) << 56;
+
+							while (localApicIn(0x300) & 1 << 12 == 1 << 12) {}
+			   				localApicOut(0x310, (uint32_t)(icr >> 32));
+			   				localApicOut(0x300, (uint32_t)icr);
+			   				while (localApicIn(0x300) & 1 << 12 == 1 << 12) {}
+
+							uint32_t apic_id = lapicid;
+							uint32_t vector = icr;
+							#define ICR_STARTUP 0x00000600
+							}
+						}
+					}
+
+					while (currentCoresAP == coresAP) {
+						amd64::pause();
+					}
+
+					break;
+			}
+
+			data += length;
+		}
 	}
 
 	static function loadMcfg(const acpi::AcpiMcfg *mcfg) {
