@@ -96,6 +96,27 @@ struct ACPI {
 
 SIZEOF(ACPI, sizeof(Acpi10) + sizeof(Acpi20))
 
+struct ApicHeader {
+	uint8_t type;
+	uint8_t length;
+} __attribute__((packed));
+
+struct ApicIoApic {
+	ApicHeader header;
+	uint8_t ioApicId;
+	uint8_t reserved;
+	uint32_t ioApicAddress;
+	uint32_t globalSystemInterruptBase;
+} __attribute__((packed));
+
+struct ApicInterruptOverride {
+	ApicHeader header;
+	uint8_t bus;
+	uint8_t source;
+	uint32_t interrupt;
+	uint16_t flags;
+} __attribute__((packed));
+
 extern "C++" template <typename T> uint64_t acpiTableEntries(const T *t, uint64_t size) {
 	return (t->header.length - sizeof(T)) / size;
 }
@@ -251,9 +272,6 @@ class ACPIParser {
 		quakePrintf(L"done.\n");
 	}
 
-	static function loadApic(const acpi::AcpiApic *apic) {
-		uint32_t *local = reinterpret_cast<uint32_t *>(apic->localAddress);
-		serialPrintf(L"loadApic\n");
 	static volatile uint64_t coresAP;
 	static Spinlock apLock;
 
@@ -262,6 +280,7 @@ class ACPIParser {
 		apLock.lock();
 
 		// TODO IDT
+		// TODO GDT
 		let core = coresAP + 1;
 		quakePrintf(L"CPU #%u initialized, ", core);
 		amd64::disableAllInterrupts();
@@ -274,6 +293,7 @@ class ACPIParser {
 		};
 	}
 
+	static function loadApic(const acpi::AcpiApic *apic) {
 	}
 
 	static function loadMcfg(const acpi::AcpiMcfg *mcfg) {
