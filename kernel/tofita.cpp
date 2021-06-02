@@ -237,6 +237,7 @@ function kernelInit(const KernelParams *params) {
 		tmemcpy((void*)trapeze, (const void*)asset.data, asset.size);
 	}
 
+	disablePic();
 	if (!ACPIParser::parse(params->acpiTablePhysical)) {
 		quakePrintf(L"ACPI is *not* loaded\n");
 	} else {

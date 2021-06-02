@@ -294,6 +294,43 @@ class ACPIParser {
 	}
 
 	static function loadApic(const acpi::AcpiApic *apic) {
+		amd64::disableAllInterrupts();
+
+		uint32_t APIC_BASE_FLAG = 0xFFFFF000;
+		uint32_t APIC_ENABLE_FLAG = 0x800;
+
+		amd64::wrmsr(amd64::MSR::IA32_APIC_BASE, (apic->localAddress & APIC_BASE_FLAG) | APIC_ENABLE_FLAG);
+
+		// +32 GB
+		uint64_t virtualLapic = (uint64_t)WholePhysicalStart + ((uint64_t)32 * (uint64_t)1024 * (uint64_t)1024 * (uint64_t)1024);
+		uint64_t physicalLapic = apic->localAddress;
+		virtualLapicBase = virtualLapic;
+
+		auto localApicOut = [&](uint64_t reg, uint32_t data) {
+			auto at = reinterpret_cast<volatile uint32_t *>(virtualLapic + reg);
+			at[0] = data;
+		};
+
+		auto localApicIn = [&](uint64_t reg) {
+			 return amd64::readFrom<volatile uint32_t>(virtualLapic + reg);
+		};
+
+		#define LAPIC_TPR 0x0080  // Task Priority
+		#define LAPIC_DFR 0x00e0  // Destination Format
+		#define LAPIC_LDR 0x00d0  // Logical Destination
+		#define LAPIC_SVR 0x00f0  // Spurious Interrupt Vector
+
+		pages::mapMemory(pages::pml4entries, virtualLapic, physicalLapic, 1);
+
+		// Clear task priority to enable all interrupts
+		localApicOut(LAPIC_TPR, 0);
+
+		// Logical Destination Mode
+		localApicOut(LAPIC_DFR, 0xffffffff);   // Flat mode
+		localApicOut(LAPIC_LDR, 0x01000000);   // All cpus use logical id 1
+
+		// Configure Spurious Interrupt Vector Register
+		localApicOut(LAPIC_SVR, 0x100 | 0xff);
 	}
 
 	static function loadMcfg(const acpi::AcpiMcfg *mcfg) {
