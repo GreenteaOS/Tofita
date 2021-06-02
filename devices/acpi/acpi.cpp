@@ -444,6 +444,7 @@ class ACPIParser {
 		ioApicSetEntry(virtualIOapic, acpiRemapIrq(IRQ_TIMER), INT_TIMER);
 
 		localApicOut(LAPIC_EOI, 0);
+
 		// SMP
 		// We will fill trapeze arguments dynamically by updating it's binary
 		uint64_t trapeze = 0x8000 + (uint64_t)WholePhysicalStart;
@@ -514,6 +515,16 @@ class ACPIParser {
 						uint64_t icr = 0x4500;
 						if (x2) {
 						} else {
+							#define LAPIC_ICRHI           0x0310  // Interrupt Command [63:32]
+							#define ICR_DESTINATION_SHIFT 24
+							#define LAPIC_ICRLO           0x0300  // Interrupt Command
+							#define ICR_INIT              0x00000500
+							#define ICR_PHYSICAL          0x00000000
+							#define ICR_ASSERT            0x00004000
+							#define ICR_EDGE              0x00000000
+							#define ICR_NO_SHORTHAND      0x00000000
+							#define ICR_SEND_PENDING      0x00001000
+
 							uint32_t apic_id = lapicid;
 							localApicOut(LAPIC_ICRHI, apic_id << ICR_DESTINATION_SHIFT);
 							localApicOut(LAPIC_ICRLO, ICR_INIT | ICR_PHYSICAL
@@ -543,6 +554,8 @@ class ACPIParser {
 							uint32_t apic_id = lapicid;
 							uint32_t vector = icr;
 							#define ICR_STARTUP 0x00000600
+
+							if (0) {
 							}
 						}
 					}
