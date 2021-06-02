@@ -76,6 +76,7 @@ function writePort(volatile uint16_t port, volatile uint8_t value) {
 	portOutb(port, value);
 }
 
+extern "C"
 function loadIdt(volatile Idtr *idtr);
 
 // Handling IDT
@@ -102,7 +103,7 @@ function loadIdt(volatile Idtr *idtr);
 IdtEntry IDT[IDT_SIZE];
 
 // Handling keyboard
-extern function keyboardHandler();
+extern "C" function keyboardHandler();
 function initializeKeyboard(IdtEntry *entry) {
 	uint64_t keyboardAddress = ((uint64_t)keyboardHandler);
 	entry->offsetLowerbits = keyboardAddress & 0xffff;
@@ -116,7 +117,7 @@ function initializeKeyboard(IdtEntry *entry) {
 	entry->gateType = 0xe; // Interrupt gate
 }
 
-extern function mouseHandler();
+extern "C" function mouseHandler();
 function initializeMouse(IdtEntry *entry) {
 	uint64_t mouseAddress = ((uint64_t)mouseHandler);
 	entry->offsetLowerbits = mouseAddress & 0xffff;
@@ -248,6 +249,7 @@ struct TablePtr {
 
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
+extern "C"
 function lgdt(volatile const TablePtr *gdt);
 
 enum GdtType : uint8_t {
@@ -493,6 +495,7 @@ function switchToGuiThread(volatile InterruptFrame *frame) {
 	tmemcpy(frame, &guiThreadFrame, sizeof(InterruptFrame));
 }
 
+extern "C"
 void yieldInterruptHandler(volatile InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 	switchToNextProcess(frame);
@@ -556,6 +559,7 @@ void timerInterruptHandler(volatile InterruptFrame *frame) {
 	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20);
 }
 
+extern "C"
 function syscallInterruptHandler(InterruptFrame *frame) {
 	amd64::disableAllInterrupts();
 	volatile process::Process *process = &process::processes[process::currentProcess];
@@ -592,6 +596,7 @@ function syscallInterruptHandler(InterruptFrame *frame) {
 	}
 }
 
+extern "C"
 function setTsr(volatile uint16_t tsr_data);
 
 // 16 records

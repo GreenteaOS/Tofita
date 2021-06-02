@@ -145,6 +145,7 @@ function handleMousePacket() {
 	lockMouse = false;
 }
 
+extern "C"
 function handleMouse() {
 	// This is hack to avoid race condition in poller
 	// this way we handle mouse *only* in poller

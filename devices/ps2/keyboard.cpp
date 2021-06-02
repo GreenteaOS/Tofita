@@ -156,6 +156,7 @@ function handleKeyboardPacket() {
 	// lockMouse = false;
 }
 
+extern "C"
 function handleKeyboard() {
 	// uint8_t status = readPort(STATUS_REGISTER);
 	// pollForce = status;

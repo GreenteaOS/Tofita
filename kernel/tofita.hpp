@@ -53,8 +53,8 @@ struct Pixel32;
 // TODO refactor to .hpp!
 uint16_t drawAsciiText(const char8_t *text, double x, int16_t y, Pixel32 color);
 function quakePrintf(const wchar_t *c, ...);
-function guiThread();
-function kernelThread();
-function guiThreadStart();
-function kernelThreadStart();
+extern "C" function guiThread();
+extern "C" function kernelThread();
+extern "C" function guiThreadStart();
+extern "C" function kernelThreadStart();
 function kernelThreadLoop();

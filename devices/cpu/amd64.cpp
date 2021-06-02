@@ -54,6 +54,7 @@ inline void writeTo(uint64_t pointer, T value) {
 }
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
+extern "C" {
 function writeCr3(uint64_t value);
 // TODO asm("invd")
 function halt();
@@ -63,4 +64,5 @@ function disableAllInterrupts();
 function enableAllInterruptsAndHalt();
 function pause();
 function yield();
+}
 } // namespace amd64

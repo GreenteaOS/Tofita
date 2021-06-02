@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-extern "C" {
-
 namespace efi {
 #include <efi.hpp>
 }
@@ -76,7 +74,7 @@ function memzero(void *dest, uint64_t len) {
 	memset(dest, 0, len);
 }
 
-void ___chkstk_ms(){};
+extern "C" void ___chkstk_ms(){};
 
 #include "util/Math.cpp"
 #include "util/String.cpp"
@@ -463,6 +461,7 @@ function guiThread() {
 	}
 }
 
+extern "C"
 function kernelMain(const KernelParams *params) {
 	kernelInit(params);
 	__sync_synchronize();
@@ -478,5 +477,4 @@ function kernelMain(const KernelParams *params) {
 	}
 	// TODO hexa: error if code present in unreachable block
 	// (no break/continue/throw)
-}
 }
