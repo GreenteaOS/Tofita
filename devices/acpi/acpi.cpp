@@ -331,6 +331,119 @@ class ACPIParser {
 
 		// Configure Spurious Interrupt Vector Register
 		localApicOut(LAPIC_SVR, 0x100 | 0xff);
+
+		// IO APIC
+
+		uint64_t virtualIOapic = (uint64_t)WholePhysicalStart + ((uint64_t)33 * (uint64_t)1024 * (uint64_t)1024 * (uint64_t)1024);
+		uint64_t physicalIOapic = 0;
+
+		let count = acpiTableEntries(apic, 1);
+		uint8_t const *data = apic->controllerData;
+		uint8_t const *end = data + count;
+
+		while (data < end) {
+			const uint8_t type = data[0];
+			const uint8_t length = data[1];
+
+			// APIC structure types
+			#define APIC_TYPE_LOCAL_APIC            0
+			#define APIC_TYPE_IO_APIC               1
+			#define APIC_TYPE_INTERRUPT_OVERRIDE    2
+
+			switch (type) {
+				case APIC_TYPE_IO_APIC: {
+					auto s = (acpi::ApicIoApic *)data;
+
+					physicalIOapic = s->ioApicAddress;
+				};
+				break;
+			}
+
+			data += length;
+		}
+
+		// TODO 1 page?
+		pages::mapMemory(pages::pml4entries, virtualIOapic, physicalIOapic, 1);
+
+		// Memory mapped registers for IO APIC register access
+		#define IOREGSEL                        0x00
+		#define IOWIN                           0x10
+
+		// IO APIC Registers
+		#define IOAPICID                        0x00
+		#define IOAPICVER                       0x01
+		#define IOAPICARB                       0x02
+		#define IOREDTBL                        0x10
+
+		auto ioApicOut = [&](uint64_t base, uint8_t reg, uint32_t val)
+		{
+			amd64::writeTo<volatile uint32_t>(base + IOREGSEL, reg);
+			amd64::writeTo<volatile uint32_t>(base + IOWIN, val);
+		};
+
+		auto ioApicIn = [&](uint64_t base, uint8_t reg)
+		{
+			amd64::writeTo<volatile uint32_t>(base + IOREGSEL, reg);
+			return amd64::readFrom<volatile uint32_t>(base + IOWIN);
+		};
+
+		auto ioApicSetEntry = [&](uint64_t base, uint8_t index, uint64_t data)
+		{
+			ioApicOut(base, IOREDTBL + index * 2, (uint32_t)data);
+			ioApicOut(base, IOREDTBL + index * 2 + 1, (uint32_t)(data >> 32));
+		};
+
+		auto ioApicInit = [&]()
+		{
+			// Get number of entries supported by the IO APIC
+			uint32_t x = ioApicIn(virtualIOapic, IOAPICVER);
+			uint32_t count = ((x >> 16) & 0xff) + 1;    // maximum redirection entry
+
+			// Disable all entries
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				ioApicSetEntry(virtualIOapic, i, 1 << 16);
+			}
+		};
+
+		ioApicInit();
+
+		auto acpiRemapIrq = [&](uint32_t irq) {
+			let count = acpiTableEntries(apic, 1);
+			uint8_t const *data = apic->controllerData;
+			uint8_t const *end = data + count;
+
+			while (data < end) {
+				const uint8_t type = data[0];
+				const uint8_t length = data[1];
+
+				// APIC structure types
+				#define APIC_TYPE_LOCAL_APIC            0
+				#define APIC_TYPE_IO_APIC               1
+				#define APIC_TYPE_INTERRUPT_OVERRIDE    2
+
+				switch (type) {
+					case APIC_TYPE_INTERRUPT_OVERRIDE: {
+						auto s = (acpi::ApicInterruptOverride *)data;
+						if (s->source == irq) {
+							return s->interrupt;
+						}
+					};
+					break;
+				}
+
+				data += length;
+			}
+
+			return irq;
+		};
+
+		// Enable IO APIC entries
+		#define INT_TIMER 0x20
+		#define IRQ_TIMER 0x00
+		ioApicSetEntry(virtualIOapic, acpiRemapIrq(IRQ_TIMER), INT_TIMER);
+
+		localApicOut(LAPIC_EOI, 0);
 	}
 
 	static function loadMcfg(const acpi::AcpiMcfg *mcfg) {
