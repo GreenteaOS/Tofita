@@ -44,7 +44,7 @@ struct Process {
 
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
-	volatile TofitaSyscalls volatile syscallToHandle; // = Noop if no actions required
+	volatile TofitaSyscalls syscallToHandle; // = Noop if no actions required
 													  // TODO do this on per-thread basis
 
 	// TODO separate syscall arguments, cause they differ in 32-bit

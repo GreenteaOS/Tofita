@@ -15,7 +15,7 @@
 
 namespace icon {
 
-Bitmap32 *loadIcon(const RamDiskAsset *asset, uint8_t widthToExtract) {
+Bitmap32 *loadIcon(const RamDiskAsset *asset, uint16_t widthToExtract) {
 	uint8_t *buffer = asset->data;
 
 	// Reserved. Must always be 0.

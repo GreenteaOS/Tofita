@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#undef free libc_free
-#undef malloc libc_malloc
-#undef realloc libc_realloc
-#undef memset libc_memset
-#undef abs libc_abs
-#undef pow libc_pow
-#undef memcpy libc_memcpy
+#undef free
+#undef malloc
+#undef realloc
+#undef memset
+#undef abs
+#undef pow
+#undef memcpy
 
 Bitmap32 *loadPng32FromBuffer(uint8_t *data, uint32_t size) {
 	int32_t width, height, png_bpp;

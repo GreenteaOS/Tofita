@@ -30,7 +30,7 @@ extern "C++" namespace shortcut {
 
 	_Static_assert(sizeof(LnkFlags) == 4, "bad sizeof");
 
-	__attribute__((packed)) struct LnkAttributes {
+	 struct __attribute__((packed)) LnkAttributes {
 		uint8_t readOnly : 1;
 		uint8_t hidden : 1;
 		uint8_t systemFile : 1;
@@ -50,7 +50,7 @@ extern "C++" namespace shortcut {
 	_Static_assert(sizeof(LnkAttributes) == 4, "bad sizeof");
 
 #pragma pack(1)
-	__attribute__((packed)) struct Lnk {
+	struct __attribute__((packed)) Lnk {
 		uint32_t magucka;
 		uint8_t clus[16];
 		LnkFlags flugs;

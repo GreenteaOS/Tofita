@@ -37,7 +37,7 @@ Module *loadModule(ModuleInterim *params) {
 	auto ptr = (uint8_t *)params->dll->data;
 	auto peHeader = (const exe::PeHeader *)((uint64_t)ptr + ptr[0x3C] + ptr[0x3C + 1] * 256);
 	auto peOptionalHeader = (const exe::Pe32OptionalHeader *)((uint64_t)peHeader + sizeof(exe::PeHeader));
-	void *base = (void *)peOptionalHeader->imageBase;
+	void *base = (void *)(uint64_t)peOptionalHeader->imageBase;
 	memset(base, 0, peOptionalHeader->sizeOfImage); // Zeroing
 	module->base = peOptionalHeader->imageBase;
 

@@ -251,7 +251,7 @@ PageEntry *newCR3(const PageEntry *pml4source) {
 	return pml4result;
 }
 
-PageEntry *freeCR3(PageEntry *pml4) {
+void freeCR3(PageEntry *pml4) {
 	// TODO deallocate full lower half
 }
 

@@ -149,11 +149,13 @@ enum class Message : uint32_t {
 	WM_SIZING = 0x0214
 };
 
+#ifndef SIZEOF
 extern "C++"
 template<typename T, uint16_t s, uint16_t t> struct checkSize {
     static_assert(s == t, "wrong size");
 };
 #define SIZEOF(T, SIZE) namespace sizeofChecks { wapi::checkSize<T, sizeof(T), SIZE> __SIZEOF__##T; }
+#endif
 
 SIZEOF(Message, 4)
 
