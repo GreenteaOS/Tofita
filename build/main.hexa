@@ -35,7 +35,7 @@ fun deleteFolderRecursive(path, noRemoveSelf) {
 
 let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
 let tasks = process.argv.slice()
-let llvm = 'LLVM-10.0.0'
+let llvm = 'LLVM-12.0.0'
 tasks.shift()
 tasks.shift()
 
@@ -131,6 +131,7 @@ for task in tasks {
 						'-D versionRolling=' + versionRolling + ' ',
 						'-D versionName=\\"' + versionName + '\\" ',
 
+						'-mno-ms-bitfields -fno-threadsafe-statics ',
 						'-fshort-wchar -mno-red-zone -Os',
 						' -c ',
 						'boot/uefi/boot.cpp',
@@ -199,6 +200,7 @@ for task in tasks {
 								'-mtune=nocona -fno-stack-protector -mno-red-zone ',
 								'-fno-rtti -fno-exceptions -fvisibility=default ',
 								'-fno-stack-check ',
+								'-mno-ms-bitfields -fno-threadsafe-statics ',
 								'-Dbit\(bit) ',
 								'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
 								'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
@@ -232,7 +234,7 @@ for task in tasks {
 								// TODO -visibility=hidden
 								// TODO check if `/kill-at` keeps `@` from `asm()`
 								'..\\Teapot\\\(llvm)\\bin\\lld-link.exe ',
-								'/verbose /DLL /WX /MACHINE:X\(machine) ',
+								'/DLL /WX /MACHINE:X\(machine) ',
 								[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.' + bit + '.lib '].join(''),
 								outobj + ' ',
 								asm,
@@ -259,11 +261,12 @@ for task in tasks {
 						'-fno-stack-check ',
 						'-fvisibility=hidden ',
 						'-Dbit64 ',
-						'-ffreestanding ',
+						'-fno-rtti -fno-exceptions -ffreestanding ',
+						'-mno-ms-bitfields -fno-threadsafe-statics ',
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
 						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-m64 -target x86_64-pc-windows-gnu -nostdlib -nodefaultlibs -nostartfiles ',
+						'-m64 -target x86_64-pc-windows-gnu -nostdlib -nodefaultlibs ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fno-pic -mcmodel=large ',
 						warn,
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -Wimplicit-function-declaration ',
