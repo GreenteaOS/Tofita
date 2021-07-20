@@ -15,7 +15,17 @@
 
 declare class Config {
 	let warnings: Bool
-	let tempFolder: String
+	var tempFolder: String
+	let tempFolderUnix: String
+}
+
+let isUnix = process.platform != "win32"
+
+fun slash(path: String): String {
+	if isUnix {
+		return path.split('\\').join('/')
+	}
+	return path.split('/').join('\\')
 }
 
 let dlls = [
@@ -38,7 +48,7 @@ let deps: [[String]] = [
 fun packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
-			JSON.parse(fs.readFileSync('assets/root/Windows/Fonts/default.json').toString().trim())
+			JSON.parse(fs.readFileSync(slash('assets/root/Windows/Fonts/default.json')).toString().trim())
 
 		let charSize = 2 + 2 + 8
 		let size = 256 * charSize // Just ASCII for now
@@ -55,7 +65,7 @@ fun packFonts(config: Config) {
 			}
 		}
 
-		fs.writeFileSync(config.tempFolder + '\\tofita\\ascii.tofita', buffer, "binary")
+		fs.writeFileSync(slash(config.tempFolder + '\\tofita\\ascii.tofita'), buffer, "binary")
 }
 
 fun packAssets(config: Config) {
@@ -104,7 +114,7 @@ fun packAssets(config: Config) {
 		// Compute RAM disk size
 		var ramDiskSize = 0
 		for asset in assetPath {
-			ramDiskSize += fs.statSync(asset).size
+			ramDiskSize += fs.statSync(slash(asset)).size
 		}
 
 		ramDiskSize += 4 // UInt32 ramDiskChecksum
@@ -132,7 +142,7 @@ fun packAssets(config: Config) {
 		var assetDataOffset = ramDiskSize
 		for i in assetName.length {
 			let asset = assetName[i]
-			let path = assetPath[i]
+			let path = slash(assetPath[i])
 			let assetSize = fs.statSync(path).size
 			buffer.write(asset, assetInfoOffset, "utf16le")
 			buffer.writeUInt32LE(assetSize, assetInfoOffset + 256)
@@ -161,5 +171,5 @@ fun packAssets(config: Config) {
 		buffer.writeUInt32LE(ramDiskChecksum, 0)
 		console.log('ramDiskChecksum is', ramDiskChecksum)
 
-		fs.writeFileSync(config.tempFolder + '\\tofita\\iso\\TOFITA.DAT', buffer, "binary")
+		fs.writeFileSync(slash(config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'), buffer, "binary")
 }

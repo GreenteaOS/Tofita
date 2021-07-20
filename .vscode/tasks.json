@@ -6,7 +6,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "wine start build.bat",
+            "command": "bash ./build.sh",
             "windows": {
                 "command": ".\\build.bat"
             },
@@ -22,6 +22,7 @@
                 "kind": "build",
                 "isDefault": true
             },
+            "problemMatcher": []
         }
     ]
 }

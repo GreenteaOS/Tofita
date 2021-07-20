@@ -57,11 +57,11 @@ Help to hire developers and buy hardware
 
 Get automatic build or make yours with Teapot (if you want to edit the code)
 
-#### Nightly builds
+### Nightly builds
 
 If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 
-#### Teapot
+### Build using Teapot
 
 Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-latest-zip) and place alongside of Tofita repo:
 
@@ -108,6 +108,10 @@ cmd /c build
 ```
 
 Or just open `build.bat` file with Explorer.
+
+### Build using Linux
+
+Open `build.sh` for instructions. Remember to `chmod +x build.sh` if required.
 
 ## License
 
