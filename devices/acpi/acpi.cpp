@@ -304,7 +304,6 @@ class ACPIParser {
 		// +32 GB
 		uint64_t virtualLapic = (uint64_t)WholePhysicalStart + ((uint64_t)32 * (uint64_t)1024 * (uint64_t)1024 * (uint64_t)1024);
 		uint64_t physicalLapic = apic->localAddress;
-		virtualLapicBase = virtualLapic;
 
 		auto localApicOut = [&](uint64_t reg, uint32_t data) {
 			auto at = reinterpret_cast<volatile uint32_t *>(virtualLapic + reg);

@@ -123,6 +123,10 @@ class PhysicalAllocator {
 // Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
 #undef PAGE_RESERVED
 
+	static uint64_t getAvailablePages() {
+		return available;
+	}
+
 	// 31-bit addressable, first 2 GB of RAM
 	// Required by some hardware
 	// We assume this by-default

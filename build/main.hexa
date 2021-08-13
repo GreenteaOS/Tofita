@@ -323,7 +323,7 @@ for task in tasks {
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
 				] {
 					require('child_process').execSync(
-						slash(cmd), { stdio: 'inherit' }
+						isUnix? slash(cmd) : cmd, { stdio: 'inherit' }
 					)
 				}
 				// Create disk image
