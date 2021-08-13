@@ -442,6 +442,7 @@ class ACPIParser {
 		#define IRQ_TIMER 0x00
 		ioApicSetEntry(virtualIOapic, acpiRemapIrq(IRQ_TIMER), INT_TIMER);
 
+		#define LAPIC_EOI 0x00b0  // EOI
 		localApicOut(LAPIC_EOI, 0);
 
 		// SMP
