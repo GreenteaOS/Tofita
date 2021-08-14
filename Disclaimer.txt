@@ -1,6 +1,6 @@
 Disclaimer & Known Issues
 
-As with any pre-release software, there are are some known issues in this beta release.
+As with any pre-release software, there are some known issues in this beta release.
 Check the public project board for known regressions, as well as the progress towards the stable release.
 
 And as always:
@@ -23,5 +23,5 @@ And as always:
 
 Credits
 
-This text is unmodified copy-paste from Cassidy James Blaede blog post (CC BY-SA 4.0)
+This text is a copy-paste from Cassidy James Blaede blog post (CC BY-SA 4.0) with `are are` changed to `are`
 Thanks James for a very clear disclaimer, I don't know how to spell it better than that
