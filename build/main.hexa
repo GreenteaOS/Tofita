@@ -57,7 +57,7 @@ let warn = if config.warnings {
 }
 
 let today = new Date()
-let month = today.getMonth()
+let month = today.getMonth() + 1
 let versionRolling = today.getFullYear() * 10000 + month * 100 + today.getDate()
 let versionName = today.getFullYear() + '.' + month + '.' + today.getDate()
 
@@ -313,6 +313,10 @@ for task in tasks {
 				fs.copyFileSync(
 					slash('LICENSE'),
 					slash(config.tempFolder + '\\tofita\\iso\\LICENSE.txt'))
+				fs.writeFileSync(
+					slash(config.tempFolder + '\\tofita\\iso\\version.txt'),
+					versionName
+				)
 
 				// Create floppy image
 				fs.copyFileSync(
@@ -323,6 +327,7 @@ for task in tasks {
 					mmd + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ::/EFI/BOOT',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
+					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\version.txt ::/version.txt',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG LICENSE ::/LICENSE.txt',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG assets\\autorun.ico ::/autorun.ico',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
