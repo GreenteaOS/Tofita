@@ -310,6 +310,10 @@ for task in tasks {
 				fs.copyFileSync(
 					slash('assets\\autorun.inf'),
 					slash(config.tempFolder + '\\tofita\\iso\\autorun.inf'))
+				fs.copyFileSync(
+					slash('LICENSE'),
+					slash(config.tempFolder + '\\tofita\\iso\\LICENSE.txt'))
+
 				// Create floppy image
 				fs.copyFileSync(
 					slash('..\\Teapot\\mtools\\disk-template.img'),
@@ -319,6 +323,7 @@ for task in tasks {
 					mmd + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ::/EFI/BOOT',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
+					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG LICENSE ::/LICENSE.txt',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG assets\\autorun.ico ::/autorun.ico',
 					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
 				] {
