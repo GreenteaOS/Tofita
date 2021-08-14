@@ -1,0 +1,27 @@
+Disclaimer & Known Issues
+
+As with any pre-release software, there are are some known issues in this beta release.
+Check the public project board for known regressions, as well as the progress towards the stable release.
+
+And as always:
+
+- We do not recommend using beta builds on your primary device, as irrecoverable crashes and data loss are possible.
+
+- It will not be possible to upgrade to the stable release from beta builds.
+
+- Some user-facing features are unfinished and in rapid development; beta releases are intended for developers.
+
+
+
+
+
+
+
+
+
+
+
+Credits
+
+This text is unmodified copy-paste from Cassidy James Blaede blog post (CC BY-SA 4.0)
+Thanks James for a very clear disclaimer, I don't know how to spell it better than that
