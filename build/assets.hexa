@@ -15,6 +15,7 @@
 
 declare class Config {
 	let warnings: Bool
+	let teapot: String
 	var tempFolder: String
 	let tempFolderUnix: String
 }

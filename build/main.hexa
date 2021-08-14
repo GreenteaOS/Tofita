@@ -39,12 +39,13 @@ let tasks: [String] = process.argv.slice()
 let llvm = 'LLVM-12.0.0'
 tasks.shift()
 tasks.shift()
-let nasm = isUnix? 'nasm' : '..\\Teapot\\nasm-2.14.02\\nasm'
-let clang = isUnix? 'clang-12' : '..\\Teapot\\\(llvm)\\bin\\clang.exe'
-let link = isUnix? 'lld-link-12' : '..\\Teapot\\\(llvm)\\bin\\lld-link.exe'
-let xorriso = isUnix? 'xorriso' : '..\\Teapot\\xorriso-1.5.2\\xorriso.exe'
-let mmd = isUnix? 'mmd' : '..\\Teapot\\mtools\\mmd.exe'
-let mcopy = isUnix? 'mcopy' : '..\\Teapot\\mtools\\mcopy.exe'
+let teapot = config.teapot
+let nasm = isUnix? 'nasm' : '\(teapot)\\nasm-2.14.02\\nasm'
+let clang = isUnix? 'clang-12' : '\(teapot)\\\(llvm)\\bin\\clang.exe'
+let link = isUnix? 'lld-link-12' : '\(teapot)\\\(llvm)\\bin\\lld-link.exe'
+let xorriso = isUnix? 'xorriso' : '\(teapot)\\xorriso-1.5.2\\xorriso.exe'
+let mmd = isUnix? 'mmd' : '\(teapot)\\mtools\\mmd.exe'
+let mcopy = isUnix? 'mcopy' : '\(teapot)\\mtools\\mcopy.exe'
 
 if isUnix {
 	config.tempFolder = config.tempFolderUnix
@@ -320,7 +321,7 @@ for task in tasks {
 
 				// Create floppy image
 				fs.copyFileSync(
-					slash('..\\Teapot\\mtools\\disk-template.img'),
+					slash('\(teapot)\\mtools\\disk-template.img'),
 					slash(config.tempFolder + '\\tofita\\DISK.IMG'))
 				for cmd in [
 					mmd + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ::/EFI',
@@ -359,7 +360,7 @@ for task in tasks {
 			}
 		case 'clang-format':
 			{
-				let clang = '..\\Teapot\\\(llvm)\\bin\\clang-format'
+				let clang = '\(teapot)\\\(llvm)\\bin\\clang-format'
 				let files: [String] = []
 
 				fun formatFolderRecursive(path) {
