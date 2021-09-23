@@ -35,7 +35,7 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 
 - 2 GB RAM
 - Motherboard with UEFI, SATA (AHCI) or NVMe, PCIe and USB 2.0+
-- Multicore modern 64-bit CPU (most AMD and Intel CPUs from 2009 and newer)
+- Multicore modern 64-bit CPU (most AMD and Intel CPUs from [Q3 2011 and newer](https://github.com/GreenteaOS/Greentea/blob/kawaii/Developer-Guide/CPUID.md#notes-on-cpu-compatibility))
 
 [![Give a star](docs/star.png?raw=true)](https://github.com/GreenteaOS/Tofita/stargazers)
 
