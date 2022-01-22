@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2021  Oleg Petrenko
+// Copyright (C) 2022 Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,8 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Desktop window manager (i.e. GUI logic)
-
-
 
 // Zero for system GUI (like taskbar)
 var firstResponder: UInt64 = 0 // Active window to catch keyboard input

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2021  Oleg Petrenko
+// Copyright (C) 2022 Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,8 +15,6 @@
 
 // Loads EXE and DLL files
 // TODO 32-bit loader
-
-
 
 // TODO ntdll should have tofitaStub(){} for unresolved dll imports . log them
 

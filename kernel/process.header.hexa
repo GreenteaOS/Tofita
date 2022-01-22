@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2021  Oleg Petrenko
+// Copyright (C) 2022 Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -12,8 +12,6 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
 
 // TODO probably use Thread instead of Process for easier scheduling & syscalls
 // and threads will have parentPID and that's

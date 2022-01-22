@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2021  Oleg Petrenko
+// Copyright (C) 2022 Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,8 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Tofita Sandboxes/Toastes
-
-
 
 // "Toast user" is one associated with Toast sandbox
 // We can "Run As" but cannot login

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2021  Oleg Petrenko
+// Copyright (C) 2022 Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // AMD64 assembly instructions wrapper
-
 
 @inline fun cpuid(leaf: UInt32, subleaf: UInt32, eax: Pointer<UInt32>, ebx: Pointer<UInt32>, ecx: Pointer<UInt32>,
 					  edx: Pointer<UInt32>) {
