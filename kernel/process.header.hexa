@@ -19,18 +19,18 @@
 @struct
 class Process {
 	// Is process exists at all and fully initialized
-	@volatile Bool present
+	@volatile var present: Bool
 	// TODO SoA
 
 	// Index
-	@volatile pid: UInt64
+	@volatile var pid: UInt64
 
 	// Is it allowed to make this process current
-	@volatile Bool schedulable
+	@volatile var schedulable: Bool
 	// TODO combine booleans into bit/flag mask?
 
 	// Should be false after creation
-	@volatile Bool scheduleOnNextTick
+	@volatile var scheduleOnNextTick: Bool
 
 	// CR3, should be page aligned
 	pages.PageEntry *@volatile pml4
@@ -41,7 +41,7 @@ class Process {
 	var frame: InterruptFrame
 
 	// Filled on #PF
-	@volatile cr2PageFaultAddress: UInt64
+	@volatile var cr2PageFaultAddress: UInt64
 
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
@@ -53,7 +53,7 @@ class Process {
 	// oh probably
 
 	// Ring buffer
-	var messages: Pointer<wapi.Msg>
+	var messages: Pointer<Msg>
 	var messagesUsed: UInt64
 	var awaitsGetMessage: Bool
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
@@ -65,7 +65,7 @@ const UInt64 ProcessLimit = 256
 var processes[ProcessLimit]: Process = {0}
 
 // Working process pid, with restored state and active CR3
-@volatile currentProcess: UInt64 = 0
 
 Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessagePayload>)
 Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessagePayload>)
+@volatile var currentProcess: UInt64 = 0

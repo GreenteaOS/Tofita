@@ -13,9 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@extern "C++" class Math {
-  public
 	static Int32 round(value: Float) {
+class Math {
 		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5))
 	}
 

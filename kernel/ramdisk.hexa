@@ -21,11 +21,11 @@ class RamDiskInfo {
 }
 
 @struct
-class {
 	var path[128]: UInt16
+class RamDiskAssetInfo {
 	var size: UInt32
 	var offsetFromRamDiskFirstByte: UInt32
-} RamDiskAssetInfo
+}
 
 static const RamDisk *_ramdisk
 fun setRamDisk(const ramdisk: Pointer<RamDisk>) {
@@ -33,10 +33,10 @@ fun setRamDisk(const ramdisk: Pointer<RamDisk>) {
 }
 
 @struct
-class {
+class RamDiskAsset {
 	var size: UInt32
 	var data: Pointer<UInt8>
-} RamDiskAsset
+}
 
 const RamDiskAsset getRamDiskAsset(pathToAsset: ConstWideCharPointer) {
 	var asset: RamDiskAsset
@@ -48,21 +48,23 @@ const RamDiskAsset getRamDiskAsset(pathToAsset: ConstWideCharPointer) {
 
 	for (UInt32 id = 0; id < ramDiskInfo.assetsCount; id++) {
 		// Pointer arithmetic like a boss
-		const UInt64 ramDiskAssetInfoPtr =
+		let ramDiskAssetInfoPtr =
 			(_ramdisk.base as! UInt64) + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id
 		const RamDiskAssetInfo *ramDiskAssetInfo = (const RamDiskAssetInfo *)ramDiskAssetInfoPtr
 		var found: UInt8 = 1
 
 		for (UInt8 at = 0; at < 127; at++) {
-			if (ramDiskAssetInfo.path[at] != path[at]) {
+			if ramDiskAssetInfo.path[at] != path[at] {
 				found = 0
 				break
 			}
-			if (ramDiskAssetInfo.path[at] == 0)
+
+			if ramDiskAssetInfo.path[at] == 0 {
 				break
+			}
 		}
 
-		if (found) {
+		if found {
 			asset.size = ramDiskAssetInfo.size
 			asset.data = (UInt8 *)((_ramdisk.base as! UInt64) + ramDiskAssetInfo.offsetFromRamDiskFirstByte)
 			return asset

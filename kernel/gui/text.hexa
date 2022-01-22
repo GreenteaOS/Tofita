@@ -16,8 +16,8 @@
 // Simple bitmap font drawing
 // Non-monospace
 
-Bitmap32 *textFontBitmap
-@extern Pixel32 *_pixels
+var textFontBitmap: Bitmap32
+@extern var _pixels: Pixel32
 
 @struct @packed
 class TextFontList {
@@ -38,24 +38,27 @@ fun initText() {
 }
 
 Int8 getLigatureAdvance(left: Char8, const Char8 right) {
-	if (left == 0)
+	if left == 0 {
 		return 0
-	if (right == 0)
+	}
+	if right == 0 {
 		return 0
+	}
 	return 8
 }
 
 Float getCharAdvance(const Char8 c) {
-	if (textFontList == null)
+	if textFontList == null {
 		return 8
 	var textChar: TextFontList = textFontList[(c] as! UInt64)
+	}
 	return textChar.width
 }
 
 UInt16 getTextAdvance(text: ConstPointer<Char8>) {
 	var i: UInt16 = 0
 	var xx: Float = 0
-	while (text[i] != 0 && i < 255 * 255) {
+	while text[i] != 0 && i < 255 * 255 {
 		xx += textFontList[text[i]].width
 		i++
 	}
@@ -68,20 +71,24 @@ Float drawChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 	var xx: Int16 = (int32_t)(x + 0.5)
 	var w: UInt8 = (int32_t)(textChar.width + 0.5)
 
-	for (UInt8 yi = 0; yi < 12; yi++)
-		for (UInt8 xi = 0; xi < w; xi++) {
+	for yi in 12
+		for xi in w {
 			let atx: Int32 = xx + xi
 			let aty: Int32 = y + yi
 
-			if (atx >= _framebuffer.width)
+			if atx >= _framebuffer.width {
 				continue
-			if (atx < 0)
+			}
+			if atx < 0 {
 				continue
+			}
 
-			if (aty >= _framebuffer.height)
+			if aty >= _framebuffer.height {
 				continue
-			if (aty < 0)
+			}
+			if aty < 0 {
 				continue
+			}
 
 			Pixel32 font =
 				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)]
@@ -102,20 +109,24 @@ Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 	var xx: Int16 = (int16_t)(x + 0.5)
 	var w: UInt8 = (uint8_t)(textChar.width + 0.5)
 
-	for (UInt8 yi = 0; yi < 12; yi++)
-		for (UInt8 xi = 0; xi < w; xi++) {
+	for yi in 12
+		for xi in w {
 			let atx: Int16 = (int16_t)xx + (int16_t)xi
 			let aty: Int16 = (int16_t)y + (int16_t)yi
 
-			if (atx >= _framebuffer.width)
+			if atx >= _framebuffer.width {
 				continue
-			if (atx < 0)
+			}
+			if atx < 0 {
 				continue
+			}
 
-			if (aty >= _framebuffer.height)
+			if aty >= _framebuffer.height {
 				continue
-			if (aty < 0)
+			}
+			if aty < 0 {
 				continue
+			}
 
 			Pixel32 font =
 				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)]
@@ -145,7 +156,7 @@ Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 UInt16 drawAsciiText(text: ConstPointer<Char8>, x: Float, y: Int16, color: Pixel32) {
 	var i: UInt16 = 0
 	var xx: Float = x
-	while (text[i] != 0 && i < 255 * 255) {
+	while text[i] != 0 && i < 255 * 255 {
 		xx += drawChar(text[i], xx, y, color)
 		i++
 	}
@@ -165,8 +176,8 @@ UInt16 drawText(const text: Pointer<WideChar>, x: Float, y: Int16, color: Pixel3
 
 UInt16 drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) {
 	var xx: Float = x
-	if (value < 0) {
 		xx += drawAsciiText(u8"-", xx, y, color)
+	if value < 0 {
 		value = -value
 	}
 	const Char8 *digits[] = {u8"0", u8"1", u8"2", u8"3", u8"4", u8"5", u8"6", u8"7", u8"8", u8"9"}
@@ -177,8 +188,8 @@ UInt16 drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) {
 		value = (int64_t)(value / 10)
 		count++
 	} while (value > 0)
-	for (UInt8 i = 0; i < 24; ++i) {
-		if (chars[i] != 0)
+	for i in 24 {
+		if chars[i] != 0 {
 			xx += drawAsciiText(chars[i], xx, y, color)
 	}
 	return xx - x
@@ -190,7 +201,7 @@ fun drawShadowText(text: ConstPointer<Char8>, x: Float, y: Int16) {
 	var color: Pixel32
 	color.color = 0x00000000
 	color.rgba.a = 70
-	while (text[i] != 0 && i < 255 * 255) {
+	while text[i] != 0 && i < 255 * 255 {
 		var ch: Char8 = text[i]
 
 		drawAlphaChar(ch, xx + 1, y + 1, color)

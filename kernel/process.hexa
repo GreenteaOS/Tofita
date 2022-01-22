@@ -30,12 +30,14 @@ fun Process_init(process: Pointer<Process>) {
 
 Process *Process_create() {
 	var index: UInt64 = 0
-	while (index < 255) {
+	while index < 255 {
 		index++
-		if (index == 256)
+		if index == 256 {
 			return null
-		if (processes[index].present != true)
+		}
+		if processes[index].present != true {
 			break
+		}
 	}
 
 	var process: Pointer<Process> = Pointer.of(process.processes[index])
@@ -46,16 +48,16 @@ Process *Process_create() {
 }
 
 // Note: supposedly 10.000 system-wise
-const UInt64 messagesBufferSize = 256
+let messagesBufferSize: UInt64 = 256
 
 wapi.Msg *getOrCreateMessagesBuffer(@volatile process: Pointer<Process>) {
-	if (process.messages == null) {
 		const UInt64 bytes = sizeof(wapi.Msg) * messagesBufferSize
+	if process.messages == null {
 
 		process.messages = (wapi.Msg *)PhysicalAllocator.allocateBytes(bytes)
 
-		if (process.messages != PHYSICAL_NOT_FOUND) {
 			memset((Void *)process.messages, 0, bytes)
+		if process.messages != PHYSICAL_NOT_FOUND {
 			process.messagesUsed = 0
 		} else {
 			process.messages = null
@@ -69,11 +71,13 @@ wapi.Msg *getOrCreateMessagesBuffer(@volatile process: Pointer<Process>) {
 Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessagePayload>) {
 	// TODO do not allocate messages queue if no windows and not awaits for them
 	var messages = getOrCreateMessagesBuffer(process)
-	if (messages == null)
+	if messages == null {
 		return false
+	}
 
-	if (process.messagesUsed == messagesBufferSize)
+	if process.messagesUsed == messagesBufferSize {
 		return false
+	}
 
 	var message: Pointer<wapi.Msg> = Pointer.of(messages[process.messagesUsed])
 
@@ -89,7 +93,7 @@ Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessa
 
 	process.messagesUsed++
 
-	if (process.awaitsGetMessage) {
+	if process.awaitsGetMessage {
 		process.awaitsGetMessage = false
 		process.syscallToHandle = TofitaSyscalls.GetMessage
 	}
@@ -99,20 +103,23 @@ Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessa
 
 Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessagePayload>) {
 	// Do not allocate until needed
-	if (process.messages == null)
+	if process.messages == null {
 		return false
+	}
 
 	var messages = getOrCreateMessagesBuffer(process)
-	if (messages == null)
+	if messages == null {
 		return false
+	}
 
 	// TODO does not apply to wmQuit/wmPaint
-	if (process.messagesUsed == 0)
+	if process.messagesUsed == 0 {
 		return false
+	}
 
 	// TODO filters & hWnd
-	var message: Pointer<wapi.Msg> = Pointer.of(messages[0])
-	var target: Pointer<wapi.Msg> = payload.msg
+	var message: Pointer<Msg> = Pointer.of(messages[0])
+	var target: Pointer<Msg> = payload.msg
 
 	target.hwnd = message.hwnd
 	target.message = message.message
@@ -127,7 +134,7 @@ Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessage
 	// Shift first element
 	process.messagesUsed--
 
-	for (UInt16 i = 0; i < process.messagesUsed; ++i) {
+	for i in process.messagesUsed {
 		messages[i] = messages[i + 1]
 	}
 
@@ -141,7 +148,7 @@ fun Process_destroy(@volatile process: Pointer<Process>) {
 
 	var window = dwm.OverlappedWindow_findAnyProcessWindow(process.pid)
 
-	while (window != null) {
+	while window != null {
 		dwm.OverlappedWindow_destroy(window.windowId)
 		window = dwm.OverlappedWindow_findAnyProcessWindow(process.pid)
 	}

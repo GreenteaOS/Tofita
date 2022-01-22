@@ -129,7 +129,7 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	PhysicalAllocator.init(params)
 	pages.pml4entries = (pages.PageEntry *)((wholePhysicalStart as! UInt64) + (uint64_t)(params.pml4))
 
-	if (false) {
+	if false {
 		pages.mapMemory(pages.pml4entries, 4096, 4096, 256)
 		pages.mapMemory(pages.pml4entries, 4096, 4096, 256)
 		pages.mapMemory(pages.pml4entries, 4096 * 20, 4096 * 10, 256)
@@ -150,7 +150,7 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576),
 					 pages.resolveAddr(pages.pml4entries, (uint64_t)0xffff800000000000))
 		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576 + 123),
-					 pages.resolveAddr(pages.pml4entries, (uint64_t)0xffff800000000000 + 123))
+					 pages.resolveAddr(pages.pml4entries, 0xffff800000000000u64 + 123))
 
 		// serialPrint("resolves from, to, wh, wh+8888: ")
 		// serialPrint("\n")
@@ -176,7 +176,9 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	if (sizeof(UInt8 *) == 4)
 		serialPrintln("<Tofita> void*: 4 bytes")
 	if (sizeof(UInt8 *) == 8)
+	}
 		serialPrintln("<Tofita> void*: 8 bytes")
+	}
 
 	disablePic()
 	enableInterrupts()
@@ -194,7 +196,7 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	var megs: UInt32 = Math.round((double)params.ramBytes / (1024.0 * 1024.0))
 	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs)
 
-	if (!ACPIParser.parse(params.acpiTablePhysical)) {
+	if !ACPIParser.parse(params.acpiTablePhysical) {
 		quakePrintf("ACPI is *not* loaded\n")
 	} else {
 		quakePrintf("ACPI 2.0 is loaded and ready\n")
@@ -241,7 +243,7 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	// Idle process
 	{
 		memset(Pointer.of(process.processes), 0, sizeof(process.processes)) // Zeroing
-		var idle: Pointer<process.Process> = Pointer.of(process.processes[0])
+		var idle: Pointer<Process> = Pointer.of(process.processes[0])
 		idle.pml4 = pages.pml4entries // Save CR3 template to idle process
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
@@ -251,9 +253,9 @@ fun kernelInit(const params: Pointer<KernelParams>) {
 	}
 
 	// Demo
-	if (false) {
-		for (UInt8 i = 0; i < 3; ++i) {
 			var demo: Pointer<process.Process> = process.Process_create()
+	if false {
+		for i in 3 {
 			serialPrintf("<> pid == %u\n", demo.pid)
 			process.Process_init(demo)
 			exe.loadExeIntoProcess("desktop/wndapp.exe", demo)
@@ -301,12 +303,12 @@ fun kernelThread() {
 	serialPrintf("<seh> 0 == %u\n", probeForReadOkay((uint64_t)-1, 1))
 	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)Pointer.of(switchToNextProcess), 1))
 
-	while (true) {
+	while true {
 		@volatile var index: UInt64 = 1 // Idle process ignored
-		while (index < 255) {		 // TODO
+		while index < 255 {		 // TODO
 			@volatile process.Process *process = Pointer.of(process.processes[index])
-			if (process.present == true) {
-				if (process.syscallToHandle != TofitaSyscalls.Noop) {
+			if process.present == true {
+				if process.syscallToHandle != TofitaSyscalls.Noop {
 					@volatile let syscall = process.syscallToHandle
 					process.syscallToHandle = TofitaSyscalls.Noop
 					@volatile var frame = Pointer.of(process.frame)
@@ -318,21 +320,21 @@ fun kernelThread() {
 
 					// TODO refactor to separate syscall handler per-DLL
 
-					if (syscall == TofitaSyscalls.DebugLog) {
+					if syscall == TofitaSyscalls.DebugLog {
 						serialPrintf("[[DebugLog:PID %d]] ", index)
 						serialPrintf("[[rcx=%u rdx=%u r8=%u]] ", frame.rcxArg0, frame.rdxArg1, frame.r8)
 
-						if (probeForReadOkay(frame.rdxArg1, sizeof(DebugLogPayload))) {
 							var payload: Pointer<DebugLogPayload> = (DebugLogPayload *)frame.rdxArg1
+						if probeForReadOkay(frame.rdxArg1, sizeof(DebugLogPayload)) {
 							// Note this is still very unsafe
-							if (probeForReadOkay((payload.message as! UInt64), 1)) {
+							if probeForReadOkay((payload.message as! UInt64), 1) {
 								serialPrintf(payload.message, payload.extra, payload.more)
 							}
 						}
 
 						serialPrintf("\n")
 						process.schedulable = true
-					} else if (syscall == TofitaSyscalls.ExitProcess) {
+					} else if syscall == TofitaSyscalls.ExitProcess {
 						serialPrintf("[[ExitProcess:PID %d]] %d\n", index, frame.rdxArg1)
 						process.present = false
 
@@ -342,19 +344,19 @@ fun kernelThread() {
 
 						// Deallocate process
 						process.Process_destroy(process)
-					} else if (syscall == TofitaSyscalls.Cpu) {
+					} else if syscall == TofitaSyscalls.Cpu {
 						serialPrintf("[[Cpu:PID %d]] %d\n", index, frame.rdxArg1)
 						quakePrintf("Process #%d closed due to CPU exception #%u\n", index, frame.index)
 						process.present = false
 
 						// Page fault
-						if (frame.index == 0x0E) {
+						if frame.index == 0x0E {
 							quakePrintf("#PF at %8\n", process.cr2PageFaultAddress)
 						}
-						if (frame.index == 0x0D) {
+						if frame.index == 0x0D {
 							quakePrintf("#GPF at %8\n", frame.ip)
 						}
-						if (frame.index == 0x03) {
+						if frame.index == 0x03 {
 							quakePrintf("#BP at %8\n", frame.ip)
 						}
 
@@ -369,7 +371,7 @@ fun kernelThread() {
 						// Note ^ some code in syscall handlers may *read* this value
 						// So set it to zero just in case
 
-						if (!userCall.userCallHandled(process, syscall)) {
+						if !userCall.userCallHandled(process, syscall) {
 							// Unknown syscall is no-op
 							serialPrintf("[[PID %d]] Unknown or unhandled syscall %d\n", index,
 										 frame.rcxArg0)
@@ -393,7 +395,7 @@ fun kernelThreadStart()
 // In case of kernel crash set instruction pointer to here
 fun kernelThreadLoop() {
 	serialPrintln("<Tofita> [looping forever]")
-	while (true) {
+	while true {
 		amd64.pause()
 	}
 }
@@ -401,11 +403,11 @@ fun kernelThreadLoop() {
 fun guiThread() {
 	serialPrintln("<Tofita> [guiThread] thread started")
 
-	while (true) {
+	while true {
 		// Poll PS/2 devices
 		pollPS2Devices()
 
-		if (haveToRender == false) {
+		if haveToRender == false {
 			switchToUserProcess()
 		}
 
@@ -429,7 +431,7 @@ fun kernelMain(params: ConstPointer<KernelParams>) {
 	// sti . start sheduling here
 	// It will erase whole stack on next sheduling
 	// TOOD kernel `yield`/`await`
-	while (true) {
+	while true {
 		amd64.enableAllInterruptsAndHalt()
 	}
 	// TODO hexa: error if code present in unreachable block

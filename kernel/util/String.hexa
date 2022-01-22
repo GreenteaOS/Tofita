@@ -16,7 +16,7 @@
 UInt64 String.length(const source: Pointer<WideChar>) {
 	let string = (const UInt16 *)source
 	var i: UInt32 = 0
-	while (string[i] != 0) {
+	while string[i] != 0 {
 		i++
 	}
 	return i * 2 + 2
@@ -28,7 +28,7 @@ const WideChar *String.duplicate(const source: Pointer<WideChar>) {
 	let string = (const UInt16 *)source
 
 	var i: UInt32 = 0
-	while (string[i] != 0) {
+	while string[i] != 0 {
 		result[i] = string[i]
 		i++
 	}

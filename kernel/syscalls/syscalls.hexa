@@ -42,7 +42,7 @@ class DebugLogPayload {
 @struct @sizeOf(8 * 2)
 class SwapWindowFramebufferPayload {
 	var windowId: UInt64
-	var fb: Pointer<nj.WindowFramebuffer>
+	var fb: Pointer<WindowFramebuffer>
 }
 
 @struct @sizeOf(8 * 2)
@@ -54,8 +54,8 @@ class ShowWindowPayload {
 // TODO use pointer wrappers instead of raw pointers
 @struct @sizeOf(8 * 8 + 5 * 4 + 4)
 class CreateWindowExPayload {
-	const wapi.WindowClass *wc
-	var hWnd: wapi.HWnd
+	var wc: WindowClass
+	var hWnd: HWnd
 
 	// CreateWindowEx
 	var lpClassName: ConstWideCharPointer
@@ -66,24 +66,24 @@ class CreateWindowExPayload {
 	var y: Int32
 	var nWidth: Int32
 	var nHeight: Int32
-	var hWndParent: wapi.HWnd
-	var hMenu: wapi.HMenu
-	var hInstance: wapi.HInstance
+	var hWndParent: HWnd
+	var hMenu: HMenu
+	var hInstance: HInstance
 	var lpParam: Pointer<Void>
 }
 
 @struct @sizeOf(8 + 4 + 8 * 2 + 4)
 class PostMessagePayload {
-	var hWnd: wapi.HWnd
-	var msg: wapi.Message
+	var hWnd: HWnd
+	var msg: Message
 	var wParam: Pointer<Void>
 	var lParam: Pointer<Void>
 }
 
 @struct @sizeOf(8 * 2 + 4 * 2)
 class GetMessagePayload {
-	var msg: Pointer<wapi.Msg>
-	var hWnd: wapi.HWnd
+	var msg: Pointer<Msg>
+	var hWnd: HWnd
 	var wMsgFilterMin: UInt32
 	var wMsgFilterMax: UInt32
 }

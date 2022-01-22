@@ -13,27 +13,30 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSyscalls syscall) {
+fun userCallHandled(@volatile process: Pointer<Process>, syscall: TofitaSyscalls): Bool {
 	@volatile var frame = Pointer.of(process.frame)
 
-	if (syscall == TofitaSyscalls.CreateWindowEx) {
-		if (!probeForReadOkay(frame.rdxArg1, sizeof(CreateWindowExPayload)))
+	if syscall == TofitaSyscalls.CreateWindowEx {
+		if !probeForReadOkay(frame.rdxArg1, sizeof(CreateWindowExPayload)) {
 			return false
+		}
 
-		var payload = (CreateWindowExPayload *)frame.rdxArg1
+		var payload = frame.rdxArg1 as! CreateWindowExPayload
 
-		if (probeForReadOkay((payload.lpClassName as! UInt64), 16))
+		if probeForReadOkay((payload.lpClassName as! UInt64), 16) {
 			serialPrintf("<> lpClassName == %S\n", payload.lpClassName)
+		}
 
-		if (probeForReadOkay((payload.lpWindowName as! UInt64), 16))
+		if probeForReadOkay((payload.lpWindowName as! UInt64), 16) {
 			serialPrintf("<> lpWindowName == %S\n", payload.lpWindowName)
+		}
 
 		var window = dwm.OverlappedWindow_create(process.pid)
 
 		window.hWnd = payload.hWnd
 
 		// TODO proper probe method, probably separate probeForWideCharOkay
-		if (probeForReadOkay((payload.lpWindowName as! UInt64), 8)) {
+		if probeForReadOkay((payload.lpWindowName as! UInt64), 8) {
 			window.title = String.duplicate(payload.lpWindowName)
 		}
 
@@ -42,18 +45,19 @@ Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSy
 		return true
 	}
 
-	if (syscall == TofitaSyscalls.ShowWindow) {
+	if syscall == TofitaSyscalls.ShowWindow {
 		// TODO merge to probeForReadAndConvert os it takes <T> and returns nullable for `if let`
-		if (!probeForReadOkay(frame.rdxArg1, sizeof(ShowWindowPayload)))
+		if !probeForReadOkay(frame.rdxArg1, sizeof(ShowWindowPayload)) {
 			return false
+		}
 
-		let payload = (ShowWindowPayload *)frame.rdxArg1
+		let payload = frame.rdxArg1 as! ShowWindowPayload
 
 		let windowId: UInt64 = payload.windowId
 		let nCmdShow: Int32 = payload.nCmdShow
 		var window = dwm.OverlappedWindow_find(process.pid, windowId)
 
-		if (window != null) {
+		if window != null {
 			window.visible = true
 			dwm.OverlappedWindow_attach(windowId)
 		}
@@ -62,19 +66,21 @@ Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSy
 		return true
 	}
 
-	if (syscall == TofitaSyscalls.GetMessage) {
-		if (!probeForReadOkay(frame.rdxArg1, sizeof(GetMessagePayload)))
+	if syscall == TofitaSyscalls.GetMessage {
+		if !probeForReadOkay(frame.rdxArg1, sizeof(GetMessagePayload)) {
 			return false
+		}
 
-		var payload = (GetMessagePayload *)frame.rdxArg1
+		var payload = frame.rdxArg1 as! GetMessagePayload
 
-		if (!probeForWriteOkay((payload.msg as! UInt64), sizeof(wapi.Msg)))
+		if !probeForWriteOkay((payload.msg as! UInt64), sizeof(Msg)) {
 			return false
+		}
 
 		frame.raxReturn = process.getMessage(process, payload)
 
 		// Should sorts of loop forever
-		if (frame.raxReturn) {
+		if frame.raxReturn {
 			process.schedulable = true
 		} else {
 			// process.syscallToHandle = TofitaSyscalls.GetMessage
@@ -84,11 +90,12 @@ Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSy
 		return true
 	}
 
-	if (syscall == TofitaSyscalls.PostMessage) {
-		if (!probeForReadOkay(frame.rdxArg1, sizeof(PostMessagePayload)))
+	if syscall == TofitaSyscalls.PostMessage {
+		if !probeForReadOkay(frame.rdxArg1, sizeof(PostMessagePayload)) {
 			return false
+		}
 
-		var payload = (PostMessagePayload *)frame.rdxArg1
+		var payload = frame.rdxArg1 as! PostMessagePayload
 
 		frame.raxReturn = process.postMessage(process, payload)
 
@@ -96,32 +103,35 @@ Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSy
 		return true
 	}
 
-	if (syscall == TofitaSyscalls.SwapWindowFramebuffer) {
-		if (!probeForReadOkay(frame.rdxArg1, sizeof(SwapWindowFramebufferPayload)))
+	if syscall == TofitaSyscalls.SwapWindowFramebuffer {
+		if !probeForReadOkay(frame.rdxArg1, sizeof(SwapWindowFramebufferPayload)) {
 			return false
+		}
 
-		let payload = (SwapWindowFramebufferPayload *)frame.rdxArg1
+		let payload = frame.rdxArg1 as! SwapWindowFramebufferPayload
 
-		if (!probeForWriteOkay((payload.fb as! UInt64), sizeof(nj.WindowFramebuffer)))
+		if !probeForWriteOkay((payload.fb as! UInt64), sizeof(WindowFramebuffer)) {
 			return false
+		}
 
 		var windowId: UInt64 = payload.windowId
 
-		var fb = (nj.WindowFramebuffer *)payload.fb
+		var fb = payload.fb as! WindowFramebuffer
 		var window = dwm.OverlappedWindow_find(process.pid, windowId)
 
-		if (window == null)
+		if window == null {
 			return false
+		}
 
 		let width = (uint32_t)window.width
 		let height = (uint32_t)window.height
 		let bytes = width * height * sizeof(Pixel32)
 
-		if (window.fbZeta != null) {
+		if window.fbZeta != null {
 			window.fbCurrentZeta = !window.fbCurrentZeta
-			if (window.fbCurrentZeta) {
 				tmemcpy((Void *)Pointer.of(window.fbZeta.pixels), (const Void *)Pointer.of(window.fbGama.pixels), bytes)
 				fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbZeta.pixels)
+			if window.fbCurrentZeta {
 				fb.width = window.fbZeta.width
 				fb.height = window.fbZeta.height
 			} else {
@@ -132,11 +142,11 @@ Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSy
 			}
 		}
 
-		//		if (window != null) {
+		//		if window != null {
 		//			var pixelsKernel = window.fbKernel.pixels
 		//			var pixelsUser = window.fbUser.pixels
 		//			let count = window.fbKernel.width * window.fbKernel.height
-		//			for (UInt32 i = 0; i < count; ++i)
+		//			for i in count
 		//			{
 		//				pixelsKernel[i] = pixelsUser[i]
 		//			}
@@ -147,33 +157,36 @@ Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSy
 		return true
 	}
 
-	if (syscall == TofitaSyscalls.GetOrCreateWindowFramebuffer) {
-		if (!probeForReadOkay(frame.rdxArg1, sizeof(SwapWindowFramebufferPayload)))
+	if syscall == TofitaSyscalls.GetOrCreateWindowFramebuffer {
+		if !probeForReadOkay(frame.rdxArg1, sizeof(SwapWindowFramebufferPayload)) {
 			return false
+		}
 
-		let payload = (SwapWindowFramebufferPayload *)frame.rdxArg1
+		let payload = frame.rdxArg1 as! SwapWindowFramebufferPayload
 
 		// TODO probeForWriteOkay alias taking pointer probeForWriteAtOkay
-		if (!probeForWriteOkay((payload.fb as! UInt64), sizeof(nj.WindowFramebuffer)))
+		if !probeForWriteOkay((payload.fb as! UInt64), sizeof(WindowFramebuffer)) {
 			return false
+		}
 
 		var windowId: UInt64 = payload.windowId
 
 		var fb = payload.fb
 		var window = dwm.OverlappedWindow_find(process.pid, windowId)
 
-		if (window == null)
+		if window == null {
 			return false
+		}
 
 		// TODO resize fb *here* on window size change
-		if (window.fbZeta == null) {
+		if window.fbZeta == null {
 			let width = (uint32_t)window.width
 			let height = (uint32_t)window.height
 
 			let bytes = width * height * sizeof(Pixel32)
 			// serialPrintln("[GetOrCreateWindowFramebuffer.allocateBytes]")
-			// window.fbZeta.pixels = (nj.Pixel32 *)PhysicalAllocator.allocateBytes(bytes)
-			// window.fbGama.pixels = (nj.Pixel32 *)PhysicalAllocator.allocateBytes(bytes)
+			// window.fbZeta.pixels = PhysicalAllocator.allocateBytes(bytes) as! Pixel32
+			// window.fbGama.pixels = PhysicalAllocator.allocateBytes(bytes) as! Pixel32
 
 			// TODO client width
 			window.fbZeta = allocateBitmap(width, height)
@@ -188,8 +201,8 @@ Bool userCallHandled(@volatile process.process: Pointer<Process>, const TofitaSy
 			// window.fbGama.height = height
 		}
 
-		if (window.fbCurrentZeta) {
 			fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbZeta.pixels)
+		if window.fbCurrentZeta {
 			fb.width = window.fbZeta.width
 			fb.height = window.fbZeta.height
 		} else {

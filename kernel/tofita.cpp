@@ -225,14 +225,15 @@ function kernelInit(const KernelParams *params) {
 
 	uint32_t megs = Math::round((double)params->ramBytes / (1024.0 * 1024.0));
 	uint32_t availableMegs = Math::round((double)available / (1024.0 * 1024.0));
-	quakePrintf(L"[CPU] %s %s %d MB RAM (%d MB usable)\n", cpuid.vendorID, cpuid.brandName, megs, availableMegs);
+	quakePrintf(L"[CPU] %s %s %d MB RAM (%d MB usable)\n", cpuid.vendorID, cpuid.brandName, megs,
+				availableMegs);
 
 	// SMP trapeze
 	{
 		RamDiskAsset asset = getRamDiskAsset(L"trapeze.tofita");
 		serialPrintf(L"Copy trapeze %d bytes\n", asset.size);
 		uint64_t trapeze = (uint64_t)0x8000 + (uint64_t)WholePhysicalStart;
-		tmemcpy((void*)trapeze, (const void*)asset.data, asset.size);
+		tmemcpy((void *)trapeze, (const void *)asset.data, asset.size);
 	}
 
 	disablePic();
@@ -461,8 +462,7 @@ function guiThread() {
 	}
 }
 
-extern "C"
-function kernelMain(const KernelParams *params) {
+extern "C" function kernelMain(const KernelParams *params) {
 	kernelInit(params);
 	__sync_synchronize();
 

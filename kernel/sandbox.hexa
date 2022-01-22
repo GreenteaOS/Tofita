@@ -22,5 +22,5 @@ class NtUser {}
 
 @struct
 class Sandbox {
-	const Char8 *name
+	var name: String
 }

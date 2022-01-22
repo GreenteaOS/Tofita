@@ -19,14 +19,14 @@
 @struct
 class Module {
 	const Char8 *name
-	const RamDiskAsset *dll
+	var dll: RamDiskAsset
 	var base: UInt64
 }
 
 @struct
 class ModuleInterim {
 	const Char8 *name
-	const RamDiskAsset *dll
+	var dll: RamDiskAsset
 }
 
 Module *loadModule(params: Pointer<ModuleInterim>) {
@@ -45,7 +45,7 @@ Module *loadModule(params: Pointer<ModuleInterim>) {
 	// Copy sections
 	var imageSectionHeader =
 		(const exe.ImageSectionHeader *)((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader)
-	for (UInt16 i = 0; i < peHeader.numberOfSections; ++i) {
+	for i in peHeader.numberOfSections {
 		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, Pointer.of(imageSectionHeader[i].name),
 					 imageSectionHeader[i].sizeOfRawData)
 		var where: UInt64 = (base as! UInt64) + imageSectionHeader[i].virtualAddress
