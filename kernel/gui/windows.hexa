@@ -65,8 +65,8 @@ fun drawShadowBox(x: Int16, y: Int16, w: UInt16, h: UInt16) {
 		}
 }
 
-fun drawWindowFrame(const title: Pointer<WideChar>, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
-						 dwm.FrameHover hover, down: Bool) {
+fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
+						 hover: FrameHover, down: Bool) {
 	var shorterFrame: Bool = false // OSX style
 
 	var color: Pixel32

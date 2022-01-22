@@ -17,6 +17,4 @@
 import "gdi32.hpp"
 import "gdi32Vars.hpp"
 
-@extern "C" {
 @fastcall Void _DllMainCRTStartup() {}
-}

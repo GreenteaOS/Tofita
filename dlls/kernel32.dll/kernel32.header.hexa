@@ -20,9 +20,7 @@ import "../tofita32.dll/tofita32.hpp"
 #define KERNEL32_DLL __declspec(dllimport)
 #end
 
-@extern "C" {
 KERNEL32_DLL Void ExitProcess(exitCode: UInt32)
 KERNEL32_DLL wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes)
 KERNEL32_DLL wapi.HGlobal GlobalAlloc(flags: UInt32, size_t bytes)
 KERNEL32_DLL Void *HeapAlloc(wapi.Handle heap, flags: UInt32, size_t bytes)
-}

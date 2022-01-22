@@ -126,7 +126,7 @@ let image_directory_entry_iat = 12			// Import Address Table
 let image_directory_entry_delay_import = 13	// Delay Load Import Descriptors
 let image_directory_entry_com_descriptor = 14 // COM Runtime descriptor
 
-@struct class _IMAGE_EXPORT_DIRECTORY {
+@struct class IMAGE_EXPORT_DIRECTORY {
 	var characteristics: UInt32
 	var timeDateStamp: UInt32
 	var majorVersion: UInt16
@@ -138,23 +138,24 @@ let image_directory_entry_com_descriptor = 14 // COM Runtime descriptor
 	var addressOfFunctions: UInt32
 	var addressOfNames: UInt32
 	var addressOfNameOrdinals: UInt32
-} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY
+}
 
 @struct class _IMAGE_BASE_RELOCATION {
 	var virtualAddress: UInt32
 	var sizeOfBlock: UInt32
-} IMAGE_BASE_RELOCATION, *PIMAGE_BASE_RELOCATION
+}
 
-@struct class _IMAGE_DATA_DIRECTORY {
+@struct class IMAGE_DATA_DIRECTORY {
 	var virtualAddress: UInt32
 	var size: UInt32
-} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY
+}
+
 let image_sizeof_base_relocation = 8
 let image_rel_based_absolute = 0
 let image_rel_based_dir64 = 10
 let image_rel_based_highlow = 3
 
-@struct @packed class _IMAGE_IMPORT_DESCRIPTOR {
+@struct @packed class IMAGE_IMPORT_DESCRIPTOR {
 	//_ANONYMOUS_UNION union {
 	//	var characteristics: UInt32
 	var originalFirstThunk: UInt32
@@ -163,20 +164,18 @@ let image_rel_based_highlow = 3
 	var forwarderChain: UInt32
 	var name: UInt32
 	var firstThunk: UInt32
-} IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR
+}
 
 declare FARPROC = () => Void
 
-@struct class _IMAGE_IMPORT_BY_NAME {
+@struct class IMAGE_IMPORT_BY_NAME {
 	var hint: UInt16
 	var name[1]: UInt8
-} IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME
+}
 
-@struct class _IMAGE_THUNK_DATA {
-	union {
-		var fun: UInt64 // address of imported fun
-		var ordinal: UInt32 // ordinal value of fun
-		var addressOfData: PIMAGE_IMPORT_BY_NAME // RVA of imported name
-		var forwarderStringl: UInt32 // RVA to forwarder string
-	} u1
-} IMAGE_THUNK_DATA, *PIMAGE_THUNK_DATA
+@union class IMAGE_THUNK_DATA {
+	var func: UInt64 // address of imported function
+	var ordinal: UInt32 // ordinal value of function
+	var addressOfData: PIMAGE_IMPORT_BY_NAME // RVA of imported name
+	var forwarderStringl: UInt32 // RVA to forwarder string
+}

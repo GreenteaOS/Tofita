@@ -79,7 +79,7 @@ Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessa
 		return false
 	}
 
-	var message: Pointer<wapi.Msg> = Pointer.of(messages[process.messagesUsed])
+	var message: Pointer<Msg> = Pointer.of(messages[process.messagesUsed])
 
 	message.hwnd = payload.hWnd
 	message.message = payload.msg

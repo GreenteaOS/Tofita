@@ -30,7 +30,7 @@ TextFontList *textFontList = null
 
 fun initText() {
 	var textFont: RamDiskAsset = getRamDiskAsset("ascii.tofita")
-	textFontList = (TextFontList *)textFont.data
+	textFontList = textFont.data as! TextFontList
 
 	Bitmap32 *loadPng32(const asset: Pointer<RamDiskAsset>)
 	var a: RamDiskAsset = getRamDiskAsset("root/Windows/Fonts/default.png")
@@ -50,8 +50,8 @@ Int8 getLigatureAdvance(left: Char8, const Char8 right) {
 Float getCharAdvance(const Char8 c) {
 	if textFontList == null {
 		return 8
-	var textChar: TextFontList = textFontList[(c] as! UInt64)
 	}
+	var textChar: TextFontList = textFontList[c] as! UInt64
 	return textChar.width
 }
 
@@ -66,7 +66,7 @@ UInt16 getTextAdvance(text: ConstPointer<Char8>) {
 }
 
 Float drawChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
-	var textChar: TextFontList = textFontList[(c] as! UInt64)
+	var textChar: TextFontList = textFontList[c] as! UInt64
 
 	var xx: Int16 = (int32_t)(x + 0.5)
 	var w: UInt8 = (int32_t)(textChar.width + 0.5)
@@ -104,7 +104,7 @@ Float drawChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 }
 
 Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
-	var textChar: TextFontList = textFontList[(c] as! UInt64)
+	var textChar: TextFontList = textFontList[c] as! UInt64
 
 	var xx: Int16 = (int16_t)(x + 0.5)
 	var w: UInt8 = (uint8_t)(textChar.width + 0.5)
@@ -191,6 +191,7 @@ UInt16 drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) {
 	for i in 24 {
 		if chars[i] != 0 {
 			xx += drawAsciiText(chars[i], xx, y, color)
+		}
 	}
 	return xx - x
 }

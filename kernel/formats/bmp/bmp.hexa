@@ -22,7 +22,7 @@ fun loadBitMap24(buffer: Buffer) {
 
 	// Fix BGR
 	var i = 0
-	while (i < bmp.pixels.length) {
+	while i < bmp.pixels.length {
 		let b = bmp.pixels[i + 0]
 		let r = bmp.pixels[i + 2]
 
@@ -37,7 +37,7 @@ fun loadBitMap24(buffer: Buffer) {
 	let pixels = Buffer.alloc(bmp.width * bmp.height * 4)
 
 	for (y in bmp.height)
-		for (x in bmp.width) {
+		for x in bmp.width {
 			let off1 = ((bmp.height - y - 1) * bmp.width + x) * 3
 			let off2 = (y * bmp.width + x) * 4
 			pixels[off2 + 0] = bmp.pixels[off1 + 0]

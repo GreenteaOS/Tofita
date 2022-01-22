@@ -16,7 +16,7 @@
 // Based on the http://blog.ivank.net/fastest-gaussian-blur.html
 
 @fastcall fun floor(x: Float32): Int32 {
-	if (x >= 0) {
+	if x >= 0 {
 		return x as! Int32
 	} else {
 		var y: Int32 = x as! Int32
@@ -26,8 +26,9 @@
 
 @fastcall fun sqrt(number: Float32): Float32 {
 	var i: Int32
-	float x2, y
-	const float threehalfs = 1.5F
+	var x2: Float32
+	var y: Float32
+	let threehalfs: Float32 = 1.5f32
 
 	x2 = number * 0.5F
 	y = number
@@ -56,14 +57,14 @@ boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 		var val_g: UInt16 = fv.g * (radius + 1)
 		var val_b: UInt16 = fv.b * (radius + 1)
 
-		for (UInt8 j = 0; j < radius; j++) {
+		for j in radius {
 			var pixel: PixelRGBAData = source.pixels[ti + j * width].rgba
 			val_r += pixel.r
 			val_g += pixel.g
 			val_b += pixel.b
 		}
 
-		for (UInt8 j = 0; j <= radius; j++) {
+		for j in radius + 1 {
 			var pixel: PixelRGBAData = source.pixels[ri].rgba
 			val_r += (pixel.r - fv.r)
 			val_g += (pixel.g - fv.g)
@@ -77,7 +78,7 @@ boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 			ti += width
 		}
 
-		for (UInt8 j = radius + 1; j < height - radius; j++) {
+		for j in radius + 1 ... height - radius {
 			var pixel_ri: PixelRGBAData = source.pixels[ri].rgba
 			var pixel_li: PixelRGBAData = source.pixels[li].rgba
 
@@ -94,7 +95,7 @@ boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 			ti += width
 		}
 
-		for (UInt16 j = height - radius; j < height; j++) {
+		for j in height - radius ... height {
 			var pixel: PixelRGBAData = source.pixels[li].rgba
 
 			val_r += (lv.r + pixel.r)
@@ -114,7 +115,7 @@ boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 @fastcall fun
 boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	var iarr: Float = (double)1.0 / (radius + radius + 1)
-	for (UInt16 i = 0; i < height; i++) {
+	for i in height {
 		var ti: UInt32 = i * width
 		var li: UInt32 = ti
 		var ri: UInt32 = ti + radius
@@ -125,14 +126,14 @@ boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 		var val_g: UInt16 = fv.g * (radius + 1)
 		var val_b: UInt16 = fv.b * (radius + 1)
 
-		for (UInt8 j = 0; j < radius; j++) {
+		for j in radius {
 			var pixel: PixelRGBAData = source.pixels[ti + j].rgba
 			val_r += pixel.r
 			val_g += pixel.g
 			val_b += pixel.b
 		}
 
-		for (UInt8 j = 0; j <= radius; j++) {
+		for j in radius + 1 {
 			var pixel: PixelRGBAData = source.pixels[ri++].rgba
 			val_r += (pixel.r - fv.r)
 			val_g += (pixel.g - fv.g)
@@ -144,7 +145,7 @@ boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 			ti++
 		}
 
-		for (UInt8 j = radius + 1; j < width - radius; j++) {
+		for j in radius + 1 ... width - radius {
 			var pixel_ri: PixelRGBAData = source.pixels[ri++].rgba
 			var pixel_li: PixelRGBAData = source.pixels[li++].rgba
 
@@ -158,7 +159,7 @@ boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 			ti++
 		}
 
-		for (UInt16 j = width - radius; j < width; j++) {
+		for j in width - radius ... width {
 			var pixel: PixelRGBAData = source.pixels[li++].rgba
 
 			val_r += (lv.r - pixel.r)
@@ -175,7 +176,7 @@ boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 
 @fastcall fun
 boxBlur(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
-	for (UInt32 i = 0; i < source.width * source.height; i++)
+	for i in source.width * source.height
 		target.pixels[i].color = source.pixels[i].color
 	boxBlurH(target, source, width, height, radius)
 	boxBlurT(source, target, width, height, radius)
@@ -184,17 +185,19 @@ boxBlur(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, hei
 fun boxesForGauss(sigma: Float, n: UInt8): Pointer<UInt8> {
 	var wIdeal: Float = sqrt((12 * sigma * sigma / n) + 1) // Ideal averaging filter width
 	var wl: UInt8 = (uint8_t)floor(wIdeal)
-	if (wl % 2 == 0)
+	if wl % 2 == 0 {
 		wl--
+	}
 	var wu: UInt8 = wl + 2
 
 	var mIdeal: Float = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
- 	fun round(x) return ((x) >= 0 ? (int64_t)((x) + 0.5) : (int64_t)((x)-0.5))
+ 	fun round(x) {
+		return ((x) >= 0 ? (int64_t)((x) + 0.5) : (int64_t)((x)-0.5))
+	}
 	var m: Int8 = round(mIdeal)
 
-
 	var sizes: Pointer<UInt8> = (UInt8 *)PhysicalAllocator.allocateBytes(n)
-	for (UInt8 i = 0; i < n; i++) {
+	for i in n {
 		sizes[i] = i < m ? wl : wu
 	}
 	return sizes

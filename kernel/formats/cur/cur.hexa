@@ -15,25 +15,31 @@
 
 fun loadCursor(buffer: Buffer) {
 	// Reserved. Must always be 0.
-	if (buffer[0] != 0) return null
+	if buffer[0] != 0 {
+		return null
+	}
 	// Specifies image type: 1 for icon (.ICO) image, 2 for cursor (.CUR) image.
 	// Other values are invalid.
-	if (buffer[2] != 2) return null
+	if buffer[2] != 2 {
+		return null
+	}
 	// Specifies number of images in the file.
 	let count: Int = buffer[4] + buffer[5] * 0xFF
 	console.log("%d images in a cursor", count)
-	if (count == 0) return null
+	if count == 0 {
+		return null
+	}
 
 	// Search for the largest one with best quality
 	var best = 6 // Offset
 	var bestId = 0
 	var offset = 6
-	for (i in count) {
+	for i in count {
 		// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
 		// Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
 		// Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
 		console.log("%d image is %dx%d, palette = %d", i, buffer[offset], buffer[offset + 1], buffer[offset + 2])
-		if (buffer[offset] + buffer[offset + 1] >= buffer[best] + buffer[best + 1]) {
+		if buffer[offset] + buffer[offset + 1] >= buffer[best] + buffer[best + 1] {
 			best = offset
 			bestId = i
 		}

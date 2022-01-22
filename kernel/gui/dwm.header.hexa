@@ -26,7 +26,7 @@ class OverlappedWindow {
 	var windowId: UInt64
 	var nextId: UInt64
 	var prevId: UInt64
-	var hWnd: wapi.HWnd
+	var hWnd: HWnd
 
 	var visible: Bool
 	var title: ConstWideCharPointer
@@ -61,7 +61,12 @@ var mouseDragLastY: Int16 = 0
 @volatile Int16 mouseX = 256
 @volatile Int16 mouseY = 256
 
-enum FrameHover : UInt8 { Noop = 0, Min, Max, Close }
+enum FrameHover : UInt8 {
+	Noop = 0
+	Min
+	Max
+	Close
+}
 
 var frameHoverWindow: UInt64 = 0
 var frameHoverWindowDown: Bool = false

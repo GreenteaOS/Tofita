@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@extern "C++"
-	Bool validate(const data: Pointer<UInt8>, const UInt64 bytes) {
-		if (bytes < sizeof(Lnk))
-			return false
-		let lnk = (Lnk *)data
-		if (lnk.magucka != magic)
-			return false
-		return true
+fun validate(data: ConstPointer<UInt8>, bytes: UInt64): Bool {
+	if bytes < sizeof(Lnk) {
+		return false
 	}
+	let lnk = data as! Lnk
+	if lnk.magucka != magic {
+		return false
+	}
+	return true
 }

@@ -18,9 +18,9 @@ Bitmap32 *loadPng32FromBuffer(data: Pointer<UInt8>, size: UInt32) {
 	var colors: Pointer<UInt8> = stbi_load_from_memory(data, size, Pointer.of(width), Pointer.of(height), Pointer.of(png_bpp), 4)
 	var bitmap: Pointer<Bitmap32> = allocateBitmap(width, height)
 
-	var rgba: Pointer<UInt32> = (UInt32 *)colors
-	for (UInt16 y = 0; y < height; y++)
-		for (UInt16 x = 0; x < width; x++) {
+	var rgba: Pointer<UInt32> = colors as! Pointer<UInt32>
+	for y in height
+		for x in width {
 			bitmap.pixels[y * width + x].color = rgba[y * width + x]
 			// This should be fixed in framebuffer? Or PNG really BGRA?
 			var temp: UInt8 = bitmap.pixels[y * width + x].rgba.r

@@ -19,7 +19,6 @@ declare Handle = VoidPointer
 declare HandleSize = UInt64
 declare HInstance = Handle
 declare HIcon = Handle
-declare HIcon = Handle
 declare HBrush = Handle
 declare HCursor = Handle
 declare HLocal = Handle
@@ -31,9 +30,9 @@ declare HDc = Handle
 declare LResult = VoidPointer
 
 // TODO LResult as enum?
-let error_success = 0 as! wapi.LResult
-let error_invalid_handle = 6 as! wapi.LResult
-let invalid_handle_value = -1 as! wapi.Handle
+let error_success = 0 as! LResult
+let error_invalid_handle = 6 as! LResult
+let invalid_handle_value = -1 as! Handle
 
 enum Bool : Int32 {
 	False = 0
@@ -177,8 +176,8 @@ class WindowClass {
 	var hIcon: HIcon
 	var hCursor: HCursor
 	var hbrBackground: HBrush
-	lpszMenuName: ConstArrayPointer<WideChar>
-	lpszClassName: ConstArrayPointer<WideChar>
+	var lpszMenuName: ConstArrayPointer<WideChar>
+	var lpszClassName: ConstArrayPointer<WideChar>
 }
 
 enum CmdShow : Int32 {
@@ -207,12 +206,10 @@ class PixelRGBAData {
 	var a: UInt8
 }
 
-@struct @sizeOf(4)
+@union @sizeOf(4)
 class Pixel32 {
-	union {
-		var rgba: PixelRGBAData
-		var color: UInt32
-	}
+	var rgba: PixelRGBAData
+	var color: UInt32
 }
 
 @struct

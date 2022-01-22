@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /// Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
-fun interpolatePixel(bitmap, x, y) {
+fun interpolate(bitmap, x, y) {
 	let px = Math.floor(x) | 0 // Same as floor(x)
 	let py = Math.floor(y) | 0 // Same as floor(y)
 	let stride = bitmap.width

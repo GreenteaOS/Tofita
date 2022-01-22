@@ -13,37 +13,37 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const UInt32 magic = 0x0000004C
 const UInt8 cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46}
+let magic: UInt32 = 0x0000004C
 
 @packed @struct @sizeOf(4)
 class LnkFlags {
-	UInt8 shellItemIdListIsPresent : 1
-	UInt8 pointsToFileOrDirectory : 1
-	UInt8 hasDescription : 1
-	UInt8 hasRelativePath : 1
-	UInt8 hasWorkingDirectory : 1
-	UInt8 hasCommandLineArguments : 1
-	UInt8 hasCustomIcon : 1
-	UInt32 padding : 25
+	@bits(1) var shellItemIdListIsPresent: UInt8
+	@bits(1) var pointsToFileOrDirectory: UInt8
+	@bits(1) var hasDescription: UInt8
+	@bits(1) var hasRelativePath: UInt8
+	@bits(1) var hasWorkingDirectory: UInt8
+	@bits(1) var hasCommandLineArguments: UInt8
+	@bits(1) var hasCustomIcon: UInt8
+	@bits(25) var padding: UInt32
 }
 
 @packed @struct @sizeOf(4)
 class LnkAttributes {
-	UInt8 readOnly : 1
-	UInt8 hidden : 1
-	UInt8 systemFile : 1
-	UInt8 volumeLabel : 1
-	UInt8 directory : 1
-	UInt8 targetArchiveChanged : 1
-	UInt8 encrypted : 1
-	UInt8 none : 1
-	UInt8 temporary : 1
-	UInt8 sparseFile : 1
-	UInt8 hasReparsePointData : 1
-	UInt8 compressed : 1
-	UInt8 offline : 1
-	UInt32 padding : 19
+	@bits(1) var readOnly: UInt8
+	@bits(1) var hidden: UInt8
+	@bits(1) var systemFile: UInt8
+	@bits(1) var volumeLabel: UInt8
+	@bits(1) var directory: UInt8
+	@bits(1) var targetArchiveChanged: UInt8
+	@bits(1) var encrypted: UInt8
+	@bits(1) var none: UInt8
+	@bits(1) var temporary: UInt8
+	@bits(1) var sparseFile: UInt8
+	@bits(1) var hasReparsePointData: UInt8
+	@bits(1) var compressed: UInt8
+	@bits(1) var offline: UInt8
+	@bits(19) var padding: UInt32
 }
 
 @packed @struct @sizeOf(0x0000004C)

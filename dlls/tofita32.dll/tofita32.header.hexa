@@ -19,7 +19,6 @@ import "../../kernel/syscalls/syscalls.hpp"
 #define TOFITA32_DLL __declspec(dllimport)
 #end
 
-@extern "C" {
 // Tofita
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 TOFITA32_DLL UInt64 tofitaFastSystemCall(rcx: TofitaSyscalls, UInt64 rdx = 0)
@@ -38,4 +37,3 @@ TOFITA32_DLL wapi.Bool tofitaPostMessage(payload: Pointer<PostMessagePayload>)
 // NjRAA
 TOFITA32_DLL Void njraaGetOrCreateWindowFramebuffer(UInt64 windowId, nj.fb: Pointer<WindowFramebuffer>)
 TOFITA32_DLL Void njraaSwapWindowFramebuffer(UInt64 windowId, nj.fb: Pointer<WindowFramebuffer>)
-}
