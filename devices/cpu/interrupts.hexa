@@ -49,15 +49,15 @@ class Idtr {
 
 @struct @packed
 class IdtEntry {
-	UInt16 offsetLowerbits : 16
-	UInt16 selector : 16
-	UInt8 ist : 8
-	UInt8 gateType : 4
-	UInt8 z : 1
-	UInt8 dpl : 2
-	UInt8 present : 1
-	UInt64 offsetHigherbits : 48
-	UInt32 zero : 32
+	@bits(16) var offsetLowerbits: UInt16
+	@bits(16) var selector: UInt16
+	@bits(8) var ist: UInt8
+	@bits(4) var gateType: UInt8
+	@bits(1) var z: UInt8
+	@bits(2) var dpl: UInt8
+	@bits(1) var present: UInt8
+	@bits(48) var offsetHigherbits: UInt64
+	@bits(32) var zero: UInt32
 }
 
 fun readPort(@volatile port: UInt16): UInt8 {
@@ -261,26 +261,26 @@ class GdtDescriptor {
 
 @struct @packed @sizeOf(8)
 class GdtDescriptorEx {
-	UInt16 limitLow : 16
-	UInt16 baseLow : 16
-	UInt8 baseMid : 8
+	@bits(16) var limitLow: UInt16
+	@bits(16) var baseLow: UInt16
+	@bits(8) var baseMid: UInt8
 	// Access
-	UInt8 accessed : 1
-	UInt8 rw : 1 // 0 - read, 1 - read/write
-	UInt8 direction : 1 // or conform
+	@bits(1) var accessed: UInt8
+	@bits(1) var rw: UInt8 // 0 - read, 1 - read/write
+	@bits(1) var direction: UInt8 // or conform
 	// If 1 code in this segment can be executed from an equal or lower privilege level
 	// If 0 code in this segment can only be executed from the ring set in "privilege"
-	UInt8 execute : 1 // 1 = code, 0 = data
-	UInt8 one : 1
-	UInt8 privilege : 2 // 0 = ring0/kernel, 3 = ring3
-	UInt8 present : 1
+	@bits(1) var execute: UInt8 // 1 = code, 0 = data
+	@bits(1) var one: UInt8
+	@bits(2) var privilege: UInt8 // 0 = ring0/kernel, 3 = ring3
+	@bits(1) var present: UInt8
 	// Flags
-	UInt8 limit : 4
-	UInt8 reserved : 2
-	UInt8 zero16one32 : 1
-	UInt8 blocks : 1
+	@bits(4) var limit: UInt8
+	@bits(2) var reserved: UInt8
+	@bits(1) var zero16one32: UInt8
+	@bits(1) var blocks: UInt8
 
-	UInt8 baseHigh : 8
+	@bits(8) var baseHigh: UInt8
 }
 
 @struct @packed
@@ -361,13 +361,11 @@ Void anyInterruptHandler(frame: Pointer<InterruptFrame>) {
 // ~121 times per second
 var timerCalled: UInt64 = 0
 
-const UInt64 stackSizeForKernelThread = 1024 * 1024
+let stackSizeForKernelThread: UInt64 = 1024 * 1024
 
-fun kernelThread()
 @aligned(64) UInt8 kernelStack[stackSizeForKernelThread] = {0}
 
-InterruptFrame guiThreadFrame
-fun guiThread()
+var guiThreadFrame: InterruptFrame
 @aligned(64) UInt8 guiStack[stackSizeForKernelThread] = {0}
 
 @extern "C" Void timerInterruptHandler(@volatile frame: Pointer<InterruptFrame>)
@@ -379,11 +377,13 @@ var taskBarRedraw: UInt8 = 0 // Re-paint task bar current time
 
 fun getNextProcess(): UInt64 {
 	var index: UInt64 = 1
-	while (index < 255) {
-		if (process.processes[index].present == true) {
-			if (process.processes[index].schedulable == true)
-				if (process.processes[index].scheduleOnNextTick == true)
+	while index < 255 {
+		if process.processes[index].present == true {
+			if process.processes[index].schedulable == true {
+				if process.processes[index].scheduleOnNextTick == true {
 					return index
+				}
+			}
 		}
 		index++
 	}
@@ -393,24 +393,26 @@ fun getNextProcess(): UInt64 {
 
 fun markAllProcessessSchedulable() {
 	var index: UInt64 = 0
-	while (index < 255) { // TODO 256?
-		if (process.processes[index].present == true) {
-			if (process.processes[index].schedulable == true)
+	while index < 255 { // TODO 256?
+		if process.processes[index].present == true {
+			if process.processes[index].schedulable == true {
 				process.processes[index].scheduleOnNextTick = true
+			}
 		}
 		index++
 	}
 }
 
 fun switchToKernelThread(@volatile frame: Pointer<InterruptFrame>) {
-	if (currentThread == THREAD_KERNEL)
+	if currentThread == THREAD_KERNEL {
 		return
+	}
 
-	if (currentThread == THREAD_USER) {
+	if currentThread == THREAD_USER {
 		// Save
 		var process: Pointer<process.Process> = Pointer.of(process.processes[process.currentProcess])
 		tmemcpy(Pointer.of(process.frame), frame, sizeof(InterruptFrame))
-	} else if (currentThread == THREAD_GUI) {
+	} else if currentThread == THREAD_GUI {
 		// Save
 		tmemcpy(Pointer.of(guiThreadFrame), frame, sizeof(InterruptFrame))
 	}
@@ -424,12 +426,12 @@ fun switchToKernelThread(@volatile frame: Pointer<InterruptFrame>) {
 fun switchToNextProcess(@volatile frame: Pointer<InterruptFrame>) {
 	@volatile var next = getNextProcess()
 
-	if (next == 0) {
+	if next == 0 {
 		markAllProcessessSchedulable()
 		next = getNextProcess()
 	}
 
-	var process: Pointer<process.Process> = Pointer.of(process.processes[next])
+	var process: Pointer<Process> = Pointer.of(process.processes[next])
 	@volatile let old = process.currentProcess
 	process.currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
@@ -438,15 +440,15 @@ fun switchToNextProcess(@volatile frame: Pointer<InterruptFrame>) {
 	process.scheduleOnNextTick = false
 
 	// Note: pid 0 is not real process, so keep things in kernel
-	if (next != 0) {
-		if (currentThread == THREAD_GUI) {
+	if next != 0 {
+		if currentThread == THREAD_GUI {
 			// Save
 			tmemcpy(Pointer.of(guiThreadFrame), frame, sizeof(InterruptFrame))
-		} else if (currentThread == THREAD_USER) {
+		} else if currentThread == THREAD_USER {
 			// Save
-			var processOld: Pointer<process.Process> = Pointer.of(process.processes[old])
+			var processOld: Pointer<Process> = Pointer.of(process.processes[old])
 			tmemcpy(Pointer.of(processOld.frame), frame, sizeof(InterruptFrame))
-		} else if (currentThread == THREAD_KERNEL) {
+		} else if currentThread == THREAD_KERNEL {
 			// Save
 			tmemcpy(Pointer.of(kernelThreadFrame), frame, sizeof(InterruptFrame))
 		}
@@ -461,14 +463,15 @@ fun switchToNextProcess(@volatile frame: Pointer<InterruptFrame>) {
 }
 
 fun switchToGuiThread(@volatile frame: Pointer<InterruptFrame>) {
-	if (currentThread == THREAD_GUI)
+	if currentThread == THREAD_GUI {
 		return
+	}
 
-	if (currentThread == THREAD_USER) {
+	if currentThread == THREAD_USER {
 		// Save
-		var process: Pointer<process.Process> = Pointer.of(process.processes[process.currentProcess])
+		var process: Pointer<Process> = Pointer.of(process.processes[process.currentProcess])
 		tmemcpy(Pointer.of(process.frame), frame, sizeof(InterruptFrame))
-	} else if (currentThread == THREAD_KERNEL) {
+	} else if currentThread == THREAD_KERNEL {
 		// Save
 		tmemcpy(Pointer.of(kernelThreadFrame), frame, sizeof(InterruptFrame))
 	}
@@ -478,34 +481,34 @@ fun switchToGuiThread(@volatile frame: Pointer<InterruptFrame>) {
 	tmemcpy(frame, Pointer.of(guiThreadFrame), sizeof(InterruptFrame))
 }
 
-Void yieldInterruptHandler(@volatile frame: Pointer<InterruptFrame>) {
+fun yieldInterruptHandler(@volatile frame: Pointer<InterruptFrame>) {
 	amd64.disableAllInterrupts()
 	switchToNextProcess(frame)
 }
 
-Void timerInterruptHandler(@volatile frame: Pointer<InterruptFrame>) {
+fun timerInterruptHandler(@volatile frame: Pointer<InterruptFrame>) {
 	amd64.disableAllInterrupts()
 
-	if (timerCalled % 121 == 0) {
+	if timerCalled % 121 == 0 {
 		taskBarRedraw++
-		if (taskBarRedraw > 30) {
+		if taskBarRedraw > 30 {
 			haveToRender = 1
 			taskBarRedraw = 0
 		}
 	}
 	uptimeMilliseconds += 8
-	if (extraMillisecond % 4 == 0) {
+	if extraMillisecond % 4 == 0 {
 		uptimeMilliseconds += 1 // PIT is somewhat imprecise
 	}
-	if (extraMillisecond % 64 == 0) {
+	if extraMillisecond % 64 == 0 {
 		uptimeMilliseconds += 1 // PIT is somewhat imprecise
 	}
 	extraMillisecond++
 	timerCalled++
 
 	// Schedule
-	if (true) {
-		if (currentThread == THREAD_INIT) {
+	if true {
+		if currentThread == THREAD_INIT {
 			// TODO hexa error == statement: currentThread == THREAD_INIT
 			guiThreadFrame.flags = frame.flags // TODO
 			kernelThreadFrame.flags = frame.flags // TODO
@@ -514,17 +517,17 @@ Void timerInterruptHandler(@volatile frame: Pointer<InterruptFrame>) {
 			currentThread = THREAD_GUI
 			tmemcpy(frame, Pointer.of(guiThreadFrame), sizeof(InterruptFrame))
 		} else {
-			if (currentThread == THREAD_GUI) {
+			if currentThread == THREAD_GUI {
 				// Just give it enough time to fimish rendering
 				// It will schedule to other process on finish
 				nextIsGuiThread = false
 			} else {
-				if (nextIsGuiThread == true) {
+				if nextIsGuiThread == true {
 					nextIsGuiThread = false
 					switchToGuiThread(frame)
 				} else {
 					nextIsGuiThread = true
-					if (nextIsUserProcess == true) {
+					if nextIsUserProcess == true {
 						switchToKernelThread(frame)
 					} else {
 						switchToNextProcess(frame)
@@ -534,7 +537,7 @@ Void timerInterruptHandler(@volatile frame: Pointer<InterruptFrame>) {
 			}
 		}
 	}
-	//		if (currentThread == THREAD_INIT) {
+	//		if currentThread == THREAD_INIT {
 	//			// TODO hexa error == statement: currentThread == THREAD_INIT
 
 	// Enable interrupts
@@ -548,7 +551,7 @@ fun syscallInterruptHandler(frame: Pointer<InterruptFrame>) {
 	@volatile let index = (TofitaSyscalls)frame.rcxArg0
 
 	// No-op
-	if ((index as! UInt64) < USER_SYSCALLS) {
+	if (index as! UInt64) < USER_SYSCALLS {
 		process.schedulable = true
 		return
 	}
@@ -560,16 +563,16 @@ fun syscallInterruptHandler(frame: Pointer<InterruptFrame>) {
 	// switchToNextProcess(frame)
 	return
 
-	if (index == TofitaSyscalls.DebugLog) {
+	if index == TofitaSyscalls.DebugLog {
 		serialPrintf("[[DebugLog:PID %d]] %s\n", process.currentProcess, frame.rdxArg1)
 		return
 	}
 
-	if (index == TofitaSyscalls.ExitProcess) {
+	if index == TofitaSyscalls.ExitProcess {
 		serialPrintf("[[ExitProcess:PID %d]] %d\n", process.currentProcess, frame.rdxArg1)
 		// TODO kernel wakeup
 		// TODO destroy process
-		var process: Pointer<process.Process> = Pointer.of(process.processes[process.currentProcess])
+		var process: Pointer<Process> = Pointer.of(process.processes[process.currentProcess])
 		process.schedulable = false
 		switchToNextProcess(frame)
 		process.present = false
@@ -623,35 +626,47 @@ fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
 
 @aligned(64) var cacheIdtr: Idtr
 
-fun dumpGDT(desc: Pointer<GdtDescriptorEx>) {
+fun dumpGDT(desc: GdtDescriptorEx) {
 	serialPrintf("[dumpGDT]")
 
-	if (desc.accessed)
+	if desc.accessed {
 		serialPrintf(" accessed")
-	if (desc.rw)
+	}
+	if desc.rw {
 		serialPrintf(" rw")
-	if (desc.direction)
+	}
+	if desc.direction {
 		serialPrintf(" direction")
-	if (desc.execute)
+	}
+	if desc.execute {
 		serialPrintf(" execute")
-	if (desc.one)
+	}
+	if desc.one {
 		serialPrintf(" one")
+	}
 
-	if (desc.privilege == 0)
+	if desc.privilege == 0 {
 		serialPrintf(" privilege=ring0")
-	if (desc.privilege == 1)
+	}
+	if desc.privilege == 1 {
 		serialPrintf(" privilege=ring1")
-	if (desc.privilege == 2)
+	}
+	if desc.privilege == 2 {
 		serialPrintf(" privilege=ring2")
-	if (desc.privilege == 3)
+	}
+	if desc.privilege == 3 {
 		serialPrintf(" privilege=ring3")
+	}
 
-	if (desc.present)
+	if desc.present {
 		serialPrintf(" present")
-	if (desc.zero16one32)
+	}
+	if desc.zero16one32 {
 		serialPrintf(" zero16one32")
-	if (desc.blocks)
+	}
+	if desc.blocks {
 		serialPrintf(" pages")
+	}
 
 	serialPrintf("\n")
 }
@@ -698,17 +713,21 @@ fun enableInterrupts() {
 		// tssSetEntry(8, tssBase, sizeof_TssEntry - 1); TODO
 	}
 
-	if (false) {
+	if false {
 		let gdt = gdtTemplate as! Pointer<GdtDescriptorEx>
-		for (i in 16) {
-			if (i == 0)
+		for i in 16 {
+			if i == 0 {
 				continue // Empty
-			if (i == 8)
+			}
+			if i == 8 {
 				continue // TSS
-			if (i == 9)
+			}
+			if i == 9 {
 				continue // TSS
-			if (gdt[i].present == 0)
+			}
+			if gdt[i].present == 0 {
 				continue
+			}
 			serialPrintf("[dumpGDT] #%u\n", i)
 			dumpGDT(Pointer.of(gdt[i]))
 		}
@@ -733,8 +752,8 @@ fun enableInterrupts() {
 
 	serialPrintln("[cpu] initializing unknownInterrupt")
 
-	for (UInt32 i = 0; i < 286; ++i) {
 		initializeFallback(&IDT[i], Pointer.of(unknownInterrupt) as! UInt64)
+	for i in 286 {
 	}
 
 	// CPU exceptions
@@ -844,24 +863,23 @@ fun enablePS2Mouse() {
 	// Setup the mouse handler
 	// irq_install_handler(12, mouseHandler)
 	serialPrintln("[cpu] done: setting PS/2 mouse")
-	fun quakePrintf(const c: Pointer<WideChar>, ...)
 	quakePrintf("Enabled PS/2 mouse and keyboard\n")
 }
 
 fun mouseWait(@volatile UInt8 aType) {
 	@volatile UInt32 _timeOut = 1000000
-	if (aType == 0) {
-		while (_timeOut--) // Data
+	if aType == 0 {
+		while _timeOut-- // Data
 		{
-			if ((readPort(PS2_CONTROL_PORT) & 1) == 1) {
+			if (readPort(PS2_CONTROL_PORT) & 1) == 1 {
 				return
 			}
 		}
 		return
 	} else {
-		while (_timeOut--) // Signal
+		while _timeOut-- // Signal
 		{
-			if ((readPort(PS2_CONTROL_PORT) & 2) == 0) {
+			if (readPort(PS2_CONTROL_PORT) & 2) == 0 {
 				return
 			}
 		}

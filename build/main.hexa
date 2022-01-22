@@ -18,17 +18,17 @@ let path = require('path')
 
 // Removes folder recursively
 fun deleteFolderRecursive(path, noRemoveSelf) {
-	if (fs.existsSync(path)) {
+	if fs.existsSync(path) {
 		fs.readdirSync(path).forEach(fun(file, index) {
 			let curPath = path + "/" + file
-			if (fs.lstatSync(curPath).isDirectory()) {
+			if fs.lstatSync(curPath).isDirectory() {
 				deleteFolderRecursive(curPath)
 			} else {
 				fs.unlinkSync(curPath)
 			}
 		})
 		// Fixes some random errors
-		if (noRemoveSelf != true) {
+		if noRemoveSelf != true {
 			fs.rmdirSync(path)
 		}
 	}
@@ -62,7 +62,7 @@ let month = today.getMonth() + 1
 let versionRolling = today.getFullYear() * 10000 + month * 100 + today.getDate()
 let versionName = today.getFullYear() + '.' + month + '.' + today.getDate()
 
-if (tasks.length == 0) {
+if tasks.length == 0 {
 	console.log('No tasks defined')
 }
 
@@ -198,7 +198,7 @@ for task in tasks {
 
 						// TODO refactor
 						var asm = ' '
-						if (dlls[i] == 'ntdll') {
+						if dlls[i] == 'ntdll' {
 							asm = config.tempFolder + '/tofita/tofita\(bit).asm.obj '
 						}
 
@@ -364,10 +364,10 @@ for task in tasks {
 				let files: [String] = []
 
 				fun formatFolderRecursive(path) {
-					if (fs.existsSync(path)) {
+					if fs.existsSync(path) {
 						fs.readdirSync(path).forEach(fun(file, index) {
 							let curPath = path + "/" + file
-							if (fs.lstatSync(curPath).isDirectory()) {
+							if fs.lstatSync(curPath).isDirectory() {
 								formatFolderRecursive(curPath)
 							} else {
 								if curPath.indexOf('external/') == -1, curPath.endsWith('.cpp') || curPath.endsWith('.hpp') {

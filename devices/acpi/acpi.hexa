@@ -19,15 +19,6 @@
 
 // Types
 
-const UInt32 byteswap(x: UInt32) {
-	return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) | ((x << 8) & 0x00ff0000) |
-		   ((x << 24) & 0xff000000)
-}
-
-#define TABLE_HEADER(signature)                                                                              \
-	static const UInt32 typeId = byteswap(signature);                                                      \
-	var header: AcpiTableHeader
-
 @struct @packed
 class AcpiTableHeader {
 	var type: UInt32
@@ -137,16 +128,13 @@ class PciGroup {
 	}
 }
 
-
-
 class ACPIParser {
-  public
 	static Bool parse(acpiVendorTable: UInt64) {
 		serialPrint("[ACPI] parsing started at physical ")
 		serialPrintHex(acpiVendorTable as! UInt64)
 		serialPrint("\n")
 
-		if (acpiVendorTable == 0) {
+		if acpiVendorTable == 0 {
 			serialPrintln("[ACPI] not present at all")
 			return false
 		}
@@ -165,7 +153,7 @@ class ACPIParser {
 		let signature[9]: Char8 = u8"RSD PTR "
 
 		for (Int32 i = 0; i < sizeof(acpi10.signature); i++)
-			if (acpi10.signature[i] != signature[i]) {
+			if acpi10.signature[i] != signature[i] {
 				serialPrintln("[ACPI] RSDP table signature is incorrect")
 				return false
 			}
@@ -173,7 +161,7 @@ class ACPIParser {
 		var checksum: UInt8 = 0
 		for (Int32 i = 0; i < sizeof(acpi.Acpi10); i++)
 			checksum += ((UInt8 *)acpi10)[i]
-		if (checksum != 0) {
+		if checksum != 0 {
 			serialPrintln("[ACPI] checksum ACPI 1.0 failed")
 			return false
 		}
@@ -183,7 +171,7 @@ class ACPIParser {
 		checksum = 0
 		for (Int32 i = 0; i < sizeof(acpi.Acpi20); i++)
 			checksum += (acpi20raw)[i]
-		if (checksum != 0) {
+		if checksum != 0 {
 			serialPrintln("[ACPI] checksum ACPI 2.0 failed")
 			return false
 		}
@@ -216,8 +204,9 @@ class ACPIParser {
 	}
 
 	static fun loadXsdt(const acpi.xsdt: Pointer<XSDT>) {
-		if (xsdt == null)
+		if xsdt == null {
 			return
+		}
 
 		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", acpiValidate(xsdt))
 
@@ -230,8 +219,8 @@ class ACPIParser {
 		var numTables: UInt64 = acpiTableEntries(xsdt, sizeof(Void *))
 		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)
 
-		for (UInt64 i = 0; i < numTables; ++i) {
 			var header = (const acpi.AcpiTableHeader *)physicalToVirtual((xsdt.headers[i] as! UInt64))
+		for i in numTables {
 
 			acpi.put_sig(sig, header.type)
 			serialPrintf("[ACPI] Found table %s\n", sig)
@@ -239,7 +228,7 @@ class ACPIParser {
 
 			serialPrintf("[ACPI] acpiValidate(header) %d\n", header.validate())
 
-			switch (header.type) {
+			switch header.type {
 			case acpi.AcpiApic.typeId:
 				loadApic((const acpi.AcpiApic *)(header))
 				break
@@ -266,7 +255,7 @@ class ACPIParser {
 		var count: UInt64 = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry))
 		var mPci[count]: acpi.PciGroup
 
-		for (UInt32 i = 0; i < count; ++i) {
+		for i in count {
 			const acpi.AcpiMcfgEntry *mcfge = Pointer.of(mcfg.entries[i])
 
 			mPci[i].group = mcfge.group
@@ -286,12 +275,12 @@ class ACPIParser {
 		return mMulti
 	}
 
-	static fun probePci(acpi.PciGroup *mPci, count: UInt64) {
+	static fun probePci(mPci: PciGroup, count: UInt64) {
 		serialPrintf("[PCI] probePci\n")
-		for (UInt32 i = 0; i < count; ++i) {
-			var pci: Pointer<acpi.PciGroup> = Pointer.of(mPci[i])
-			for (Int32 bus = pci.busStart; bus <= pci.busEnd; ++bus) {
-				for (Int32 dev = 0; dev < 32; ++dev) {
+		for i in count {
+			var pci: Pointer<PciGroup> = Pointer.of(mPci[i])
+			for bus in pci.busStart ... pci.busEnd + 1 {
+				for dev in 32 {
 					// TODO
 				}
 			}

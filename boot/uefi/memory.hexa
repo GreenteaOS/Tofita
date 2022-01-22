@@ -14,11 +14,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable) {
-	var status: efi.EFI_STATUS = systemTable.BootServices.GetMemoryMap(
 		Pointer.of(efiMemoryMap.memoryMapSize), efiMemoryMap.memoryMap, Pointer.of(efiMemoryMap.mapKey),
 		Pointer.of(efiMemoryMap.descriptorSize), Pointer.of(efiMemoryMap.descriptorVersion))
+	var status: EFI_STATUS = systemTable.BootServices.GetMemoryMap(
 
-	if (status != EFI_SUCCESS) {
+	if status != EFI_SUCCESS {
 		serialPrint("[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n")
 	}
 
@@ -27,27 +27,27 @@ fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable)
 }
 
 fun initializeFramebuffer(fb: Pointer<Framebuffer>, efi.EFI_SYSTEM_TABLE *systemTable) {
-	var gopGuid: efi.EFI_GUID = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
-	var gop: Pointer<efi.EFI_GRAPHICS_OUTPUT_PROTOCOL>
+	var gopGuid: EFI_GUID = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
+	var gop: Pointer<EFI_GRAPHICS_OUTPUT_PROTOCOL>
 
 	systemTable.BootServices.LocateProtocol(Pointer.of(gopGuid), null, (Void **)Pointer.of(gop))
 
-	fb.base = gop.Mode.FrameBufferBase
-	fb.size = gop.Mode.FrameBufferSize
+	fb.base = gop.Mode.frameBufferBase
+	fb.size = gop.Mode.frameBufferSize
 
-	fb.width = gop.Mode.Info.HorizontalResolution
-	fb.height = gop.Mode.Info.VerticalResolution
-	fb.pixelsPerScanLine = gop.Mode.Info.PixelsPerScanLine
+	fb.width = gop.Mode.Info.horizontalResolution
+	fb.height = gop.Mode.Info.verticalResolution
+	fb.pixelsPerScanLine = gop.Mode.Info.pixelsPerScanLine
 
 	serialPrintf("[[[efi_main.initializeFramebuffer]]] width=%d height=%d pixelsPerScanLine=%d size=%d\n",
 				 fb.width, fb.height, fb.pixelsPerScanLine, fb.size)
 
-	gop.SetMode(gop, gop.Mode.Mode)
+	gop.setMode(gop, gop.Mode.Mode)
 }
 
 efi.EFI_STATUS uefiAllocate(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, bytes: Pointer<UInt64>, Void **destination) {
 	serialPrintf("[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes)
-	var status: efi.EFI_STATUS
+	var status: EFI_STATUS
 	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
 	efi.EFI_MEMORY_TYPE allocationType =
 		efi.EfiLoaderCode // Use *Code not *Data to avoid NX-bit crash if data executed
@@ -62,7 +62,7 @@ efi.EFI_STATUS uefiAllocate(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, bytes: Poin
 					 *bytes)
 	}
 
-	if (status != EFI_SUCCESS) {
+	if status != EFI_SUCCESS {
 		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, "
 					 +
 					 "status %d\n",

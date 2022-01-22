@@ -21,12 +21,11 @@ class PixelRGBAData {
 	var a: UInt8
 }
 
-@struct @sizeOf(4)
+// Union is pointer by default
+@union @sizeOf(4)
 class Pixel32 {
-	union {
-		var rgba: PixelRGBAData
-		var color: UInt32
-	}
+	var rgba: PixelRGBAData
+	var color: UInt32
 }
 
 @struct

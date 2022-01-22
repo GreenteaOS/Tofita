@@ -19,12 +19,12 @@ let addressBits = 12
 
 @struct @packed @sizeOf(8)
 class LinearAddress {
-	UInt16 offset : 12
-	UInt16 pt : 9
-	UInt16 pd : 9
-	UInt16 pdpt : 9
-	UInt16 pml4 : 9
-	UInt16 reserved : 16
+	@bits(12) var offset: UInt16
+	@bits(9) var pt: UInt16
+	@bits(9) var pd: UInt16
+	@bits(9) var pdpt: UInt16
+	@bits(9) var pml4: UInt16
+	@bits(16) var reserved: UInt16
 }
 
 // 512 entries * 8 bytes = 4 KiB
@@ -54,12 +54,12 @@ fun initializePage(entry: Pointer<PageEntry>, address: UInt64) {
 fun getPage(table: Pointer<PageEntry>, entryId: UInt64): Pointer<PageEntry> {
 	var entry: Pointer<PageEntry> = Pointer.of(table[entryId])
 
-	if (entry.present == 1) {
+	if entry.present == 1 {
 		return ((entry.address << addressBits) + (wholePhysicalStart as! UInt64)) as! Pointer<PageEntry>
 	} else {
 		var newPage = PhysicalAllocator.allocateOnePagePreZeroed() as! Pointer<PageEntry>
-		if (newPage != null)
 			initializePage(entry, (newPage as! UInt64) - (wholePhysicalStart as! UInt64))
+		if newPage != null {
 		return newPage
 	}
 }
@@ -67,44 +67,41 @@ fun getPage(table: Pointer<PageEntry>, entryId: UInt64): Pointer<PageEntry> {
 fun map_pt(PageEntry pt[], virtualAddr: UInt64, physicalAddr: UInt64) {
 	var entry: Pointer<PageEntry> = Pointer.of(pt[getLinearAddress(virtualAddr).pt])
 	initializePage(entry, physicalAddr)
+// TODO handle huge pages returned from bootloader
 }
 
-// TODO handle huge pages returned from bootloader
-#define createMapping(fromTable, toTable)                                                                    \
-	Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {               \
-		var toTable: Pointer<PageEntry> = getPage(fromTable, getLinearAddress(virtualAddr).fromTable);                    \
-		map_##toTable(toTable, virtualAddr, physicalAddr);                                                   \
-	}
 
-createMapping(pd, pt)
-createMapping(pdpt, pd)
-createMapping(pml4, pdpt)
 
 // Returns actual physical address from virtual address
 fun resolveAddr(const pml4entries: Pointer<PageEntry>, virtualAddr: UInt64): UInt64 {
 	var linear = getLinearAddress(virtualAddr)
 	// pml4
 	const PageEntry *entry = Pointer.of(pml4entries[linear.pml4])
-	if (entry.present == 0)
+	if entry.present == 0 {
 		return PHYSICAL_NOT_FOUND
 	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
+	}
 	// pdpt
 	entry = Pointer.of(entry[linear.pdpt])
-	if (entry.present == 0)
+	if entry.present == 0 {
 		return PHYSICAL_NOT_FOUND
+	}
 	// TODO handle mega pages
 	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
 	// pd
 	entry = Pointer.of(entry[linear.pd])
-	if (entry.present == 0)
+	if entry.present == 0 {
 		return PHYSICAL_NOT_FOUND
-	if (entry.largePage == 1)
+	}
+	if entry.largePage == 1 {
 		return (entry.address << addressBits) + linear.pt * 4096 + linear.offset
 	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
+	}
 	// pt
 	entry = Pointer.of(entry[linear.pt])
-	if (entry.present == 0)
+	if entry.present == 0 {
 		return PHYSICAL_NOT_FOUND
+	}
 	return (entry.address << addressBits) + linear.offset
 }
 
@@ -139,7 +136,7 @@ fun mapMemory(pml4entries: Pointer<PageEntry>, virtualAddr: UInt64, physicalAddr
 	serialPrintHex(virtualAddrEnd as! UInt64)
 	serialPrint("\n")
 
-	while (vAddress < virtualAddrEnd) {
+	while vAddress < virtualAddrEnd {
 		map_pml4(pml4entries, vAddress, pAddress)
 
 		vAddress += pageSize
@@ -170,7 +167,7 @@ fun unmapAndFreeMemory(pml4entries: Pointer<PageEntry>, virtualAddr: UInt64, pag
 // because it is always the same between processes
 fun copyKernelMemoryMap(const pml4source: Pointer<PageEntry>, pml4destination: Pointer<PageEntry>) {
 	var i: UInt32 = 255 // TODO validate that this is where upper half starts
-	while (i < pageTableSize) {
+	while i < pageTableSize {
 		pml4destination[i] = pml4source[i]
 		i++
 	}
@@ -179,8 +176,9 @@ fun copyKernelMemoryMap(const pml4source: Pointer<PageEntry>, pml4destination: P
 // Creates new PML4 for new process
 fun newCR3(const pml4source: Pointer<PageEntry>): Pointer<PageEntry> {
 	var pml4result: Pointer<PageEntry> = PhysicalAllocator.allocateOnePagePreZeroed() as! Pointer<PageEntry>
-	if (pml4result != null)
+	if pml4result != null {
 		copyKernelMemoryMap(pml4source, pml4result)
+	}
 	return pml4result
 }
 

@@ -25,7 +25,7 @@ _probeForReadOkay(@volatile at: UInt64, @volatile const UInt64 bytes) {
 	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
 	@volatile const UInt8 *ptr = (@volatile const UInt8 *)at
-	for (UInt64 i = 0; i < bytes; ++i) {
+	for i in bytes {
 		at += ptr[i]
 	}
 	sehProbe = false
@@ -41,7 +41,7 @@ _probeForWriteOkay(@volatile const UInt64 at, @volatile const UInt64 bytes) {
 	// TODO per-page not per-byte
 	@volatile UInt8 *ptr = (@volatile UInt8 *)at
 	// TODO i also as volatile?
-	for (UInt64 i = 0; i < bytes; ++i) {
+	for i in bytes {
 		ptr[i] = ptr[i]
 	}
 	sehProbe = false

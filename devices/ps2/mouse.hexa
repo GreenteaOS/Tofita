@@ -52,9 +52,9 @@ let mouseActionsLimit: UInt8 = 255
 @volatile var mouseActionsZetaAmount: UInt8 = 0
 @volatile var mouseActionsGamaAmount: UInt8 = 0
 
-fun pushMouseAction(type: MouseActionType, Int16 mouseXdiff = 0, Int16 mouseYdiff = 0) {
-	if (mouseActionsUseZeta) {
-		if (mouseActionsZetaAmount == mouseActionsLimit) {
+fun pushMouseAction(type: MouseActionType, mouseXdiff: Int16 = 0, mouseYdiff: Int16 = 0) {
+	if mouseActionsUseZeta {
+		if mouseActionsZetaAmount == mouseActionsLimit {
 			return
 		}
 
@@ -64,7 +64,7 @@ fun pushMouseAction(type: MouseActionType, Int16 mouseXdiff = 0, Int16 mouseYdif
 
 		mouseActionsZetaAmount++
 	} else {
-		if (mouseActionsGamaAmount == mouseActionsLimit) {
+		if mouseActionsGamaAmount == mouseActionsLimit {
 			return
 		}
 
@@ -81,13 +81,13 @@ fun getBit(byte: UInt8, bit: UInt8): UInt8 {
 }
 
 fun handleMousePacket() {
-	while (lockMouse) {}
+	while lockMouse {}
 	lockMouse = true
 
-	switch (mouseCycle) {
+	switch mouseCycle {
 	case 0: {
 		mouseByte[0] = mouseRead()
-		if ((mouseByte[0] & 0x08) != 0) {
+		if (mouseByte[0] & 0x08) != 0 {
 			mouseCycle++ // Only accept this as the first byte if the "must be 1" bit is set
 		}
 		// mouseCycle++
@@ -106,26 +106,30 @@ fun handleMousePacket() {
 		mouseYd = -mouseYd
 
 		// Overflow
-		if (getBit(mouseByte[0], 6) != 0)
+		if getBit(mouseByte[0], 6) != 0 {
 			mouseXd = 0
-		else if (getBit(mouseByte[0], 4) != 0)
-			mouseXd -= (int16_t)0x100
+		} else if getBit(mouseByte[0], 4) != 0 {
+			mouseXd -= 0x100i16
+		}
 
-		if (getBit(mouseByte[0], 7) != 0)
+		if getBit(mouseByte[0], 7) != 0 {
 			mouseYd = 0
-		else if (getBit(mouseByte[0], 5) != 0)
-			mouseYd += (int16_t)0x100
+		} else if getBit(mouseByte[0], 5) != 0 {
+			mouseYd += 0x100i16
+		}
 
 		mouseCycle = 0
 
 		// Ignore all state changes until message pool is ready
 		// Otherwise we will have situaion like DOWN-UP-UP instead of D-U-D-U
-		if (mouseActionsUseZeta && mouseActionsZetaAmount == mouseActionsLimit)
+		if mouseActionsUseZeta && mouseActionsZetaAmount == mouseActionsLimit {
 			break
-		if (!mouseActionsUseZeta && mouseActionsGamaAmount == mouseActionsLimit)
+		}
+		if !mouseActionsUseZeta && mouseActionsGamaAmount == mouseActionsLimit {
 			break
+		}
 
-		if (mouseXd != 0 || mouseYd != 0) {
+		if mouseXd != 0 || mouseYd != 0 {
 			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
 		}
 
@@ -133,20 +137,26 @@ fun handleMousePacket() {
 		let right: Bool = getBit(mouseByte[0], 1) != 0
 		let middle: Bool = getBit(mouseByte[0], 2) != 0
 
-		if (left == false && leftDown == true)
+		if left == false && leftDown == true {
 			pushMouseAction(MouseActionType.LeftUp)
-		if (left == true && leftDown == false)
+		}
+		if left == true && leftDown == false {
 			pushMouseAction(MouseActionType.LeftDown)
+		}
 
-		if (right == false && rightDown == true)
+		if right == false && rightDown == true {
 			pushMouseAction(MouseActionType.RightUp)
-		if (right == true && rightDown == false)
+		}
+		if right == true && rightDown == false {
 			pushMouseAction(MouseActionType.RightDown)
+		}
 
-		if (middle == false && middleDown == true)
+		if middle == false && middleDown == true {
 			pushMouseAction(MouseActionType.MiddleUp)
-		if (middle == true && middleDown == false)
+		}
+		if middle == true && middleDown == false {
 			pushMouseAction(MouseActionType.MiddleDown)
+		}
 
 		leftDown = left
 		rightDown = right
@@ -166,7 +176,7 @@ fun handleMousePacket() {
 fun handleMouse() {
 	// This is hack to avoid race condition in poller
 	// this way we handle mouse *only* in poller
-	// if (true) {
+	// if true {
 	//	pollForce = true
 	//	writePort(0xA0, 0x20)
 	//	writePort(0x20, 0x20)
@@ -177,7 +187,7 @@ fun handleMouse() {
 	// polls = true
 	// handleMousePacket()
 	// UInt8 poll = readPort(0x64)
-	// while (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
+	// while getBit(poll, 0) == 1 && getBit(poll, 5) == 1 {
 	//	// if (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
 	//	// handleMousePacket()
 	//	poll = readPort(0x64)

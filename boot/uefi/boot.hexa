@@ -46,14 +46,15 @@ fun tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64): VoidPointe
 
 // Loading animation, progress 0...2
 fun drawLoading(framebuffer: Pointer<Framebuffer>, progress: UInt8) {
-	for (UInt8 y = 0; y < leavesHeight; y++)
-		for (UInt8 x = 0; x < leavesWidth; x++) {
+	for y in leavesHeight {
+		for x in leavesWidth {
 			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
 			drawPixel(framebuffer,
 					  x + framebuffer.width / 2 - (leavesWidth / 2) + progress * leavesWidth * 2 -
 						  leavesWidth * 2,
 					  y + (framebuffer.height / 4) * 3, pixel)
 		}
+	}
 }
 
 fun memset(dest: VoidPointer, e: Int32, len: UInt64): VoidPointer {
@@ -116,7 +117,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 		serialPrintln("[[[efi_main]]] done: ACPI")
 	}
 
-	var status: efi.EFI_STATUS = EFI_NOT_READY
+	var status = EFI_STATUS.EFI_NOT_READY
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer")
 	var framebuffer: Framebuffer
@@ -127,8 +128,8 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	let errorY: UInt16 = (framebuffer.height / 4) * 3 + 64 + 32
 
 	// Check ACPI here, after framebuffer initialization
-	while (acpiTable == null) {
 		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, Pointer.of(framebuffer))
+	while acpiTable == null {
 	}
 
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
@@ -139,8 +140,8 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	// Initial RAM disk
 	var ramdisk: RamDisk
 	status = findAndLoadRamDisk(systemTable.BootServices, Pointer.of(ramdisk))
-	while (status != EFI_SUCCESS) {
 		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, Pointer.of(framebuffer))
+	while status != EFI_SUCCESS {
 	}
 	drawLoading(Pointer.of(framebuffer), 1)
 
@@ -159,13 +160,13 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	fillMemoryMap(Pointer.of(efiMemoryMap), systemTable)
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap")
 
-	var time: efi.EFI_TIME
-	time.Year = 2021
-	var capabilities: efi.EFI_TIME_CAPABILITIES
+	var time: EFI_TIME
+	time.Year = 2022
+	var capabilities: EFI_TIME_CAPABILITIES
 	{
 		serialPrintln("[[[efi_main]]] begin: GetTime")
 		var status: efi.EFI_STATUS = systemTable.RuntimeServices.GetTime(Pointer.of(time), Pointer.of(capabilities))
-		while (status != EFI_SUCCESS) {
+		while status != EFI_SUCCESS {
 			serialPrintln("[[[efi_main]]] <ERROR> GetTime")
 			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, Pointer.of(framebuffer))
 		}
@@ -180,10 +181,10 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 			serialPrintf("[[[efi_main]]] EFI_TIME_CAPABILITIES Resolution=%d Accuracy=%d SetsToZero=%d\n",
 						 capabilities.Resolution, capabilities.Accuracy, capabilities.SetsToZero)
 
-			// Set 2021 as least valid, so security/HTTPS certificates at least partially work
+			// Set 2022 as least valid, so security/HTTPS certificates at least partially work
 			// and file system is not messed
-			if (time.Year < 2021) {
-				time.Year = 2021
+			if time.Year < 2022 {
+				time.Year = 2022
 			}
 		}
 		serialPrintln("[[[efi_main]]] done: GetTime")
@@ -192,7 +193,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	serialPrintln("[[[efi_main]]] begin: ExitBootServices")
 	var oops: UInt8 = 0
 	status = EFI_NOT_READY
-	while (status != EFI_SUCCESS) {
+	while status != EFI_SUCCESS {
 		if oops < 10 {
 			serialPrintln("[[[efi_main]]] try: ExitBootServices")
 		}
@@ -211,7 +212,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 		status = systemTable.BootServices.ExitBootServices(imageHandle, efiMemoryMap.mapKey)
 	}
 
-	if (status != EFI_SUCCESS) {
+	if status != EFI_SUCCESS {
 		// TODO `status` to string
 		serialPrintln("[[[efi_main]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR")
 		return EFI_LOAD_ERROR
@@ -273,7 +274,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	var stack = paging.conventionalAllocateNext(1024 * 1024) + 1024 * 1024
 	{
 		var b = (stack - 1024 * 1024) as! ArrayPointer<UInt8>
-		for (UInt64 i = 0; i < 1024 * 1024; ++i) {
+		for i in 1024 * 1024 {
 			b[i] = paging.buffa[0]
 		}
 	}
@@ -300,7 +301,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 		(paging.PageEntry *)paging.conventionalAllocateNext(sizeof(paging.PageEntry) * pageTableSize)
 
 	{
-		for (UInt64 i = 0; i < paging.conventionalOffset; ++i) {
+		for i in paging.conventionalOffset {
 		var b = paging.pml4entries as! Pointer<UInt8>
 			// TODO faster with uint64_t
 			b[i] = paging.buffa[0]

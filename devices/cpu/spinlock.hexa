@@ -23,8 +23,8 @@ class Spinlock {
 	@inline fun lock() {
 		// TODO UInt8 tries = 255
 		// TODO yield to another process
-		while (!__sync_bool_compare_and_swap(Pointer.of(value), 0, 1)) {
-			while (value) {
+		while !__sync_bool_compare_and_swap(Pointer.of(value), 0, 1) {
+			while value {
 				amd64.pause()
 			}
 		}

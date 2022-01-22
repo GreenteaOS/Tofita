@@ -31,7 +31,6 @@ fun getCPUID(): CPUID {
 
 	amd64.cpuid(cpuidExtendedLevels, 0, Pointer.of(result.extras), Pointer.of(stub), Pointer.of(stub), Pointer.of(stub))
 
-	if (result.extras >= cpuidExtendedLevels + 4) {
 		amd64.cpuid(cpuidExtendedLevels + 2, 0, (UInt32 *)(Pointer.of(result.brandName[0])),
 					 (UInt32 *)(Pointer.of(result.brandName[4])), (UInt32 *)(Pointer.of(result.brandName[8])),
 					 (UInt32 *)(Pointer.of(result.brandName[12])))
@@ -41,23 +40,26 @@ fun getCPUID(): CPUID {
 		amd64.cpuid(cpuidExtendedLevels + 4, 0, (UInt32 *)(Pointer.of(result.brandName[32])),
 					 (UInt32 *)(Pointer.of(result.brandName[36])), (UInt32 *)(Pointer.of(result.brandName[40])),
 					 (UInt32 *)(Pointer.of(result.brandName[44])))
+	if result.extras >= cpuidExtendedLevels + 4 {
 	}
 
 	var i = 0
 	while (i++ < sizeof(result.brandName))
-		if (result.brandName[i] == '\r') {
+		if result.brandName[i] == '\r' {
 			result.brandName[i] = 0
-		} else if (result.brandName[i] == '\n') {
+		} else if result.brandName[i] == '\n' {
 			result.brandName[i] = 0
 		}
+	}
 
 	i = 0
 	while (i++ < sizeof(result.vendorID))
-		if (result.vendorID[i] == '\r') {
+		if result.vendorID[i] == '\r' {
 			result.vendorID[i] = 0
-		} else if (result.vendorID[i] == '\n') {
+		} else if result.vendorID[i] == '\n' {
 			result.vendorID[i] = 0
 		}
+	}
 
 	return result
 }

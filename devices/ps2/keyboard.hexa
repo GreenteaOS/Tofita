@@ -60,7 +60,7 @@ let keyboardMap[128]: UInt8 = [
 	0,	  0,   0,
 	0, // F11 Key
 	0, // F12 Key
-	0, // All other keys are undefined
+	0 // All other keys are undefined
 ]
 
 let status_register = 0x64
@@ -80,7 +80,7 @@ fun handleKeyboardPacket() {
 
 	// if (lockMouse)
 	//	return
-	// while (lockMouse) {}
+	// while lockMouse {}
 	// lockMouse = true
 
 	// UInt8 status = readPort(STATUS_REGISTER)
@@ -88,7 +88,7 @@ fun handleKeyboardPacket() {
 	/// PS2 Mouse
 	// if (status & 0x20) {
 	//	//    UInt8 keycode = readPort(DATA_PORT)
-	//	//    //if (keycode < 0) {
+	//	//    //if keycode < 0 {
 	//	lockMouse = false
 	//	handleMousePacket()
 	//	return
@@ -103,29 +103,31 @@ fun handleKeyboardPacket() {
 	{
 		var keycode: UInt8 = readPort(DATA_PORT)
 
-		if (keycode < 0) {
+		if keycode < 0 {
 			// lockMouse = false
 			return
 		}
 
-		if (keycode < 128) {
 			var buffer[]: WideChar = {(char8_t)keyboardMap[keycode], 0}
-			if (buffer[0] == 0)
+		if keycode < 128 {
+			if buffer[0] == 0 {
 				buffer[0] = '?'
+			}
 			// serialPrint("[")
 			// serialPrint(buffer)
 			// serialPrintf(" down] %d\n", keycode)
 			keyboardPressedState[keycode] = 1
-			if (haveToQuake)
+			if haveToQuake {
 				quakeHandleButtonDown(keycode)
-			else {
+			} else {
 				// handleKeyDown(keycode)
 			}
 		} else {
 			keycode = keycode - 128
 			var buffer[]: WideChar = {(char8_t)keyboardMap[keycode], 0}
-			if (buffer[0] == 0)
+			if buffer[0] == 0 {
 				buffer[0] = '?'
+			}
 			// serialPrint("[")
 			// serialPrint(buffer)
 			// serialPrintf(" up] %d\n", keycode + 128)
@@ -139,7 +141,7 @@ fun handleKeyboardPacket() {
 	}
 
 	// Note: Quake terminal has higher priority than kernel itself
-	if (keyboardPressedState[41]) {
+	if keyboardPressedState[41] {
 		haveToQuake = !haveToQuake
 		// TODO DWM
 		haveToRender = 1

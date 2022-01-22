@@ -42,8 +42,9 @@ fun Blend255(target, color, alpha) return (Mul255(alpha, color) + Mul255(255 - a
 
 @fastcall fun  blendPixel(x: Int16, y: Int16, pixel: Pixel32) {
 	var _framebuffer = ._framebuffer // Faster access
-	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
+	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
 		return
+	}
 	var p: Pixel32 = _pixels[y * _framebuffer.width + x]
 
 	p.rgba.r = Mul255(pixel.rgba.a, pixel.rgba.r) + Mul255(255 - pixel.rgba.a, p.rgba.r)
@@ -55,51 +56,53 @@ fun Blend255(target, color, alpha) return (Mul255(alpha, color) + Mul255(255 - a
 
 @fastcall fun  setPixel(x: Int16, y: Int16, pixel: Pixel32) {
 	var _framebuffer = ._framebuffer // Faster access
-	if ((x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0))
+	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
 		return
+	}
 	_pixels[y * _framebuffer.width + x] = pixel
 }
 
 fun drawBitmap32WithAlpha(bitmap: Pointer<Bitmap32>, x: UInt16, y: UInt16) {
-	for (Int16 yy = 0; yy < bitmap.height; yy++) {
-		for (Int16 xx = 0; xx < bitmap.width; xx++) {
+	for yy in bitmap.height {
+		for xx in bitmap.width {
 			blendPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
 		}
 	}
 }
 
 fun drawBitmap32(bitmap: Pointer<Bitmap32>, x: UInt16, y: UInt16) {
-	for (Int16 yy = 0; yy < bitmap.height; yy++) {
-		for (Int16 xx = 0; xx < bitmap.width; xx++) {
+	for yy in bitmap.height {
+		for xx in bitmap.width {
 			setPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
 		}
 	}
 }
 
 fun drawRectangleWithAlpha(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, height: UInt16) {
-	for (Int16 yy = 0; yy < height; yy++) {
-		for (Int16 xx = 0; xx < width; xx++) {
+	for yy in height {
+		for xx in width {
 			blendPixel(x + xx, y + yy, color)
 		}
 	}
 }
 
 fun drawRectangle(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, height: UInt16) {
-	for (Int16 yy = 0; yy < height; yy++) {
-		for (Int16 xx = 0; xx < width; xx++) {
+	for yy in height {
+		for xx in width {
 			setPixel(x + xx, y + yy, color)
 		}
 	}
 }
 
 fun drawRectangleOutline(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, height: UInt16) {
-	for (Int16 yy = 0; yy < height; yy++) {
-		for (Int16 xx = 0; xx < width; xx++) {
+	for yy in height {
+		for xx in width {
 			// Rendering left and far right points sequentally should be
 			// better for cache-locality than vertical lines
 			// At least this is true for small rectangles (like buttons)
-			if (yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1)
+			if yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1 {
 				setPixel(x + xx, y + yy, color)
+			}
 		}
 	}
 }
@@ -107,7 +110,7 @@ fun drawRectangleOutline(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, he
 fun line45smooth(color: Pixel32, x: Int16, y: Int16, width: Int16, mod: Int16) {
 	color.rgba.a = 98
 	var xx: Int16 = 0
-	for (Int16 xi = 0; xi < width - 1; xi++) {
+	for xi in width - 1 {
 		xx += mod
 		setPixel(xx + x, y + xi, color)
 		blendPixel(xx + x, y + xi + 1, color)
@@ -118,25 +121,25 @@ fun line45smooth(color: Pixel32, x: Int16, y: Int16, width: Int16, mod: Int16) {
 }
 
 fun lineHorizontal(color: Pixel32, x: Int16, y: Int16, rightLength: UInt16) {
-	for (UInt16 i = 0; i < rightLength; ++i) {
+	for i in rightLength {
 		setPixel(x + i, y, color)
 	}
 }
 
 fun lineHorizontalWithAlpha(color: Pixel32, x: Int16, y: Int16, rightLength: UInt16) {
-	for (UInt16 i = 0; i < rightLength; ++i) {
+	for i in rightLength {
 		blendPixel(x + i, y, color)
 	}
 }
 
 fun lineVertical(color: Pixel32, x: Int16, y: Int16, bottomLength: UInt16) {
-	for (UInt16 i = 0; i < bottomLength; ++i) {
+	for i in bottomLength {
 		setPixel(x, y + i, color)
 	}
 }
 
 fun lineVerticalWithAlpha(color: Pixel32, x: Int16, y: Int16, bottomLength: UInt16) {
-	for (UInt16 i = 0; i < bottomLength; ++i) {
+	for i in bottomLength {
 		blendPixel(x, y + i, color)
 	}
 }

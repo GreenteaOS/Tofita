@@ -25,7 +25,9 @@ let page_mask = 0b1111
 // TODO mask user-mode pages differently than kernel-mode
 // TODO let granular_partial = 0b1010
 // TODO let granular_full = 0b1001
-@inline fun down_bytes_to_pages(bytes) return ((bytes) >> 12)
+@inline fun down_bytes_to_pages(bytes) {
+	return ((bytes) >> 12)
+}
 // 4095 >> 12 == 0
 // 4096 >> 12 == 1
 // 8191 >> 12 == 1
@@ -38,10 +40,10 @@ let kernel_reserved_pages = 4096
 class PhysicalAllocator {
 	// Approx. 1 megabyte per each 4 gygabyte of RAM
 	static UInt8 *buffer // TODO use bits, not bytes
-	static UInt64 count
-	static UInt64 countUser // count - kernel_reserved_pages
-	static UInt64 available
-	static UInt64 last
+	static var count: UInt64
+	static var countUser: UInt64 // count - kernel_reserved_pages
+	static var available: UInt64
+	static var last: UInt64
 
 	// static fun init(const EfiMemoryMap *memoryMap, bufferVirtual: UInt64, ramPages: UInt64) {
 	static fun init(const params: Pointer<KernelParams>) {
@@ -68,8 +70,9 @@ class PhysicalAllocator {
 				let where = down_bytes_to_pages(descriptor.PhysicalStart)
 				let steps = descriptor.NumberOfPages
 
-				if (kind == page_reserved)
+				if kind == page_reserved {
 					serialPrintf("[physical] Reserve %u pages from %u page\n", steps, where)
+				}
 
 				var i: UInt64 = where
 				while i < steps {
@@ -102,8 +105,9 @@ class PhysicalAllocator {
 			var i: UInt64 = count
 			while i > 0 {
 				i--
-				if (buffer[i] == page_free)
+				if buffer[i] == page_free {
 					available++
+				}
 			}
 
 			serialPrintf("[physical] Available %u of %u physical pages\n", available, count)
@@ -114,13 +118,12 @@ class PhysicalAllocator {
 	static fun reserveOnePage(physical: UInt64) {
 		let where = down_bytes_to_pages(physical)
 		buffer[where] = page_reserved
-		if (last == where)
+		if last == where {
 			last = physical_not_found
+		}
 	}
 
 // Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
-
-
 	// 31-bit addressable, first 2 GB of RAM
 	// Required by some hardware
 	// We assume this by-default
@@ -129,7 +132,7 @@ class PhysicalAllocator {
 
 	// Returns physical 64-bit address, not page number
 	static UInt64 allocateOnePage() {
-		if (last != physical_not_found) {
+		if last != physical_not_found {
 			let where = last
 			last = physical_not_found
 			return where * pageSize + (wholePhysicalStart as! UInt64)
@@ -138,8 +141,8 @@ class PhysicalAllocator {
 		var i: UInt64 = 0
 		// TODO fast large-step outer search with uint64_t
 		var steps: UInt64 = count // Avoid non-register access
-		while (i < steps) {
-			if (buffer[i] == page_free) {
+		while i < steps {
+			if buffer[i] == page_free {
 				buffer[i] = page_full
 				return i * pageSize + (wholePhysicalStart as! UInt64)
 			}
@@ -151,10 +154,11 @@ class PhysicalAllocator {
 		return physical_not_found
 	}
 
-	static UInt64 allocateOnePagePreZeroed() {
+	static fun allocateOnePagePreZeroed(): UInt64 {
 		var result = allocateOnePage()
-		if (result != physical_not_found)
 			memset((Void *)result, 0, pageSize)
+		if result != physical_not_found {
+		}
 		return result
 	}
 
@@ -162,16 +166,17 @@ class PhysicalAllocator {
 	// TODO modify available
 	// TODO each process should have some private extra pages (1 megabyte)
 	// ^ means that available_now = (available - 1mb * process_count)
-	static UInt64 allocateSafeUserspaceOnePagePreZeroed() {
-		if (available > kernel_reserved_pages)
+	static fun allocateSafeUserspaceOnePagePreZeroed(): UInt64 {
+		if available > kernel_reserved_pages {
 			return allocateOnePagePreZeroed()
+		}
 		return physical_not_found
 	}
 
 	// TODO faster
-	static UInt64 allocatePages(pages: UInt64) {
+	static fun allocatePages(pages: UInt64): UInt64 {
 		// 0 or 1 == 1 page anyway
-		if (pages < 2) {
+		if pages < 2 {
 			return allocateOnePage()
 		}
 
@@ -188,33 +193,34 @@ class PhysicalAllocator {
 			var steps: UInt64 = count // Avoid non-register access
 			// TODO ^ same for buffer[]
 			// TODO probably UInt32 is completely enough to represent pages
-			while (i < steps) {
-				// if (buffer[i] != PAGE_FREE) {
-				//	if (current > largest) {
+			while i < steps {
+				// if buffer[i] != PAGE_FREE {
+				//	if current > largest {
 				//		largest = current
 				//		largestAt = currentAt
-				//		if (largest >= pages) break
+				//		if largest >= pages { break }
 				//	}
 				//	current = 0
 				//} else {
-				//	if (current == 0) currentAt = i
+				//	if current == 0 { currentAt = i }
 				//	current++
 				//}
 
-				if (buffer[i] == page_free) {
-					if (current == 0)
+				if buffer[i] == page_free {
+					if current == 0 {
 						currentAt = i
+					}
 					current++
 				}
 
-				if (current >= pages) {
+				if current >= pages {
 					largest = current
 					largestAt = currentAt
 					// if (largest >= pages)
 					break
 				}
 
-				if (buffer[i] != page_free) {
+				if buffer[i] != page_free {
 					current = 0
 				}
 
@@ -224,9 +230,9 @@ class PhysicalAllocator {
 			serialPrintf("[physical] allocatePages currentAt %u\n", currentAt)
 		}
 
-		if (largest >= pages) {
+		if largest >= pages {
 			var i: UInt64 = pages
-			while (i > 0) {
+			while i > 0 {
 				i--
 				buffer[largestAt + i] = page_full
 			}
@@ -238,13 +244,13 @@ class PhysicalAllocator {
 	}
 
 	// Current granularity: 4096 bytes
-	static UInt64 allocateBytes(bytes: UInt64) {
+	static fun allocateBytes(bytes: UInt64): UInt64 {
 		// TODO
 		return allocatePages(down_bytes_to_pages(bytes) + 1)
 	}
 
 	// Current granularity: xxx bytes
-	static UInt64 allocateFileCacheBlock(bytes: UInt64) {
+	static fun allocateFileCacheBlock(bytes: UInt64): UInt64 {
 		// TODO
 		// The idea is to use very fast wide search over bitmask
 		// too quickly find large chunks of memory
@@ -258,12 +264,12 @@ class PhysicalAllocator {
 	static fun freeOnePage(physical: UInt64) {
 		let where = down_bytes_to_pages(physical - (wholePhysicalStart as! UInt64))
 		// Bounds check
-		if (physical <= wholePhysicalStart || where > count) {
+		if physical <= wholePhysicalStart || where > count {
 			return
 		}
 
 		// Cosmic rays
-		if (buffer[where] == page_full) {
+		if buffer[where] == page_full {
 			buffer[where] = page_free
 		}
 

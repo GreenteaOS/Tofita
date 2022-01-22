@@ -95,6 +95,7 @@ fun drawText(const text: Pointer<WideChar>, y: Int16, framebuffer: Pointer<Frame
 		width += getCharAdvance((uint16_t)text[i] & 0xFF)
 		i++
 	}
+
 	var xx: Float = framebuffer.width / 2 - width / 2
 
 	i = 0

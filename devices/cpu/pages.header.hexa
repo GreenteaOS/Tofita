@@ -17,28 +17,28 @@
 @struct @packed @sizeOf(8)
 class PageEntry {
 	// Is the page present in physical memory?
-	UInt8 present : 1
+	@bits(1) var present: UInt8
 
 	// Pages are read-only by default
-	UInt8 writeAllowed : 1
+	@bits(1) var writeAllowed: UInt8
 
 	// Pages are only accessible by supervisor by default
-	UInt8 accessibleByAll : 1
+	@bits(1) var accessibleByAll: UInt8
 
 	// Write through abilities of the page
-	UInt8 writeThrough : 1
+	@bits(1) var writeThrough: UInt8
 
 	// If set, the page will not be cached
-	UInt8 cacheDisabled : 1
+	@bits(1) var cacheDisabled: UInt8
 
 	// Was the page accessed?
-	UInt8 accessed : 1
+	@bits(1) var accessed: UInt8
 
 	// Has the page been written to? Only applicable for PTE.
-	UInt8 dirty : 1
+	@bits(1) var dirty: UInt8
 
 	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
-	UInt8 largePage : 1
+	@bits(1) var largePage: UInt8
 
 	// Prevent the translations cache from updating
 	// the address in cache if CR3 is reset.
@@ -47,20 +47,20 @@ class PageEntry {
 	// enable this feature.
 	//
 	// Only applicable for PTE
-	UInt8 global : 1
+	@bits(1) var global: UInt8
 
 	// Not used by the processor
-	UInt8 metadata : 3
+	@bits(3) var metadata: UInt8
 
 	// Physical address of the child table/page
-	UInt64 address : 40
+	@bits(40) var address: UInt64
 
 	// Not used by the processor
-	UInt8 metadata2 : 7
+	@bits(7) var metadata2: UInt8
 
 	// Only applicable for PTE
-	UInt8 protectionKey : 4
+	@bits(4) var protectionKey: UInt8
 
 	// Disable execution of code from this page
-	UInt8 disableExecution : 1
+	@bits(1) var disableExecution: UInt8
 }

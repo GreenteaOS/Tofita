@@ -21,12 +21,12 @@ fun initSerial(): UInt8 {
 	// Calculate divisor for baud generator
 	//    Ref_Clk_Rate / Baud_Rate / 16
 	var divisor: UInt32 = SERIAL_CLOCK_RATE / (SERIAL_BAUD_RATE * 16)
-	if ((SERIAL_CLOCK_RATE % (SERIAL_BAUD_RATE * 16)) >= SERIAL_BAUD_RATE * 8) {
+	if (SERIAL_CLOCK_RATE % (SERIAL_BAUD_RATE * 16)) >= SERIAL_BAUD_RATE * 8 {
 		divisor++
 	}
 	// See if the serial port is already initialized
 	var initialized: Bool = true
-	if ((readSerialRegister(R_UART_LCR) & 0x3F) != (SERIAL_LINE_CONTROL & 0x3F)) {
+	if (readSerialRegister(R_UART_LCR) & 0x3F) != (SERIAL_LINE_CONTROL & 0x3F) {
 		initialized = false
 	}
 	// Calculate current divisor
@@ -41,8 +41,8 @@ fun initSerial(): UInt8 {
 	}
 	// Wait for the serial port to be ready.
 	// Verify that both the transmit FIFO and the shift register are empty.
-	while ((readSerialRegister(R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) !=
-		   (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) {}
+	while (readSerialRegister(R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) !=
+		   (B_UART_LSR_TEMT | B_UART_LSR_TXRDY) {}
 
 	// Configure baud rate
 	writeSerialRegister(R_UART_LCR, B_UART_LCR_DLAB)

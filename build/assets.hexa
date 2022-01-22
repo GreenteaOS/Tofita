@@ -96,10 +96,10 @@ fun packAssets(config: Config) {
 		assetPath.push(config.tempFolder + '\\tofita\\ascii.tofita')
 
 		fun addFolderRecursive(path) {
-			if (fs.existsSync(path)) {
+			if fs.existsSync(path) {
 				fs.readdirSync(path).forEach(fun(file, index) {
 					let curPath = path + "/" + file
-					if (fs.lstatSync(curPath).isDirectory()) {
+					if fs.lstatSync(curPath).isDirectory() {
 						addFolderRecursive(curPath)
 					} else {
 						assetName.push(curPath.substr('assets/'.length))
