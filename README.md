@@ -8,13 +8,11 @@ All-new kernel for the [Greentea OS](https://github.com/GreenteaOS)
 [![Telegram Chatroom](https://img.shields.io/badge/Telegram-Greentea%20OS-blue.svg)](https://telegram.me/greenteaos)
 [![Join the chat at Discord!](https://img.shields.io/badge/Discord-Join%20Chat-677bc4.svg)](https://discord.gg/UGZq8GB)
 [![GPL License](https://img.shields.io/badge/License-GNU%20LGPLv3-green.svg?style=flat)](https://github.com/GreenteaOS/Tofita/blob/kawaii/LICENSE)
-[![GitHub Feed](https://img.shields.io/badge/GitHub-Feed-0f9d58.svg?style=flat)](https://t.me/greenteaos_github)
-[![Nightly Builds](https://img.shields.io/badge/Nightly-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
+[![Automatic Builds](https://img.shields.io/badge/Automatic-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 [![Made with Hexa](https://img.shields.io/badge/Code-Hexa-FF7F50.svg?style=flat)](https://github.com/hexalang/hexa)
 
 Greentea OS is aimed to provide complete operating system compatible with existing apps
 
-![Screenshot](https://raw.githubusercontent.com/GreenteaOS/Greentea/master/Images/screenshot.jpg)
 
 ## Features
 
@@ -30,6 +28,7 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 - Isolation and containerization of everything
 - Exclusively only multi-core CPUs
 - NjRAA graphics stack
+![Screenshot](https://raw.githubusercontent.com/GreenteaOS/Greentea/kawaii/Images/screenshot.jpg)
 
 ## GreenteaOS (Tofita) system requirements
 
@@ -57,9 +56,9 @@ Help to hire developers and buy hardware
 
 Get automatic build or make yours with Teapot (if you want to edit the code)
 
-### Nightly builds
+### Automatic builds
+If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts).
 
-If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 
 ### Build using Teapot
 
@@ -70,7 +69,7 @@ Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-la
 .\Tofita
 ```
 
-You should have extracted `Teapot-master` and have folders like this `.\Teapot\LLVM-*.*.*`.
+You should have extracted `Teapot-kawaii` and have folders like this `.\Teapot\LLVM-*.*.*`.
 
 Teapot will take less space if cloned with limited depth of commit history:
 
@@ -109,10 +108,6 @@ cmd /c build
 
 Or just open `build.bat` file with Explorer.
 
-### Build using Linux
-
-Open `build.sh` for instructions. Remember to `chmod +x build.sh` if required.
-
 ## License
 
 This program is free software: you can redistribute it and/or modify
@@ -127,4 +122,4 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-[More information about legal issues](https://github.com/GreenteaOS/Greentea/blob/master/README.md#license)
+[More information about legal issues](https://github.com/GreenteaOS/Greentea/blob/kawaii/README.md#license)
