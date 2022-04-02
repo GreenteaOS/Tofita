@@ -71,12 +71,15 @@ for task in tasks {
 		case 'init':
 			{
 				let folder = slash(config.tempFolder + '\\tofita')
-				if !fs.existsSync(folder) {
+				if not fs.existsSync(folder) {
 					fs.mkdirSync(folder)
 				}
 
 				// Cleanup
 				deleteFolderRecursive(folder, noRemoveSelf: true)
+				fs.copyFileSync('assets\\tea.ico', folder + '\\icon.ico')
+				fs.copyFileSync('desktop.ini', folder + '\\desktop.ini')
+				require('child_process').execSync('cmd /c ATTRIB +S ' + folder, { stdio: 'inherit' })
 
 				// Create directory tofita/iso/EFI/BOOT/
 				let dirs = [
@@ -89,7 +92,7 @@ for task in tasks {
 				var path = config.tempFolder
 				for dir in dirs {
 					path += dir
-					if !fs.existsSync(path) {
+					if not fs.existsSync(path) {
 						fs.mkdirSync(path)
 					}
 				}

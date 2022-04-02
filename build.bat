@@ -11,6 +11,7 @@ IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
 echo [36m[Success][0m
+ATTRIB +S .
 ::node build.js vbox
 ::node tools\vbox.js
 ::node tools\listen.js
