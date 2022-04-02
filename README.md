@@ -13,27 +13,13 @@ All-new kernel for the [Greentea OS](https://github.com/GreenteaOS)
 
 Greentea OS is aimed to provide complete operating system compatible with existing apps
 
-
-## Features
-
-- UEFI 64-bit x86 hybrid performance-oriented kernel
-- Quake-style terminal (hit `~` to show/hide)
-- Desktop GUI
-- Tested on those VMs:
-  - VirtualBox 6.0+ `(use exactly "Mac OS X (64-bit)" preset)`
-  - Hyper-V `(use Generation 2, disable Secure Boot, no PS/2 support, read tools\pipe.js for more info)`
-  - WMware Workstation `(Other 64-bit, Virtualize Intel VT-x/EPT or AMD-V/RVI, Firmware type - UEFI)`
-  - QEMU with KVM or WHPX `(-accel [kvm or whpx] -bios OVMF.fd -m 2048 -serial stdio -vga std -machine pc-q35-2.10 -smp 2)`
-- Very low on resources, just 2 GB RAM minimum required
-- Isolation and containerization of everything
-- Exclusively only multi-core CPUs
-- NjRAA graphics stack
 ![Screenshot](https://raw.githubusercontent.com/GreenteaOS/Greentea/kawaii/Images/screenshot.jpg)
 
 ## GreenteaOS (Tofita) system requirements
 
-- 2 GB RAM
-- Motherboard with UEFI, SATA (AHCI) or NVMe, PCIe and USB 2.0+
+- 64-bit UEFI
+- Very low on resources, just 2 GB RAM minimum required
+- Motherboard with SATA (AHCI) or NVMe, PCIe and USB 2.0+
 - Multicore modern 64-bit CPU (most AMD and Intel CPUs from [Q3 2011 and newer](https://github.com/GreenteaOS/Greentea/blob/kawaii/Developer-Guide/CPUID.md#notes-on-cpu-compatibility))
 
 [![Give a star](docs/star.png?raw=true)](https://github.com/GreenteaOS/Tofita/stargazers)
@@ -57,6 +43,7 @@ Help to hire developers and buy hardware
 Get automatic build or make yours with Teapot (if you want to edit the code)
 
 ### Automatic builds
+
 If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts).
 
 
