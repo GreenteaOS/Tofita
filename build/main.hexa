@@ -20,7 +20,7 @@ let path = require('path')
 fun deleteFolderRecursive(path, noRemoveSelf) {
 	if fs.existsSync(path) {
 		fs.readdirSync(path).forEach(fun(file, index) {
-			let curPath = path + "/" + file
+			let curPath = path + "\\" + file
 			if fs.lstatSync(curPath).isDirectory() {
 				deleteFolderRecursive(curPath)
 			} else {
@@ -40,19 +40,15 @@ let llvm = 'LLVM-12.0.0'
 tasks.shift()
 tasks.shift()
 let teapot = config.teapot
-let nasm = isUnix? 'nasm' : '\(teapot)\\nasm-2.14.02\\nasm'
-let clang = isUnix? 'clang-12' : '\(teapot)\\\(llvm)\\bin\\clang.exe'
-let link = isUnix? 'lld-link-12' : '\(teapot)\\\(llvm)\\bin\\lld-link.exe'
-let xorriso = isUnix? 'xorriso' : '\(teapot)\\xorriso-1.5.2\\xorriso.exe'
-let mmd = isUnix? 'mmd' : '\(teapot)\\mtools\\mmd.exe'
-let mcopy = isUnix? 'mcopy' : '\(teapot)\\mtools\\mcopy.exe'
-
-if isUnix {
-	config.tempFolder = config.tempFolderUnix
-}
 
 let warn = if config.warnings {
 	"-Wall -Wextra -Werror -ferror-limit=1000 "
+let nasm = '\(teapot)\\nasm-2.14.02\\nasm'
+let clang = '\(teapot)\\\(llvm)\\bin\\clang.exe'
+let link = '\(teapot)\\\(llvm)\\bin\\lld-link.exe'
+let xorriso = '\(teapot)\\xorriso-1.5.2\\xorriso.exe'
+let mmd = '\(teapot)\\mtools\\mmd.exe'
+let mcopy = '\(teapot)\\mtools\\mcopy.exe'
 } else {
 	"-w "
 }
@@ -67,10 +63,11 @@ if tasks.length == 0 {
 }
 
 for task in tasks {
+	let folder = config.tempFolder + tea
+
 	switch task {
 		case 'init':
 			{
-				let folder = slash(config.tempFolder + '\\tofita')
 				if not fs.existsSync(folder) {
 					fs.mkdirSync(folder)
 				}
@@ -83,7 +80,7 @@ for task in tasks {
 
 				// Create directory tofita/iso/EFI/BOOT/
 				let dirs = [
-					path.sep + 'tofita',
+					path.sep + teaFolder,
 					path.sep + 'iso',
 					path.sep + 'EFI',
 					path.sep + 'BOOT'
@@ -152,7 +149,7 @@ for task in tasks {
 						' -c ',
 						'boot/uefi/boot.cpp',
 						' -o ',
-						config.tempFolder + '/tofita/miniefi.o'
+						config.tempFolder + '/' + teaFolder + '/miniefi.o'
 					].join(''), { stdio: 'inherit' }
 				)
 
@@ -160,10 +157,10 @@ for task in tasks {
 					[
 						link + ' ',
 						'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
-						config.tempFolder + '/tofita/trampoline.o ',
-						config.tempFolder + '/tofita/miniefi.o ',
+						config.tempFolder + '/' + teaFolder + '/trampoline.o ',
+						config.tempFolder + '/' + teaFolder + '/miniefi.o ',
 						' -out:',
-						config.tempFolder + '/tofita/iso/EFI/BOOT/BOOTX64.EFI'
+						config.tempFolder + '/' + teaFolder + '/iso/EFI/BOOT/BOOTX64.EFI'
 					].join(''), { stdio: 'inherit' }
 				)
 			}
@@ -202,10 +199,10 @@ for task in tasks {
 						// TODO refactor
 						var asm = ' '
 						if dlls[i] == 'ntdll' {
-							asm = config.tempFolder + '/tofita/tofita\(bit).asm.obj '
+							asm = folder + '\\tofita\(bit).asm.obj '
 						}
 
-						let outobj = config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '_dll.obj'
+						let outobj = folder + '\\' + dlls[i] + '.' + bit + '_dll.obj'
 
 						require('child_process').execSync(
 							[
@@ -252,11 +249,11 @@ for task in tasks {
 								// TODO check if `/kill-at` keeps `@` from `asm()`
 								link + ' ',
 								'/DLL /WX /MACHINE:X\(machine) ',
-								[for dep in deps[i] config.tempFolder + '/tofita/' + dep + '.' + bit + '.lib '].join(''),
+								[for dep in deps[i] config.tempFolder + '/' + teaFolder + '/' + dep + '.' + bit + '.lib '].join(''),
 								outobj + ' ',
 								asm,
 								'/out:',
-								config.tempFolder + '/tofita/' + dlls[i] + '.' + bit + '.dll'
+								config.tempFolder + '/' + teaFolder + '/' + dlls[i] + '.' + bit + '.dll'
 							].join(''), { stdio: 'inherit' }
 						)
 					}
@@ -309,35 +306,35 @@ for task in tasks {
 		case 'iso':
 			{
 				fs.copyFileSync(
-					slash('assets\\autorun.ico'),
-					slash(config.tempFolder + '\\tofita\\iso\\autorun.ico'))
+					'assets\\autorun.ico',
+					folder + '\\iso\\autorun.ico')
 				fs.copyFileSync(
-					slash('assets\\autorun.inf'),
-					slash(config.tempFolder + '\\tofita\\iso\\autorun.inf'))
+					'assets\\autorun.inf',
+					folder + '\\iso\\autorun.inf')
 				fs.copyFileSync(
-					slash('LICENSE'),
-					slash(config.tempFolder + '\\tofita\\iso\\LICENSE.txt'))
+					'LICENSE',
+					folder + '\\iso\\LICENSE.txt')
 				fs.writeFileSync(
-					slash(config.tempFolder + '\\tofita\\iso\\version.txt'),
+					folder + '\\iso\\version.txt',
 					versionName
 				)
 
 				// Create floppy image
 				fs.copyFileSync(
-					slash('\(teapot)\\mtools\\disk-template.img'),
-					slash(config.tempFolder + '\\tofita\\DISK.IMG'))
+					'\(teapot)\\mtools\\disk-template.img',
+					folder + '\\DISK.IMG')
 				for cmd in [
-					mmd + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ::/EFI',
-					mmd + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ::/EFI/BOOT',
-					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
-					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\TOFITA.DAT ::/TOFITA.DAT',
-					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG ' + config.tempFolder + '\\tofita\\iso\\version.txt ::/version.txt',
-					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG LICENSE ::/LICENSE.txt',
-					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG assets\\autorun.ico ::/autorun.ico',
-					mcopy + ' -i ' + config.tempFolder + '\\tofita\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
+					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI',
+					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI/BOOT',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\TOFITA.DAT ::/TOFITA.DAT',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\version.txt ::/version.txt',
+					mcopy + ' -i ' + folder + '\\DISK.IMG LICENSE ::/LICENSE.txt',
+					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.ico ::/autorun.ico',
+					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
 				] {
 					require('child_process').execSync(
-						isUnix? slash(cmd) : cmd, { stdio: 'inherit' }
+						cmd, { stdio: 'inherit' }
 					)
 				}
 				// Create disk image
@@ -369,11 +366,11 @@ for task in tasks {
 				fun formatFolderRecursive(path) {
 					if fs.existsSync(path) {
 						fs.readdirSync(path).forEach(fun(file, index) {
-							let curPath = path + "/" + file
+							let curPath = path + "\\" + file
 							if fs.lstatSync(curPath).isDirectory() {
 								formatFolderRecursive(curPath)
 							} else {
-								if curPath.indexOf('external/') == -1, curPath.endsWith('.cpp') || curPath.endsWith('.hpp') {
+								if curPath.indexOf('external\\') == -1, curPath.endsWith('.cpp') || curPath.endsWith('.hpp') {
 									files.push(curPath)
 								}
 							}

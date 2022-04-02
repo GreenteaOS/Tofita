@@ -1,7 +1,6 @@
 {
 	"warnings": false,
 	"teapot": "..\\Teapot",
-	"tempFolderUnix": "/tmp",
 	"features": [
 		"example-like-mail-client-or-something"
 	],

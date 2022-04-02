@@ -17,17 +17,10 @@ declare class Config {
 	let warnings: Bool
 	let teapot: String
 	var tempFolder: String
-	let tempFolderUnix: String
 }
 
-let isUnix = process.platform != "win32"
-
-fun slash(path: String): String {
-	if isUnix {
-		return path.split('\\').join('/')
-	}
-	return path.split('/').join('\\')
-}
+let teaFolder = 'Tea'
+let tea = '\\' + teaFolder
 
 let dlls = [
 	// Order is important
@@ -49,7 +42,7 @@ let deps: [[String]] = [
 fun packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
-			JSON.parse(fs.readFileSync(slash('assets/root/Windows/Fonts/default.json')).toString().trim())
+			JSON.parse(fs.readFileSync('assets\\root\\Windows\\Fonts\\default.json').toString().trim())
 
 		let charSize = 2 + 2 + 8
 		let size = 256 * charSize // Just ASCII for now
@@ -66,56 +59,56 @@ fun packFonts(config: Config) {
 			}
 		}
 
-		fs.writeFileSync(slash(config.tempFolder + '\\tofita\\ascii.tofita'), buffer, "binary")
+		fs.writeFileSync(config.tempFolder + tea + '\\ascii.tofita', buffer, "binary")
 }
 
 fun packAssets(config: Config) {
-
-		let fs = require('fs')
+		let folder = config.tempFolder + tea
+		let fs = require('fs') // TODO import normally
 
 		let assetName: [String] = []
 		let assetPath: [String] = []
 
 		assetName.push('tofita.gnu')
-		assetPath.push(config.tempFolder + '\\tofita\\tofita.exe')
+		assetPath.push(folder + '\\tofita.exe')
 
 		assetName.push('trapeze.tofita')
-		assetPath.push(config.tempFolder + '\\tofita\\trapeze.bin')
+		assetPath.push(folder + '\\trapeze.bin')
 
 		for dll in dlls {
 			// TODO \ not werks in js assetName.push(`C:\Windows\System32\` + dll + '.dll')
 			assetName.push(`C:\\Windows\\System32\\` + dll + '.dll')
-			assetPath.push(config.tempFolder + '\\tofita\\\(dll).64.dll')
+			assetPath.push(folder + '\\\(dll).64.dll')
 
 			assetName.push(`C:\\Windows\\SysWOW64\\` + dll + '.dll')
-			assetPath.push(config.tempFolder + '\\tofita\\\(dll).32.dll')
+			assetPath.push(folder + '\\\(dll).32.dll')
 		}
 
 		packFonts(config)
 		assetName.push('ascii.tofita')
-		assetPath.push(config.tempFolder + '\\tofita\\ascii.tofita')
+		assetPath.push(folder + '\\ascii.tofita')
 
 		fun addFolderRecursive(path) {
 			if fs.existsSync(path) {
 				fs.readdirSync(path).forEach(fun(file, index) {
-					let curPath = path + "/" + file
+					let curPath = path + "\\" + file
 					if fs.lstatSync(curPath).isDirectory() {
 						addFolderRecursive(curPath)
 					} else {
-						assetName.push(curPath.substr('assets/'.length))
+						assetName.push(curPath.substr('assets/'.length).split('\\').join('/'))
 						assetPath.push(curPath)
 					}
 				})
 			}
 		}
 
-		addFolderRecursive('assets/root')
-		addFolderRecursive('assets/desktop')
+		addFolderRecursive('assets\\root')
+		addFolderRecursive('assets\\desktop')
 
 		// Compute RAM disk size
 		var ramDiskSize = 0
 		for asset in assetPath {
-			ramDiskSize += fs.statSync(slash(asset)).size
+			ramDiskSize += fs.statSync(asset).size
 		}
 
 		ramDiskSize += 4 // UInt32 ramDiskChecksum
@@ -143,7 +136,7 @@ fun packAssets(config: Config) {
 		var assetDataOffset = ramDiskSize
 		for i in assetName.length {
 			let asset = assetName[i]
-			let path = slash(assetPath[i])
+			let path = assetPath[i]
 			let assetSize = fs.statSync(path).size
 			buffer.write(asset, assetInfoOffset, "utf16le")
 			buffer.writeUInt32LE(assetSize, assetInfoOffset + 256)
@@ -172,5 +165,5 @@ fun packAssets(config: Config) {
 		buffer.writeUInt32LE(ramDiskChecksum, 0)
 		console.log('ramDiskChecksum is', ramDiskChecksum)
 
-		fs.writeFileSync(slash(config.tempFolder + '\\tofita\\iso\\TOFITA.DAT'), buffer, "binary")
+		fs.writeFileSync(folder + '\\iso\\TOFITA.DAT', buffer, "binary")
 }
