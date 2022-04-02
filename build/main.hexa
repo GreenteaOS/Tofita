@@ -40,18 +40,32 @@ let llvm = 'LLVM-12.0.0'
 tasks.shift()
 tasks.shift()
 let teapot = config.teapot
-
-let warn = if config.warnings {
-	"-Wall -Wextra -Werror -ferror-limit=1000 "
 let nasm = '\(teapot)\\nasm-2.14.02\\nasm'
 let clang = '\(teapot)\\\(llvm)\\bin\\clang.exe'
 let link = '\(teapot)\\\(llvm)\\bin\\lld-link.exe'
 let xorriso = '\(teapot)\\xorriso-1.5.2\\xorriso.exe'
 let mmd = '\(teapot)\\mtools\\mmd.exe'
 let mcopy = '\(teapot)\\mtools\\mcopy.exe'
+
+// NOTE Splitting into separate lines helps review process
+let warn = if config.warnings {
+	[
+		"-Wall",
+		"-Wextra",
+		"-Werror",
+		"-ferror-limit=1000"
+	].join(' ')
 } else {
-	"-w "
-}
+	"-w"
+} + ' '
+
+// CPU support
+let enabledFeatures = '-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw '
+// TODO 4.2?
+let disabledFeatures = '-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 '
+
+// Security and safety
+let optimizationFeatures = '-O2 -fwrapv -fno-strict-aliasing -fno-strict-overflow -mtune=nocona '
 
 let today = new Date()
 let month = today.getMonth() + 1
@@ -95,7 +109,7 @@ for task in tasks {
 				}
 
 				// Assets
-				let assets = slash(config.tempFolder + '\\tofita\\iso\\TOFITA.DAT')
+				let assets = folder + '\\iso\\TOFITA.DAT'
 				if fs.existsSync(assets) {
 					fs.unlinkSync(assets)
 				}
@@ -105,29 +119,29 @@ for task in tasks {
 				// CR3 TRAMPOLINE
 				require('child_process').execSync(
 					nasm + ' -f win64 -o ' +
-					slash(config.tempFolder + '/tofita/trampoline.o boot\\loader\\trampoline.asm'), { stdio: 'inherit' }
+					folder + '\\trampoline.o boot\\loader\\trampoline.asm', { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
 					nasm + ' -f win64 -o ' +
-					slash(config.tempFolder + '\\tofita\\tofita.asm.obj kernel\\all.asm'), { stdio: 'inherit' }
+					folder + '\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
 				)
 
 				// SMP TRAPEZE
 				require('child_process').execSync(
 					nasm + ' -f bin -o ' +
-					slash(config.tempFolder + '/tofita/trapeze.bin devices\\cpu\\trapeze.asm'), { stdio: 'inherit' }
+					folder + '\\trapeze.bin devices\\cpu\\trapeze.asm', { stdio: 'inherit' }
 				)
 
 				// DLL
 				require('child_process').execSync(
 					nasm + ' -f win64 -o ' +
-					slash(config.tempFolder + '\\tofita\\tofita64.asm.obj dlls\\tofita32.dll\\tofita64.asm'), { stdio: 'inherit' }
+					folder + '\\tofita64.asm.obj dlls\\tofita32.dll\\tofita64.asm', { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
 					nasm + ' -f win32 -o ' +
-					slash(config.tempFolder + '\\tofita\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm'), { stdio: 'inherit' }
+					folder + '\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm', { stdio: 'inherit' }
 				)
 			}
 		case 'uefi':
@@ -277,15 +291,16 @@ for task in tasks {
 						'-Dbit64 ',
 						'-fno-rtti -fno-exceptions -ffreestanding ',
 						'-mno-ms-bitfields -fno-threadsafe-statics ',
-						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
-						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
+						enabledFeatures,
+						disabledFeatures,
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
 						'-m64 -target x86_64-pc-windows-gnu -nostdlib -nodefaultlibs ',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG -fno-pic -mcmodel=large ',
 						warn,
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -Wimplicit-function-declaration ',
-						'-Ofast -x c++ -std=c++2a -c kernel/tofita.cpp -o ',
-						config.tempFolder + '/tofita/tofita.obj '
+						optimizationFeatures,
+						'-x c++ -std=c++2a -c kernel/tofita.cpp -o ',
+						config.tempFolder + '/' + teaFolder + '/tofita.obj '
 					].join(''), { stdio: 'inherit' }
 				)
 
@@ -294,10 +309,10 @@ for task in tasks {
 						link + ' ',
 						'/verbose /WX /MACHINE:X64 /entry:kernelMain /SUBSYSTEM:CONSOLE ',
 						'/BASE:0xffff800000000000 ',
-						config.tempFolder + '/tofita/tofita.asm.obj ',
-						config.tempFolder + '/tofita/tofita.obj ',
+						config.tempFolder + '/' + teaFolder + '/tofita.asm.obj ',
+						config.tempFolder + '/' + teaFolder + '/tofita.obj ',
 						'/out:',
-						config.tempFolder + '/tofita/tofita.exe'
+						config.tempFolder + '/' + teaFolder + '/tofita.exe'
 					].join(''), { stdio: 'inherit' }
 				)
 
@@ -339,15 +354,15 @@ for task in tasks {
 				}
 				// Create disk image
 				fs.copyFileSync(
-					slash(config.tempFolder + '\\tofita\\DISK.IMG'),
-					slash(config.tempFolder + '\\tofita\\iso\\DISK.IMG'))
+					folder + '\\DISK.IMG',
+					folder + '\\iso\\DISK.IMG')
 
-				let path = isUnix? config.tempFolder : '/cygdrive/' + config.tempFolder.split(':').join('')
+				let path = '/cygdrive/' + folder.split(':').join('')
 				require('child_process').execSync(
 					[
 						xorriso,
-						'-as mkisofs -o \(path)/tofita/greenteaos-uefi64.iso -iso-level 3',
-						'-V GreenteaOS \(path)/tofita/iso -append_partition 2 0xef \(path)/tofita/DISK.IMG',
+						'-as mkisofs -o \(path)/greenteaos-uefi64.iso -iso-level 3',
+						'-V GreenteaOS \(path)/iso -append_partition 2 0xef \(path)/DISK.IMG',
 						'-e --interval:appended_partition_2:all:: -no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
 				)
