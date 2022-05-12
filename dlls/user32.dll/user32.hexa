@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define USER32_DLL @dllExport
-import "user32.hpp"
-import "user32Vars.hpp"
-import "../kernel32.dll/kernel32.hpp"
+// Constants
+
+// TODO Test real limitation
+let classNameLimit = 256u32
 
 // Utils
 
@@ -144,12 +144,12 @@ fun createWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer, lpWindo
 	var windowId: UInt64 = tofitaCreateWindowEx(Pointer.of(payload))
 
 	window.windowId = windowId
-	window.windowIsWindow = user32.windowIsWindow
+	window.windowIsWindow = windowIsWindow
 	window.proc = wc.lpfnWndProc
 
 	// Initial paint
 	// TODO should be called somewhere else, in syscall of windows creation?
-	PostMessage(hWnd, Message.WM_PAINT, null, null)
+	postMessage(hWnd, Message.WM_PAINT, null, null)
 
 	tofitaDebugLog("CreateWindowExW done")
 	return hWnd
@@ -159,20 +159,18 @@ fun createWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer, lpWindo
 fun showWindow(hWnd: wapi.HWnd, nCmdShow: Int32): wapi.Bool {
 	tofitaDebugLog("ShowWindow called")
 	var window = handleToWindow(hWnd)
-	var result: Bool = 0
-	if (window != null) {
-		switch (nCmdShow) {
+	var result = Bool32.False
+	if window != null {
+		switch nCmdShow {
 		case SW_HIDE: {
 			tofitaShowWindow(window.windowId, nCmdShow)
-			result = 1
-			break
+			result = Bool32.True
 		}
 		case SW_SHOW:
 		case SW_SHOWNORMAL:
 		case SW_SHOWDEFAULT: {
 			tofitaShowWindow(window.windowId, nCmdShow)
-			result = 1
-			break
+			result = Bool32.True
 		}
 		case _: {
 			// TODO
@@ -198,7 +196,7 @@ fun getMessageW(msg: Pointer<wapi.Msg>, hWnd: wapi.HWnd, wMsgFilterMin: UInt32, 
 
 	// Stop iteration
 	if msg.message == Message.WM_QUIT {
-		result = 0
+		result = Bool32.False
 	}
 
 	tofitaDebugLog("GetMessageW done")
@@ -210,7 +208,7 @@ fun translateMessage(msg: Pointer<wapi.Msg>): wapi.Bool {
 	tofitaDebugLog("TranslateMessage called")
 	// TODO
 	tofitaDebugLog("TranslateMessage done")
-	return 0
+	return Bool32.False
 }
 
 @rename('DispatchMessageW')
@@ -249,8 +247,8 @@ fun postMessage(hWnd: wapi.HWnd, msg: wapi.Message, wParam: VoidPointer, lParam:
 @rename('PostQuitMessage')
 fun postQuitMessage(nExitCode: Int32): Void {
 	tofitaDebugLog("PostQuitMessage called")
-	PostMessage(null, Message.WM_QUIT, nExitCode as! VoidPointer, null)
 	tofitaDebugLog("PostQuitMessage done")
+	postMessage(null, Message.WM_QUIT, nExitCode as! VoidPointer, null)
 	// TODO ERROR_SUCCESS
 }
 
@@ -305,11 +303,11 @@ fun endPaint(hWnd: wapi.HWnd, ps: Pointer<wapi.PaintStruct>): wapi.Bool {
 	tofitaDebugLog("EndPaint called")
 	var window = handleToWindow(hWnd)
 	if window == null {
-		return 0
+		return Bool32.False
 	}
 	njraaSwapWindowFramebuffer(window.windowId, Pointer.of(window.fb))
 	tofitaDebugLog("EndPaint done")
-	return 1
+	return Bool32.True
 }
 
 @rename('DefWindowProcW')
@@ -332,5 +330,5 @@ fun defWindowProcW(wapi.HWnd hWnd, wapi.Message uMsg, Void *wParam, Void *lParam
 
 @rename('_DllMainCRTStartup')
 @fastcall fun _DllMainCRTStartup(): Void {
-	user32.rootClass.next = null
+	rootClass.next = null
 }

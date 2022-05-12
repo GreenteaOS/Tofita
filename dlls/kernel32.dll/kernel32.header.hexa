@@ -13,13 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "../ntdll.dll/ntdll.hpp"
-import "../tofita32.dll/tofita32.hpp"
-
-#ifndef KERNEL32_DLL
-#define KERNEL32_DLL __declspec(dllimport)
-#end
-
 KERNEL32_DLL Void ExitProcess(exitCode: UInt32)
 KERNEL32_DLL wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes)
 KERNEL32_DLL wapi.HGlobal GlobalAlloc(flags: UInt32, size_t bytes)

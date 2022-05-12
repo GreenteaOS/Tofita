@@ -13,11 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define KERNEL32_DLL @dllExport
-import "kernel32.hpp"
-import "kernel32Vars.hpp"
-
-Void ExitProcess(exitCode: UInt32) {
+fun exitProcess(exitCode: UInt32) {
 	tofitaExitProcess(exitCode)
 	while true {}
 }
@@ -30,7 +26,7 @@ wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes) {
 	// TODO how many bits exactly?
 	// TODO also pre-align at CRT startup, cause section may be misaligned
 	while kernel32.bufferOffset % 8 != 0 {
-		kernel32.bufferOffset++
+		bufferOffset++
 	}
 	return result as! HLocal
 }

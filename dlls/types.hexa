@@ -34,7 +34,7 @@ let error_success = 0 as! LResult
 let error_invalid_handle = 6 as! LResult
 let invalid_handle_value = -1 as! Handle
 
-enum Bool : Int32 {
+enum Bool32 : Int32 {
 	False = 0
 	True = 1
 }
@@ -55,11 +55,11 @@ class Rect {
 @struct
 class PaintStruct {
 	var hdc: HDc
-	var fErase: Bool
+	var fErase: Bool32
 	var rcPaint: Rect
-	var fRestore: Bool
-	var fIncUpdate: Bool
 	var rgbReserved[32]: UInt8
+	var fRestore: Bool32
+	var fIncUpdate: Bool32
 }
 
 enum Message : UInt32 {

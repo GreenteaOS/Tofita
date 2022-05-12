@@ -13,13 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#define NTDLL32_DLL @dllExport
-import "ntdll.hpp"
-import "../tofita32.dll/tofita32.cpp"
-import "ntdllVars.hpp"
-
-UInt64 KiFastSystemCall(rcx: UInt64, rdx: UInt64) {
 	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx)
+fun kiFastSystemCall(rcx: UInt64, rdx: UInt64): UInt64 {
 }
 
 Void greenteaosIsTheBest(Int32 (*entry)(), pid: UInt64) {

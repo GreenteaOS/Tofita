@@ -24,7 +24,7 @@ class ClassesLinkedList {
 var rootClass: ClassesLinkedList
 
 // TODO some HandleWrapper with handle type field?
-let windowIsWindow: UInt16= 0xA1CE
+let windowIsWindow: UInt16 = 0xA1CE
 
 @struct
 class Window {

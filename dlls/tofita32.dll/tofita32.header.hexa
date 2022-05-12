@@ -13,12 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "../../kernel/syscalls/syscalls.hpp"
-
-#ifndef TOFITA32_DLL
-#define TOFITA32_DLL __declspec(dllimport)
-#end
-
 // Tofita
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 TOFITA32_DLL UInt64 tofitaFastSystemCall(rcx: TofitaSyscalls, UInt64 rdx = 0)
@@ -26,7 +20,7 @@ TOFITA32_DLL UInt64 tofitaFastSystemCall(rcx: TofitaSyscalls, UInt64 rdx = 0)
 TOFITA32_DLL Void tofitaDebugLog(const message: Pointer<WideChar>, UInt64 extra = 0, UInt64 more = 0)
 
 // Kernel32
-TOFITA32_DLL Void tofitaExitProcess(exitCode: UInt32)
+declare fun tofitaExitProcess(exitCode: UInt32): Void
 
 // User32
 TOFITA32_DLL UInt64 tofitaCreateWindowEx(payload: Pointer<CreateWindowExPayload>)
