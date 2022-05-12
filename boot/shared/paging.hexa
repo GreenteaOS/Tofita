@@ -133,25 +133,33 @@ fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
 	initializePageHuge(entry, physicalAddr)
 }
 
-#define createMapping(fromTable, toTable)                                                                    \
-	Void map_##fromTable(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64,          \
-								UInt8 writeAllowed) {                                                      \
-		var toTable: Pointer<Void> = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, writeAllowed)           \
-		map_##toTable((PageEntry *)toTable, virtualAddr, physicalAddr, writeAllowed)                        \
-	}
+fun mapPD(pd: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+							writeAllowed: UInt8): Void {
+	var pt = getPage(pd, getLinearAddress(virtualAddr).pd, writeAllowed)
+	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
+}
 
-createMapping(pd, pt)
-createMapping(pdpt, pd)
-createMapping(pml4, pdpt)
+fun mapPDPT(pdpt: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+							writeAllowed: UInt8): Void {
+	var pd = getPage(pdpt, getLinearAddress(virtualAddr).pdpt, writeAllowed)
+	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
+}
 
-#define createHugeMapping(name, fromTable, calls, toTable)                                                   \
-	Void map_##name(PageEntry fromTable[], virtualAddr: UInt64, physicalAddr: UInt64) {             \
-		var toTable: Pointer<Void> = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1)                      \
-		map_##calls((PageEntry *)toTable, virtualAddr, physicalAddr)                                        \
-	}
+fun mapPML4(pml4: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+							writeAllowed: UInt8): Void {
+	var pdpt = getPage(pml4, getLinearAddress(virtualAddr).pml4, writeAllowed)
+	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
+}
 
-createHugeMapping(p3huge, pdpt, p2huge, pd)
-createHugeMapping(p4huge, pml4, p3huge, pdpt)
+fun mapP3Huge(pdpt: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64): Void {
+	var pd = getPage(pdpt, getLinearAddress(virtualAddr).pdpt, 1u8)
+	mapP2Huge(pd, virtualAddr, physicalAddr)
+}
+
+fun mapP4Huge(fromTable: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64): Void {
+	var pdpt = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1u8)
+	mapP3Huge(pdpt, virtualAddr, physicalAddr)
+}
 
 fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32, writeAllowed: UInt8) {
 	serialPrintln("[paging] mapping memory range")
@@ -217,7 +225,7 @@ UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
 	var offset: UInt64 = startOfMemoryMap
 
 	while offset < endOfMemoryMap {
-		numberOfPages += descriptor.NumberOfPages
+		numberOfPages += descriptor.numberOfPages
 
 		offset += descriptorSize
 		descriptor = getNextDescriptor(descriptor, descriptorSize)
@@ -230,7 +238,7 @@ UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
 fun mapEfi(memoryMap: EfiMemoryMap) {
 	serialPrintln("[paging] mapping efi")
 
-	const EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
+	var descriptor: EFI_MEMORY_DESCRIPTOR = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
 	var sum: UInt64 = 0
 
@@ -258,7 +266,7 @@ fun mapEfi(memoryMap: EfiMemoryMap) {
 var buffa[1]: UInt8 = {0}
 
 UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
-	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
+	var descriptor = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
 	var result: UInt64 = 0
 	var largestPages: UInt64 = 0
@@ -269,9 +277,9 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 
 	while offset < endOfMemoryMap {
 		// Note: > not >= cause we should have some extra space next to this
-		if descriptor.Type == EfiConventionalMemory, descriptor.NumberOfPages > largestPages {
-			largestPages = descriptor.NumberOfPages
-			result = descriptor.PhysicalStart
+		if descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory, descriptor.numberOfPages > largestPages {
+			largestPages = descriptor.numberOfPages
+			result = descriptor.physicalStart
 		}
 
 		offset += descriptorSize
