@@ -15,11 +15,22 @@
 
 Bitmap32 *loadPng32FromBuffer(data: Pointer<UInt8>, size: UInt32) {
 	Int32 width, height, png_bpp
+@deep
+@noGenerate
+declare fun stbi_load_from_memory(
+	data: Pointer<UInt8>,
+	size: UInt32,
+	width: Pointer<Int32>,
+	height: Pointer<Int32>,
+	png_bpp: Pointer<Int32>,
+	bytes: Int32
+): Pointer<UInt8>
+
 	var colors: Pointer<UInt8> = stbi_load_from_memory(data, size, Pointer.of(width), Pointer.of(height), Pointer.of(png_bpp), 4)
 	var bitmap: Pointer<Bitmap32> = allocateBitmap(width, height)
 
 	var rgba: Pointer<UInt32> = colors as! Pointer<UInt32>
-	for y in height
+	for y in height {
 		for x in width {
 			bitmap.pixels[y * width + x].color = rgba[y * width + x]
 			// This should be fixed in framebuffer? Or PNG really BGRA?
@@ -27,10 +38,11 @@ Bitmap32 *loadPng32FromBuffer(data: Pointer<UInt8>, size: UInt32) {
 			bitmap.pixels[y * width + x].rgba.r = bitmap.pixels[y * width + x].rgba.b
 			bitmap.pixels[y * width + x].rgba.b = temp
 		}
+	}
 
 	return bitmap
 }
 
-Bitmap32 *loadPng32(const asset: Pointer<RamDiskAsset>) {
+fun loadPng32(asset: RamDiskAsset): Bitmap32 {
 	return loadPng32FromBuffer(asset.data, asset.size)
 }

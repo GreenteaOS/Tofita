@@ -13,23 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "../devices/cpu/physical.hpp"
-import "util/String.hpp"
-import "../dlls/types.hpp"
-import "../devices/screen/framebuffer.hpp"
-import "../devices/ps2/mouse.hpp"
-import "../devices/ps2/polling.hpp"
-import "gui/dwm.hpp"
-import "gui/desktop.hpp"
-import "syscalls/syscalls.hpp"
-import "formats/lnk/lnk.hpp"
-import "../devices/cpu/pages.hpp"
-import "../devices/cpu/interrupts.hpp"
-import "../devices/cpu/seh.hpp"
-import "../devices/cpu/exceptions.hpp"
-import "process.hpp"
-import "syscalls/user32/userCall.hpp"
-import "gui/quake.hpp"
 
 // Globals
 
@@ -45,15 +28,3 @@ import "gui/quake.hpp"
 
 var uptimeMilliseconds: UInt64 = 0
 
-// Forward for global usage
-fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, Bool dark = true)
-struct Pixel32
-
-// TODO refactor to .hpp!
-UInt16 drawAsciiText(text: ConstPointer<Char8>, x: Float, y: Int16, color: Pixel32)
-fun quakePrintf(const c: Pointer<WideChar>, ...)
-fun guiThread()
-fun kernelThread()
-fun guiThreadStart()
-fun kernelThreadStart()
-fun kernelThreadLoop()

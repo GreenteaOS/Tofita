@@ -42,10 +42,9 @@
 	return 1.0f / y
 }
 
-@fastcall fun
-boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	var iarr: Float = (double)1.0 / (radius + radius + 1)
-	for (UInt16 i = 0; i < width; i++) {
+fun boxBlurT(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, radius: UInt8) {
+	for i in width {
 		var ti: UInt32 = i
 		var li: UInt32 = ti
 		var ri: UInt32 = ti + radius * width
@@ -113,8 +112,8 @@ boxBlurT(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 }
 
 @fastcall fun
-boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
 	var iarr: Float = (double)1.0 / (radius + radius + 1)
+boxBlurH(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, radius: UInt8) {
 	for i in height {
 		var ti: UInt32 = i * width
 		var li: UInt32 = ti
@@ -174,10 +173,10 @@ boxBlurH(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, he
 	}
 }
 
-@fastcall fun
-boxBlur(source: Pointer<Bitmap32>, target: Pointer<Bitmap32>, width: UInt16, height: UInt16, radius: UInt8) {
-	for i in source.width * source.height
+fun boxBlur(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, radius: UInt8) {
+	for i in source.width * source.height {
 		target.pixels[i].color = source.pixels[i].color
+	}
 	boxBlurH(target, source, width, height, radius)
 	boxBlurT(source, target, width, height, radius)
 }
@@ -203,8 +202,8 @@ fun boxesForGauss(sigma: Float, n: UInt8): Pointer<UInt8> {
 	return sizes
 }
 
-fun gaussBlur(bitmap: Pointer<Bitmap32>, radius: Float): Pointer<Bitmap32> {
-	var target: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
+fun gaussBlur(bitmap: Bitmap32, radius: Float): Bitmap32 {
+	var target: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
 
 	var boxes: Pointer<UInt8> = boxesForGauss(radius, 3)
 	boxBlur(bitmap, target, bitmap.width, bitmap.height, (boxes[0] - 1) / 2)
@@ -217,7 +216,7 @@ fun gaussBlur(bitmap: Pointer<Bitmap32>, radius: Float): Pointer<Bitmap32> {
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
 @fastcall fun
-interpolatePixel(bitmap: ConstPointer<Bitmap32>, x: Float32, y: Float32): PixelRGBAData {
+interpolatePixel(bitmap: Bitmap32, x: Float32, y: Float32): PixelRGBAData {
 	let px: UInt16 = x as! UInt16 // Same as floor(x)
 	let py: UInt16 = y as! UInt16 // Same as floor(y)
 	let stride: UInt16 = bitmap.width

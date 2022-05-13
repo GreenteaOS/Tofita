@@ -46,7 +46,7 @@ class ExeInterim {
 class PeExportLinkedList {
 	const Char8 *name
 	var ptr: UInt64
-	var next: Pointer<PeExportLinkedList>
+	var next: PeExportLinkedList
 	var hash: UInt8
 }
 
@@ -76,7 +76,7 @@ fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, ex
 		exec.nextBase = peOptionalHeader.imageBase
 	}
 
-	pages.mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
+	mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
 
 	let buffer: UInt64 = exec.nextBase
 	memset((Void *)buffer, 0, peOptionalHeader.sizeOfImage) // Zeroing
@@ -90,7 +90,8 @@ fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, ex
 	// TODO copy PE headers?
 	for i in peHeader.numberOfSections {
 		serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
-					 Pointer.of(imageSectionHeader[i].name), imageSectionHeader[i].sizeOfRawData,
+					 Pointer.of(imageSectionHeader[i].name),
+					 imageSectionHeader[i].sizeOfRawData,
 					 imageSectionHeader[i].virtualAddress)
 		var where: UInt64 = (buffer as! UInt64) + imageSectionHeader[i].virtualAddress
 
@@ -116,10 +117,10 @@ fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, ex
 		var codeBase: Pointer<UInt8> = (UInt8 *)buffer
 	if delta != 0 {
 
-		var relocation: PIMAGE_BASE_RELOCATION
+		var relocation: IMAGE_BASE_RELOCATION
 
-		PIMAGE_DATA_DIRECTORY directory =
 			(PIMAGE_DATA_DIRECTORY)Pointer.of(imageDataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC])
+		var directory =
 
 		if directory.size == 0 {
 			// return (delta == 0)
@@ -138,11 +139,11 @@ fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, ex
 
 				switch type {
 				case IMAGE_REL_BASED_ABSOLUTE:
-					// skip relocation
+					// Skip relocation
 					break
 
 				case IMAGE_REL_BASED_HIGHLOW:
-					// change complete 32 bit address
+					// Change complete 32 bit address
 					{
 						var patchAddrHL: Pointer<UInt32> = (UInt32 *)(dest + offset)
 						*patchAddrHL += (uint32_t)delta
@@ -169,7 +170,7 @@ fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, ex
 
 	// Exports
 
-	var tail: Pointer<PeExportLinkedList> = root
+	var tail: PeExportLinkedList = root
 	while tail.next != null {
 		tail = tail.next
 	}
@@ -222,7 +223,7 @@ fun loadDll(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, ex
 // may be moved between versions.
 // Search only selected .dll only within the user provided dlls
 PeExportLinkedList *getProcAddress(name: ConstPointer<Char8>, root: Pointer<PeExportLinkedList>) {
-	var list: Pointer<PeExportLinkedList> = root
+	var list: PeExportLinkedList = root
 	// TODO compute crc for faster .dll import names lookup
 	while list.next != null {
 		// Step upfront, to ignore empty root
@@ -247,7 +248,7 @@ PeExportLinkedList *getProcAddress(name: ConstPointer<Char8>, root: Pointer<PeEx
 	return null
 }
 
-fun resolveDllImports(pei: PeInterim, root: Pointer<PeExportLinkedList>) {
+fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
 	var buffer = pei.base
 	var imageDataDirectory = pei.imageDataDirectory
 
@@ -289,7 +290,7 @@ fun resolveDllImports(pei: PeInterim, root: Pointer<PeExportLinkedList>) {
 					// Resolve import
 					func = null
 
-					var proc: Pointer<PeExportLinkedList> = getProcAddress(szImportName, root)
+					var proc: PeExportLinkedList = getProcAddress(szImportName, root)
 
 						func = (Void *)proc.ptr
 						func = (Void *)getProcAddress(u8"tofitaFastStub", root).ptr
@@ -319,8 +320,8 @@ auto loadExe(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, e
 		let physical = PhysicalAllocator.allocatePages(pages)
 
 		let buffer: UInt64 = exec.nextBase
-		pages.mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
 		memset((Void *)buffer, 0, ei.pei.sizeOfStackReserve) // Zeroing
+		mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
 
 		exec.nextBase = exec.nextBase + pages * pageSize
 
@@ -330,14 +331,14 @@ auto loadExe(const name: Pointer<WideChar>, root: Pointer<PeExportLinkedList>, e
 	return ei
 }
 
-fun resolveExeImports(ei: ExeInterim, root: Pointer<PeExportLinkedList>) {
+fun resolveExeImports(ei: ExeInterim, root: PeExportLinkedList) {
 	resolveDllImports(ei.pei, root)
 }
 
 fun loadExeIntoProcess(const file: Pointer<WideChar>, process.process: Pointer<Process>) {
 	{
-		PeExportLinkedList *root =
 			(PeExportLinkedList *)PhysicalAllocator.allocateBytes(sizeof(PeExportLinkedList))
+		let root =
 		root.next = null
 		root.name = null
 		root.ptr = 0

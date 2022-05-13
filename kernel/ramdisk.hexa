@@ -21,8 +21,8 @@ class RamDiskInfo {
 }
 
 @struct
-	var path[128]: UInt16
 class RamDiskAssetInfo {
+	var path: ArrayByValue<UInt16, 128>
 	var size: UInt32
 	var offsetFromRamDiskFirstByte: UInt32
 }

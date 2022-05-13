@@ -42,27 +42,31 @@ auto distance(x1: Int16, y1: Int16, x2: Int16, y2: Int16) {
 }
 
 fun drawShadowBox(x: Int16, y: Int16, w: UInt16, h: UInt16) {
-	for iy in 16
+	for iy in 16 {
 		for ix in w {
 			shadow(x + ix, y - iy, 192 + iy * 4)
 			shadow(x + ix, y + iy + h, 192 + iy * 4)
 		}
-	for iy in h
+	}
+	for iy in h {
 		for ix in 16 {
 			shadow(x - ix, y + iy, 192 + ix * 4)
 			shadow(x + ix + w, y + iy, 192 + ix * 4)
 		}
-	for iy in 1...15
+	}
+	for iy in 1...15 {
 		for ix in 1...15 {
 			let dist = 192 + distance(x, y, x - ix, y - iy) * 4
 			if dist > 255 {
 				continue
 			}
+
 			shadow(x - ix, y - iy, dist)
 			shadow(x + ix + w - 1, y - iy, dist)
 			shadow(x + ix + w - 1, y - 1 + iy + h, dist)
 			shadow(x - ix, y - 1 + iy + h, dist)
 		}
+	}
 }
 
 fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
@@ -96,8 +100,8 @@ fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16
 	// rectangle(x + w - (45 + 1) * 3 + 23 - 4, y + 20, 8, 1, 0, 0, 0)
 	color.color = 0xFFFFB911u32
 
-	if hover == dwm.FrameHover.Min {
 		color.rgba.a = down ? 128 : 230
+	if hover == FrameHover.Min {
 		drawRectangleWithAlpha(color, x + w - (45 + 1) * 3 + 1, y + 1, 44, 29)
 		color.color = 0xFF000000u32
 	}
@@ -112,8 +116,8 @@ fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16
 	// color.rgba.r = color.rgba.g = color.rgba.b = 0
 	color.color = 0xFF59B842u32
 
-	if hover == dwm.FrameHover.Max {
 		color.rgba.a = down ? 128 : 240
+	if hover == FrameHover.Max {
 		drawRectangleWithAlpha(color, x + w - (45 + 1) * 2 + 1, y + 1, 44, 29)
 		color.color = 0xFF000000u32
 	}
@@ -133,8 +137,8 @@ fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16
 	// color.rgba.r = color.rgba.g = color.rgba.b = 255
 	color.color = 0xFFFF5557u32
 
-	if hover == dwm.FrameHover.Close {
 		color.rgba.a = down ? 128 : 240
+	if hover == FrameHover.Close {
 		drawRectangleWithAlpha(color, x + w - (45 + 1) * 1 + 1, y + 1, 44, 29)
 		color.color = 0xFF000000u32
 	}

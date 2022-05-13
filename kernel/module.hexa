@@ -29,8 +29,8 @@ class ModuleInterim {
 	var dll: RamDiskAsset
 }
 
-Module *loadModule(params: Pointer<ModuleInterim>) {
 	var module = (Module *)PhysicalAllocator.allocateBytes(sizeof(Module))
+fun loadModule(params: ModuleInterim): Module {
 	module.name = params.name // TODO copy string
 	module.dll = params.dll
 

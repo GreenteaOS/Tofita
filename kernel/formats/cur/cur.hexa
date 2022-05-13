@@ -13,7 +13,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun loadCursor(buffer: Buffer) {
+class Cursor {
+	var x: UInt16
+	var y: UInt16
+	var width: UInt8
+	var height: UInt8
+	var bmp: Pointer<UInt8> // TODO just Buffer?
+}
+
+fun loadCursor(buffer: Buffer): Cursor {
 	// Reserved. Must always be 0.
 	if buffer[0] != 0 {
 		return null
@@ -88,4 +96,18 @@ fun loadCursor(buffer: Buffer) {
 	cur.bmp = buffer.slice(start, start + imageSize)
 
 	return cur
+}
+
+fun drawCursor(cur: Cursor, x: UInt16, y: UInt16) {
+	// TODO mirror cursor in this code if global setting for cursors mirroring is set
+	// to affect all apps
+	let pixel: Pixel32 = new Pixel32()
+	for yi in cur.height {
+		for xi in cur.width {
+			let yy: UInt32 = cur.height - yi - 1u32
+			let bmp = cur.bmp
+			pixel.color = bmp[xi + yy * cur.width]
+			blendPixel(x + xi - cur.x + 1, y + yi - cur.y + 1, pixel)
+		}
+	}
 }

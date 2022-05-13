@@ -112,7 +112,7 @@ fun loadIcon(buffer: Buffer, width: Int) {
 		buffer[offset + 3] == 0x47
 	{
 		console.log('Decoding as PNG')
-		return loadPng(buffer.slice(offset))
+		return loadPng32FromBuffer(buffer.slice(offset).bytes)
 	}
 
 	console.log("Header at: %d %d %d %d", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])

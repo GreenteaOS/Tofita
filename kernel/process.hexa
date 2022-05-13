@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun Process_init(process: Pointer<Process>) {
-	process.pml4 = pages.newCR3(processes[0].pml4)
+fun processInit(process: Process) {
+	process.pml4 = newCR3(processes[0].pml4)
 	process.schedulable = false // Not yet ready
 	process.scheduleOnNextTick = false // Prevent DoS attack
 	memset(Pointer.of(process.frame), 0, sizeof(InterruptFrame)) // Zeroing
-	process.frame.cs = USER_CODE64_SEL + 3
-	process.frame.ss = USER_DATA32_SEL + 3
+	process.frame.cs = Selector.USER_CODE64_SEL_USER_MODE
+	process.frame.ss = Selector.USER_DATA32_SEL_USER_MODE
 	// process.frame.flags = 0x002 // No interrupts
 	process.frame.flags = 0x202
 	process.syscallToHandle = TofitaSyscalls.Noop
@@ -28,7 +28,7 @@ fun Process_init(process: Pointer<Process>) {
 	process.awaitsGetMessage = false
 }
 
-Process *Process_create() {
+fun processCreate(): Process {
 	var index: UInt64 = 0
 	while index < 255 {
 		index++
@@ -40,7 +40,7 @@ Process *Process_create() {
 		}
 	}
 
-	var process: Pointer<Process> = Pointer.of(process.processes[index])
+	var process: Process = processes[index]
 	process.pid = index
 	process.present = true // Occupied
 
@@ -50,11 +50,11 @@ Process *Process_create() {
 // Note: supposedly 10.000 system-wise
 let messagesBufferSize: UInt64 = 256
 
-wapi.Msg *getOrCreateMessagesBuffer(@volatile process: Pointer<Process>) {
 		const UInt64 bytes = sizeof(wapi.Msg) * messagesBufferSize
+fun getOrCreateMessagesBuffer(@volatile process: Process): /*TODO wapi.*/[Msg]? {
 	if process.messages == null {
 
-		process.messages = (wapi.Msg *)PhysicalAllocator.allocateBytes(bytes)
+		process.messages = []
 
 			memset((Void *)process.messages, 0, bytes)
 		if process.messages != PHYSICAL_NOT_FOUND {
@@ -79,7 +79,7 @@ Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessa
 		return false
 	}
 
-	var message: Pointer<Msg> = Pointer.of(messages[process.messagesUsed])
+	var message: Msg = messages[process.messagesUsed]
 
 	message.hwnd = payload.hWnd
 	message.message = payload.msg
@@ -118,8 +118,8 @@ Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessage
 	}
 
 	// TODO filters & hWnd
-	var message: Pointer<Msg> = Pointer.of(messages[0])
-	var target: Pointer<Msg> = payload.msg
+	var message: Msg = messages[0]
+	var target: Msg = payload.msg
 
 	target.hwnd = message.hwnd
 	target.message = message.message
@@ -141,15 +141,15 @@ Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessage
 	return true
 }
 
-fun Process_destroy(@volatile process: Pointer<Process>) {
+fun processDestroy(@volatile process: Process) {
 	// TODO deallocate stuff
 	process.present = false
 	process.messages = null
 
-	var window = dwm.OverlappedWindow_findAnyProcessWindow(process.pid)
+	var window = overlappedWindow_findAnyProcessWindow(process.pid)
 
 	while window != null {
-		dwm.OverlappedWindow_destroy(window.windowId)
-		window = dwm.OverlappedWindow_findAnyProcessWindow(process.pid)
+		overlappedWindow_destroy(window.windowId)
+		window = overlappedWindow_findAnyProcessWindow(process.pid)
 	}
 }

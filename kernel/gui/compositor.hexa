@@ -38,21 +38,22 @@ enum WallpaperStyle : UInt8 {
 	// TODO more options
 }
 
-fun setWallpaper(bitmap: Pointer<Bitmap32>, style: WallpaperStyle) {
+fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 
 	{
 		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size")
-		var upscale: Pointer<Bitmap32> = allocateBitmap(_framebuffer.width, _framebuffer.height)
+		var upscale: Bitmap32 = allocateBitmap(_framebuffer.width, _framebuffer.height)
 
 		float hReciprocal = 1.0f / (float)_framebuffer.height
 		float wReciprocal = 1.0f / (float)_framebuffer.width
 
-		for y in upscale.height
+		for y in upscale.height {
 			for x in upscale.width {
 				var rgba: PixelRGBAData = interpolatePixel(bitmap, (x * wReciprocal) * bitmap.width,
 													  (y * hReciprocal) * (bitmap.height - 8))
 				upscale.pixels[y * upscale.width + x].rgba = rgba
 			}
+		}
 
 		wallpaper = upscale
 		bitmap = wallpaper
@@ -63,33 +64,38 @@ fun setWallpaper(bitmap: Pointer<Bitmap32>, style: WallpaperStyle) {
 	var blurScale: UInt8 = 8
 
 	var downscale: Pointer<Bitmap32> = allocateBitmap(bitmap.width / blurScale - 1, bitmap.height / blurScale - 1 + 8)
+	)
 
-	for y in downscale.height - 8
-		for x in downscale.width
+	for y in downscale.height - 8 {
+		for x in downscale.width {
 			downscale.pixels[y * downscale.width + x].color =
 				bitmap.pixels[y * bitmap.width * blurScale + x * blurScale].color
+		}
+	}
 
 	// Fix
-	for y in downscale.height - 8 ... downscale.height
-		for x in downscale.width
+	for y in downscale.height - 8 ... downscale.height {
+		for x in downscale.width {
 			downscale.pixels[y * downscale.width + x].color =
 				bitmap.pixels[bitmap.width * (bitmap.height - 1) + x * blurScale].color
+		}
+	}
 
 	serialPrintln("[compositor.setWallpaper] blur")
 
-	var blur: Pointer<Bitmap32> = gaussBlur(downscale, 4)
+	var blur: Bitmap32 = gaussBlur(downscale, 4)
 
 	serialPrintln("[compositor.setWallpaper] upscale 8x")
 
 	// Upscale
-	var upscaleLight: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
-	var upscaleDark: Pointer<Bitmap32> = allocateBitmap(bitmap.width, bitmap.height)
-	var upscale: Pointer<Bitmap32> = upscaleDark
+	var upscaleLight: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
+	var upscaleDark: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
+	var upscale: Bitmap32 = upscaleDark
 
 	float hReciprocal = 1.0f / (float)upscale.height
 	float wReciprocal = 1.0f / (float)upscale.width
 
-	for y in upscale.height
+	for y in upscale.height {
 		for x in upscale.width {
 			PixelRGBAData rgbaSource =
 				interpolatePixel(downscale, (x * wReciprocal) * downscale.width,
@@ -102,20 +108,21 @@ fun setWallpaper(bitmap: Pointer<Bitmap32>, style: WallpaperStyle) {
 
 			{
 				var rgba: PixelRGBAData = rgbaSource
-				rgba.r = Blend255(rgba.r, 0, 168)
-				rgba.g = Blend255(rgba.g, 0, 168)
-				rgba.b = Blend255(rgba.b, 0, 168)
+				rgba.r = blend255(rgba.r, 0, 168)
+				rgba.g = blend255(rgba.g, 0, 168)
+				rgba.b = blend255(rgba.b, 0, 168)
 				upscaleDark.pixels[y * upscale.width + x].rgba = rgba
 			}
 
 			{
 				var rgba: PixelRGBAData = rgbaSource
-				rgba.r = Blend255(rgba.r, 255, 168)
-				rgba.g = Blend255(rgba.g, 255, 168)
-				rgba.b = Blend255(rgba.b, 255, 168)
+				rgba.r = blend255(rgba.r, 255, 168)
+				rgba.g = blend255(rgba.g, 255, 168)
+				rgba.b = blend255(rgba.b, 255, 168)
 				upscaleLight.pixels[y * upscale.width + x].rgba = rgba
 			}
 		}
+	}
 
 	vibranceDark = upscaleDark
 	vibranceLight = upscaleLight
@@ -143,28 +150,26 @@ fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, da
 	}
 }
 
-Bitmap32 *doublebuffer
+var doublebuffer: Bitmap32
 fun initializeCompositor() {
 	serialPrintln("[compositor.initializeCompositor] begin")
 	doublebuffer = allocateBitmap(_framebuffer.width, _framebuffer.height)
 	_pixels = doublebuffer.pixels
 
-	Bitmap32 *loadPng32(const asset: Pointer<RamDiskAsset>)
-
 	let a = getRamDiskAsset("root/Windows/Resources/Icons/leaves.png")
-	leaves = loadPng32(&a)
+	leaves = loadPng32(a)
 
 	let b = getRamDiskAsset("root/Windows/Resources/Icons/trash-empty48.png")
-	trashCan = loadPng32(&b)
+	trashCan = loadPng32(b)
 
 	let c = getRamDiskAsset("root/Windows/Resources/Icons/notepad.ico_48x48.png")
-	notepad48 = loadPng32(&c)
+	notepad48 = loadPng32(c)
 
 	let d = getRamDiskAsset("root/Windows/Resources/Icons/notepad.ico_16x16.png")
-	notepad16 = loadPng32(&d)
+	notepad16 = loadPng32(d)
 
 	let e = getRamDiskAsset("root/Windows/Resources/Icons/link.png")
-	link = loadPng32(&e)
+	link = loadPng32(e)
 
 	let asset = getRamDiskAsset("root/Windows/Cursors/aero_arrow.cur")
 	cur = cursor.loadCursor(Pointer.of(asset))
@@ -173,10 +178,10 @@ fun initializeCompositor() {
 }
 
 fun compositeWindows() {
-	var i = dwm.rootWindow
+	var i = rootWindow
 	// Avoid infinite loop
-	for loop in dwm.windowsLimit {
-		let window = Pointer.of(dwm.windowsList[i])
+	for loop in windowsLimit {
+		let window = windowsList[i]
 
 		if i != 0 && window.present && window.visible {
 			let hover = dwm.frameHoverWindow == i ? dwm.frameHoverState : dwm.FrameHover.Noop
@@ -198,7 +203,7 @@ fun compositeWindows() {
 			}
 		}
 
-		i = dwm.windowsList[i].nextId
+		i = windowsList[i].nextId
 		if i == 0 {
 			break
 		}
@@ -207,13 +212,12 @@ fun compositeWindows() {
 
 fun composite(startupMilliseconds: UInt64) {
 	// TODO not best place for this
-	dwm.handleMouseActivity()
-	dwm.handleKeyboardActivity()
 
 	let mouseX = dwm.mouseX
 	let mouseY = dwm.mouseY
+	handleMouseActivity()
+	handleKeyboardActivity()
 
-	var _framebuffer = ._framebuffer // Faster access
 
 	// Startup animation
 	if startupAnimation < 2000 {
@@ -240,7 +244,7 @@ fun composite(startupMilliseconds: UInt64) {
 	}
 
 	// Desktop below everything
-	desktop.compositeDesktop(mouseX, mouseY)
+	compositeDesktop(mouseX, mouseY)
 
 	// Windows below taskbar
 	compositeWindows()

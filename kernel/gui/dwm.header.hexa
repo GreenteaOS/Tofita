@@ -29,7 +29,7 @@ class OverlappedWindow {
 	var hWnd: HWnd
 
 	var visible: Bool
-	var title: ConstWideCharPointer
+	var title: String
 
 	var x: Int16
 	var y: Int16
@@ -39,15 +39,14 @@ class OverlappedWindow {
 
 	// fb.pixels == null if framebuffer not present
 	// Note: fb size may be != current window size
-	var fbZeta: Pointer<Bitmap32>
-	var fbGama: Pointer<Bitmap32>
+	var fbZeta: Bitmap32
+	var fbGama: Bitmap32
 	var fbCurrentZeta: Bool // Use to swap chain
 }
 
-const UInt64 windowsLimit = 256
 
 // TODO allocate dynamically (just use Hexa Array or something)
-OverlappedWindow windowsList[windowsLimit]
+let windowsList: [OverlappedWindow] = []
 
 var rootWindow: UInt64 = 0
 var topmostWindow: UInt64 = 0
@@ -72,13 +71,3 @@ var frameHoverWindow: UInt64 = 0
 var frameHoverWindowDown: Bool = false
 var frameHoverState: FrameHover = FrameHover.Noop
 
-OverlappedWindow *OverlappedWindow_create(pid: UInt64)
-OverlappedWindow *OverlappedWindow_findAnyProcessWindow(pid: UInt64)
-OverlappedWindow *OverlappedWindow_find(pid: UInt64, windowId: UInt64)
-fun OverlappedWindow_detach(windowId: UInt64)
-fun OverlappedWindow_attach(windowId: UInt64)
-fun OverlappedWindow_destroy(windowId: UInt64)
-fun initDwm()
-fun handleMouseActivity()
-fun handleKeyboardActivity()
-UInt64 findWindowUnderCursor(Int16 mouseX, mouseY: Int16)

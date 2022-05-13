@@ -22,10 +22,10 @@ var quakeLine: UInt8 = 0
 var quakeRow: UInt8 = 0
 var quakeAdvance: Float = 0.0
 var quakeCommandSize: UInt8 = 0
-var haveToQuake: UInt8 = 0
+var haveToQuake: Bool = false
 
 fun quake() {
-	if haveToQuake == 0 {
+	if haveToQuake == false {
 		return
 	}
 
@@ -91,7 +91,7 @@ fun quakeHandleButtonDown(key: UInt8) {
 }
 
 fun qsod(const format: Pointer<WideChar>, extra: UInt64, const UInt64 more) {
-	haveToQuake = 1
+	haveToQuake = true
 	quakePrintf("Kernel stopped working. Please, reboot.\n")
 	quakePrintf(format, extra, more)
 }
@@ -135,8 +135,6 @@ fun _quake_newline() {
 }
 
 UInt8 __cdecl _quake_putchar(const UInt8 c) {
-	Float getCharAdvance(const Char8 c)
-
 	if c != 0 {
 		putchar(c) // Copy to serial log
 		if (c == '\n') {
@@ -155,14 +153,14 @@ UInt8 __cdecl _quake_putchar(const UInt8 c) {
 		}
 		return c
 	}
-	return EOF
+	return 0
 }
 
 Int32 _quake_puts(const string: Pointer<UInt8>) {
 	var i: Int32 = 0
 	while string[i] != 0 {
-		if _quake_putchar(string[i]) == EOF {
-			return EOF
+		if _quake_putchar(string[i]) == 0 {
+			return 0
 		}
 		i++
 	}
@@ -175,6 +173,7 @@ fun quakePrintHex(n: UInt64) {
 	for i in 16 {
 		buf[i] = '0'
 	}
+
 	do {
 		bp--
 		var mod: UInt8 = n % 16
@@ -185,6 +184,7 @@ fun quakePrintHex(n: UInt64) {
 		}
 		n /= 16
 	} while (n != 0)
+
 	for i in 16 {
 		_quake_putchar(buf[i])
 	}

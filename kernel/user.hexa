@@ -19,6 +19,6 @@
 // Note: Toast sandbox has it's own set of users
 @struct
 class User {
-	const Char8 *name
+	var name: String
 	var sandbox: Pointer<Sandbox>
 }

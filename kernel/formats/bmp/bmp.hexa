@@ -36,7 +36,7 @@ fun loadBitMap24(buffer: Buffer) {
 	// Mirror vertical
 	let pixels = Buffer.alloc(bmp.width * bmp.height * 4)
 
-	for (y in bmp.height)
+	for y in bmp.height {
 		for x in bmp.width {
 			let off1 = ((bmp.height - y - 1) * bmp.width + x) * 3
 			let off2 = (y * bmp.width + x) * 4
@@ -45,6 +45,7 @@ fun loadBitMap24(buffer: Buffer) {
 			pixels[off2 + 2] = bmp.pixels[off1 + 2]
 			pixels[off2 + 3] = 0xFF
 		}
+	}
 
 	bmp.pixels = pixels
 	return bmp

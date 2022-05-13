@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun userCallHandled(@volatile process: Pointer<Process>, syscall: TofitaSyscalls): Bool {
-	@volatile var frame = Pointer.of(process.frame)
+fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
+	@volatile var frame = process.frame
 
 	if syscall == TofitaSyscalls.CreateWindowEx {
 		if !probeForReadOkay(frame.rdxArg1, sizeof(CreateWindowExPayload)) {
@@ -31,13 +31,13 @@ fun userCallHandled(@volatile process: Pointer<Process>, syscall: TofitaSyscalls
 			serialPrintf("<> lpWindowName == %S\n", payload.lpWindowName)
 		}
 
-		var window = dwm.OverlappedWindow_create(process.pid)
+		var window = overlappedWindow_create(process.pid)
 
 		window.hWnd = payload.hWnd
 
 		// TODO proper probe method, probably separate probeForWideCharOkay
 		if probeForReadOkay((payload.lpWindowName as! UInt64), 8) {
-			window.title = String.duplicate(payload.lpWindowName)
+			window.title = String.fromUTF16z(payload.lpWindowName)
 		}
 
 		frame.raxReturn = window.windowId
@@ -54,12 +54,12 @@ fun userCallHandled(@volatile process: Pointer<Process>, syscall: TofitaSyscalls
 		let payload = frame.rdxArg1 as! ShowWindowPayload
 
 		let windowId: UInt64 = payload.windowId
-		let nCmdShow: Int32 = payload.nCmdShow
-		var window = dwm.OverlappedWindow_find(process.pid, windowId)
+		let nCmdShow = payload.nCmdShow
+		var window = overlappedWindow_find(process.pid, windowId)
 
 		if window != null {
 			window.visible = true
-			dwm.OverlappedWindow_attach(windowId)
+			overlappedWindow_attach(windowId)
 		}
 
 		process.schedulable = true
@@ -80,7 +80,7 @@ fun userCallHandled(@volatile process: Pointer<Process>, syscall: TofitaSyscalls
 		frame.raxReturn = process.getMessage(process, payload)
 
 		// Should sorts of loop forever
-		if frame.raxReturn {
+		if frame.raxReturn != 0 {
 			process.schedulable = true
 		} else {
 			// process.syscallToHandle = TofitaSyscalls.GetMessage
@@ -117,7 +117,7 @@ fun userCallHandled(@volatile process: Pointer<Process>, syscall: TofitaSyscalls
 		var windowId: UInt64 = payload.windowId
 
 		var fb = payload.fb as! WindowFramebuffer
-		var window = dwm.OverlappedWindow_find(process.pid, windowId)
+		var window = overlappedWindow_find(process.pid, windowId)
 
 		if window == null {
 			return false
@@ -172,7 +172,7 @@ fun userCallHandled(@volatile process: Pointer<Process>, syscall: TofitaSyscalls
 		var windowId: UInt64 = payload.windowId
 
 		var fb = payload.fb
-		var window = dwm.OverlappedWindow_find(process.pid, windowId)
+		var window = overlappedWindow_find(process.pid, windowId)
 
 		if window == null {
 			return false
