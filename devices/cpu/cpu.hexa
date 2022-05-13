@@ -15,34 +15,34 @@
 
 // Bindings to the .asm
 
-declare fun enterKernelMode()
-declare fun selectSegment()
-declare fun enterUserMode()
-declare fun timerInterrupt()
-declare fun syscallInterrupt()
-declare fun yieldInterrupt()
+declare fun enterKernelMode(): Void
+declare fun selectSegment(): Void
+declare fun enterUserMode(): Void
+declare fun timerInterrupt(): Void
+declare fun syscallInterrupt(): Void
+declare fun yieldInterrupt(): Void
 @volatile declare fun getCr2(): UInt64
 @volatile declare fun sehReturnFalse(): Bool
 
-declare fun cpu0x00()
-declare fun cpu0x01()
-declare fun cpu0x02()
-declare fun cpu0x03()
-declare fun cpu0x04()
-declare fun cpu0x05()
-declare fun cpu0x06()
-declare fun cpu0x07()
-declare fun cpu0x08()
-declare fun cpu0x09()
-declare fun cpu0x0A()
-declare fun cpu0x0B()
-declare fun cpu0x0C()
-declare fun cpu0x0D()
-declare fun cpu0x0E()
-declare fun cpu0x0F()
-declare fun cpu0x10()
-declare fun cpu0x11()
-declare fun cpu0x12()
-declare fun cpu0x13()
-declare fun cpu0x14()
-declare fun cpu0x15()
+declare fun cpu0x00(): Void
+declare fun cpu0x01(): Void
+declare fun cpu0x02(): Void
+declare fun cpu0x03(): Void
+declare fun cpu0x04(): Void
+declare fun cpu0x05(): Void
+declare fun cpu0x06(): Void
+declare fun cpu0x07(): Void
+declare fun cpu0x08(): Void
+declare fun cpu0x09(): Void
+declare fun cpu0x0A(): Void
+declare fun cpu0x0B(): Void
+declare fun cpu0x0C(): Void
+declare fun cpu0x0D(): Void
+declare fun cpu0x0E(): Void
+declare fun cpu0x0F(): Void
+declare fun cpu0x10(): Void
+declare fun cpu0x11(): Void
+declare fun cpu0x12(): Void
+declare fun cpu0x13(): Void
+declare fun cpu0x14(): Void
+declare fun cpu0x15(): Void

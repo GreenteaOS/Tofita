@@ -29,12 +29,12 @@
 }
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
-declare fun writeCr3(value: UInt64)
+declare fun writeCr3(value: UInt64): Void
 // TODO asm("invd")
-declare fun halt()
-declare fun enableAllInterrupts()
+declare fun halt(): Void
+declare fun enableAllInterrupts(): Void
 // Except non-mascable
-declare fun disableAllInterrupts()
-declare fun enableAllInterruptsAndHalt()
-declare fun pause()
-declare fun yield()
+declare fun disableAllInterrupts(): Void
+declare fun enableAllInterruptsAndHalt(): Void
+declare fun pause(): Void
+declare fun yield(): Void
