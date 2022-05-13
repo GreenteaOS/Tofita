@@ -141,10 +141,10 @@ fun handleKeyboardPacket() {
 	}
 
 	// Note: Quake terminal has higher priority than kernel itself
-	if keyboardPressedState[41] {
+	if keyboardPressedState[41] != 0 {
 		haveToQuake = !haveToQuake
 		// TODO DWM
-		haveToRender = 1
+		haveToRender = true
 	}
 
 	// keyDownHandler = null

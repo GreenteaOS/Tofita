@@ -13,8 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-static const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.descriptor: Pointer<EFI_MEMORY_DESCRIPTOR>,
-	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
-	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
-														  descriptorSize: UInt64) {
+fun getNextDescriptor(descriptor: @readonly EFI_MEMORY_DESCRIPTOR, descriptorSize: UInt64): EFI_MEMORY_DESCRIPTOR {
+	let desc = (descriptor as! UInt64) + descriptorSize
+	return desc as! @readonly EFI_MEMORY_DESCRIPTOR
 }

@@ -22,18 +22,18 @@ fun exceptionHandler(frame: InterruptFrame) {
 		cr2 = getCr2()
 	}
 
-	if currentThread == THREAD_USER {
-		@volatile process.Process *process = Pointer.of(process.processes[process.currentProcess])
+	if currentThread == ThreadKind.THREAD_USER {
+		@volatile let process: Process = processes[currentProcess]
 		process.schedulable = false
 		process.syscallToHandle = TofitaSyscalls.Cpu
 		process.cr2PageFaultAddress = cr2
 		switchToKernelThread(frame)
-	} else if currentThread == THREAD_GUI {
 		frame.ip = (uint64_t)Pointer.of(kernelThreadLoop)
-		@volatile process.Process *process = Pointer.of(process.processes[0])
+	} else if currentThread == ThreadKind.THREAD_GUI {
+		@volatile let process: Process = processes[0]
 		process.cr2PageFaultAddress = cr2
 		qsod("THREAD_GUI unhandled CPU exception: index = %u, code = %8\n", frame.index, frame.code)
-	} else if currentThread == THREAD_KERNEL {
+	} else if currentThread == ThreadKind.THREAD_KERNEL {
 		// SEH
 		if sehProbe {
 			frame.ip = (uint64_t)Pointer.of(sehReturnFalse)
@@ -42,7 +42,7 @@ fun exceptionHandler(frame: InterruptFrame) {
 		}
 
 		frame.ip = (uint64_t)Pointer.of(kernelThreadLoop)
-		@volatile process.Process *process = Pointer.of(process.processes[0])
+		@volatile let process: Process = processes[0]
 		process.cr2PageFaultAddress = cr2
 		qsod("THREAD_KERNEL unhandled CPU exception: index = %u, code = %8\n", frame.index, frame.code)
 	}

@@ -53,11 +53,11 @@ class PhysicalAllocator {
 		countUser = count - kernel_reserved_pages
 		last = physical_not_found
 
-		memset((Void *)buffer, page_reserved, count)
+		memset(buffer, page_reserved, count)
 
 		// Reserve UEFI memory map
 		{
-			const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
+			var descriptor: EFI_MEMORY_DESCRIPTOR = memoryMap.memoryMap
 			let descriptorSize: UInt64 = memoryMap.descriptorSize
 			var numberOfPages: UInt64 = 0
 
@@ -66,9 +66,9 @@ class PhysicalAllocator {
 			var offset: UInt64 = startOfMemoryMap
 
 			while offset < endOfMemoryMap {
-				let kind = (descriptor.Type == efi.EfiConventionalMemory) ? page_free : page_reserved
-				let where = down_bytes_to_pages(descriptor.PhysicalStart)
-				let steps = descriptor.NumberOfPages
+				let kind = (descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory) ? page_free : page_reserved
+				let where = down_bytes_to_pages(descriptor.physicalStart)
+				let steps = descriptor.numberOfPages
 
 				if kind == page_reserved {
 					serialPrintf("[physical] Reserve %u pages from %u page\n", steps, where)
@@ -82,7 +82,7 @@ class PhysicalAllocator {
 				}
 
 				offset += descriptorSize
-				descriptor = efi.getNextDescriptor(descriptor, descriptorSize)
+				descriptor = getNextDescriptor(descriptor, descriptorSize)
 			}
 		}
 
@@ -123,7 +123,7 @@ class PhysicalAllocator {
 		}
 	}
 
-// Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
+	// TODO Must test as (buffer[_] != PAGE_FREE) == PAGE_RESERVED
 	// 31-bit addressable, first 2 GB of RAM
 	// Required by some hardware
 	// We assume this by-default
@@ -131,7 +131,7 @@ class PhysicalAllocator {
 	// TODO fill pages in reverse so I can traverse bitmap from zero?
 
 	// Returns physical 64-bit address, not page number
-	static UInt64 allocateOnePage() {
+	static fun allocateOnePage(): UInt64 {
 		if last != physical_not_found {
 			let where = last
 			last = physical_not_found
@@ -300,6 +300,6 @@ class PhysicalAllocator {
 	}
 }
 
-UInt64 allocateBytes(bytes: UInt64) {
+fun allocateBytes(bytes: UInt64): UInt64 {
 	return PhysicalAllocator.allocateBytes(bytes)
 }

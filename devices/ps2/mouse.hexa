@@ -30,7 +30,7 @@ enum MouseActionType : UInt8 {
 
 @volatile var lockMouse = false
 @volatile var mouseCycle: UInt8 = 0
-@volatile UInt8 mouseByte[3] = {0}
+@volatile let mouseByte: ArrayByValue<UInt8, 3> = [0]
 
 // Note: those are controlled by driver
 @volatile var leftDown = false
@@ -91,12 +91,10 @@ fun handleMousePacket() {
 			mouseCycle++ // Only accept this as the first byte if the "must be 1" bit is set
 		}
 		// mouseCycle++
-		break
 	}
 	case 1: {
 		mouseByte[1] = mouseRead()
 		mouseCycle++
-		break
 	}
 	case 2: {
 		mouseByte[2] = mouseRead()
@@ -161,8 +159,6 @@ fun handleMousePacket() {
 		leftDown = left
 		rightDown = right
 		middleDown = middle
-
-		break
 	}
 	}
 

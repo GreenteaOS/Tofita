@@ -18,7 +18,7 @@
 // Speed of rendering mostly depends on cache-locality
 // Remember: top-down, left-to-right: for(y) for(x) {}, not other way!
 
-Framebuffer *_framebuffer
+var _framebuffer: Framebuffer
 
 // Avoid one level of pointer indirection
 Pixel32 *_pixels
@@ -41,7 +41,7 @@ fun Mul255(a255, c255) return (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
 fun Blend255(target, color, alpha) return (Mul255(alpha, color) + Mul255(255 - alpha, target))
 
 @fastcall fun  blendPixel(x: Int16, y: Int16, pixel: Pixel32) {
-	var _framebuffer = ._framebuffer // Faster access
+	var _framebuffer = _framebuffer // Faster access
 	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
 		return
 	}
@@ -55,14 +55,14 @@ fun Blend255(target, color, alpha) return (Mul255(alpha, color) + Mul255(255 - a
 }
 
 @fastcall fun  setPixel(x: Int16, y: Int16, pixel: Pixel32) {
-	var _framebuffer = ._framebuffer // Faster access
+	var _framebuffer = _framebuffer // Faster access
 	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
 		return
 	}
 	_pixels[y * _framebuffer.width + x] = pixel
 }
 
-fun drawBitmap32WithAlpha(bitmap: Pointer<Bitmap32>, x: UInt16, y: UInt16) {
+fun drawBitmap32WithAlpha(bitmap: Bitmap32, x: UInt16, y: UInt16) {
 	for yy in bitmap.height {
 		for xx in bitmap.width {
 			blendPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
@@ -70,7 +70,7 @@ fun drawBitmap32WithAlpha(bitmap: Pointer<Bitmap32>, x: UInt16, y: UInt16) {
 	}
 }
 
-fun drawBitmap32(bitmap: Pointer<Bitmap32>, x: UInt16, y: UInt16) {
+fun drawBitmap32(bitmap: Bitmap32, x: UInt16, y: UInt16) {
 	for yy in bitmap.height {
 		for xx in bitmap.width {
 			setPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])

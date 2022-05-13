@@ -15,8 +15,8 @@
 
 @struct
 class CPUID {
-	var vendorID[13]: Char8 = {0}
-	var brandName[48]: Char8 = {0}
+	var vendorID: ArrayByValue<Char8, 13> = [0]
+	var brandName: ArrayByValue<Char8, 48> = [0]
 	var data: UInt32 = 0
 	var extras: UInt32 = 0
 }
@@ -26,21 +26,42 @@ let cpuidExtendedLevels: UInt32 = 0x80000000
 fun getCPUID(): CPUID {
 	var result: CPUID
 	var stub: UInt32 = 0
-	amd64.cpuid(0, 0, Pointer.of(result.data), (UInt32 *)(Pointer.of(result.vendorID[0])), (UInt32 *)(Pointer.of(result.vendorID[8])),
-				 (UInt32 *)(Pointer.of(result.vendorID[4])))
+	cpuid(
+		0,
+		0,
+		Pointer.of(result.data),
+		(Pointer.of(result.vendorID[0])) as! Pointer<UInt32>,
+		(Pointer.of(result.vendorID[8])) as! Pointer<UInt32>,
+		(Pointer.of(result.vendorID[4])) as! Pointer<UInt32>
+	)
 
-	amd64.cpuid(cpuidExtendedLevels, 0, Pointer.of(result.extras), Pointer.of(stub), Pointer.of(stub), Pointer.of(stub))
+	cpuid(cpuidExtendedLevels, 0, Pointer.of(result.extras), Pointer.of(stub), Pointer.of(stub), Pointer.of(stub))
 
-		amd64.cpuid(cpuidExtendedLevels + 2, 0, (UInt32 *)(Pointer.of(result.brandName[0])),
-					 (UInt32 *)(Pointer.of(result.brandName[4])), (UInt32 *)(Pointer.of(result.brandName[8])),
-					 (UInt32 *)(Pointer.of(result.brandName[12])))
-		amd64.cpuid(cpuidExtendedLevels + 3, 0, (UInt32 *)(Pointer.of(result.brandName[16])),
-					 (UInt32 *)(Pointer.of(result.brandName[20])), (UInt32 *)(Pointer.of(result.brandName[24])),
-					 (UInt32 *)(Pointer.of(result.brandName[28])))
-		amd64.cpuid(cpuidExtendedLevels + 4, 0, (UInt32 *)(Pointer.of(result.brandName[32])),
-					 (UInt32 *)(Pointer.of(result.brandName[36])), (UInt32 *)(Pointer.of(result.brandName[40])),
-					 (UInt32 *)(Pointer.of(result.brandName[44])))
 	if result.extras >= cpuidExtendedLevels + 4 {
+		cpuid(
+			cpuidExtendedLevels + 2,
+			0,
+			(Pointer.of(result.brandName[0])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[4])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[8])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[12])) as! Pointer<UInt32>
+		)
+		cpuid(
+			cpuidExtendedLevels + 3,
+			0,
+			(Pointer.of(result.brandName[16])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[20])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[24])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[28])) as! Pointer<UInt32>
+		)
+		cpuid(
+			cpuidExtendedLevels + 4,
+			0,
+			(Pointer.of(result.brandName[32])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[36])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[40])) as! Pointer<UInt32>,
+			(Pointer.of(result.brandName[44])) as! Pointer<UInt32>
+		)
 	}
 
 	var i = 0

@@ -16,7 +16,7 @@
 @struct @sizeOf(0xb0 + 128)
 class InterruptFrame {
 	// SSE
-	@volatile var xmm[8: UInt64 * 2]
+	@volatile var xmm: ArrayByValue<UInt64, 16>
 
 	@volatile var r15: UInt64
 	@volatile var r14: UInt64
@@ -50,13 +50,13 @@ class InterruptFrame {
 }
 
 // Scheduling
-let thread_init: UInt8 = 0 // kernelMain, it will be destroyed
-let thread_gui: UInt8 = 1
-let thread_kernel: UInt8 = 2
-let thread_user: UInt8 = 3
+enum ThreadKind : UInt8 {
+	THREAD_INIT = 0 // kernelMain, it will be destroyed
+	THREAD_GUI = 1
+	THREAD_KERNEL = 2
+	THREAD_USER = 3
+}
 
-@volatile var currentThread: UInt8 = thread_init
+@volatile var currentThread: ThreadKind = ThreadKind.THREAD_INIT
 
 var kernelThreadFrame = new InterruptFrame()
-
-fun switchToKernelThread(@volatile frame: Pointer<InterruptFrame>)

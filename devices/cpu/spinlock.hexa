@@ -15,6 +15,14 @@
 
 // Based on https://forum.osdev.org/viewtopic.php?f=8&t=30052
 
+declare fun __sync_bool_compare_and_swap(
+	compVal: UInt32,
+	exchVal: UInt32
+): Bool
+
+declare fun __sync_lock_release(
+): Void
+
 @struct @sizeOf(4)
 class Spinlock {
 	// TODO is it faster to use uint8_t?
@@ -25,7 +33,7 @@ class Spinlock {
 		// TODO yield to another process
 		while !__sync_bool_compare_and_swap(Pointer.of(value), 0, 1) {
 			while value {
-				amd64.pause()
+				pause()
 			}
 		}
 	}

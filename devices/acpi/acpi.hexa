@@ -207,11 +207,11 @@ class ACPIParser {
 		serialPrintf("\n[DUMP] %s: ", msg)
 		const Char8 *x = (Char8 *)(virtualAddress as! UInt64)
 		const UInt8 *y = (UInt8 *)(virtualAddress as! UInt64)
-		for (Int32 j = 0; j < 8; ++j) {
-			var buffer[2]: WideChar
 			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?' : x[j]
 			buffer[1] = (char8_t)0
 
+		for j in 8 {
+			var buffer: ArrayByValue<WideChar, 2>
 			serialPrint(buffer)
 		}
 
@@ -225,7 +225,7 @@ class ACPIParser {
 
 		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", acpiValidate(xsdt))
 
-		var sig[5]: Char8 = {0, 0, 0, 0, 0}
+		var sig: ArrayByValue<Char8, 5> = [0, 0, 0, 0, 0]
 		serialPrintf("[ACPI] ACPI 2.0+ tables loading\n")
 		acpi.put_sig(sig, xsdt.header.type)
 		serialPrintf("[ACPI] Found table %s\n", sig)
@@ -260,12 +260,12 @@ class ACPIParser {
 		quakePrintf("done.\n")
 	}
 
-	static fun loadApic(const acpi.apic: Pointer<AcpiApic>) {
 		var local: Pointer<UInt32> = reinterpret_cast<UInt32 *>(apic.localAddress)
+	static fun loadApic(apic: AcpiApic) {
 		serialPrintf("loadApic\n")
 	}
 
-	static fun loadMcfg(const acpi.mcfg: Pointer<AcpiMcfg>) {
+	static fun loadMcfg(mcfg: AcpiMcfg) {
 		serialPrintf("loadMcfg\n")
 		var count: UInt64 = acpiTableEntries(mcfg, sizeof(acpi.AcpiMcfgEntry))
 		var mPci: [PciGroup] = []
