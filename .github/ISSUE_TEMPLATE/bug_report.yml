@@ -52,7 +52,5 @@ body:
       label: Agreements
       description: By submitting this issue, you agree to follow our __Contributing Guidelines__ and __Code of Conduct__
       options:
-        - label: I agree to follow this project's [__Contributing Guidelines__](https://github.com/GreenteaOS/.github/blob/kawaii/CONTRIBUTING.md)
-          required: true
         - label: I agree to follow this project's [__Code of Conduct__](https://github.com/GreenteaOS/.github/blob/kawaii/CODE_OF_CONDUCT.md)
           required: true
