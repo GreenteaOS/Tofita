@@ -1,0 +1,43 @@
+name: 'Feature proposal'
+about: 'Suggest an idea for the Tofita kernel'
+labels: enhancement
+body:
+  - type: textarea
+    id: formulation
+    attributes:
+      label: Is your feature request related to a Tofita kernel specifically? Please describe
+      description: A clear and concise description of what the idea is
+      placeholder: |
+        I would like Tofita kernel to be capable of [...]
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered
+  - type: textarea
+    id: possible-impacts
+    attributes:
+      label: Describe the possible impacts for the developers and users
+      description: A clear and concise description of possible impacts
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here
+  - type: checkboxes
+    id: agreements
+    attributes:
+      label: Agreements
+      description: By submitting this issue, you agree to follow our __Contributing Guidelines__ and __Code of Conduct__
+      options:
+        - label: I agree to follow this project's [__Contributing Guidelines__](https://github.com/GreenteaOS/.github/blob/kawaii/CONTRIBUTING.md)
+          required: true
+        - label: I agree to follow this project's [__Code of Conduct__](https://github.com/GreenteaOS/.github/blob/kawaii/CODE_OF_CONDUCT.md)
+          required: true
