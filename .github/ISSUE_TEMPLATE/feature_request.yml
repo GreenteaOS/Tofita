@@ -1,5 +1,5 @@
 name: 'Feature proposal'
-about: 'Suggest an idea for the Tofita kernel'
+description: 'Suggest an idea for the Tofita kernel'
 labels: enhancement
 body:
   - type: textarea
