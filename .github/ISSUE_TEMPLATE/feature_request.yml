@@ -1,14 +1,14 @@
 name: 'Feature proposal'
-about: 'Suggest an idea for this project'
+about: 'Suggest an idea for the Tofita kernel'
 labels: enhancement
 body:
   - type: textarea
     id: formulation
     attributes:
-      label: Is your feature request related to a problem? Please describe
-      description: A clear and concise description of what the problem is
+      label: Is your feature request related to a Tofita kernel specifically? Please describe
+      description: A clear and concise description of what the idea is
       placeholder: |
-        I had a situation, when [...]
+        I would like Tofita kernel to be capable of [...]
     validations:
       required: true
   - type: textarea
@@ -24,8 +24,8 @@ body:
   - type: textarea
     id: possible-impacts
     attributes:
-      label: Describe the possible impacts for development
-      description: A clear and concise description of possible impacts for development
+      label: Describe the possible impacts for the developers and users
+      description: A clear and concise description of possible impacts
   - type: textarea
     id: additional
     attributes:
