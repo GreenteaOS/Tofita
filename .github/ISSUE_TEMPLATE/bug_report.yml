@@ -28,8 +28,6 @@ body:
       description: Please complete the following information
       placeholder: |
         - Device
-        - Operation system
-        - Browser
         - Version
     validations:
       required: true
