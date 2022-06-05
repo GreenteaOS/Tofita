@@ -2,7 +2,7 @@
 
 ![Tofita Logo](docs/logo.png?raw=true)
 
-All-new kernel for the [Greentea OS](https://github.com/GreenteaOS)
+All-new kernel to-fit-a [Greentea OS](https://github.com/GreenteaOS) (hence "Tofita")
 
 [![Telegram Channel](https://img.shields.io/badge/Telegram-Greentea%20NEWS-blue.svg)](https://t.me/s/greenteaos_news)
 [![Telegram Chatroom](https://img.shields.io/badge/Telegram-Greentea%20OS-blue.svg)](https://telegram.me/greenteaos)
