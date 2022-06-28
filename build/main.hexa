@@ -36,7 +36,7 @@ fun deleteFolderRecursive(path, noRemoveSelf) {
 
 let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
 let tasks: [String] = process.argv.slice()
-let llvm = 'LLVM-12.0.0'
+let llvm = 'LLVM-14.0.6-2'
 tasks.shift()
 tasks.shift()
 let teapot = config.teapot
