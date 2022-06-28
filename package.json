@@ -1,0 +1,8 @@
+{
+    "name": "tofita",
+    "version": "1.0.0",
+    "description": "",
+    "main": "build.js",
+    "author": "Oleg (PeyTy)",
+    "license": "LGPL-3.0-only"
+}
