@@ -340,7 +340,7 @@ STUB(free)
 	#define CONV __cdecl
 #endif
 
-// DWORD == uint32_t
+// DWORD == uint32_t // TODO write down all types sizes NTAPI callbacks etc
 typedef bool(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
 typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow);
 

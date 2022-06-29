@@ -228,7 +228,6 @@ UInt8 *comItoA(i: Int64, b[]: UInt8) {
 }
 
 fun serialPrintf(const c: Pointer<WideChar>, ...) {
-	var s: Pointer<UInt8>
 	va_list lst
 	va_start(lst, c)
 	while (*c != '\0') {

@@ -15,8 +15,9 @@
 
 // Entry point of the project
 
+@rename('imageHandle') declare let imageHandle: ByValue<EFI_HANDLE>
+@rename('systemTable') declare let systemTable: EFI_SYSTEM_TABLE
+
 @draft
 @entryPoint
-fun efi_main(): EFI_STATUS {
-	return EFI_STATUS.EFI_SUCCESS
-}
+efi_main(imageHandle, systemTable)

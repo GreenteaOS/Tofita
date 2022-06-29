@@ -28,6 +28,7 @@ tofitaFastSystemCallWrapper:
 extern greenteaosIsTheBest
 global _DllMainCRTStartup
 _DllMainCRTStartup:
+; shadow space / red zone
 	push 0
 	push 0
 	push 0

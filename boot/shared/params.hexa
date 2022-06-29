@@ -50,6 +50,8 @@ class Physical<T> {
 // Data transferred from UEFI application into kernel loader
 
 @struct
+@sizeOf(40)
+// TODO ^ implement actual check in code gen
 class EfiMemoryMap {
 	var memoryMap: EFI_MEMORY_DESCRIPTOR
 	var memoryMapSize: UInt64
@@ -59,6 +61,7 @@ class EfiMemoryMap {
 }
 
 @struct
+@sizeOf(32)
 class Framebuffer {
 	var base: UInt64 // virtual address
 	var physical: UInt64 // physical address
@@ -69,10 +72,11 @@ class Framebuffer {
 }
 
 @struct
+@sizeOf(24)
 class RamDisk {
 	var base: UInt64 // virtual address
 	var physical: UInt64 // physical address
-	var size: UInt32 // in bytes
+	var size: UInt64 // in bytes
 }
 
 @struct

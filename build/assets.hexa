@@ -126,6 +126,7 @@ fun packAssets(config: Config) {
 		// Round upto 4 bytes
 		ramDiskSize = Math.ceil(ramDiskSize / 4) * 4
 		console.log('ramDiskSize is', ramDiskSize, 'bytes')
+		console.log('Assets count is', assetName.length)
 
 		let buffer = Buffer.alloc(ramDiskSize) // zeroed
 		buffer.writeUInt32LE(0, 0)

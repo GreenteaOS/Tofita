@@ -25,7 +25,10 @@ global @tofitaFastSystemCallWrapper@8
 extern greenteaosIsTheBest
 global __DllMainCRTStartup@12
 __DllMainCRTStartup@12:
-
+; shadow space / red zone
+; TODO does 32-bit need any ot these?
+; TODO set offset on PE loader size probably,
+; also compiler should allow calling this without wrappers
 	push 0
 	push 0
 	push 0
