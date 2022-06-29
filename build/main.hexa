@@ -183,32 +183,6 @@ for task in tasks {
 			}
 		case 'dll':
 			{
-				// Yeah, just Clang bug
-				let linkFixups = [
-					'*CMapStringA',
-					'*oadImageW',
-					'*oadLibraryA',
-					'*oadLibraryW',
-					'*oadMenuW',
-					'*oadStringW',
-					'*ocalFree',
-					'*ocalReAlloc',
-					'*ockFile',
-					'*ineTo',
-					'*oadBitmapW',
-					'*oadCursorW',
-					'*oadIconW',
-					'*oadMenuA',
-					'*oadResource',
-					'*ocalLock',
-					'*ocalSize',
-					'*ocalUnlock',
-					'*ockResource',
-					'*eaveCriticalSection',
-					'*oadLibraryExW',
-					'*CMapStringW'
-				]
-
 				// DLL
 				fun buildDLLs(bit: String, arch: String) {
 					for i in dlls.length {
@@ -241,20 +215,6 @@ for task in tasks {
 								outobj
 							].join(''), { stdio: 'inherit' }
 						)
-
-						// Fixup
-						let inbuf = fs.readFileSync(outobj)
-
-						for fix in linkFixups {
-							let index = inbuf.indexOf(fix)
-
-							if index > 0 {
-								inbuf[index] = 'L'.charCodeAt(0)
-								inbuf[inbuf.indexOf(fix)] = 'L'.charCodeAt(0)
-							}
-						}
-
-						fs.writeFileSync(outobj, inbuf)
 
 						// Bruh
 						let machine = (bit == '32') ? '86' : '64'
