@@ -39,10 +39,10 @@ class RamDiskAsset {
 	new () {}
 }
 
-	asset.size = 0
-	const UInt16 *path = (const UInt16 *)pathToAsset
 fun getRamDiskAsset(asset: RamDiskAsset, pathToAsset: String) {
+	asset.size = 0u32
 	asset.data = null // TODO should error cause non-nullable
+	let path = pathToAsset.utf16() as! ConstArrayPointer<UInt16>
 
 	let ramDiskInfo = _ramdisk.base as! @readonly RamDiskInfo
 

@@ -20,20 +20,52 @@ declare INTN = Int64 // TODO
 declare UINTN = UInt64 // TODO
 declare EFI_PHYSICAL_ADDRESS = UInt64
 
-@struct class EFI_GUID {
+@stack
+@struct class EFI_PHYSICAL_ADDRESS_STORAGE {
+	var value: EFI_PHYSICAL_ADDRESS
+	new () {}
+}
+
+@stack
+@rename('efi::UINTN')
+@struct class UINTN_STORAGE {
+	var value: UINTN
+	new () {}
+}
+
+@stack
+@struct class UINT32_STORAGE {
+	var value: UInt32
+	new () {}
+}
+
+@stack
+@struct class EFI_HANDLE_STORAGE {
+	var value: EFI_HANDLE
+	new () {}
+}
+
+@stack
+@struct class EFI_FILE_PROTOCOL_STORAGE {
+	var value: EFI_FILE_PROTOCOL
+	new () {}
+}
+
+@stack
+@struct class EFI_INTERFACE_STORAGE {
+	var value: EFI_PROTOCOL
+	new () {}
+}
+
+@rename('EFI_GUID')
+@asTitleCase
+@struct declare class EFI_GUID {
 	let data1: UInt32
 	let data2: UInt16
 	let data3: UInt16
-	let data41: UInt8
-	let data42: UInt8
-	let data43: UInt8
-	let data44: UInt8
-	let data45: UInt8
-	let data46: UInt8
-	let data47: UInt8
-	let data48: UInt8
+	let data4: ArrayByValue<UInt8, 8>
 
-	fun areSame(other: EFI_GUID): Bool {
+	/*fun areSame(other: EFI_GUID): Bool /*{
 		return
 			this.data1 == other.data1 and
 			this.data2 == other.data2 and
@@ -46,7 +78,24 @@ declare EFI_PHYSICAL_ADDRESS = UInt64
 			this.data46 == other.data46 and
 			this.data47 == other.data47 and
 			this.data48 == other.data48
-	}
+	}*/ */
+	// TODO `* /` parsed incorrectly
+}
+
+// TODO as method
+fun areSame(one: EFI_GUID, other: EFI_GUID): Bool {
+	return
+		one.data1 == other.data1 and
+		one.data2 == other.data2 and
+		one.data3 == other.data3 and
+		one.data4[1] == other.data4[1] and
+		one.data4[2] == other.data4[2] and
+		one.data4[3] == other.data4[3] and
+		one.data4[4] == other.data4[4] and
+		one.data4[5] == other.data4[5] and
+		one.data4[6] == other.data4[6] and
+		one.data4[7] == other.data4[7] and
+		one.data4[0] == other.data4[0]
 }
 
 // TODO type should infer `@struct` from parent class
@@ -138,9 +187,10 @@ class EFI_FILE_INFO_ID extends EFI_GUID {
 	new () {}
 
 	// TODO allocate statically, not ARC
-	let guid = new EFI_FILE_INFO_ID()
+	// static let guid = new EFI_FILE_INFO_ID()
 }
 
+@rename('EFI_HANDLE')
 @struct declare class EFI_HANDLE {
 	// Simply a pointer
 }
@@ -154,9 +204,18 @@ class EFI_FILE_INFO_ID extends EFI_GUID {
 	let reserved: UInt32
 }
 
+@rename('EFI_HANDLE')
+@struct
+class EFI_PHYSICAL_VOID {}
+
+@rename('VOID')
+@struct
+class EFI_VOID {}
+
+@rename('EFI_CONFIGURATION_TABLE')
 @struct declare class EFI_CONFIGURATION_TABLE {
-	let vendorGuid: EFI_GUID
-	let vendorTable: VoidPointer
+	@rename('VendorGuid') let vendorGuid: ByValue<EFI_GUID>
+	@rename('VendorTable') let vendorTable: EFI_PHYSICAL_VOID?
 }
 
 @struct declare class SIMPLE_INPUT_INTERFACE {
@@ -202,6 +261,7 @@ enum EFI_GRAPHICS_PIXEL_FORMAT : Int {
 	PixelFormatMax
 }
 
+@castTo('efi::EFI_LOCATE_SEARCH_TYPE')
 enum EFI_LOCATE_SEARCH_TYPE : Int {
 	AllHandles
 	ByRegisterNotify
@@ -216,28 +276,33 @@ enum EFI_LOCATE_SEARCH_TYPE : Int {
 }
 
 @struct declare class EFI_GRAPHICS_OUTPUT_MODE_INFORMATION {
-	let version: UInt32
-	let horizontalResolution: UInt32
-	let verticalResolution: UInt32
-	let pixelFormat: EFI_GRAPHICS_PIXEL_FORMAT
-	let pixelInformation: EFI_PIXEL_BITMASK
-	let pixelsPerScanLine: UInt32
+	@rename('Version') let version: UInt32
+	@rename('HorizontalResolution') let horizontalResolution: UInt32
+	@rename('VerticalResolution') let verticalResolution: UInt32
+	@rename('PixelFormat') let pixelFormat: EFI_GRAPHICS_PIXEL_FORMAT
+	@rename('PixelInformation') let pixelInformation: EFI_PIXEL_BITMASK
+	@rename('PixelsPerScanLine') let pixelsPerScanLine: UInt32
 }
 
 @struct declare class EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE {
-	let maxMode: UInt32
-	let mode: UInt32
-	let info: EFI_GRAPHICS_OUTPUT_MODE_INFORMATION
-	let sizeOfInfo: UINTN
-	let frameBufferBase: EFI_PHYSICAL_ADDRESS
-	let frameBufferSize: UINTN
+	@rename('MaxMode') let maxMode: UInt32
+	@rename('Mode') let mode: UInt32
+	@rename('Info') let info: EFI_GRAPHICS_OUTPUT_MODE_INFORMATION
+	@rename('SizeOfInfo') let sizeOfInfo: UINTN
+	@rename('FrameBufferBase') let frameBufferBase: EFI_PHYSICAL_ADDRESS
+	@rename('FrameBufferSize') let frameBufferSize: UINTN
 }
 
-@struct declare class EFI_GRAPHICS_OUTPUT_PROTOCOL {
-	@noCapture let queryMode: () => EFI_STATUS
-	@noCapture let setMode: (gop: EFI_GRAPHICS_OUTPUT_PROTOCOL, modeNumber: UInt32) => EFI_STATUS
-	@noCapture let blt: () => EFI_STATUS
-	@noCapture let mode: EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE
+@struct
+class EFI_PROTOCOL {
+}
+
+@rename('EFI_GRAPHICS_OUTPUT_PROTOCOL')
+@struct declare class EFI_GRAPHICS_OUTPUT_PROTOCOL extends EFI_PROTOCOL {
+	@rename('QueryMode') @noCapture let queryMode: () => EFI_STATUS
+	@rename('SetMode') @noCapture let setMode: (gop: EFI_GRAPHICS_OUTPUT_PROTOCOL, modeNumber: UInt32) => EFI_STATUS
+	@rename('Blt') @noCapture let blt: () => EFI_STATUS
+	@rename('Mode') @noCapture let mode: EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE
 }
 
 // TODO
@@ -247,6 +312,7 @@ enum EFI_LOCATE_SEARCH_TYPE : Int {
 /// Range requires a runtime mapping
 let efi_memory_runtime = 0x8000000000000000u64
 
+@castTo('efi::EFI_MEMORY_TYPE')
 enum EFI_MEMORY_TYPE : Int {
 	EfiReservedMemoryType
 	EfiLoaderCode
@@ -266,21 +332,24 @@ enum EFI_MEMORY_TYPE : Int {
 }
 
 // TODO rename to TitleCase
+@rename('EFI_MEMORY_DESCRIPTOR')
 @struct declare class EFI_MEMORY_DESCRIPTOR {
 	/// Field size is 32 bits followed by 32 bit pad
-	let type: EFI_MEMORY_TYPE
+	@rename('Type') let type: EFI_MEMORY_TYPE
 	/// Padding
 	let pad: UInt32
 	/// Field size is 64 bits
-	let physicalStart: UInt64 // TODO EFI_PHYSICAL_ADDRESS
+	@rename('PhysicalStart') let physicalStart: UInt64 // TODO EFI_PHYSICAL_ADDRESS
 	/// Field size is 64 bits
 	let virtualStart: UInt64 // TODO EFI_VIRTUAL_ADDRESS
 	/// Field size is 64 bits
-	let numberOfPages: UInt64
+	@rename('NumberOfPages') let numberOfPages: UInt64
 	/// Field size is 64 bits
-	let attribute: UInt64
+	@rename('Attribute') let attribute: UInt64
 }
 
+@rename('EFI_RUNTIME_SERVICES')
+@asTitleCase
 @struct declare class EFI_RUNTIME_SERVICES {
 	@embed let hdr: EFI_TABLE_HEADER
 
@@ -316,6 +385,24 @@ enum EFI_MEMORY_TYPE : Int {
 	@noCapture let queryVariableInfo: () => Void
 }
 
+@rename('EFI_TIME')
+@struct declare class EFI_TIME_OLD {
+	@rename('Year') var year: UInt16  // 1998 - 20XX
+	@rename('Month') var month: UInt8  // 1 - 12
+	@rename('Day') var day: UInt8	  // 1 - 31
+	@rename('Hour') var hour: UInt8	  // 0 - 23
+	@rename('Minute') var minute: UInt8 // 0 - 59
+	@rename('Second') var second: UInt8 // 0 - 59
+	var pad1: UInt8
+	@rename('Nanosecond') var nanosecond: UInt32 // 0 - 999,999,999
+	@rename('TimeZone') var timeZone: Int16	   // -1440 to 1440 or 2047
+	@rename('Daylight') var daylight: UInt8
+	var pad2: UInt8
+	new ()
+}
+
+@asTitleCase
+@rename('EFI_TIME')
 @struct declare class EFI_TIME {
 	var year: UInt16  // 1998 - 20XX
 	var month: UInt8  // 1 - 12
@@ -328,60 +415,65 @@ enum EFI_MEMORY_TYPE : Int {
 	var timeZone: Int16	   // -1440 to 1440 or 2047
 	var daylight: UInt8
 	var pad2: UInt8
+	new ()
 }
 
+@rename('EFI_TIME_CAPABILITIES')
 @struct declare class EFI_TIME_CAPABILITIES {
-	let resolution: UInt32	// 1e-6 parts per million
-	let accuracy: UInt32	// hertz
-	let setsToZero: UInt8 // Set clears sub-second time
+	@rename('Resolution') var resolution: UInt32	// 1e-6 parts per million
+	@rename('Accuracy') var accuracy: UInt32	// hertz
+	@rename('SetsToZero') var setsToZero: UInt8 // Set clears sub-second time
+	new ()
 }
 
 // Stubs can be filled later on demand
-declare EFI_RAISE_TPL = ConstVoidPointer
-declare EFI_RESTORE_TPL = ConstVoidPointer
-declare EFI_FREE_PAGES = ConstVoidPointer
-declare EFI_GET_MEMORY_MAP = ConstVoidPointer
-declare EFI_ALLOCATE_POOL = ConstVoidPointer
-declare EFI_FREE_POOL = ConstVoidPointer
-declare EFI_CREATE_EVENT = ConstVoidPointer
-declare EFI_SET_TIMER = ConstVoidPointer
-declare EFI_WAIT_FOR_EVENT = ConstVoidPointer
-declare EFI_SIGNAL_EVENT = ConstVoidPointer
-declare EFI_CLOSE_EVENT = ConstVoidPointer
-declare EFI_CHECK_EVENT = ConstVoidPointer
+//@struct class ConstArrayPointer<UInt8> {}
+declare EFI_RAISE_TPL = ConstArrayPointer<UInt8>
+declare EFI_RESTORE_TPL = ConstArrayPointer<UInt8>
+declare EFI_FREE_PAGES = ConstArrayPointer<UInt8>
+declare EFI_GET_MEMORY_MAP = ConstArrayPointer<UInt8>
+declare EFI_ALLOCATE_POOL = ConstArrayPointer<UInt8>
+declare EFI_FREE_POOL = ConstArrayPointer<UInt8>
+declare EFI_CREATE_EVENT = ConstArrayPointer<UInt8>
+declare EFI_SET_TIMER = ConstArrayPointer<UInt8>
+declare EFI_WAIT_FOR_EVENT = ConstArrayPointer<UInt8>
+declare EFI_SIGNAL_EVENT = ConstArrayPointer<UInt8>
+declare EFI_CLOSE_EVENT = ConstArrayPointer<UInt8>
+declare EFI_CHECK_EVENT = ConstArrayPointer<UInt8>
 
-declare EFI_INSTALL_PROTOCOL_INTERFACE = ConstVoidPointer
-declare EFI_REINSTALL_PROTOCOL_INTERFACE = ConstVoidPointer
-declare EFI_UNINSTALL_PROTOCOL_INTERFACE = ConstVoidPointer
-declare EFI_HANDLE_PROTOCOL = ConstVoidPointer
-declare EFI_REGISTER_PROTOCOL_NOTIFY = ConstVoidPointer
-declare EFI_LOCATE_HANDLE = ConstVoidPointer
-declare EFI_LOCATE_DEVICE_PATH = ConstVoidPointer
-declare EFI_INSTALL_CONFIGURATION_TABLE = ConstVoidPointer
+declare EFI_INSTALL_PROTOCOL_INTERFACE = ConstArrayPointer<UInt8>
+declare EFI_REINSTALL_PROTOCOL_INTERFACE = ConstArrayPointer<UInt8>
+declare EFI_UNINSTALL_PROTOCOL_INTERFACE = ConstArrayPointer<UInt8>
+declare EFI_HANDLE_PROTOCOL = ConstArrayPointer<UInt8>
+declare EFI_REGISTER_PROTOCOL_NOTIFY = ConstArrayPointer<UInt8>
+declare EFI_LOCATE_HANDLE = ConstArrayPointer<UInt8>
+declare EFI_LOCATE_DEVICE_PATH = ConstArrayPointer<UInt8>
+declare EFI_INSTALL_CONFIGURATION_TABLE = ConstArrayPointer<UInt8>
 
-declare EFI_IMAGE_LOAD = ConstVoidPointer
-declare EFI_IMAGE_START = ConstVoidPointer
-declare EFI_EXIT = ConstVoidPointer
-declare EFI_IMAGE_UNLOAD = ConstVoidPointer
-declare EFI_EXIT_BOOT_SERVICES = ConstVoidPointer
-declare EFI_GET_NEXT_MONOTONIC_COUNT = ConstVoidPointer
-declare EFI_STALL = ConstVoidPointer
-declare EFI_CONNECT_CONTROLLER = ConstVoidPointer
-declare EFI_DISCONNECT_CONTROLLER = ConstVoidPointer
-declare EFI_OPEN_PROTOCOL = ConstVoidPointer
-declare EFI_CLOSE_PROTOCOL = ConstVoidPointer
-declare EFI_OPEN_PROTOCOL_INFORMATION = ConstVoidPointer
-declare EFI_PROTOCOLS_PER_HANDLE = ConstVoidPointer
-declare EFI_LOCATE_HANDLE_BUFFER = ConstVoidPointer
-declare EFI_LOCATE_PROTOCOL = ConstVoidPointer
-declare EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES = ConstVoidPointer
-declare EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES = ConstVoidPointer
-declare EFI_CALCULATE_CRC32 = ConstVoidPointer
-declare EFI_COPY_MEM = ConstVoidPointer
-declare EFI_SET_MEM = ConstVoidPointer
-declare EFI_CREATE_EVENT_EX = ConstVoidPointer
+declare EFI_IMAGE_LOAD = ConstArrayPointer<UInt8>
+declare EFI_IMAGE_START = ConstArrayPointer<UInt8>
+declare EFI_EXIT = ConstArrayPointer<UInt8>
+declare EFI_IMAGE_UNLOAD = ConstArrayPointer<UInt8>
+declare EFI_EXIT_BOOT_SERVICES = ConstArrayPointer<UInt8>
+declare EFI_GET_NEXT_MONOTONIC_COUNT = ConstArrayPointer<UInt8>
+declare EFI_STALL = ConstArrayPointer<UInt8>
+declare EFI_CONNECT_CONTROLLER = ConstArrayPointer<UInt8>
+declare EFI_DISCONNECT_CONTROLLER = ConstArrayPointer<UInt8>
+declare EFI_OPEN_PROTOCOL = ConstArrayPointer<UInt8>
+declare EFI_CLOSE_PROTOCOL = ConstArrayPointer<UInt8>
+declare EFI_OPEN_PROTOCOL_INFORMATION = ConstArrayPointer<UInt8>
+declare EFI_PROTOCOLS_PER_HANDLE = ConstArrayPointer<UInt8>
+declare EFI_LOCATE_HANDLE_BUFFER = ConstArrayPointer<UInt8>
+declare EFI_LOCATE_PROTOCOL = ConstArrayPointer<UInt8>
+declare EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES = ConstArrayPointer<UInt8>
+declare EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES = ConstArrayPointer<UInt8>
+declare EFI_CALCULATE_CRC32 = ConstArrayPointer<UInt8>
+declare EFI_COPY_MEM = ConstArrayPointer<UInt8>
+declare EFI_SET_MEM = ConstArrayPointer<UInt8>
+declare EFI_CREATE_EVENT_EX = ConstArrayPointer<UInt8>
 // TODO all to @noCapture => stubs
 
+@castTo('efi::EFI_ALLOCATE_TYPE')
 enum EFI_ALLOCATE_TYPE : Int {
 	AllocateAnyPages
 	AllocateMaxAddress
@@ -389,6 +481,8 @@ enum EFI_ALLOCATE_TYPE : Int {
 	MaxAllocateType
 }
 
+@rename('EFI_BOOT_SERVICES')
+@asTitleCase
 @struct declare class EFI_BOOT_SERVICES {
 	@embed let hdr: EFI_TABLE_HEADER
 
@@ -401,21 +495,21 @@ enum EFI_ALLOCATE_TYPE : Int {
 	//
 	// Memory functions
 	//
-	@noCapture let allocatePages: (
+	@rename('AllocatePages') @noCapture let allocatePages: (
 		type: EFI_ALLOCATE_TYPE,
 		memoryType: EFI_MEMORY_TYPE,
 		noPages: UINTN,
-		memory: Pointer<EFI_PHYSICAL_ADDRESS>
+		memory: ArrayPointer<EFI_PHYSICAL_ADDRESS>
 	) => EFI_STATUS
 
 	let freePages: EFI_FREE_PAGES
 
-	@noCapture let getMemoryMap: (
-		memoryMapSize: Pointer<UINTN>,
+	@rename('GetMemoryMap') @noCapture let getMemoryMap: (
+		memoryMapSize: ArrayPointer<UINTN>,
 		memoryMap: EFI_MEMORY_DESCRIPTOR,
-		mapKey: Pointer<UINTN>,
-		descriptorSize: Pointer<UINTN>,
-		descriptorVersion: Pointer<UInt32>
+		mapKey: ArrayPointer<UINTN>,
+		descriptorSize: ArrayPointer<UINTN>,
+		descriptorVersion: ArrayPointer<UInt32>
 	) => EFI_STATUS
 
 	let allocatePool: EFI_ALLOCATE_POOL
@@ -437,10 +531,10 @@ enum EFI_ALLOCATE_TYPE : Int {
 	let installProtocolInterface: EFI_INSTALL_PROTOCOL_INTERFACE
 	let reinstallProtocolInterface: EFI_REINSTALL_PROTOCOL_INTERFACE
 	let uninstallProtocolInterface: EFI_UNINSTALL_PROTOCOL_INTERFACE
-	@noCapture let handleProtocol: (
-		handle: EFI_HANDLE,
+	@rename('HandleProtocol') @noCapture let handleProtocol: (
+		handle: ByValue<EFI_HANDLE>,
 		protocol: EFI_GUID,
-		interfaceStorage: Pointer<Pointer<Void>>
+		interfaceStorage: EFI_PHYSICAL_VOID
 	) => EFI_STATUS
 	let pCHandleProtocol: EFI_HANDLE_PROTOCOL
 	let registerProtocolNotify: EFI_REGISTER_PROTOCOL_NOTIFY
@@ -457,7 +551,7 @@ enum EFI_ALLOCATE_TYPE : Int {
 	let unloadImage: EFI_IMAGE_UNLOAD
 
 	@noCapture let exitBootServices: (
-		imageHandle: EFI_HANDLE,
+		imageHandle: ByValue<EFI_HANDLE>,
 		mapKey: UINTN
 	) => EFI_STATUS
 
@@ -471,7 +565,7 @@ enum EFI_ALLOCATE_TYPE : Int {
 		timeout: UINTN,
 		watchdogCode: UInt64,
 		dataSize: UINTN,
-		watchdogData: ConstWideCharPointer
+		watchdogData: ArrayPointer<UInt16>
 	) => Void
 
 	//
@@ -494,15 +588,15 @@ enum EFI_ALLOCATE_TYPE : Int {
 	@noCapture let locateHandleBuffer: (
 		searchType: EFI_LOCATE_SEARCH_TYPE,
 		protocol: EFI_GUID,
-		searchKey: Pointer<Void>,
-		noHandles: Pointer<UINTN>,
-		buffer: Pointer<EFI_HANDLE>
+		searchKey: EFI_PHYSICAL_ADDRESS?,
+		noHandles: ArrayPointer<UINTN>,
+		buffer: ArrayPointer<EFI_HANDLE>
 	) => EFI_STATUS
 
-	@noCapture let locateProtocol: (
+	@rename('LocateProtocol') @noCapture let locateProtocol: (
 		protocol: EFI_GUID,
-		registration: Pointer<Void>,
-		interfaceStorage: Pointer<Pointer<Void>>
+		registration: EFI_PHYSICAL_ADDRESS,
+		interfaceStorage: ArrayPointer<EFI_VOID>
 	) => EFI_STATUS
 
 	let installMultipleProtocolInterfaces: EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES
@@ -521,9 +615,11 @@ enum EFI_ALLOCATE_TYPE : Int {
 	let createEventEx: EFI_CREATE_EVENT_EX
 }
 
+@rename('EFI_SYSTEM_TABLE')
+@asTitleCase
 @struct declare class EFI_SYSTEM_TABLE {
 	@embed let hdr: EFI_TABLE_HEADER
-	let firmwareVendor: ConstWideCharPointer
+	let firmwareVendor: ConstArrayPointer<ClangWideChar>
 	let firmwareRevision: UInt32
 
 	let consoleInHandle: EFI_HANDLE
@@ -535,22 +631,23 @@ enum EFI_ALLOCATE_TYPE : Int {
 	let standardErrorHandle: EFI_HANDLE
 	let stdErr: SIMPLE_TEXT_OUTPUT_INTERFACE
 
-	let runtimeServices: EFI_RUNTIME_SERVICES
-	let bootServices: EFI_BOOT_SERVICES
+	@rename('RuntimeServices') let runtimeServices: EFI_RUNTIME_SERVICES
+	@rename('BootServices') let bootServices: EFI_BOOT_SERVICES
 
-	let numberOfTableEntries: UINTN
-	let configurationTable: ArrayOfStructPointer<EFI_CONFIGURATION_TABLE>
+	@rename('NumberOfTableEntries') let numberOfTableEntries: UINTN
+	@rename('ConfigurationTable') let configurationTable: ArrayPointer<ByValue<EFI_CONFIGURATION_TABLE>>
 }
 
+@rename('EFI_FILE_INFO')
 @struct declare class EFI_FILE_INFO {
-	let size: UInt64
-	let fileSize: UInt64
-	let physicalSize: UInt64
-	let createTime: EFI_TIME
-	let lastAccessTime: EFI_TIME
-	let modificationTime: EFI_TIME
-	let attribute: UInt64
-	let fileName: ArrayByValue<WideChar, 2048>
+	@rename('Size') let size: UInt64
+	@rename('FileSize') let fileSize: UInt64
+	@rename('PhysicalSize') let physicalSize: UInt64
+	@rename('CreateTime') let createTime: EFI_TIME
+	@rename('LastAccessTime') let lastAccessTime: EFI_TIME
+	@rename('ModificationTime') let modificationTime: EFI_TIME
+	@rename('Attribute') let attribute: UInt64
+	@rename('FileName') let fileName: ArrayByValue<ClangWideChar, 2048>
 	// Note: this name storage should be dynamically allocated
 	// but here it is just large enough for any file system
 	new ()
@@ -559,22 +656,26 @@ enum EFI_ALLOCATE_TYPE : Int {
 	// are filled in external constructor?
 }
 
+@rename('EFI_SIMPLE_FILE_SYSTEM_PROTOCOL')
+@asTitleCase
 @struct declare class EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
 	let revision: UInt64
 	@noCapture let openVolume: (
 		fs: EFI_SIMPLE_FILE_SYSTEM_PROTOCOL,
-		root: Pointer<EFI_FILE_PROTOCOL>
+		root: ArrayPointer<EFI_FILE_HANDLE>
 	) => EFI_STATUS
 }
 
 // Same as `EFI_FILE_HANDLE` and `EFI_FILE`
+@rename('EFI_FILE_PROTOCOL')
+@asTitleCase
 @struct declare class EFI_FILE_PROTOCOL {
 	let revision: UInt64
 
 	@noCapture let open: (
 		file: EFI_FILE_PROTOCOL,
-		newHandle: Pointer<EFI_FILE_PROTOCOL>,
-		fileName: ConstWideCharPointer,
+		newHandle: ArrayPointer<EFI_FILE_HANDLE>, // EFI_FILE_PROTOCOL_STORAGE,
+		fileName: ArrayPointer<UInt16>,
 		openMode: EFI_OpenMode
 		attributes: EFI_FileAttribute
 	) => EFI_STATUS
@@ -586,6 +687,7 @@ enum EFI_ALLOCATE_TYPE : Int {
 	) => EFI_STATUS
 
 	@noCapture let read: (
+		// TODO arguments
 	) => EFI_STATUS
 
 	@noCapture let write: (
@@ -598,6 +700,8 @@ enum EFI_ALLOCATE_TYPE : Int {
 	) => EFI_STATUS
 
 	@noCapture let getInfo: (
+		// TODO arguments
+		// TODO error too many arguments
 	) => EFI_STATUS
 
 	@noCapture let setInfo: (
@@ -618,6 +722,9 @@ enum EFI_ALLOCATE_TYPE : Int {
 	@noCapture let flushEx: (
 	) => EFI_STATUS
 }
+
+@rename('efi::EFI_FILE_HANDLE') @struct declare class EFI_FILE_HANDLE extends EFI_FILE_PROTOCOL {}
+@rename('EFI_FILE') @struct declare class EFI_FILE extends EFI_FILE_PROTOCOL {}
 
 //@size(8 + 8 + 4 + 8 * 9 + 4 + EFI_HANDLE * 10)
 //@struct class INT32 {

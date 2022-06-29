@@ -209,14 +209,13 @@ fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) 
 	}
 }
 
-const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.descriptor: Pointer<EFI_MEMORY_DESCRIPTOR>,
-														   descriptorSize: UInt64) {
-	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
-	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
+fun getNextDescriptor(descriptor: @readonly EFI_MEMORY_DESCRIPTOR, descriptorSize: UInt64) {
+	let desc = (descriptor as! UInt64) + descriptorSize
+	return desc as! @readonly EFI_MEMORY_DESCRIPTOR
 }
 
-UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
-	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
+fun getRAMSize(memoryMap: EfiMemoryMap): UInt64 {
+	var descriptor = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
 	var numberOfPages: UInt64 = 0
 
@@ -240,19 +239,19 @@ fun mapEfi(memoryMap: EfiMemoryMap) {
 
 	var descriptor: EFI_MEMORY_DESCRIPTOR = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
-	var sum: UInt64 = 0
+	var sum: UInt64 = 0u64
 
 	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
 	while offset < endOfMemoryMap {
-		if descriptor.attribute & EFI_MEMORY_RUNTIME {
+		if 0 != (descriptor.attribute & efi_memory_runtime) {
 			// TODO pointer fixups
 			// TODO should be RW or RO?
 			// Note: in VirtualBox, PhysicalStart seems way beyound RAM bounds
 			// Seems like fixup should be applied only if PhysicalStart < ramBytes?
-			mapMemory(descriptor.PhysicalStart, descriptor.PhysicalStart, descriptor.NumberOfPages, 1)
+			mapMemory(descriptor.physicalStart, descriptor.physicalStart, descriptor.numberOfPages, 1u8)
 			sum += descriptor.numberOfPages
 		}
 
@@ -265,11 +264,11 @@ fun mapEfi(memoryMap: EfiMemoryMap) {
 
 var buffa[1]: UInt8 = {0}
 
-UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
+fun conventionalAllocateLargest(memoryMap: EfiMemoryMap) {
 	var descriptor = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
-	var result: UInt64 = 0
-	var largestPages: UInt64 = 0
+	var result: UInt64 = 0u64
+	var largestPages: UInt64 = 0u64
 
 	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
@@ -287,12 +286,12 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	}
 
 	serialPrintf("[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
-				 (uint32_t)(largestPages * pageSize), largestPages)
+				 largestPages * pageSize, largestPages)
 
 	return result
 }
 
-var conventionalOffset: UInt64 = 0
+var conventionalOffset: UInt64 = 0u64
 fun conventionalAllocateNext(bytes: UInt64): UInt64 {
 	let result = conventionalOffset
 	let pages = bytes / pageSize // Math.floor

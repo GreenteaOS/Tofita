@@ -93,7 +93,7 @@ fun loadRamDiskFromVolume(
 			"[[[efi_main.loadRamDiskFromVolume]]] <ERROR> checksum is incorrect, disk may be corrupted!")
 	}
 
-	ramdisk.base = address as! UInt64
+	ramdisk.base = address[0] as! UInt64
 	ramdisk.size = size[0]
 
 	return EFI_STATUS.EFI_SUCCESS

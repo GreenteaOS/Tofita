@@ -87,16 +87,16 @@ class KernelParams {
 	var physicalBytes: UInt64
 	var physicalRamBitMaskVirtual: UInt64 // virtual address of where RAM usage
 										// bit-map stored
-	var efiMemoryMap: EfiMemoryMap
-	var efiRuntimeServices: Pointer<efi.EFI_RUNTIME_SERVICES> = null
 	var framebuffer: Framebuffer
 	var ramdisk: RamDisk
 	var imageHandle: EFI_HANDLE
+	var efiMemoryMap: ByValue<EfiMemoryMap>
+	var efiRuntimeServices: EFI_RUNTIME_SERVICES = null
 	var acpiTablePhysical: UInt64
 	var ramBytes: UInt64
 
-	var time: EFI_TIME
-	var capabilities: EFI_TIME_CAPABILITIES
+	var time: ByValue<EFI_TIME>
+	var capabilities: ByValue<EFI_TIME_CAPABILITIES>
 	// UInt8 isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and
 	// don't allow to login! in the sense that it looks like a security hole
 	// like "let it in without entering a login-password")
