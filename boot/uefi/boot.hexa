@@ -147,17 +147,19 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap")
 	var sizeAlloc: UInt64 = (ramdisk.size / pageSize + 1) * pageSize
-	var efiMemoryMap: EfiMemoryMap
-	efiMemoryMap.memoryMapSize = sizeof(efi.EFI_MEMORY_DESCRIPTOR) * 512
-	efiMemoryMap.memoryMap = (efi.EFI_MEMORY_DESCRIPTOR *)(ramdisk.base + sizeAlloc)
+	var efiMemoryMap: EfiMemoryMap = new EfiMemoryMap()
+	efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64
+	// TODO bug efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512
+	// TODO sizeOf<EFI_MEMORY_DESCRIPTOR>() ?
+	efiMemoryMap.memoryMap = (ramdisk.base + sizeAlloc) as! EFI_MEMORY_DESCRIPTOR
 	{
-		var b: Pointer<UInt8> = (UInt8 *)efiMemoryMap.memoryMap
+		var b = efiMemoryMap.memoryMap as! ArrayPointer<UInt8>
 		for i in efiMemoryMap.memoryMapSize {
 			// TODO faster with uint64_t
 			b[i] = buffa[0]
 		}
 	}
-	fillMemoryMap(Pointer.of(efiMemoryMap), systemTable)
+	fillMemoryMap(efiMemoryMap, systemTable)
 	serialPrintln("[[[efi_main]]] done: fillMemoryMap")
 
 	var time: EFI_TIME
@@ -230,7 +232,7 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	getRamDiskAsset(asset, "tofita.gnu")
 	serialPrintf("[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
 
-	let largeBuffer: UInt64 = paging.conventionalAllocateLargest(Pointer.of(efiMemoryMap))
+	let largeBuffer: UInt64 = conventionalAllocateLargest(efiMemoryMap)
 	serialPrintf("[[[efi_main]]] large buffer allocated at %u\n", largeBuffer)
 	conventionalOffset = largeBuffer
 	var mAddressOfEntryPoint: UInt64 = 0
@@ -243,8 +245,8 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 		serialPrintf("PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.mMagic,
 					 0x020B)
 		serialPrintf("PE32(+) size of image == %d\n", peOptionalHeader.mSizeOfImage)
-		var kernelBase: Pointer<Void> = (Void *)paging.conventionalAllocateNext(peOptionalHeader.mSizeOfImage)
 		memset(kernelBase, 0, peOptionalHeader.mSizeOfImage) // Zeroing
+		var kernelBase = conventionalAllocateNext(peOptionalHeader.mSizeOfImage)
 
 		// Copy sections
 		var imageSectionHeader =
@@ -263,10 +265,10 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 		mAddressOfEntryPoint = peOptionalHeader.mAddressOfEntryPoint
 	}
 
-	var params: Pointer<KernelParams> = (KernelParams *)paging.conventionalAllocateNext(sizeof(KernelParams))
+	var params = conventionalAllocateNext(sizeOf<KernelParams>()) as! KernelParams
 	{
 		var b = params as! ArrayPointer<UInt8>
-		for (UInt64 i = 0; i < sizeof(KernelParams); ++i) {
+		for i in sizeOf<KernelParams>() {
 			b[i] = buffa[0]
 		}
 	}
@@ -276,7 +278,7 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 
 	// Note: stack grows from x to X-N, not X+N
 	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
-	var stack = paging.conventionalAllocateNext(1024 * 1024) + 1024 * 1024
+	var stack = conventionalAllocateNext(1024u64 * 1024) + 1024 * 1024
 	{
 		var b = (stack - 1024 * 1024) as! ArrayPointer<UInt8>
 		for i in 1024 * 1024 {
@@ -284,14 +286,19 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 		}
 	}
 
-	params.efiMemoryMap = efiMemoryMap
 	params.ramdisk = ramdisk
 	params.framebuffer = framebuffer
+	params.efiMemoryMap.ref.memoryMap = efiMemoryMap.memoryMap
+	params.efiMemoryMap.ref.memoryMapSize = efiMemoryMap.memoryMapSize
+	params.efiMemoryMap.ref.mapKey = efiMemoryMap.mapKey
+	params.efiMemoryMap.ref.descriptorSize = efiMemoryMap.descriptorSize
+	params.efiMemoryMap.ref.descriptorVersion = efiMemoryMap.descriptorVersion
 
 	// RAM usage bit-map
 
-	var ram: UInt64 = paging.getRAMSize(Pointer.of(params.efiMemoryMap))
-	var megs: UInt32 = (uint32_t)(ram / (1024 * 1024))
+	var ram: UInt64 = getRAMSize(params.efiMemoryMap.ref)
+	var megs: UInt32 = (ram / (1024u64 * 1024u64)) as! UInt32
+	serialPrintf("[paging] available RAM is ~%u bytes\n", ram)
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
 	while megs < 1234 {
@@ -302,12 +309,12 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	params.ramBytes = ram
 	params.physicalRamBitMaskVirtual = conventionalAllocateNext(ram >> 12)
 
-		(paging.PageEntry *)paging.conventionalAllocateNext(sizeof(paging.PageEntry) * pageTableSize)
 	pml4entries =
+		conventionalAllocateNext(sizeOf<PageEntry>() * pageTableSize) as! ArrayPointer<ByValue<PageEntry>>
 
 	{
 		for i in conventionalOffset {
-		var b = pml4entries as! Pointer<UInt8>
+		var b = pml4entries as! ArrayPointer<UInt8>
 			// TODO faster with uint64_t
 			b[i] = buffa[0]
 		}
@@ -317,16 +324,16 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 
 	serialPrintln("[[[efi_main]]] mapping pages for kernel loader")
 
-	paging.mapMemory(upper, largeBuffer, (paging.conventionalOffset - largeBuffer) / pageSize + 1, 1)
+	mapMemory(upper, largeBuffer, (conventionalOffset - largeBuffer) / pageSize + 1, 1)
 
 	// Note: framebuffer is *not* within physical memory
-	paging.mapFramebuffer(Pointer.of(params.framebuffer))
 	drawLoading(Pointer.of(framebuffer), 2)
-	paging.mapEfi(Pointer.of(params.efiMemoryMap))
+	mapFramebuffer(params.framebuffer.ref)
+	mapEfi(params.efiMemoryMap.ref)
 	mapMemoryHuge(wholePhysicalStart, 0, ram / pageSize)
 
-	let startFunction = (InitKernelTrampoline)(paging.conventionalOffset + pageSize)
-	tmemcpy((Void *)startFunction, Pointer.of(trampolineCR3), 32)
+	let startFunction = (conventionalOffset + pageSize) as! InitKernelTrampoline
+	tmemcpy(startFunction as! ArrayPointer<UInt8>, trampolineCR3 as! ConstArrayPointer<UInt8>, 32)
 	mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0)
 
 	// Fix virtual addresses
@@ -343,8 +350,8 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	params.physicalBytes = conventionalOffset - largeBuffer
 	params.efiRuntimeServices = systemTable.runtimeServices
 	params.acpiTablePhysical = acpiTable as! UInt64
-	params.efiMemoryMap.memoryMap =
-		(efi.EFI_MEMORY_DESCRIPTOR *)(wholePhysicalStart + (params.efiMemoryMap.memoryMap as! UInt64))
+	params.efiMemoryMap.ref.memoryMap =
+		(wholePhysicalStart + (params.efiMemoryMap.ref.memoryMap as! UInt64)) as! EFI_MEMORY_DESCRIPTOR
 
 	// Convert addresses to upper half
 

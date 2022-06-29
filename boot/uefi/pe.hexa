@@ -63,7 +63,7 @@ class Pe32OptionalHeader {
 
 @struct @packed @sizeOf(40)
 class ImageSectionHeader { // size 40 bytes
-	var mName: UInt64
+	var mName: ArrayByValue<UInt8, 8>
 	var mVirtualSize: UInt32
 	var mVirtualAddress: UInt32
 	var mSizeOfRawData: UInt32

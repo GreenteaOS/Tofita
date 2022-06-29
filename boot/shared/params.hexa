@@ -16,34 +16,48 @@
 // Constants: shared data from the bootloader to the kernel
 
 // Start of kernel sections in memory
-let kernelVirtualBase = 0xffff800000000000u64
-let framebufferStart = (kernelVirtualBase + 768 * 1024 * 1024)
+let kernelVirtualBase: UInt64 = 0xffff800000000000u64
+let framebufferStart: UInt64 = (kernelVirtualBase + 768u64 * 1024u64 * 1024u64)
 // TODO: no need for mapping framebufferStart if wholePhysicalStart used
 // TODO proper dynamically computed numbers
 
 // Mapping of 1:1 of physical memory as virtual = physical + wholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-let wholePhysicalStart = (framebufferStart + 128 * 1024 * 1024)
-let pageSize = 4096 // 4 KiB
+let wholePhysicalStart: UInt64 = (framebufferStart + 128 * 1024 * 1024)
+let pageSize: UInt16 = 4096u16 // 4 KiB
 
 // Helpers
+@struct
+//@sizeOf(8)
+// TODO separate UserVirtual
+class Virtual<T> {
 
-@struct @sizeOf(8)
+}
+
+@struct
+class UserVirtual<T> {
+	// Note: no access to the value from pointer, direct access nt allowed
+	// TODO `fun sehRead () T?` for convenience, `sizeOf<T>`
+}
+
+@struct
+// @sizeOf(8)
 class Physical<T> {
-	var physical: UInt64
-
+	//var physical: UInt64
 	static fun toPhysical(physical: UInt64): Physical<T> {
 		return physical as! Physical<T>
 	}
 
-	fun toVirtual(): Pointer<T> {
+	fun toVirtual(): Virtual<T> {
+		var physical: UInt64 = this as! UInt64
 		var result: UInt64 = (wholePhysicalStart as! UInt64) + physical
-		return result as! Pointer<T>
+		return result as! Virtual<T>
 	}
 
-	fun toVirtualOffset(offset: UInt64): Pointer<T> {
+	fun toVirtualOffset(offset: UInt64): Virtual<T> {
+		var physical: UInt64 = this as! UInt64
 		var result: UInt64 = (wholePhysicalStart as! UInt64) + physical + offset
-		return result as! Pointer<T>
+		return result as! Virtual<T>
 	}
 }
 
@@ -58,6 +72,7 @@ class EfiMemoryMap {
 	var mapKey: UInt64
 	var descriptorSize: UInt64
 	var descriptorVersion: UInt32
+	new () {}
 }
 
 @struct
@@ -69,6 +84,7 @@ class Framebuffer {
 	var width: UInt32
 	var height: UInt32
 	var pixelsPerScanLine: UInt32
+	new () {}
 }
 
 @struct
@@ -77,6 +93,7 @@ class RamDisk {
 	var base: UInt64 // virtual address
 	var physical: UInt64 // physical address
 	var size: UInt64 // in bytes
+	new () {}
 }
 
 @struct
@@ -87,11 +104,11 @@ class KernelParams {
 	var physicalBytes: UInt64
 	var physicalRamBitMaskVirtual: UInt64 // virtual address of where RAM usage
 										// bit-map stored
-	var framebuffer: Framebuffer
-	var ramdisk: RamDisk
 	var imageHandle: EFI_HANDLE
 	var efiMemoryMap: ByValue<EfiMemoryMap>
 	var efiRuntimeServices: EFI_RUNTIME_SERVICES = null
+	var framebuffer: ByValue<Framebuffer>
+	var ramdisk: ByValue<RamDisk>
 	var acpiTablePhysical: UInt64
 	var ramBytes: UInt64
 
@@ -102,7 +119,7 @@ class KernelParams {
 	// like "let it in without entering a login-password")
 }
 
-declare InitKernel = @fastcall (params: ConstPointer<KernelParams>) => Void
+declare InitKernel = @convention(fastcall) (params: KernelParams) => Void
 // TODO ^ fix that in quake
-declare InitKernelTrampoline = @fastcall (kernelParams: UInt64, pml4: UInt64, stack: UInt64,
+declare InitKernelTrampoline = @convention(fastcall) (kernelParams: UInt64, pml4: UInt64, stack: UInt64,
 												entry: UInt64) => Void
