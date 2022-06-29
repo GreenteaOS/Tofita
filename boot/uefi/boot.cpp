@@ -37,6 +37,8 @@ namespace efi {
 efi::EFI_HANDLE imageHandle = nullptr;
 efi::EFI_SYSTEM_TABLE *systemTable = nullptr;
 
+#define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), __VA_ARGS__)
+
 // CR3 trampoline
 extern "C" function __attribute__((fastcall))
 trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
