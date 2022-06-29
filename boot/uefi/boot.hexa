@@ -62,12 +62,18 @@ fun memset(dest: VoidPointer, e: Int32, len: UInt64): VoidPointer {
 trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile stack: UInt64,
 			  @volatile entry: UInt64): Void
 
+@extern @rename('versionMajor') declare let versionMajor: Int
+@extern @rename('versionMinor') declare let versionMinor: Int
+@extern @rename('versionTag') declare let versionTag: Int
+// TODO ^ to C++n't about -D
+// @deep
+
 // Entry point
-fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TABLE>): efi.EFI_STATUS {
+fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_STATUS {
 	initSerial()
 
 	serialPrint("\n[[[efi_main]]] Tofita " + versionMajor + "." +
-		versionMinor + " " + versionName + " UEFI bootloader. Welcome!\n")
+		versionMinor + "." + versionTag + " UEFI bootloader. Welcome!\n")
 
 	initText()
 
@@ -119,6 +125,7 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	drawText("Greentea OS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag,
 			 (framebuffer.height / 4) * 3 + 64, Pointer.of(framebuffer))
 	let errorY: UInt16 = (framebuffer.height / 4) * 3 + 64 + 32
+	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag
 
 	// Check ACPI here, after framebuffer initialization
 		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, Pointer.of(framebuffer))

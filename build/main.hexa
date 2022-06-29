@@ -69,7 +69,10 @@ let optimizationFeatures = '-O2 -fwrapv -fno-strict-aliasing -fno-strict-overflo
 
 let today = new Date()
 let month = today.getMonth() + 1
-let versionRolling = today.getFullYear() * 10000 + month * 100 + today.getDate()
+let versionMajor = today.getFullYear()
+let versionMinor = month
+let versionTag = today.getDate()
+let versionRolling = versionMajor * 10000 + versionMinor * 100 + versionTag
 let versionName = today.getFullYear() + '.' + month + '.' + today.getDate()
 
 if tasks.length == 0 {
@@ -157,6 +160,9 @@ for task in tasks {
 						'-DUEFI_BOOT_LOADER ',
 						'-D versionRolling=' + versionRolling + ' ',
 						'-D versionName=\\"' + versionName + '\\" ',
+						'-D versionMajor=' + versionMajor,
+						'-D versionMinor=' + versionMinor,
+						'-D versionTag=' + versionTag,
 
 						// TODO mno-sse avx etc DISABLE ALL FEATURES BUT SSE2
 						// SO CPUID CHECK WILL HANG BOOTLOADER WITH ERROR FOR SELECTED FEATURE
