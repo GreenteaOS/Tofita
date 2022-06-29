@@ -131,9 +131,9 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
-	status = findAndLoadRamDisk(systemTable.BootServices, Pointer.of(ramdisk))
 		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, Pointer.of(framebuffer))
 	var ramdisk: RamDisk = new RamDisk()
+	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk)
 	while status != EFI_STATUS.EFI_SUCCESS {
 	}
 	drawLoading(Pointer.of(framebuffer), 1)
