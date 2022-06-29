@@ -36,7 +36,7 @@ fun deleteFolderRecursive(path, noRemoveSelf) {
 
 let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
 let tasks: [String] = process.argv.slice()
-let llvm = 'LLVM-12.0.0'
+let llvm = 'LLVM-14.0.6-2'
 tasks.shift()
 tasks.shift()
 let teapot = config.teapot
@@ -158,13 +158,16 @@ for task in tasks {
 						'-D versionRolling=' + versionRolling + ' ',
 						'-D versionName=\\"' + versionName + '\\" ',
 
+						// TODO mno-sse avx etc DISABLE ALL FEATURES BUT SSE2
+						// SO CPUID CHECK WILL HANG BOOTLOADER WITH ERROR FOR SELECTED FEATURE
+
 						'-mno-ms-bitfields -fno-threadsafe-statics ',
 						'-fshort-wchar -mno-red-zone -Os',
 						' -c ',
 						'boot/uefi/boot.cpp',
 						' -o ',
 						config.tempFolder + '/' + teaFolder + '/miniefi.o'
-					].join(''), { stdio: 'inherit' }
+					].join(' '), { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
@@ -299,6 +302,7 @@ for task in tasks {
 						warn,
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -Wimplicit-function-declaration ',
 						optimizationFeatures,
+						// TODO disable C++ mode
 						'-x c++ -std=c++2a -c kernel/tofita.cpp -o ',
 						config.tempFolder + '/' + teaFolder + '/tofita.obj '
 					].join(''), { stdio: 'inherit' }
