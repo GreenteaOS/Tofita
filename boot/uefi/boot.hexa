@@ -37,7 +37,7 @@ fun tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64): VoidPointe
 }
 
 // Loading animation, progress 0...2
-fun drawLoading(framebuffer: Pointer<Framebuffer>, progress: UInt8) {
+fun drawLoading(framebuffer: Framebuffer, progress: UInt8) {
 	for y in leavesHeight {
 		for x in leavesWidth {
 			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
@@ -119,17 +119,20 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	var status = EFI_STATUS.EFI_NOT_READY
 
 	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer")
-	var framebuffer: Framebuffer
-	initializeFramebuffer(Pointer.of(framebuffer), systemTable)
-	drawLoading(Pointer.of(framebuffer), 0)
-	drawText("Greentea OS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag,
-			 (framebuffer.height / 4) * 3 + 64, Pointer.of(framebuffer))
-	let errorY: UInt16 = (framebuffer.height / 4) * 3 + 64 + 32
+	var framebuffer: Framebuffer = new Framebuffer()
+	initializeFramebuffer(framebuffer, systemTable)
+	drawLoading(framebuffer, 0)
 	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag
+	drawText(
+		versionText,
+		(framebuffer.height / 4) * 3 + 64 as! Int16,
+		framebuffer
+	)
+	let errorY: Int16 = (framebuffer.height / 4) * 3 + 64 + 32 as! Int16
 
 	// Check ACPI here, after framebuffer initialization
-		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, Pointer.of(framebuffer))
 	while acpiTable == null {
+		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, framebuffer)
 	}
 
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
@@ -138,12 +141,12 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
-		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, Pointer.of(framebuffer))
 	var ramdisk: RamDisk = new RamDisk()
 	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk)
 	while status != EFI_STATUS.EFI_SUCCESS {
+		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, framebuffer)
 	}
-	drawLoading(Pointer.of(framebuffer), 1)
+	drawLoading(framebuffer, 1)
 
 	serialPrintln("[[[efi_main]]] begin: fillMemoryMap")
 	var sizeAlloc: UInt64 = (ramdisk.size / pageSize + 1) * pageSize
@@ -170,7 +173,7 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 		var status: efi.EFI_STATUS = systemTable.RuntimeServices.GetTime(Pointer.of(time), Pointer.of(capabilities))
 		while status != EFI_STATUS.EFI_SUCCESS {
 			serialPrintln("[[[efi_main]]] <ERROR> GetTime")
-			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, Pointer.of(framebuffer))
+			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, framebuffer)
 		}
 
 		{
@@ -203,7 +206,7 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 		}
 
 		if oops == 100 {
-			drawText("Loading...", errorY, Pointer.of(framebuffer))
+			drawText("Loading...", errorY, framebuffer)
 			serialPrintln("[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices")
 			serialPrintln("[[[efi_main]]] <ERROR?> system may or may not start")
 			oops = 200
@@ -302,7 +305,7 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
 	while megs < 1234 {
-		drawText("[ERROR] Tofita requires at least 2 GB of memory [ERROR]", errorY, Pointer.of(framebuffer))
+		drawText("[ERROR] Tofita requires at least 2 GB of memory [ERROR]", errorY, framebuffer)
 		serialPrintf("Tofita requires at least 2 GB of memory\n")
 	}
 
@@ -327,8 +330,8 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	mapMemory(upper, largeBuffer, (conventionalOffset - largeBuffer) / pageSize + 1, 1)
 
 	// Note: framebuffer is *not* within physical memory
-	drawLoading(Pointer.of(framebuffer), 2)
 	mapFramebuffer(params.framebuffer.ref)
+	drawLoading(framebuffer, 2)
 	mapEfi(params.efiMemoryMap.ref)
 	mapMemoryHuge(wholePhysicalStart, 0, ram / pageSize)
 
