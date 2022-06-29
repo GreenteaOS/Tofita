@@ -65,6 +65,7 @@ trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile 
 // Entry point
 fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TABLE>): efi.EFI_STATUS {
 	initSerial()
+
 	serialPrint("\n[[[efi_main]]] Tofita " + versionMajor + "." +
 		versionMinor + " " + versionName + " UEFI bootloader. Welcome!\n")
 
@@ -130,9 +131,9 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
-	var ramdisk: RamDisk
 	status = findAndLoadRamDisk(systemTable.BootServices, Pointer.of(ramdisk))
 		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, Pointer.of(framebuffer))
+	var ramdisk: RamDisk = new RamDisk()
 	while status != EFI_STATUS.EFI_SUCCESS {
 	}
 	drawLoading(Pointer.of(framebuffer), 1)
@@ -213,11 +214,13 @@ fun efi_main(imageHandle: efi.EFI_HANDLE, systemTable: Pointer<efi.EFI_SYSTEM_TA
 	}
 	serialPrintln("[[[efi_main]]] done: ExitBootServices")
 
-	setRamDisk(Pointer.of(ramdisk))
+	setRamDisk(ramdisk)
 
 	serialPrintln("[[[efi_main]]] begin: preparing kernel loader")
 
-	var asset: RamDiskAsset = getRamDiskAsset("tofita.gnu")
+	// TODO forward constructor arguments `var asset: ByValue<RamDiskAsset> = new ByValue<RamDiskAsset>()`
+	var asset: RamDiskAsset = new RamDiskAsset()
+	getRamDiskAsset(asset, "tofita.gnu")
 	serialPrintf("[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
 
 	let largeBuffer: UInt64 = paging.conventionalAllocateLargest(Pointer.of(efiMemoryMap))
