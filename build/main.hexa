@@ -95,10 +95,10 @@ for task in tasks {
 				fs.copyFileSync('desktop.ini', folder + '\\desktop.ini')
 				require('child_process').execSync('cmd /c ATTRIB +S ' + folder, { stdio: 'inherit' })
 
-				// Create directory tofita/iso/EFI/BOOT/
+				// Create directory tofita/spin-off/EFI/BOOT/
 				let dirs = [
 					path.sep + teaFolder,
-					path.sep + 'iso',
+					path.sep + 'spin-off',
 					path.sep + 'EFI',
 					path.sep + 'BOOT'
 				]
@@ -112,7 +112,7 @@ for task in tasks {
 				}
 
 				// Assets
-				let assets = folder + '\\iso\\TOFITA.DAT'
+				let assets = folder + '\\spin-off\\TOFITA.DAT'
 				if fs.existsSync(assets) {
 					fs.unlinkSync(assets)
 				}
@@ -183,7 +183,7 @@ for task in tasks {
 						config.tempFolder + '/' + teaFolder + '/trampoline.o ',
 						config.tempFolder + '/' + teaFolder + '/miniefi.o ',
 						' -out:',
-						config.tempFolder + '/' + teaFolder + '/iso/EFI/BOOT/BOOTX64.EFI'
+						config.tempFolder + '/' + teaFolder + '/spin-off/EFI/BOOT/BOOTX64.EFI'
 					].join(''), { stdio: 'inherit' }
 				)
 			}
@@ -292,15 +292,15 @@ for task in tasks {
 			{
 				fs.copyFileSync(
 					'assets\\autorun.ico',
-					folder + '\\iso\\autorun.ico')
+					folder + '\\spin-off\\autorun.ico')
 				fs.copyFileSync(
 					'assets\\autorun.inf',
-					folder + '\\iso\\autorun.inf')
+					folder + '\\spin-off\\autorun.inf')
 				fs.copyFileSync(
 					'LICENSE',
-					folder + '\\iso\\LICENSE.txt')
+					folder + '\\spin-off\\LICENSE.txt')
 				fs.writeFileSync(
-					folder + '\\iso\\version.txt',
+					folder + '\\spin-off\\version.txt',
 					versionName
 				)
 
@@ -311,9 +311,9 @@ for task in tasks {
 				for cmd in [
 					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI',
 					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI/BOOT',
-					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
-					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\TOFITA.DAT ::/TOFITA.DAT',
-					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\version.txt ::/version.txt',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\TOFITA.DAT ::/TOFITA.DAT',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\version.txt ::/version.txt',
 					mcopy + ' -i ' + folder + '\\DISK.IMG LICENSE ::/LICENSE.txt',
 					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.ico ::/autorun.ico',
 					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
@@ -325,14 +325,14 @@ for task in tasks {
 				// Create disk image
 				fs.copyFileSync(
 					folder + '\\DISK.IMG',
-					folder + '\\iso\\DISK.IMG')
+					folder + '\\spin-off\\DISK.IMG')
 
 				let path = '/cygdrive/' + folder.split(':').join('')
 				require('child_process').execSync(
 					[
 						xorriso,
 						'-as mkisofs -o \(path)/greenteaos-uefi64.iso -iso-level 3',
-						'-V GreenteaOS \(path)/iso -append_partition 2 0xef \(path)/DISK.IMG',
+						'-V GreenteaOS \(path)/spin-off -append_partition 2 0xef \(path)/DISK.IMG',
 						'-e --interval:appended_partition_2:all:: -no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
 				)

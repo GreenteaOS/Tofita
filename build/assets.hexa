@@ -166,5 +166,5 @@ fun packAssets(config: Config) {
 		buffer.writeUInt32LE(ramDiskChecksum, 0)
 		console.log('ramDiskChecksum is', ramDiskChecksum)
 
-		fs.writeFileSync(folder + '\\iso\\TOFITA.DAT', buffer, "binary")
+		fs.writeFileSync(folder + '\\spin-off\\TOFITA.DAT', buffer, "binary")
 }
