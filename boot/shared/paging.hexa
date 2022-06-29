@@ -92,8 +92,8 @@ fun allocatePage(): ArrayPointer<ByValue<PageEntry>> {
 	return conventionalAllocateNext(pageSize) as! ArrayPointer<ByValue<PageEntry>>
 }
 
-LinearAddress getLinearAddress(address: UInt64) {
-	return *((LinearAddress *)Pointer.of(address))
+fun getLinearAddress(address: UInt64): ByValue<LinearAddress> {
+	return address as! ByValue<LinearAddress>
 }
 
 fun initializePage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
