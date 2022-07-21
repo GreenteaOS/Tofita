@@ -15,6 +15,14 @@
 
 // CPU exceptions
 
+// In case of kernel crash set instruction pointer to here
+fun kernelThreadLoop() {
+	serialPrintln("<Tofita> [looping forever]")
+	while true {
+		pause()
+	}
+}
+
 fun exceptionHandler(frame: InterruptFrame) {
 	// Page fault
 	@volatile var cr2: UInt64 = 0
@@ -23,27 +31,27 @@ fun exceptionHandler(frame: InterruptFrame) {
 	}
 
 	if currentThread == ThreadKind.THREAD_USER {
-		@volatile let process: Process = processes[currentProcess]
+		@volatile let process: UserProcess = processes[currentProcess]
 		process.schedulable = false
 		process.syscallToHandle = TofitaSyscalls.Cpu
 		process.cr2PageFaultAddress = cr2
 		switchToKernelThread(frame)
-		frame.ip = (uint64_t)Pointer.of(kernelThreadLoop)
 	} else if currentThread == ThreadKind.THREAD_GUI {
-		@volatile let process: Process = processes[0]
+		frame.ip = kernelThreadLoop as! UInt64 // TODO `@noCapture`
+		@volatile let process: UserProcess = processes[0]
 		process.cr2PageFaultAddress = cr2
-		qsod("THREAD_GUI unhandled CPU exception: index = %u, code = %8\n", frame.index, frame.code)
+		qsod("THREAD_GUI unhandled CPU exception: index = %u, code = %8\n".utf16(), frame.index, frame.code)
 	} else if currentThread == ThreadKind.THREAD_KERNEL {
 		// SEH
 		if sehProbe {
-			frame.ip = (uint64_t)Pointer.of(sehReturnFalse)
+			frame.ip = sehReturnFalse as! UInt64
 			sehProbe = false
 			return
 		}
 
-		frame.ip = (uint64_t)Pointer.of(kernelThreadLoop)
-		@volatile let process: Process = processes[0]
+		frame.ip = kernelThreadLoop as! UInt64
+		@volatile let process: UserProcess = processes[0]
 		process.cr2PageFaultAddress = cr2
-		qsod("THREAD_KERNEL unhandled CPU exception: index = %u, code = %8\n", frame.index, frame.code)
+		qsod("THREAD_KERNEL unhandled CPU exception: index = %u, code = %8\n".utf16(), frame.index, frame.code)
 	}
 }

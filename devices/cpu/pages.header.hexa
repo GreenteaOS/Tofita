@@ -13,54 +13,78 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Entry in a page table
+// Used to limit address space for compatibility modes
+enum AddressAwareness : UInt8 {
+	Bit32limit2GB = 0x0000 // Default
+	Bit32limit3GB = 0x0001 // Large address aware (compatibility mode)
+	Bit32limit4GB = 0x0002 // Large address aware on 64-bit kernels
+	Bit64limit8TB = 0x0003 // Default
+	Bit64limit128TB = 0x0004 // Default on newer kernels (compatibility mode)
+}
+
+/// Lowest level entry or higher if `largePage` bit set
 @struct @packed @sizeOf(8)
 class PageEntry {
-	// Is the page present in physical memory?
+	/// If false then causes #PF
 	@bits(1) var present: UInt8
 
-	// Pages are read-only by default
+	/// RW
+	// TODO RW causes #PF or #GPF?
+	// TODO The WP bit in CR0 determines if this is only applied to user land,
+	// always giving the kernel write access (the default) or both user land and the kernel
+	// (see Intel Manuals 3A 2-20)
 	@bits(1) var writeAllowed: UInt8
 
-	// Pages are only accessible by supervisor by default
+	/// User mode allowed
 	@bits(1) var accessibleByAll: UInt8
 
-	// Write through abilities of the page
+	/// Write through
 	@bits(1) var writeThrough: UInt8
 
-	// If set, the page will not be cached
+	/// TODO difference between `writeThrough`
 	@bits(1) var cacheDisabled: UInt8
 
-	// Was the page accessed?
+	/// Used by LRU (whether a PDE or PTE was read during virtual address translation)
 	@bits(1) var accessed: UInt8
 
-	// Has the page been written to? Only applicable for PTE.
+	/// Was overwritten, PTE only
 	@bits(1) var dirty: UInt8
 
-	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
+	/// Huge page or epic page
 	@bits(1) var largePage: UInt8
 
-	// Prevent the translations cache from updating
-	// the address in cache if CR3 is reset.
-	//
-	// Page global enable bit in CR4 has to be set to
-	// enable this feature.
-	//
-	// Only applicable for PTE
+	// TODO
+	/// Do not invalidate the TLB entry upon a MOV to CR3 instruction
 	@bits(1) var global: UInt8
 
-	// Not used by the processor
-	@bits(3) var metadata: UInt8
+	/*
+	The remaining bits 9 through 11 (if PS=0, also bits 6 & 8) are not used by the processor,
+	and are free for the OS to store some of its own accounting information.
 
-	// Physical address of the child table/page
+	TODO In addition, when P is not set,
+	the processor ignores the rest of the entry and you can use all remaining 31 bits
+	for extra information,
+	like recording where the page has ended up in swap space.
+	When changing the accessed or dirty bits from 1 to 0 while an entry is marked as present,
+	it's recommended to invalidate the associated page. Otherwise,
+	the processor may not set those bits upon subsequent read/writes
+	due to TLB caching.
+
+	^ https://wiki.osdev.org/Paging extra nuances apply
+	^ PS is `largePage`
+	*/
+	/// Available to the OS
+	@bits(3) var payload: UInt8
+
+	/// Physical address of the target
 	@bits(40) var address: UInt64
 
-	// Not used by the processor
-	@bits(7) var metadata2: UInt8
+	/// Available to the OS
+	@bits(7) var extra: UInt8
 
-	// Only applicable for PTE
+	/// Protection Key
 	@bits(4) var protectionKey: UInt8
 
-	// Disable execution of code from this page
+	/// NX-bit
 	@bits(1) var disableExecution: UInt8
 }

@@ -15,24 +15,30 @@
 
 // Based on https://forum.osdev.org/viewtopic.php?f=8&t=30052
 
+@rename('__sync_bool_compare_and_swap')
 declare fun __sync_bool_compare_and_swap(
+	ptr: ArrayPointer<UInt32>,
 	compVal: UInt32,
 	exchVal: UInt32
 ): Bool
 
+@rename('__sync_lock_release')
 declare fun __sync_lock_release(
+	ptr: ArrayPointer<UInt32>
 ): Void
 
 @struct @sizeOf(4)
-class Spinlock {
+class SpinLock {
 	// TODO is it faster to use uint8_t?
-	@volatile private var value: UInt32 = 0
+	@volatile private var counter: ArrayByValue<UInt32, 1> = [0]
 
 	@inline fun lock() {
+		// TODO instant return if a lock held without loops
+		// TODO simply loop 4096 times before doing version with `pause()`
 		// TODO UInt8 tries = 255
 		// TODO yield to another process
-		while !__sync_bool_compare_and_swap(Pointer.of(value), 0, 1) {
-			while value {
+		while !__sync_bool_compare_and_swap(counter.ref, 0, 1) {
+			while counter[0] != 0 {
 				pause()
 			}
 		}
@@ -40,6 +46,6 @@ class Spinlock {
 
 	// TODO C++20 inline attribute
 	@inline fun unlock() {
-		__sync_lock_release(Pointer.of(value))
+		__sync_lock_release(counter.ref)
 	}
 }

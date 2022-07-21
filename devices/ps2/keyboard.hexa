@@ -15,9 +15,10 @@
 
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
-var keyboardPressedState[128]: UInt8 = {0}
-let keyboardMap[128]: UInt8 = [
-	0,	  27,  '1', '2', '3', '4', '5', '6', '7',
+// TODO this is just array of booleans
+var keyboardPressedState: ArrayByValue<UInt8, 128> = [0]
+let keyboardMap: [String] = [
+	'', ''/*ESC*/, '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
 	'9',  '0', '-', '=',
 	'\b', // Backspace
@@ -26,55 +27,46 @@ let keyboardMap[128]: UInt8 = [
 	'r', // 19
 	't',  'y', 'u', 'i', 'o', 'p', '[', ']',
 	'\n', // Enter key
-	0,	  // 29 - Control
+	'',	  // 29 - Control
 	'a',  's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
 	';', // 39
 	'\'', '`',
-	0, // Left shift
+	'', // Left shift
 	'\\', 'z', 'x', 'c', 'v', 'b',
 	'n', // 49
 	'm',  ',', '.', '/',
-	0, // Right shift
+	'', // Right shift
 	'*',
-	0,	 // Alt
+	'',	 // Alt
 	' ', // Space bar
-	0,	 // Caps lock
-	0,	 // 59 - F1 key ... >
-	0,	  0,   0,	0,	 0,	  0,   0,	0,
-	0, // < ... F10
-	0, // 69 - Num lock
-	0, // Scroll Lock
-	0, // Home key
-	0, // Up Arrow
-	0, // Page Up
+	'',	 // Caps lock
+	'',	 // 59 - F1 key ... >
+	'',	  '',   '',	'',	 '',	  '',   '',	'',
+	'', // < ... F10
+	'', // 69 - Num lock
+	'', // Scroll Lock
+	'', // Home key
+	'', // Up Arrow
+	'', // Page Up
 	'-',
-	0, // Left Arrow
-	0,
-	0, // Right Arrow
+	'', // Left Arrow
+	'',
+	'', // Right Arrow
 	'+',
-	0, // 79 - End key
-	0, // Down Arrow
-	0, // Page Down
-	0, // Insert Key
-	0, // Delete Key
-	0,	  0,   0,
-	0, // F11 Key
-	0, // F12 Key
-	0 // All other keys are undefined
+	'', // 79 - End key
+	'', // Down Arrow
+	'', // Page Down
+	'', // Insert Key
+	'', // Delete Key
+	'',	  '',   '',
+	'', // F11 Key
+	'', // F12 Key
+	'' // All other keys are undefined
 ]
 
-let status_register = 0x64
-let data_port = 0x60
+let dataPort = 0x60u8
 
 fun handleKeyboardPacket() {
-	// serialPrint("[keyboard] intreruroror")
-	// readPort(STATUS_REGISTER)
-	// readPort(DATA_PORT)
-	// writePort(PIC1_COMMAND, PIC_EOI)
-	// return
-	// Fixes race condition / hang,
-	// but probably not the best way to do it
-	// cause keyboard is *not* handled in the poller
 	// if (polls)
 	//	return
 
@@ -99,35 +91,38 @@ fun handleKeyboardPacket() {
 	//	//    serialPrint(buffer)
 	//}
 
-	// if (status & 0x1)
+	// TODO if status & 0x1 != 0
 	{
-		var keycode: UInt8 = readPort(DATA_PORT)
+		var keycode: UInt8 = readPort(dataPort)
 
+		// TODO should hint that `<` useless here for `uint8`
 		if keycode < 0 {
 			// lockMouse = false
 			return
 		}
 
-			var buffer[]: WideChar = {(char8_t)keyboardMap[keycode], 0}
+		if keyboardMap[keycode] == null {
+			return
+		}
+
 		if keycode < 128 {
-			if buffer[0] == 0 {
-				buffer[0] = '?'
-			}
 			// serialPrint("[")
 			// serialPrint(buffer)
-			// serialPrintf(" down] %d\n", keycode)
 			keyboardPressedState[keycode] = 1
+
+			if 41 == keycode {
+				haveToQuake = !haveToQuake
+				// TODO DWM
+				haveToRender = true
+			}
+
 			if haveToQuake {
 				quakeHandleButtonDown(keycode)
 			} else {
 				// handleKeyDown(keycode)
 			}
 		} else {
-			keycode = keycode - 128
-			var buffer[]: WideChar = {(char8_t)keyboardMap[keycode], 0}
-			if buffer[0] == 0 {
-				buffer[0] = '?'
-			}
+			keycode = keycode - 128u8
 			// serialPrint("[")
 			// serialPrint(buffer)
 			// serialPrintf(" up] %d\n", keycode + 128)
@@ -141,11 +136,6 @@ fun handleKeyboardPacket() {
 	}
 
 	// Note: Quake terminal has higher priority than kernel itself
-	if keyboardPressedState[41] != 0 {
-		haveToQuake = !haveToQuake
-		// TODO DWM
-		haveToRender = true
-	}
 
 	// keyDownHandler = null
 	// if (haveToQuake)
@@ -154,11 +144,12 @@ fun handleKeyboardPacket() {
 	// EOI
 	// Disable this line if polling is used
 	// TODO @defer
-	writePort(PIC1_COMMAND, PIC_EOI)
+	writePort(pic1_command, pic_eoi)
 	// lockMouse = false
 }
 
+// TODO interrupt
 fun handleKeyboard() {
-	// UInt8 status = readPort(STATUS_REGISTER)
+	// let status = readPort(status_register)
 	// pollForce = status
 }

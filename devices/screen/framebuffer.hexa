@@ -18,59 +18,68 @@
 // Speed of rendering mostly depends on cache-locality
 // Remember: top-down, left-to-right: for(y) for(x) {}, not other way!
 
-var _framebuffer: Framebuffer
+var _framebuffer: FrameBuffer = null
 
 // Avoid one level of pointer indirection
-Pixel32 *_pixels
+var _pixels: ArrayPointer<ByValue<Pixel32>> = null
 
-Bitmap32 *allocateBitmap(width: UInt16, height: UInt16) {
-	var result = (Bitmap32Interim *)PhysicalAllocator.allocateBytes(sizeof(uint16_t) * 2 +
-																	 sizeof(Pixel32) * width * height)
+fun allocateBitmap(width: UInt32, height: UInt32): Bitmap32 {
+	// TODO allocateStruct<T>
+	var result = PhysicalAllocator.allocateBytes(
+		sizeOf<Bitmap32Interim>() +
+		(sizeOf<Pixel32>() * width * height)
+	) as! Bitmap32Interim
 	result.width = width
 	result.height = height
-	return (Bitmap32 *)result
+	result.pixels = (result as! UInt64 + 8 + 8) as! ArrayPointer<ByValue<Pixel32>>
+	return result as! Bitmap32
 }
 
-fun setFramebuffer(framebuffer: ConstPointer<Framebuffer>) {
-	_framebuffer = const_cast<Framebuffer *>(framebuffer)
-	_pixels = (Pixel32 *)_framebuffer.base
+fun setFramebuffer(framebuffer: FrameBuffer) {
+	_framebuffer = framebuffer
+	_pixels = _framebuffer.base as! ArrayPointer<ByValue<Pixel32>>
 }
 
 // Very fast, but not precise, alpha multiply
-fun Mul255(a255, c255) return (((uint32_t)a255 + 1) * (uint32_t)c255 >> 8)
-fun Blend255(target, color, alpha) return (Mul255(alpha, color) + Mul255(255 - alpha, target))
+fun mul255(a255: UInt32, c255: UInt32): UInt8 {
+	return ((a255 + 1) * c255 >> 8) as! UInt8
+}
 
-@fastcall fun  blendPixel(x: Int16, y: Int16, pixel: Pixel32) {
-	var _framebuffer = _framebuffer // Faster access
+fun blend255(target: UInt32, color: UInt32, alpha: UInt32): UInt8 {
+	return (mul255(alpha, color) + mul255(255u32 - alpha, target)) as! UInt8
+}
+
+@fastcall fun blendPixel(x: Int64, y: Int64, pixel: Pixel32) {
+	let _framebuffer = _framebuffer // Faster access
 	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
 		return
 	}
-	var p: Pixel32 = _pixels[y * _framebuffer.width + x]
+	var p: Pixel32 = _pixels[y * _framebuffer.width + x].ref
 
-	p.rgba.r = Mul255(pixel.rgba.a, pixel.rgba.r) + Mul255(255 - pixel.rgba.a, p.rgba.r)
-	p.rgba.g = Mul255(pixel.rgba.a, pixel.rgba.g) + Mul255(255 - pixel.rgba.a, p.rgba.g)
-	p.rgba.b = Mul255(pixel.rgba.a, pixel.rgba.b) + Mul255(255 - pixel.rgba.a, p.rgba.b)
+	p.rgba.ref.r = mul255(pixel.rgba.ref.a, pixel.rgba.ref.r) + mul255(255u32 - pixel.rgba.ref.a, p.rgba.ref.r)
+	p.rgba.ref.g = mul255(pixel.rgba.ref.a, pixel.rgba.ref.g) + mul255(255u32 - pixel.rgba.ref.a, p.rgba.ref.g)
+	p.rgba.ref.b = mul255(pixel.rgba.ref.a, pixel.rgba.ref.b) + mul255(255u32 - pixel.rgba.ref.a, p.rgba.ref.b)
 
-	_pixels[y * _framebuffer.width + x] = p
+	// TODO type check _pixels[y * _framebuffer.width + x] = p
 }
 
-@fastcall fun  setPixel(x: Int16, y: Int16, pixel: Pixel32) {
-	var _framebuffer = _framebuffer // Faster access
+@fastcall fun setPixel(x: Int64, y: Int64, pixel: ByValue<Pixel32>) {
+	let _framebuffer = _framebuffer // Faster access
 	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
 		return
 	}
 	_pixels[y * _framebuffer.width + x] = pixel
 }
 
-fun drawBitmap32WithAlpha(bitmap: Bitmap32, x: UInt16, y: UInt16) {
+fun drawBitmap32WithAlpha(bitmap: Bitmap32, x: Int16, y: Int16) {
 	for yy in bitmap.height {
 		for xx in bitmap.width {
-			blendPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
+			blendPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx].ref)
 		}
 	}
 }
 
-fun drawBitmap32(bitmap: Bitmap32, x: UInt16, y: UInt16) {
+fun drawBitmap32(bitmap: Bitmap32, x: Int16, y: Int16) {
 	for yy in bitmap.height {
 		for xx in bitmap.width {
 			setPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
@@ -78,7 +87,7 @@ fun drawBitmap32(bitmap: Bitmap32, x: UInt16, y: UInt16) {
 	}
 }
 
-fun drawRectangleWithAlpha(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, height: UInt16) {
+fun drawRectangleWithAlpha(color: Pixel32, x: Int16, y: Int16, width: UInt16, height: UInt16) {
 	for yy in height {
 		for xx in width {
 			blendPixel(x + xx, y + yy, color)
@@ -86,7 +95,7 @@ fun drawRectangleWithAlpha(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, 
 	}
 }
 
-fun drawRectangle(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, height: UInt16) {
+fun drawRectangle(color: ByValue<Pixel32>, x: Int16, y: Int16, width: UInt16, height: UInt16) {
 	for yy in height {
 		for xx in width {
 			setPixel(x + xx, y + yy, color)
@@ -94,7 +103,7 @@ fun drawRectangle(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, height: U
 	}
 }
 
-fun drawRectangleOutline(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, height: UInt16) {
+fun drawRectangleOutline(color: ByValue<Pixel32>, x: Int16, y: Int16, width: UInt16, height: UInt16) {
 	for yy in height {
 		for xx in width {
 			// Rendering left and far right points sequentally should be
@@ -107,20 +116,20 @@ fun drawRectangleOutline(color: Pixel32, x: UInt16, y: UInt16, width: UInt16, he
 	}
 }
 
-fun line45smooth(color: Pixel32, x: Int16, y: Int16, width: Int16, mod: Int16) {
-	color.rgba.a = 98
+fun line45smooth(color: ByValue<Pixel32>, x: Int16, y: Int16, width: Int16, mod: Int16) {
+	color.ref.rgba.ref.a = 98
 	var xx: Int16 = 0
 	for xi in width - 1 {
 		xx += mod
 		setPixel(xx + x, y + xi, color)
-		blendPixel(xx + x, y + xi + 1, color)
-		blendPixel(xx + x + mod, y + xi, color)
+		blendPixel(xx + x, y + xi + 1, color.ref)
+		blendPixel(xx + x + mod, y + xi, color.ref)
 	}
 	xx += mod
 	setPixel(xx + x, y + width - 1, color)
 }
 
-fun lineHorizontal(color: Pixel32, x: Int16, y: Int16, rightLength: UInt16) {
+fun lineHorizontal(color: ByValue<Pixel32>, x: Int16, y: Int16, rightLength: UInt16) {
 	for i in rightLength {
 		setPixel(x + i, y, color)
 	}
@@ -132,7 +141,7 @@ fun lineHorizontalWithAlpha(color: Pixel32, x: Int16, y: Int16, rightLength: UIn
 	}
 }
 
-fun lineVertical(color: Pixel32, x: Int16, y: Int16, bottomLength: UInt16) {
+fun lineVertical(color: ByValue<Pixel32>, x: Int16, y: Int16, bottomLength: UInt16) {
 	for i in bottomLength {
 		setPixel(x, y + i, color)
 	}

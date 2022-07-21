@@ -15,4 +15,6 @@
 
 // Read the RDTSC timer
 
-Void rdtscTicks(@volatile result: Pointer<UInt64>)
+// 123 // TODO constant\ident cannot be top level expr
+@rename('rdtscTicks')
+declare fun rdtscTicks(@volatile result: ArrayPointer<UInt64>): Void

@@ -14,15 +14,18 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 @struct
+@packed
 class Bitmap32Interim {
-	var width: UInt16
-	var height: UInt16
-	var pixels[]: Pixel32
+	var width: UInt32
+	var height: UInt32
+	var pixels: ArrayPointer<ByValue<Pixel32>>
 }
 
 @struct
+@packed
 class Bitmap32 {
-	let width: UInt16
-	let height: UInt16
-	var pixels[]: Pixel32
+	let width: UInt32
+	let height: UInt32
+	// TODO let
+	var pixels: ArrayPointer<ByValue<Pixel32>>
 }

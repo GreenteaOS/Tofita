@@ -13,42 +13,43 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let physical_not_found = 0
+// TODO as smart *simple* enum: special `PHYSICAL_NOT_FOUND = 0` and `PHYSICAL = ...`
+let physical_not_found = 0u64
 // A lot of non-zero bits
 // i.e. good in case of cosmic rays or something
 // Completely reserved by hardware and kernel executable image
 // Anything that is not defined considered to be PAGE_RESERVED
-let page_reserved = 0xFF
-let page_free = 0b1010
-let page_full = 0b0101
-let page_mask = 0b1111
+let page_reserved = 0xFFu8
+let page_free = 0b1010u8
+let page_full = 0b0101u8
+let page_mask = 0b1111u8
 // TODO mask user-mode pages differently than kernel-mode
 // TODO let granular_partial = 0b1010
 // TODO let granular_full = 0b1001
-@inline fun down_bytes_to_pages(bytes) {
-	return ((bytes) >> 12)
+@inline fun down_bytes_to_pages(bytes: UInt64): UInt64 {
+	return ((bytes) >> 12u64)
 }
 // 4095 >> 12 == 0
 // 4096 >> 12 == 1
 // 8191 >> 12 == 1
 // 8192 >> 12 == 2
-let kernel_reserved_pages = 4096
+let kernel_reserved_pages: UInt64 = 4096u64
 // == 16 megabytes
 // ^ this amount of memory cannot be allocated by user process
 // to avoid system crash on our of memory
 
 class PhysicalAllocator {
 	// Approx. 1 megabyte per each 4 gygabyte of RAM
-	static UInt8 *buffer // TODO use bits, not bytes
+	static var buffer: ArrayPointer<UInt8> // TODO use bits, not bytes
 	static var count: UInt64
 	static var countUser: UInt64 // count - kernel_reserved_pages
 	static var available: UInt64
 	static var last: UInt64
+	// TODO those fields must have ` = default`
 
-	// static fun init(const EfiMemoryMap *memoryMap, bufferVirtual: UInt64, ramPages: UInt64) {
-	static fun init(const params: Pointer<KernelParams>) {
-		buffer = (UInt8 *)params.physicalRamBitMaskVirtual
-		const EfiMemoryMap *memoryMap = Pointer.of(params.efiMemoryMap)
+	static fun init(params: UefiPayload) {
+		buffer = params.physicalRamBitMaskVirtual as! ArrayPointer<UInt8>
+		let memoryMap: UefiMemoryMap = params.efiMemoryMap.ref
 		count = down_bytes_to_pages(params.ramBytes)
 		countUser = count - kernel_reserved_pages
 		last = physical_not_found
@@ -66,7 +67,7 @@ class PhysicalAllocator {
 			var offset: UInt64 = startOfMemoryMap
 
 			while offset < endOfMemoryMap {
-				let kind = (descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory) ? page_free : page_reserved
+				let kind: UInt8 = (descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory) ? page_free : page_reserved
 				let where = down_bytes_to_pages(descriptor.physicalStart)
 				let steps = descriptor.numberOfPages
 
@@ -93,10 +94,10 @@ class PhysicalAllocator {
 			var physical: UInt64 = params.physicalBuffer
 			serialPrintf("[physical] Reserve %u bytes at %u of bootloader buffer\n", params.physicalBytes,
 						 physical)
-			var i: UInt64 = down_bytes_to_pages(params.physicalBytes) + 1
+			var i: UInt64 = down_bytes_to_pages(params.physicalBytes) + 1u64
 			while i > 0 {
 				i--
-				reserveOnePage(physical + i * pageSize)
+				reserveOnePage(physical + i * (pageSize as! UInt64))
 			}
 		}
 
@@ -130,12 +131,16 @@ class PhysicalAllocator {
 	// static UInt64 allocateDmaPage2G() {}
 	// TODO fill pages in reverse so I can traverse bitmap from zero?
 
+	static fun resetCounter() {
+		last = physical_not_found
+	}
+
 	// Returns physical 64-bit address, not page number
 	static fun allocateOnePage(): UInt64 {
 		if last != physical_not_found {
 			let where = last
 			last = physical_not_found
-			return where * pageSize + (wholePhysicalStart as! UInt64)
+			return where * (pageSize as! UInt64) + (wholePhysicalStart as! UInt64)
 		}
 
 		var i: UInt64 = 0
@@ -144,7 +149,7 @@ class PhysicalAllocator {
 		while i < steps {
 			if buffer[i] == page_free {
 				buffer[i] = page_full
-				return i * pageSize + (wholePhysicalStart as! UInt64)
+				return i * (pageSize as! UInt64) + (wholePhysicalStart as! UInt64)
 			}
 
 			i++
@@ -156,8 +161,8 @@ class PhysicalAllocator {
 
 	static fun allocateOnePagePreZeroed(): UInt64 {
 		var result = allocateOnePage()
-			memset((Void *)result, 0, pageSize)
 		if result != physical_not_found {
+			memset(result as! ArrayPointer<UInt8>, 0, pageSize)
 		}
 		return result
 	}
@@ -176,7 +181,7 @@ class PhysicalAllocator {
 	// TODO faster
 	static fun allocatePages(pages: UInt64): UInt64 {
 		// 0 or 1 == 1 page anyway
-		if pages < 2 {
+		if pages < 2u64 {
 			return allocateOnePage()
 		}
 
@@ -207,7 +212,7 @@ class PhysicalAllocator {
 				//}
 
 				if buffer[i] == page_free {
-					if current == 0 {
+					if current == 0u64 {
 						currentAt = i
 					}
 					current++
@@ -232,11 +237,11 @@ class PhysicalAllocator {
 
 		if largest >= pages {
 			var i: UInt64 = pages
-			while i > 0 {
+			while i > 0u64 {
 				i--
 				buffer[largestAt + i] = page_full
 			}
-			return largestAt * pageSize + (wholePhysicalStart as! UInt64)
+			return largestAt * (pageSize as! UInt64) + (wholePhysicalStart as! UInt64)
 		}
 
 		serialPrintf("[physical] allocatePages %u pages == PHYSICAL_NOT_FOUND\n", pages)
@@ -246,7 +251,7 @@ class PhysicalAllocator {
 	// Current granularity: 4096 bytes
 	static fun allocateBytes(bytes: UInt64): UInt64 {
 		// TODO
-		return allocatePages(down_bytes_to_pages(bytes) + 1)
+		return allocatePages(down_bytes_to_pages(bytes) + 1u64)
 	}
 
 	// Current granularity: xxx bytes
@@ -258,7 +263,7 @@ class PhysicalAllocator {
 		// and quickly deallocate if memory is not enough for apps/kernel
 		// (maybe even in semi-automated way within this memory allocator)
 		// (another very small bitmask for disk caches?)
-		return allocatePages(down_bytes_to_pages(bytes) + 1)
+		return allocatePages(down_bytes_to_pages(bytes) + 1u64)
 	}
 
 	static fun freeOnePage(physical: UInt64) {
@@ -283,7 +288,8 @@ class PhysicalAllocator {
 
 	static fun freeBytes(physical: UInt64, bytes: UInt64) {
 		// TODO
-		freePages(physical, down_bytes_to_pages(bytes) + 1)
+		freePages(physical, down_bytes_to_pages(bytes) + 1u64)
+		// TODO `u64` to just `1`
 	}
 
 	// Same mechanics as in garbage collector
