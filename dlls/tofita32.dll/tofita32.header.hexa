@@ -14,20 +14,38 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Tofita
+let _fltused: Int64 = 0
+
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
-TOFITA32_DLL UInt64 tofitaFastSystemCall(rcx: TofitaSyscalls, UInt64 rdx = 0)
-@fastcall TOFITA32_DLL UInt32 tofitaFastStub()
-TOFITA32_DLL Void tofitaDebugLog(const message: Pointer<WideChar>, UInt64 extra = 0, UInt64 more = 0)
+declare fun tofitaFastSystemCall(rcx: TofitaSyscalls,
+#if bit64
+	rdx: UInt64 = 0
+#else
+	rdx: UInt32 = 0
+#end
+): #if bit64 UInt64 #else UInt32 #end
+// TODO link name + dll import
+@fastcall declare fun tofitaFastStub(rcx: UInt64, rdx: UInt64): UInt32
+@stdcall declare fun tofitaStdStub(arg: ConstArrayPointer<UInt8>): UInt32
+@rename('tofitaDebugLog')
+declare fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0): Void
 
 // Kernel32
+@rename('tofitaExitProcess')
 declare fun tofitaExitProcess(exitCode: UInt32): Void
 
 // User32
-TOFITA32_DLL UInt64 tofitaCreateWindowEx(payload: Pointer<CreateWindowExPayload>)
-TOFITA32_DLL Void tofitaShowWindow(UInt64 windowId, nCmdShow: Int32)
-TOFITA32_DLL wapi.Bool tofitaGetMessage(payload: Pointer<GetMessagePayload>)
-TOFITA32_DLL wapi.Bool tofitaPostMessage(payload: Pointer<PostMessagePayload>)
+@rename('cast_tofitaCreateWindowEx')
+declare fun tofitaCreateWindowEx(payload: CreateWindowExPayload): UInt64
+@rename('tofitaShowWindow')
+declare fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow): Void
+@rename('cast_tofitaGetMessage')
+declare fun tofitaGetMessage(payload: GetMessagePayload): Bool32
+@rename('cast_tofitaPostMessage')
+declare fun tofitaPostMessage(payload: PostMessagePayload): Bool32
 
 // NjRAA
-TOFITA32_DLL Void njraaGetOrCreateWindowFramebuffer(UInt64 windowId, nj.fb: Pointer<WindowFramebuffer>)
-TOFITA32_DLL Void njraaSwapWindowFramebuffer(UInt64 windowId, nj.fb: Pointer<WindowFramebuffer>)
+@rename('cast_njraaGetOrCreateWindowFramebuffer')
+declare fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void
+@rename('cast_njraaSwapWindowFramebuffer')
+declare fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void

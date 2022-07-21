@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-declare Handle = VoidPointer
+// TODO better idea
+@struct
+class Handle {
+	// Ok
+}
+
 // TODO ifdef 64-bit
 // (HandleSize)handle & ~(HandleSize)0b11
 declare HandleSize = UInt64
@@ -27,16 +32,23 @@ declare HWnd = Handle
 declare HMenu = Handle
 declare HDc = Handle
 
-declare LResult = VoidPointer
+// TODO @byValue + @sizeOf(8/4)/@sizeOfPointer + value: size_t = safe converters
+@struct
+class LResult {
+	// Ok
+}
 
 // TODO LResult as enum?
 let error_success = 0 as! LResult
 let error_invalid_handle = 6 as! LResult
-let invalid_handle_value = -1 as! Handle
+let invalid_handle_value = (-1) as! Handle
+// TODO `let invalid_handle_value = -1 as! Handle` not `(-1)`
 
 enum Bool32 : Int32 {
 	False = 0
+	// TODO ^ types check infer 0i32 etc same as int
 	True = 1
+	// TODO ^ `true` is any non-0 value `True = 1 or _` or just `v != Bool32.False`
 }
 
 // LONG is signed 32-bit int32_t
@@ -50,16 +62,21 @@ class Rect {
 	var top: Int32
 	var right: Int32
 	var bottom: Int32
+	// TODO const all fields or `Rect extends ConstRect`
 }
 
 @struct
 class PaintStruct {
+	//var xdc: Handle // TODO Unused?
+	//var udc: Handle
 	var hdc: HDc
 	var fErase: Bool32
-	var rcPaint: Rect
-	var rgbReserved[32]: UInt8
+	// TODO this and other ByValue fields must be `let` to avoid unnecessary copy
+	// TODO how to disallow copy-from, not only copy-to?
+	var rcPaint: ByValue<Rect>
 	var fRestore: Bool32
 	var fIncUpdate: Bool32
+	var rgbReserved: ArrayByValue<UInt8, 32>
 }
 
 enum Message : UInt32 {
@@ -124,7 +141,7 @@ enum Message : UInt32 {
 	BM_GETIMAGE = 0x00F6
 	BM_SETIMAGE = 0x00F7
 	WM_KEYFIRST = 0x0100
-	WM_KEYDOWN = 0x0100
+	WM_KEYDOWN = WM_KEYFIRST // 0x0100
 	WM_KEYUP = 0x0101
 	WM_CHAR = 0x0102
 	WM_DEADCHAR = 0x0103
@@ -157,14 +174,16 @@ class Point {
 class Msg {
 	var hwnd: HWnd
 	var message: Message
-	var wParam: Pointer<Void>
-	var lParam: Pointer<Void>
+	var wParam: WParam
+	var lParam: LParam
 	var time: UInt32
-	var pt: Point
+	var pt: ByValue<Point>
 	var lPrivate: UInt32
+
+	new () {}
 }
 
-declare WindowProcedure = (hWnd: HWnd, uMsg: Message, wParam: VoidPointer, lParam: VoidPointer) => LResult
+declare WindowProcedure = (hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam) => LResult
 
 @struct @sizeOf(72)
 class WindowClass {
@@ -176,17 +195,18 @@ class WindowClass {
 	var hIcon: HIcon
 	var hCursor: HCursor
 	var hbrBackground: HBrush
-	var lpszMenuName: ConstArrayPointer<WideChar>
-	var lpszClassName: ConstArrayPointer<WideChar>
+	var lpszMenuName: ConstArrayPointer<ClangWideChar>
+	var lpszClassName: ConstArrayPointer<ClangWideChar>
+	new () {}
 }
 
 enum CmdShow : Int32 {
 	SW_HIDE = 0
 	SW_SHOWNORMAL = 1
-	SW_NORMAL = 1
+	SW_NORMAL = SW_SHOWNORMAL
 	SW_SHOWMINIMIZED = 2
 	SW_SHOWMAXIMIZED = 3
-	SW_MAXIMIZE = 3
+	SW_MAXIMIZE = SW_SHOWMAXIMIZED
 	SW_SHOWNOACTIVATE = 4
 	SW_SHOW = 5
 	SW_MINIMIZE = 6
@@ -195,26 +215,32 @@ enum CmdShow : Int32 {
 	SW_SHOWRESTORE = 9
 	SW_SHOWDEFAULT = 10
 	SW_FORCEMINIMIZE = 11
-	SW_MAX = 11
+	SW_MAX = SW_FORCEMINIMIZE
 }
 
-@struct @packed
+// TODO `@byValue`
+@struct @packed @sizeOf(4) // TODO generate `sizeof` check in code
 class PixelRGBAData {
 	var r: UInt8
 	var g: UInt8
 	var b: UInt8
 	var a: UInt8
+	new () {}
 }
 
+// Union is pointer by default
+// TODO `@byValue`
 @union @sizeOf(4)
+@struct
 class Pixel32 {
-	var rgba: PixelRGBAData
+	var rgba: ByValue<PixelRGBAData>
 	var color: UInt32
+	new () {}
 }
 
 @struct
 class WindowFramebuffer {
-	var pixels: Pointer<Pixel32>
-	var width: UInt16
-	var height: UInt16
+	var pixels: ArrayPointer<ByValue<Pixel32>>
+	var width: UInt32
+	var height: UInt32
 }

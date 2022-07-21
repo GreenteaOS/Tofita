@@ -13,23 +13,53 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx)
 fun kiFastSystemCall(rcx: UInt64, rdx: UInt64): UInt64 {
+	return tofitaFastSystemCall(rcx as! TofitaSyscalls, rdx)
 }
 
-Void greenteaosIsTheBest(Int32 (*entry)(), pid: UInt64) {
+// TODO calling convention
+// TODO no capture `@closure(false)`
+declare Entry = (hInstance: ConstArrayPointer<Void>, hPrev: ConstArrayPointer<Void>, pCmdLine: ConstArrayPointer<Void>, nCmdShow: Int) => UInt32
+declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, lpvReserved: ConstArrayPointer<Void>) => Bool32
+// TODO must error `hinstDLL` twice `declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, hinstDLL: ConstArrayPointer<Void>) => Bool32`
+
+@rename('hexa_entry') declare let hexa_entry: Entry // TOSO size_r
+@rename('hexa_pid') declare let hexa_pid: UInt64 // TOSO size_r
+@rename('hexa_dllEntries') declare let hexa_dllEntries: UInt64 // TOSO size_r
+
+enum DllEntryReason : UInt32 {
+	DLL_PROCESS_ATTACH = 1
+}
+
+//TODO set as entry @linkName('greenteaosIsTheBest')
+fun greenteaosIsTheBest(entry: Entry, pid: UInt64, dllEntries: UInt64) {
 	// TODO entry arguments (argv, argc)
 	// TODO init DLLs
 	// TODO PEB/TEB
 	// TODO TLS callbacks
 	// TODO load DLLs in usermode
-	tofitaDebugLog("CRT ready for PID %u", pid)
+	tofitaDebugLog("ENTRERED_HEXA".utf16())
+	tofitaDebugLog("CRT ready for PID %u".utf16(), pid)
+	// TODO as stricture `{ count UInt32, dllEntries ArrayByValue<...> }`
+	let count = (dllEntries != 0)? (dllEntries as! ConstArrayPointer<UInt32>)[0] : 0u32
+	let dllMains = dllEntries as! ConstArrayPointer<DllEntry>
+
+	for i in count {
+		dllMains[i + 1](null, DllEntryReason.DLL_PROCESS_ATTACH, null)
+	}
+
+	// TODO unmap entries/etc if required
+	tofitaDebugLog("Done %u DLLs".utf16(), count)
+
 	if entry != null {
-		tofitaDebugLog("entry != null OK for PID %u", pid)
+		tofitaDebugLog("entry != null OK for PID %u".utf16(), pid)
 	}
 	if entry == null {
-		tofitaDebugLog("entry == null ERROR for PID %u", pid)
+		tofitaDebugLog("entry == null ERROR for PID %u".utf16(), pid)
 	}
-	tofitaExitProcess(entry())
+	tofitaExitProcess(entry(null, null, null, 0))
 	while (true) {}
 }
+
+tofitaDebugLog("PRE_ENTRERED_HEXA".utf16())
+greenteaosIsTheBest(hexa_entry, hexa_pid, hexa_dllEntries)

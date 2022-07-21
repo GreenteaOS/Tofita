@@ -16,109 +16,119 @@
 // Constants
 
 // TODO Test real limitation
-let classNameLimit = 256u32
+let classNameLimit = 256u16
 
 // Utils
 
-fun handleToWindow(hWnd: wapi.HWnd): Pointer<user32.Window> {
+fun handleToWindow(hWnd: HWnd): Window {
 	if hWnd == null {
 		return null // TODO return desktop
 	}
-	if hWnd == INVALID_HANDLE_VALUE {
+	// TODO some bits of HANLDE sould be ignored before reading
+	// and comparison
+	if hWnd == invalid_handle_value {
 		return null
-	if (((user32.Window *)hWnd).windowIsWindow != user32.windowIsWindow)
 	}
+	// TODO probe for read hWnd as pointer,
+	// and only then compare HANDLE.tag (windowIsWindow)
+	// HWnd should extend Handle/TaggedHandle probably
+	// TODO SEH-reading
+	if (hWnd as! Window).windowIsWindowSecret != windowIsWindow {
 		return null
-	return hWnd as! Pointer<user32.Window>
+	}
+	// TODO static Window.fromHandle
+	return hWnd as! Window
 }
 
-fun windowToHandle(user32.window: Pointer<Window>): wapi.HWnd {
+fun windowToHandle(window: Window): HWnd {
 	// TODO offset ptr 8-byte aligned + reserved space
 	// os it fits into upper half of virtual space
 	return window as! HWnd
 }
 
 // WAPI
-@rename('RegisterClassW')
-fun registerClassW(const wapi.wc: Pointer<WindowClass>): wapi.Atom {
-	tofitaDebugLog("RegisterClassW called")
+@dllExport('RegisterClassW')
+fun registerClassW(wc: WindowClass): Atom {
+	tofitaDebugLog("RegisterClassW called".utf16())
 
 	// TODO use libc func utf16le
-	var len = 0
+	//var len = 0
 	// TODO lpszClassName takes atoms?
-	var str = (const UInt16 *)wc.lpszClassName
-	for i in 256 {
-		// Increment upfront to rezerve for zeros
-		len += 2
-		// Null-termination of utf16le is \0\0
-		if str[i] == 0 {
-			break
-		}
-	}
+	// TODO rename to just className, ci to require no \wlpsz[A-Z_][A-z_]+\w/etc prefixes
+	// to avoid headers copy-pasta law (print all places at once)
 
-	var tail = Pointer.of(user32.rootClass)
+	var tail = rootClass
+	// TODO `while let`
 	while tail.next != null {
 		tail = tail.next
 	}
 
-	var list = (user32.ClassesLinkedList *)LocalAlloc(0, sizeof(user32.ClassesLinkedList))
-	var name = (UInt16 *)LocalAlloc(0, len)
+	// TODO sizeOf struct by value(!)
+	// TODO `new ClassesLinkedList()`
+	// TODO just use Hexa Map here
+	var list = new ClassesLinkedList(named: String.fromUTF16zUpTo(wc.lpszClassName as! ConstArrayPointer<UInt16>, classNameLimit))
+	//var name = localAlloc(0, len) as! ArrayPointer<UInt16>
 	list.next = null
 
-	for i in len {
-		name[i] = str[i]
-	}
 
-	list.name = name
-	list.wc = *wc
+	list.wc = new WindowClass() // TODO `new T() { ...wc }` to make a copy
+	memcpy(list.wc as! ArrayPointer<UInt8>, wc as! ConstArrayPointer<UInt8>, sizeOf<WindowClass>() as! Int)
+
+	// TODO still bad idea cause pointers to strings (aka wide chars)
 
 	tail.next = list
 	tail = tail.next
 
-	tofitaDebugLog("RegisterClassW done")
+	tofitaDebugLog("RegisterClassW done".utf16())
 	return 0 as! Atom
 }
 
-@rename('CreateWindowExW')
-fun createWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer, lpWindowName: ConstWideCharPointer,
-						   UInt32 dwStyle, x: Int32, y: Int32, nWidth: Int32, nHeight: Int32,
-						   wapi.HWnd hWndParent, wapi.HMenu hMenu, wapi.HInstance hInstance,
-						   Void *lpParam): wapi.HWnd {
-	tofitaDebugLog("CreateWindowExW called")
+@dllExport('CreateWindowExW')
+fun createWindowExW(
+	dwExStyle: UInt32,
+	lpClassName: ConstArrayPointer<ClangWideChar>,
+	lpWindowName: ConstArrayPointer<ClangWideChar>,
+	dwStyle: UInt32,
+	x: Int32,
+	y: Int32,
+	nWidth: Int32,
+	nHeight: Int32,
+	hWndParent: HWnd,
+	hMenu: HMenu,
+	hInstance: HInstance,
+	lpParam: LParam
+): HWnd {
+	tofitaDebugLog("CreateWindowExW called".utf16())
 
 	// Find class
-	var list = Pointer.of(user32.rootClass)
-	var name = lpClassName
+	var list = rootClass
+	var name = String.fromUTF16zUpTo(lpClassName as! ConstArrayPointer<UInt16>, classNameLimit)
 	var found = false
-	const wapi.WindowClass *wc = null
+	var wc: WindowClass = null
 
 	while list.next != null {
 		// Step upfront, to ignore empty root
 		list = list.next
 
-		var i: UInt16 = 0
-		while true {
-			if ((list.name[i] == name[i]) && (name[i] == 0)) {
-				tofitaDebugLog("CreateWindowExW found class {%S}\n", (name as! UInt64))
-				found = true
-				wc = Pointer.of(list.wc)
-				break
-			}
-			if (list.name[i] == name[i]) {
-				i++
-				continue
-			}
+		if list.name == name {
+			tofitaDebugLog("CreateWindowExW found class {%S}\n".utf16(), (name.utf16() as! UInt64))
+			found = true
+			wc = list.wc
 			break
 		}
 	}
 
+	// TODO `not`
+	// TODO `if let`
 	if !found {
-		tofitaDebugLog("CreateWindowExW not found return")
+		tofitaDebugLog("CreateWindowExW not found return".utf16())
 		return null
 	}
 
 	// Prepare for syscall
-	var payload: CreateWindowExPayload
+	// TODO proper `new CreateWindowExPayload {} ()`
+	// TODO stack alloc\dealloc by @owned/borrowed @struct refs
+	var payload: CreateWindowExPayload = new CreateWindowExPayload()
 
 	payload.wc = wc
 
@@ -135,32 +145,36 @@ fun createWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer, lpWindo
 	payload.lpParam = lpParam
 
 	// Create local window counterpart
-	var window = (user32.Window *)LocalAlloc(0, sizeof(user32.Window))
+	var window = new Window()
+	tofitaDebugLog("window = {%8}\n".utf16(), (window as! UInt64))
 
 	let hWnd = window as! HWnd
 	payload.hWnd = hWnd
 
 	// Create native window counterpart
-	var windowId: UInt64 = tofitaCreateWindowEx(Pointer.of(payload))
+	var windowId: UInt64 = tofitaCreateWindowEx(payload)
 
 	window.windowId = windowId
-	window.windowIsWindow = windowIsWindow
+	window.windowIsWindowSecret = windowIsWindow
+	tofitaDebugLog("wc.lpfnWndProc = {%8}\n".utf16(), (wc.lpfnWndProc as! UInt64))
 	window.proc = wc.lpfnWndProc
+	tofitaDebugLog("window.proc = {%8}\n".utf16(), (window.proc as! UInt64))
 
 	// Initial paint
 	// TODO should be called somewhere else, in syscall of windows creation?
 	postMessage(hWnd, Message.WM_PAINT, null, null)
 
-	tofitaDebugLog("CreateWindowExW done")
+	tofitaDebugLog("CreateWindowExW done".utf16())
 	return hWnd
 }
 
-@rename('ShowWindow')
-fun showWindow(hWnd: wapi.HWnd, nCmdShow: Int32): wapi.Bool {
-	tofitaDebugLog("ShowWindow called")
+@dllExport('ShowWindow')
+fun showWindow(hWnd: HWnd, nCmdShow: CmdShow): Bool32 {
+	tofitaDebugLog("ShowWindow called".utf16())
 	var window = handleToWindow(hWnd)
 	var result = Bool32.False
 	if window != null {
+		// TODO Cannot switch over `Int32` type
 		switch nCmdShow {
 		case SW_HIDE: {
 			tofitaShowWindow(window.windowId, nCmdShow)
@@ -177,158 +191,183 @@ fun showWindow(hWnd: wapi.HWnd, nCmdShow: Int32): wapi.Bool {
 		}
 		}
 	}
-	tofitaDebugLog("ShowWindow done")
+	tofitaDebugLog("ShowWindow done".utf16())
 	return result
 }
 
 // TODO take 2 or more messages at a time for better perf (this is pretty common)
-@rename('GetMessageW')
-fun getMessageW(msg: Pointer<wapi.Msg>, hWnd: wapi.HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32): wapi.Bool {
-	tofitaDebugLog("GetMessageW called")
-	var result: Bool = 1
+@dllExport('GetMessageW')
+fun getMessageW(msg: Msg, hWnd: HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32): Bool32 {
+	tofitaDebugLog("GetMessageW called".utf16())
+	var result = Bool32.True // TODO `true`
 
-	var payload: GetMessagePayload
+	var payload: GetMessagePayload = new GetMessagePayload() // TODO not a valid syntax, must =
 	payload.msg = msg
 	payload.hWnd = hWnd
 	payload.wMsgFilterMin = wMsgFilterMin
 	payload.wMsgFilterMax = wMsgFilterMax
-	tofitaGetMessage(Pointer.of(payload))
+	tofitaGetMessage(payload)
 
 	// Stop iteration
 	if msg.message == Message.WM_QUIT {
 		result = Bool32.False
 	}
 
-	tofitaDebugLog("GetMessageW done")
+	tofitaDebugLog("GetMessageW done".utf16())
 	return result
 }
 
-@rename('TranslateMessage')
-fun translateMessage(msg: Pointer<wapi.Msg>): wapi.Bool {
-	tofitaDebugLog("TranslateMessage called")
+@dllExport('TranslateMessage')
+fun translateMessage(msg: Msg): Bool32 {
+	tofitaDebugLog("TranslateMessage called".utf16())
 	// TODO
-	tofitaDebugLog("TranslateMessage done")
+	tofitaDebugLog("TranslateMessage done".utf16())
 	return Bool32.False
 }
 
-@rename('DispatchMessageW')
-fun dispatchMessageW(msg: Pointer<wapi.Msg>): wapi.LResult {
-	tofitaDebugLog("DispatchMessageW called")
-	var result: LResult = 0
+@dllExport('DispatchMessageW')
+fun dispatchMessageW(msg: Msg): LResult? {
+	tofitaDebugLog("DispatchMessageW called (hexa)".utf16())
+	var result: LResult? = null
+	// TODO ^ clearer result type? LResult.zero
 	if msg.hwnd != null {
+		tofitaDebugLog("msg.hwnd != null".utf16())
 		var window = handleToWindow(msg.hwnd)
+		tofitaDebugLog("handleToWindow".utf16())
 		if window == null {
-			return 0
+			tofitaDebugLog("window == null".utf16())
+			return null
 		}
 		// ERROR_INVALID_HANDLE
 		if msg.message == Message.WM_PAINT {
+			tofitaDebugLog("WM_PAINT".utf16())
+			//
 			result = window.proc(msg.hwnd, msg.message, msg.wParam, msg.lParam)
 		} else {
+			tofitaDebugLog("not_WM_PAINT".utf16())
 			result = window.proc(msg.hwnd, msg.message, msg.wParam, msg.lParam)
 		}
 		// result = ERROR_SUCCESS
 	} else {
 		// TODO
 	}
-	tofitaDebugLog("DispatchMessageW done")
+	tofitaDebugLog("DispatchMessageW done".utf16())
 	return result
 }
 
-@rename('PostMessage')
-fun postMessage(hWnd: wapi.HWnd, msg: wapi.Message, wParam: VoidPointer, lParam: VoidPointer): wapi.Bool {
-	var payload: PostMessagePayload
+@dllExport('PostMessage')
+fun postMessage(hWnd: HWnd, msg: Message, wParam: WParam, lParam: LParam): Bool32 {
+	var payload: PostMessagePayload = new PostMessagePayload()
 	payload.hWnd = hWnd
 	payload.msg = msg
 	payload.wParam = wParam
 	payload.lParam = lParam
-	return tofitaPostMessage(Pointer.of(payload))
+	return tofitaPostMessage(payload)
 }
 
-@rename('PostQuitMessage')
+@dllExport('PostQuitMessage')
 fun postQuitMessage(nExitCode: Int32): Void {
-	tofitaDebugLog("PostQuitMessage called")
-	tofitaDebugLog("PostQuitMessage done")
-	postMessage(null, Message.WM_QUIT, nExitCode as! VoidPointer, null)
+	tofitaDebugLog("PostQuitMessage called".utf16())
+	postMessage(null, Message.WM_QUIT, nExitCode as! WParam, null)
+	tofitaDebugLog("PostQuitMessage done".utf16())
 	// TODO ERROR_SUCCESS
 }
 
-@rename('BeginPaint')
-fun beginPaint(wapi.HWnd hWnd, wapi.ps: Pointer<PaintStruct>): wapi.HDc {
-	tofitaDebugLog("BeginPaint called")
+@dllExport('BeginPaint')
+fun beginPaint(hWnd: HWnd, ps: PaintStruct): HDc {
+	tofitaDebugLog("BeginPaint called".utf16())
 	var window = handleToWindow(hWnd)
+	// TODO guard `let window = window ?? return null`
 	if window == null {
 		return null
 	}
 	// We do this every time, cause window may be resized
-	njraaGetOrCreateWindowFramebuffer(window.windowId, Pointer.of(window.fb))
-	ps.rcPaint.left = 0
-	ps.rcPaint.top = 0
-	ps.rcPaint.right = window.fb.width
-	ps.rcPaint.bottom = window.fb.height
-	tofitaDebugLog("BeginPaint done")
-	return (wapi.HDc)Pointer.of(window.fb) // TODO
+	let fb = window.fb.ref
+	njraaGetOrCreateWindowFramebuffer(window.windowId, fb)
+	let rcPaint = ps.rcPaint.ref
+	rcPaint.left = 0
+	rcPaint.top = 0
+	rcPaint.right = fb.width as! Int32
+	rcPaint.bottom = fb.height as! Int32
+	tofitaDebugLog("BeginPaint done".utf16())
+	return fb as! HDc
 }
 
-@fastcall fun setPixel(nj.fb: Pointer<WindowFramebuffer>, x: Int16, y: Int16, nj.Pixel32 pixel): Void {
+// TODO reimplement into SEH writer instead of `if`? is it any safer for overflows? faster? x/y bounds?
+@fastcall fun setPixel(fb: WindowFramebuffer, x: Int32, y: Int32, pixel: ByValue<Pixel32>): Void {
+	// TODO merge to single comparison
 	if (x < 0) || (y < 0) {
 		return
 	}
 	if (x > fb.width - 1) || (y > fb.height - 1) {
 		return
 	}
+
+	// TODO this is not copy by value!!!
 	fb.pixels[y * fb.width + x] = pixel
 }
 
-@rename('FillRect')
-fun fillRect(dc: wapi.HDc, lprc: ConstPointer<wapi.Rect>, brush: wapi.HBrush): Int32 {
-	tofitaDebugLog("FillRect called")
+@dllExport('FillRect')
+fun fillRect(dc: HDc, lprc: Rect, brush: HBrush): Int32 {
+	tofitaDebugLog("FillRect called".utf16())
 
-	var fb = (nj.WindowFramebuffer *)dc
+	var fb = dc as! WindowFramebuffer
+	// TODO validate != null and that it is actually a WindowFramebuffer
 
-	var color: Pixel32
-	color.color = 0xFFAA0000u32
+	var color = new ByValue<Pixel32>()
+	// TOOD by val
+	color.ref.color = 0xFFAA0000u32
 
 	for y in lprc.top ... lprc.bottom {
 		for x in lprc.left ... lprc.right {
+			//color.ref.color = 0xFFAA0000u32 +
+			color.ref.color = (x * 256) + (y ^ x) + (y * 255 * 255) + 0u32
 			setPixel(fb, x, y, color)
 		}
 	}
 
-	tofitaDebugLog("FillRect done")
+	tofitaDebugLog("FillRect done".utf16())
 	return 1
 }
 
-@rename('EndPaint')
-fun endPaint(hWnd: wapi.HWnd, ps: Pointer<wapi.PaintStruct>): wapi.Bool {
-	tofitaDebugLog("EndPaint called")
+@dllExport('EndPaint')
+fun endPaint(hWnd: HWnd, ps: PaintStruct): Bool32 {
+	// TODO respect ps
+	tofitaDebugLog("EndPaint called".utf16())
+	// TODO `?? return 0` (hardcoded `return\throw` for now)
 	var window = handleToWindow(hWnd)
 	if window == null {
 		return Bool32.False
 	}
-	njraaSwapWindowFramebuffer(window.windowId, Pointer.of(window.fb))
-	tofitaDebugLog("EndPaint done")
+	let fb = window.fb.ref
+	njraaSwapWindowFramebuffer(window.windowId, fb)
+	tofitaDebugLog("EndPaint done".utf16())
 	return Bool32.True
 }
 
-@rename('DefWindowProcW')
-fun defWindowProcW(wapi.HWnd hWnd, wapi.Message uMsg, Void *wParam, Void *lParam): wapi.LResult {
-	tofitaDebugLog("DefWindowProcW called")
+@dllExport('DefWindowProcW')
+fun defWindowProcW(hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam): LResult? {
+	tofitaDebugLog("DefWindowProcW called".utf16())
 	var window = handleToWindow(hWnd)
 	if window == null {
-		return 0
+		return null
 	}
 	if uMsg == Message.WM_CLOSE {
 		// TODO DestroyWindow(hWnd)
 		// TODO probably should be async post?
-		window.proc(hWnd, Message.WM_DESTROY, 0, 0)
-		window.proc(hWnd, Message.WM_NCDESTROY, 0, 0)
-		return 0
+		// TODO call proc with an asm wrapper which sets red-zone and extra stack/reg safety
+		window.proc(hWnd, Message.WM_DESTROY, null, null)
+		window.proc(hWnd, Message.WM_NCDESTROY, null, null)
+		return null
 	}
-	tofitaDebugLog("DefWindowProcW done")
-	return 0
+	tofitaDebugLog("DefWindowProcW done".utf16())
+	return null
 }
 
-@rename('_DllMainCRTStartup')
+@linkName('NO_DllMainCRTStartup')
 @fastcall fun _DllMainCRTStartup(): Void {
+	// TODO how to handle in Hexa? just HX_MAIN?
 	rootClass.next = null
 }
+
+rootClass.next = null

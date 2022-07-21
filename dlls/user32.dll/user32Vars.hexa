@@ -16,24 +16,34 @@
 @struct
 class ClassesLinkedList {
 	// TODO char16_t
-	const UInt16 *name = null
+	// TODO let name String (late init)
+	var name: String
 	var wc: WindowClass
-	var next: Pointer<ClassesLinkedList> = null
+	var next: ClassesLinkedList = null // TODO Pointer useless for struct?
+	new (named: String) {
+		name = named
+	}
 }
 
-var rootClass: ClassesLinkedList
+// TODO alloc by value, and use .ref (same for String.root)
+// TODO use Map instead of linked list
+var rootClass = new ClassesLinkedList(null)
+//: ClassesLinkedList
 
 // TODO some HandleWrapper with handle type field?
+// TODO to enums
 let windowIsWindow: UInt16 = 0xA1CE
 
 @struct
 class Window {
-	var windowIsWindow: UInt16
+	// @rename('windowIsWindow_') // TODO renames due to global
+	var windowIsWindowSecret: UInt16
 	var windowId: UInt64
 	// TODO Bool isNativeWindow
 	var proc: WindowProcedure
-	var fb: WindowFramebuffer
+	var fb: ByValue<WindowFramebuffer>
 	var instanceId: UInt64 // Random unique ID
+	new () {}
 }
 
 let windowIsRemoteWindow: UInt16 = 0xA1CB

@@ -14,4 +14,4 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
-NTDLL32_DLL UInt64 KiFastSystemCall(rcx: UInt64, rdx: UInt64)
+// TODO ^ fix link high `_-%~`

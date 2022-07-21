@@ -13,30 +13,38 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+@dllExport('ExitProcess')
 fun exitProcess(exitCode: UInt32) {
 	tofitaExitProcess(exitCode)
+	// TODO jump to NtDLL or something
 	while true {}
 }
 
-wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes) {
-	var result = Pointer.of(kernel32.buffer[kernel32.bufferOffset])
-	kernel32.bufferOffset += bytes
+@dllExport('LocalAlloc')
+fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal {
+	var result = (buffer as! UInt64) + bufferOffset
+	bufferOffset += bytes as! UInt64 // TODO .toInt()
 	// Align to 8 bytes
 	// Because handle has some bits reserved for tags
 	// TODO how many bits exactly?
 	// TODO also pre-align at CRT startup, cause section may be misaligned
-	while kernel32.bufferOffset % 8 != 0 {
+	// TODO 16-bytes align
+	// TODO OOM
+	while bufferOffset % 8 != 0 {
 		bufferOffset++
 	}
 	return result as! HLocal
 }
 
-wapi.HGlobal GlobalAlloc(flags: UInt32, size_t bytes) {
-	return (wapi.HGlobal)LocalAlloc(0, bytes)
+@dllExport('GlobalAlloc')
+fun globalAlloc(flags: UInt32, bytes: SizeOfPointer): HGlobal {
+	return localAlloc(0, bytes) as! HGlobal
 }
 
-Void *HeapAlloc(wapi.Handle heap, flags: UInt32, size_t bytes) {
-	return (Void *)LocalAlloc(0, bytes)
+@dllExport('HeapAlloc')
+fun heapAlloc(heap: Handle, flags: UInt32, bytes: SizeOfPointer): ArrayPointer<UInt8> {
+	return localAlloc(0, bytes) as! ArrayPointer<UInt8>
 }
 
+// TODO @linkName('_DllMainCRTStartup')
 @fastcall fun _DllMainCRTStartup(): Void {}

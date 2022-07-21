@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-KERNEL32_DLL Void ExitProcess(exitCode: UInt32)
-KERNEL32_DLL wapi.HLocal LocalAlloc(flags: UInt32, size_t bytes)
-KERNEL32_DLL wapi.HGlobal GlobalAlloc(flags: UInt32, size_t bytes)
-KERNEL32_DLL Void *HeapAlloc(wapi.Handle heap, flags: UInt32, size_t bytes)
+@linkName('LocalAlloc')
+declare
+fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal
