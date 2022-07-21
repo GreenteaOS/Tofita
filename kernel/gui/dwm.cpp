@@ -294,6 +294,7 @@ function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 }
 
 function handleMouseActivity() {
+	pollPS2Devices();
 	if (lockMouse) {
 		return;
 	}

@@ -49,7 +49,7 @@ fun getRamDiskAsset(asset: RamDiskAsset, pathToAsset: String) {
 	var id: UInt32 = 0u32
 	while id < ramDiskInfo.assetsCount { // TODO use iterators
 		// Pointer arithmetic like a boss
-		let ramDiskAssetInfoPtr =
+		let ramDiskAssetInfoPtr: UInt64 =
 			(_ramdisk.base as! UInt64) + sizeOf<RamDiskInfo>() + sizeOf<RamDiskAssetInfo>() * id
 		let ramDiskAssetInfo = ramDiskAssetInfoPtr as! @readonly RamDiskAssetInfo
 		var found = true

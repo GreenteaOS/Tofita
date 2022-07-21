@@ -15,78 +15,85 @@
 
 // Window frames and some GUI elements
 
-fun drawHint(text: ConstPointer<Char8>, x: Int16, y: Int16) {
+fun drawHint(text: String, x: Int16, y: Int16) {
 	let measure = getTextAdvance(text)
 	let w = 6 * 2 + measure + 1
-	let h = 20
+	let h = 20u16
 
-	var color: Pixel32
-	color.color = 0x57575757
+	var color = new ByValue<Pixel32>()
+	color.ref.color = 0x57575757
 	drawRectangleOutline(color, x, y, w, h)
-	color.color = 0xFFFFFFFFu32
-	drawRectangle(color, x + 1, y + 1, w - 2, h - 2)
-	color.color = 0x57575757
-	drawAsciiText(text, x + 6, y + 5, color)
+	color.ref.color = 0xFFFFFFFFu32
+	drawRectangle(color, x + 1i16, y + 1i16, w - 2, h - 2)
+	color.ref.color = 0x57575757
+	drawAsciiText(text, x + 6, y + 5i16, color.ref)
 }
 
 fun shadow(x: Int16, y: Int16, darkness: UInt8) {
-	var pixel: Pixel32
-	pixel.color = 0
-	pixel.rgba.a = 0xFF - darkness
-	blendPixel(x, y, pixel)
+	var pixel = new ByValue<Pixel32>()
+	pixel.ref.color = 0
+	pixel.ref.rgba.ref.a = 0xFF - darkness
+	blendPixel(x, y, pixel.ref)
 }
 
-auto distance(x1: Int16, y1: Int16, x2: Int16, y2: Int16) {
+fun distance(x1: Int16, y1: Int16, x2: Int16, y2: Int16): Int32 {
 	// TODO floor?
 	return Math.round(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)))
 }
 
 fun drawShadowBox(x: Int16, y: Int16, w: UInt16, h: UInt16) {
-	for iy in 16 {
+	let w = w as! Int16
+	let h = h as! Int16
+
+	for iy in 16i16 {
 		for ix in w {
-			shadow(x + ix, y - iy, 192 + iy * 4)
-			shadow(x + ix, y + iy + h, 192 + iy * 4)
+			shadow(x + ix, y - iy, 192u8 + iy * 4u8)
+			shadow(x + ix, y + iy + h, 192u8 + iy * 4u8)
 		}
 	}
 	for iy in h {
-		for ix in 16 {
-			shadow(x - ix, y + iy, 192 + ix * 4)
-			shadow(x + ix + w, y + iy, 192 + ix * 4)
+		for ix in 16i16 {
+			shadow(x - ix, y + iy, 192u8 + ix * 4u8)
+			shadow(x + ix + w, y + iy, 192u8 + ix * 4u8)
 		}
 	}
 	for iy in 1...15 {
 		for ix in 1...15 {
+			let ix = ix as! Int16 // TODO `...i16`
+			let iy = iy as! Int16
+
 			let dist = 192 + distance(x, y, x - ix, y - iy) * 4
 			if dist > 255 {
 				continue
 			}
+			let dist = dist as! UInt8 // TODO
 
 			shadow(x - ix, y - iy, dist)
-			shadow(x + ix + w - 1, y - iy, dist)
-			shadow(x + ix + w - 1, y - 1 + iy + h, dist)
+			shadow(x + ix + w - 1i16, y - iy, dist) // TODO i16
+			shadow(x + ix + w - 1i16, y - 1 + iy + h, dist)
 			shadow(x - ix, y - 1 + iy + h, dist)
 		}
 	}
 }
 
-fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
+fun drawWindowFrame(title: String, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
 						 hover: FrameHover, down: Bool) {
-	var shorterFrame: Bool = false // OSX style
+	var shorterFrame: Bool = false // OSX style TODO
 
-	var color: Pixel32
-	color.rgba.r = color.rgba.g = color.rgba.b = 0xAA
+	var color = new ByValue<Pixel32>()
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 
-	drawVibrancedRectangle(x + 1, y + 1, w - 1, 32, true)
+	drawVibrancedRectangle(x + 1i16, y + 1i16, w - 1, 32, true)
 
-	// TODO " (responding: Not)"
+	// TODO " (Not responding)"
 	// TODO crop text to fit size, i.e. drawText to take optional argument
-	drawText(title, x + 8 + 4, y + 9 + 3, color)
+	drawText(title, x + 8 + 4, y + 9i16 + 3i16, color.ref)
 
 	// Frame hairline
 	if active {
-		color.color = 0x126099FF
+		color.ref.color = 0x126099FF
 	} else {
-		color.rgba.r = color.rgba.g = color.rgba.b = 164
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 164u8
 	}
 	drawRectangleOutline(color, x, y, w, h)
 
@@ -98,15 +105,15 @@ fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16
 
 	// color.rgba.r = color.rgba.g = color.rgba.b = 0
 	// rectangle(x + w - (45 + 1) * 3 + 23 - 4, y + 20, 8, 1, 0, 0, 0)
-	color.color = 0xFFFFB911u32
+	color.ref.color = 0xFFFFB911u32
 
-		color.rgba.a = down ? 128 : 230
 	if hover == FrameHover.Min {
-		drawRectangleWithAlpha(color, x + w - (45 + 1) * 3 + 1, y + 1, 44, 29)
-		color.color = 0xFF000000u32
+		color.ref.rgba.ref.a = down ? 128u8 : 230u8 // TODO u8
+		drawRectangleWithAlpha(color.ref, x + w - (45 + 1) * 3 + 1i16, y + 1i16, 44, 29)
+		color.ref.color = 0xFF000000u32
 	}
 
-	drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4, y + 19, 8, 1)
+	drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 19i16, 8, 1)
 
 	// Maximize
 	// color.rgba.r = color.rgba.g = color.rgba.b = 229
@@ -114,18 +121,18 @@ fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16
 	// drawRectangleWithAlpha(color, x + w - (45 + 1) * 2, y + 1, 45, 29)
 
 	// color.rgba.r = color.rgba.g = color.rgba.b = 0
-	color.color = 0xFF59B842u32
+	color.ref.color = 0xFF59B842u32
 
-		color.rgba.a = down ? 128 : 240
 	if hover == FrameHover.Max {
-		drawRectangleWithAlpha(color, x + w - (45 + 1) * 2 + 1, y + 1, 44, 29)
-		color.color = 0xFF000000u32
+		color.ref.rgba.ref.a = down ? 128u8 : 240u8
+		drawRectangleWithAlpha(color.ref, x + w - (45 + 1) * 2 + 1i16, y + 1i16, 44, 29)
+		color.ref.color = 0xFF000000u32
 	}
 
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 - 4, 9, 1)
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 + 5, 10, 1)
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4, y + 14 - 4, 1, 9)
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 + 5, y + 14 - 4, 1, 9)
+	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 - 4i16, 9, 1)
+	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 + 5i16, 10, 1)
+	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 - 4i16, 1, 9)
+	drawRectangle(color, x + w - (45 + 1) * 2 + 23 + 5i16, y + 14 - 4i16, 1, 9)
 
 	// Close
 	// color.rgba.b = 232
@@ -135,17 +142,17 @@ fun drawWindowFrame(title: ConstPointer<WideChar>, x: Int16, y: Int16, w: UInt16
 	// drawRectangleWithAlpha(color, x + w - (45 + 1) * 1, y + 1, 45, 29)
 
 	// color.rgba.r = color.rgba.g = color.rgba.b = 255
-	color.color = 0xFFFF5557u32
+	color.ref.color = 0xFFFF5557u32
 
-		color.rgba.a = down ? 128 : 240
 	if hover == FrameHover.Close {
-		drawRectangleWithAlpha(color, x + w - (45 + 1) * 1 + 1, y + 1, 44, 29)
-		color.color = 0xFF000000u32
+		color.ref.rgba.ref.a = down ? 128u8 : 240u8
+		drawRectangleWithAlpha(color.ref, x + w - (45 + 1) * 1 + 1i16, y + 1i16, 44, 29)
+		color.ref.color = 0xFF000000u32
 	}
 
-	line45smooth(color, x + w - (45 + 1) * 1 + 23 - 6, y + 10, 10, 1)
-	line45smooth(color, x + w - 18, y + 10, 10, -1)
+	line45smooth(color, x + w - (45 + 1) * 1 + 23 - 6i16, y + 10i16, 10i16, 1i16)
+	line45smooth(color, x + w - 18i16, y + 10i16, 10i16, -1i16)
 
 	// Shadow
-	drawShadowBox(x - 1, y - 1, w + 1, h + 1)
+	drawShadowBox(x - 1i16, y - 1i16, w + 1, h + 1)
 }

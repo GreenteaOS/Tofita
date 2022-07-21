@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// TODO probably use Thread instead of Process for easier scheduling & syscalls
+// TODO probably use Thread instead of UserProcess for easier scheduling & syscalls
 // and threads will have parentPID and that's
 // so we don't have linked list of threads per process
 @struct
-class Process {
+class UserProcess {
 	// Is process exists at all and fully initialized
 	@volatile var present: Bool
 	// TODO SoA
@@ -33,7 +33,7 @@ class Process {
 	@volatile var scheduleOnNextTick: Bool
 
 	// CR3, should be page aligned
-	pages.PageEntry *@volatile pml4
+	@volatile var pml4: ArrayPointer<ByValue<PageEntry>>
 
 	// TODO 32-bit
 
@@ -57,10 +57,16 @@ class Process {
 	var messagesUsed: UInt64
 	var awaitsGetMessage: Bool
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
+
+	// 32-bit
+	var is64bit: Bool
+	var limits: AddressAwareness
+
+	new () {}
 }
 
 // TODO dynamic allocation of this list
-var processes: [Process] = []
+var processes: [UserProcess] = []
 
 // Working process pid, with restored state and active CR3
 @volatile var currentProcess: UInt64 = 0

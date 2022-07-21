@@ -13,13 +13,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun processInit(process: Process) {
+fun processInit(process: UserProcess) {
 	process.pml4 = newCR3(processes[0].pml4)
 	process.schedulable = false // Not yet ready
 	process.scheduleOnNextTick = false // Prevent DoS attack
-	memset(Pointer.of(process.frame), 0, sizeof(InterruptFrame)) // Zeroing
+	// TODO memset as template<> or get rid of memset altogether
+	memset(process.frame as! ArrayPointer<UInt8>, 0, sizeOf<InterruptFrame>()) // Zeroing
+	process.is64bit = true
+	process.limits = AddressAwareness.Bit64limit8TB
 	process.frame.cs = Selector.USER_CODE64_SEL_USER_MODE
 	process.frame.ss = Selector.USER_DATA32_SEL_USER_MODE
+	// TODO fs gs
 	// process.frame.flags = 0x002 // No interrupts
 	process.frame.flags = 0x202
 	process.syscallToHandle = TofitaSyscalls.Noop
@@ -28,19 +32,22 @@ fun processInit(process: Process) {
 	process.awaitsGetMessage = false
 }
 
-fun processCreate(): Process {
+fun processCreate(): UserProcess {
 	var index: UInt64 = 0
 	while index < 255 {
 		index++
 		if index == 256 {
 			return null
 		}
+		if processes[index] == null {
+			processes[index] = new UserProcess()
+		}
 		if processes[index].present != true {
 			break
 		}
 	}
 
-	var process: Process = processes[index]
+	var process: UserProcess = processes[index]
 	process.pid = index
 	process.present = true // Occupied
 
@@ -50,30 +57,38 @@ fun processCreate(): Process {
 // Note: supposedly 10.000 system-wise
 let messagesBufferSize: UInt64 = 256
 
-		const UInt64 bytes = sizeof(wapi.Msg) * messagesBufferSize
-fun getOrCreateMessagesBuffer(@volatile process: Process): /*TODO wapi.*/[Msg]? {
+fun getOrCreateMessagesBuffer(@volatile process: UserProcess): /*TODO wapi.*/[Msg]? {
 	if process.messages == null {
+		let bytes: UInt64 = sizeOf<Msg>() * messagesBufferSize
 
 		process.messages = []
+		process.messagesUsed = 0
 
-			memset((Void *)process.messages, 0, bytes)
-		if process.messages != PHYSICAL_NOT_FOUND {
+		// TODO this check is useless
+		// TODO must error `if process.messages != physical_not_found {` comparison between pointer and integer
+		/*
+		if process.messages as! UInt64 != physical_not_found {
+			//memset(process.messages as! ArrayPointer<UInt8>, 0, bytes)
 			process.messagesUsed = 0
 		} else {
 			process.messages = null
 			return null
 		}
+		*/
 	}
 
 	return process.messages
 }
 
-Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessagePayload>) {
+fun postMessage(@volatile process: UserProcess, payload: PostMessagePayload): Bool {
 	// TODO do not allocate messages queue if no windows and not awaits for them
-	var messages = getOrCreateMessagesBuffer(process)
+	let messages = getOrCreateMessagesBuffer(process)
 	if messages == null {
 		return false
 	}
+
+	// TODO guard
+	let messages = messages as! [Msg]
 
 	if process.messagesUsed == messagesBufferSize {
 		return false
@@ -81,14 +96,19 @@ Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessa
 
 	var message: Msg = messages[process.messagesUsed]
 
+	if message == null {
+		message = new Msg()
+		messages[process.messagesUsed] = message
+	}
+
 	message.hwnd = payload.hWnd
 	message.message = payload.msg
 	message.wParam = payload.wParam
 	message.lParam = payload.lParam
 
-	message.time = uptimeMilliseconds // TODO
-	message.pt.x = dwm.mouseX // TODO
-	message.pt.y = dwm.mouseY // TODO
+	message.time = uptimeMilliseconds as! UInt32 // TODO `& 0xFF....` or better truncation method? `UInt64.truncate32(): UInt32`?
+	message.pt.ref.x = mouseX // TODO
+	message.pt.ref.y = mouseY // TODO
 	message.lPrivate = 0
 
 	process.messagesUsed++
@@ -101,7 +121,7 @@ Bool postMessage(@volatile process: Pointer<Process>, payload: Pointer<PostMessa
 	return true
 }
 
-Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessagePayload>) {
+fun getMessage(@volatile process: UserProcess, payload: GetMessagePayload): Bool {
 	// Do not allocate until needed
 	if process.messages == null {
 		return false
@@ -111,6 +131,9 @@ Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessage
 	if messages == null {
 		return false
 	}
+
+	// TODO guard
+	let messages = messages as! [Msg]
 
 	// TODO does not apply to wmQuit/wmPaint
 	if process.messagesUsed == 0 {
@@ -127,8 +150,8 @@ Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessage
 	target.lParam = message.lParam
 
 	target.time = message.time
-	target.pt.x = message.pt.x
-	target.pt.y = message.pt.y
+	target.pt.ref.x = message.pt.ref.x
+	target.pt.ref.y = message.pt.ref.y
 	target.lPrivate = message.lPrivate
 
 	// Shift first element
@@ -141,7 +164,7 @@ Bool getMessage(@volatile process: Pointer<Process>, payload: Pointer<GetMessage
 	return true
 }
 
-fun processDestroy(@volatile process: Process) {
+fun processDestroy(@volatile process: UserProcess) {
 	// TODO deallocate stuff
 	process.present = false
 	process.messages = null

@@ -137,8 +137,8 @@ fun overlappedWindow_destroy(windowId: UInt64) {
 }
 
 fun initDwm() {
-	mouseX = _framebuffer.width / 2
-	mouseY = _framebuffer.height / 2
+	mouseX = _framebuffer.width / 2i16
+	mouseY = _framebuffer.height / 2i16
 }
 
 fun getFrameButton(mouseX: Int16, mouseY: Int16, windowId: UInt64): FrameHover {
@@ -158,7 +158,7 @@ fun getFrameButton(mouseX: Int16, mouseY: Int16, windowId: UInt64): FrameHover {
 	let yy = y + frameHeight
 
 	if mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy {
-		let diff: UInt8 = (mouseX - x) / 46
+		let diff: UInt8 = (mouseX - x) / 46u8
 		if diff == 0 {
 			return FrameHover.Min
 		}
@@ -181,7 +181,7 @@ fun handleMouseMove(mouseX: Int16, mouseY: Int16) {
 		window.x += diffX
 		window.y += diffY
 		if window.y < 0 {
-			window.y = 0
+			window.y = 0i16
 		}
 
 		mouseDragLastX = mouseX
@@ -201,6 +201,11 @@ fun findWindowUnderCursor(mouseX: Int16, mouseY: Int16): UInt64 {
 
 	do {
 		var window = windowsList[windowId]
+
+		// TODO
+		if window == null {
+			break
+		}
 
 		// TODO depend on style
 		let frameHeight = 30 + 3
@@ -289,14 +294,14 @@ fun handleMouseUp(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 			if frameHoverState == FrameHover.Min {}
 			if frameHoverState == FrameHover.Max {}
 			if frameHoverState == FrameHover.Close {
-				var payload: PostMessagePayload
+				var payload: PostMessagePayload = new PostMessagePayload()
 
 				payload.hWnd = window.hWnd
 				payload.msg = Message.WM_CLOSE
 				payload.wParam = null
 				payload.lParam = null
 
-				@volatile let process: Process = processes[window.pid]
+				@volatile let process: UserProcess = processes[window.pid]
 				postMessage(process, payload)
 			}
 		}
@@ -316,7 +321,7 @@ fun handleMouseActivity() {
 	// Swap buffers
 	mouseActionsUseZeta = !mouseActionsUseZeta
 
-	@volatile MouseAction(*mouseActions)[255] = (!mouseActionsUseZeta) ? Pointer.of(mouseActionsZeta) : Pointer.of(mouseActionsGama)
+	@volatile let mouseActions: [MouseAction] = (!mouseActionsUseZeta) ? mouseActionsZeta : mouseActionsGama
 
 	let mouseActionsAmount: UInt8 =
 		(!mouseActionsUseZeta) ? mouseActionsZetaAmount : mouseActionsGamaAmount
@@ -340,10 +345,10 @@ fun handleMouseActivity() {
 			}
 
 			if mouseXtemp > _framebuffer.width {
-				mouseXtemp = _framebuffer.width
+				mouseXtemp = _framebuffer.width as! Int16 // TODO just make mouseX same precision
 			}
 			if mouseYtemp > _framebuffer.height {
-				mouseYtemp = _framebuffer.height
+				mouseYtemp = _framebuffer.height as! Int16
 			}
 
 			handleMouseMove(mouseXtemp, mouseYtemp)

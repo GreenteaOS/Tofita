@@ -19,14 +19,14 @@
 
 // Differential composition is not yet supported, performance with large amount of apps may be low
 
-var wallpaper: Bitmap32 // Size of framebuffer
-var vibranceLight: Bitmap32 // Size of framebuffer
-var vibranceDark: Bitmap32 // Size of framebuffer
-var leaves: Bitmap32
-var trashCan: Bitmap32
-var notepad16: Bitmap32
-var notepad48: Bitmap32
-var link: Bitmap32
+var wallpaper: Bitmap32 = null // Size of framebuffer
+var vibranceLight: Bitmap32 = null // Size of framebuffer
+var vibranceDark: Bitmap32 = null // Size of framebuffer
+var leaves: Bitmap32 = null
+var trashCan: Bitmap32 = null
+var notepad16: Bitmap32 = null
+var notepad48: Bitmap32 = null
+var link: Bitmap32 = null
 var cur: Cursor = null
 
 var startupAnimation: UInt16 = 0
@@ -39,19 +39,25 @@ enum WallpaperStyle : UInt8 {
 }
 
 fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
+	var bitmap = bitmap
 
 	{
 		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size")
 		var upscale: Bitmap32 = allocateBitmap(_framebuffer.width, _framebuffer.height)
 
-		float hReciprocal = 1.0f / (float)_framebuffer.height
-		float wReciprocal = 1.0f / (float)_framebuffer.width
+		let hReciprocal = 1.0f32 / (_framebuffer.height as! Float32)
+		let wReciprocal = 1.0f32 / (_framebuffer.width as! Float32)
 
 		for y in upscale.height {
 			for x in upscale.width {
-				var rgba: PixelRGBAData = interpolatePixel(bitmap, (x * wReciprocal) * bitmap.width,
-													  (y * hReciprocal) * (bitmap.height - 8))
-				upscale.pixels[y * upscale.width + x].rgba = rgba
+				var rgba = interpolatePixel(
+					bitmap,
+					(x * wReciprocal) * bitmap.width as! Float32, // TODO `as! _` or something
+					(y * hReciprocal) * (bitmap.height - 8) as! Float32
+				)
+				upscale.pixels[y * upscale.width + x].ref.rgba.ref.r = rgba.ref.r
+				upscale.pixels[y * upscale.width + x].ref.rgba.ref.g = rgba.ref.g
+				upscale.pixels[y * upscale.width + x].ref.rgba.ref.b = rgba.ref.b
 			}
 		}
 
@@ -63,21 +69,23 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 
 	var blurScale: UInt8 = 8
 
-	var downscale: Pointer<Bitmap32> = allocateBitmap(bitmap.width / blurScale - 1, bitmap.height / blurScale - 1 + 8)
+	var downscale: Bitmap32 = allocateBitmap(
+		bitmap.width / blurScale - 1u32, // TODO infer int types, also integer division
+		bitmap.height / blurScale - 1u32 + 8
 	)
 
 	for y in downscale.height - 8 {
 		for x in downscale.width {
-			downscale.pixels[y * downscale.width + x].color =
-				bitmap.pixels[y * bitmap.width * blurScale + x * blurScale].color
+			downscale.pixels[y * downscale.width + x].ref.color =
+				bitmap.pixels[y * bitmap.width * blurScale + x * blurScale].ref.color
 		}
 	}
 
 	// Fix
 	for y in downscale.height - 8 ... downscale.height {
 		for x in downscale.width {
-			downscale.pixels[y * downscale.width + x].color =
-				bitmap.pixels[bitmap.width * (bitmap.height - 1) + x * blurScale].color
+			downscale.pixels[y * downscale.width + x].ref.color =
+				bitmap.pixels[bitmap.width * (bitmap.height - 1) + x * blurScale].ref.color
 		}
 	}
 
@@ -92,14 +100,17 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 	var upscaleDark: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
 	var upscale: Bitmap32 = upscaleDark
 
-	float hReciprocal = 1.0f / (float)upscale.height
-	float wReciprocal = 1.0f / (float)upscale.width
+	let hReciprocal = 1.0f32 / (upscale.height as! Float32)
+	let wReciprocal = 1.0f32 / (upscale.width as! Float32)
 
-	for y in upscale.height {
-		for x in upscale.width {
-			PixelRGBAData rgbaSource =
-				interpolatePixel(downscale, (x * wReciprocal) * downscale.width,
-								 (y * hReciprocal) * (downscale.height - 8))
+	for y in upscale.height as! UInt64 {
+		for x in upscale.width as! UInt64 {
+			let rgbaSource =
+				interpolatePixel(
+					downscale,
+					(x * wReciprocal) * downscale.width as! Float32, // TODO UInt32 is precise than Float32
+					(y * hReciprocal) * (downscale.height - 8) as! Float32
+				)
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
 			/// rgba.r = Blend255(rgba.r, 255, 168)
@@ -107,19 +118,27 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 			/// rgba.b = Blend255(rgba.b, 255, 168)
 
 			{
-				var rgba: PixelRGBAData = rgbaSource
+				var rgba = rgbaSource
+				var rgba = rgba.ref
 				rgba.r = blend255(rgba.r, 0, 168)
 				rgba.g = blend255(rgba.g, 0, 168)
 				rgba.b = blend255(rgba.b, 0, 168)
-				upscaleDark.pixels[y * upscale.width + x].rgba = rgba
+				// TODO upscaleDark.pixels[y * upscale.width + x].ref.rgba = rgba
+				upscaleDark.pixels[y * upscale.width + x].ref.rgba.ref.r = rgba.r
+				upscaleDark.pixels[y * upscale.width + x].ref.rgba.ref.g = rgba.g
+				upscaleDark.pixels[y * upscale.width + x].ref.rgba.ref.b = rgba.b
 			}
 
 			{
-				var rgba: PixelRGBAData = rgbaSource
+				var rgba = rgbaSource
+				var rgba = rgba.ref
 				rgba.r = blend255(rgba.r, 255, 168)
 				rgba.g = blend255(rgba.g, 255, 168)
 				rgba.b = blend255(rgba.b, 255, 168)
-				upscaleLight.pixels[y * upscale.width + x].rgba = rgba
+				// TODO upscaleLight.pixels[y * upscale.width + x].ref.rgba = rgba
+				upscaleLight.pixels[y * upscale.width + x].ref.rgba.ref.r = rgba.r
+				upscaleLight.pixels[y * upscale.width + x].ref.rgba.ref.g = rgba.g
+				upscaleLight.pixels[y * upscale.width + x].ref.rgba.ref.b = rgba.b
 			}
 		}
 	}
@@ -128,7 +147,7 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 	vibranceLight = upscaleLight
 }
 
-fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, dark: Bool) {
+fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, dark: Bool = true) {
 	let vibrance = dark ? vibranceDark : vibranceLight // Avoit non-register global access
 	for yy in height {
 		for xx in width {
@@ -144,35 +163,42 @@ fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, da
 			if y + yy > vibrance.height {
 				continue
 			}
-			var pixel: UInt32 = (y + yy) * vibrance.width + xx + x
+			var pixel: UInt32 = (y + yy) * vibrance.width + xx + x as! UInt32
 			setPixel(x + xx, y + yy, vibrance.pixels[pixel])
 		}
 	}
 }
 
-var doublebuffer: Bitmap32
+var doublebuffer: Bitmap32 = null
 fun initializeCompositor() {
 	serialPrintln("[compositor.initializeCompositor] begin")
 	doublebuffer = allocateBitmap(_framebuffer.width, _framebuffer.height)
 	_pixels = doublebuffer.pixels
 
-	let a = getRamDiskAsset("root/Windows/Resources/Icons/leaves.png")
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves.png")
 	leaves = loadPng32(a)
 
-	let b = getRamDiskAsset("root/Windows/Resources/Icons/trash-empty48.png")
+	let b = new RamDiskAsset()
+	getRamDiskAsset(b, "root/Windows/Resources/Icons/trash-empty48.png")
 	trashCan = loadPng32(b)
 
-	let c = getRamDiskAsset("root/Windows/Resources/Icons/notepad.ico_48x48.png")
+	let c = new RamDiskAsset()
+	getRamDiskAsset(c, "root/Windows/Resources/Icons/notepad.ico_48x48.png")
 	notepad48 = loadPng32(c)
 
-	let d = getRamDiskAsset("root/Windows/Resources/Icons/notepad.ico_16x16.png")
+	let d = new RamDiskAsset()
+	getRamDiskAsset(d, "root/Windows/Resources/Icons/notepad.ico_16x16.png")
 	notepad16 = loadPng32(d)
 
-	let e = getRamDiskAsset("root/Windows/Resources/Icons/link.png")
+	let e = new RamDiskAsset()
+	getRamDiskAsset(e, "root/Windows/Resources/Icons/link.png")
 	link = loadPng32(e)
 
-	let asset = getRamDiskAsset("root/Windows/Cursors/aero_arrow.cur")
-	cur = cursor.loadCursor(Pointer.of(asset))
+	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Cursors/aero_arrow.cur")
+	// TODO cur = loadCursor(Buffer.fromBytes(asset.data))
+	cur = loadCursor(asset)
 
 	serialPrintln("[compositor.initializeCompositor] done")
 }
@@ -183,23 +209,42 @@ fun compositeWindows() {
 	for loop in windowsLimit {
 		let window = windowsList[i]
 
+		// TODO proper iteration
+		if window == null {
+			continue
+		}
+
 		if i != 0 && window.present && window.visible {
-			let hover = dwm.frameHoverWindow == i ? dwm.frameHoverState : dwm.FrameHover.Noop
+			let hover = frameHoverWindow == i ? frameHoverState : FrameHover.Noop
 
-			drawWindowFrame(window.title ? window.title : "Greentea OS", window.x, window.y,
-							window.width + 2, window.height + 34, dwm.firstResponder == i, hover,
-							dwm.frameHoverWindowDown)
+			drawWindowFrame(
+				window.title,
+				window.x,
+				window.y,
+				window.width + 2,
+				window.height + 34,
+				firstResponder == i,
+				hover,
+				frameHoverWindowDown
+			)
 
-			let frameHeight = 30 + 3
-			let frameWidth = 1
+			// TODO just untyped `let frameHeight = 30 + 3`, see below
+			// TODO also `let frameHeight: Int16 = 30 + 3`
+			let frameHeight: Int16 = 30 + 3i16
+			let frameWidth: Int16 = 1i16
 
 			if window.fbZeta != null && window.fbGama != null {
 
 				drawBitmap32(window.fbCurrentZeta ? window.fbZeta : window.fbGama, window.x + frameWidth,
 							 window.y + frameHeight)
 			} else {
-				drawVibrancedRectangle(window.x + frameWidth, window.y + frameHeight, window.width,
-									   window.height, true)
+				drawVibrancedRectangle(
+					window.x + frameWidth, // TODO late-infer-fix int type
+					window.y + frameHeight,
+					window.width,
+					window.height,
+					true
+				)
 			}
 		}
 
@@ -212,34 +257,33 @@ fun compositeWindows() {
 
 fun composite(startupMilliseconds: UInt64) {
 	// TODO not best place for this
-
-	let mouseX = dwm.mouseX
-	let mouseY = dwm.mouseY
 	handleMouseActivity()
 	handleKeyboardActivity()
 
+	let mouseX = mouseX
+	let mouseY = mouseY
 
 	// Startup animation
 	if startupAnimation < 2000 {
 		haveToRender = true
-		startupAnimation += 9 * 2
+		startupAnimation += 9 * 2u16
 	}
 
 	drawBitmap32(wallpaper, 0, 0)
-	drawBitmap32WithAlpha(trashCan, 12, 10)
-	var color: Pixel32
-	color.color = 0x00000000
-	drawShadowText(u8"Recycle Bin", 8, 62)
-	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF
-	drawAsciiText(u8"Recycle Bin", 8, 62, color)
+	drawBitmap32WithAlpha(trashCan, 12i16, 10i16)
+	var color = new ByValue<Pixel32>()
+	color.ref.color = 0x00000000
+	drawShadowText("Recycle Bin", 8, 62i16) // TODO infer i16
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+	drawAsciiText("Recycle Bin", 8, 62i16, color.ref)
 
-	color.rgba.a = 64
+	color.ref.rgba.ref.a = 64
 	if mouseX > 20 && mouseX < (20 + 32) && mouseY > 12 && mouseY < (12 + 60) {
-		let outlineX = 1
-		let outlineY = 10
-		let outlineW = 72
-		let outlineH = 64
-		drawRectangleWithAlpha(color, outlineX, outlineY, outlineW, outlineH)
+		let outlineX = 1i16
+		let outlineY = 10i16
+		let outlineW = 72u16
+		let outlineH = 64u16
+		drawRectangleWithAlpha(color.ref, outlineX, outlineY, outlineW, outlineH)
 		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH)
 	}
 
@@ -251,40 +295,46 @@ fun composite(startupMilliseconds: UInt64) {
 
 	// Taskbar
 	let animationTaskbarY = Math.min(startupAnimation / 1555.0, 1.0) * 30
-	drawVibrancedRectangle(0, _framebuffer.height - animationTaskbarY, _framebuffer.width, 30)
+	drawVibrancedRectangle(
+		0,
+		_framebuffer.height - animationTaskbarY as! Int16, // TODO upcast `a - b` to larger type
+		_framebuffer.width as! UInt16,
+		30
+	)
 
 	let taskbarY = _framebuffer.height + 30 - animationTaskbarY * 2.0
+	let taskbarY = taskbarY as! Int16
 
 	// Start button
-	color.rgba.a = 128
-	color.rgba.a = 100
-	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF
-	color.rgba.r = color.rgba.g = color.rgba.b = 0x61
+	color.ref.rgba.ref.a = 128
+	color.ref.rgba.ref.a = 100
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
 	if mouseX < 40 && mouseY > (_framebuffer.height - 30) {
-		drawRectangleWithAlpha(color, 0, taskbarY, 40, 30)
+		drawRectangleWithAlpha(color.ref, 0, taskbarY, 40, 30)
 	}
-	drawBitmap32WithAlpha(leaves, 2, taskbarY + 2)
+	drawBitmap32WithAlpha(leaves, 2i16, taskbarY + 2i16)
 
 	// Taskbar shortcuts
-	let shortcutsStart = 5 + 36 + 4
-	drawBitmap32WithAlpha(notepad16, shortcutsStart, taskbarY + 7)
+	let shortcutsStart = 5 + 36 + 4i16
+	drawBitmap32WithAlpha(notepad16, shortcutsStart, taskbarY + 7i16)
 
 	// Tray | line
-	color.color = 0x00000000
-	color.rgba.r = color.rgba.g = color.rgba.b = 0x66
-	drawRectangle(color, _framebuffer.width - 4, taskbarY, 1, 30)
+	color.ref.color = 0x00000000
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x66u8
+	drawRectangle(color, _framebuffer.width - 4i16, taskbarY, 1, 30)
 
-	var trayButtonX = _framebuffer.width - 20 - 16
-	trayButtonX = _framebuffer.width - 80
-	color.rgba.r = color.rgba.g = color.rgba.b = 0x11
-	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF
+	var trayButtonX = _framebuffer.width - 20 - 16i16
+	trayButtonX = _framebuffer.width - 80i16
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x11u8
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 
 	let timeMilliseconds = uptimeMilliseconds + startupMilliseconds
-	var uptimeHours = (uint64_t)(timeMilliseconds / (60 * 60 * 1000))
+	var uptimeHours = (timeMilliseconds / (60 * 60 * 1000)) as! Int64
 	while uptimeHours >= 24 {
 		uptimeHours -= 24
 	}
-	let uptimeMinutes = (uint8_t)((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000))
+	let uptimeMinutes = ((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000)) as! UInt8
 
 	var pm: Bool = uptimeHours >= 12
 	if uptimeHours > 12 {
@@ -292,38 +342,38 @@ fun composite(startupMilliseconds: UInt64) {
 	}
 
 	var trayTimeX = trayButtonX + 20
-	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10, color)
-	trayTimeX += drawAsciiText(u8":", trayTimeX, taskbarY + 10, color)
-		trayTimeX += drawAsciiText(u8"0", trayTimeX, taskbarY + 10, color)
+	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10i16, color.ref)
+	trayTimeX += drawAsciiText(":", trayTimeX, taskbarY + 10i16, color.ref)
 	if uptimeMinutes < 10 {
+		trayTimeX += drawAsciiText("0", trayTimeX, taskbarY + 10i16, color.ref)
 	}
-	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10, color)
-	trayTimeX += drawAsciiText(pm ? u8" PM" : u8" AM", trayTimeX, taskbarY + 10, color)
+	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10i16, color.ref)
+	trayTimeX += drawAsciiText(pm ? " PM" : " AM", trayTimeX, taskbarY + 10i16, color.ref)
 
-	line45smooth(color, trayButtonX, taskbarY + 10 + 2, 6, 1)
-	line45smooth(color, trayButtonX + 1, taskbarY + 10 + 2, 6, -1)
+	line45smooth(color, trayButtonX, taskbarY + 10 + 2i16, 6i16, 1i16)
+	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
 
-	drawCursor(cur, mouseX, mouseY)
+	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
 	quake()
 }
 
 fun copyToScreen() {
 	// On 64-bit platform registers are 64-bit,
 	// so lets copy two pixels at a time
-	let height: UInt16 = _framebuffer.height
+	let height = _framebuffer.height
 	// Let's assume it is always divideable by 2
-	let width: UInt16 = _framebuffer.width / 2
+	let width = _framebuffer.width / 2
 	let scanline: UInt64 = _framebuffer.width * 4
 	let pixelsPerScanLine: UInt64 = _framebuffer.pixelsPerScanLine * 4
-	const UInt64 *source = (const UInt64 *)((_pixels as! UInt64))
-	var destination = (UInt64 *)((_framebuffer.base as! UInt64))
+	var source = (_pixels as! UInt64) as! ArrayPointer<UInt64>
+	var destination = (_framebuffer.base as! UInt64) as! ArrayPointer<UInt64>
 
 	for y in height {
 		for x in width {
 			destination[x] = source[x]
 		}
 
-		source = (const UInt64 *)(((source as! UInt64)) + scanline)
-		destination = (UInt64 *)(((destination as! UInt64)) + pixelsPerScanLine)
+		source = ((source as! UInt64) + scanline) as! ArrayPointer<UInt64>
+		destination = ((destination as! UInt64) + pixelsPerScanLine) as! ArrayPointer<UInt64>
 	}
 }

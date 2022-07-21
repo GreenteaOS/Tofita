@@ -18,41 +18,49 @@
 
 @struct
 class Module {
-	const Char8 *name
+	var name: ArrayPointer<ClangChar>
 	var dll: RamDiskAsset
 	var base: UInt64
 }
 
 @struct
 class ModuleInterim {
-	const Char8 *name
+	var name: ArrayPointer<ClangChar>
 	var dll: RamDiskAsset
 }
 
-	var module = (Module *)PhysicalAllocator.allocateBytes(sizeof(Module))
 fun loadModule(params: ModuleInterim): Module {
+	var module = PhysicalAllocator.allocateBytes(sizeOf<Module>()) as! Module // TODO new Module
 	module.name = params.name // TODO copy string
 	module.dll = params.dll
 
 	// TODO relocation? or overwrite?
-	var ptr = (UInt8 *)params.dll.data
-	var peHeader = (const exe.PeHeader *)((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256)
-	var peOptionalHeader = (const exe.Pe32OptionalHeader *)((peHeader as! UInt64) + sizeof(exe.PeHeader))
-	var base: Pointer<Void> = (Void *)peOptionalHeader.imageBase
+	var ptr = params.dll.data as! ArrayPointer<UInt8>
+	var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
+	var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe32OptionalHeader
+	var base = peOptionalHeader.imageBase as! ArrayPointer<UInt8>
 	memset(base, 0, peOptionalHeader.sizeOfImage) // Zeroing
 	module.base = peOptionalHeader.imageBase
 
 	// Copy sections
-	var imageSectionHeader =
-		(const exe.ImageSectionHeader *)((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader)
 	for i in peHeader.numberOfSections {
-		serialPrintf("Copy section [%d] named '%s' of size %d\n", i, Pointer.of(imageSectionHeader[i].name),
-					 imageSectionHeader[i].sizeOfRawData)
-		var where: UInt64 = (base as! UInt64) + imageSectionHeader[i].virtualAddress
+		let imageSectionHeader =
+			(
+				(peOptionalHeader as! UInt64)
+				+ (sizeOf<ImageSectionHeader>() * i)
+				+ peHeader.sizeOfOptionalHeader
+			) as! ImageSectionHeader
 
-		tmemcpy((Void *)where,
-				(Void *)((params.dll.data as! UInt64) + (imageSectionHeader[i].pointerToRawData as! UInt64)),
-				imageSectionHeader[i].sizeOfRawData)
+		serialPrintf("Copy section [%d] named '%s' of size %d\n",
+			i,
+			imageSectionHeader.name,
+			imageSectionHeader.sizeOfRawData
+		)
+		var where: UInt64 = (base as! UInt64) + imageSectionHeader.virtualAddress
+
+		tmemcpy(where as! ArrayPointer<UInt8>,
+				((params.dll.data as! UInt64) + (imageSectionHeader.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
+				imageSectionHeader.sizeOfRawData)
 	}
 
 	return module

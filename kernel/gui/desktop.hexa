@@ -15,14 +15,14 @@
 
 // Desktop (i.e. icons)
 
-var dragX = 255
-var dragY = 255
+var dragX = 255i16
+var dragY = 255i16
 var drag = false
 
 fun compositeDesktop(mouseX: Int16, mouseY: Int16) {
-	var color: Pixel32
-	color.rgba.r = color.rgba.g = color.rgba.b = 0xFF
-	color.rgba.a = 64
+	var color = new ByValue<Pixel32>()
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+	color.ref.rgba.ref.a = 64
 
 	// Keep origin left-top
 	var outlineX = mouseX < dragX ? mouseX : dragX
@@ -31,8 +31,8 @@ fun compositeDesktop(mouseX: Int16, mouseY: Int16) {
 	var outlineH = mouseY < dragY ? dragY - mouseY : mouseY - dragY
 
 	if drag {
-		drawRectangleWithAlpha(color, outlineX, outlineY, outlineW, outlineH)
-		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH)
+		drawRectangleWithAlpha(color.ref, outlineX, outlineY, outlineW as! UInt16, outlineH as! UInt16)
+		drawRectangleOutline(color, outlineX, outlineY, outlineW as! UInt16, outlineH as! UInt16)
 	}
 }
 

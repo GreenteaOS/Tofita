@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const UInt8 cls[16] = {0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46}
 let magic: UInt32 = 0x0000004C
+var cls: ArrayByValue<UInt8, 16> = [0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46]
 
 @packed @struct @sizeOf(4)
 class LnkFlags {

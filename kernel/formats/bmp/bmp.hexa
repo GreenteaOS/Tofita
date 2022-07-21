@@ -13,40 +13,24 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun loadBitMap24(buffer: Buffer) {
-	let bmp = {
-		width: buffer.readUInt32LE(18),
-		height: buffer.readUInt32LE(22),
-		pixels: buffer.slice(54)
-	}
+fun loadBitMap24(asset: RamDiskAsset): Bitmap32 {
+	let buffer = asset.data as! UInt64
+	// TODO uint32_t width_ = (buffer_ + (uint32_t*)((int32_t)18))[(int32_t)0];
+	// also int32_t is wrong
+	let width = ((buffer + 18) as! ArrayPointer<UInt32>)[0]
+	let height = ((buffer + 22) as! ArrayPointer<UInt32>)[0]
 
-	// Fix BGR
-	var i = 0
-	while i < bmp.pixels.length {
-		let b = bmp.pixels[i + 0]
-		let r = bmp.pixels[i + 2]
-
-		bmp.pixels[i + 0] = r
-		bmp.pixels[i + 2] = b
-
-		i += 3
-	}
-
-	// Convert to 32 bit
-	// Mirror vertical
-	let pixels = Buffer.alloc(bmp.width * bmp.height * 4)
+	let bmp = allocateBitmap(width, height)
+	let colors = buffer + 54 as! ArrayPointer<UInt8>
 
 	for y in bmp.height {
 		for x in bmp.width {
-			let off1 = ((bmp.height - y - 1) * bmp.width + x) * 3
-			let off2 = (y * bmp.width + x) * 4
-			pixels[off2 + 0] = bmp.pixels[off1 + 0]
-			pixels[off2 + 1] = bmp.pixels[off1 + 1]
-			pixels[off2 + 2] = bmp.pixels[off1 + 2]
-			pixels[off2 + 3] = 0xFF
+			bmp.pixels[y * width + x].ref.rgba.ref.a = 255 // transparency
+			bmp.pixels[y * width + x].ref.rgba.ref.r = colors[((height - y - 1) * width + x) * 3 + 0]
+			bmp.pixels[y * width + x].ref.rgba.ref.g = colors[((height - y - 1) * width + x) * 3 + 1]
+			bmp.pixels[y * width + x].ref.rgba.ref.b = colors[((height - y - 1) * width + x) * 3 + 2]
 		}
 	}
 
-	bmp.pixels = pixels
 	return bmp
 }

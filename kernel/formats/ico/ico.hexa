@@ -13,11 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun toInt32(a, b, c, d) {
-	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFF
+// TODO rename to `toUInt32`
+fun toInt32(a: UInt8, b: UInt8, c: UInt8, d: UInt8): UInt32 {
+	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFFu32
 }
 
-fun loadIcon(buffer: Buffer, width: Int) {
+fun loadIcon(buffer: ConstArrayPointer<UInt8>, width: Int): Bitmap32 {
 	// Reserved. Must always be 0.
 	if buffer[0] != 0 {
 		return null
@@ -29,15 +30,15 @@ fun loadIcon(buffer: Buffer, width: Int) {
 	}
 	// Specifies number of images in the file.
 	let count: Int = buffer[4] + buffer[5] * 0xFF
-	console.log("%d images in a icon", count)
+	serialPrintf("%d images in a icon\n", count)
 	if count == 0 {
 		return null
 	}
 
 	// Search for the largest one with best quality
-	var best = 6 // Offset
+	var best = 6u32 // Offset
 	var bestId = 0
-	var offset = 6
+	var offset = 6u32
 	var width = width
 	if width == 256 {
 		width = 0 // Fix search
@@ -46,7 +47,7 @@ fun loadIcon(buffer: Buffer, width: Int) {
 		// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
 		// Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
 		// Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
-		console.log("%d image is %dx%d, palette = %d", i, buffer[offset], buffer[offset + 1], buffer[offset + 2])
+		serialPrintf("%d image is %dx%d, palette = %d\n", i, buffer[offset], buffer[offset + 1], buffer[offset + 2])
 		//if buffer[offset] + buffer[offset + 1] >= buffer[best] + buffer[best + 1] {
 		if buffer[offset] == width {
 			best = offset
@@ -67,8 +68,9 @@ fun loadIcon(buffer: Buffer, width: Int) {
 		// Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
 	}
 
-	console.log("The best image is %dx%d, palette = %d, id %d", buffer[best], buffer[best + 1], buffer[best + 2], bestId)
+	serialPrintf("The best image is %dx%d, palette = %d, id %d\n", buffer[best], buffer[best + 1], buffer[best + 2], bestId)
 
+	/* TODO
 	let bmp: {width: Int, height: Int, planes: Int, bits: Int, pixels: Buffer} = {
 		// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
 		width: buffer[best],
@@ -84,25 +86,35 @@ fun loadIcon(buffer: Buffer, width: Int) {
 		bits: buffer[best + 6] + buffer[best + 7] * 0xFF,
 		pixels: null
 	}
+	*/
+
+	let planes = buffer[best + 4] + buffer[best + 5] * 0xFF
+	let bits = buffer[best + 6] + buffer[best + 7] * 0xFF
+	var width: UInt16 = buffer[best]
+	var height: UInt16 = buffer[best + 1]
+
 	// Specifies the size of the image's data in bytes
 	let imageSize = toInt32(buffer[best + 8], buffer[best + 9], buffer[best + 10], buffer[best + 11])
 	// Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
 	offset = toInt32(buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])
 
-	if bmp.width == 0 {
-		bmp.width = 256
+	if width == 0 {
+		width = 256
 	}
-	if bmp.height == 0 {
-		bmp.height = 256
+	if height == 0 {
+		height = 256
 	}
-	if bmp.height == bmp.width * 2 {
-		bmp.height = bmp.width
+	// TODO investigate this nuance
+	if height == width * 2 {
+		height = width
 	}
 
-	console.log("The icon is %dx%d, %d bytes at %d", bmp.width, bmp.height, imageSize, offset)
+	let bmp: Bitmap32 = allocateBitmap(width, height)
+
+	serialPrintf("The icon is %dx%d, %d bytes at %d\n", bmp.width, bmp.height, imageSize, offset)
 	// A PNG file starts with an 8-byte signature (refer to hex editor image on the right):
-	console.log("Header at %d: %d %d %d %d", offset, buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3])
-	console.log("Header text is:", String.fromCharCode(buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3]))
+	serialPrintf("Header at %d: %d %d %d %d\n", offset, buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3])
+	//serialPrintf("Header text is:\n", String.fromCharCode(buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3]))
 
 	// ?PNG
 	if
@@ -111,34 +123,32 @@ fun loadIcon(buffer: Buffer, width: Int) {
 		buffer[offset + 2] == 0x4E &&
 		buffer[offset + 3] == 0x47
 	{
-		console.log('Decoding as PNG')
-		return loadPng32FromBuffer(buffer.slice(offset).bytes)
+		serialPrintf('Decoding as PNG\n')
+		// TODO let buffer = (buffer.address)
+		let buffer = (buffer as! UInt64) + offset
+		return loadPng32FromBuffer(buffer as! ArrayPointer<UInt8>, imageSize)
 	}
 
-	console.log("Header at: %d %d %d %d", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])
+	serialPrintf("Header at: %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])
 
 	let fsize = bmp.width * bmp.height * 4
 	let start = offset + 20 + 16 + 4
-	bmp.pixels = buffer.slice(start, start + imageSize)
+	// TODO bmp.pixels = buffer.slice(start, start + imageSize)
+	let pixels = ((buffer as! UInt64) + start) as! ArrayPointer<UInt8>
 
-	console.log("Icon bits per pixel %d == %d, color planes %d", bmp.bits, 8 * Math.round(imageSize / (bmp.width * bmp.height)), bmp.planes)
-	console.log("Icon bytes %d == %d", bmp.pixels.length, imageSize)
+	serialPrintf("Icon bits per pixel %d == %d, color planes %d\n", bits, 8 * Math.round(imageSize / (bmp.width * bmp.height)), planes)
+	serialPrintf("Icon bytes %d == %d\n", bmp.width * bmp.height * 4, imageSize)
 
 	// Mirror vertical
-	let pixels = Buffer.alloc(bmp.width * bmp.height * 4)
 
 	for y in bmp.height {
 		for x in bmp.width {
-			let off1 = ((bmp.height - y - 1) * bmp.width + x) * 4
-			let off2 = (y * bmp.width + x) * 4
-			pixels[off2 + 0] = bmp.pixels[off1 + 2]
-			pixels[off2 + 1] = bmp.pixels[off1 + 1]
-			pixels[off2 + 2] = bmp.pixels[off1 + 0]
-			pixels[off2 + 3] = bmp.pixels[off1 + 3]
+			bmp.pixels[y * width + x].ref.rgba.ref.r = pixels[((height - y - 1) * width + x) * 4 + 0]
+			bmp.pixels[y * width + x].ref.rgba.ref.g = pixels[((height - y - 1) * width + x) * 4 + 1]
+			bmp.pixels[y * width + x].ref.rgba.ref.b = pixels[((height - y - 1) * width + x) * 4 + 2]
+			bmp.pixels[y * width + x].ref.rgba.ref.a = pixels[((height - y - 1) * width + x) * 4 + 3]
 		}
 	}
-
-	bmp.pixels = pixels
 
 	return bmp
 }

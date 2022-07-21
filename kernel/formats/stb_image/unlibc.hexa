@@ -13,30 +13,52 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-Bitmap32 *loadPng32FromBuffer(data: Pointer<UInt8>, size: UInt32) {
-	Int32 width, height, png_bpp
+@rename('stbi_load_from_memory')
 @deep
 @noGenerate
 declare fun stbi_load_from_memory(
-	data: Pointer<UInt8>,
+	data: ArrayPointer<UInt8>,
 	size: UInt32,
-	width: Pointer<Int32>,
-	height: Pointer<Int32>,
-	png_bpp: Pointer<Int32>,
+	width: ArrayPointer<Int32>,
+	height: ArrayPointer<Int32>,
+	bpp: ArrayPointer<Int32>,
 	bytes: Int32
-): Pointer<UInt8>
+): ArrayPointer<UInt8>
 
-	var colors: Pointer<UInt8> = stbi_load_from_memory(data, size, Pointer.of(width), Pointer.of(height), Pointer.of(png_bpp), 4)
-	var bitmap: Pointer<Bitmap32> = allocateBitmap(width, height)
+fun loadPng32FromBuffer(data: ArrayPointer<UInt8>, size: UInt32): Bitmap32 {
+	// TODO better idea, like `ArrayByValue` or just `ByValue`?
+	var width: ArrayByValue<Int32, 1> = [0]
+	var height: ArrayByValue<Int32, 1> = [0]
+	var bpp: ArrayByValue<Int32, 1> = [0]
 
-	var rgba: Pointer<UInt32> = colors as! Pointer<UInt32>
+	var colors: ArrayPointer<UInt8> = stbi_load_from_memory(
+		data,
+		size,
+		width.ref,
+		height.ref,
+		bpp.ref,
+		4
+	)
+
+	let width = width[0]
+	let height = height[0]
+	let bpp = bpp[0]
+	// TODO validate bpp
+
+	serialPrintln("<Tofita> loadPng32FromBuffer before allocateBitmap")
+
+	// TODO should error due to data loss `ArrayByValue<Int32, 1> as! UInt32` `var bitmap: Bitmap32 = allocateBitmap(width as! UInt32, height as! UInt32)`
+	var bitmap: Bitmap32 = allocateBitmap(width as! UInt32, height as! UInt32)
+
+	serialPrintln("<Tofita> loadPng32FromBuffer before rgba")
+	var rgba: ArrayPointer<UInt32> = colors as! ArrayPointer<UInt32>
 	for y in height {
 		for x in width {
-			bitmap.pixels[y * width + x].color = rgba[y * width + x]
+			bitmap.pixels[y * width + x].ref.color = rgba[y * width + x]
 			// This should be fixed in framebuffer? Or PNG really BGRA?
-			var temp: UInt8 = bitmap.pixels[y * width + x].rgba.r
-			bitmap.pixels[y * width + x].rgba.r = bitmap.pixels[y * width + x].rgba.b
-			bitmap.pixels[y * width + x].rgba.b = temp
+			var temp: UInt8 = bitmap.pixels[y * width + x].ref.rgba.ref.r
+			bitmap.pixels[y * width + x].ref.rgba.ref.r = bitmap.pixels[y * width + x].ref.rgba.ref.b
+			bitmap.pixels[y * width + x].ref.rgba.ref.b = temp
 		}
 	}
 
