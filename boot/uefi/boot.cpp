@@ -17,13 +17,14 @@
 
 extern "C" {
 
-namespace efi {
+#include <stdint.h>
+
+namespace efi { // TODO dont use ns cause C mode!
 #include <efi.hpp>
 }
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdarg.h>
 
 #include "../shared/boot.hpp"
@@ -248,7 +249,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle__, efi::EFI_SYSTEM_TABLE *s
 						switch (type) {
 							case 0:
 								// TODO If flags bit 0 is set the CPU is able to be enabled, if it is not set you need to check bit 1.
-								// If that one is set you can still enable it, if it is not the CPU can not be enabled and the OS should not try.
+								// If that one is set you can still enable it, if it is not the CPU cannot be enabled and the OS should not try.
 								cpus++;
 								break;
 						}

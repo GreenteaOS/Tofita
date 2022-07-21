@@ -15,15 +15,16 @@
 
 // Constants: shared data from the bootloader to the kernel
 
-// Start of kernel sections in memory
-let kernelVirtualBase: UInt64 = 0xffff800000000000u64
-let framebufferStart: UInt64 = (kernelVirtualBase + 768u64 * 1024u64 * 1024u64)
-// TODO: no need for mapping framebufferStart if wholePhysicalStart used
+// Kernel memory upper half starts from here
+let upper: UInt64 = 0xffff800000000000u64
+// TODO map pixels right here to avoid pointer indirection?
+let frameBufferVirtualBase: UInt64 = (upper + 768u64 * 1024u64 * 1024u64)
+// TODO: no need for mapping frameBufferVirtualBase if wholePhysicalStart used
 // TODO proper dynamically computed numbers
 
 // Mapping of 1:1 of physical memory as virtual = physical + wholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-let wholePhysicalStart: UInt64 = (framebufferStart + 128 * 1024 * 1024)
+let wholePhysicalStart: UInt64 = (frameBufferVirtualBase + 128 * 1024 * 1024)
 let pageSize: UInt16 = 4096u16 // 4 KiB
 
 // Helpers
@@ -66,7 +67,7 @@ class Physical<T> {
 @struct
 @sizeOf(40)
 // TODO ^ implement actual check in code gen
-class EfiMemoryMap {
+class UefiMemoryMap {
 	var memoryMap: EFI_MEMORY_DESCRIPTOR
 	var memoryMapSize: UInt64
 	var mapKey: UInt64
@@ -77,10 +78,15 @@ class EfiMemoryMap {
 
 @struct
 @sizeOf(32)
-class Framebuffer {
-	var base: UInt64 // virtual address
-	var physical: UInt64 // physical address
-	var size: UInt32 // in bytes
+class FrameBuffer {
+	/// Virtual address of pixels buffer
+	var base: UInt64
+	// TODO ^ equals to `frameBufferVirtualBase`?
+	/// Physical address of pixels buffer
+	var physical: UInt64
+	// TODO ^ seems useless cause easy to compute
+	/// Bytes for mapping
+	var size: UInt32 // TODO should be a method, respecting `pixelsPerScanLine` and bpp
 	var width: UInt32
 	var height: UInt32
 	var pixelsPerScanLine: UInt32
@@ -90,24 +96,28 @@ class Framebuffer {
 @struct
 @sizeOf(24)
 class RamDisk {
-	var base: UInt64 // virtual address
-	var physical: UInt64 // physical address
-	var size: UInt64 // in bytes
+	/// Virtual
+	var base: UInt64
+	/// Physical
+	var physical: UInt64
+	/// Bytes for mapping
+	var size: UInt64
 	new () {}
 }
 
 @struct
-class KernelParams {
+class UefiPayload {
 	var pml4: UInt64
 	var stack: UInt64
-	var physicalBuffer: UInt64 // physical address of where kernel loader placed
+	/// Physical address of where kernel loader placed
+	var physicalBuffer: UInt64
 	var physicalBytes: UInt64
-	var physicalRamBitMaskVirtual: UInt64 // virtual address of where RAM usage
-										// bit-map stored
+	/// Virtual address of where RAM usage bit-map stored
+	var physicalRamBitMaskVirtual: UInt64
 	var imageHandle: EFI_HANDLE
-	var efiMemoryMap: ByValue<EfiMemoryMap>
+	var efiMemoryMap: ByValue<UefiMemoryMap>
 	var efiRuntimeServices: EFI_RUNTIME_SERVICES = null
-	var framebuffer: ByValue<Framebuffer>
+	var framebuffer: ByValue<FrameBuffer>
 	var ramdisk: ByValue<RamDisk>
 	var acpiTablePhysical: UInt64
 	var ramBytes: UInt64
@@ -119,7 +129,7 @@ class KernelParams {
 	// like "let it in without entering a login-password")
 }
 
-declare InitKernel = @convention(fastcall) (params: KernelParams) => Void
+declare InitKernel = @convention(fastcall) (params: UefiPayload) => Void
 // TODO ^ fix that in quake
 declare InitKernelTrampoline = @convention(fastcall) (kernelParams: UInt64, pml4: UInt64, stack: UInt64,
 												entry: UInt64) => Void

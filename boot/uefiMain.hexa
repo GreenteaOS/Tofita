@@ -18,6 +18,6 @@
 @rename('imageHandle') declare let imageHandle: ByValue<EFI_HANDLE>
 @rename('systemTable') declare let systemTable: EFI_SYSTEM_TABLE
 
-@draft
-@entryPoint
-efi_main(imageHandle, systemTable)
+@draft // TODO those are conceptual decorators
+@entryPoint // TODO those are conceptual decorators
+uefi(imageHandle, systemTable)

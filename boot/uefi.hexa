@@ -310,6 +310,7 @@ class EFI_PROTOCOL {
 //typedef UINT64 EFI_VIRTUAL_ADDRESS;
 
 /// Range requires a runtime mapping
+// TODO convert to bit flags enum
 let efi_memory_runtime = 0x8000000000000000u64
 
 @castTo('efi::EFI_MEMORY_TYPE')

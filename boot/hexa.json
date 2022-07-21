@@ -6,6 +6,8 @@
 	"license": "LGPL-3.0-only",
 	"global": [
 		"shared/params",
+		"amd64/amd64Page",
+		"amd64/amd64Mapper",
 		"shared/paging",
 		"../devices/serial/init",
 		"../devices/serial/log",
@@ -25,5 +27,5 @@
 			"options": []
 		}
 	],
-	"entry": "main"
+	"entry": "uefiMain"
 }

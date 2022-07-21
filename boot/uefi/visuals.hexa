@@ -25,7 +25,7 @@ let leavesHeight: UInt32 = 25
 
 let _fltused: Int64 = 0
 
-fun drawPixel(framebuffer: Framebuffer, x: UInt32, y: UInt32, color: UInt32) {
+fun drawPixel(framebuffer: FrameBuffer, x: UInt32, y: UInt32, color: UInt32) {
 	var pixels = framebuffer.base as! ArrayPointer<UInt32>
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
@@ -71,7 +71,7 @@ fun getCharAdvance(c: UInt8) {
 	return textChar.width
 }
 
-fun drawChar(c: UInt8, x: Float, y: Int16, framebuffer: Framebuffer) {
+fun drawChar(c: UInt8, x: Float, y: Int16, framebuffer: FrameBuffer) {
 	var textChar: TextFontList = textFontList[c as! UInt64].ref
 
 	var xx: Int16 = (x + 0.5) as! Int32 as! Int16
@@ -97,7 +97,7 @@ fun drawChar(c: UInt8, x: Float, y: Int16, framebuffer: Framebuffer) {
 	return textChar.width
 }
 
-fun drawText(text: String, y: Int16, framebuffer: Framebuffer) {
+fun drawText(text: String, y: Int16, framebuffer: FrameBuffer) {
 	let text: ConstArrayPointer<ClangWideChar> = text.utf16()
 	var i: UInt16 = 0
 

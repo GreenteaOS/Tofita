@@ -13,17 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
-
-fun unused_compareGuid(guid1: Virtual<EFI_GUID>, guid2: Virtual<EFI_GUID>): INTN {
-	let g1: ArrayPointer<Int32> = guid1 as! ArrayPointer<Int32>
-	let g2: ArrayPointer<Int32> = guid2 as! ArrayPointer<Int32>
-	var r: Int32 = g1[0] - g2[0]
-	r |= g1[1] - g2[1]
-	r |= g1[2] - g2[2]
-	r |= g1[3] - g2[3]
-	return r
-}
+// Boot loader: enters uefi, reads all UEFI data and starts kernel loader
 
 fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64): Void {
 	for i in count {
@@ -32,7 +22,7 @@ fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UIn
 }
 
 // Loading animation, progress 0...2
-fun drawLoading(framebuffer: Framebuffer, progress: UInt8) {
+fun drawLoading(framebuffer: FrameBuffer, progress: UInt8) {
 	for y in leavesHeight {
 		for x in leavesWidth {
 			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
@@ -66,10 +56,10 @@ trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile 
 // @deep
 
 // Entry point
-fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_STATUS {
+fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_STATUS {
 	initSerial()
 
-	serialPrint("\n[[[efi_main]]] Tofita " + versionMajor + "." +
+	serialPrint("\n[[[uefi]]] Tofita " + versionMajor + "." +
 		versionMinor + "." + versionTag + " UEFI bootloader. Welcome!\n")
 
 	initText()
@@ -81,17 +71,16 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 		var revision: UInt32 = systemTable.firmwareRevision
 		var minor: UInt16 = revision as! UInt16
 		var major: UInt16 = (revision >> 16) as! UInt16
-		serialPrintf("[[[efi_main]]] UEFI revision %d.%d\n", major, minor)
+		serialPrintf("[[[uefi]]] UEFI revision %d.%d\n", major, minor)
 	}
 
 	// Actually, no matter where lower is present, cause no lower-relative addressing done in kernel
 	// after calling cr3 at the first instruction
 	// so it is safe to allocate it at random position in conventional memory
 
-	let upper = 0xffff800000000000u64
 	var acpiTable: EFI_PHYSICAL_ADDRESS? = null
 	{
-		serialPrintln("[[[efi_main]]] begin: ACPI")
+		serialPrintln("[[[uefi]]] begin: ACPI")
 		var acpi20: EFI_GUID = new ACPI_20_TABLE_GUID()
 		var acpi: EFI_GUID = new ACPI_TABLE_GUID()
 
@@ -99,24 +88,24 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 			var efiTable: EFI_CONFIGURATION_TABLE = systemTable.configurationTable[i].ref
 			if areSame(efiTable.vendorGuid.ref, acpi20) { // Prefer ACPI 2.0
 				acpiTable = efiTable.vendorTable as! EFI_PHYSICAL_ADDRESS?
-				serialPrintln("[[[efi_main]]] found: ACPI 2.0")
+				serialPrintln("[[[uefi]]] found: ACPI 2.0")
 				break
 			} else if areSame(efiTable.vendorGuid.ref, acpi) {
 				// ACPI 2.0 is required by Tofita
 				// So we don't need to support ACPI 1.0
-				serialPrintln("[[[efi_main]]] found: ACPI 1.0, ignoring")
+				serialPrintln("[[[uefi]]] found: ACPI 1.0, ignoring")
 			}
 		}
 
 		// TODO also transfer ACPI version to report SandyBridge
-		serialPrintln("[[[efi_main]]] done: ACPI")
+		serialPrintln("[[[uefi]]] done: ACPI")
 	}
 
 	var status = EFI_STATUS.EFI_NOT_READY
 
-	serialPrintln("[[[efi_main]]] begin: initializeFramebuffer")
-	var framebuffer: Framebuffer = new Framebuffer()
-	initializeFramebuffer(framebuffer, systemTable)
+	serialPrintln("[[[uefi]]] begin: uefiSetFrameBufferMode")
+	var framebuffer: FrameBuffer = new FrameBuffer()
+	uefiSetFrameBufferMode(framebuffer, systemTable)
 	drawLoading(framebuffer, 0)
 	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag
 	drawText(
@@ -133,7 +122,7 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
-	serialPrintln("[[[efi_main]]] done: initializeFramebuffer")
+	serialPrintln("[[[uefi]]] done: uefiSetFrameBufferMode")
 	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
@@ -144,12 +133,14 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	}
 	drawLoading(framebuffer, 1)
 
-	serialPrintln("[[[efi_main]]] begin: fillMemoryMap")
+	serialPrintln("[[[uefi]]] begin: uefiGetMemoryMap")
 	var sizeAlloc: UInt64 = (ramdisk.size / pageSize + 1) * pageSize
-	var efiMemoryMap: EfiMemoryMap = new EfiMemoryMap()
+	var efiMemoryMap: UefiMemoryMap = new UefiMemoryMap()
 	efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64
 	// TODO bug efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512
 	// TODO sizeOf<EFI_MEMORY_DESCRIPTOR>() ?
+	// TODO is 512 enough?
+	// TODO is this storage destination ok?
 	efiMemoryMap.memoryMap = (ramdisk.base + sizeAlloc) as! EFI_MEMORY_DESCRIPTOR
 	{
 		var b = efiMemoryMap.memoryMap as! ArrayPointer<UInt8>
@@ -158,28 +149,28 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 			b[i] = buffa[0]
 		}
 	}
-	fillMemoryMap(efiMemoryMap, systemTable)
-	serialPrintln("[[[efi_main]]] done: fillMemoryMap")
+	uefiGetMemoryMap(efiMemoryMap, systemTable)
+	serialPrintln("[[[uefi]]] done: uefiGetMemoryMap")
 
 	var time: EFI_TIME = new EFI_TIME()
 	time.year = 2022
 	var capabilities: EFI_TIME_CAPABILITIES = new EFI_TIME_CAPABILITIES()
 	{
-		serialPrintln("[[[efi_main]]] begin: GetTime")
+		serialPrintln("[[[uefi]]] begin: GetTime")
 		var status: EFI_STATUS = systemTable.runtimeServices.getTime(time, capabilities)
 		while status != EFI_STATUS.EFI_SUCCESS {
-			serialPrintln("[[[efi_main]]] <ERROR> GetTime")
+			serialPrintln("[[[uefi]]] <ERROR> GetTime")
 			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, framebuffer)
 		}
 
 		{
-			serialPrintf("[[[efi_main]]] EFI_TIME Year=%d Month=%d Day=%d Hour=%d Minute=%d Second=%d "
+			serialPrintf("[[[uefi]]] EFI_TIME Year=%d Month=%d Day=%d Hour=%d Minute=%d Second=%d "
 						 +
 						 "Nanosecond=%d TimeZone=%d Daylight=%d\n",
 						 time.year, time.month, time.day, time.hour, time.minute, time.second,
 						 time.nanosecond, time.timeZone, time.daylight)
 
-			serialPrintf("[[[efi_main]]] EFI_TIME_CAPABILITIES Resolution=%d Accuracy=%d SetsToZero=%d\n",
+			serialPrintf("[[[uefi]]] EFI_TIME_CAPABILITIES Resolution=%d Accuracy=%d SetsToZero=%d\n",
 						 capabilities.resolution,
 						 capabilities.accuracy,
 						 capabilities.setsToZero)
@@ -190,21 +181,23 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 				time.year = 2022
 			}
 		}
-		serialPrintln("[[[efi_main]]] done: GetTime")
+		serialPrintln("[[[uefi]]] done: GetTime")
 	}
 
-	serialPrintln("[[[efi_main]]] begin: ExitBootServices")
+	serialPrintln("[[[uefi]]] begin: ExitBootServices")
 	var oops: UInt8 = 0
 	status = EFI_STATUS.EFI_NOT_READY
 	while status != EFI_STATUS.EFI_SUCCESS {
 		if oops < 10 {
-			serialPrintln("[[[efi_main]]] try: ExitBootServices")
+			serialPrintln("[[[uefi]]] try: ExitBootServices")
 		}
 
 		if oops == 100 {
+			// Keep user aware of the loading process
 			drawText("Loading...", errorY, framebuffer)
-			serialPrintln("[[[efi_main]]] <ERROR?> probably infinite loop on ExitBootServices")
-			serialPrintln("[[[efi_main]]] <ERROR?> system may or may not start")
+			serialPrintln("[[[uefi]]] <ERROR?> probably infinite loop on ExitBootServices")
+			serialPrintln("[[[uefi]]] <ERROR?> system may or may not start")
+			// Do this once
 			oops = 200
 		}
 
@@ -217,22 +210,22 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 
 	if status != EFI_STATUS.EFI_SUCCESS {
 		// TODO `status` to string
-		serialPrintln("[[[efi_main]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR")
+		serialPrintln("[[[uefi]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR")
 		return EFI_STATUS.EFI_LOAD_ERROR
 	}
-	serialPrintln("[[[efi_main]]] done: ExitBootServices")
+	serialPrintln("[[[uefi]]] done: ExitBootServices")
 
 	setRamDisk(ramdisk)
 
-	serialPrintln("[[[efi_main]]] begin: preparing kernel loader")
+	serialPrintln("[[[uefi]]] begin: preparing kernel loader")
 
 	// TODO forward constructor arguments `var asset: ByValue<RamDiskAsset> = new ByValue<RamDiskAsset>()`
 	var asset: RamDiskAsset = new RamDiskAsset()
 	getRamDiskAsset(asset, "tofita.gnu")
-	serialPrintf("[[[efi_main]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
+	serialPrintf("[[[uefi]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
 
 	let largeBuffer: UInt64 = conventionalAllocateLargest(efiMemoryMap)
-	serialPrintf("[[[efi_main]]] large buffer allocated at %u\n", largeBuffer)
+	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", largeBuffer)
 	conventionalOffset = largeBuffer
 	var mAddressOfEntryPoint: UInt64 = 0
 
@@ -271,10 +264,10 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 		mAddressOfEntryPoint = peOptionalHeader.mAddressOfEntryPoint
 	}
 
-	var params = conventionalAllocateNext(sizeOf<KernelParams>()) as! KernelParams
+	var params = conventionalAllocateNext(sizeOf<UefiPayload>()) as! UefiPayload
 	{
 		var b = params as! ArrayPointer<UInt8>
-		for i in sizeOf<KernelParams>() {
+		for i in sizeOf<UefiPayload>() {
 			b[i] = buffa[0]
 		}
 	}
@@ -332,8 +325,9 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	params.ramBytes = ram
 	params.physicalRamBitMaskVirtual = conventionalAllocateNext(ram >> 12)
 
+	let pageTableEntriesCount = 512u64
 	pml4entries =
-		conventionalAllocateNext(sizeOf<PageEntry>() * pageTableSize) as! ArrayPointer<ByValue<PageEntry>>
+		conventionalAllocateNext(sizeOf<PageEntry>() * pageTableEntriesCount) as! ArrayPointer<ByValue<PageEntry>>
 
 	{
 		for i in conventionalOffset {
@@ -345,14 +339,14 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 
 	// Map memory
 
-	serialPrintln("[[[efi_main]]] mapping pages for kernel loader")
+	serialPrintln("[[[uefi]]] mapping pages for kernel loader")
 
 	mapMemory(upper, largeBuffer, (conventionalOffset - largeBuffer) / pageSize + 1, 1)
 
 	// Note: framebuffer is *not* within physical memory
-	mapFramebuffer(params.framebuffer.ref)
+	mapFrameBuffer(params.framebuffer.ref)
 	drawLoading(framebuffer, 2)
-	mapEfi(params.efiMemoryMap.ref)
+	mapUefiRuntime(params.efiMemoryMap.ref)
 	mapMemoryHuge(wholePhysicalStart, 0, ram / pageSize)
 
 	let startFunction = (conventionalOffset + pageSize) as! InitKernelTrampoline
@@ -362,7 +356,7 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 	// Fix virtual addresses
 
 	params.framebuffer.ref.physical = params.framebuffer.ref.base
-	params.framebuffer.ref.base = framebufferStart
+	params.framebuffer.ref.base = frameBufferVirtualBase
 
 	params.ramdisk.ref.physical = params.ramdisk.ref.base
 	params.ramdisk.ref.base = wholePhysicalStart + params.ramdisk.ref.physical
@@ -380,15 +374,16 @@ fun efi_main(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): E
 
 	stack = (wholePhysicalStart as! UInt64) + stack
 	params.physicalRamBitMaskVirtual = (wholePhysicalStart as! UInt64) + params.physicalRamBitMaskVirtual
-	params = ((wholePhysicalStart as! UInt64) + (params as! UInt64)) as! KernelParams
+	params = ((wholePhysicalStart as! UInt64) + (params as! UInt64)) as! UefiPayload
 
-	serialPrintln("[[[efi_main]]] done: all done, entering kernel loader")
+	serialPrintln("[[[uefi]]] done: all done, entering kernel loader")
 
-	serialPrint("[[[efi_main]]] CR3 points to: ")
+	serialPrint("[[[uefi]]] CR3 points to: ")
 	serialPrintHex((pml4entries as! UInt64))
 	serialPrint("\n")
 
 	startFunction((params as! UInt64), (pml4entries as! UInt64), stack, upper + mAddressOfEntryPoint)
 
+	// Should never return in practice
 	return EFI_STATUS.EFI_SUCCESS
 }
