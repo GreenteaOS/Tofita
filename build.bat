@@ -13,6 +13,8 @@ IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
 
+::debug
+::
 node build.js init asm uefi dll build iso
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad

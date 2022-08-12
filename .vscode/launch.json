@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) localhost:1234",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "R:\\Tea\\tofita.exe",
+            "miDebuggerServerAddress": "localhost:1234",
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Pretty gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "type": "lldb-mi",
+            "request": "attach",
+            "name": "QEMU LLDB",
+            "target": "localhost:1234",
+            "cwd": "${workspaceRoot}",
+            "valuesFormatting": "parseText",
+            "executable": "R:\\Tea\\tofita.exe"
+        },
+        {
+            "name": "QEMU",
+            "type": "gdb",
+            "request": "attach",
+            "cwd": "${workspaceRoot}",
+            "target": "localhost:1234",
+            "gdbpath": "gdb.exe",
+            "remote": true,
+            "executable": "R:\\Tea\\tofita.exe",
+            "valuesFormatting": "parseText"
+        }
+    ]
+}

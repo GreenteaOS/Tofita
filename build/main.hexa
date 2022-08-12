@@ -34,6 +34,9 @@ fun deleteFolderRecursive(path, noRemoveSelf) {
 	}
 }
 
+// Modes
+var debuggie: Bool = false
+
 let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
 let tasks: [String] = process.argv.slice()
 let llvm = 'LLVM-14.0.6-2'
@@ -83,6 +86,9 @@ for task in tasks {
 	let folder = config.tempFolder + tea
 
 	switch task {
+		case 'debug':
+			console.log('[Debug mode is ON]')
+			debuggie = true
 		case 'init':
 			{
 				if not fs.existsSync(folder) {
@@ -125,8 +131,9 @@ for task in tasks {
 					folder + '\\trampoline.o boot\\loader\\trampoline.asm', { stdio: 'inherit' }
 				)
 
+				// KERNEL
 				require('child_process').execSync(
-					nasm + ' -f win64 -o ' +
+					nasm + (debuggie? ' -g' : '') + ' -f win64 -o ' +
 					folder + '\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
 				)
 
@@ -153,13 +160,14 @@ for task in tasks {
 				require('child_process').execSync(
 					[
 						clang + ' ',
-						'-target x86_64-pc-win32-coff -fno-stack-protector ',
 						'-O2 -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
-						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-DUEFI_BOOT_LOADER ',
 						'-D versionRolling=' + versionRolling + ' ',
 						'-D versionName=\\"' + versionName + '\\" ',
+						'-target x86_64-pc-win32-coff -fno-stack-protector',
+						'-fomit-frame-pointer',
+						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER',
+						'-DUEFI_BOOT_LOADER',
 						'-D versionMajor=' + versionMajor,
 						'-D versionMinor=' + versionMinor,
 						'-D versionTag=' + versionTag,
@@ -167,8 +175,9 @@ for task in tasks {
 						// TODO mno-sse avx etc DISABLE ALL FEATURES BUT SSE2
 						// SO CPUID CHECK WILL HANG BOOTLOADER WITH ERROR FOR SELECTED FEATURE
 
-						'-mno-ms-bitfields -fno-threadsafe-statics ',
 						'-fshort-wchar -mno-red-zone -Os',
+						'-mno-ms-bitfields -fno-threadsafe-statics',
+						'-Wno-address-of-temporary',
 						' -c ',
 						'boot/uefi/boot.cpp',
 						' -o ',
@@ -219,10 +228,10 @@ for task in tasks {
 								'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
 								'-o ',
 								outobj
-							].join(''), { stdio: 'inherit' }
+							].join(' '), { stdio: 'inherit' }
 						)
 
-						// Bruh
+						// 32 bit is `86`
 						let machine = (bit == '32') ? '86' : '64'
 
 						require('child_process').execSync(
@@ -251,12 +260,13 @@ for task in tasks {
 				// KERNEL
 				require('child_process').execSync(
 					[
-						clang + ' ',
-						'-D versionRolling=' + versionRolling + ' ',
-						'-D versionName=\\"' + versionName + '\\" ',
+						clang,
+						'-D versionRolling=' + versionRolling,
+						'-D versionName=\\"' + versionName + '\\"', // TODO too
+
 						'-mtune=nocona -fno-stack-protector -fshort-wchar -mno-red-zone ',
 						'-fno-stack-check ',
-						'-fvisibility=hidden ',
+						debuggie? '-fvisibility=default' : '-fvisibility=hidden',
 						'-Dbit64 ',
 						'-fno-rtti -fno-exceptions -ffreestanding ',
 						'-mno-ms-bitfields -fno-threadsafe-statics ',
@@ -269,14 +279,19 @@ for task in tasks {
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -Wimplicit-function-declaration ',
 						optimizationFeatures,
 						// TODO disable C++ mode
+						debuggie? '-fno-omit-frame-pointer' : '-fomit-frame-pointer',
+						'-Wno-address-of-temporary',
+						debuggie? '-g -O2' : '-O2',
 						'-x c++ -std=c++2a -c kernel/tofita.cpp -o ',
 						config.tempFolder + '/' + teaFolder + '/tofita.obj '
-					].join(''), { stdio: 'inherit' }
+					].join(' '), { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
 					[
 						link + ' ',
+						debuggie? '/debug:dwarf ' : '',
+						'/FIXED ', // Disable relocations
 						'/verbose /WX /MACHINE:X64 /entry:kernelMain /SUBSYSTEM:CONSOLE ',
 						'/BASE:0xffff800000000000 ',
 						config.tempFolder + '/' + teaFolder + '/tofita.asm.obj ',
