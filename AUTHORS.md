@@ -8,7 +8,7 @@ Anyone will be capable to sue GPL violators
 
 ```c
 Oleg Petrenko https://github.com/PeyTy
-Renat Şakirov https://github.com/acidicMercury8
+Renat Shakirov https://github.com/acidicMercury8
 
 
 
