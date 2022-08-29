@@ -27,51 +27,58 @@ class RamDiskAssetInfo {
 	var offsetFromRamDiskFirstByte: UInt32
 }
 
-static const RamDisk *_ramdisk
-fun setRamDisk(const ramdisk: Pointer<RamDisk>) {
+var _ramdisk: @readonly RamDisk = null as! RamDisk
+fun setRamDisk(ramdisk: @readonly RamDisk) {
 	_ramdisk = ramdisk
 }
 
 @struct
 class RamDiskAsset {
 	var size: UInt32
-	var data: Pointer<UInt8>
+	var data: ArrayPointer<UInt8>
+	new () {}
 }
 
-const RamDiskAsset getRamDiskAsset(pathToAsset: ConstWideCharPointer) {
-	var asset: RamDiskAsset
-	asset.size = 0
-	asset.data = 0
-	const UInt16 *path = (const UInt16 *)pathToAsset
+fun getRamDiskAsset(asset: RamDiskAsset, pathToAsset: String) {
+	asset.size = 0u32
+	asset.data = null // TODO should error cause non-nullable
+	let path = pathToAsset.utf16() as! ConstArrayPointer<UInt16>
 
-	const RamDiskInfo *ramDiskInfo = (const RamDiskInfo *)_ramdisk.base
+	let ramDiskInfo = _ramdisk.base as! @readonly RamDiskInfo
 
-	for (UInt32 id = 0; id < ramDiskInfo.assetsCount; id++) {
+	var id: UInt32 = 0u32
+	while id < ramDiskInfo.assetsCount { // TODO use iterators
 		// Pointer arithmetic like a boss
-		let ramDiskAssetInfoPtr =
-			(_ramdisk.base as! UInt64) + sizeof(RamDiskInfo) + sizeof(RamDiskAssetInfo) * id
-		const RamDiskAssetInfo *ramDiskAssetInfo = (const RamDiskAssetInfo *)ramDiskAssetInfoPtr
-		var found: UInt8 = 1
+		let ramDiskAssetInfoPtr: UInt64 =
+			(_ramdisk.base as! UInt64) + sizeOf<RamDiskInfo>() + sizeOf<RamDiskAssetInfo>() * id
+		let ramDiskAssetInfo = ramDiskAssetInfoPtr as! @readonly RamDiskAssetInfo
+		var found = true
 
-		for (UInt8 at = 0; at < 127; at++) {
+		var at: UInt8 = 0
+		while at < 127 {
 			if ramDiskAssetInfo.path[at] != path[at] {
-				found = 0
+				found = false
 				break
 			}
 
 			if ramDiskAssetInfo.path[at] == 0 {
 				break
 			}
+
+			at++
 		}
 
 		if found {
 			asset.size = ramDiskAssetInfo.size
-			asset.data = (UInt8 *)((_ramdisk.base as! UInt64) + ramDiskAssetInfo.offsetFromRamDiskFirstByte)
-			return asset
+			asset.data = ((_ramdisk.base as! UInt64) + ramDiskAssetInfo.offsetFromRamDiskFirstByte) as! ArrayPointer<UInt8>
+			// TODO `as! _` short syntax
+			return
 		}
+
+		id++
 	}
 
 	serialPrintf("[ramdisk.getRamDiskAsset] asset '%S' not found in %d assets\n", path,
 				 ramDiskInfo.assetsCount)
-	return asset
+	return
 }

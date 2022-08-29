@@ -13,155 +13,97 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let addressBits = 12
+/// Align to 4096
+let addressBits = 12u64
+var pml4entries: ArrayPointer<ByValue<PageEntry>> = null
 
+fun conventionalAllocatePage(): ArrayPointer<ByValue<PageEntry>> {
+	// TODO bounds check
+	return conventionalAllocateNext(pageSize) as! ArrayPointer<ByValue<PageEntry>>
+}
+
+fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
+	entry.address = address >> addressBits
+	entry.present = 1u64
+	entry.writeAllowed = (writeAllowed == 1) ? 1u64 : 0u64
+	entry.accessibleByAll = 1u64 // TODO
+}
+
+fun mapPageHuge(entry: PageEntry, address: UInt64) {
+	entry.address = address >> addressBits
+	entry.present = 1u64
+	entry.writeAllowed = 1u64
+	entry.largePage = 1u64
+	entry.accessibleByAll = 1u64 // TODO
+}
+
+fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8): ArrayPointer<ByValue<PageEntry>> {
+	var entry: PageEntry = table[entryId].ref
+
+	if entry.present == 1 {
+		return (entry.address << addressBits) as! ArrayPointer<ByValue<PageEntry>>
+	} else {
+		// TODO check for null
+		var newPage = conventionalAllocatePage()
+		mapPage(entry, newPage as! UInt64, writeAllowed)
+		return newPage
+	}
+}
+
+/// allows to access separate address by page table levels
 @struct @packed @sizeOf(8)
-class LinearAddress {
+class PageAddressView {
 	@bits(12) var offset: UInt64
 	@bits(9) var pt: UInt64
 	@bits(9) var pd: UInt64
 	@bits(9) var pdpt: UInt64
 	@bits(9) var pml4: UInt64
-	@bits(16) var reserved: UInt64
+	@bits(16) var padding: UInt64
 }
 
-// `512 entries * 8 bytes = 4 KiB`
-// PML4 size = PDP size = PD size = PT size
-//
-// Since we are using 64 bit mode, the entry size
-// is 64 bits.
-
-let pageTableSize = 512
-
-// Entry in a page table
-@struct @packed @sizeOf(8)
-class PageEntry {
-	// Is the page present in physical memory?
-	@bits(1) var present: UInt64
-
-	// Pages are read-only by default
-	@bits(1) var writeAllowed: UInt64
-
-	// Pages are only accessible by supervisor by default
-	@bits(1) var accessibleByAll: UInt64
-
-	// Write through abilities of the page
-	@bits(1) var writeThrough: UInt64
-
-	// If set, the page will not be cached
-	@bits(1) var cacheDisabled: UInt64
-
-	// Was the page accessed?
-	@bits(1) var accessed: UInt64
-
-	// Has the page been written to? Only applicable for PTE.
-	@bits(1) var dirty: UInt64
-
-	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
-	@bits(1) var largePage: UInt64
-
-	// Prevent the translations cache from updating
-	// the address in cache if CR3 is reset.
-	//
-	// Page global enable bit in CR4 has to be set to
-	// enable this feature.
-	//
-	// Only applicable for PTE
-	@bits(1) var global: UInt64
-
-	// Not used by the processor
-	@bits(3) var metadata: UInt64
-
-	// Physical address of the child table/page
-	@bits(40) var address: UInt64
-
-	// Not used by the processor
-	@bits(7) var metadata2: UInt64
-
-	// Only applicable for PTE
-	@bits(4) var protectionKey: UInt64
-
-	// Disable execution of code from this page
-	@bits(1) var disableExecution: UInt64
+fun getPageAddressView(address: UInt64): ByValue<PageAddressView> {
+	return address as! ByValue<PageAddressView>
 }
 
-var pml4entries: PageEntry = null
-
-fun allocatePage() {
-	// TODO bounds check
-	return conventionalAllocateNext(pageSize)
+fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
+	var entry: PageEntry = pt[getPageAddressView(virtualAddr).ref.pt].ref
+	mapPage(entry, physicalAddr, writeAllowed)
 }
 
-LinearAddress getLinearAddress(address: UInt64) {
-	return *((LinearAddress *)Pointer.of(address))
+fun mapP2Huge(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64) {
+	var entry: PageEntry = pd[getPageAddressView(virtualAddr).ref.pd].ref
+	mapPageHuge(entry, physicalAddr)
 }
 
-fun initializePage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
-	entry.address = address >> addressBits
-	entry.present = 1
-	entry.writeAllowed = (writeAllowed == 1) ? 1 : 0
-	entry.accessibleByAll = 1 // TODO
-}
-
-fun initializePageHuge(entry: PageEntry, address: UInt64) {
-	entry.address = address >> addressBits
-	entry.present = 1
-	entry.writeAllowed = 1
-	entry.largePage = 1
-	entry.accessibleByAll = 1 // TODO
-}
-
-Void *getPage(table: Pointer<PageEntry>, entryId: UInt64, writeAllowed: UInt8) {
-	var entry: Pointer<PageEntry> = Pointer.of(table[entryId])
-
-		return (Void *)(entry.address << addressBits)
-	if entry.present == 1 {
-	} else {
-		var newPage: Pointer<Void> = allocatePage()
-		initializePage(entry, (newPage as! UInt64), writeAllowed)
-		return newPage
-	}
-}
-
-fun map_pt(PageEntry pt[], virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
-	var entry: Pointer<PageEntry> = Pointer.of(pt[getLinearAddress(virtualAddr).pt])
-	initializePage(entry, physicalAddr, writeAllowed)
-}
-
-fun map_p2huge(PageEntry pd[], virtualAddr: UInt64, physicalAddr: UInt64) {
-	var entry: Pointer<PageEntry> = Pointer.of(pd[getLinearAddress(virtualAddr).pd])
-	initializePageHuge(entry, physicalAddr)
-}
-
-fun mapPD(pd: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+fun mapPD(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pt = getPage(pd, getLinearAddress(virtualAddr).pd, writeAllowed)
+	var pt = referOrCreatePage(pd, getPageAddressView(virtualAddr).ref.pd, writeAllowed)
 	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPDPT(pdpt: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+fun mapPDPT(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pd = getPage(pdpt, getLinearAddress(virtualAddr).pdpt, writeAllowed)
+	var pd = referOrCreatePage(pdpt, getPageAddressView(virtualAddr).ref.pdpt, writeAllowed)
 	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPML4(pml4: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pdpt = getPage(pml4, getLinearAddress(virtualAddr).pml4, writeAllowed)
+	var pdpt = referOrCreatePage(pml4, getPageAddressView(virtualAddr).ref.pml4, writeAllowed)
 	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapP3Huge(pdpt: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64): Void {
-	var pd = getPage(pdpt, getLinearAddress(virtualAddr).pdpt, 1u8)
+fun mapP3Huge(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64): Void {
+	var pd = referOrCreatePage(pdpt, getPageAddressView(virtualAddr).ref.pdpt, 1u8)
 	mapP2Huge(pd, virtualAddr, physicalAddr)
 }
 
-fun mapP4Huge(fromTable: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64): Void {
-	var pdpt = getPage(fromTable, getLinearAddress(virtualAddr).fromTable, 1u8)
+fun mapP4Huge(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64): Void {
+	var pdpt = referOrCreatePage(pml4, getPageAddressView(virtualAddr).ref.pml4, 1u8)
 	mapP3Huge(pdpt, virtualAddr, physicalAddr)
 }
 
-fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32, writeAllowed: UInt8) {
+fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64, writeAllowed: UInt8) {
 	serialPrintln("[paging] mapping memory range")
 
 	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
@@ -169,22 +111,22 @@ fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32, writ
 	var vAddress: UInt64 = virtualAddr
 	var pAddress: UInt64 = physicalAddr
 
-	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * pageSize)
+	serialPrintf("[paging.range] Bytes to map %d == %d\n", virtualAddrEnd - virtualAddr, pageCount * pageSize)
 
-	serialPrint("[paging.range] virtual address = ")
-	serialPrintHex(virtualAddr as! UInt64)
+	serialPrint("[paging.range] At virtual address = ")
+	serialPrintHex(virtualAddr)
 	serialPrint("\n")
 
-	serialPrint("[paging.range] physical address = ")
-	serialPrintHex(physicalAddr as! UInt64))
+	serialPrint("[paging.range] To physical address = ")
+	serialPrintHex(physicalAddr)
 	serialPrint("\n")
 
-	serialPrint("[paging.range] page count = ")
-	serialPrintHex(pageCount as! UInt64)
+	serialPrint("[paging.range] Of page count = ")
+	serialPrintHex(pageCount)
 	serialPrint("\n")
 
-	serialPrint("[paging.range] virtual address end = ")
-	serialPrintHex(virtualAddrEnd as! UInt64)
+	serialPrint("[paging.range] The virtual address end = ")
+	serialPrintHex(virtualAddrEnd)
 	serialPrint("\n")
 
 	while vAddress < virtualAddrEnd {
@@ -204,21 +146,20 @@ fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) 
 	while vAddress < virtualAddrEnd {
 		mapP4Huge(pml4entries, vAddress, pAddress)
 
-		vAddress += pageSize * 512
-		pAddress += pageSize * 512
+		vAddress += pageSize * 512u64
+		pAddress += pageSize * 512u64
 	}
 }
 
-const efi.EFI_MEMORY_DESCRIPTOR *getNextDescriptor(const efi.descriptor: Pointer<EFI_MEMORY_DESCRIPTOR>,
-														   descriptorSize: UInt64) {
-	const UInt8 *desc = ((const UInt8 *)descriptor) + descriptorSize
-	return (const efi.EFI_MEMORY_DESCRIPTOR *)desc
+fun getNextDescriptor(descriptor: @readonly EFI_MEMORY_DESCRIPTOR, descriptorSize: UInt64) {
+	let desc = (descriptor as! UInt64) + descriptorSize
+	return desc as! @readonly EFI_MEMORY_DESCRIPTOR
 }
 
-UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
-	const efi.EFI_MEMORY_DESCRIPTOR *descriptor = memoryMap.memoryMap
+fun getRAMSize(memoryMap: UefiMemoryMap): UInt64 {
+	var descriptor = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
-	var numberOfPages: UInt64 = 0
+	var numberOfPages: UInt64 = 0u64
 
 	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
@@ -235,24 +176,24 @@ UInt64 getRAMSize(EfiMemoryMap *memoryMap) {
 }
 
 // TODO this should be reconsidered (i.e. pointer fixups)
-fun mapEfi(memoryMap: EfiMemoryMap) {
+fun mapUefiRuntime(memoryMap: UefiMemoryMap) {
 	serialPrintln("[paging] mapping efi")
 
 	var descriptor: EFI_MEMORY_DESCRIPTOR = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
-	var sum: UInt64 = 0
+	var sum: UInt64 = 0u64
 
 	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset: UInt64 = startOfMemoryMap
 
 	while offset < endOfMemoryMap {
-		if descriptor.attribute & EFI_MEMORY_RUNTIME {
+		if 0 != (descriptor.attribute & efi_memory_runtime) {
 			// TODO pointer fixups
 			// TODO should be RW or RO?
 			// Note: in VirtualBox, PhysicalStart seems way beyound RAM bounds
 			// Seems like fixup should be applied only if PhysicalStart < ramBytes?
-			mapMemory(descriptor.PhysicalStart, descriptor.PhysicalStart, descriptor.NumberOfPages, 1)
+			mapMemory(descriptor.physicalStart, descriptor.physicalStart, descriptor.numberOfPages, 1u8)
 			sum += descriptor.numberOfPages
 		}
 
@@ -263,13 +204,18 @@ fun mapEfi(memoryMap: EfiMemoryMap) {
 	serialPrintf("[paging] efi mapped %u pages\n", sum)
 }
 
-var buffa[1]: UInt8 = {0}
+@struct class Buffa {
+	let value: UInt64 = 0
+	new () {}
+}
+let buffaStorage = new Buffa()
+let buffa = buffaStorage as! ArrayPointer<UInt8>
 
-UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
+fun conventionalAllocateLargest(memoryMap: UefiMemoryMap) {
 	var descriptor = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
-	var result: UInt64 = 0
-	var largestPages: UInt64 = 0
+	var result: UInt64 = 0u64
+	var largestPages: UInt64 = 0u64
 
 	var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
 	var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
@@ -287,12 +233,12 @@ UInt64 conventionalAllocateLargest(EfiMemoryMap *memoryMap) {
 	}
 
 	serialPrintf("[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
-				 (uint32_t)(largestPages * pageSize), largestPages)
+				 largestPages * pageSize, largestPages)
 
 	return result
 }
 
-var conventionalOffset: UInt64 = 0
+var conventionalOffset: UInt64 = 0u64
 fun conventionalAllocateNext(bytes: UInt64): UInt64 {
 	let result = conventionalOffset
 	let pages = bytes / pageSize // Math.floor
@@ -303,9 +249,8 @@ fun conventionalAllocateNext(bytes: UInt64): UInt64 {
 	return result
 }
 
-fun mapFramebuffer(fb: ConstPointer<Framebuffer>) {
-	let framebufferBase = fb.base
+fun mapFrameBuffer(fb: @readonly FrameBuffer) {
 	// TODO map with hugepages!!!
 	// TODO map ALL with EPIC pages?
-	mapMemory(framebufferStart, (framebufferBase as! UInt64), fb.size / pageSize + 1, 1)
+	mapMemory(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u64, 1u8)
 }

@@ -1,0 +1,66 @@
+// The Tofita Kernel
+// Copyright (C) 2022 Oleg Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+/// Lowest level entry or higher if `largePage` bit set
+@struct @packed @sizeOf(8)
+class PageEntry {
+	// Is the page present in physical memory?
+	@bits(1) var present: UInt64
+
+	// Pages are read-only by default
+	@bits(1) var writeAllowed: UInt64
+
+	// Pages are only accessible by supervisor by default
+	@bits(1) var accessibleByAll: UInt64
+
+	// Write through abilities of the page
+	@bits(1) var writeThrough: UInt64
+
+	// If set, the page will not be cached
+	@bits(1) var cacheDisabled: UInt64
+
+	// Was the page accessed?
+	@bits(1) var accessed: UInt64
+
+	// Has the page been written to? Only applicable for PTE.
+	@bits(1) var dirty: UInt64
+
+	// Page size by default is small, enabling this bit makes it bigger. Only applicable for PTE
+	@bits(1) var largePage: UInt64
+
+	// Prevent the translations cache from updating
+	// the address in cache if CR3 is reset.
+	//
+	// Page global enable bit in CR4 has to be set to
+	// enable this feature.
+	//
+	// Only applicable for PTE
+	@bits(1) var global: UInt64
+
+	// Not used by the processor
+	@bits(3) var metadata: UInt64
+
+	// Physical address of the child table/page
+	@bits(40) var address: UInt64
+
+	// Not used by the processor
+	@bits(7) var metadata2: UInt64
+
+	// Only applicable for PTE
+	@bits(4) var protectionKey: UInt64
+
+	// Disable execution of code from this page
+	@bits(1) var disableExecution: UInt64
+}

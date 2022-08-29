@@ -13,42 +13,61 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let user_syscalls = 123000
+// TODO randomize on every build (use version number)
+// @randomize(min: 2, max: 123456)
+let userSyscalls = 123000
 
-enum TofitaSyscalls : UInt64 {
+// TODO store all syscalls as huge complex enum and generate all wrappers with macro
+// and serializer to-from enum tags / wow64
+//@castTo('TofitaSyscalls')
+enum TofitaSyscalls : UInt32 {
 	// System
 	Noop = 0
 	Cpu = 1
 
 	// User
-	DebugLog = user_syscalls
-	CreateWindowEx
-	ShowWindow
-	GetMessage
-	PostMessage
-	GetOrCreateWindowFramebuffer
-	SwapWindowFramebuffer
-	ExitProcess
+	// TODO DebugLog = userSyscalls
+	DebugLog = 123000
+	CreateWindowEx = 123001 // TODO auto compute
+	ShowWindow = 123002 // TODO auto compute
+	GetMessage = 123003 // TODO auto compute
+	PostMessage = 123004 // TODO auto compute
+	GetOrCreateWindowFramebuffer = 123005 // TODO auto compute
+	SwapWindowFramebuffer = 123006 // TODO auto compute
+	ExitProcess = 123007 // TODO auto compute
 }
 
 @struct @sizeOf(8 * 3)
 class DebugLogPayload {
-	var message: ConstWideCharPointer
+	var message: ConstArrayPointer<UInt16>
 	// TODO count chars at userspace, and transfer as length for SEH probing
 	var extra: UInt64 = 0
 	var more: UInt64 = 0
+	new () {}
 }
 
 @struct @sizeOf(8 * 2)
 class SwapWindowFramebufferPayload {
 	var windowId: UInt64
 	var fb: WindowFramebuffer
+	new () {}
 }
 
 @struct @sizeOf(8 * 2)
 class ShowWindowPayload {
 	var nCmdShow: CmdShow
 	var windowId: UInt64
+	new () {}
+}
+
+@struct
+class LParam {
+	new () {}
+}
+
+@struct
+class WParam {
+	new () {}
 }
 
 // TODO use pointer wrappers instead of raw pointers
@@ -58,9 +77,9 @@ class CreateWindowExPayload {
 	var hWnd: HWnd
 
 	// CreateWindowEx
-	var lpClassName: ConstWideCharPointer
+	var lpClassName: ConstArrayPointer<ClangWideChar>
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	var lpWindowName: ConstWideCharPointer
+	var lpWindowName: ConstArrayPointer<ClangWideChar>
 	var dwStyle: UInt32
 	var x: Int32
 	var y: Int32
@@ -69,15 +88,17 @@ class CreateWindowExPayload {
 	var hWndParent: HWnd
 	var hMenu: HMenu
 	var hInstance: HInstance
-	var lpParam: Pointer<Void>
+	var lpParam: LParam
+	new () {}
 }
 
 @struct @sizeOf(8 + 4 + 8 * 2 + 4)
 class PostMessagePayload {
 	var hWnd: HWnd
 	var msg: Message
-	var wParam: Pointer<Void>
-	var lParam: Pointer<Void>
+	var wParam: WParam
+	var lParam: LParam
+	new () {}
 }
 
 @struct @sizeOf(8 * 2 + 4 * 2)
@@ -86,4 +107,5 @@ class GetMessagePayload {
 	var hWnd: HWnd
 	var wMsgFilterMin: UInt32
 	var wMsgFilterMax: UInt32
+	new () {}
 }

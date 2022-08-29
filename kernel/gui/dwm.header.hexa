@@ -42,8 +42,11 @@ class OverlappedWindow {
 	var fbZeta: Bitmap32
 	var fbGama: Bitmap32
 	var fbCurrentZeta: Bool // Use to swap chain
+
+	new () {}
 }
 
+let windowsLimit: UInt64 = 256
 
 // TODO allocate dynamically (just use Hexa Array or something)
 let windowsList: [OverlappedWindow] = []
@@ -57,8 +60,8 @@ var mouseDragLastX: Int16 = 0
 var mouseDragLastY: Int16 = 0
 
 // Note: those are controlled by DWM
-@volatile Int16 mouseX = 256
-@volatile Int16 mouseY = 256
+@volatile var mouseX: Int16 = 256i16
+@volatile var mouseY: Int16 = 256i16
 
 enum FrameHover : UInt8 {
 	Noop = 0

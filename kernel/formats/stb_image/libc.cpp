@@ -22,6 +22,8 @@
 #define abs libc_abs
 #define pow libc_pow
 
+extern "C" uint64_t PhysicalAllocator_$allocateBytes_(uint64_t);
+
 function libc_free(void *addr) {
 	// Do nothing for now
 	serialPrintf(L"[libc] libc_free\n");
@@ -29,14 +31,14 @@ function libc_free(void *addr) {
 
 void *libc_malloc(uint64_t size) {
 	serialPrintf(L"[libc] libc_malloc of size %u\n", size);
-	return (void *)PhysicalAllocator::allocateBytes(size);
+	return (void *)(kernelParams? PhysicalAllocator_$allocateBytes_(size) : PhysicalAllocator::allocateBytes(size));
 }
 
 void *libc_realloc(void *addr, uint64_t size) {
 	serialPrintf(L"[libc] libc_realloc %u of size %u\n", addr, size);
 
 	{
-		var result = PhysicalAllocator::allocateBytes(size);
+		uint64_t result = kernelParams? PhysicalAllocator_$allocateBytes_(size) : PhysicalAllocator::allocateBytes(size);
 		return (void *)result;
 	}
 }

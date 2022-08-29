@@ -16,59 +16,68 @@
 // Simple bitmap font drawing
 // Non-monospace
 
-var textFontBitmap: Bitmap32
-@extern var _pixels: Pixel32
+var textFontBitmap: Bitmap32 = null
 
-@struct @packed
+@struct @packed @sizeOf(12)
 class TextFontList {
 	var x: UInt16
 	var y: UInt16
 	var width: Float
 }
 
-TextFontList *textFontList = null
+// TODO just use `[Const]ArrayPointer`? cause same meaning? `ArrayByValuePointer`?
+var textFontList: ArrayPointer<ByValue<TextFontList>> = null as! ArrayPointer<ByValue<TextFontList>>
 
 fun initText() {
-	var textFont: RamDiskAsset = getRamDiskAsset("ascii.tofita")
-	textFontList = textFont.data as! TextFontList
+	var textFont = new RamDiskAsset()
+	getRamDiskAsset(textFont, "ascii.tofita")
+	textFontList = textFont.data as! ArrayPointer<ByValue<TextFontList>>
 
-	var a: RamDiskAsset = getRamDiskAsset("root/Windows/Fonts/default.png")
-	textFontBitmap = loadPng32(a)
+	var font = new RamDiskAsset()
+	getRamDiskAsset(font, "root/Windows/Fonts/default.png")
+	textFontBitmap = loadPng32(font)
 }
 
-Int8 getLigatureAdvance(left: Char8, const Char8 right) {
+fun getLigatureAdvance(left: UInt8, right: UInt8): Int8 {
 	if left == 0 {
-		return 0
+		return 0i8 // TODO i8
 	}
+
 	if right == 0 {
-		return 0
+		return 0i8
 	}
-	return 8
+
+	return 8i8
 }
 
-Float getCharAdvance(const Char8 c) {
+fun getCharAdvance(c: UInt8): Float {
 	if textFontList == null {
 		return 8
 	}
-	var textChar: TextFontList = textFontList[c] as! UInt64
+
+	var textChar: TextFontList = textFontList[c].ref
+
 	return textChar.width
 }
 
-UInt16 getTextAdvance(text: ConstPointer<Char8>) {
+fun getTextAdvance(text: String): UInt16 {
 	var i: UInt16 = 0
 	var xx: Float = 0
+	let text = text.utf16() as! ConstArrayPointer<UInt16>
+
 	while text[i] != 0 && i < 255 * 255 {
-		xx += textFontList[text[i]].width
+		xx += textFontList[text[i] as! Int].ref.width
 		i++
 	}
-	return xx
+
+	return xx as! UInt16
 }
 
-Float drawChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
-	var textChar: TextFontList = textFontList[c] as! UInt64
+fun drawChar(c: UInt8, x: Float, y: Int16, color: Pixel32): Float {
+	var textChar: TextFontList = textFontList[c as! Int].ref
 
-	var xx: Int16 = (int32_t)(x + 0.5)
-	var w: UInt8 = (int32_t)(textChar.width + 0.5)
+	var xx: Int16 = (x + 0.5) as! Int32 as! Int16
+	var w: UInt8 = (textChar.width + 0.5) as! Int32 as! UInt8
 
 	for yi in 12 {
 		for xi in w {
@@ -89,30 +98,31 @@ Float drawChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 				continue
 			}
 
-			Pixel32 font =
-				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)]
+			let font: Pixel32 =
+				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
 
-			var p: Pixel32 = _pixels[aty * _framebuffer.width + atx]
-			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r)
-			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g)
-			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b)
-			_pixels[aty * _framebuffer.width + atx] = p
+			var p: Pixel32 = _pixels[aty * _framebuffer.width + atx].ref
+			p.rgba.ref.r = blend255(p.rgba.ref.r, color.rgba.ref.r, font.rgba.ref.r)
+			p.rgba.ref.g = blend255(p.rgba.ref.g, color.rgba.ref.g, font.rgba.ref.g)
+			p.rgba.ref.b = blend255(p.rgba.ref.b, color.rgba.ref.b, font.rgba.ref.b)
+			// TODO `no known conversion from 'Pixel32_ *' to 'const Pixel32_'`
+			// `_pixels[aty * _framebuffer.width + atx] = p`
 		}
 	}
 
 	return textChar.width
 }
 
-Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
-	var textChar: TextFontList = textFontList[c] as! UInt64
+fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32): Float {
+	var textChar: TextFontList = textFontList[c as! Int].ref
 
-	var xx: Int16 = (int16_t)(x + 0.5)
-	var w: UInt8 = (uint8_t)(textChar.width + 0.5)
+	var xx: Int16 = (x + 0.5) as! Int16
+	var w: UInt8 = (textChar.width + 0.5) as! UInt8
 
 	for yi in 12 {
 		for xi in w {
-			let atx: Int16 = (int16_t)xx + (int16_t)xi
-			let aty: Int16 = (int16_t)y + (int16_t)yi
+			let atx: Int16 = (xx as! Int16) + (xi as! Int16)
+			let aty: Int16 = (y as! Int16) + (yi as! Int16)
 
 			if atx >= _framebuffer.width {
 				continue
@@ -128,24 +138,28 @@ Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 				continue
 			}
 
-			Pixel32 font =
-				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)]
+			let font: Pixel32 =
+				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
 
-			var p: Pixel32 = _pixels[aty * _framebuffer.width + atx]
-			p.rgba.r = Blend255(p.rgba.r, color.rgba.r, font.rgba.r)
-			p.rgba.g = Blend255(p.rgba.g, color.rgba.g, font.rgba.g)
-			p.rgba.b = Blend255(p.rgba.b, color.rgba.b, font.rgba.b)
+			let p = _pixels[aty * _framebuffer.width + atx]
+			let p: Pixel32 = p.ref
+			p.rgba.ref.r = blend255(p.rgba.ref.r, color.rgba.ref.r, font.rgba.ref.r)
+			p.rgba.ref.g = blend255(p.rgba.ref.g, color.rgba.ref.g, font.rgba.ref.g)
+			p.rgba.ref.b = blend255(p.rgba.ref.b, color.rgba.ref.b, font.rgba.ref.b)
 
 			// Grayscale
 			// TODO probably just blend color.rgb all with p.g?
-			var sum: UInt16 = (uint16_t)p.rgba.r + (uint16_t)p.rgba.g + (uint16_t)p.rgba.b
-			sum = sum * 0.33
+			var sum: UInt16 =
+				(p.rgba.ref.r as! UInt16) +
+				(p.rgba.ref.g as! UInt16) +
+				(p.rgba.ref.b as! UInt16)
+			sum = (sum * 0.33) as! UInt16
 
-			p.rgba.r = sum
-			p.rgba.g = sum
-			p.rgba.b = sum
+			p.rgba.ref.r = sum as! UInt8
+			p.rgba.ref.g = sum as! UInt8
+			p.rgba.ref.b = sum as! UInt8
 
-			p.rgba.a = color.rgba.a
+			p.rgba.ref.a = color.rgba.ref.a
 			blendPixel(atx, aty, p)
 		}
 	}
@@ -154,67 +168,81 @@ Float drawAlphaChar(c: Char8, x: Float, y: Int16, color: Pixel32) {
 }
 
 /// Returns advance after last character
-UInt16 drawAsciiText(text: ConstPointer<Char8>, x: Float, y: Int16, color: Pixel32) {
+fun drawAsciiText(text: String, x: Float, y: Int16, color: Pixel32): UInt16 {
 	var i: UInt16 = 0
 	var xx: Float = x
-	while text[i] != 0 && i < 255 * 255 {
-		xx += drawChar(text[i], xx, y, color)
+	let text = text.utf16() as! ConstArrayPointer<ClangWideChar>
+
+	while text[i] as! UInt16 != 0 && i < 255 * 255 {
+		xx += drawChar((text[i] as! UInt16) & 0xFF as! UInt8, xx, y, color)
 		i++
 	}
-	return xx - x
+
+	return (xx - x)  as! UInt16
 }
 
 /// Returns advance after last character
-UInt16 drawText(const text: Pointer<WideChar>, x: Float, y: Int16, color: Pixel32) {
+fun drawText(text: String, x: Float, y: Int16, color: Pixel32): UInt16 {
 	var i: UInt16 = 0
 	var xx: Float = x
-	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
-		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, color)
+
+	while (text.charCodeAt(i) as! UInt16) != 0 && i < 255 * 255 {
+		xx += drawChar((text.charCodeAt(i) as! UInt16) & 0xFF as! UInt8, xx, y, color)
 		i++
 	}
-	return xx - x
+
+	return (xx - x) as! UInt16
 }
 
-UInt16 drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) {
+let digits: [String] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+fun drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32): UInt16 {
 	var xx: Float = x
-		xx += drawAsciiText(u8"-", xx, y, color)
+	var value = value as! Int
+
 	if value < 0 {
+		xx += drawAsciiText("-", xx, y, color)
 		value = -value
 	}
-	const Char8 *digits[] = {u8"0", u8"1", u8"2", u8"3", u8"4", u8"5", u8"6", u8"7", u8"8", u8"9"}
-	const Char8 *chars[24] = {0}
-	var count: UInt8 = 0
+
+	let chars: [String] = []
+	var count: Int8 = 0
 
 	do {
 		chars[23 - count] = digits[value % 10]
-		value = (int64_t)(value / 10)
+		value = (value / 10) as! Int
+		// TODO `\`
 		count++
 	} while (value > 0)
 
 	for i in 24 {
-		if chars[i] != 0 {
+		if chars[i] != null {
 			xx += drawAsciiText(chars[i], xx, y, color)
 		}
 	}
-	return xx - x
 
+	return (xx - x) as! UInt16 // TODO `round`
 }
 
-fun drawShadowText(text: ConstPointer<Char8>, x: Float, y: Int16) {
+fun drawShadowText(text: String, x: Float, y: Int16) {
 	var i: UInt16 = 0
 	var xx: Float = x
-	var color: Pixel32
+	var color = new ByValue<Pixel32>()
+	var color = color.ref
+	let text = text.utf16() as! ConstArrayPointer<ClangWideChar>
 
 	color.color = 0x00000000
-	color.rgba.a = 70
-	while text[i] != 0 && i < 255 * 255 {
-		var ch: Char8 = text[i]
+	color.rgba.ref.a = 70
 
-		drawAlphaChar(ch, xx + 1, y + 1, color)
-		drawAlphaChar(ch, xx + 1, y + 2, color)
+	// TODO `while let char = .charCodeAt(i)`
+	while text[i] as! UInt16 != 0 && i < 255 * 255 {
+		var ch: UInt8 = text[i] as! UInt8
+		// TODO charCodeAt return zero? oh wait, `while let` checks for null!
 
-		drawAlphaChar(ch, xx - 1, y + 1, color)
-		xx += drawAlphaChar(ch, xx - 1, y + 2, color)
+		drawAlphaChar(ch, xx + 1, y + 1i16, color)
+		drawAlphaChar(ch, xx + 1, y + 2i16, color)
+
+		drawAlphaChar(ch, xx - 1, y + 1i16, color)
+		xx += drawAlphaChar(ch, xx - 1, y + 2i16, color)
 
 		i++
 	}

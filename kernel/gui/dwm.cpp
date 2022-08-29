@@ -294,6 +294,7 @@ function handleMouseUp(MouseActionType type, int16_t mouseX, int16_t mouseY) {
 }
 
 function handleMouseActivity() {
+	pollPS2Devices();
 	if (lockMouse) {
 		return;
 	}
@@ -309,12 +310,12 @@ function handleMouseActivity() {
 	var mouseYtemp = mouseY;
 
 	for (uint8_t i = 0; i < mouseActionsAmount; ++i) {
-		let type = mouseActions[i]->type;
+		let type = mouseActions[0][i].type;
 
 		if (type == MouseActionType::Moved) {
 
-			mouseXtemp += mouseActions[i]->mouseXdiff;
-			mouseYtemp += mouseActions[i]->mouseYdiff;
+			mouseXtemp += (*mouseActions)[i].mouseXdiff;
+			mouseYtemp += (*mouseActions)[i].mouseYdiff;
 
 			if (mouseYtemp < 0)
 				mouseYtemp = 0;
@@ -335,7 +336,7 @@ function handleMouseActivity() {
 			handleMouseDown(type, mouseXtemp, mouseYtemp);
 		}
 
-		mouseActions[i]->type = MouseActionType::Noop;
+		(*mouseActions)[i].type = MouseActionType::Noop;
 	}
 
 	if (!mouseActionsUseZeta)

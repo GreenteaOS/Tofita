@@ -2,10 +2,19 @@
 echo [32mWelcome to the Greentea OS! Support us at https://www.patreon.com/PeyTy and https://greenteaos.github.io/donate/
 echo [0m
 cd /d %~dp0
+
 cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
+
+cmd /c hexa boot\hexa.json
+IF %ERRORLEVEL% NEQ 0 (
+  goto somethingbad
+)
+
+::debug
+::
 node build.js init asm uefi dll build iso
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad

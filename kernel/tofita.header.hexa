@@ -13,11 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 // Globals
+var paramsCache = null as! UefiPayload
 
 // For syscalls & scheduler
-@volatile pages.PageEntry *@volatile pml4kernelThread = null
+// TODO `@volatile class X {}` ?
+@volatile var pml4kernelThread = null as! ArrayPointer<ByValue<PageEntry>>
 
 // Flag to keep in kernel mode and not switch to user mode
 @volatile var kernelBusy = false
@@ -28,3 +29,5 @@
 
 var uptimeMilliseconds: UInt64 = 0
 
+@rename('libc_memset')
+declare fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64): Void

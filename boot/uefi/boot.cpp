@@ -17,13 +17,14 @@
 
 extern "C" {
 
-namespace efi {
+#include <stdint.h>
+
+namespace efi { // TODO dont use ns cause C mode!
 #include <efi.hpp>
 }
 
 #include <stddef.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdarg.h>
 
 #include "../shared/boot.hpp"
@@ -33,6 +34,16 @@ namespace efi {
 #include "pe.cpp"
 #include "visuals.cpp"
 #include "../../kernel/ramdisk.cpp"
+
+efi::EFI_HANDLE imageHandle = nullptr;
+efi::EFI_SYSTEM_TABLE *systemTable = nullptr;
+
+#define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), __VA_ARGS__)
+
+// CR3 trampoline
+extern "C" function __attribute__((fastcall))
+trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
+			  volatile uint64_t entry);
 
 efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
 	efi::INT32 *g1, *g2, r;
@@ -47,7 +58,7 @@ efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
 
 void *tmemcpy(void *dest, const void *src, uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
-	uint8_t *src8 = (uint8_t *)src;
+	const uint8_t *src8 = (const uint8_t *)src;
 
 	while (count--) {
 		*dst8++ = *src8++;
@@ -77,11 +88,6 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	}
 	return dest;
 }
-
-// CR3 trampoline
-extern "C" function __attribute__((fastcall))
-trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
-			  volatile uint64_t entry);
 
 struct ACPITableHeader {
 	uint32_t type;
@@ -141,7 +147,10 @@ struct ACPI {
 };
 
 // Entry point
-efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *systemTable) {
+efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle__, efi::EFI_SYSTEM_TABLE *systemTable__) {
+	imageHandle = imageHandle__;
+	systemTable = systemTable__;
+
 	initSerial();
 	serialPrint(L"\n[[[efi_main]]] Tofita " versionName " UEFI bootloader. Welcome!\n");
 
@@ -240,7 +249,7 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 						switch (type) {
 							case 0:
 								// TODO If flags bit 0 is set the CPU is able to be enabled, if it is not set you need to check bit 1.
-								// If that one is set you can still enable it, if it is not the CPU can not be enabled and the OS should not try.
+								// If that one is set you can still enable it, if it is not the CPU cannot be enabled and the OS should not try.
 								cpus++;
 								break;
 						}
@@ -371,8 +380,10 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle, efi::EFI_SYSTEM_TABLE *sys
 		auto imageSectionHeader =
 			(const ImageSectionHeader *)((uint64_t)peOptionalHeader + peHeader->mSizeOfOptionalHeader);
 		for (uint16_t i = 0; i < peHeader->mNumberOfSections; ++i) {
-			serialPrintf(L"Copy section [%d] named '%s' of size %d\n", i, &imageSectionHeader[i].mName,
-						 imageSectionHeader[i].mSizeOfRawData);
+			serialPrintf(L"Copy section [%d] named '%s' of size %d\n", i,
+				&imageSectionHeader[i].mName,
+				imageSectionHeader[i].mSizeOfRawData
+			);
 			uint64_t where = (uint64_t)kernelBase + imageSectionHeader[i].mVirtualAddress;
 
 			tmemcpy((void *)where,

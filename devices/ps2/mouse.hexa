@@ -30,7 +30,7 @@ enum MouseActionType : UInt8 {
 
 @volatile var lockMouse = false
 @volatile var mouseCycle: UInt8 = 0
-@volatile let mouseByte: ArrayByValue<UInt8, 3> = [0]
+@volatile var mouseByte: ArrayByValue<UInt8, 3> = [0]
 
 // Note: those are controlled by driver
 @volatile var leftDown = false
@@ -43,12 +43,13 @@ class MouseAction {
 	var mouseYdiff: Int16
 	var type: MouseActionType
 	// TODO time stamp
+	new () {}
 }
 
 let mouseActionsLimit: UInt8 = 255
-@volatile MouseAction mouseActionsZeta[mouseActionsLimit]
-@volatile MouseAction mouseActionsGama[mouseActionsLimit]
-@volatile var mouseActionsUseZeta = false
+@volatile let mouseActionsZeta: [MouseAction] = []
+@volatile let mouseActionsGama: [MouseAction] = []
+@volatile var mouseActionsUseZeta: Bool = false
 @volatile var mouseActionsZetaAmount: UInt8 = 0
 @volatile var mouseActionsGamaAmount: UInt8 = 0
 
@@ -56,6 +57,11 @@ fun pushMouseAction(type: MouseActionType, mouseXdiff: Int16 = 0, mouseYdiff: In
 	if mouseActionsUseZeta {
 		if mouseActionsZetaAmount == mouseActionsLimit {
 			return
+		}
+
+		// TODO refactor
+		if mouseActionsZeta[mouseActionsZetaAmount] == null {
+			mouseActionsZeta[mouseActionsZetaAmount] = new MouseAction()
 		}
 
 		mouseActionsZeta[mouseActionsZetaAmount].mouseXdiff = mouseXdiff
@@ -66,6 +72,10 @@ fun pushMouseAction(type: MouseActionType, mouseXdiff: Int16 = 0, mouseYdiff: In
 	} else {
 		if mouseActionsGamaAmount == mouseActionsLimit {
 			return
+		}
+
+		if mouseActionsGama[mouseActionsGamaAmount] == null {
+			mouseActionsGama[mouseActionsGamaAmount] = new MouseAction()
 		}
 
 		mouseActionsGama[mouseActionsGamaAmount].mouseXdiff = mouseXdiff
@@ -121,10 +131,10 @@ fun handleMousePacket() {
 		// Ignore all state changes until message pool is ready
 		// Otherwise we will have situaion like DOWN-UP-UP instead of D-U-D-U
 		if mouseActionsUseZeta && mouseActionsZetaAmount == mouseActionsLimit {
-			break
+			// TODO break
 		}
 		if !mouseActionsUseZeta && mouseActionsGamaAmount == mouseActionsLimit {
-			break
+			// TODO break
 		}
 
 		if mouseXd != 0 || mouseYd != 0 {
@@ -169,6 +179,7 @@ fun handleMousePacket() {
 	lockMouse = false
 }
 
+// TODO interrupt
 fun handleMouse() {
 	// This is hack to avoid race condition in poller
 	// this way we handle mouse *only* in poller
@@ -192,4 +203,62 @@ fun handleMouse() {
 	// writePort(0x20, 0x20)
 	// haveToRender = 1
 	// polls = false
+}
+
+fun enablePS2Mouse() {
+	serialPrintln("[mouse] begin: setting PS/2 mouse")
+	// Auxiliary
+	mouseWait(1)
+	writePort(ps2_control_port, 0xA8)
+	// Interrupts
+	mouseWait(1)
+	writePort(ps2_control_port, 0x20)
+	mouseWait(0)
+	// IRQ12
+	var status: UInt8 = (readPort(ps2_data_port) | 2u8)
+	// status &= ~0x20 // TODO Clock
+	mouseWait(1)
+	writePort(ps2_control_port, 0x60)
+	mouseWait(1)
+	writePort(ps2_data_port, status)
+	// Defaults
+	mouseWrite(0xF6)
+	// Ack
+	mouseRead()
+	// Enable
+	mouseWrite(0xF4)
+	// Ack
+	mouseRead()
+	serialPrintln("[mouse] done: setting PS/2 mouse")
+}
+
+fun mouseWait(@volatile aType: UInt8) {
+	@volatile var timeOut: UInt32 = 1000000
+	if aType == 0 {
+		while timeOut-- { // TODO Should error (not Bool)
+			// Data
+			if (readPort(ps2_control_port) & 1) == 1 {
+				return
+			}
+		}
+	} else {
+		while timeOut-- {
+			// Signal TODO `> 0`
+			if (readPort(ps2_control_port) & 2) == 0 {
+				return
+			}
+		}
+	}
+}
+
+fun mouseWrite(@volatile aWrite: UInt8) {
+	mouseWait(1)
+	writePort(ps2_control_port, 0xD4)
+	mouseWait(1)
+	writePort(ps2_data_port, aWrite)
+}
+
+fun mouseRead(): UInt8 {
+	mouseWait(0)
+	return readPort(ps2_data_port)
 }

@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-	if bytes < sizeof(Lnk) {
-fun validateLnk(data: ConstPointer<UInt8>, bytes: UInt64): Bool {
+fun validateLnk(data: ConstArrayPointer<UInt8>, bytes: UInt64): Bool {
+	if bytes < sizeOf<Lnk>() {
 		return false
 	}
 	let lnk = data as! Lnk

@@ -13,65 +13,94 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun fillMemoryMap(EfiMemoryMap *efiMemoryMap, efi.EFI_SYSTEM_TABLE *systemTable) {
-		Pointer.of(efiMemoryMap.memoryMapSize), efiMemoryMap.memoryMap, Pointer.of(efiMemoryMap.mapKey),
-		Pointer.of(efiMemoryMap.descriptorSize), Pointer.of(efiMemoryMap.descriptorVersion))
+fun uefiGetMemoryMap(efiMemoryMap: UefiMemoryMap, systemTable: EFI_SYSTEM_TABLE) {
+	var memoryMapSize: ArrayByValue<UINTN, 1> = [efiMemoryMap.memoryMapSize]
+	var mapKey: ArrayByValue<UINTN, 1> = [efiMemoryMap.mapKey]
+	var descriptorSize: ArrayByValue<UINTN, 1> = [efiMemoryMap.descriptorSize]
+	var descriptorVersion: ArrayByValue<UInt32, 1> = [efiMemoryMap.descriptorVersion]
+
 	var status: EFI_STATUS = systemTable.bootServices.getMemoryMap(
+		memoryMapSize.ref,
+		efiMemoryMap.memoryMap,
+		mapKey.ref,
+		descriptorSize.ref,
+		descriptorVersion.ref
+	)
+
+	efiMemoryMap.memoryMapSize = memoryMapSize[0]
+	efiMemoryMap.mapKey = mapKey[0]
+	efiMemoryMap.descriptorSize = descriptorSize[0]
+	efiMemoryMap.descriptorVersion = descriptorVersion[0]
 
 	if status != EFI_STATUS.EFI_SUCCESS {
-		serialPrint("[[[efi_main.fillMemoryMap]]] <ERROR> GetMemoryMap: failed\n")
+		serialPrint("[[[uefi.uefiGetMemoryMap]]] <ERROR> GetMemoryMap: failed\n")
 	}
 
-	serialPrintf("[[[efi_main.fillMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
+	serialPrintf("[[[uefi.uefiGetMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
 				 efiMemoryMap.memoryMapSize, efiMemoryMap.descriptorSize)
 }
 
-fun initializeFramebuffer(fb: Pointer<Framebuffer>, efi.EFI_SYSTEM_TABLE *systemTable) {
-	var gopGuid: EFI_GUID = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID
-	var gop: Pointer<EFI_GRAPHICS_OUTPUT_PROTOCOL>
+fun uefiSetFrameBufferMode(fb: FrameBuffer, systemTable: EFI_SYSTEM_TABLE) {
+	var gopGuid: EFI_GUID = new EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID()
+	var igop: ArrayByValue<UInt64, 1> = [] // TODO must error: should'nt be empty
+	// TODO ^ also `<..., 1> = [1,2,3, too much]` error
+	// TODO `ByValue.ref`
 
-	systemTable.BootServices.LocateProtocol(Pointer.of(gopGuid), null, (Void **)Pointer.of(gop))
+	// TODO handle EFI_STATUS of locateProtocol
+	// TODO `@checkReturn let locateProtocol: () => EFI_STATUS` to force result check
+	systemTable.bootServices.locateProtocol(gopGuid, 0, igop.ref)
+
+	let gop: EFI_GRAPHICS_OUTPUT_PROTOCOL = igop[0] as! EFI_GRAPHICS_OUTPUT_PROTOCOL
 
 	fb.base = gop.mode.frameBufferBase
-	fb.size = gop.mode.frameBufferSize
+	fb.size = gop.mode.frameBufferSize as! UInt32
 
 	fb.width = gop.mode.info.horizontalResolution
 	fb.height = gop.mode.info.verticalResolution
 	fb.pixelsPerScanLine = gop.mode.info.pixelsPerScanLine
 
-	serialPrintf("[[[efi_main.initializeFramebuffer]]] width=%d height=%d pixelsPerScanLine=%d size=%d\n",
+	serialPrintf("[[[uefi.uefiSetFrameBufferMode]]] width=%d height=%d pixelsPerScanLine=%d size=%d\n",
 				 fb.width, fb.height, fb.pixelsPerScanLine, fb.size)
 
 	// TODO https://forum.osdev.org/viewtopic.php?f=1&t=37201
 	gop.setMode(gop, gop.mode.mode)
 }
 
-efi.EFI_STATUS uefiAllocate(efi.bootsvc: Pointer<EFI_BOOT_SERVICES>, bytes: Pointer<UInt64>, Void **destination) {
-	serialPrintf("[[[efi_main.uefiAllocate]]] start allocating %d bytes\n", *bytes)
-	var status: EFI_STATUS
+fun uefiAllocate(bootServices: EFI_BOOT_SERVICES, bytes: ArrayPointer<UInt64>, destination: ArrayPointer<UInt64>) {
+	serialPrintf("[[[uefi.uefiAllocate]]] start allocating %d bytes\n", bytes[0])
 	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
-		efi.EfiLoaderCode // Use *Code not *Data to avoid NX-bit crash if data executed
 	let allocationType =
+		EFI_MEMORY_TYPE.EfiLoaderCode // Use `*Code` not `*Data` to avoid NX-bit crash if data executed
 
 	// Round to page size
-	var pages: UInt64 = ((*bytes - 1) / pageSize) + 1
-	var addr: efi.EFI_PHYSICAL_ADDRESS = (efi.EFI_PHYSICAL_ADDRESS)*destination
+	var pages: UInt64 = ((bytes[0] - 1) / pageSize) + 1
+	var addr: EFI_PHYSICAL_ADDRESS = destination[0] as! EFI_PHYSICAL_ADDRESS
+	var saddr: ArrayByValue<EFI_PHYSICAL_ADDRESS, 1> = [addr]
 
-	status = bootsvc.AllocatePages(efi.AllocateAnyPages, allocationType, pages, Pointer.of(addr))
+	let status = bootServices.allocatePages(
+		EFI_ALLOCATE_TYPE.AllocateAnyPages,
+		allocationType,
+		pages,
+		saddr.ref
+	)
+
+	addr = saddr[0]
+
 	if status == EFI_STATUS.EFI_NOT_FOUND || status == EFI_STATUS.EFI_OUT_OF_RESOURCES {
-		serialPrintf("[[[efi_main.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
-					 *bytes)
+		serialPrintf("[[[uefi.uefiAllocate]]] failed: EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
+					 bytes[0])
 	}
 
 	if status != EFI_STATUS.EFI_SUCCESS {
-		serialPrintf("[[[efi_main.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, "
+		serialPrintf("[[[uefi.uefiAllocate]]] failed: AllocateAnyPages %d bytes, %d pages, of type %d, "
 					 +
 					 "status %d\n",
-					 *bytes, pages, allocationType, status)
+					 bytes[0], pages, allocationType, status)
 	}
 
-	*bytes = pages * pageSize
-	*destination = (Void *)addr
+	bytes[0] = pages * (pageSize as! UInt64)
+	destination[0] = addr as! UInt64
+	// TODO typecheck `destination[0] = addr as! ArrayPointer<UInt8>`
 
 	return status
 }

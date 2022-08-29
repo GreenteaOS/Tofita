@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// TODO replace to virtual alloc
-UInt8 buffer[1024 * 1024] = {0}
-var bufferOffset: UInt32 = 0
+// TODO replace to virtual allocation
+var buffer: ArrayByValue<UInt8, 1048576> = [0]
+// TODO <UInt8, 1024 * 1024>
+var bufferOffset: UInt64 = 0

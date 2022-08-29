@@ -12,27 +12,3 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-import "../ntdll.dll/ntdll.hpp"
-import "../tofita32.dll/tofita32.hpp"
-
-#ifndef USER32_DLL
-#define USER32_DLL __declspec(dllimport)
-#end
-
-USER32_DLL wapi.Atom RegisterClassW(const wapi.wc: Pointer<WindowClass>)
-USER32_DLL wapi.HWnd CreateWindowExW(UInt32 dwExStyle, lpClassName: ConstWideCharPointer,
-									  lpWindowName: ConstWideCharPointer, dwStyle: UInt32, x: Int32, y: Int32,
-									  Int32 nWidth, nHeight: Int32, wapi.HWnd hWndParent,
-									  wapi.HMenu hMenu, wapi.HInstance hInstance, Void *lpParam)
-USER32_DLL wapi.Bool ShowWindow(hWnd: wapi.HWnd, nCmdShow: Int32)
-USER32_DLL wapi.Bool GetMessageW(wapi.msg: Pointer<Msg>, hWnd: wapi.HWnd, wMsgFilterMin: UInt32,
-								  UInt32 wMsgFilterMax)
-USER32_DLL wapi.Bool TranslateMessage(wapi.msg: Pointer<Msg>)
-USER32_DLL wapi.LResult DispatchMessageW(wapi.msg: Pointer<Msg>)
-USER32_DLL Void PostQuitMessage(nExitCode: Int32)
-USER32_DLL wapi.HDc BeginPaint(hWnd: wapi.HWnd, wapi.ps: Pointer<PaintStruct>)
-USER32_DLL Int32 FillRect(wapi.HDc dc, const wapi.lprc: Pointer<Rect>, wapi.HBrush brush)
-USER32_DLL wapi.Bool EndPaint(hWnd: wapi.HWnd, wapi.ps: Pointer<PaintStruct>)
-USER32_DLL wapi.LResult DefWindowProcW(hWnd: wapi.HWnd, uMsg: wapi.Message, wParam: VoidPointer, lParam: VoidPointer)
-USER32_DLL wapi.Bool PostMessage(hWnd: wapi.HWnd, wapi.Message msg, wParam: VoidPointer, lParam: VoidPointer)

@@ -56,26 +56,6 @@ enterUserMode:
 	jmp $
 	ret
 
-extern guiThread
-global guiThreadStart_
-guiThreadStart_:
-	push 0 ; Signal end of stack with 0 return address
-	push 0 ; and a few extra entries in case of stack
-	push 0 ; problems
-	push 0
-	mov rbp, rsp ; Frame
-	o64 call guiThread
-
-extern kernelThread
-global kernelThreadStart_
-kernelThreadStart_:
-	push 0 ; Signal end of stack with 0 return address
-	push 0 ; and a few extra entries in case of stack
-	push 0 ; problems
-	push 0
-	mov rbp, rsp ; Frame
-	o64 call kernelThread
-
 global enterKernelMode
 enterKernelMode:
 	cli
@@ -304,11 +284,11 @@ irqHandlerReturn:
 	defineIRQwithErrCode %1, %2, %2Prelude
 %endmacro
 
-defineIRQnoCode 0x00, timerInterrupt, timerInterruptPrelude, timerInterruptHandler
-defineIRQnoCode 0x80, syscallInterrupt, syscallInterruptPrelude, syscallInterruptHandler
-defineIRQnoCode 0x00, yieldInterrupt, yieldInterruptPrelude, yieldInterruptHandler
-defineIRQnoCode 0x00, keyboardHandler, keyboardInterruptPrelude, handleKeyboard
-defineIRQnoCode 0x00, mouseHandler, mouseInterruptPrelude, handleMouse
+defineIRQnoCode 0x00, timerInterrupt, timerInterruptPrelude, timerInterruptHandler_
+defineIRQnoCode 0x80, syscallInterrupt, syscallInterruptPrelude, syscallInterruptHandler_
+defineIRQnoCode 0x00, yieldInterrupt, yieldInterruptPrelude, yieldInterruptHandler_
+defineIRQnoCode 0x00, keyboardHandler, keyboardInterruptPrelude, handleKeyboard_
+defineIRQnoCode 0x00, mouseHandler, mouseInterruptPrelude, handleMouse_
 
 global spuriousInterrupt
 spuriousInterrupt:
@@ -316,7 +296,7 @@ spuriousInterrupt:
 	nop
 
 ; CPU exceptions
-defineIRQHandler exceptionHandler, exceptionPrelude
+defineIRQHandler exceptionHandler_, exceptionPrelude
 
 defineIRQ 0x00, cpu0x00, exceptionPrelude ; Division by zero
 defineIRQ 0x01, cpu0x01, exceptionPrelude ; Single-step interrupt (see trap flag)
@@ -389,7 +369,7 @@ yield:
 	int 0x81
 	ret
 
-extern guiThread
+extern guiThread_
 global guiThreadStart
 guiThreadStart:
 	push 0
@@ -397,9 +377,10 @@ guiThreadStart:
 	push 0
 	push 0
 	mov rbp, rsp
-	call guiThread
+	call guiThread_
+	; o64 call guiThread_ ; Alternatively
 
-extern kernelThread
+extern kernelThread_
 global kernelThreadStart
 kernelThreadStart:
 	push 0
@@ -407,7 +388,8 @@ kernelThreadStart:
 	push 0
 	push 0
 	mov rbp, rsp
-	call kernelThread
+	call kernelThread_
+	; o64 call kernelThread_ ; Alternatively
 
 global portOutb
 portOutb:

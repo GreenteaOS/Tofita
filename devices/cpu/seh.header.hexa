@@ -15,7 +15,9 @@
 
 // SEH exceptions
 
-@volatile var sehProbe: Bool = false
+@volatile
+@rename('sehProbe') declare
+var sehProbe: Bool //= false
 
 // TODO template wrappers
 /*

@@ -16,8 +16,10 @@
 // Quake-style console with ~
 
 var quakeHeight: UInt8 = 255
-var quakeCommand[256]: Char8 = {0}
-var quakeLines[17][256]: Char8 = {0}
+var quakeCommand: String = ""
+// `var quakeLines: [String] = [0]` // TODO `= [0]` not valid type
+var quakeLines: [String] = []
+// TODO `= []` is inferred as `Array_$Any_$new_(0);`
 var quakeLine: UInt8 = 0
 var quakeRow: UInt8 = 0
 var quakeAdvance: Float = 0.0
@@ -29,137 +31,145 @@ fun quake() {
 		return
 	}
 
-	drawVibrancedRectangle(0, 0, _framebuffer.width, quakeHeight)
-	var color: Pixel32
-	color.color = 0x126099FF
-	lineHorizontal(color, 0, quakeHeight, _framebuffer.width)
+	drawVibrancedRectangle(0, 0, _framebuffer.width as! UInt16, quakeHeight)
+	var color = new ByValue<Pixel32>()
+	color.ref.color = 0x126099FF
+	lineHorizontal(color, 0, quakeHeight, _framebuffer.width as! UInt16)
 	// color.rgba.r = color.rgba.g = color.rgba.b = 48
-	color.rgba.r = color.rgba.g = color.rgba.b = 0xDD
-	var x = drawAsciiText(quakeCommand, 2, quakeHeight - 14, color)
-	drawAsciiText(u8"|", x + 2, quakeHeight - 15, color)
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xDDu8
+	var x = drawAsciiText(quakeCommand, 2, quakeHeight - 14u8, color.ref)
+	drawAsciiText("|", x + 2, quakeHeight - 15u8, color.ref)
 
 	for i in 17 {
-		drawAsciiText(quakeLines[i], 2, i * 14 + 2, color)
+		if let line = quakeLines[i] {
+			drawAsciiText(line, 2, i * 14i16 + 2i16, color.ref)
+		}
 	}
 }
 
 fun quakeHandleButtonDown(key: UInt8) {
 	serialPrintf("quakeHandleButtonDown %d\n", key)
+	if keyboardMap[key] == null or keyboardMap[key].length == 0 {
+		serialPrintf("quakeHandleButtonDown null\n")
+		return
+	}
 
 	if keyboardMap[key] == '\b' && quakeCommandSize > 0 {
-		quakeCommand[quakeCommandSize - 1] = 0
+		quakeCommand = '' // TODO substr -1
 		quakeCommandSize--
 	}
 
 	if keyboardMap[key] == '\n' && quakeCommandSize > 0 {
-		if quakeCommand[0] == 'r' && quakeCommand[1] == 'e' {
-			@extern const KernelParams *paramsCache
-			quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n")
-			var start: InitKernel = (InitKernel)kernelVirtualBase
+		if quakeCommand == 're' {
+			quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n".utf16())
+			var start: InitKernel = upper as! InitKernel // TODO `= (InitKernel)` compiles
 			start(paramsCache) // TODO pml4, stack
-		} else if (quakeCommand[0] == 'd' && quakeCommand[1] == 'a') {
+		} else if quakeCommand == 'da' { // TODO startsWith
 			// Dark theme
 			// TODO
-		} else if (quakeCommand[0] == 'l' && quakeCommand[1] == 'i') {
+		} else if quakeCommand == 'li' {
 			// Light theme
 			// TODO
-		} else if (quakeCommand[0] == 'h' && quakeCommand[1] == 'e') {
-			quakePrintf("Hit `~` to show/hide this terminal\n", quakeCommand)
-			quakePrintf("Command 'reload' does quick kernel restart (without actual reboot). Note: this "
+		} else if quakeCommand == 'he' {
+			quakePrintf("Hit `~` to show/hide this terminal\n".utf16(), quakeCommand)
+			quakePrintf(("Command 'reload' does quick kernel restart (without actual reboot). Note: this "
 						+
-						"destroys all unsaved data and may crash the system!\n",
+						"destroys all unsaved data and may crash the system!\n").utf16(),
 						quakeCommand)
 		} else {
-			quakePrintf("Command '%s' not supported\n", quakeCommand)
-			quakePrintf("Enter 'help' for commands\n")
+			quakePrintf("Command '%S' not supported\n".utf16(), quakeCommand)
+			quakePrintf("Enter 'help' for commands\n".utf16())
 		}
-		for i in 255 {
-			quakeCommand[i] = 0
-		}
+		quakeCommand = ''
 		quakeCommandSize = 0
 	}
 
-	if (keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z') ||
-		(keyboardMap[key] >= '0' && keyboardMap[key] <= '9') || (keyboardMap[key] == ' ') {
-		if quakeCommandSize < 255 {
-			quakeCommand[quakeCommandSize] = keyboardMap[key]
-			quakeCommandSize++
+	// TODO support string comparisons `if (keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z') ||`
+	if let char = keyboardMap[key] {
+		let charCode = char.charCodeAt(0) as! UInt16 // TODO `?? 0`
+		// TODO nullables are incomparable, do some cool way to avoid this `if (charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0)) ||`
+		// TODO ^ better error `you are comparing nullable values`
+		if (charCode >= 97 && charCode <= 122) ||
+			(charCode >= 48 && charCode <= 57) || (charCode == 32) {
+			if quakeCommandSize < 255 {
+				// quakeCommand += keyboardMap[key]
+				quakeCommand = quakeCommand + char
+				serialPrintf("quake append\n")
+				quakeCommandSize++
+			}
 		}
+		serialPrintf("quake command is %S +%S %d\n", quakeCommand.utf16(), char.utf16(), charCode)
 	}
-
-	serialPrintf("quake command is %s\n", quakeCommand)
 }
 
-fun qsod(const format: Pointer<WideChar>, extra: UInt64, const UInt64 more) {
+var qsodHappened = false
+fun qsod(format: ConstArrayPointer<ClangWideChar>, extra: UInt64, more: UInt64) {
+	qsodHappened = true
 	haveToQuake = true
-	quakePrintf("Kernel stopped working. Please, reboot.\n")
+	quakePrintf("Kernel stopped working. Please, reboot.\n".utf16())
 	quakePrintf(format, extra, more)
+	kernelThreadBusy = false
 }
 
-UInt8 *_quakeItoA(i: Int32, b[]: UInt8) {
-	UInt8 const digit[] = "0123456789"
-	var p: Pointer<UInt8> = b
-		*p++ = '-'
-	if i < 0 {
-		i *= -1
-	}
-	var shifter: Int32 = i
-	do { // Move to where representation ends
-		++p
-		shifter = shifter / 10
-	} while (shifter)
-	*p = '\0'
-	do { // Move back, inserting digits as u go
-		*--p = digit[i % 10]
-		i = i / 10
-	} while (i)
-	return b
-}
-
-fun _quake_newline() {
+// TODO `private`
+fun quakeNewline() {
 	quakeLine++
 	quakeRow = 0
 	quakeAdvance = 0.0
 	if quakeLine == 17 {
 		// Move all lines upper
 		quakeLine = 16
-			for (var k = 0; k < sizeof(quakeLines[i]); k++)
 		for i in 16 {
-				quakeLines[i][k] = 0
-			for (var k = 0; k < sizeof(quakeLines[i]); k++)
-				quakeLines[i][k] = quakeLines[i + 1][k]
+			quakeLines[i] = quakeLines[i + 1]
 		}
-		for (var i = 0; i < sizeof(quakeLines[16]); i++)
-			quakeLines[16][i] = 0
+		quakeLines[16] = ''
 	}
 }
 
-UInt8 __cdecl _quake_putchar(const UInt8 c) {
+fun quakePutChar(c: UInt8): UInt8 {
 	if c != 0 {
 		putchar(c) // Copy to serial log
-		if (c == '\n') {
-			_quake_newline()
+		if let char = '\n'.charCodeAt(0), c == char {
+			quakeNewline()
 			return c
 		}
-		quakeAdvance += getCharAdvance(c)
+		quakeAdvance += getCharAdvance(c as! UInt8)
 		if quakeAdvance > _framebuffer.width {
-			_quake_newline()
-			quakeAdvance = getCharAdvance(c)
+			quakeNewline()
+			quakeAdvance = getCharAdvance(c as! UInt8)
 		}
-		quakeLines[quakeLine][quakeRow] = c
+
+		if quakeLines[quakeLine] == null {
+			quakeLines[quakeLine] = ``
+		}
+
+		// TODO how this should work then? `nullADD`?
+		quakeLines[quakeLine] += String.fromCharCode(c)
 		quakeRow++
 		if quakeRow > 255 {
-			_quake_newline()
+			quakeNewline()
 		}
 		return c
 	}
 	return 0
 }
 
-Int32 _quake_puts(const string: Pointer<UInt8>) {
+fun quakePutString(string: ArrayPointer<UInt8>): Int32 {
 	var i: Int32 = 0
 	while string[i] != 0 {
-		if _quake_putchar(string[i]) == 0 {
+		if quakePutChar(string[i]) == 0 {
+			return 0
+		}
+		i++
+	}
+	return 1
+}
+
+// TODO batch whole lines or store separate chars as strings to avoid `+=char`
+fun quakePutStringUnicode(string: ConstArrayPointer<ClangWideChar>): Int32 {
+	var i: Int32 = 0
+	while string[i] != 0 as! ClangWideChar {
+		if quakePutChar(string[i] as! UInt8) == 0 { // TODO
 			return 0
 		}
 		i++
@@ -168,76 +178,84 @@ Int32 _quake_puts(const string: Pointer<UInt8>) {
 }
 
 fun quakePrintHex(n: UInt64) {
-	_quake_puts((const UInt8 *)"0x")
-	UInt8 buf[16], *bp = buf + 16
+	quakePutString("0x".utf16() as! ArrayPointer<UInt8>)
+
+	var n = n
+	var buf: ArrayByValue<UInt8, 16> = [0]
+	var bp = ((buf as! UInt64) + 16) as! ArrayPointer<UInt8>
+
 	for i in 16 {
-		buf[i] = '0'
+		buf[i] = '0'.charCodeAt(0)
 	}
 
 	do {
 		bp--
-		var mod: UInt8 = n % 16
-			*bp = '0' + mod
+		var mod: UInt8 = (n % 16) as! UInt8
 		if mod < 10 {
+			bp[0] = '0'.charCodeAt(0) + mod
 		} else {
-			*bp = 'A' - 10 + mod
+			bp[0] = 'A'.charCodeAt(0) - 10 + mod
 		}
 		n /= 16
 	} while (n != 0)
 
 	for i in 16 {
-		_quake_putchar(buf[i])
+		quakePutChar(buf[i] as! UInt8)
 	}
 }
 
-fun quakePrintf(const c: Pointer<WideChar>, ...) {
-	var s: Pointer<UInt8>
+fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
+	// TODO
+	serialPrintf("quakePrintf: %S\n", c)
+	quakePutStringUnicode(c)
+	/*
+	var s: ArrayPointer<UInt8>
 	va_list lst
 	va_start(lst, c)
-	while (*c != '\0') {
-		if (*c != '%') {
-			_quake_putchar(*c & 0xFF)
+	while c[0] != '\0' {
+		if c[0] != '%' {
+			quakePutChar(c[0] & 0xFF)
 			c++
 			continue
 		}
 
 		c++
 
-		if (*c == '\0') {
+		if c[0] == '\0' {
 			break
 		}
 
-		switch (*c) {
+		switch c[0] {
 		case 's':
-			_quake_puts(va_arg(lst, UInt8 *))
+			quakePutString(vaArg<ArrayPointer<UInt8> >(lst))
 			break
 		case 'c':
-			_quake_putchar(va_arg(lst, int32_t))
+			quakePutChar(vaArg(lst, int32_t))
 			break
 		case 'd': {
-			var value: Int32 = va_arg(lst, int32_t)
-			var buffer[16]: UInt8
+			var value: Int32 = vaArg<Int32>(lst)
+			var buffer: ArrayByValue<UInt8, 16>
 			for i in 16 {
 				buffer[i] = 0
 			}
-			_quakeItoA(value, buffer)
-			var c: Pointer<UInt8> = buffer
-			while (*c != '\0') {
-				_quake_putchar(*c)
+			quakeItoA(value, buffer)
+			var c: ArrayPointer<UInt8> = buffer
+			while c[0] != '\0' {
+				quakePutChar(c[0])
 				c++
 			}
 			break
 		}
 		case 'u': {
 			var value: UInt32 = va_arg(lst, uint32_t)
-			var buffer[16]: UInt8
+			var buffer: ArrayByValue<UInt8, 16>
 			for i in 16 {
 				buffer[i] = 0
 			}
-			_quakeItoA(value, buffer)
-			var c: Pointer<UInt8> = buffer
-			while (*c != '\0') {
-				_quake_putchar(*c)
+			quakeItoA(value, buffer)
+			var c: ArrayPointer<UInt8> = buffer
+			while c[0] != '\0' {
+				quakePutChar(c[0])
 				c++
 			}
 			break
@@ -249,5 +267,5 @@ fun quakePrintf(const c: Pointer<WideChar>, ...) {
 		}
 		}
 		c++
-	}
+	}*/
 }

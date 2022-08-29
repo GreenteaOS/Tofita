@@ -14,23 +14,24 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // trampoline.asm . incbin
-@extern const UInt8 binFont[]
-@extern const UInt8 binFontBitmap[]
+@extern @rename('binFont') declare let binFont: ConstArrayPointer<UInt8>
+@extern @rename('binFontBitmap') declare let binFontBitmap: ConstArrayPointer<UInt8>
 let fontWidth: UInt32 = 512
 let fontHeight: UInt32 = 32
 
-@extern const UInt8 binLeavesBitmap[]
+@extern @rename('binLeavesBitmap') declare let binLeavesBitmap: ConstArrayPointer<UInt8>
 let leavesWidth: UInt32 = 36
 let leavesHeight: UInt32 = 25
 
 let _fltused: Int64 = 0
 
-fun drawPixel(framebuffer: Pointer<Framebuffer>, x: UInt32, y: UInt32, color: UInt32) {
-	var pixels: Pointer<UInt32> = (UInt32 *)framebuffer.base
+fun drawPixel(framebuffer: FrameBuffer, x: UInt32, y: UInt32, color: UInt32) {
+	var pixels = framebuffer.base as! ArrayPointer<UInt32>
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
 
 @struct @packed @sizeOf(4)
+@stack
 class UefiPixel {
 	var b: UInt8
 	var g: UInt8
@@ -38,15 +39,17 @@ class UefiPixel {
 	var a: UInt8
 }
 
-UInt32 getBitmapPixel(const bmp: Pointer<UInt8>, x: UInt32, y: UInt32, width: UInt32, height: UInt32) {
-	let colors = bmp + 54
-	var pixel: UefiPixel
-	pixel.b = colors[((height - y - 1) * width + x) * 3 + 0]
-	pixel.g = colors[((height - y - 1) * width + x) * 3 + 1]
-	pixel.r = colors[((height - y - 1) * width + x) * 3 + 2]
-	pixel.a = 0xFF
-	var color: Pointer<UInt32> = (UInt32 *)Pointer.of(pixel)
-	return *color
+fun getBitmapPixel(bmp: ConstArrayPointer<UInt8>, x: UInt32, y: UInt32, width: UInt32, height: UInt32): UInt32 {
+	let bmpHeaderSize = 54u64
+	let colors: ConstArrayPointer<UInt8> = (bmp as! UInt64 + bmpHeaderSize) as! ConstArrayPointer<UInt8>
+	var pixel: ByValue<UefiPixel> = new ByValue<UefiPixel>()
+	pixel.ref.b = colors[((height - y - 1) * width + x) * 3 + 0]
+	pixel.ref.g = colors[((height - y - 1) * width + x) * 3 + 1]
+	pixel.ref.r = colors[((height - y - 1) * width + x) * 3 + 2]
+	pixel.ref.a = 0xFF
+	var color = pixel.ref as! ArrayPointer<UInt32>
+	// TODO `@union`
+	return color[0]
 }
 
 @struct @packed @sizeOf(12)
@@ -56,51 +59,61 @@ class TextFontList {
 	var width: Float
 }
 
-TextFontList *textFontList = null
+var textFontList = null as! ArrayPointer<ByValue<TextFontList>>
+// TODO `ConstArrayPointer<TextFontList>` + `@const @struct { let }`
 
 fun initText() {
-	textFontList = (TextFontList *)binFont
+	textFontList = binFont as! ArrayPointer<ByValue<TextFontList>> // TODO as! _
 }
 
-Float getCharAdvance(const Char8 c) {
-	var textChar: TextFontList = textFontList[(c] as! UInt64)
+fun getCharAdvance(c: UInt8) {
+	var textChar: TextFontList = textFontList[c as! UInt64].ref
 	return textChar.width
 }
 
-Float drawChar(c: Char8, x: Float, y: Int16, framebuffer: Pointer<Framebuffer>) {
-	var textChar: TextFontList = textFontList[(c] as! UInt64)
+fun drawChar(c: UInt8, x: Float, y: Int16, framebuffer: FrameBuffer) {
+	var textChar: TextFontList = textFontList[c as! UInt64].ref
 
-	var xx: Int16 = (int32_t)(x + 0.5)
-	var w: UInt16 = (int32_t)(textChar.width + 0.5)
+	var xx: Int16 = (x + 0.5) as! Int32 as! Int16
+	var w: UInt16 = (textChar.width + 0.5) as! Int32 as! UInt16
 
-	for (UInt16 yi = 0; yi < 12; yi++)
-		for (UInt16 xi = 0; xi < w; xi++) {
+	var yi: UInt16 = 0
+	while yi < 12 {
+		var xi: UInt16 = 0
+		while xi < w {
 			let atx: UInt32 = xx + xi
 			let aty: UInt32 = y + yi
 
 			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight)
 
 			drawPixel(framebuffer, atx, aty, font)
+
+			xi++
 		}
+
+		yi++
+	}
 
 	return textChar.width
 }
 
-fun drawText(const text: Pointer<WideChar>, y: Int16, framebuffer: Pointer<Framebuffer>) {
+fun drawText(text: String, y: Int16, framebuffer: FrameBuffer) {
+	let text: ConstArrayPointer<ClangWideChar> = text.utf16()
 	var i: UInt16 = 0
 
 	// Get width to center text on screen
 	var width: Float = 0
-	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
-		width += getCharAdvance((uint16_t)text[i] & 0xFF)
+
+	while (text[i] as! UInt16) != 0 && i < 255 * 255 {
+		width += getCharAdvance((text[i] as! UInt16) & 0xFF as! UInt8)
 		i++
 	}
 
-	var xx: Float = framebuffer.width / 2 - width / 2
+	var xx: Float = (framebuffer.width / 2) - (width / 2)
 
 	i = 0
-	while ((uint16_t)text[i] != 0 && i < 255 * 255) {
-		xx += drawChar((uint16_t)text[i] & 0xFF, xx, y, framebuffer)
+	while (text[i] as! UInt16) != 0 && i < 255 * 255 {
+		xx += drawChar((text[i] as! UInt16) & 0xFF as! UInt8, xx, y, framebuffer)
 		i++
 	}
 }

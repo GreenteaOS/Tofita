@@ -19,34 +19,44 @@
 
 // TODO probeCopy to local stack instead of probe.read, good for SMP
 
+// TODO rewrite in asm
+// TODO no need to jump less than per-page!
+// TODO Volatile<T> .read .write => cause whole-byte, avoid bit compression (for Bool etc)
+// ^ the whole point of volatile is *order* of reads and writes
 @volatile @noInline
-fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool {
+@rename('probeForReadOkay') declare
+fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool /*{
 	sehProbe = true
 	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
-	@volatile const UInt8 *ptr = (@volatile const UInt8 *)at
+	var at = at
+	@volatile let ptr = at as! @volatile ArrayPointer<UInt8>
+	// TODO VolatilePointer
 	for i in bytes {
 		at += ptr[i]
 	}
 	sehProbe = false
 	return true
-}
-
-@volatile Bool (*@volatile const probeForReadOkay)(@volatile at: UInt64,
-												 @volatile bytes: UInt64) = _probeForReadOkay
+}*/
+//@volatile Bool (*@volatile const probeForReadOkay)(@volatile at: UInt64,
+//												 @volatile bytes: UInt64) = _probeForReadOkay
 
 @volatile @noInline
-fun probeForWriteOkay(@volatile at: UInt64, @volatile bytes: UInt64): Bool {
+@rename('probeForWriteOkay') declare
+fun probeForWriteOkay(@volatile at: UInt64, @volatile bytes: UInt64): Bool /*{
 	sehProbe = true
 	// TODO per-page not per-byte
-	@volatile UInt8 *ptr = (@volatile UInt8 *)at
+	@volatile let ptr = at as! @volatile ArrayPointer<UInt8>
 	// TODO i also as volatile?
 	for i in bytes {
 		ptr[i] = ptr[i]
 	}
 	sehProbe = false
 	return true
-}
+}*/
 
-@volatile Bool (*@volatile const probeForWriteOkay)(@volatile at: UInt64,
-												  @volatile bytes: UInt64) = _probeForWriteOkay
+//@volatile Bool (*@volatile const probeForWriteOkay)(@volatile at: UInt64,
+//												  @volatile bytes: UInt64) = _probeForWriteOkay
+// This is a fascinating way to not allow compiler to optimize return value
+//let probeForReadOkay = _probeForReadOkay
+//let probeForWriteOkay = _probeForWriteOkay

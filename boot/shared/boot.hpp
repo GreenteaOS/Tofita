@@ -42,15 +42,6 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof");
 
 // Use uint64_t, int32_t, char8_t, etc
 
-#define char do_not_use_such_types_please
-#define int do_not_use_such_types_please
-#define signed do_not_use_such_types_please
-#define short do_not_use_such_types_please
-#define size_t do_not_use_such_types_please
-#define intptr_t do_not_use_such_types_please
-#define uintptr_t do_not_use_such_types_please
-#define nullptr do_not_use_such_types_please
-
 #define STR_IMPL_(x) #x		// stringify argument
 #define STR(x) STR_IMPL_(x) // indirection to expand argument macros
 
@@ -98,6 +89,7 @@ struct EfiMemoryMap {
 	uint64_t descriptorSize;
 	uint32_t descriptorVersion;
 };
+_Static_assert(sizeof(EfiMemoryMap) == (40), "EfiMemoryMap");
 
 struct Framebuffer {
 	uint64_t base;	   // virtual address
@@ -107,12 +99,14 @@ struct Framebuffer {
 	uint32_t height;
 	uint32_t pixelsPerScanLine;
 };
+_Static_assert(sizeof(Framebuffer) == (32), "Framebuffer");
 
 struct RamDisk {
 	uint64_t base;	   // virtual address
 	uint64_t physical; // physical address
 	uint32_t size;	   // in bytes
 };
+_Static_assert(sizeof(RamDisk) == (24), "RamDisk");
 
 struct KernelParams {
 	uint64_t pml4;
@@ -135,6 +129,8 @@ struct KernelParams {
 	// don't allow to login! in the sense that it looks like a security hole
 	// like "let it in without entering a login-password")
 };
+
+_Static_assert(sizeof(KernelParams) == (172 + sizeof(efi::EFI_TIME) + sizeof(efi::EFI_TIME_CAPABILITIES)), "KernelParams");
 
 typedef function(__fastcall *InitKernel)(const KernelParams *);
 // TODO ^ fix that in quake

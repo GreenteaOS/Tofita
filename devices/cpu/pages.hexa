@@ -15,111 +15,106 @@
 
 // AMD64 pages format and map/unmap internal implementation
 
+/// Align to 4096
 let addressBits = 12
 
-@struct @packed @sizeOf(8)
-class LinearAddress {
-	@bits(12) var offset: UInt16
-	@bits(9) var pt: UInt16
-	@bits(9) var pd: UInt16
-	@bits(9) var pdpt: UInt16
-	@bits(9) var pml4: UInt16
-	@bits(16) var reserved: UInt16
-}
-
-// 512 entries * 8 bytes = 4 KiB
-// PML4 size = PDP size = PD size = PT size
-//
-// Since we are using 64 bit mode, the entry size
-// is 64 bits.
-
-let pageTableSize = 512
-
 // TODO remove this
-@aligned(4096) var pml4entries: Pointer<PageEntry> = null
+@aligned(4096) var pml4entries: ArrayPointer<ByValue<PageEntry>> = null as! ArrayPointer<ByValue<PageEntry>>
 
-LinearAddress getLinearAddress(virtualAddr: UInt64) {
-	return *((LinearAddress *)Pointer.of(virtualAddr))
-}
-
-fun initializePage(entry: Pointer<PageEntry>, address: UInt64) {
+fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
 	entry.address = address >> addressBits
 	entry.present = 1
-	entry.writeAllowed = 1
+	entry.writeAllowed = (writeAllowed == 1) ? 1u8 : 0u8 // TODO simply Bool
 
 	// TODO
 	entry.accessibleByAll = 1
 }
 
-fun getPage(table: Pointer<PageEntry>, entryId: UInt64): Pointer<PageEntry> {
-	var entry: Pointer<PageEntry> = Pointer.of(table[entryId])
+fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8): ArrayPointer<ByValue<PageEntry>> {
+	let entry: PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
-		return ((entry.address << addressBits) + (wholePhysicalStart as! UInt64)) as! Pointer<PageEntry>
+		return ((entry.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 	} else {
-		var newPage = PhysicalAllocator.allocateOnePagePreZeroed() as! Pointer<PageEntry>
-			initializePage(entry, (newPage as! UInt64) - (wholePhysicalStart as! UInt64))
+		var newPage = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>
 		if newPage != null {
+			mapPage(entry, (newPage as! UInt64) - (wholePhysicalStart as! UInt64), writeAllowed)
+			// TODO else error
 		}
 		return newPage
 	}
 }
 
-fun map_pt(PageEntry pt[], virtualAddr: UInt64, physicalAddr: UInt64) {
-	var entry: Pointer<PageEntry> = Pointer.of(pt[getLinearAddress(virtualAddr).pt])
-	initializePage(entry, physicalAddr)
-// TODO handle huge pages returned from bootloader
+/// allows to access separate address by page table levels
+@struct @packed @sizeOf(8)
+class PageAddressView {
+	@bits(12) var offset: UInt64 = 0 // TODO `let` and no `= 0`
+	@bits(9) var pt: UInt64 = 0
+	@bits(9) var pd: UInt64 = 0
+	@bits(9) var pdpt: UInt64 = 0
+	@bits(9) var pml4: UInt64 = 0
+	@bits(16) var padding: UInt64 = 0
 }
 
-fun mapPD(pd: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+fun getPageAddressView(virtualAddr: UInt64): ByValue<PageAddressView> {
+	return virtualAddr as! ByValue<PageAddressView>
+}
+
+// TODO handle huge pages returned from bootloader
+fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
+	var entry: PageEntry = pt[getPageAddressView(virtualAddr).ref.pt].ref
+	mapPage(entry, physicalAddr, writeAllowed)
+}
+
+fun mapPD(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pt = getPage(pd, getLinearAddress(virtualAddr).pd, writeAllowed)
+	var pt = referOrCreatePage(pd, getPageAddressView(virtualAddr).ref.pd, writeAllowed)
 	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPDPT(pdpt: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+fun mapPDPT(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pd = getPage(pdpt, getLinearAddress(virtualAddr).pdpt, writeAllowed)
+	var pd = referOrCreatePage(pdpt, getPageAddressView(virtualAddr).ref.pdpt, writeAllowed)
 	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPML4(pml4: ArrayOfStructPointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64,
+fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pdpt = getPage(pml4, getLinearAddress(virtualAddr).pml4, writeAllowed)
+	var pdpt = referOrCreatePage(pml4, getPageAddressView(virtualAddr).ref.pml4, writeAllowed)
 	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
 }
 
 // Returns actual physical address from virtual address
-fun resolveAddr(const pml4entries: Pointer<PageEntry>, virtualAddr: UInt64): UInt64 {
-	var linear = getLinearAddress(virtualAddr)
+fun resolveAddr(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64): UInt64 {
+	var linear = getPageAddressView(virtualAddr).ref
 	// pml4
-	const PageEntry *entry = Pointer.of(pml4entries[linear.pml4])
-	if entry.present == 0 {
-		return PHYSICAL_NOT_FOUND
-	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
+	var entry = pml4entries[linear.pml4] as! ArrayPointer<ByValue<PageEntry>>
+	if entry[0].ref.present == 0 {
+		return physical_not_found
 	}
+	entry = ((entry[0].ref.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 	// pdpt
-	entry = Pointer.of(entry[linear.pdpt])
-	if entry.present == 0 {
-		return PHYSICAL_NOT_FOUND
+	entry = entry[linear.pdpt] as! ArrayPointer<ByValue<PageEntry>>
+	if entry[0].ref.present == 0 {
+		return physical_not_found
 	}
 	// TODO handle mega pages
-	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
+	entry = ((entry[0].ref.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 	// pd
-	entry = Pointer.of(entry[linear.pd])
-	if entry.present == 0 {
-		return PHYSICAL_NOT_FOUND
+	entry = entry[linear.pd] as! ArrayPointer<ByValue<PageEntry>>
+	if entry[0].ref.present == 0 {
+		return physical_not_found
 	}
-	if entry.largePage == 1 {
-		return (entry.address << addressBits) + linear.pt * 4096 + linear.offset
-	entry = (const PageEntry *)((entry.address << addressBits) + (wholePhysicalStart as! UInt64))
+	if entry[0].ref.largePage == 1 {
+		return (entry[0].ref.address << addressBits) + linear.pt * 4096 + linear.offset
 	}
+	entry = ((entry[0].ref.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 	// pt
-	entry = Pointer.of(entry[linear.pt])
-	if entry.present == 0 {
-		return PHYSICAL_NOT_FOUND
+	entry = entry[linear.pt] as! ArrayPointer<ByValue<PageEntry>>
+	if entry[0].ref.present == 0 {
+		return physical_not_found
 	}
-	return (entry.address << addressBits) + linear.offset
+	return (entry[0].ref.address << addressBits) + linear.offset
 }
 
 // TODO return error code (as enum)
@@ -127,7 +122,7 @@ fun resolveAddr(const pml4entries: Pointer<PageEntry>, virtualAddr: UInt64): UIn
 // TODO ^ same clang warning
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
-fun mapMemory(pml4entries: Pointer<PageEntry>, virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
+fun mapMemory(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
 	serialPrintln("[paging] mapping memory range")
 
 	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
@@ -154,7 +149,8 @@ fun mapMemory(pml4entries: Pointer<PageEntry>, virtualAddr: UInt64, physicalAddr
 	serialPrint("\n")
 
 	while vAddress < virtualAddrEnd {
-		mapPML4(pml4entries, vAddress, pAddress)
+		let writeAllowed = 1u8 // TODO
+		mapPML4(pml4entries, vAddress, pAddress, writeAllowed)
 
 		vAddress += pageSize
 		pAddress += pageSize
@@ -182,17 +178,19 @@ fun unmapAndFreeMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: U
 // Upper half
 // Just makes a copy of upper half's PML4,
 // because it is always the same between processes
-fun copyKernelMemoryMap(const pml4source: Pointer<PageEntry>, pml4destination: Pointer<PageEntry>) {
+fun copyKernelMemoryMap(pml4source: ArrayPointer<ByValue<PageEntry>>, pml4destination: ArrayPointer<ByValue<PageEntry>>) {
 	var i: UInt32 = 255 // TODO validate that this is where upper half starts
-	while i < pageTableSize {
+	let pageTableEntriesCount = 512u64
+
+	while i < pageTableEntriesCount {
 		pml4destination[i] = pml4source[i]
 		i++
 	}
 }
 
 // Creates new PML4 for new process
-fun newCR3(const pml4source: Pointer<PageEntry>): Pointer<PageEntry> {
-	var pml4result: Pointer<PageEntry> = PhysicalAllocator.allocateOnePagePreZeroed() as! Pointer<PageEntry>
+fun newCR3(pml4source: ArrayPointer<ByValue<PageEntry>>): ArrayPointer<ByValue<PageEntry>> {
+	var pml4result = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>
 	if pml4result != null {
 		copyKernelMemoryMap(pml4source, pml4result)
 	}
@@ -217,3 +215,44 @@ fun mapUserspaceMemory(pml4entries: PageEntry, virtualAddr: UInt64, physicalAddr
 // if virtualAddr == 0
 // Note: also allocates physical pages, i.e consumes extra memory
 fun allocUserspaceMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: UInt32) {}
+
+// TODO protection ring
+// TODO respect WoW limits
+// TODO VirtualAllocEx-like behavior (i.e. alloc for other processes, not only current)
+// Decides automatically where to allocate
+// if virtualAddr == 0
+// Does NOT allocate physical memory for the requested range
+// Returns 0 if requested pointer is occupied
+fun findUserspaceMemory(
+	pml4entries: ArrayPointer<ByValue<PageEntry>>,
+	virtualAddr: UInt64,
+	pageCount: UInt32,
+	limits: AddressAwareness
+): UInt64 {
+	let upperBound = 0x7FFFFFFFFFFFu64
+
+	// TODO return 0 if virtualAddr not page aligned (virtualAddr & ADDRESS_BITS != 0)
+
+	// Yeah, brute force PML4 for now
+	var pageFirstByte = virtualAddr == 0? 4096u64 : virtualAddr
+	let cycle = virtualAddr == 0
+
+	while cycle && pageFirstByte < upperBound {
+		var found = 0u64
+		let result = pageFirstByte
+		// TODO create isMapped function
+		while resolveAddr(pml4entries, pageFirstByte) == physical_not_found {
+			found++
+			if found == pageCount {
+				return result
+			}
+			pageFirstByte += 4096
+		}
+
+		while resolveAddr(pml4entries, pageFirstByte) != physical_not_found {
+			pageFirstByte += 4096
+		}
+	}
+
+	return 0
+}

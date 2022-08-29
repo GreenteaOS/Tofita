@@ -13,50 +13,52 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let pic1 = 0x20 // io base address for main pic
-let pic2 = 0xa0 // io base address for secondary pic
+let pic1 = 0x20u8 // io base address for main pic
+let pic2 = 0xa0u8 // io base address for secondary pic
 let pic1_command = pic1
-let pic1_command_0x20 = 0x20
+let pic1_command_0x20 = 0x20u16
 let pic1_data = (pic1 + 1)
 let pic2_command = pic2
 let pic2_data = (pic2 + 1)
-let pic_eoi = 0x20	  // end-of-interrupt command code
-let pic_eoi_0x20 = 0x20 // end-of-interrupt command code
+let pic_eoi = 0x20u8	  // end-of-interrupt command code
+let pic_eoi_0x20 = 0x20u8 // end-of-interrupt command code
 
-fun tmemcpy(dest: VoidPointer, src: ConstVoidPointer, count: UInt64): Void {
-	var dst8: Pointer<UInt8> = (UInt8 *)dest
-	var src8: Pointer<UInt8> = (UInt8 *)src
-
-	while (count--) {
-		*dst8++ = *src8++
+@rename('vmemcpy')
+declare fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64): Void
+/* {
+	for i in count {
+		dest[0] = src[0]
 	}
-}
+}*/
 
-fun tmemcpy(@volatile dest: VoidPointer, const @volatile src: VoidPointer, @volatile count: UInt64): Void {
-	var dst8: Pointer<UInt8> = (UInt8 *)dest
-	var src8: Pointer<UInt8> = (UInt8 *)src
-
-	while (count--) {
-		*dst8++ = *src8++
+@rename('vmemcpy')
+declare fun vmemcpy(@volatile dest: ArrayPointer<UInt8>, @volatile src: ConstArrayPointer<UInt8>, @volatile count: UInt64): Void
+/* {
+	for i in count {
+		dest[0] = src[0]
 	}
-}
+}*/
 
 @struct @packed @sizeOf(10)
+@rename('Idtr')
+@asIs
+declare
 class Idtr {
 	var limit: UInt16
 	var offset: UInt64
+	new ()
 }
 
 @struct @packed
 class IdtEntry {
-	@bits(16) var offsetLowerbits: UInt16
+	@bits(16) var offsetLowerBits: UInt16
 	@bits(16) var selector: UInt16
 	@bits(8) var ist: UInt8
 	@bits(4) var gateType: UInt8
 	@bits(1) var z: UInt8
 	@bits(2) var dpl: UInt8
 	@bits(1) var present: UInt8
-	@bits(48) var offsetHigherbits: UInt64
+	@bits(48) var offsetHigherBits: UInt64
 	@bits(32) var zero: UInt32
 }
 
@@ -68,7 +70,7 @@ fun writePort(@volatile port: UInt16, @volatile value: UInt8) {
 	portOutb(port, value)
 }
 
-declare fun loadIdt(@volatile idtr: Idtr): Void
+@rename('loadIdt') declare fun loadIdt(@volatile idtr: Idtr): Void
 
 enum Selector : UInt64 {
 	SYS_CODE64_SEL = 0x10 // Execute/Read
@@ -88,33 +90,28 @@ enum Selector : UInt64 {
 // Handling IDT
 let idt_size = 256
 // Records of the GDT - 16 items
-let null_sel = 0x00
 //let empty_sel = 0x08
-let sys_code64_sel = 0x10 // Execute/Read
-let sys_data32_sel = 0x18 // Read/Write
 // Layout expected by SYSRET
-let user_code32_sel = 0x20 // Execute/Read
-let user_data32_sel = 0x28 // Read/Write
-let user_code64_sel = 0x30 // Execute/Read
 //let empty_sel = 0x38
 //let tss_sel = 0x40 // Index = 8
 //let tss_sel = 0x48
 //let user_data32_sel = 0x50 // Read/Write
 //let empty_sel = 0x58
-let sys_code32_sel = 0x60 // Execute/Read
 //let empty_sel = 0x68
 //let empty_sel = 0x70
 //let empty_sel = 0x78
 
-IdtEntry IDT[idt_size]
+// TODO IdtEntry IDT[idt_size]
+var idt: ArrayByValue<ByValue<IdtEntry>, 256> = []
 
-// Handling keyboard
+// Handling keyboard interrupts
+@rename('keyboardHandler')
 @extern declare fun keyboardHandler(): Void
 fun initializeKeyboard(entry: IdtEntry) {
 	var keyboardAddress: UInt64 = ((keyboardHandler as! UInt64))
-	entry.offsetLowerbits = keyboardAddress & 0xFFFF
-	entry.offsetHigherbits = (keyboardAddress & 0xFFFFFFFFFFFF0000) >> 16
-	entry.selector = sys_code64_sel
+	entry.offsetLowerBits = keyboardAddress & 0xFFFFu16
+	entry.offsetHigherBits = (keyboardAddress & 0xFFFFFFFFFFFF0000u64) >> 16
+	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
 	entry.zero = 0
 	entry.ist = 2 // Stack
 	entry.z = 0
@@ -124,12 +121,14 @@ fun initializeKeyboard(entry: IdtEntry) {
 	// TODO fix vscode: 0xe is invalid, valid only oxE
 }
 
+// Handling mouse interrupts
+@rename('mouseHandler')
 @extern declare fun mouseHandler(): Void
 fun initializeMouse(entry: IdtEntry) {
 	var mouseAddress: UInt64 = ((mouseHandler as! UInt64))
-	entry.offsetLowerbits = mouseAddress & 0xFFFF
-	entry.offsetHigherbits = (mouseAddress & 0xFFFFFFFFFFFF0000) >> 16
-	entry.selector = sys_code64_sel
+	entry.offsetLowerBits = mouseAddress & 0xFFFFu16
+	entry.offsetHigherBits = (mouseAddress & 0xFFFFFFFFFFFF0000u64) >> 16
+	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
 	entry.zero = 0
 	entry.ist = 2 // Stack
 	entry.z = 0
@@ -138,11 +137,12 @@ fun initializeMouse(entry: IdtEntry) {
 	entry.gateType = 0xE // Interrupt gate
 }
 
-fun initializeFallback(entry: IdtEntry, fallbackHandler: UInt64) {
+// Handling interrupts and exceptions
+fun initializeCallback(entry: IdtEntry, fallbackHandler: UInt64) {
 	var address: UInt64 = ((fallbackHandler as! UInt64))
-	entry.offsetLowerbits = address & 0xFFFF
-	entry.offsetHigherbits = (address & 0xFFFFFFFFFFFF0000) >> 16
-	entry.selector = sys_code64_sel
+	entry.offsetLowerBits = address & 0xFFFFu16
+	entry.offsetHigherBits = (address & 0xFFFFFFFFFFFF0000u64) >> 16
+	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
 	entry.zero = 0
 	entry.ist = 1 // Stack
 	entry.z = 0
@@ -151,27 +151,9 @@ fun initializeFallback(entry: IdtEntry, fallbackHandler: UInt64) {
 	entry.gateType = 0xE // Interrupt gate
 }
 
-let icw1_icw4 = 0x01		// ICW4 (not) needed
-let icw1_single = 0x02	// Single (cascade) mode
-let icw1_interval4 = 0x04 // Call address interval 4 (8)
-let icw1_level = 0x08		// Level triggered (edge) mode
-let icw1_init = 0x10		// Initialization - required!
-
-let icw4_8086 = 0x01			// 8086/88 (MCS-80/85) mode
-let icw4_auto = 0x02			// Auto (normal) EOI
-let icw4_buf_secondary = 0x08 // Buffered mode/secondary
-let icw4_buf_master = 0x0C	// Buffered mode/primary
-let icw4_sfnm = 0x10			// Special fully nested (not)
-
-/*
-arguments:
-	offset1 - vector offset for master PIC
-			vectors on the master become offset1..offset1+7
-	offset2 - same for secondary PIC: offset2..offset2+7
-
-Taken from http://wiki.osdev.org/8259_PIC
-*/
-fun remapPic(offset1: UInt8, offset2: UInt8) {
+// PIC http://wiki.osdev.org/8259_PIC
+// TODO move to separate module
+fun remapPic() {
 	serialPrintln("[cpu] begin: remap PIC")
 
 	writePort(0x20, 0x11)
@@ -190,6 +172,8 @@ fun remapPic(offset1: UInt8, offset2: UInt8) {
 
 // Sets up the legacy PIC and then disables it
 fun disablePic() {
+	serialPrintln("[cpu] begin: disable PIC")
+
 	/* Set ICW1 */
 	writePort(0x20, 0x11)
 	writePort(0xA0, 0x11)
@@ -209,6 +193,8 @@ fun disablePic() {
 	/* Set OCW1 (interrupt masks) */
 	writePort(0x21, 0xFF)
 	writePort(0xA1, 0xFF)
+
+	serialPrintln("[cpu] done: disable PIC")
 }
 
 fun physicalToVirtual(physical: UInt64): UInt64 {
@@ -220,38 +206,42 @@ fun physicalToVirtual(physical: UInt64): UInt64 {
 fun enableLocalApic() {
 	serialPrintln("[cpu] begin: enableLocalApic")
 
-	var ptr = (UInt32 *)physicalToVirtual(0xFEE000F0)
-	var val: UInt32 = *ptr
-	quakePrintf("APIC value is %u\n", val)
+	var ptr = physicalToVirtual(0xFEE000F0u32) as! ArrayPointer<UInt32>
+	var val: UInt32 = ptr[0]
+	quakePrintf("APIC value is %u\n".utf16(), val)
 
 	serialPrintln("[cpu] done: enableLocalApic")
 }
 
-let irq0 = 32
-let irq1 = 0x21 // 33
-let irq2 = 34
-let irq3 = 35
-let irq4 = 36
-let irq5 = 37
-let irq6 = 38
-let irq7 = 39
-let irq8 = 40
-let irq9 = 41
-let irq10 = 42
-let irq11 = 43
-let irq12 = 44 // 2c
-let irq13 = 45
-let irq14 = 46
-let irq15 = 47
+let irq0 = 32u16
+let irq1 = 0x21u16 // 33
+let irq2 = 34u16
+let irq3 = 35u16
+let irq4 = 36u16
+let irq5 = 37u16
+let irq6 = 38u16
+let irq7 = 39u16
+let irq8 = 40u16
+let irq9 = 41u16
+let irq10 = 42u16
+let irq11 = 43u16
+let irq12 = 44u16 // 2c
+let irq13 = 45u16
+let irq14 = 46u16
+let irq15 = 47u16
 
 @struct @packed @sizeOf(10)
-class TablePtr {
+@asIs // TODO
+@rename('TablePtr')
+declare class TablePtr {
 	var limit: UInt16
 	var base: UInt64
+	new ()
 }
 
-declare fun lgdt(@volatile gdt: ConstPointer<TablePtr>)
+@rename('lgdt') declare fun lgdt(@volatile gdt: TablePtr): Void
 
+// TODO @bitMask
 enum GdtType : UInt8 {
 	Accessed = 0x01
 	Read_write = 0x02
@@ -320,36 +310,40 @@ class TssEntry {
 	var reserved1: UInt64
 	var reserved2: UInt16
 	var iomap_offset: UInt16
+
+	new () {}
 }
 
-@aligned(64) @volatile var globalGdtr: TablePtr
-@aligned(64) @volatile var globalTss: TssEntry
+@aligned(64) @volatile var globalGdtr: TablePtr = new TablePtr()
+@aligned(64) @volatile var globalTss: TssEntry = new TssEntry()
 
 // rsp0stack = exp0 in TSS
 // Stack used by kernel to handle syscalls/interrupts
 // `4096 * 32 = 131072`
-@aligned(64) let rsp0stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let rsp1stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let rsp2stack: ArrayByValue<UInt8, 131072> = [0]
+// TODO `let`
+@aligned(64) var rsp0stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var rsp1stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var rsp2stack: ArrayByValue<UInt8, 131072> = [0]
 
-@aligned(64) let ist0stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let ist1stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let ist2stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let ist3stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let ist4stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let ist5stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let ist6stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) let ist7stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist0stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist1stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist2stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist3stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist4stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist5stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist6stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist7stack: ArrayByValue<UInt8, 131072> = [0]
 
 // LLVM did the magic expected of it. It only saved registers that are clobbered by your fun (hence rax).
 // All other register are left unchanged hence there’s no need of saving and restoring them.
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
 
 // TODO: errcode is `extra` here:
-//@aligned(64) @interrupt Void unknownInterrupt(struct frame: Pointer<InterruptFrame>,
+//@aligned(64) @interrupt Void unknownInterrupt(struct frame: <InterruptFrame>,
 // uint64_t
 // extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
+//declare fun anyInterruptHandler(frame: <InterruptFrame>): Void
 
 // TODO remove
 @aligned(64) @interrupt fun unknownInterrupt(frame: InterruptFrame): Void {
@@ -365,7 +359,7 @@ fun anyInterruptHandler(frame: InterruptFrame): Void {
 
 	// Enable interrupts
 	writePort(0xA0, 0x20)
-	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20)
+	writePort(pic1_command_0x20, pic_eoi_0x20)
 
 	// Operating systems use some of the segments for internal usage.
 	// For instance GS register to access the TLS (thread local storage)
@@ -374,15 +368,16 @@ fun anyInterruptHandler(frame: InterruptFrame): Void {
 // ~121 times per second
 var timerCalled: UInt64 = 0
 
-let stackSizeForKernelThread: UInt64 = 1024 * 1024
+let stackSizeForKernelThread: UInt64 = 1024 * 1024u64
 
 @aligned(64)
-let kernelStack: ArrayByValue<UInt8, 1048576> = [0]
+// TODO let
+// TODO ArrayByValue cannot be `var`
+var kernelStack: ArrayByValue<UInt8, 1048576> = [0]
 
-var guiThreadFrame: InterruptFrame
-@extern "C" Void timerInterruptHandler(@volatile frame: Pointer<InterruptFrame>)
+var guiThreadFrame: InterruptFrame = new InterruptFrame()
 @aligned(64)
-let guiStack: ArrayByValue<UInt8, 1048576> = [0]
+var guiStack: ArrayByValue<UInt8, 1048576> = [0]
 
 var extraMillisecond: UInt8 = 0
 var taskBarRedraw: UInt8 = 0 // Re-paint task bar current time
@@ -424,17 +419,17 @@ fun switchToKernelThread(@volatile frame: InterruptFrame) {
 
 	if currentThread == ThreadKind.THREAD_USER {
 		// Save
-		tmemcpy(Pointer.of(process.frame), frame, sizeof(InterruptFrame))
-		var process: Process = processes[currentProcess]
+		var process: UserProcess = processes[currentProcess]
+		tmemcpy(process.frame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	} else if currentThread == ThreadKind.THREAD_GUI {
 		// Save
-		tmemcpy(Pointer.of(guiThreadFrame), frame, sizeof(InterruptFrame))
+		tmemcpy(guiThreadFrame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	}
 
 	// Restore
-	tmemcpy(frame, Pointer.of(kernelThreadFrame), sizeof(InterruptFrame))
 	currentThread = ThreadKind.THREAD_KERNEL
 	writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
+	tmemcpy(frame as! ArrayPointer<UInt8>, kernelThreadFrame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 }
 
 fun switchToNextProcess(@volatile frame: InterruptFrame) {
@@ -445,7 +440,7 @@ fun switchToNextProcess(@volatile frame: InterruptFrame) {
 		next = getNextProcess()
 	}
 
-	var process: Process = processes[next]
+	var process: UserProcess = processes[next]
 	@volatile let old = currentProcess
 	currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
@@ -457,25 +452,26 @@ fun switchToNextProcess(@volatile frame: InterruptFrame) {
 	if next != 0 {
 		if currentThread == ThreadKind.THREAD_GUI {
 			// Save
-			tmemcpy(Pointer.of(guiThreadFrame), frame, sizeof(InterruptFrame))
+			tmemcpy(guiThreadFrame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 		} else if currentThread == ThreadKind.THREAD_USER {
 			// Save
-			tmemcpy(Pointer.of(processOld.frame), frame, sizeof(InterruptFrame))
-			var processOld: Process = processes[old]
+			var processOld: UserProcess = processes[old]
+			tmemcpy(processOld.frame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 		} else if currentThread == ThreadKind.THREAD_KERNEL {
 			// Save
-			tmemcpy(Pointer.of(kernelThreadFrame), frame, sizeof(InterruptFrame))
+			tmemcpy(kernelThreadFrame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 		}
 
 		// Restore
-		tmemcpy(frame, Pointer.of(process.frame), sizeof(InterruptFrame))
 		currentThread = ThreadKind.THREAD_USER
+		tmemcpy(frame as! ArrayPointer<UInt8>, process.frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	} else {
 		writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 		switchToKernelThread(frame)
 	}
 }
 
+var kernelThreadBusy = false
 fun switchToGuiThread(@volatile frame: InterruptFrame) {
 	if currentThread == ThreadKind.THREAD_GUI {
 		return
@@ -483,16 +479,19 @@ fun switchToGuiThread(@volatile frame: InterruptFrame) {
 
 	if currentThread == ThreadKind.THREAD_USER {
 		// Save
-		tmemcpy(Pointer.of(process.frame), frame, sizeof(InterruptFrame))
-		var process: Process = processes[currentProcess]
+		var process: UserProcess = processes[currentProcess]
+		tmemcpy(process.frame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	} else if currentThread == ThreadKind.THREAD_KERNEL {
+		if kernelThreadBusy {
+			return // Wait to avoid race conditions
+		}
 		// Save
-		tmemcpy(Pointer.of(kernelThreadFrame), frame, sizeof(InterruptFrame))
+		tmemcpy(kernelThreadFrame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	}
 
 	// Restore
-	tmemcpy(frame, Pointer.of(guiThreadFrame), sizeof(InterruptFrame))
 	currentThread = ThreadKind.THREAD_GUI
+	tmemcpy(frame as! ArrayPointer<UInt8>, guiThreadFrame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 }
 
 fun yieldInterruptHandler(@volatile frame: InterruptFrame) {
@@ -528,11 +527,11 @@ fun timerInterruptHandler(@volatile frame: InterruptFrame) {
 			kernelThreadFrame.flags = frame.flags // TODO
 
 			// Restore
-			tmemcpy(frame, Pointer.of(guiThreadFrame), sizeof(InterruptFrame))
 			currentThread = ThreadKind.THREAD_GUI
+			tmemcpy(frame as! ArrayPointer<UInt8>, guiThreadFrame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 		} else {
 			if currentThread == ThreadKind.THREAD_GUI {
-				// Just give it enough time to fimish rendering
+				// Just give it enough time to finish rendering
 				// It will schedule to other process on finish
 				nextIsGuiThread = false
 			} else {
@@ -555,17 +554,17 @@ fun timerInterruptHandler(@volatile frame: InterruptFrame) {
 	//			// TODO hexa error == statement: currentThread == THREAD_INIT
 
 	// Enable interrupts
-	writePort(PIC1_COMMAND_0x20, PIC_EOI_0x20)
+	writePort(pic1_command_0x20, pic_eoi_0x20)
 }
 
 fun syscallInterruptHandler(frame: InterruptFrame) {
 	disableAllInterrupts()
-	@volatile let process: Process = processes[currentProcess]
+	@volatile let process: UserProcess = processes[currentProcess]
 	process.schedulable = false
-	@volatile let index = (TofitaSyscalls)frame.rcxArg0
+	@volatile let index = frame.rcxArg0 as! TofitaSyscalls
 
 	// No-op
-	if (index as! UInt64) < USER_SYSCALLS {
+	if (index as! UInt64) < userSyscalls {
 		process.schedulable = true
 		return
 	}
@@ -588,7 +587,7 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 		serialPrintf("[[ExitProcess:PID %d]] %d\n", currentProcess, frame.rdxArg1)
 		// TODO kernel wakeup
 		// TODO destroy process
-		var process: Process = processes[currentProcess]
+		var process: UserProcess = processes[currentProcess]
 		process.schedulable = false
 		switchToNextProcess(frame)
 		process.present = false
@@ -596,51 +595,59 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 	}
 }
 
+@rename('setTsr')
 declare fun setTsr(@volatile tsr_data: UInt16): Void
 
 // 16 records
-@aligned(64) let gdtTemplate: ArrayByValue<UInt32, 32> = [
-	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209B00, 0x0000FFFF, 0x00CF9300,
+// TODO let
+@aligned(64) var gdtTemplate: ArrayByValue<UInt32, 32> = [
+	0x00000000u32, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209B00, 0x0000FFFF, 0x00CF9300,
 	0x0000FFFF, 0x00CFFA00, 0x0000FFFF, 0x00CFF300, 0x00000000, 0x0020FB00, 0x00000000, 0x00000000,
-	0x60800067, 0x00008BB9, 0xFFFFF800, 0x00000000, 0xE0003C00, 0xFF40F3FA, 0x00000000, 0x00000000,
+	0x60800067, 0x00008BB9, 0xFFFFF800u32, 0x00000000, 0xE0003C00u32, 0xFF40F3FAu32, 0x00000000, 0x00000000,
 	0x0000FFFF, 0x00CF9A00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
 ]
 
-let PS2_DATA_PORT = 0x60
-let PS2_CONTROL_PORT = 0x64
+let ps2_data_port = 0x60u8
+let ps2_control_port = 0x64u8
 
-	var gdtd: Pointer<GdtDescriptor> = (GdtDescriptor *)Pointer.of(gdtTemplate[i * 2])
-	gdtd.limitLow = limit & 0xFFFF
-	gdtd.size = (limit >> 16) & 0xF
 fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, typed: GdtType) {
+	var gdtd: GdtDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! GdtDescriptor
+	gdtd.limitLow = limit & 0xFFFFu16
+	gdtd.size = (limit >> 16) & 0xFu8
 	// gdtd.size |= (is64 ? 0xa0 : 0xc0)
 	gdtd.size |= 0xA0
 	gdtd.size <<= 0x0D // Long mode
 
-	gdtd.baseLow = base & 0xFFFF
-	gdtd.baseMid = (base >> 16) & 0xFF
-	gdtd.baseHigh = (base >> 24) & 0xFF
+	gdtd.baseLow = base & 0xFFFFu16
+	gdtd.baseMid = (base >> 16) & 0xFFu8
+	gdtd.baseHigh = (base >> 24) & 0xFFu8
 
-	gdtd.type = (typed | system | present) as! GdtType
+	gdtd.type =
+		(typed | GdtType.System | GdtType.Present)
+		as! GdtType
 }
 
 // Takes 2 GDT entries
 fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
-	var tssd: Pointer<TssDescriptor> = (TssDescriptor *)Pointer.of(gdtTemplate[i * 2])
-	tssd.limitLow = limit & 0xFFFF
-	tssd.size = (limit >> 16) & 0xF
+	var tssd: TssDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! TssDescriptor
+	tssd.limitLow = limit & 0xFFFFu16
+	tssd.size = (limit >> 16) & 0xFu8
 
-	tssd.base_00 = base & 0xFFFF
-	tssd.base_16 = (base >> 16) & 0xFF
-	tssd.base_24 = (base >> 24) & 0xFF
-	tssd.base_32 = (base >> 32) & 0xFFFFFFFF
+	tssd.base_00 = base & 0xFFFFu16
+	tssd.base_16 = (base >> 16) & 0xFFu8
+	tssd.base_24 = (base >> 24) & 0xFFu8
+	tssd.base_32 = (base >> 32) & 0xFFFFFFFFu32
 	tssd.reserved = 0
 
-	tssd.type = (accessed | execute | ring3 | // TODO
-								present) as! GdtType
+	tssd.type = (
+		GdtType.Accessed |
+		GdtType.Execute |
+		GdtType.Ring3 | // TODO
+		GdtType.Present
+	) as! GdtType
 }
 
-@aligned(64) var cacheIdtr: Idtr
+@aligned(64) var cacheIdtr: Idtr = new Idtr()
 
 fun dumpGDT(desc: GdtDescriptorEx) {
 	serialPrintf("[dumpGDT]")
@@ -687,27 +694,27 @@ fun dumpGDT(desc: GdtDescriptorEx) {
 	serialPrintf("\n")
 }
 
-fun enableInterrupts() {
+fun setupInterruptsAndExceptions() {
 	serialPrintln("[cpu] initializing lgdt")
 
-	var sizeof_TssEntry: UInt64 = sizeof(globalTss)
-	serialPrintf("[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeof(TssEntry))
+	var sizeof_TssEntry: UInt16 = sizeOf<TssEntry>() as! UInt16
+	serialPrintf("[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeOf<TssEntry>())
 
-	memset(Pointer.of(globalTss) as! VoidPointer, 0, sizeof_TssEntry)
+	memset(globalTss as! ArrayPointer<UInt8>, 0, sizeof_TssEntry)
 	globalTss.iomap_offset = sizeof_TssEntry
-	globalTss.rsp[0] = Pointer.of(rsp0stack) as! UInt64
-	globalTss.rsp[1] = Pointer.of(rsp1stack) as! UInt64
-	globalTss.rsp[2] = Pointer.of(rsp2stack) as! UInt64
+	globalTss.rsp[0] = rsp0stack.ref as! UInt64
+	globalTss.rsp[1] = rsp1stack.ref as! UInt64
+	globalTss.rsp[2] = rsp2stack.ref as! UInt64
 	// TODO zero out stacks
 	// TODO more stacks
-	globalTss.ist[0] = Pointer.of(ist0stack) as! UInt64
-	globalTss.ist[1] = Pointer.of(ist1stack) as! UInt64
-	globalTss.ist[2] = Pointer.of(ist2stack) as! UInt64
-	globalTss.ist[3] = Pointer.of(ist3stack) as! UInt64
-	globalTss.ist[4] = Pointer.of(ist4stack) as! UInt64
-	globalTss.ist[5] = Pointer.of(ist5stack) as! UInt64
-	globalTss.ist[6] = Pointer.of(ist6stack) as! UInt64
-	globalTss.ist[7] = Pointer.of(ist7stack) as! UInt64
+	globalTss.ist[0] = ist0stack.ref as! UInt64
+	globalTss.ist[1] = ist1stack.ref as! UInt64
+	globalTss.ist[2] = ist2stack.ref as! UInt64
+	globalTss.ist[3] = ist3stack.ref as! UInt64
+	globalTss.ist[4] = ist4stack.ref as! UInt64
+	globalTss.ist[5] = ist5stack.ref as! UInt64
+	globalTss.ist[6] = ist6stack.ref as! UInt64
+	globalTss.ist[7] = ist7stack.ref as! UInt64
 
 	serialPrint("[cpu] RSP[0] points to: ")
 	serialPrintHex((globalTss.rsp[0] as! UInt64))
@@ -721,7 +728,7 @@ fun enableInterrupts() {
 	serialPrintHex((globalTss.rsp[2] as! UInt64))
 	serialPrint("\n")
 
-	var tssBase: UInt64 = Pointer.of(globalTss) as! UInt64
+	var tssBase: UInt64 = globalTss as! UInt64
 
 	// upload
 	{
@@ -730,7 +737,7 @@ fun enableInterrupts() {
 	}
 
 	if false {
-		let gdt = gdtTemplate as! Pointer<GdtDescriptorEx>
+		let gdt = gdtTemplate as! ArrayPointer<ByValue<GdtDescriptorEx>>
 		for i in 16 {
 			if i == 0 {
 				continue // Empty
@@ -741,86 +748,88 @@ fun enableInterrupts() {
 			if i == 9 {
 				continue // TSS
 			}
-			if gdt[i].present == 0 {
+			if gdt[i].ref.present == 0 {
 				continue
 			}
 			serialPrintf("[dumpGDT] #%u\n", i)
-			dumpGDT(Pointer.of(gdt[i]))
+			dumpGDT(gdt[i].ref)
 		}
 	}
 
-	globalGdtr.limit = sizeof(gdtTemplate) - 1
-	globalGdtr.base = Pointer.of(gdtTemplate[0]) as! UInt64
+	// globalGdtr.limit = sizeOf(gdtTemplate) - 1
+	globalGdtr.limit = (4 * 32) - 1u16
+	globalGdtr.base = gdtTemplate.ref as! UInt64
 	serialPrint("[cpu] GDTR points to: ")
-	serialPrintHex(Pointer.of(globalGdtr) as! UInt64)
+	serialPrintHex(globalGdtr as! UInt64)
 	serialPrint("\n")
 	serialPrint("[cpu] GDT points to: ")
 	serialPrintHex((globalGdtr.base as! UInt64))
 	serialPrint("\n")
 	serialPrintf("[cpu] GDT size is %u == %u\n", globalGdtr.limit, 0x7F)
-	serialPrintln("[cpu] calling lgdt")
-	lgdt(Pointer.of(globalGdtr))
-	serialPrintln("[cpu] calling ltr")
+	serialPrintln("[cpu] Calling lgdt")
+	lgdt(globalGdtr)
+	serialPrintln("[cpu] Calling ltr")
 	{
 		setTsr(64)
-		// setTsr(64 + 3)
+		// TODO setTsr(64 + 3)
 	}
 
-	serialPrintln("[cpu] initializing unknownInterrupt")
+	serialPrintln("[cpu] Initializing unknown interrupts")
 
-		initializeFallback(&IDT[i], Pointer.of(unknownInterrupt) as! UInt64)
+	// TODO 286 magic number
 	for i in 286 {
+		initializeCallback(idt[i].ref, unknownInterrupt as! UInt64)
 	}
 
 	// CPU exceptions
-	initializeFallback(&IDT[0x00], Pointer.of(cpu0x00) as! UInt64)
-	initializeFallback(&IDT[0x01], Pointer.of(cpu0x01) as! UInt64)
-	initializeFallback(&IDT[0x02], Pointer.of(cpu0x02) as! UInt64)
-	initializeFallback(&IDT[0x03], Pointer.of(cpu0x03) as! UInt64)
-	initializeFallback(&IDT[0x04], Pointer.of(cpu0x04) as! UInt64)
-	initializeFallback(&IDT[0x05], Pointer.of(cpu0x05) as! UInt64)
-	initializeFallback(&IDT[0x06], Pointer.of(cpu0x06) as! UInt64)
-	initializeFallback(&IDT[0x07], Pointer.of(cpu0x07) as! UInt64)
-	initializeFallback(&IDT[0x08], Pointer.of(cpu0x08) as! UInt64)
-	initializeFallback(&IDT[0x09], Pointer.of(cpu0x09) as! UInt64)
-	initializeFallback(&IDT[0x0A], Pointer.of(cpu0x0A) as! UInt64)
-	initializeFallback(&IDT[0x0B], Pointer.of(cpu0x0B) as! UInt64)
-	initializeFallback(&IDT[0x0C], Pointer.of(cpu0x0C) as! UInt64)
-	initializeFallback(&IDT[0x0D], Pointer.of(cpu0x0D) as! UInt64)
-	initializeFallback(&IDT[0x0E], Pointer.of(cpu0x0E) as! UInt64)
-	initializeFallback(&IDT[0x0F], Pointer.of(cpu0x0F) as! UInt64)
-	initializeFallback(&IDT[0x10], Pointer.of(cpu0x10) as! UInt64)
-	initializeFallback(&IDT[0x11], Pointer.of(cpu0x11) as! UInt64)
-	initializeFallback(&IDT[0x12], Pointer.of(cpu0x12) as! UInt64)
-	initializeFallback(&IDT[0x13], Pointer.of(cpu0x13) as! UInt64)
-	initializeFallback(&IDT[0x14], Pointer.of(cpu0x14) as! UInt64)
-	initializeFallback(&IDT[0x15], Pointer.of(cpu0x15) as! UInt64)
+	initializeCallback(idt[0x00].ref, cpu0x00 as! UInt64)
+	initializeCallback(idt[0x01].ref, cpu0x01 as! UInt64)
+	initializeCallback(idt[0x02].ref, cpu0x02 as! UInt64)
+	initializeCallback(idt[0x03].ref, cpu0x03 as! UInt64)
+	initializeCallback(idt[0x04].ref, cpu0x04 as! UInt64)
+	initializeCallback(idt[0x05].ref, cpu0x05 as! UInt64)
+	initializeCallback(idt[0x06].ref, cpu0x06 as! UInt64)
+	initializeCallback(idt[0x07].ref, cpu0x07 as! UInt64)
+	initializeCallback(idt[0x08].ref, cpu0x08 as! UInt64)
+	initializeCallback(idt[0x09].ref, cpu0x09 as! UInt64)
+	initializeCallback(idt[0x0A].ref, cpu0x0A as! UInt64)
+	initializeCallback(idt[0x0B].ref, cpu0x0B as! UInt64)
+	initializeCallback(idt[0x0C].ref, cpu0x0C as! UInt64)
+	initializeCallback(idt[0x0D].ref, cpu0x0D as! UInt64)
+	initializeCallback(idt[0x0E].ref, cpu0x0E as! UInt64)
+	initializeCallback(idt[0x0F].ref, cpu0x0F as! UInt64)
+	initializeCallback(idt[0x10].ref, cpu0x10 as! UInt64)
+	initializeCallback(idt[0x11].ref, cpu0x11 as! UInt64)
+	initializeCallback(idt[0x12].ref, cpu0x12 as! UInt64)
+	initializeCallback(idt[0x13].ref, cpu0x13 as! UInt64)
+	initializeCallback(idt[0x14].ref, cpu0x14 as! UInt64)
+	initializeCallback(idt[0x15].ref, cpu0x15 as! UInt64)
 
 	// PIC interrupts
-	initializeFallback(&IDT[IRQ0], Pointer.of(timerInterrupt) as! UInt64)
-	initializeKeyboard(&IDT[IRQ1])
-	initializeMouse(&IDT[IRQ12])
+	initializeCallback(idt[irq0].ref, timerInterrupt as! UInt64)
+	initializeKeyboard(idt[irq1].ref)
+	initializeMouse(idt[irq12].ref)
 
 	// Syscalls
-	initializeFallback(&IDT[0x80], Pointer.of(syscallInterrupt) as! UInt64)
-	initializeFallback(&IDT[0x81], Pointer.of(yieldInterrupt) as! UInt64)
+	initializeCallback(idt[0x80].ref, syscallInterrupt as! UInt64)
+	initializeCallback(idt[0x81].ref, yieldInterrupt as! UInt64)
 
-	cacheIdtr.limit = (sizeof(IdtEntry) * IDT_SIZE) - 1
-	cacheIdtr.offset = IDT as! UInt64
+	cacheIdtr.limit = (sizeOf<IdtEntry>() * idt_size) - 1u16
+	cacheIdtr.offset = idt as! UInt64
 
 	serialPrint("[cpu] IDTR points to: ")
-	serialPrintHex(Pointer.of(cacheIdtr) as! UInt64)
+	serialPrintHex(cacheIdtr as! UInt64)
 	serialPrint("\n")
 	serialPrint("[cpu] IDT points to: ")
-	serialPrintHex(Pointer.of(IDT) as! UInt64)
+	serialPrintHex(idt.ref as! UInt64)
 	serialPrint("\n")
-	serialPrintf("[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, IDT_SIZE,
-				 sizeof(IdtEntry))
+	serialPrintf("[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, idt_size,
+				 sizeOf<IdtEntry>())
 	serialPrintln("[cpu] loading IDTR")
 	// Before you implement the IDT, make sure you have a working GDT
-	remapPic(0x20, 0x28)
+	remapPic()
 	serialPrintln("[cpu] calling lidtq")
-	loadIdt(Pointer.of(cacheIdtr))
+	loadIdt(cacheIdtr)
 
 	serialPrintln("[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL")
 	enterKernelMode()
@@ -830,91 +839,16 @@ fun enableInterrupts() {
 	// Next valid: `i = 174; while (Math.round(1193181 / i) != (1193181 / i)) {i++;}; console.log(i)`
 	writePort(0x43, 0x36)
 	let frequency = 1193181 / 121
-	writePort(0x40, frequency & 0xFF)
-	writePort(0x40, (frequency >> 8) & 0xFF)
+	writePort(0x40, frequency & 0xFFu8)
+	writePort(0x40, (frequency >> 8) & 0xFFu8)
 
 	// Unmasking IRQ to support all the things
 	// but NOT keyboard
-	writePort(IRQ1, 0x00 | 0b00000010)
+	writePort(irq1, 0x00 | 0b00000010u8)
+	writePort(irq1, 0xFE)
 	// 0xFA - timer
 	// 0xFC - timer and kb
 	// 0xFD - kb
 	// 0xFE - timer
 	// 0xFF - none
-}
-
-fun enablePS2Mouse() {
-	serialPrintln("[cpu] begin: setting PS/2 mouse")
-	// Enable the auxiliary mouse device
-	mouseWait(1)
-	writePort(PS2_CONTROL_PORT, 0xA8)
-
-	/*
-
-	IOWriteB(PS2_CONTROL_PORT, 0x20)
-	ControllerConfig = IOReadB(PS2_DATA_PORT)
-	ControllerConfig |=  0x02 // Turn on IRQ12
-	ControllerConfig &= ~0x20 // Enable mouse clock line
-	IOWriteB(PS2_CONTROL_PORT, 0x60)
-
-	*/
-
-	// Enable the interrupts
-	mouseWait(1)
-	writePort(PS2_CONTROL_PORT, 0x20)
-	mouseWait(0)
-	_status = (readPort(PS2_DATA_PORT) | 2) // Turn on IRQ12
-	//_status &= ~0x20 // Enable mouse clock line
-	mouseWait(1)
-	writePort(PS2_CONTROL_PORT, 0x60)
-	mouseWait(1)
-	writePort(PS2_DATA_PORT, _status)
-	// Tell the mouse to use default settings
-	mouseWrite(0xF6)
-	mouseRead() // Acknowledge
-	// Enable the mouse
-	mouseWrite(0xF4)
-	mouseRead() // Acknowledge
-	// Setup the mouse handler
-	// irq_install_handler(12, mouseHandler)
-	serialPrintln("[cpu] done: setting PS/2 mouse")
-	quakePrintf("Enabled PS/2 mouse and keyboard\n")
-}
-
-fun mouseWait(@volatile aType: UInt8) {
-	@volatile var _timeOut: UInt32 = 1000000
-	if aType == 0 {
-		while _timeOut-- // Data
-		{
-			if (readPort(PS2_CONTROL_PORT) & 1) == 1 {
-				return
-			}
-		}
-		return
-	} else {
-		while _timeOut-- // Signal
-		{
-			if (readPort(PS2_CONTROL_PORT) & 2) == 0 {
-				return
-			}
-		}
-		return
-	}
-}
-
-fun mouseWrite(@volatile aWrite: UInt8) {
-	// Wait to be able to send a command
-	mouseWait(1)
-	// Tell the mouse we are sending a command
-	writePort(PS2_CONTROL_PORT, 0xD4)
-	// Wait for the final part
-	mouseWait(1)
-	// Finally write
-	writePort(PS2_DATA_PORT, aWrite)
-}
-
-fun mouseRead(): UInt8 {
-	// Get's response from mouse
-	mouseWait(0)
-	return readPort(PS2_DATA_PORT)
 }

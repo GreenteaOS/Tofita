@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
+fun userCallHandled(@volatile process: UserProcess, syscall: TofitaSyscalls): Bool {
 	@volatile var frame = process.frame
 
 	if syscall == TofitaSyscalls.CreateWindowEx {
-		if !probeForReadOkay(frame.rdxArg1, sizeof(CreateWindowExPayload)) {
+		if !probeForReadOkay(frame.rdxArg1, sizeOf<CreateWindowExPayload>()) {
 			return false
 		}
 
@@ -37,7 +37,8 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 
 		// TODO proper probe method, probably separate probeForWideCharOkay
 		if probeForReadOkay((payload.lpWindowName as! UInt64), 8) {
-			window.title = String.fromUTF16z(payload.lpWindowName)
+			// TODO must error `candidate function not viable: no known conversion from 'const wchar_t *' to 'const uint16_t      *'` window.title = String.fromUTF16z(payload.lpWindowName)
+			window.title = String.fromUTF16z(payload.lpWindowName as! ConstArrayPointer<UInt16>)
 		}
 
 		frame.raxReturn = window.windowId
@@ -47,7 +48,7 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 
 	if syscall == TofitaSyscalls.ShowWindow {
 		// TODO merge to probeForReadAndConvert os it takes <T> and returns nullable for `if let`
-		if !probeForReadOkay(frame.rdxArg1, sizeof(ShowWindowPayload)) {
+		if !probeForReadOkay(frame.rdxArg1, sizeOf<ShowWindowPayload>()) {
 			return false
 		}
 
@@ -67,17 +68,17 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 	}
 
 	if syscall == TofitaSyscalls.GetMessage {
-		if !probeForReadOkay(frame.rdxArg1, sizeof(GetMessagePayload)) {
+		if !probeForReadOkay(frame.rdxArg1, sizeOf<GetMessagePayload>()) {
 			return false
 		}
 
 		var payload = frame.rdxArg1 as! GetMessagePayload
 
-		if !probeForWriteOkay((payload.msg as! UInt64), sizeof(Msg)) {
+		if !probeForWriteOkay((payload.msg as! UInt64), sizeOf<Msg>()) {
 			return false
 		}
 
-		frame.raxReturn = process.getMessage(process, payload)
+		frame.raxReturn = getMessage(process, payload).toZeroOrOne
 
 		// Should sorts of loop forever
 		if frame.raxReturn != 0 {
@@ -91,26 +92,27 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 	}
 
 	if syscall == TofitaSyscalls.PostMessage {
-		if !probeForReadOkay(frame.rdxArg1, sizeof(PostMessagePayload)) {
+
+		if !probeForReadOkay(frame.rdxArg1, sizeOf<PostMessagePayload>()) {
 			return false
 		}
 
 		var payload = frame.rdxArg1 as! PostMessagePayload
 
-		frame.raxReturn = process.postMessage(process, payload)
+		frame.raxReturn = postMessage(process, payload).toZeroOrOne
 
 		process.schedulable = true
 		return true
 	}
 
 	if syscall == TofitaSyscalls.SwapWindowFramebuffer {
-		if !probeForReadOkay(frame.rdxArg1, sizeof(SwapWindowFramebufferPayload)) {
+		if !probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
 			return false
 		}
 
 		let payload = frame.rdxArg1 as! SwapWindowFramebufferPayload
 
-		if !probeForWriteOkay((payload.fb as! UInt64), sizeof(WindowFramebuffer)) {
+		if !probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
 			return false
 		}
 
@@ -123,23 +125,25 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 			return false
 		}
 
-		let width = (uint32_t)window.width
-		let height = (uint32_t)window.height
-		let bytes = width * height * sizeof(Pixel32)
+		let width = window.width
+		let height = window.height
+		let bytes = width * height * sizeOf<Pixel32>()
 
 		if window.fbZeta != null {
 			window.fbCurrentZeta = !window.fbCurrentZeta
-				tmemcpy((Void *)Pointer.of(window.fbZeta.pixels), (const Void *)Pointer.of(window.fbGama.pixels), bytes)
-				fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbZeta.pixels)
 			if window.fbCurrentZeta {
+				// TODO triple buffer: screen<-fb<-zeta and no gama
+				tmemcpy(window.fbZeta.pixels as! ArrayPointer<UInt8>, window.fbGama.pixels as! ConstArrayPointer<UInt8>, bytes)
+				fb.pixels = window.fbZeta.pixels // as! Pixel32
 				fb.width = window.fbZeta.width
 				fb.height = window.fbZeta.height
 			} else {
-				tmemcpy((Void *)Pointer.of(window.fbGama.pixels), (const Void *)Pointer.of(window.fbZeta.pixels), bytes)
-				fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbGama.pixels)
+				tmemcpy(window.fbGama.pixels as! ArrayPointer<UInt8>, window.fbZeta.pixels as! ConstArrayPointer<UInt8>, bytes)
+				fb.pixels = window.fbGama.pixels // as! Pixel32
 				fb.width = window.fbGama.width
 				fb.height = window.fbGama.height
 			}
+		} else {
 		}
 
 		//		if window != null {
@@ -158,14 +162,14 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 	}
 
 	if syscall == TofitaSyscalls.GetOrCreateWindowFramebuffer {
-		if !probeForReadOkay(frame.rdxArg1, sizeof(SwapWindowFramebufferPayload)) {
+		if !probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
 			return false
 		}
 
 		let payload = frame.rdxArg1 as! SwapWindowFramebufferPayload
 
 		// TODO probeForWriteOkay alias taking pointer probeForWriteAtOkay
-		if !probeForWriteOkay((payload.fb as! UInt64), sizeof(WindowFramebuffer)) {
+		if !probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
 			return false
 		}
 
@@ -180,10 +184,10 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 
 		// TODO resize fb *here* on window size change
 		if window.fbZeta == null {
-			let width = (uint32_t)window.width
-			let height = (uint32_t)window.height
+			let width = window.width
+			let height = window.height
 
-			let bytes = width * height * sizeof(Pixel32)
+			let bytes = width * height * sizeOf<Pixel32>()
 			// serialPrintln("[GetOrCreateWindowFramebuffer.allocateBytes]")
 			// window.fbZeta.pixels = PhysicalAllocator.allocateBytes(bytes) as! Pixel32
 			// window.fbGama.pixels = PhysicalAllocator.allocateBytes(bytes) as! Pixel32
@@ -192,8 +196,8 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 			window.fbZeta = allocateBitmap(width, height)
 			window.fbGama = allocateBitmap(width, height)
 
-			memset((Void *)window.fbZeta.pixels, 0x33, bytes)
-			memset((Void *)window.fbGama.pixels, 0x33, bytes)
+			memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
+			memset(window.fbGama.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
 
 			// window.fbZeta.width = width // TODO client width
 			// window.fbZeta.height = height
@@ -201,12 +205,12 @@ fun userCallHandled(@volatile process: Process, syscall: TofitaSyscalls): Bool {
 			// window.fbGama.height = height
 		}
 
-			fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbZeta.pixels)
 		if window.fbCurrentZeta {
+			fb.pixels = window.fbZeta.pixels
 			fb.width = window.fbZeta.width
 			fb.height = window.fbZeta.height
 		} else {
-			fb.pixels = (nj.Pixel32 *)Pointer.of(window.fbGama.pixels)
+			fb.pixels = window.fbGama.pixels
 			fb.width = window.fbGama.width
 			fb.height = window.fbGama.height
 		}

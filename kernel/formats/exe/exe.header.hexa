@@ -97,7 +97,7 @@ class Pe32OptionalHeader {
 
 @struct @packed @sizeOf(40)
 class ImageSectionHeader { // size 40 bytes
-	var name: UInt64
+	var name: ArrayByValue<UInt8, 8>
 	var virtualSize: UInt32
 	var virtualAddress: UInt32
 	var sizeOfRawData: UInt32
@@ -159,7 +159,7 @@ enum ImageDirectoryType : UInt8 {
 	var addressOfNameOrdinals: UInt32
 }
 
-@struct class _IMAGE_BASE_RELOCATION {
+@struct class IMAGE_BASE_RELOCATION { // TODO invalid name _Name
 	var virtualAddress: UInt32
 	var sizeOfBlock: UInt32
 }
@@ -191,16 +191,20 @@ let image_rel_based_highlow = 3
 	var firstThunk: UInt32
 }
 
-declare FARPROC = () => Void
+declare FARPROC = @closure(false) () => Void
 
+// TODO rename to TitleCase
 @struct class IMAGE_IMPORT_BY_NAME {
 	var hint: UInt16
-	var name[1]: UInt8
+	var name: ArrayByValue<UInt8, 1>
 }
 
-@union class IMAGE_THUNK_DATA {
+// TODO `template<typename SIZE>`
+@struct
+@union // TODO disallows `@struct`
+class IMAGE_THUNK_DATA {
 	var func: UInt64 // address of imported function
 	var ordinal: UInt32 // ordinal value of function
-	var addressOfData: PIMAGE_IMPORT_BY_NAME // RVA of imported name
+	var addressOfData: IMAGE_IMPORT_BY_NAME? // RVA of imported name
 	var forwarderStringl: UInt32 // RVA to forwarder string
 }

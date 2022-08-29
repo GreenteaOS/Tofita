@@ -240,7 +240,6 @@ uint8_t *comItoA(int64_t i, uint8_t b[]) {
 #endif
 
 function serialPrintf(const wchar_t *c, ...) {
-	uint8_t *s;
 	va_list lst;
 	va_start(lst, c);
 	while (*c != '\0') {

@@ -34,6 +34,9 @@ fun deleteFolderRecursive(path, noRemoveSelf) {
 	}
 }
 
+// Modes
+var debuggie: Bool = false
+
 let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
 let tasks: [String] = process.argv.slice()
 let llvm = 'LLVM-14.0.6-2'
@@ -69,7 +72,10 @@ let optimizationFeatures = '-O2 -fwrapv -fno-strict-aliasing -fno-strict-overflo
 
 let today = new Date()
 let month = today.getMonth() + 1
-let versionRolling = today.getFullYear() * 10000 + month * 100 + today.getDate()
+let versionMajor = today.getFullYear()
+let versionMinor = month
+let versionTag = today.getDate()
+let versionRolling = versionMajor * 10000 + versionMinor * 100 + versionTag
 let versionName = today.getFullYear() + '.' + month + '.' + today.getDate()
 
 if tasks.length == 0 {
@@ -80,6 +86,9 @@ for task in tasks {
 	let folder = config.tempFolder + tea
 
 	switch task {
+		case 'debug':
+			console.log('[Debug mode is ON]')
+			debuggie = true
 		case 'init':
 			{
 				if not fs.existsSync(folder) {
@@ -92,10 +101,10 @@ for task in tasks {
 				fs.copyFileSync('desktop.ini', folder + '\\desktop.ini')
 				require('child_process').execSync('cmd /c ATTRIB +S ' + folder, { stdio: 'inherit' })
 
-				// Create directory tofita/iso/EFI/BOOT/
+				// Create directory tofita/spin-off/EFI/BOOT/
 				let dirs = [
 					path.sep + teaFolder,
-					path.sep + 'iso',
+					path.sep + 'spin-off',
 					path.sep + 'EFI',
 					path.sep + 'BOOT'
 				]
@@ -109,7 +118,7 @@ for task in tasks {
 				}
 
 				// Assets
-				let assets = folder + '\\iso\\TOFITA.DAT'
+				let assets = folder + '\\spin-off\\TOFITA.DAT'
 				if fs.existsSync(assets) {
 					fs.unlinkSync(assets)
 				}
@@ -122,8 +131,9 @@ for task in tasks {
 					folder + '\\trampoline.o boot\\loader\\trampoline.asm', { stdio: 'inherit' }
 				)
 
+				// KERNEL
 				require('child_process').execSync(
-					nasm + ' -f win64 -o ' +
+					nasm + (debuggie? ' -g' : '') + ' -f win64 -o ' +
 					folder + '\\tofita.asm.obj kernel\\all.asm', { stdio: 'inherit' }
 				)
 
@@ -150,21 +160,29 @@ for task in tasks {
 				require('child_process').execSync(
 					[
 						clang + ' ',
-						'-target x86_64-pc-win32-coff -fno-stack-protector ',
 						'-O2 -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
-						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG ',
-						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER ',
-						'-DUEFI_BOOT_LOADER ',
 						'-D versionRolling=' + versionRolling + ' ',
 						'-D versionName=\\"' + versionName + '\\" ',
+						'-target x86_64-pc-win32-coff -fno-stack-protector',
+						'-fomit-frame-pointer',
+						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG',
+						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER',
+						'-DUEFI_BOOT_LOADER',
+						'-D versionMajor=' + versionMajor,
+						'-D versionMinor=' + versionMinor,
+						'-D versionTag=' + versionTag,
 
-						'-mno-ms-bitfields -fno-threadsafe-statics ',
+						// TODO mno-sse avx etc DISABLE ALL FEATURES BUT SSE2
+						// SO CPUID CHECK WILL HANG BOOTLOADER WITH ERROR FOR SELECTED FEATURE
+
 						'-fshort-wchar -mno-red-zone -Os',
+						'-mno-ms-bitfields -fno-threadsafe-statics',
+						'-Wno-address-of-temporary',
 						' -c ',
 						'boot/uefi/boot.cpp',
 						' -o ',
 						config.tempFolder + '/' + teaFolder + '/miniefi.o'
-					].join(''), { stdio: 'inherit' }
+					].join(' '), { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
@@ -174,38 +192,12 @@ for task in tasks {
 						config.tempFolder + '/' + teaFolder + '/trampoline.o ',
 						config.tempFolder + '/' + teaFolder + '/miniefi.o ',
 						' -out:',
-						config.tempFolder + '/' + teaFolder + '/iso/EFI/BOOT/BOOTX64.EFI'
+						config.tempFolder + '/' + teaFolder + '/spin-off/EFI/BOOT/BOOTX64.EFI'
 					].join(''), { stdio: 'inherit' }
 				)
 			}
 		case 'dll':
 			{
-				// Yeah, just Clang bug
-				let linkFixups = [
-					'*CMapStringA',
-					'*oadImageW',
-					'*oadLibraryA',
-					'*oadLibraryW',
-					'*oadMenuW',
-					'*oadStringW',
-					'*ocalFree',
-					'*ocalReAlloc',
-					'*ockFile',
-					'*ineTo',
-					'*oadBitmapW',
-					'*oadCursorW',
-					'*oadIconW',
-					'*oadMenuA',
-					'*oadResource',
-					'*ocalLock',
-					'*ocalSize',
-					'*ocalUnlock',
-					'*ockResource',
-					'*eaveCriticalSection',
-					'*oadLibraryExW',
-					'*CMapStringW'
-				]
-
 				// DLL
 				fun buildDLLs(bit: String, arch: String) {
 					for i in dlls.length {
@@ -236,24 +228,10 @@ for task in tasks {
 								'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
 								'-o ',
 								outobj
-							].join(''), { stdio: 'inherit' }
+							].join(' '), { stdio: 'inherit' }
 						)
 
-						// Fixup
-						let inbuf = fs.readFileSync(outobj)
-
-						for fix in linkFixups {
-							let index = inbuf.indexOf(fix)
-
-							if index > 0 {
-								inbuf[index] = 'L'.charCodeAt(0)
-								inbuf[inbuf.indexOf(fix)] = 'L'.charCodeAt(0)
-							}
-						}
-
-						fs.writeFileSync(outobj, inbuf)
-
-						// Bruh
+						// 32 bit is `86`
 						let machine = (bit == '32') ? '86' : '64'
 
 						require('child_process').execSync(
@@ -282,12 +260,13 @@ for task in tasks {
 				// KERNEL
 				require('child_process').execSync(
 					[
-						clang + ' ',
-						'-D versionRolling=' + versionRolling + ' ',
-						'-D versionName=\\"' + versionName + '\\" ',
+						clang,
+						'-D versionRolling=' + versionRolling,
+						'-D versionName=\\"' + versionName + '\\"', // TODO too
+
 						'-mtune=nocona -fno-stack-protector -fshort-wchar -mno-red-zone ',
 						'-fno-stack-check ',
-						'-fvisibility=hidden ',
+						debuggie? '-fvisibility=default' : '-fvisibility=hidden',
 						'-Dbit64 ',
 						'-fno-rtti -fno-exceptions -ffreestanding ',
 						'-mno-ms-bitfields -fno-threadsafe-statics ',
@@ -299,14 +278,20 @@ for task in tasks {
 						warn,
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -Wimplicit-function-declaration ',
 						optimizationFeatures,
+						// TODO disable C++ mode
+						debuggie? '-fno-omit-frame-pointer' : '-fomit-frame-pointer',
+						'-Wno-address-of-temporary',
+						debuggie? '-g -O2' : '-O2',
 						'-x c++ -std=c++2a -c kernel/tofita.cpp -o ',
 						config.tempFolder + '/' + teaFolder + '/tofita.obj '
-					].join(''), { stdio: 'inherit' }
+					].join(' '), { stdio: 'inherit' }
 				)
 
 				require('child_process').execSync(
 					[
 						link + ' ',
+						debuggie? '/debug:dwarf ' : '',
+						'/FIXED ', // Disable relocations
 						'/verbose /WX /MACHINE:X64 /entry:kernelMain /SUBSYSTEM:CONSOLE ',
 						'/BASE:0xffff800000000000 ',
 						config.tempFolder + '/' + teaFolder + '/tofita.asm.obj ',
@@ -322,15 +307,15 @@ for task in tasks {
 			{
 				fs.copyFileSync(
 					'assets\\autorun.ico',
-					folder + '\\iso\\autorun.ico')
+					folder + '\\spin-off\\autorun.ico')
 				fs.copyFileSync(
 					'assets\\autorun.inf',
-					folder + '\\iso\\autorun.inf')
+					folder + '\\spin-off\\autorun.inf')
 				fs.copyFileSync(
 					'LICENSE',
-					folder + '\\iso\\LICENSE.txt')
+					folder + '\\spin-off\\LICENSE.txt')
 				fs.writeFileSync(
-					folder + '\\iso\\version.txt',
+					folder + '\\spin-off\\version.txt',
 					versionName
 				)
 
@@ -341,9 +326,9 @@ for task in tasks {
 				for cmd in [
 					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI',
 					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI/BOOT',
-					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
-					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\TOFITA.DAT ::/TOFITA.DAT',
-					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\iso\\version.txt ::/version.txt',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\TOFITA.DAT ::/TOFITA.DAT',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\version.txt ::/version.txt',
 					mcopy + ' -i ' + folder + '\\DISK.IMG LICENSE ::/LICENSE.txt',
 					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.ico ::/autorun.ico',
 					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
@@ -355,14 +340,14 @@ for task in tasks {
 				// Create disk image
 				fs.copyFileSync(
 					folder + '\\DISK.IMG',
-					folder + '\\iso\\DISK.IMG')
+					folder + '\\spin-off\\DISK.IMG')
 
 				let path = '/cygdrive/' + folder.split(':').join('')
 				require('child_process').execSync(
 					[
 						xorriso,
 						'-as mkisofs -o \(path)/greenteaos-uefi64.iso -iso-level 3',
-						'-V GreenteaOS \(path)/iso -append_partition 2 0xef \(path)/DISK.IMG',
+						'-V GreenteaOS \(path)/spin-off -append_partition 2 0xef \(path)/DISK.IMG',
 						'-e --interval:appended_partition_2:all:: -no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
 				)

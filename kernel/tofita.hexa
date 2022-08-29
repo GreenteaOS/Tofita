@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-fun memzero(dest: VoidPointer, len: UInt64) {
+fun memzero(dest: ArrayPointer<UInt8>, len: UInt64) {
 	memset(dest, 0, len)
 }
 
@@ -22,61 +22,49 @@ fun memzero(dest: VoidPointer, len: UInt64) {
 @rename('___chkstk_ms')
 fun chkstkStub(): Void {}
 // STB library
-#define STBI_NO_SIMD
-#define STBI_NO_STDIO
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_PNG
-import "formats/stb_image/libc.cpp"
-import "formats/stb_image/stb_image.hpp"
-import "formats/stb_image/unlibc.cpp"
-import "formats/exe/exe.cpp"
-import "formats/cur/cur.cpp"
-import "formats/ico/ico.cpp"
-import "formats/bmp/bmp.cpp"
-import "formats/lnk/lnk.cpp"
-import "gui/blur.cpp"
-import "gui/desktop.cpp"
-import "gui/quake.cpp"
-import "gui/text.cpp"
-import "gui/windows.cpp"
-import "gui/compositor.cpp"
-import "gui/dwm.cpp"
-import "syscalls/user32/userCall.cpp"
 
-const KernelParams *paramsCache = null
+// TODO wipe this feature for now? or fix?
 var startupMilliseconds: UInt64 = 0
 
-fun kernelInit(params: KernelParams) {
-	serialPrintln("<Tofita> Greentea OS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag + " kernel loaded and operational")
+@extern @rename('versionMajor') declare let versionMajor: Int
+@extern @rename('versionMinor') declare let versionMinor: Int
+@extern @rename('versionTag') declare let versionTag: Int
+
+fun kernelInit(params: UefiPayload) {
+	serialPrintln("<Tofita> Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " kernel loaded and operational")
 	serialPrintf("<Tofita> CR3 points to: %8\n", params.pml4 as! UInt64)
+	// TODO `anyPtrOrObj as! UInt32` -> error precision lost on 64-bit
 	paramsCache = params
-	// PhysicalAllocator.init(Pointer.of(params.efiMemoryMap), params.physicalRamBitMaskVirtual,
 	// DOWN_BYTES_TO_PAGES(params.ramBytes))
 	PhysicalAllocator.init(params)
-	pages.pml4entries = (pages.PageEntry *)((wholePhysicalStart as! UInt64) + (uint64_t)(params.pml4))
+	PhysicalAllocator.resetCounter()
+	let trapeze_ = PhysicalAllocator.allocateOnePage()
+	let trapeze = PhysicalAllocator.allocatePages(8) // Bootloader
+
+	pml4entries = ((wholePhysicalStart as! UInt64) + (params.pml4 as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 
 	if false {
-		serialPrintf("<> %8 == %8\n", (uint64_t)(4096 * 10),
-					 pages.resolveAddr(pages.pml4entries, 4096 * 20))
-		serialPrintf("<> %8 == %8\n", (uint64_t)(4096 * 10 + 123),
-					 pages.resolveAddr(pages.pml4entries, 4096 * 20 + 123))
-		serialPrintf("<> %8 == %8\n", (uint64_t)(0),
-					 pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64)))
-		serialPrintf("<> %8 == %8\n", (uint64_t)(0 + 123),
-					 pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64) + 123))
-		serialPrintf("<> %8 == %8\n", (uint64_t)(0 + 4096),
-					 pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64) + 4096))
 		mapMemory(pml4entries, 4096, 4096, 256)
 		mapMemory(pml4entries, 4096, 4096, 256)
 		mapMemory(pml4entries, 4096 * 20u64, 4096 * 10u64, 256)
 
+		serialPrintf("<> %8 == %8\n", (4096u64 * 10),
+					 resolveAddr(pml4entries, 4096u64 * 20))
+		serialPrintf("<> %8 == %8\n", (4096 * 10 + 123),
+					 resolveAddr(pml4entries, 4096u64 * 20 + 123))
+		serialPrintf("<> %8 == %8\n", (0),
+					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64)))
+		serialPrintf("<> %8 == %8\n", (0 + 123),
+					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 123))
+		serialPrintf("<> %8 == %8\n", (0 + 4096),
+					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 4096))
 		serialPrintf(
-			"<> %8 == %8\n", (uint64_t)(0 + 4096 * 1000 + 123),
-			pages.resolveAddr(pages.pml4entries, (wholePhysicalStart as! UInt64) + 4096 * 1000 + 123))
-		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576),
-					 pages.resolveAddr(pages.pml4entries, (uint64_t)0xffff800000000000))
-		serialPrintf("<> %8 == %8\n", (uint64_t)(1048576 + 123),
-					 pages.resolveAddr(pages.pml4entries, 0xffff800000000000u64 + 123))
+			"<> %8 == %8\n", (0 + 4096 * 1000 + 123),
+			resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 4096 * 1000 + 123))
+		serialPrintf("<> %8 == %8\n", (1048576),
+					 resolveAddr(pml4entries, 0xffff800000000000u64))
+		serialPrintf("<> %8 == %8\n", (1048576 + 123),
+					 resolveAddr(pml4entries, 0xffff800000000000u64 + 123))
 
 		// serialPrint("resolves from, to, wh, wh+8888: ")
 		// serialPrint("\n")
@@ -96,45 +84,50 @@ fun kernelInit(params: KernelParams) {
 		// serialPrint("\n")
 	}
 
-	setFramebuffer(params.framebuffer)
-	setRamDisk(params.ramdisk)
+	setFramebuffer(params.framebuffer.ref)
+	setRamDisk(params.ramdisk.ref)
 
-	if (sizeof(UInt8 *) == 4)
+	// TODO >>
+	if sizeOf<ArrayPointer<UInt8> >() == 4 {
 		serialPrintln("<Tofita> void*: 4 bytes")
-	if (sizeof(UInt8 *) == 8)
 	}
+	if sizeOf<ArrayPointer<UInt8> >() == 8 {
 		serialPrintln("<Tofita> void*: 8 bytes")
 	}
 
-	disablePic()
-	enableInterrupts()
+	// disablePic()
+	setupInterruptsAndExceptions()
 	enablePS2Mouse()
 
 	initText()
 	initializeCompositor()
 
-	quakePrintf("Greentea OS " + versionName + " " + versionMajor + "." + versionMinor + " " + versionTag + " loaded and operational\n")
+	serialPrintln("<Tofita> quakePrintf(versionText.utf16())")
+	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " loaded and operational\n"
+	quakePrintf(versionText.utf16())
 
 	// TODO enableLocalApic()
 
 	var cpuid: CPUID = getCPUID()
 
-	var megs: UInt32 = Math.round((double)params.ramBytes / (1024.0 * 1024.0))
-	quakePrintf("[CPU] %s %s %d MB RAM\n", cpuid.vendorID, cpuid.brandName, megs)
+	var megs: Int32 = Math.round(params.ramBytes / (1024.0 * 1024.0))
+	quakePrintf("[CPU] %s %s %d MB RAM\n".utf16(), cpuid.vendorID, cpuid.brandName, megs)
 
 	if !ACPIParser.parse(params.acpiTablePhysical) {
-		quakePrintf("ACPI is *not* loaded\n")
+		quakePrintf("ACPI is *not* loaded\n".utf16())
 	} else {
-		quakePrintf("ACPI 2.0 is loaded and ready\n")
+		quakePrintf("ACPI 2.0 is loaded and ready\n".utf16())
 	}
 
-	quakePrintf("Enter 'help' for commands\n")
+	quakePrintf("Enter 'help' for commands\n".utf16())
 
 	{
 		// TODO move to compositor
-		var a: RamDiskAsset = getRamDiskAsset("root/Windows/Web/Wallpaper/Tofita/default.bmp")
-		var bmp: Pointer<Bitmap32> = bmp.loadBmp24(&a)
-		setWallpaper(bmp, Center)
+		var a: RamDiskAsset = new RamDiskAsset()
+		getRamDiskAsset(a, "root/Windows/Web/Wallpaper/Tofita/default.bmp")
+		var bmp: Bitmap32 = loadBitMap24(a)
+		// TODO var bmp: Bitmap32 = loadBitMap24(Buffer.fromBytes(a.data))
+		setWallpaper(bmp, WallpaperStyle.Center)
 	}
 
 	// TODO var sandbox = sandbox.createSandbox()
@@ -145,31 +138,50 @@ fun kernelInit(params: KernelParams) {
 
 	// GUI thread
 	{
-		memset(Pointer.of(guiThreadFrame), 0, sizeof(InterruptFrame)) // Zeroing
-		memset(Pointer.of(guiStack), 0, sizeof(stackSizeForKernelThread)) // Zeroing
+		memset(guiThreadFrame as! ArrayPointer<UInt8>, 0, sizeOf<InterruptFrame>()) // Zeroing TODO sizeOf
+		memset(guiStack.ref, 0, stackSizeForKernelThread) // Zeroing
+		// TODO allocate stack with PhyAllocator
 
-		guiThreadFrame.ip = (uint64_t)Pointer.of(guiThreadStart)
+		guiThreadFrame.ip = guiThreadStart as! UInt64
 		guiThreadFrame.cs = Selector.SYS_CODE64_SEL
-		// TODO allocate as physicall memory
-		guiThreadFrame.sp = (uint64_t)Pointer.of(guiStack) + stackSizeForKernelThread
+		// TODO allocate as physical memory
+		guiThreadFrame.sp = guiStack.ref as! UInt64 + stackSizeForKernelThread
 		guiThreadFrame.ss = Selector.SYS_DATA32_SEL
 	}
 
 	// Main thread
 	{
-		memset(Pointer.of(kernelThreadFrame), 0, sizeof(InterruptFrame)) // Zeroing
-		memset(Pointer.of(kernelStack), 0, sizeof(stackSizeForKernelThread)) // Zeroing
+		memset(kernelThreadFrame as! ArrayPointer<UInt8>, 0, sizeOf<InterruptFrame>()) // Zeroing
+		memset(kernelStack.ref, 0, stackSizeForKernelThread) // Zeroing
 
-		kernelThreadFrame.ip = (uint64_t)Pointer.of(kernelThreadStart)
-		kernelThreadFrame.sp = (uint64_t)Pointer.of(kernelStack) + stackSizeForKernelThread
+		kernelThreadFrame.ip = kernelThreadStart as! UInt64
 		kernelThreadFrame.cs = Selector.SYS_CODE64_SEL
+		kernelThreadFrame.sp = kernelStack as! UInt64 + stackSizeForKernelThread
 		kernelThreadFrame.ss = Selector.SYS_DATA32_SEL
 	}
 
 	// Idle process
 	{
-		memset(Pointer.of(process.processes), 0, sizeof(process.processes)) // Zeroing
-		var idle: Process = processes[0]
+		// TODO must error `sizeOf(processes)`
+		// processes[0] = new UserProcess()
+		for i in 256 {
+			// TODO optimizer: set Array.capacity to 256 upfront cause known value
+			let process = new UserProcess()
+			process.frame = new InterruptFrame()
+			processes[i] = process
+			process.present = false
+			process.schedulable = false
+			process.syscallToHandle = TofitaSyscalls.Noop
+		}
+
+		// TODO yay
+		for i in windowsLimit {
+			let window = new OverlappedWindow()
+			window.present = false
+			windowsList[i] = window
+		}
+
+		var idle: UserProcess = processes[0]
 		idle.pml4 = pml4entries // Save CR3 template to idle process
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
@@ -179,9 +191,11 @@ fun kernelInit(params: KernelParams) {
 	}
 
 	// Demo
-	if false {
-		for i in 3 {
-			var demo: Process = processCreate()
+	// if false {
+	if true {
+		//for i in 3
+		{
+			var demo: UserProcess = processCreate()
 			serialPrintf("<> pid == %u\n", demo.pid)
 			processInit(demo)
 			loadExeIntoProcess("desktop/wndapp.exe", demo)
@@ -189,8 +203,8 @@ fun kernelInit(params: KernelParams) {
 		}
 	}
 
-						  paramsCache.time.Second * 1000
-	startupMilliseconds = paramsCache.time.hour * 60 * 60 * 1000 + paramsCache.time.minute * 60 * 1000 +
+	startupMilliseconds = paramsCache.time.ref.hour * 60 * 60 * 1000 + paramsCache.time.ref.minute * 60 * 1000 +
+						  paramsCache.time.ref.second * 1000u64
 
 	// Show something before scheduling delay
 	composite(startupMilliseconds)
@@ -204,6 +218,7 @@ fun switchToUserProcess() {
 	// TODO
 	var next = getNextProcess()
 
+	// TODO comparing `nullable == 0` error
 	if next == 0 {
 		markAllProcessessSchedulable()
 		next = getNextProcess()
@@ -212,6 +227,7 @@ fun switchToUserProcess() {
 	if next == 0 {
 		// serialPrintln("<Tofita> [halt]")
 		// amd64.enableAllInterruptsAndHalt() // Nothing to do
+		// TODO fix this feature
 	}
 	// else
 	yield()
@@ -230,11 +246,13 @@ fun kernelThread() {
 	serialPrintf("<seh> 0 == %u\n", probeForReadOkay(999999999, 1))
 
 	while true {
+		// TODO optimize cast to 1u64
 		@volatile var index: UInt64 = 1 // Idle process ignored
 		while index < 255 {		 // TODO
 			@volatile var process = processes[index]
-			if process.present == true {
+			if process != null, process.present == true {
 				if process.syscallToHandle != TofitaSyscalls.Noop {
+					kernelThreadBusy = true
 					@volatile let syscall = process.syscallToHandle
 					process.syscallToHandle = TofitaSyscalls.Noop
 					@volatile var frame = process.frame
@@ -248,11 +266,12 @@ fun kernelThread() {
 
 					if syscall == TofitaSyscalls.DebugLog {
 						serialPrintf("[[DebugLog:PID %d]] ", index)
-						serialPrintf("[[rcx=%u rdx=%u r8=%u]] ", frame.rcxArg0, frame.rdxArg1, frame.r8)
+						serialPrintf("[[rcx=%u rdx=%8 r8=%8]] ", frame.rcxArg0, frame.rdxArg1, frame.r8)
 
-							var payload: Pointer<DebugLogPayload> = (DebugLogPayload *)frame.rdxArg1
-						if probeForReadOkay(frame.rdxArg1, sizeof(DebugLogPayload)) {
+						if probeForReadOkay(frame.rdxArg1, sizeOf<DebugLogPayload>()) {
+							var payload = frame.rdxArg1 as! DebugLogPayload
 							// Note this is still very unsafe
+							// TODO safer one, with SEH + check to addrs be at userspace
 							if probeForReadOkay((payload.message as! UInt64), 1) {
 								serialPrintf(payload.message, payload.extra, payload.more)
 							}
@@ -265,34 +284,38 @@ fun kernelThread() {
 						process.present = false
 
 						// Select pml4 of idle process for safety
+						// TODO idle as `idle: UserProcess` var, not `[0]`
 						pml4kernelThread = processes[0].pml4
 						writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 						// Deallocate process
+						// TODO as UserProcess class method
 						processDestroy(process)
 					} else if syscall == TofitaSyscalls.Cpu {
-						serialPrintf("[[Cpu:PID %d]] %d\n", index, frame.rdxArg1)
-						quakePrintf("Process #%d closed due to CPU exception #%u\n", index, frame.index)
 						process.present = false
+						serialPrintf("[[Cpu:PID %d]] %d\n", index, frame.rdxArg1)
+						quakePrintf("UserProcess #%d closed due to CPU exception #%u\n".utf16(), index, frame.index)
 
 						// Page fault
 						if frame.index == 0x0E {
-							quakePrintf("#PF at %8\n", process.cr2PageFaultAddress)
+							quakePrintf("#PF at %8\n".utf16(), process.cr2PageFaultAddress)
 						}
 						if frame.index == 0x0D {
-							quakePrintf("#GPF at %8\n", frame.ip)
+							quakePrintf("#GPF at %8\n".utf16(), frame.ip)
 						}
 						if frame.index == 0x03 {
-							quakePrintf("#BP at %8\n", frame.ip)
+							quakePrintf("#BP at %8\n".utf16(), frame.ip)
 						}
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = processes[0].pml4
+						// TODO `UserProcess.this.writeOwnCr3`
 						writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 						// Deallocate process
 						processDestroy(process)
 					} else {
+						// TODO TofitaSyscalls.type.tagNameFromValue(syscall)
 						frame.raxReturn = 0 // Must return at least something
 						// Note ^ some code in syscall handlers may *read* this value
 						// So set it to zero just in case
@@ -305,6 +328,9 @@ fun kernelThread() {
 							process.schedulable = true
 						}
 					}
+
+					// TODO `@defer` this
+					kernelThreadBusy = false
 				}
 			}
 			index++
@@ -314,6 +340,7 @@ fun kernelThread() {
 	}
 }
 
+@rename('guiThreadStart')
 declare fun guiThreadStart(): Void
 
 // In case of kernel crash set instruction pointer to here
@@ -323,6 +350,7 @@ fun kernelThreadLoop() {
 		amd64.pause()
 	}
 }
+@rename('kernelThreadStart')
 declare fun kernelThreadStart(): Void
 
 fun guiThread() {
@@ -341,13 +369,19 @@ fun guiThread() {
 		composite(startupMilliseconds)
 		copyToScreen()
 
+		while qsodHappened {
+			disableAllInterrupts()
+			halt()
+		}
+
 		switchToUserProcess()
 	}
 }
 
-fun kernelMain(params: ConstPointer<KernelParams>) {
+@rename('__sync_synchronize')
 declare fun __sync_synchronize(): Void
 
+fun kernelMain(params: UefiPayload) {
 	kernelInit(params)
 	__sync_synchronize()
 
@@ -357,9 +391,17 @@ declare fun __sync_synchronize(): Void
 	// sti . start sheduling here
 	// It will erase whole stack on next sheduling
 	// TODO kernel `yield`/`await`
+	// TODO dealloc pre-thread after first yield
 	while true {
 		enableAllInterruptsAndHalt()
 	}
 	// TODO hexa: error if code present in unreachable block
 	// (no break/continue/throw)
 }
+
+// Entry point of the project
+
+@rename('kernelParams') declare let kernelParams: UefiPayload
+
+//
+kernelMain(kernelParams)

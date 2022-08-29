@@ -20,5 +20,5 @@
 @struct
 class User {
 	var name: String
-	var sandbox: Pointer<Sandbox>
+	var sandbox: Sandbox
 }

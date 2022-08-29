@@ -1,0 +1,31 @@
+{
+	"name": "Tofita Bootloader",
+	"version": "1.0.0",
+	"description": "UEFI bootloader",
+	"author": "PeyTy",
+	"license": "LGPL-3.0-only",
+	"global": [
+		"shared/params",
+		"amd64/amd64Page",
+		"amd64/amd64Mapper",
+		"shared/paging",
+		"../devices/serial/init",
+		"../devices/serial/log",
+		"../kernel/ramdisk",
+		"uefi",
+		"uefi/boot",
+		"uefi/memory",
+		"uefi/pe",
+		"uefi/ramdisk",
+		"uefi/visuals"
+	],
+	"targets": [
+		{
+			"name": "default",
+			"generator": "c",
+			"output": "uefi.c",
+			"options": []
+		}
+	],
+	"entry": "uefiMain"
+}
