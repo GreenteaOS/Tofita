@@ -14,8 +14,8 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 ::debug
+node build.js init-or-clean asm efi dll kernel ramdisk iso
 ::
-node build.js init asm uefi dll build iso
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )

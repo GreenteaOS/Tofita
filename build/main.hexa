@@ -89,7 +89,7 @@ for task in tasks {
 		case 'debug':
 			console.log('[Debug mode is ON]')
 			debuggie = true
-		case 'init':
+		case 'init-or-clean':
 			{
 				if not fs.existsSync(folder) {
 					fs.mkdirSync(folder)
@@ -154,9 +154,9 @@ for task in tasks {
 					folder + '\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm', { stdio: 'inherit' }
 				)
 			}
-		case 'uefi':
+		case 'efi':
 			{
-				// UEFI
+				// EFI
 				require('child_process').execSync(
 					[
 						clang + ' ',
@@ -213,20 +213,20 @@ for task in tasks {
 						require('child_process').execSync(
 							[
 								clang + ' ',
-								'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles ',
-								'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w ',
 								'-Wimplicit-function-declaration -O2 -c ',
-								'-mtune=nocona -fno-stack-protector -mno-red-zone ',
-								'-fno-rtti -fno-exceptions -fvisibility=default ',
-								'-fno-stack-check ',
-								'-mno-ms-bitfields -fno-threadsafe-statics ',
-								'-ferror-limit=2000 ',
-								'-Dbit\(bit) ',
-								'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw ',
-								'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 ', // Unsupported
 								'-std=c++2a ',
-								'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp ',
-								'-o ',
+								'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles',
+								'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w',
+								'-mtune=nocona -fno-stack-protector -mno-red-zone',
+								'-fno-stack-check',
+								'-fshort-wchar',
+								'-mno-ms-bitfields -fno-threadsafe-statics',
+								'-ferror-limit=2000',
+								'-Dbit\(bit)',
+								'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw',
+								'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4', // Unsupported
+								'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp',
+								'-o',
 								outobj
 							].join(' '), { stdio: 'inherit' }
 						)
@@ -255,7 +255,7 @@ for task in tasks {
 				buildDLLs('64', 'x86_64')
 				buildDLLs('32', 'i686')
 			}
-		case 'build':
+		case 'kernel':
 			{
 				// KERNEL
 				require('child_process').execSync(
@@ -292,7 +292,8 @@ for task in tasks {
 						link + ' ',
 						debuggie? '/debug:dwarf ' : '',
 						'/FIXED ', // Disable relocations
-						'/verbose /WX /MACHINE:X64 /entry:kernelMain /SUBSYSTEM:CONSOLE ',
+						// Uncomment for some info '/verbose ',
+						'/WX /MACHINE:X64 /entry:kernelMain /SUBSYSTEM:CONSOLE ',
 						'/BASE:0xffff800000000000 ',
 						config.tempFolder + '/' + teaFolder + '/tofita.asm.obj ',
 						config.tempFolder + '/' + teaFolder + '/tofita.obj ',
@@ -300,7 +301,9 @@ for task in tasks {
 						config.tempFolder + '/' + teaFolder + '/tofita.exe'
 					].join(''), { stdio: 'inherit' }
 				)
-
+			}
+		case 'ramdisk':
+			{
 				packAssets(config) // Loader
 			}
 		case 'iso':
