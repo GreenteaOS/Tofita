@@ -1,0 +1,24 @@
+{
+    "name": "Uzah",
+    "version": "1.0.0",
+    "description": "Greentea OS",
+    "author": "PeyTy",
+    "license": "LGPL-3.0-only",
+    "global": [
+        "../types",
+        "../../kernel/syscalls/syscalls",
+        "../tofita32.dll/tofita32.header",
+        "../kernel32.dll/kernel32.header",
+        "user32.header",
+        "user32Vars"
+    ],
+    "targets": [
+        {
+            "name": "default",
+            "generator": "c",
+            "output": "user32.c",
+            "options": []
+        }
+    ],
+    "entry": "user32"
+}

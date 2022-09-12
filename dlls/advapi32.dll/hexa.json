@@ -1,0 +1,17 @@
+{
+    "name": "Advapeh",
+    "version": "1.0.0",
+    "description": "Greentea OS",
+    "author": "PeyTy",
+    "license": "LGPL-3.0-only",
+    "global": [],
+    "targets": [
+        {
+            "name": "default",
+            "generator": "c",
+            "output": "advapi32.c",
+            "options": []
+        }
+    ],
+    "entry": "advapi32"
+}

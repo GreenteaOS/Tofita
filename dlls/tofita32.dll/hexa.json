@@ -1,0 +1,20 @@
+{
+    "name": "Tofita Bindings",
+    "version": "1.0.0",
+    "description": "Greentea OS",
+    "author": "PeyTy",
+    "license": "LGPL-3.0-only",
+    "global": [
+        "../types",
+        "../../kernel/syscalls/syscalls"
+    ],
+    "targets": [
+        {
+            "name": "default",
+            "generator": "c",
+            "output": "tofita32.c",
+            "options": []
+        }
+    ],
+    "entry": "tofita32"
+}
