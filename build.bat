@@ -9,10 +9,6 @@ IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
 
-IF %ERRORLEVEL% NEQ 0 (
-  goto somethingbad
-)
-
 ::debug
 node build.js init-or-clean asm efi dll kernel ramdisk iso
 ::

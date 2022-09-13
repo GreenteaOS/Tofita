@@ -96,15 +96,12 @@ if tasks.length == 0 {
 	console.log('No tasks defined')
 }
 
-for task in tasks {
 console.log("[Tasks: \(tasks.join(', '))]")
 
+for task in ['tasks'] {
 	let folder = config.tempFolder + tea
 
 	switch task {
-		case 'debug':
-			console.log('[Debug mode is ON]')
-			debuggie = true
 		case 'init-or-clean':
 			{
 				if not fs.existsSync(folder) {
@@ -400,7 +397,6 @@ console.log("[Tasks: \(tasks.join(', '))]")
 				console.log('clang-format ' + files.length + ' files')
 			}
 		case _:
-			console.log('Unknown task', task)
 	}
 }
 
@@ -410,15 +406,23 @@ for task in tasks {
 	let begin = Date.now()
 
 	switch task {
+		case 'help':
+			// TODO print available commands
+			// TODO commands to enum, use meta-feature of enum keys here `switch.cases[String/Int/SimpleEnum/etc]`
+		case 'ci':
+			// build + test here for unique file names, APIs unit tests etc
 		case 'debug':
 			console.log('[Debug mode is ON]')
+			// TODO no debug -> disable COM log for max perf
 			debuggie = true
 		case 'strict':
 			console.log('[Strict mode is ON]')
 			// TODO enables C++ & warnings
 			strict = true
 		case 'verbose':
+			// TODO
 		case 'experimental':
+			// TODO
 		case 'init-or-clean':
 			cleanupTask = true
 		case 'asm':
@@ -453,7 +457,7 @@ fun runTasks() {
 		fs.copyFileSync('desktop.ini', folder + '\\desktop.ini')
 		require('child_process').execSync('cmd /c ATTRIB +S ' + folder, { stdio: 'inherit' })
 
-		// Create directory tofita/spin-off/EFI/BOOT/
+		// Create directory `tofita/spin-off/EFI/BOOT/`
 		let dirs = [
 			path.sep + teaFolder,
 			path.sep + 'spin-off',
@@ -476,59 +480,49 @@ fun runTasks() {
 		}
 	}
 
-	var wave: [String] = []
+	// var wave: [String] = []
 	// let waves: [String] = [wave] TODO wrong type, not `String`
-	let waves: [[String]] = [wave]
-
-	fun nextWave(): [String] {
-		wave = []
-		waves.push(wave)
-		return wave
-	}
-
-	// TODO wave1 wave2 ...
+	let phase1: [String] = []
+	let phase2: [String] = []
+	let phase3: [String] = []
 
 	if asmTask {
 		// CR3 TRAMPOLINE
-		wave.push(
+		phase1.push(
 			nasm + ' -f win64 -o ' +
 			folder + '\\trampoline.o boot\\loader\\trampoline.asm'
 		)
 
 		// KERNEL
-		wave.push(
+		phase1.push(
 			nasm + (debuggie? ' -g' : '') + ' -f win64 -o ' +
 			folder + '\\tofita.asm.obj kernel\\all.asm'
 		)
 
 		// SMP TRAPEZE
-		wave.push(
+		phase1.push(
 			nasm + ' -f bin -o ' +
 			folder + '\\trapeze.bin devices\\cpu\\trapeze.asm'
 		)
 
 		// DLL
-		wave.push(
+		phase1.push(
 			nasm + ' -f win64 -o ' +
 			folder + '\\tofita64.asm.obj dlls\\tofita32.dll\\tofita64.asm'
 		)
 
-		wave.push(
+		phase1.push(
 			nasm + ' -f win32 -o ' +
 			folder + '\\tofita32.asm.obj dlls\\tofita32.dll\\tofita32.asm'
 		)
 	}
 
 	if efiTask {
-		let projects = wave
-		let compiling = nextWave()
-		let linking = nextWave()
-
 		// Hexa
-		projects.push('cmd /c hexa boot\\hexa.json')
+		phase1.push('cmd /c hexa boot\\hexa.json')
 
 		// EFI
-		compiling.push(
+		phase2.push(
 			[
 				clang + ' ',
 				'-target x86_64-pc-win32-coff -fno-stack-protector',
@@ -558,7 +552,7 @@ fun runTasks() {
 		)
 
 		// Note: this is also depends on `asm`
-		linking.push(
+		phase3.push(
 			[
 				link + ' ',
 				'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
@@ -571,20 +565,13 @@ fun runTasks() {
 	}
 
 	if dllTask {
-		let projects = wave
-		// Note: this depends on hexa
-		let compiling = nextWave()
-		// Note: this is also depends on `asm`
-		let linking = nextWave()
-
 		// DLL
 		fun buildDLLs(bit: String, arch: String) {
 			for i in dlls.length {
 
 				// TODO per-32/64-arch
 				// TODO libgen txt list here, to .lib in phase 2
-				//
-				projects.push('cmd /c hexa dlls\\\(dlls[i]).dll\\hexa.json')
+				phase1.push('cmd /c hexa dlls\\\(dlls[i]).dll\\hexa.json')
 
 				// TODO refactor
 				var asm = ' '
@@ -594,7 +581,7 @@ fun runTasks() {
 
 				let outobj = folder + '\\' + dlls[i] + '.' + bit + '_dll.obj'
 
-				compiling.push(
+				phase2.push(
 					[
 						clang + ' ',
 						'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles',
@@ -620,14 +607,15 @@ fun runTasks() {
 				// 32 bit is `86`
 				let machine = (bit == '32') ? '86' : '64'
 
-				linking.push(
+				// Note: this is also depends on `asm`
+				phase3.push(
 					[
-						// TODO -fno-underscoring
 						// TODO -visibility=hidden
-						// TODO check if `/kill-at` keeps `@` from `asm()`
 						link + ' ',
 						'/DLL /WX /MACHINE:X\(machine) ',
-						[for dep in deps[i] config.tempFolder + '/' + teaFolder + '/' + dep + '.' + bit + '.lib '].join(''),
+						[
+							for dep in deps[i] config.tempFolder + '/' + teaFolder + '/!' + dep + '.' + bit + '.lib '
+						].join(''),
 						outobj + ' ',
 						asm,
 						'/out:',
@@ -643,15 +631,11 @@ fun runTasks() {
 	}
 
 	if kernelTask {
-		let projects = wave
-		let compiling = nextWave()
-		let linking = nextWave()
-
 		// Hexa
-		projects.push('cmd /c hexa hexa.json')
+		phase1.push('cmd /c hexa hexa.json')
 
 		// KERNEL
-		compiling.push(
+		phase2.push(
 			[
 				clang,
 				'-D versionRolling=' + versionRolling,
@@ -690,7 +674,7 @@ fun runTasks() {
 		)
 
 		// Note: this is also depends on `asm`
-		linking.push(
+		phase3.push(
 			[
 				link + ' ',
 				debuggie? '/debug:dwarf ' : '',
@@ -708,16 +692,37 @@ fun runTasks() {
 
 	process.stdout.write('[Processing...')
 
-	var currentWave = waves.shift() ?? []
+	var currentWave = phase1
+	var busy = 0
 
 	fun evaluate() {
-		if currentWave.length == 0 {
+		if busy == 0 and currentWave.length == 0 {
 			// TODO `switch wave case (firstWave):` match by value
-			currentWave = waves.shift() ?? []
+			if currentWave == phase1 {
+				// LIB GEN
+				for i in dlls.length {
+					let named = dlls[i]
+					let items = fs.readFileSync('dlls\\\(named).dll\\\(named).c.dllExport.txt').toString()
+					let gen =
+						(
+							' bit named ' + config.tempFolder + '/' + teaFolder + '/!named.bit.lib ' + items
+						).replaceAll('named', named)
+					phase2.push(libgen + gen.replaceAll('bit', '64'))
+					phase2.push(libgen + gen.replaceAll('bit', '32'))
+				}
+
+				currentWave = phase2
+			} else if currentWave == phase2 {
+				currentWave = phase3
+			} else if currentWave == phase3 {
+				currentWave = []
+			}
 		}
 
+		let cmd = currentWave.shift()
+
 		process.stdout.write('.')
-		if let cmd = currentWave.shift() {
+		if let cmd = cmd {
 			child_process.exec(cmd, fun(error: Bool?, stdout: String, stderr: String) {
 				if error != null {
 					process.stdout.write(']\r\n')
@@ -736,10 +741,16 @@ fun runTasks() {
 					console.log(stdout)
 				}
 
+				busy--
 				evaluate()
-				// TODO lmao this is obvisly SEQUENTIAL LOOL
 			})
-		} else {
+
+			busy++
+
+			if currentWave.length != 0 {
+				evaluate()
+			}
+		} else if busy == 0 {
 			process.stdout.write(']\r\n')
 
 			if ramDiskTask {
@@ -779,6 +790,7 @@ fun runTasks() {
 						cmd, { stdio: 'inherit' }
 					)
 				}
+
 				// Create disk image
 				fs.copyFileSync(
 					folder + '\\DISK.IMG',
@@ -796,6 +808,7 @@ fun runTasks() {
 			}
 
 			console.log("[All tasks finished in \(Date.now() - begin) ms]")
+			process.stdout.once('drain', fun () { Process.exit(0) })
 		}
 	}
 
