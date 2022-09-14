@@ -14,7 +14,6 @@ jobs:
     strategy:
       matrix:
         os: [ windows-2022 ]
-        node-version: [ 16.x ]
 
     steps:
     - name: Checkout
@@ -22,27 +21,22 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-
     - name: Get Hexa
       run: |
         git clone --depth 1 https://github.com/hexalang/Hexa.git
-
-    - name: Prepare Hexa
-      run: |
-        node --trace-uncaught ./Hexa/bootstrap.js ./Hexa/hexa.json
 
     - name: Get Teapot
       run: |
         git clone --depth 1 https://github.com/GreenteaOS/Teapot.git ../Teapot
 
+    - name: Prepare Hexa
+      run: |
+        ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ./Hexa/bootstrap.js ./Hexa/hexa.json
+
     - name: Building Tofita
       run: |
-        node --trace-uncaught ./Hexa/hexa-node.js build/hexa.json
-        node --trace-uncaught build.js init asm uefi dll build iso
+        ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ./Hexa/hexa-node.js build/hexa.json
+        ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught build.js init asm uefi dll build iso
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
