@@ -3,19 +3,15 @@ echo [32mWelcome to the Greentea OS! Support us at https://www.patreon.com/PeyT
 echo [0m
 cd /d %~dp0
 
+:: Build the builder itself
 cmd /c hexa build\hexa.json
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )
 
-cmd /c hexa boot\hexa.json
-IF %ERRORLEVEL% NEQ 0 (
-  goto somethingbad
-)
-
 ::debug
+node build.js init-or-clean asm efi dll kernel ramdisk iso
 ::
-node build.js init asm uefi dll build iso
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
 )

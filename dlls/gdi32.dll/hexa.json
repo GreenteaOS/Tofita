@@ -1,0 +1,20 @@
+{
+    "name": "GeeDeeEye",
+    "version": "1.0.0",
+    "description": "Greentea OS",
+    "author": "PeyTy",
+    "license": "LGPL-3.0-only",
+    "global": [
+        "gdi32.header",
+        "gdi32Vars"
+    ],
+    "targets": [
+        {
+            "name": "default",
+            "generator": "c",
+            "output": "gdi32.c",
+            "options": []
+        }
+    ],
+    "entry": "gdi32"
+}
