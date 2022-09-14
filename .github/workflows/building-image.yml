@@ -36,7 +36,7 @@ jobs:
     - name: Building Tofita
       run: |
         ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ./Hexa/hexa-node.js build/hexa.json
-        ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught build.js init asm uefi dll build iso
+        ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught build.js init-or-clean asm efi dll kernel ramdisk iso
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
