@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020  Oleg Petrenko
+// Copyright (C) 2020-2022  Oleg Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -28,7 +28,7 @@ namespace efi { // TODO dont use ns cause C mode!
 #include <stdarg.h>
 
 #include "../shared/boot.hpp"
-#include "../../devices/serial/init.cpp"
+#include "../../devices/serial/log.cpp"
 
 extern const uint8_t binFont[];
 extern const uint8_t binFontBitmap[];
