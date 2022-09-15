@@ -29,11 +29,12 @@ namespace efi { // TODO dont use ns cause C mode!
 
 #include "../shared/boot.hpp"
 #include "../../devices/serial/init.cpp"
-#include "memory.cpp"
-#include "ramdisk.cpp"
-#include "pe.cpp"
-#include "visuals.cpp"
-#include "../../kernel/ramdisk.cpp"
+
+extern const uint8_t binFont[];
+extern const uint8_t binFontBitmap[];
+extern const uint8_t binLeavesBitmap[];
+int64_t _fltused = 0;
+
 
 efi::EFI_HANDLE imageHandle = nullptr;
 efi::EFI_SYSTEM_TABLE *systemTable = nullptr;
@@ -78,8 +79,6 @@ function drawLoading(Framebuffer *framebuffer, uint8_t progress) {
 					  y + (framebuffer->height / 4) * 3, pixel);
 		}
 }
-
-#include "../shared/paging.cpp"
 
 void *memset(void *dest, int32_t e, uint64_t len) {
 	uint8_t *d = (uint8_t *)dest;

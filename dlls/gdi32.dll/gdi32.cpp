@@ -20,7 +20,6 @@
 #endif
 
 #include "gdi32.hpp"
-#include "gdi32Vars.hpp"
 
 void startup() {
 	tofitaDebugLog(L"gdi32.dll startup done");

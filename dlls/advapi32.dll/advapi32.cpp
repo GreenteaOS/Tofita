@@ -20,7 +20,6 @@
 #endif
 
 #include "advapi32.hpp"
-#include "advapi32Vars.hpp"
 
 void startup() {
 	tofitaDebugLog(L"advapi32.dll startup done");

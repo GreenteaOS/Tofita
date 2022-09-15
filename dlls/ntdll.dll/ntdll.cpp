@@ -21,7 +21,6 @@
 
 #include "ntdll.hpp"
 #include "../tofita32.dll/tofita32.cpp"
-#include "ntdllVars.hpp"
 
 extern "C" {
 uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
