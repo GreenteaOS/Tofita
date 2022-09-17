@@ -424,11 +424,13 @@ fun loadExeIntoProcess(file: String, process: UserProcess) {
 		// DLL entry points
 		let dllEntries = PhysicalAllocator.allocateOnePagePreZeroed()
 
+		// TODO parse DLLs in multiple threads
 		let ntdll = loadDll("ntdll.dll", root, exec) // TODO proper path!!!
 		let kernel32 = loadDll("kernel32.dll", root, exec)
 		let gdi32 = loadDll("gdi32.dll", root, exec)
 		let user32 = loadDll("user32.dll", root, exec)
 
+		// TODO resolve in multiple threads (this is readonly operation over list of imports, but not for sections)
 		resolveDllImports(ntdll, root)
 		resolveDllImports(kernel32, root)
 		resolveDllImports(gdi32, root)

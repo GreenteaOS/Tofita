@@ -25,6 +25,7 @@ let classNameLimit = 256u16
 
 fun handleToWindow(hWnd: HWnd): Window {
 	if hWnd == null {
+		// TODO ^ assumes `HWnd?` so must error here or something
 		return null // TODO return desktop
 	}
 	// TODO some bits of HANLDE sould be ignored before reading
@@ -57,25 +58,24 @@ fun windowToHandle(window: Window): HWnd {
 fun registerClassW(wc: WindowClass): Atom {
 	tofitaDebugLog("RegisterClassW called".utf16())
 
-	// TODO use libc func utf16le
-	//var len = 0
 	// TODO lpszClassName takes atoms?
 	// TODO rename to just className, ci to require no \wlpsz[A-Z_][A-z_]+\w/etc prefixes
 	// to avoid headers copy-pasta law (print all places at once)
 
+	// TODO abort if class name is too long (test real limitation)
 	var tail = rootClass
 	// TODO `while let`
 	while tail.next != null {
 		tail = tail.next
+		// TODO error if requested name already registered
 	}
 
 	// TODO sizeOf struct by value(!)
 	// TODO `new ClassesLinkedList()`
 	// TODO just use Hexa Map here
+	// TODO use SEH for string pointer validation? At least check it is not null ptr
 	var list = new ClassesLinkedList(named: String.fromUTF16zUpTo(wc.lpszClassName as! ConstArrayPointer<UInt16>, classNameLimit))
-	//var name = localAlloc(0, len) as! ArrayPointer<UInt16>
 	list.next = null
-
 
 	list.wc = new WindowClass() // TODO `new T() { ...wc }` to make a copy
 	memcpy(list.wc as! ArrayPointer<UInt8>, wc as! ConstArrayPointer<UInt8>, sizeOf<WindowClass>() as! Int)
@@ -86,7 +86,7 @@ fun registerClassW(wc: WindowClass): Atom {
 	tail = tail.next
 
 	tofitaDebugLog("RegisterClassW done".utf16())
-	return 0 as! Atom
+	return 0 as! Atom // TODO make atom
 }
 
 @dllExport('CreateWindowExW')
@@ -109,6 +109,7 @@ fun createWindowExW(
 	// Find class
 	var list = rootClass
 	var name = String.fromUTF16zUpTo(lpClassName as! ConstArrayPointer<UInt16>, classNameLimit)
+	// TODO ^ check string pointer for null/SEH
 	var found = false
 	var wc: WindowClass = null
 
@@ -159,6 +160,7 @@ fun createWindowExW(
 
 	// Create native window counterpart
 	var windowId: UInt64 = tofitaCreateWindowEx(payload)
+	// TODO ^ check the result if it succeeded
 
 	window.windowId = windowId
 	window.windowIsWindowSecret = windowIsWindow
@@ -177,6 +179,7 @@ fun createWindowExW(
 @dllExport('ShowWindow')
 fun showWindow(hWnd: HWnd, nCmdShow: CmdShow): Bool32 {
 	tofitaDebugLog("ShowWindow called".utf16())
+	// TODO ^ remove all debug logs, make them traceable with external tool
 	var window = handleToWindow(hWnd)
 	var result = Bool32.False
 	if window != null {
@@ -207,7 +210,7 @@ fun getMessageW(msg: Msg, hWnd: HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt
 	tofitaDebugLog("GetMessageW called".utf16())
 	var result = Bool32.True // TODO `true`
 
-	var payload: GetMessagePayload = new GetMessagePayload() // TODO not a valid syntax, must =
+	var payload: GetMessagePayload = new GetMessagePayload() // TODO by value
 	payload.msg = msg
 	payload.hWnd = hWnd
 	payload.wMsgFilterMin = wMsgFilterMin
@@ -247,13 +250,12 @@ fun dispatchMessageW(msg: Msg): LResult? {
 		// ERROR_INVALID_HANDLE
 		if msg.message == Message.WM_PAINT {
 			tofitaDebugLog("WM_PAINT".utf16())
-			//
 			result = window.proc(msg.hwnd, msg.message, msg.wParam, msg.lParam)
 		} else {
 			tofitaDebugLog("not_WM_PAINT".utf16())
 			result = window.proc(msg.hwnd, msg.message, msg.wParam, msg.lParam)
 		}
-		// result = ERROR_SUCCESS
+		// TODO result = ERROR_SUCCESS
 	} else {
 		// TODO
 	}
@@ -264,6 +266,7 @@ fun dispatchMessageW(msg: Msg): LResult? {
 @dllExport('PostMessage')
 fun postMessage(hWnd: HWnd, msg: Message, wParam: WParam, lParam: LParam): Bool32 {
 	var payload: PostMessagePayload = new PostMessagePayload()
+	// TODO ^ by value
 	payload.hWnd = hWnd
 	payload.msg = msg
 	payload.wParam = wParam
@@ -287,8 +290,8 @@ fun beginPaint(hWnd: HWnd, ps: PaintStruct): HDc {
 	if window == null {
 		return null
 	}
-	// We do this every time, cause window may be resized
 	let fb = window.fb.ref
+	// We do this every time, cause window may be resized
 	njraaGetOrCreateWindowFramebuffer(window.windowId, fb)
 	let rcPaint = ps.rcPaint.ref
 	rcPaint.left = 0
@@ -297,9 +300,12 @@ fun beginPaint(hWnd: HWnd, ps: PaintStruct): HDc {
 	rcPaint.bottom = fb.height as! Int32
 	tofitaDebugLog("BeginPaint done".utf16())
 	return fb as! HDc
+	// TODO ^ proper HDc implementation (at least as a handle with secret)
 }
 
 // TODO reimplement into SEH writer instead of `if`? is it any safer for overflows? faster? x/y bounds?
+// TODO @inline ?
+// TODO Clang may NOT pass Pixel32 as a single uint32_t in argument and cause perf loss
 @fastcall fun setPixel(fb: WindowFramebuffer, x: Int32, y: Int32, pixel: ByValue<Pixel32>): Void {
 	// TODO merge to single comparison
 	if (x < 0) || (y < 0) {
@@ -318,17 +324,18 @@ fun fillRect(dc: HDc, lprc: Rect, brush: HBrush): Int32 {
 	tofitaDebugLog("FillRect called".utf16())
 
 	var fb = dc as! WindowFramebuffer
-	// TODO validate != null and that it is actually a WindowFramebuffer
+	// TODO validate != null and that it is actually a WindowFrameBuffer
 
 	var color = new ByValue<Pixel32>()
-	// TOOD by val
+	// TODO by val
 	color.ref.color = 0xFFAA0000u32
 
 	for y in lprc.top ... lprc.bottom {
 		for x in lprc.left ... lprc.right {
-			//color.ref.color = 0xFFAA0000u32 +
 			color.ref.color = (x * 256) + (y ^ x) + (y * 255 * 255) + 0u32
+			// TODO respect brush color/style
 			setPixel(fb, x, y, color)
+			// TODO ^ this can be unsafe write, cause within bounds
 		}
 	}
 
@@ -347,6 +354,7 @@ fun endPaint(hWnd: HWnd, ps: PaintStruct): Bool32 {
 	}
 	let fb = window.fb.ref
 	njraaSwapWindowFramebuffer(window.windowId, fb)
+	// TODO ^ could be there multiple End Paint event? Probably swap after primary WM_PAINT
 	tofitaDebugLog("EndPaint done".utf16())
 	return Bool32.True
 }

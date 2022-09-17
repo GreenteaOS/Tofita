@@ -14,35 +14,38 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Bindings to the .asm
+// TODO `@emitHeader@linkAsIs` undesired parsing? also test `@x/*y*/@z`
+// TODO `@linkAsIs` should assume `@emitHeader`?
+@emitHeader @linkAsIs /*@rename('enterKernelMode')*/ declare fun enterKernelMode(): Void
+@emitHeader @linkAsIs /*@rename('selectSegment')*/ declare fun selectSegment(): Void
+@emitHeader @linkAsIs /*@rename('enterUserMode')*/ declare fun enterUserMode(): Void
+@emitHeader @linkAsIs /*@rename('timerInterrupt')*/ declare fun timerInterrupt(): Void
+@emitHeader @linkAsIs /*@rename('syscallInterrupt')*/ declare fun syscallInterrupt(): Void
+@emitHeader @linkAsIs /*@rename('yieldInterrupt')*/ declare fun yieldInterrupt(): Void
+@emitHeader @linkAsIs @volatile /*@rename('getCr2')*/ declare fun getCr2(): UInt64
+@emitHeader @linkAsIs @volatile /*@rename('sehReturnFalse')*/ declare fun sehReturnFalse(): Bool
 
-@rename('enterKernelMode') declare fun enterKernelMode(): Void
-@rename('selectSegment') declare fun selectSegment(): Void
-@rename('enterUserMode') declare fun enterUserMode(): Void
-@rename('timerInterrupt') declare fun timerInterrupt(): Void
-@rename('syscallInterrupt') declare fun syscallInterrupt(): Void
-@rename('yieldInterrupt') declare fun yieldInterrupt(): Void
-@volatile @rename('getCr2') declare fun getCr2(): UInt64
-@volatile @rename('sehReturnFalse') declare fun sehReturnFalse(): Bool
+@emitHeader @linkName('cpu0x00')
+declare fun cpu0x00(): Void
 
-@rename('cpu0x00') declare fun cpu0x00(): Void
-@rename('cpu0x01') declare fun cpu0x01(): Void
-@rename('cpu0x02') declare fun cpu0x02(): Void
-@rename('cpu0x03') declare fun cpu0x03(): Void
-@rename('cpu0x04') declare fun cpu0x04(): Void
-@rename('cpu0x05') declare fun cpu0x05(): Void
-@rename('cpu0x06') declare fun cpu0x06(): Void
-@rename('cpu0x07') declare fun cpu0x07(): Void
-@rename('cpu0x08') declare fun cpu0x08(): Void
-@rename('cpu0x09') declare fun cpu0x09(): Void
-@rename('cpu0x0A') declare fun cpu0x0A(): Void
-@rename('cpu0x0B') declare fun cpu0x0B(): Void
-@rename('cpu0x0C') declare fun cpu0x0C(): Void
-@rename('cpu0x0D') declare fun cpu0x0D(): Void
-@rename('cpu0x0E') declare fun cpu0x0E(): Void
-@rename('cpu0x0F') declare fun cpu0x0F(): Void
-@rename('cpu0x10') declare fun cpu0x10(): Void
-@rename('cpu0x11') declare fun cpu0x11(): Void
-@rename('cpu0x12') declare fun cpu0x12(): Void
-@rename('cpu0x13') declare fun cpu0x13(): Void
-@rename('cpu0x14') declare fun cpu0x14(): Void
-@rename('cpu0x15') declare fun cpu0x15(): Void
+@emitHeader @linkAsIs declare fun cpu0x01(): Void
+@emitHeader @linkAsIs declare fun cpu0x02(): Void
+@emitHeader @linkAsIs declare fun cpu0x03(): Void
+@emitHeader @linkAsIs declare fun cpu0x04(): Void
+@emitHeader @linkAsIs declare fun cpu0x05(): Void
+@emitHeader @linkAsIs declare fun cpu0x06(): Void
+@emitHeader @linkAsIs declare fun cpu0x07(): Void
+@emitHeader @linkAsIs declare fun cpu0x08(): Void
+@emitHeader @linkAsIs declare fun cpu0x09(): Void
+@emitHeader @linkAsIs declare fun cpu0x0A(): Void
+@emitHeader @linkAsIs declare fun cpu0x0B(): Void
+@emitHeader @linkAsIs declare fun cpu0x0C(): Void
+@emitHeader @linkAsIs declare fun cpu0x0D(): Void
+@emitHeader @linkAsIs declare fun cpu0x0E(): Void
+@emitHeader @linkAsIs declare fun cpu0x0F(): Void
+@emitHeader @linkAsIs declare fun cpu0x10(): Void
+@emitHeader @linkAsIs declare fun cpu0x11(): Void
+@emitHeader @linkAsIs declare fun cpu0x12(): Void
+@emitHeader @linkAsIs declare fun cpu0x13(): Void
+@emitHeader @linkAsIs declare fun cpu0x14(): Void
+@emitHeader @linkAsIs declare fun cpu0x15(): Void

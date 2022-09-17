@@ -106,6 +106,7 @@ class RamDisk {
 }
 
 @struct
+// TODO sizeOf
 class UefiPayload {
 	var pml4: UInt64
 	var stack: UInt64

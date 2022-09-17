@@ -258,7 +258,7 @@ function serialPrintf(const wchar_t *c, ...) {
 		switch (*c) {
 		case 's': { // ASCII of UTF-8
 			const uint8_t *string = va_arg(lst, uint8_t *);
-			if (string != null && probeForReadOkay((uint64_t)string, 1)) {
+			if (string != null/* && probeForReadOkay((uint64_t)string, 1)*/) {
 				puts(string);
 			} else {
 				puts(sehLogError);
@@ -267,7 +267,7 @@ function serialPrintf(const wchar_t *c, ...) {
 		case 'S': { // ASCII of UTF-16
 			const uint16_t *string = va_arg(lst, uint16_t *);
 			uint32_t i = 0;
-			if (string != null && probeForReadOkay((uint64_t)string, 2)) {
+			if (string != null/* && probeForReadOkay((uint64_t)string, 2)*/) {
 				while (string[i] != 0) {
 					putchar(string[i] & 0xFF);
 					i++;

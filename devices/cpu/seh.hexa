@@ -23,8 +23,31 @@
 // TODO no need to jump less than per-page!
 // TODO Volatile<T> .read .write => cause whole-byte, avoid bit compression (for Bool etc)
 // ^ the whole point of volatile is *order* of reads and writes
+@customHeader('
+	// Flag
+	volatile bool sehProbe = false;
+
+	volatile bool __attribute__((noinline))
+	hexa_probeForReadOkay_impl(volatile uint64_t at, volatile const uint64_t bytes) {
+		sehProbe = true;
+		// TODO do not probe upper half to not touch mmio from user process while probing
+		// TODO per-page not per-byte
+		volatile const uint8_t *ptr = (volatile const uint8_t *)at;
+		for (uint64_t i = 0; i < bytes; ++i) {
+			at += ptr[i];
+		}
+		sehProbe = false;
+		return true;
+	}
+
+	// This is a fascinating way to not allow compiler to optimize return value
+	extern volatile bool (*volatile const hexa_probeForReadOkay)(volatile uint64_t at, volatile const uint64_t bytes);
+	volatile bool (__fastcall *volatile const hexa_probeForReadOkay)(volatile uint64_t at,
+												 volatile const uint64_t bytes) = hexa_probeForReadOkay_impl;
+')
 @volatile @noInline
-@rename('probeForReadOkay') declare
+@rename('hexa_probeForReadOkay')
+declare
 fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool /*{
 	sehProbe = true
 	// TODO do not probe upper half to not touch mmio from user process while probing
@@ -42,8 +65,28 @@ fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool /*{
 //@volatile Bool (*@volatile const probeForReadOkay)(@volatile at: UInt64,
 //												 @volatile bytes: UInt64) = _probeForReadOkay
 
+@customHeader('
+	volatile bool __attribute__((noinline))
+	hexa_probeForWriteOkay_impl(volatile const uint64_t at, volatile const uint64_t bytes) {
+		sehProbe = true;
+		// TODO per-page not per-byte
+		volatile uint8_t *ptr = (volatile uint8_t *)at;
+		// TODO i also as volatile?
+		for (uint64_t i = 0; i < bytes; ++i) {
+			ptr[i] = ptr[i];
+		}
+		sehProbe = false;
+		return true;
+	}
+
+	// This is a fascinating way to not allow compiler to optimize return value
+	extern volatile bool (*volatile const hexa_probeForWriteOkay)(volatile const uint64_t at,
+														 volatile const uint64_t bytes);
+	volatile bool (__fastcall *volatile const hexa_probeForWriteOkay)(volatile const uint64_t at,
+												  volatile const uint64_t bytes) = hexa_probeForWriteOkay_impl;
+')
 @volatile @noInline
-@rename('probeForWriteOkay') declare
+@rename('hexa_probeForWriteOkay') declare
 fun probeForWriteOkay(@volatile at: UInt64, @volatile bytes: UInt64): Bool /*{
 	sehProbe = true
 	// TODO per-page not per-byte

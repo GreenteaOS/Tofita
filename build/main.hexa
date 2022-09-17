@@ -690,7 +690,7 @@ fun runTasks() {
 		)
 	}
 
-	process.stdout.write('[Processing...')
+	process.stdout.write('[Processing...]\n')
 
 	var currentWave = phase1
 	var busy = 0
@@ -721,11 +721,9 @@ fun runTasks() {
 
 		let cmd = currentWave.shift()
 
-		process.stdout.write('.')
 		if let cmd = cmd {
 			child_process.exec(cmd, fun(error: Bool?, stdout: String, stderr: String) {
 				if error != null {
-					process.stdout.write(']\r\n')
 					console.error('[Build error] ' + cmd)
 					if '' != '' + stdout {
 						console.error(stdout)
@@ -733,7 +731,8 @@ fun runTasks() {
 					if '' != '' + stderr {
 						console.error(stderr)
 					}
-					process.stdout.once('drain', fun () { Process.exit(0) })
+					process.exitCode = 123
+					process.stdout.once('drain', fun () { Process.exit(123) })
 					return
 				}
 
@@ -751,8 +750,6 @@ fun runTasks() {
 				evaluate()
 			}
 		} else if busy == 0 {
-			process.stdout.write(']\r\n')
-
 			if ramDiskTask {
 				packAssets(config)
 			}

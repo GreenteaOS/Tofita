@@ -100,15 +100,12 @@ extern "C" function lgdt(volatile const TablePtr *gdt);
 #include "../dlls/wrappers.hpp"
 #include "../dlls/types.hpp"
 #include "syscalls/syscalls.hpp"
-#include "../devices/cpu/seh.hpp"
 
 extern "C" function guiThreadStart();
 extern "C" function kernelThreadStart();
 
-#include "../devices/cpu/cpu.hpp"
 #include "../devices/cpu/amd64.cpp"
 #include "../devices/serial/log.cpp"
-#include "../devices/cpu/seh.cpp"
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO

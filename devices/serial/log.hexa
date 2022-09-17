@@ -16,6 +16,29 @@
 // Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
 // Check `serialPrintf` to see supported features
 
+// TODO
+/*
+#ifdef UEFI_BOOT_LOADER
+	#define probeForReadOkay(ptr, bytes) 1
+	const uint8_t sehLogError[] = "<STRING IS NULL>";
+#else
+	const uint8_t sehLogError[] = "<STRING IS NULL OR SEH ERROR>";
+#endif
+if (string != null && probeForReadOkay((uint64_t)string, 1)) {
+	puts(string);
+} else {
+	puts(sehLogError);
+}
+if (string != null && probeForReadOkay((uint64_t)string, 2)) {
+	while (string[i] != 0) {
+		putchar(string[i] & 0xFF);
+		i++;
+	}
+} else {
+	puts(sehLogError);
+}
+*/
+
 let serial_register_base = 0x03F8u16
 let serial_baud_rate = 115200
 let serial_clock_rate = 1843200

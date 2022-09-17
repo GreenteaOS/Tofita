@@ -100,6 +100,7 @@ fun loadRamDiskFromVolume(
 }
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
+// ^ TODO encode this in the type itself or return `RamDisk?`
 fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk): EFI_STATUS {
 	var status: EFI_STATUS = EFI_STATUS.EFI_NOT_READY
 	var handleBuffer: ArrayPointer<ByValue<EFI_HANDLE>> = null // TODO `= nullPtr`

@@ -346,7 +346,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	// Note: framebuffer is *not* within physical memory
 	mapFrameBuffer(params.framebuffer.ref)
 	drawLoading(framebuffer, 2)
-	mapUefiRuntime(params.efiMemoryMap.ref)
+	mapEfiRuntime(params.efiMemoryMap.ref)
 	mapMemoryHuge(wholePhysicalStart, 0, ram / pageSize)
 
 	let startFunction = (conventionalOffset + pageSize) as! InitKernelTrampoline

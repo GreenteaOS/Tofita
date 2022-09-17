@@ -27,7 +27,7 @@ class PeHeader {
 }
 
 // 1 byte aligned
-@struct @packed
+@struct @packed @sizeOf(112)
 class Pe32OptionalHeader {
 	var mMagic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
 	var mMajorLinkerVersion: UInt8
