@@ -20,10 +20,7 @@
 #endif
 
 #include "user32.hpp"
-#include "user32Vars.hpp"
 #include "../kernel32.dll/kernel32.hpp"
-
-// Utils
 
 user32::Window *handleToWindow(wapi::HWnd hWnd) {
 	if (hWnd == nullptr)
@@ -331,7 +328,6 @@ wapi::Bool DestroyWindow(wapi::HWnd hWnd) {
 }
 
 void startup() {
-	user32::rootClass.next = nullptr;
 	tofitaDebugLog(L"user32.dll startup done");
 }
 

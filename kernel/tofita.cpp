@@ -109,7 +109,6 @@ extern "C" function kernelThreadStart();
 #include "../devices/cpu/amd64.cpp"
 #include "../devices/serial/log.cpp"
 #include "../devices/cpu/seh.cpp"
-#include "formats/exe/exe.hpp"
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO

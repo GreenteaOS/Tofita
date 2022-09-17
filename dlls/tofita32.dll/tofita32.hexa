@@ -103,11 +103,13 @@ fun tofitaFastSystemCall(rcx: TofitaSyscalls,
 	return tofitaFastSystemCallWrapper(rcx as! TofitaSyscalls, rdx)
 }
 
+@dllExport('tofitaExitProcess')
 fun tofitaExitProcess(exitCode: UInt32): Void {
 	tofitaFastSystemCall(TofitaSyscalls.ExitProcess, exitCode)
 }
 
 @rename('tofitaDebugLog') declare
+@dllExport('tofitaDebugLog')
 fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0): Void
 /*{
 	let payload = new ByValue<DebugLogPayload>()
@@ -119,6 +121,7 @@ fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0,
 	tofitaFastSystemCall(TofitaSyscalls.DebugLog, payload.ref as! UInt64)
 }*/
 
+@dllExport('njraaSwapWindowFramebuffer')
 fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
@@ -126,6 +129,7 @@ fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
 	tofitaFastSystemCall(TofitaSyscalls.SwapWindowFramebuffer, payload as! UInt64)
 }
 
+@dllExport('njraaGetOrCreateWindowFramebuffer')
 fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
@@ -133,10 +137,12 @@ fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): 
 	tofitaFastSystemCall(TofitaSyscalls.GetOrCreateWindowFramebuffer, payload as! UInt64)
 }
 
+@dllExport('tofitaCreateWindowEx')
 fun tofitaCreateWindowEx(payload: CreateWindowExPayload): UInt64 {
 	return tofitaFastSystemCall(TofitaSyscalls.CreateWindowEx as! TofitaSyscalls, payload as! UInt64)
 }
 
+@dllExport('tofitaShowWindow')
 fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow): Void {
 	let payload = new ShowWindowPayload()
 	payload.windowId = windowId
@@ -144,12 +150,14 @@ fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow): Void {
 	tofitaFastSystemCall(TofitaSyscalls.ShowWindow, payload as! UInt64)
 }
 
+@dllExport('tofitaGetMessage')
 fun tofitaGetMessage(payload: GetMessagePayload): Bool32 {
 	// TODO filters
 	// TODO UInt64 -> Bool32 is a lossy conversion, type check it somehow
 	return tofitaFastSystemCall(TofitaSyscalls.GetMessage as! TofitaSyscalls, payload as! UInt64) as! Bool32
 }
 
+@dllExport('tofitaPostMessage')
 fun tofitaPostMessage(payload: PostMessagePayload): Bool32 {
 	return tofitaFastSystemCall(TofitaSyscalls.PostMessage as! TofitaSyscalls, payload as! UInt64) as! Bool32
 }

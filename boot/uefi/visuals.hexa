@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// trampoline.asm . incbin
+// trampoline.asm -> incbin
 @extern @rename('binFont') declare let binFont: ConstArrayPointer<UInt8>
 @extern @rename('binFontBitmap') declare let binFontBitmap: ConstArrayPointer<UInt8>
 let fontWidth: UInt32 = 512
@@ -47,6 +47,7 @@ fun getBitmapPixel(bmp: ConstArrayPointer<UInt8>, x: UInt32, y: UInt32, width: U
 	pixel.ref.g = colors[((height - y - 1) * width + x) * 3 + 1]
 	pixel.ref.r = colors[((height - y - 1) * width + x) * 3 + 2]
 	pixel.ref.a = 0xFF
+	// TODO cache .ref
 	var color = pixel.ref as! ArrayPointer<UInt32>
 	// TODO `@union`
 	return color[0]

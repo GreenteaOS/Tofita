@@ -15,9 +15,8 @@
 
 @struct
 class ClassesLinkedList {
-	// TODO char16_t
 	// TODO let name String (late init)
-	var name: String
+	var name: String // TODO = null or in constructior `new (named: String? = null)`
 	var wc: WindowClass
 	var next: ClassesLinkedList = null // TODO Pointer useless for struct?
 	new (named: String) {

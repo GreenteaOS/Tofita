@@ -34,6 +34,7 @@ fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, 
 	let entry: PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
+		// TODO `.present` is not always means allocated
 		return ((entry.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 	} else {
 		var newPage = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>

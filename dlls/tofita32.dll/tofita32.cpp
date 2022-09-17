@@ -15,7 +15,6 @@
 
 #define TOFITA32_DLL __declspec(dllexport)
 #include "tofita32.hpp"
-#include "tofita32Vars.hpp"
 
 extern "C" {
 // High performance function, that does completely nothing

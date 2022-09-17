@@ -22,6 +22,7 @@ fun exitProcess(exitCode: UInt32) {
 
 @dllExport('LocalAlloc')
 fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal {
+	// TODO better way to take pointer to array element `&buffer[bufferOffset]`
 	var result = (buffer as! UInt64) + bufferOffset
 	bufferOffset += bytes as! UInt64 // TODO .toInt()
 	// Align to 8 bytes
@@ -32,6 +33,7 @@ fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal {
 	// TODO OOM
 	while bufferOffset % 8 != 0 {
 		bufferOffset++
+		// TODO non-loop align
 	}
 	return result as! HLocal
 }
@@ -44,6 +46,11 @@ fun globalAlloc(flags: UInt32, bytes: SizeOfPointer): HGlobal {
 @dllExport('HeapAlloc')
 fun heapAlloc(heap: Handle, flags: UInt32, bytes: SizeOfPointer): ArrayPointer<UInt8> {
 	return localAlloc(0, bytes) as! ArrayPointer<UInt8>
+}
+
+@dllExport('free')
+fun free(pointer: SizeOfPointer): Void {
+	// TODO
 }
 
 // TODO @linkName('_DllMainCRTStartup')

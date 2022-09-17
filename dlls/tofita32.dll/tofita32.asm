@@ -16,6 +16,7 @@
 bits 32
 default rel
 section .head
+; TODO use .text section? This thing creates unnecessary .head section in .dll
 
 global @tofitaFastSystemCallWrapper@8
 @tofitaFastSystemCallWrapper@8:

@@ -16,3 +16,7 @@
 @linkName('LocalAlloc')
 declare
 fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal
+// TODO
+// let kernel32 = "kernel32.dll" (uppercase?)
+// @dllImport(kernel32) (fpc)
+// Generate .dllImport.txt where each line is libgen argument list line-per-dll

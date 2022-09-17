@@ -125,8 +125,8 @@ fun packAssets(config: Config) {
 
 		// Round upto 4 bytes
 		ramDiskSize = Math.ceil(ramDiskSize / 4) * 4
-		console.log('ramDiskSize is', ramDiskSize, 'bytes')
-		console.log('Assets count is', assetName.length)
+		// console.log('ramDiskSize is', ramDiskSize, 'bytes')
+		// console.log('Assets count is', assetName.length)
 
 		let buffer = Buffer.alloc(ramDiskSize) // zeroed
 		buffer.writeUInt32LE(0, 0)
@@ -164,7 +164,7 @@ fun packAssets(config: Config) {
 
 		let ramDiskChecksum = getChecksum()
 		buffer.writeUInt32LE(ramDiskChecksum, 0)
-		console.log('ramDiskChecksum is', ramDiskChecksum)
+		// console.log('ramDiskChecksum is', ramDiskChecksum)
 
 		fs.writeFileSync(folder + '\\spin-off\\TOFITA.DAT', buffer, "binary")
 }

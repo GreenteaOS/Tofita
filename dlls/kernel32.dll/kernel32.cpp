@@ -20,37 +20,12 @@
 #endif
 
 #include "kernel32.hpp"
-#include "kernel32Vars.hpp"
 
 extern "C" {
-void ExitProcess(uint32_t exitCode) {
-	tofitaExitProcess(exitCode);
-	while (true) {};
-}
 
-wapi::HLocal LocalAlloc(uint32_t flags, size_t bytes) {
-	auto result = &kernel32::buffer[kernel32::bufferOffset];
-	kernel32::bufferOffset += bytes;
-	// Align to 8 bytes
-	// Because handle has some bits reserved for tags
-	// TODO how many bits exactly?
-	// TODO also pre-align at CRT startup, cause section may be misaligned
-	while (kernel32::bufferOffset % 8 != 0)
-		kernel32::bufferOffset++;
-	return (wapi::HLocal)result;
-}
 
-wapi::HGlobal GlobalAlloc(uint32_t flags, size_t bytes) {
-	return (wapi::HGlobal)LocalAlloc(0, bytes);
-}
 
-void *HeapAlloc(wapi::Handle heap, uint32_t flags, size_t bytes) {
-	return (void *)LocalAlloc(0, bytes);
-}
 
-void *malloc(size_t bytes) {
-	return (void *)LocalAlloc(0, bytes);
-}
 
 void startup() {
 	tofitaDebugLog(L"kernel32.dll startup done");

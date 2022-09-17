@@ -22,39 +22,44 @@ enum AddressAwareness : UInt8 {
 	Bit64limit128TB = 0x0004 // Default on newer kernels (compatibility mode)
 }
 
+// More https://wiki.osdev.org/Paging#Page_Directory
+
+/// Page Table Entry
+// TODO split each level to separate type!
 /// Lowest level entry or higher if `largePage` bit set
 @struct @packed @sizeOf(8)
 class PageEntry {
-	/// If false then causes #PF
+	/// P: If false then causes #PF
 	@bits(1) var present: UInt8
 
-	/// RW
+	/// R/W: RO if not set
 	// TODO RW causes #PF or #GPF?
 	// TODO The WP bit in CR0 determines if this is only applied to user land,
 	// always giving the kernel write access (the default) or both user land and the kernel
 	// (see Intel Manuals 3A 2-20)
 	@bits(1) var writeAllowed: UInt8
 
-	/// User mode allowed
+	/// U/S: User mode allowed
 	@bits(1) var accessibleByAll: UInt8
 
-	/// Write through
+	/// PWT: Write through
 	@bits(1) var writeThrough: UInt8
 
 	/// TODO difference between `writeThrough`
+	// PCD: If the bit is set, the page will not be cached
 	@bits(1) var cacheDisabled: UInt8
 
-	/// Used by LRU (whether a PDE or PTE was read during virtual address translation)
+	/// A: Used by LRU (whether a PDE or PTE was read during virtual address translation)
 	@bits(1) var accessed: UInt8
 
-	/// Was overwritten, PTE only
+	/// D: Was overwritten, PTE only
 	@bits(1) var dirty: UInt8
 
-	/// Huge page or epic page
+	/// PS: Huge page or epic page
 	@bits(1) var largePage: UInt8
 
 	// TODO
-	/// Do not invalidate the TLB entry upon a MOV to CR3 instruction
+	/// G: Do not invalidate the TLB entry upon a MOV to CR3 instruction
 	@bits(1) var global: UInt8
 
 	/*
@@ -73,18 +78,18 @@ class PageEntry {
 	^ https://wiki.osdev.org/Paging extra nuances apply
 	^ PS is `largePage`
 	*/
-	/// Available to the OS
+	/// AVL: Available to the OS
 	@bits(3) var payload: UInt8
 
 	/// Physical address of the target
 	@bits(40) var address: UInt64
 
-	/// Available to the OS
+	/// AVL: Available to the OS
 	@bits(7) var extra: UInt8
 
-	/// Protection Key
+	/// PK: Protection Key
 	@bits(4) var protectionKey: UInt8
 
-	/// NX-bit
+	/// XD/NX-bit: Instructions are not allowed to be executed at addresses within the page
 	@bits(1) var disableExecution: UInt8
 }

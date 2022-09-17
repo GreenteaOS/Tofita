@@ -33,6 +33,7 @@ fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool /*{
 	@volatile let ptr = at as! @volatile ArrayPointer<UInt8>
 	// TODO VolatilePointer
 	for i in bytes {
+		// TODO i += 4096
 		at += ptr[i]
 	}
 	sehProbe = false

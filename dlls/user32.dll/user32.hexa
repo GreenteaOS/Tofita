@@ -18,7 +18,10 @@
 // TODO Test real limitation
 let classNameLimit = 256u16
 
+//
 // Utils
+//
+// TODO regions and separate modules
 
 fun handleToWindow(hWnd: HWnd): Window {
 	if hWnd == null {
@@ -46,7 +49,10 @@ fun windowToHandle(window: Window): HWnd {
 	return window as! HWnd
 }
 
+//
 // WAPI
+//
+
 @dllExport('RegisterClassW')
 fun registerClassW(wc: WindowClass): Atom {
 	tofitaDebugLog("RegisterClassW called".utf16())
@@ -362,6 +368,24 @@ fun defWindowProcW(hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam): L
 	}
 	tofitaDebugLog("DefWindowProcW done".utf16())
 	return null
+}
+
+@dllExport('DestroyWindow')
+fun destroyWindow(hWnd: HWnd): Bool32 {
+	tofitaDebugLog("DestroyWindow called".utf16())
+	return Bool32.False // TODO
+
+	var window = handleToWindow(hWnd)
+	if window == null {
+		// TODO ^ guard (not just if let)
+		return Bool32.False
+	}
+
+	// TODO probably should be async post?
+	window.proc(hWnd, Message.WM_DESTROY, null, null)
+	window.proc(hWnd, Message.WM_NCDESTROY, null, null)
+	tofitaDebugLog("DestroyWindow done".utf16())
+	return Bool32.False // TODO false?
 }
 
 @linkName('NO_DllMainCRTStartup')
