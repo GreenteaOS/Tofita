@@ -71,15 +71,21 @@ fun tofitaHexaFree(pointer: #if bit64 UInt64 #else UInt32 #end, size: UInt32) {
 	wrapFree(pointer, size)
 }
 
+//
+// Tofita
+//
+
 // High performance function, that does completely nothing
 // TODO link names
 @fastcall
+@dllExport('tofitaFastStub')
 fun tofitaFastStub(rcx: UInt64, rdx: UInt64): UInt32 {
 	tofitaDebugLog("--> tofitaFastStub --> rcx=%8 rdx=%8".utf16(), rcx, rdx)
 	return 0
 }
 
 @stdcall
+@dllExport('tofitaStdStub')
 fun tofitaStdStub(arg: ConstArrayPointer<UInt8>): UInt32 {
 	tofitaDebugLog("--> tofitaStdStub --> arg=%8".utf16(), arg as! UInt64)
 	return 0
@@ -88,20 +94,21 @@ fun tofitaStdStub(arg: ConstArrayPointer<UInt8>): UInt32 {
 // External
 @emitHeader
 #if bit64
-@fastcall
 @linkName('tofitaFastSystemCallWrapper')
 #else
+@fastcall // Expected convention by assembly
 @linkName('@tofitaFastSystemCallWrapper@8')
 #end
 declare fun tofitaFastSystemCallWrapper(rcx: TofitaSyscalls, rdx: #if bit64 UInt64 #else UInt32 #end): #if bit64 UInt64 #else UInt32 #end
 
 // Return value is placed into RAX
+// Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 #if bit64
 @dllExport('tofitaFastSystemCall')
+@fastcall // TODO same for 32bit?
 #else
 @dllExport('@tofitaFastSystemCall@8')
 #end
-@fastcall
 fun tofitaFastSystemCall(rcx: TofitaSyscalls,
 #if bit64
 	rdx: UInt64 = 0
@@ -114,29 +121,35 @@ fun tofitaFastSystemCall(rcx: TofitaSyscalls,
 	return tofitaFastSystemCallWrapper(rcx as! TofitaSyscalls, rdx)
 }
 
+//
+// Kernel32
+//
+
 @dllExport('tofitaExitProcess')
 fun tofitaExitProcess(exitCode: UInt32): Void {
 	tofitaFastSystemCall(TofitaSyscalls.ExitProcess, exitCode)
 }
 
-@rename('tofitaDebugLog') declare
 @dllExport('tofitaDebugLog')
-fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0): Void
-/*{
+fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0): Void {
 	let payload = new ByValue<DebugLogPayload>()
 	// TODO @stack
 	// TODO ^ optimize to allocate on stack, some lifetime flag on creation and usage?
 	payload.ref.message = message as! ConstArrayPointer<UInt16>
 	payload.ref.extra = extra
 	payload.ref.more = more
-	tofitaFastSystemCall(TofitaSyscalls.DebugLog, payload.ref as! UInt64)
-}*/
+	tofitaFastSystemCall(TofitaSyscalls.DebugLog, payload.ref as! Payload)
+}
 
 #if bit64
 	declare Payload = UInt64
 #else
 	declare Payload = UInt32
 #end
+
+//
+// NjRAA
+//
 
 @dllExport('njraaSwapWindowFramebuffer')
 fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
@@ -153,6 +166,10 @@ fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): 
 	payload.fb = fb
 	tofitaFastSystemCall(TofitaSyscalls.GetOrCreateWindowFramebuffer, payload as! Payload)
 }
+
+//
+// User32
+//
 
 @dllExport('tofitaCreateWindowEx')
 fun tofitaCreateWindowEx(payload: CreateWindowExPayload): UInt64 {

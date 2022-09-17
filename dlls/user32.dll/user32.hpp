@@ -13,13 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "../ntdll.dll/ntdll.hpp"
-#include "../tofita32.dll/tofita32.hpp"
 
-#ifndef USER32_DLL
-	#ifdef bit64
-		#define USER32_DLL __declspec(dllimport)
-	#else
-		#define USER32_DLL __declspec(dllimport) __stdcall
-	#endif
-#endif

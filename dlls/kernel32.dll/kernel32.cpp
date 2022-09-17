@@ -28,7 +28,6 @@ extern "C" {
 
 
 void startup() {
-	tofitaDebugLog(L"kernel32.dll startup done");
 }
 
 #ifdef bit64

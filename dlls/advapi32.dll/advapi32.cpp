@@ -19,10 +19,7 @@
 	#define ADVAPI32_DLL __declspec(dllexport) __stdcall
 #endif
 
-#include "advapi32.hpp"
-
 void startup() {
-	tofitaDebugLog(L"advapi32.dll startup done");
 }
 
 #ifdef bit64

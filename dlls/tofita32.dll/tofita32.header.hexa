@@ -27,25 +27,25 @@ declare fun tofitaFastSystemCall(rcx: TofitaSyscalls,
 // TODO link name + dll import
 @fastcall declare fun tofitaFastStub(rcx: UInt64, rdx: UInt64): UInt32
 @stdcall declare fun tofitaStdStub(arg: ConstArrayPointer<UInt8>): UInt32
-@rename('tofitaDebugLog')
+@dllImport @linkAsIs
 declare fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0): Void
 
 // Kernel32
-@rename('tofitaExitProcess')
+@dllImport @linkAsIs
 declare fun tofitaExitProcess(exitCode: UInt32): Void
 
 // User32
-@rename('cast_tofitaCreateWindowEx')
+@dllImport @linkAsIs
 declare fun tofitaCreateWindowEx(payload: CreateWindowExPayload): UInt64
-@rename('tofitaShowWindow')
+@dllImport @linkAsIs
 declare fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow): Void
-@rename('cast_tofitaGetMessage')
+@dllImport @linkAsIs
 declare fun tofitaGetMessage(payload: GetMessagePayload): Bool32
-@rename('cast_tofitaPostMessage')
+@dllImport @linkAsIs
 declare fun tofitaPostMessage(payload: PostMessagePayload): Bool32
 
 // NjRAA
-@rename('cast_njraaGetOrCreateWindowFramebuffer')
+@dllImport @linkAsIs
 declare fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void
-@rename('cast_njraaSwapWindowFramebuffer')
+@dllImport @linkAsIs
 declare fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void

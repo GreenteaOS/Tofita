@@ -19,10 +19,7 @@
 	#define GDI32_DLL __declspec(dllexport) __stdcall
 #endif
 
-#include "gdi32.hpp"
-
 void startup() {
-	tofitaDebugLog(L"gdi32.dll startup done");
 }
 
 #ifdef bit64
