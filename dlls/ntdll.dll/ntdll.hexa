@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun kiFastSystemCall(rcx: UInt64, rdx: UInt64): UInt64 {
+fun kiFastSystemCall(rcx: UInt64, rdx: Payload): UInt64 {
 	return tofitaFastSystemCall(rcx as! TofitaSyscalls, rdx)
 }
 

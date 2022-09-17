@@ -45,9 +45,6 @@ uint32_t tofitaFastSystemCall(TofitaSyscalls rcx, uint32_t rdx)
 	return tofitaFastSystemCallWrapper(rcx, rdx);
 }
 
-void tofitaExitProcess(uint32_t exitCode) {
-	tofitaFastSystemCall(TofitaSyscalls::ExitProcess, exitCode);
-}
 
 void tofitaDebugLog(const wchar_t *message, uint64_t extra, uint64_t more) {
 	DebugLogPayload payload;
@@ -55,39 +52,5 @@ void tofitaDebugLog(const wchar_t *message, uint64_t extra, uint64_t more) {
 	payload.extra = extra;
 	payload.more = more;
 	tofitaFastSystemCall(TofitaSyscalls::DebugLog, (uint64_t)&payload);
-}
-
-void njraaSwapWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb) {
-	SwapWindowFramebufferPayload payload;
-	payload.windowId = windowId;
-	payload.fb = fb;
-	tofitaFastSystemCall(TofitaSyscalls::SwapWindowFramebuffer, (uint64_t)&payload);
-}
-
-void njraaGetOrCreateWindowFramebuffer(uint64_t windowId, nj::WindowFramebuffer *fb) {
-	SwapWindowFramebufferPayload payload;
-	payload.windowId = windowId;
-	payload.fb = fb;
-	tofitaFastSystemCall(TofitaSyscalls::GetOrCreateWindowFramebuffer, (uint64_t)&payload);
-}
-
-uint64_t tofitaCreateWindowEx(CreateWindowExPayload *payload) {
-	return tofitaFastSystemCall(TofitaSyscalls::CreateWindowEx, (uint64_t)payload);
-}
-
-void tofitaShowWindow(uint64_t windowId, int32_t nCmdShow) {
-	ShowWindowPayload payload;
-	payload.windowId = windowId;
-	payload.nCmdShow = nCmdShow;
-	tofitaFastSystemCall(TofitaSyscalls::ShowWindow, (uint64_t)&payload);
-}
-
-wapi::Bool tofitaGetMessage(GetMessagePayload *payload) {
-	// TODO filters
-	return (wapi::Bool)tofitaFastSystemCall(TofitaSyscalls::GetMessage, (uint64_t)payload);
-}
-
-wapi::Bool tofitaPostMessage(PostMessagePayload *payload) {
-	return (wapi::Bool)tofitaFastSystemCall(TofitaSyscalls::PostMessage, (uint64_t)payload);
 }
 }

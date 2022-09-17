@@ -15,7 +15,13 @@
         {
             "name": "default",
             "generator": "c",
-            "output": "kernel32.c",
+            "output": "kernel32.64.c",
+            "options": []
+        },
+        {
+            "name": "i386",
+            "generator": "c",
+            "output": "kernel32.32.c",
             "options": []
         }
     ],

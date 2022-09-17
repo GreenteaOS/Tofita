@@ -15,7 +15,13 @@
         {
             "name": "default",
             "generator": "c",
-            "output": "ntdll.c",
+            "output": "ntdll.64.c",
+            "options": []
+        },
+        {
+            "name": "i386",
+            "generator": "c",
+            "output": "ntdll.32.c",
             "options": []
         }
     ],

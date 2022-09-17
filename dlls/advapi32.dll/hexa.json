@@ -9,7 +9,13 @@
         {
             "name": "default",
             "generator": "c",
-            "output": "advapi32.c",
+            "output": "advapi32.64.c",
+            "options": []
+        },
+        {
+            "name": "i386",
+            "generator": "c",
+            "output": "advapi32.32.c",
             "options": []
         }
     ],

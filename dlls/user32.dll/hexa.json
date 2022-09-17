@@ -16,7 +16,13 @@
         {
             "name": "default",
             "generator": "c",
-            "output": "user32.c",
+            "output": "user32.64.c",
+            "options": []
+        },
+        {
+            "name": "i386",
+            "generator": "c",
+            "output": "user32.32.c",
             "options": []
         }
     ],

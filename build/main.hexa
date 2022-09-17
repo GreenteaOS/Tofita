@@ -571,7 +571,11 @@ fun runTasks() {
 
 				// TODO per-32/64-arch
 				// TODO libgen txt list here, to .lib in phase 2
-				phase1.push('cmd /c hexa dlls\\\(dlls[i]).dll\\hexa.json')
+				if bit == '32' {
+					phase1.push('cmd /c hexa --define bit64=false dlls\\\(dlls[i]).dll\\hexa.json --target i386')
+				} else {
+					phase1.push('cmd /c hexa --define bit64=true dlls\\\(dlls[i]).dll\\hexa.json --target default')
+				}
 
 				// TODO refactor
 				var asm = ' '
@@ -702,13 +706,14 @@ fun runTasks() {
 				// LIB GEN
 				for i in dlls.length {
 					let named = dlls[i]
-					let items = fs.readFileSync('dlls\\\(named).dll\\\(named).c.dllExport.txt').toString()
+					let items64 = fs.readFileSync('dlls\\\(named).dll\\\(named).64.c.dllExport.txt').toString()
+					let items32 = fs.readFileSync('dlls\\\(named).dll\\\(named).32.c.dllExport.txt').toString()
 					let gen =
 						(
-							' bit named ' + config.tempFolder + '/' + teaFolder + '/!named.bit.lib ' + items
-						).replaceAll('named', named)
-					phase2.push(libgen + gen.replaceAll('bit', '64'))
-					phase2.push(libgen + gen.replaceAll('bit', '32'))
+							' bit named ' + config.tempFolder + '/' + teaFolder + '/!named.bit.lib '
+						)
+					phase2.push(libgen + (gen + items64).replaceAll('named', named).replaceAll('bit', '64'))
+					phase2.push(libgen + (gen + items32).replaceAll('named', named).replaceAll('bit', '32'))
 				}
 
 				currentWave = phase2

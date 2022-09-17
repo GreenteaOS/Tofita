@@ -12,7 +12,13 @@
         {
             "name": "default",
             "generator": "c",
-            "output": "gdi32.c",
+            "output": "gdi32.64.c",
+            "options": []
+        },
+        {
+            "name": "i386",
+            "generator": "c",
+            "output": "gdi32.32.c",
             "options": []
         }
     ],
