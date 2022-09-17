@@ -13,13 +13,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <stdint.h>
+#include <stddef.h>
+
 #ifdef bit64
 	#define KERNEL32_DLL __declspec(dllexport)
 #else
 	#define KERNEL32_DLL __declspec(dllexport) __stdcall
 #endif
 
-#include "kernel32.hpp"
+#include "../ntdll.dll/ntdll.hpp"
 
 extern "C" {
 

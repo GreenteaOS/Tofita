@@ -13,14 +13,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <stdint.h>
+#include <stddef.h>
+
 #ifdef bit64
 	#define USER32_DLL __declspec(dllexport)
 #else
 	#define USER32_DLL __declspec(dllexport) __stdcall
 #endif
 
-#include "user32.hpp"
-#include "../kernel32.dll/kernel32.hpp"
+#include "../ntdll.dll/ntdll.hpp"
 
 	}
 

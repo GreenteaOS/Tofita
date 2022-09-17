@@ -14,8 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdint.h>
-#include "../wrappers.hpp"
-#include "../types.hpp"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)

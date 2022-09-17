@@ -234,7 +234,7 @@ for task in ['tasks'] {
 								'-fno-stack-check',
 								'-fshort-wchar',
 								'-mno-ms-bitfields -fno-threadsafe-statics',
-								'-ferror-limit=2000',
+								'-ferror-limit=10',
 								'-Dbit\(bit)',
 								'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw',
 								'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4', // Unsupported
@@ -543,7 +543,7 @@ fun runTasks() {
 
 				'-mno-ms-bitfields -fno-threadsafe-statics',
 				'-Wno-address-of-temporary',
-				'-fshort-wchar -mno-red-zone -O0 -ferror-limit=1000',
+				'-fshort-wchar -mno-red-zone -O0 -ferror-limit=10',
 				' -c ',
 				'boot/uefi/boot.cpp',
 				' -o ',
@@ -596,7 +596,7 @@ fun runTasks() {
 						'-fno-stack-check',
 						'-fshort-wchar',
 						'-mno-ms-bitfields -fno-threadsafe-statics',
-						'-ferror-limit=2000',
+						'-ferror-limit=10',
 						'-Dbit\(bit)',
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw',
 						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4', // Unsupported
@@ -667,7 +667,7 @@ fun runTasks() {
 				// TODO disable C++ mode
 				//'-O1 -ferror-limit=1000 ',
 				debuggie? '-fno-omit-frame-pointer' : '-fomit-frame-pointer',
-				'-ferror-limit=100',
+				'-ferror-limit=10',
 				'-w',
 				'-Wno-address-of-temporary',
 				debuggie? '-g -O2' : '-O2',

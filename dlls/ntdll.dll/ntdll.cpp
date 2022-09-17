@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <stdint.h>
+#include <stddef.h>
+
 #ifdef bit64
 	#define NTDLL32_DLL __declspec(dllexport)
 #else
@@ -370,7 +373,7 @@ void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, vo
 
 	tofitaDebugLog(L"Done DLLs");
 
-	tofitaExitProcess(entry(nullptr, nullptr, nullptr, 0));
+	tofitaExitProcess_(entry(nullptr, nullptr, nullptr, 0));
 	while (true) {};
 }
 }

@@ -340,7 +340,7 @@ fun kernelThread() {
 	}
 }
 
-@rename('guiThreadStart')
+@emitHeader @linkAsIs
 declare fun guiThreadStart(): Void
 
 // In case of kernel crash set instruction pointer to here
@@ -350,7 +350,7 @@ fun kernelThreadLoop() {
 		amd64.pause()
 	}
 }
-@rename('kernelThreadStart')
+@emitHeader @linkAsIs
 declare fun kernelThreadStart(): Void
 
 fun guiThread() {

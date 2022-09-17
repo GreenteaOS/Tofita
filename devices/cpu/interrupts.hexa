@@ -70,7 +70,8 @@ fun writePort(@volatile port: UInt16, @volatile value: UInt8) {
 	portOutb(port, value)
 }
 
-@rename('loadIdt') declare fun loadIdt(@volatile idtr: Idtr): Void
+@emitHeader @linkAsIs
+declare fun loadIdt(@volatile idtr: Idtr): Void
 
 enum Selector : UInt64 {
 	SYS_CODE64_SEL = 0x10 // Execute/Read
@@ -123,7 +124,8 @@ fun initializeKeyboard(entry: IdtEntry) {
 
 // Handling mouse interrupts
 @rename('mouseHandler')
-@extern declare fun mouseHandler(): Void
+@linkName('mouseHandler')
+declare fun mouseHandler(): Void
 fun initializeMouse(entry: IdtEntry) {
 	var mouseAddress: UInt64 = ((mouseHandler as! UInt64))
 	entry.offsetLowerBits = mouseAddress & 0xFFFFu16
@@ -239,7 +241,8 @@ declare class TablePtr {
 	new ()
 }
 
-@rename('lgdt') declare fun lgdt(@volatile gdt: TablePtr): Void
+@emitHeader @linkAsIs
+declare fun lgdt(@volatile gdt: TablePtr): Void
 
 // TODO @bitMask
 enum GdtType : UInt8 {
@@ -595,8 +598,8 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 	}
 }
 
-@rename('setTsr')
-declare fun setTsr(@volatile tsr_data: UInt16): Void
+@emitHeader @linkAsIs
+declare fun setTsr(@volatile tsrData: UInt16): Void
 
 // 16 records
 // TODO let
