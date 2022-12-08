@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020-2022  Oleg Petrenko
+// Copyright (C) 2020-2022 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
