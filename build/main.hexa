@@ -571,6 +571,7 @@ fun runTasks() {
 
 				// TODO per-32/64-arch
 				// TODO libgen txt list here, to .lib in phase 2
+				// TODO --define bit32
 				if bit == '32' {
 					phase1.push('cmd /c hexa --define bit64=false dlls\\\(dlls[i]).dll\\hexa.json --target i386')
 				} else {
@@ -665,7 +666,7 @@ fun runTasks() {
 				'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -Wimplicit-function-declaration ',
 				optimizationFeatures,
 				// TODO disable C++ mode
-				//'-O1 -ferror-limit=1000 ',
+				//'-O1 -ferror-limit=10 ',
 				debuggie? '-fno-omit-frame-pointer' : '-fomit-frame-pointer',
 				'-ferror-limit=10',
 				'-w',
@@ -698,6 +699,7 @@ fun runTasks() {
 
 	var currentWave = phase1
 	var busy = 0
+	var maxBusy = 0
 
 	fun evaluate() {
 		if busy == 0 and currentWave.length == 0 {
@@ -750,6 +752,10 @@ fun runTasks() {
 			})
 
 			busy++
+
+			if busy > maxBusy {
+				maxBusy = busy
+			}
 
 			if currentWave.length != 0 {
 				evaluate()
@@ -809,7 +815,7 @@ fun runTasks() {
 				)
 			}
 
-			console.log("[All tasks finished in \(Date.now() - begin) ms]")
+			console.log("[All tasks finished in \(Date.now() - begin) ms, upto \(maxBusy) parallel tasks performed]")
 			process.stdout.once('drain', fun () { Process.exit(0) })
 		}
 	}

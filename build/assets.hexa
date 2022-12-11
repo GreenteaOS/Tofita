@@ -25,6 +25,7 @@ let tea = '\\' + teaFolder
 let dlls = [
 	// Order is important
 	'ntdll',
+	// TODO { name: 'ntdll', deps: [] },
 	'kernel32',
 	'gdi32',
 	'user32',

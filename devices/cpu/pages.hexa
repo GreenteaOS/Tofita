@@ -55,6 +55,7 @@ class PageAddressView {
 	@bits(9) var pdpt: UInt64 = 0
 	@bits(9) var pml4: UInt64 = 0
 	@bits(16) var padding: UInt64 = 0
+	// new () // TODO
 }
 
 fun getPageAddressView(virtualAddr: UInt64): ByValue<PageAddressView> {

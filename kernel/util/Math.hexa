@@ -18,22 +18,29 @@ class Math {
 		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5))
 	}
 
-	static float sqrt(float number) {
+	fun sqrt(number: Float32): Float32 {
 		var i: Int32
-		const float threehalfs = 1.5F
 		var x2: Float32
 		var y: Float32
+		let threehalfs: Float32 = 1.5f32
 
-		x2 = number * 0.5F
+		x2 = number * 0.5f32
 		y = number
-		i = *(Int32 *)&y // floating point bit level hacking [sic]
+
+		var y: ArrayByValue<Float32, 1> = [y]
+
+		// Floating point bit level hacking [sic]
+		i = (y as! ArrayPointer<Int32>)[0]
 		i = 0x5f3759df - (i >> 1) // Newton's approximation
-		y = *(float *)&i
+
+		var i: ArrayByValue<Int32, 1> = [i]
+
+		var y = (i as! ArrayPointer<Float32>)[0]
 		y = y * (threehalfs - (x2 * y * y)) // 1st iteration
 		y = y * (threehalfs - (x2 * y * y)) // 2nd iteration
 		y = y * (threehalfs - (x2 * y * y)) // 3rd iteration
 
-		return 1.0f / y
+		return 1.0f32 / y
 	}
 
 	static fun min(a: Int32, b: Int32): Int32 {

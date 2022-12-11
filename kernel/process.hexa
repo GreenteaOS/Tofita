@@ -59,8 +59,6 @@ let messagesBufferSize: UInt64 = 256
 
 fun getOrCreateMessagesBuffer(@volatile process: UserProcess): /*TODO wapi.*/[Msg]? {
 	if process.messages == null {
-		let bytes: UInt64 = sizeOf<Msg>() * messagesBufferSize
-
 		process.messages = []
 		process.messagesUsed = 0
 

@@ -233,7 +233,7 @@ let irq14 = 46u16
 let irq15 = 47u16
 
 @struct @packed @sizeOf(10)
-@asIs // TODO
+@asIs
 @rename('TablePtr')
 declare class TablePtr {
 	var limit: UInt16
@@ -698,10 +698,7 @@ fun dumpGDT(desc: GdtDescriptorEx) {
 }
 
 fun setupInterruptsAndExceptions() {
-	serialPrintln("[cpu] initializing lgdt")
-
 	var sizeof_TssEntry: UInt16 = sizeOf<TssEntry>() as! UInt16
-	serialPrintf("[cpu] sizeof_TssEntry 104 = %u == %u\n", sizeof_TssEntry, sizeOf<TssEntry>())
 
 	memset(globalTss as! ArrayPointer<UInt8>, 0, sizeof_TssEntry)
 	globalTss.iomap_offset = sizeof_TssEntry
@@ -718,18 +715,6 @@ fun setupInterruptsAndExceptions() {
 	globalTss.ist[5] = ist5stack.ref as! UInt64
 	globalTss.ist[6] = ist6stack.ref as! UInt64
 	globalTss.ist[7] = ist7stack.ref as! UInt64
-
-	serialPrint("[cpu] RSP[0] points to: ")
-	serialPrintHex((globalTss.rsp[0] as! UInt64))
-	serialPrint("\n")
-
-	serialPrint("[cpu] RSP[1] points to: ")
-	serialPrintHex((globalTss.rsp[1] as! UInt64))
-	serialPrint("\n")
-
-	serialPrint("[cpu] RSP[2] points to: ")
-	serialPrintHex((globalTss.rsp[2] as! UInt64))
-	serialPrint("\n")
 
 	var tssBase: UInt64 = globalTss as! UInt64
 
@@ -762,22 +747,13 @@ fun setupInterruptsAndExceptions() {
 	// globalGdtr.limit = sizeOf(gdtTemplate) - 1
 	globalGdtr.limit = (4 * 32) - 1u16
 	globalGdtr.base = gdtTemplate.ref as! UInt64
-	serialPrint("[cpu] GDTR points to: ")
-	serialPrintHex(globalGdtr as! UInt64)
-	serialPrint("\n")
-	serialPrint("[cpu] GDT points to: ")
-	serialPrintHex((globalGdtr.base as! UInt64))
-	serialPrint("\n")
-	serialPrintf("[cpu] GDT size is %u == %u\n", globalGdtr.limit, 0x7F)
-	serialPrintln("[cpu] Calling lgdt")
 	lgdt(globalGdtr)
-	serialPrintln("[cpu] Calling ltr")
 	{
 		setTsr(64)
 		// TODO setTsr(64 + 3)
 	}
 
-	serialPrintln("[cpu] Initializing unknown interrupts")
+	serialPrintln("[cpu] Initializing interrupts")
 
 	// TODO 286 magic number
 	for i in 286 {
@@ -828,10 +804,8 @@ fun setupInterruptsAndExceptions() {
 	serialPrint("\n")
 	serialPrintf("[cpu] IDT size is %u of %u elements of %u==16 size\n", cacheIdtr.limit, idt_size,
 				 sizeOf<IdtEntry>())
-	serialPrintln("[cpu] loading IDTR")
 	// Before you implement the IDT, make sure you have a working GDT
 	remapPic()
-	serialPrintln("[cpu] calling lidtq")
 	loadIdt(cacheIdtr)
 
 	serialPrintln("[cpu] Select segments of value SYS_CODE64_SEL & SYS_DATA32_SEL")

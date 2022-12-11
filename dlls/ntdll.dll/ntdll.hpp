@@ -28,14 +28,12 @@
 #else
 	__declspec(dllexport) const wchar_t* _wcmdln asm("_wcmdln") = L"_wcmdln TODO";
 #endif
-
 // TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
 extern "C" {
 NTDLL32_DLL uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) asm("KiFastSystemCall");
 
 #define STUB(name) NTDLL32_DLL uint32_t name(void* value) asm(#name);
 #define LSTUB(name, link) NTDLL32_DLL uint32_t name(void* value) asm("*" #link);
-
 LSTUB(LeaveCriticalSection, eaveCriticalSection)
 LSTUB(LoadLibraryExW, oadLibraryExW)
 LSTUB(LCMapStringW, CMapStringW)

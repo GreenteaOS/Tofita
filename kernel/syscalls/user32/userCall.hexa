@@ -92,7 +92,6 @@ fun userCallHandled(@volatile process: UserProcess, syscall: TofitaSyscalls): Bo
 	}
 
 	if syscall == TofitaSyscalls.PostMessage {
-
 		if !probeForReadOkay(frame.rdxArg1, sizeOf<PostMessagePayload>()) {
 			return false
 		}
@@ -144,6 +143,7 @@ fun userCallHandled(@volatile process: UserProcess, syscall: TofitaSyscalls): Bo
 				fb.height = window.fbGama.height
 			}
 		} else {
+			serialPrintln("TofitaSyscalls.SwapWindowFramebuffer window.fbZeta == null")
 		}
 
 		//		if window != null {

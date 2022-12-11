@@ -25,6 +25,7 @@
 @emitHeader @linkAsIs @volatile /*@rename('getCr2')*/ declare fun getCr2(): UInt64
 @emitHeader @linkAsIs @volatile /*@rename('sehReturnFalse')*/ declare fun sehReturnFalse(): Bool
 
+// TODO @customHeader('void cpu0x00')
 @emitHeader @linkName('cpu0x00')
 declare fun cpu0x00(): Void
 

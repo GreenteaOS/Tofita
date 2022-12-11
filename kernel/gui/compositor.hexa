@@ -65,8 +65,6 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 		bitmap = wallpaper
 	}
 
-	serialPrintln("[compositor.setWallpaper] downscale 8x")
-
 	var blurScale: UInt8 = 8
 
 	var downscale: Bitmap32 = allocateBitmap(
@@ -89,11 +87,7 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 		}
 	}
 
-	serialPrintln("[compositor.setWallpaper] blur")
-
 	var blur: Bitmap32 = gaussBlur(downscale, 4)
-
-	serialPrintln("[compositor.setWallpaper] upscale 8x")
 
 	// Upscale
 	var upscaleLight: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)

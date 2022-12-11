@@ -73,7 +73,8 @@ fun loadRamDiskFromVolume(
 		return status
 	}
 
-	let status = file.read(file, size, address[0] as! EFI_HANDLE)
+	// TODO size.ref
+	let status = file.read(file, size.ref, address[0] as! EFI_HANDLE)
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status: Read %d\n", status)
 
 	let status = file.close(file)
@@ -115,7 +116,7 @@ fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk): EFI_STATUS
 	status = bootsvc.locateHandleBuffer(
 		EFI_LOCATE_SEARCH_TYPE.ByProtocol,
 		simpleFileSystemProtocol,
-		null,
+		0,
 		handleCountStorage.ref,
 		handleBufferStorage.ref
 	)

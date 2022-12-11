@@ -31,14 +31,14 @@ function libc_free(void *addr) {
 
 void *libc_malloc(uint64_t size) {
 	serialPrintf(L"[libc] libc_malloc of size %u\n", size);
-	return (void *)(kernelParams? PhysicalAllocator_$allocateBytes_(size) : PhysicalAllocator::allocateBytes(size));
+	return (void *)(kernelParams? PhysicalAllocator_$allocateBytes_(size) : /*PhysicalAllocator::allocateBytes(size)*/0);
 }
 
 void *libc_realloc(void *addr, uint64_t size) {
 	serialPrintf(L"[libc] libc_realloc %u of size %u\n", addr, size);
 
 	{
-		uint64_t result = kernelParams? PhysicalAllocator_$allocateBytes_(size) : PhysicalAllocator::allocateBytes(size);
+		uint64_t result = kernelParams? PhysicalAllocator_$allocateBytes_(size) : /*PhysicalAllocator::allocateBytes(size)*/0;
 		return (void *)result;
 	}
 }
