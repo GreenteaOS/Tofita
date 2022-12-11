@@ -1,14 +1,22 @@
 @echo off
 color 0A
 
-:: You must fix R:\ paths and copy OVMF.fd to QEMU folder to run this
+:: You must set proper paths to run this
 
-set QEMU="C:\Program Files\qemu\"
-cd /d %QEMU%
+set DRIVE=C
+set QEMU="C:\Program Files\qemu\qemu-system-x86_64.exe"
+set OVMF="..\Teapot\OVMF.fd"
 
+%QEMU% -accel tcg -bios %OVMF% -m 2048 ^
+    -vga std -machine pc-q35-2.10 ^
+    -serial file:%DRIVE%:\Tea\qemu.log -cpu max,x2apic=off ^
+    -smp 4 ^
+    -cdrom %DRIVE%:\Tea\greenteaos-uefi64.iso ^
+    -name "Greentea QEMU" -monitor stdio
+::    -drive format=raw,file=fat:rw:%DRIVE%:\Tea\spin-off ^
+::pause
+
+:: Possible settings
 :: -accel tcg
 :: -accel whpx
-
-qemu-system-x86_64.exe -accel tcg -bios OVMF.fd -m 2048 -vga std -machine pc-q35-2.10 -serial file:R:\tcg.txt -cpu max,x2apic=off -smp 2 -drive format=raw,file=fat:rw:R:\tofita\iso -name "Greentea OS" -monitor stdio
-
-::pause
+:: -accel whpx,kernel-irqchip=off

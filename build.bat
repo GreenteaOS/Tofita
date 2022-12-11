@@ -17,10 +17,16 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 echo [36m[Success][0m
 ATTRIB +S .
+
+:: Start VMs or tools
+::tools\qemu-vfat.bat
+::cd /d "C:\Program Files\Oracle\VirtualBox"
+::VBoxManage startvm "Tofita"
 ::node build.js vbox
 ::node tools\vbox.js
 ::node tools\listen.js
 ::node tools\pipe.js
+
 goto done
 :somethingbad
 echo [37m[41m[Exiting on error][0m
