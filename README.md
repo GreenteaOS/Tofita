@@ -21,6 +21,7 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 - Very low on resources, just 2 GB RAM minimum required
 - Motherboard with SATA (AHCI) or NVMe, PCIe and USB 2.0+
 - Multicore modern 64-bit CPU (most AMD and Intel CPUs from [Q3 2011 and newer](https://github.com/GreenteaOS/Greentea/blob/kawaii/Developer-Guide/CPUID.md#notes-on-cpu-compatibility))
+  - Try [Greentea OS Compatibility Assistant on your PC](https://t.me/s/greenteaos_official/7)
 
 [![Give a star](docs/star.png?raw=true)](https://github.com/GreenteaOS/Tofita/stargazers)
 
@@ -37,6 +38,8 @@ Help to hire developers and buy hardware
 - [`vbox.js`](tools/vbox.js) - starts VirtualBox Tofita VM and exits
 - [`webui.bat`](tools/webui/webui.bat) - web-based UI for COM port
 - [`gos-devlist.bat`](tools/gos-devlist.bat) - show useful device names and PCI IDs to gather user hardware stats
+- [`OVMF.fd`](https://t.me/s/greenteaos_official/6) - speed of light UEFI bootloader for QEMU
+- [`Greentea OS Compat`](https://t.me/s/greenteaos_official/7) - Greentea OS compatibility assistant
 
 ## Build
 
