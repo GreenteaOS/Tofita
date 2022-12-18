@@ -63,6 +63,7 @@ let link = '\(teapot)\\\(llvm)\\bin\\lld-link.exe'
 let xorriso = '\(teapot)\\xorriso-1.5.2\\xorriso.exe'
 let mmd = '\(teapot)\\mtools\\mmd.exe'
 let mcopy = '\(teapot)\\mtools\\mcopy.exe'
+let libgen = '\(teapot)\\libgen.exe'
 
 // NOTE Splitting into separate lines helps review process
 let warn = if config.warnings {
@@ -174,13 +175,14 @@ for task in ['tasks'] {
 					[
 						clang + ' ',
 						'-O2 -x c++ -std=c++2a -fno-stack-protector -fshort-wchar -w -mno-red-zone -Wall -Wextra ',
-						'-D versionRolling=' + versionRolling + ' ',
-						'-D versionName=\\"' + versionName + '\\" ',
 						'-target x86_64-pc-win32-coff -fno-stack-protector',
 						'-fomit-frame-pointer',
 						'-DGNU_EFI_USE_MS_ABI -DGNU_EFI_USE_EXTERNAL_STDARG',
 						'-Iexternal/inc -Iexternal/inc/x86_64 -DEFI_FUNCTION_WRAPPER',
 						'-DUEFI_BOOT_LOADER',
+						'-D versionRolling=' + versionRolling, // TODO used?
+						'-D versionName=\\"' + versionName + '\\"', // TODO used?
+						// TODO ^ do we need name anymore? iOS has no names
 						'-D versionMajor=' + versionMajor,
 						'-D versionMinor=' + versionMinor,
 						'-D versionTag=' + versionTag,
@@ -231,6 +233,7 @@ for task in ['tasks'] {
 								'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles',
 								'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w',
 								'-mtune=nocona -fno-stack-protector -mno-red-zone',
+								'-fno-rtti -fno-exceptions -fvisibility=default', // TODO hidden?
 								'-fno-stack-check',
 								'-fshort-wchar',
 								'-mno-ms-bitfields -fno-threadsafe-statics',
@@ -238,6 +241,7 @@ for task in ['tasks'] {
 								'-Dbit\(bit)',
 								'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw',
 								'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4', // Unsupported
+								'-fomit-frame-pointer',
 								'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp',
 								'-o',
 								outobj
@@ -276,6 +280,9 @@ for task in ['tasks'] {
 						clang,
 						'-D versionRolling=' + versionRolling,
 						'-D versionName=\\"' + versionName + '\\"', // TODO too
+						'-D versionMajor=' + versionMajor,
+						'-D versionMinor=' + versionMinor,
+						'-D versionTag=' + versionTag,
 
 						'-mtune=nocona -fno-stack-protector -fshort-wchar -mno-red-zone ',
 						'-fno-stack-check ',
@@ -293,6 +300,7 @@ for task in ['tasks'] {
 						optimizationFeatures,
 						// TODO disable C++ mode
 						debuggie? '-fno-omit-frame-pointer' : '-fomit-frame-pointer',
+						'-ferror-limit=10',
 						'-Wno-address-of-temporary',
 						debuggie? '-g -O2' : '-O2',
 						'-x c++ -std=c++2a -c kernel/tofita.cpp -o ',
@@ -809,6 +817,7 @@ fun runTasks() {
 					[
 						xorriso,
 						'-as mkisofs -o \(path)/greenteaos-uefi64.iso -iso-level 3',
+						// TODO try to use .img not in spin-off folder to avoid duplication
 						'-V GreenteaOS \(path)/spin-off -append_partition 2 0xef \(path)/DISK.IMG',
 						'-e --interval:appended_partition_2:all:: -no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
