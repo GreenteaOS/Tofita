@@ -61,7 +61,7 @@
         {
             "name": "default",
             "generator": "c",
-            "output": "kernel.c",
+            "output": "kernel-diff/kernel.c",
             "options": []
         }
     ],
