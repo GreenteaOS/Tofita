@@ -237,12 +237,14 @@ fun kernelThread() {
 	serialPrintln("<Tofita> [kernelThread] thread started")
 
 	// TODO move to preTest with infinite loop on fail
-	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)Pointer.of(currentThread), 1))
-	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)Pointer.of(guiStack), 1))
-	serialPrintf("<seh> 0 == %u\n", probeForReadOkay((uint64_t)-1, 1))
-	serialPrintf("<seh> 1 == %u\n", probeForReadOkay((uint64_t)Pointer.of(switchToNextProcess), 1))
-	serialPrintf("<seh> 0 == %u\n", probeForReadOkay(321, 1))
-	serialPrintf("<seh> 0 == %u\n", probeForReadOkay(999999999, 1))
+	serialPrintf("<seh> before\n")
+	//serialPrintf("<seh> 0 == %u\n", probeForReadOkay(321, 1))
+	//serialPrintf("<seh> 1 == %u\n", probeForReadOkay(currentThread as! UInt64, 1))
+	//serialPrintf("<seh> 0 == %u\n", probeForReadOkay(999999999, 1))
+	//serialPrintf("<seh> 1 == %u\n", probeForReadOkay(guiStack as! UInt64, 1))
+	//serialPrintf("<seh> 0 == %u\n", probeForReadOkay(-1u64, 1)) // TODO `-1u64` is invalid, also fix `~1`
+	//serialPrintf("<seh> 1 == %u\n", probeForReadOkay(switchToNextProcess as! UInt64, 1))
+	serialPrintf("<seh> done\n")
 
 	while true {
 		// TODO optimize cast to 1u64
