@@ -1,65 +1,15 @@
+# Ignore all but Tofita
+*.*
+*:*
+
 # Tofita
-build.js
-node_modules
-*.exe
-*.dll
-
-# Temp
-*DS_Store
-*DS_Store*
-*.tmp
-*~*
-.AppleDouble
-.LSOverride
-# Icon must end with two \r
-Icon\r
-Icon
-# Thumbnails
-._*
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# Image file caches
-Thumbs.db
-ehthumbs.db
-# Folder config file
-Desktop.ini
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-# Shortcuts
-*.lnk
-
-# Junk
-*.c
-*.h
-*.cpp
-*.cxx
-*.hpp
-*.S
-*.s
-*.o
-*.a
-*:encryptable
+!*.reg
+!*.hexa
+!*.json
 report.*.json
-
-# Temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-# KDE directory preferences
-.directory
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
-tools/gos-devlist.txt
-assets/desktop
-OVMF.fd
+.*
+~*
+$*
+!*.dll/
+!.github
+!.vscode

@@ -196,7 +196,7 @@ class WindowClass {
 	var hCursor: HCursor
 	var hbrBackground: HBrush
 	var lpszMenuName: ConstArrayPointer<ClangWideChar>
-	var lpszClassName: ConstArrayPointer<ClangWideChar>
+	var utf16zClassName: ConstArrayPointer<ClangWideChar>
 	new () {}
 }
 

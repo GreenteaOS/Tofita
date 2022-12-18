@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /// Shared memory allocator for Hexa projects
+// TODO maybe make tofita.c separate project that includes ntdll?
 
 //
 // Hexa

@@ -28,7 +28,7 @@ fun handleToWindow(hWnd: HWnd): Window {
 		// TODO ^ assumes `HWnd?` so must error here or something
 		return null // TODO return desktop
 	}
-	// TODO some bits of HANLDE sould be ignored before reading
+	// TODO some bits of HANDLE should be ignored before reading
 	// and comparison
 	if hWnd == invalid_handle_value {
 		return null
@@ -51,14 +51,14 @@ fun windowToHandle(window: Window): HWnd {
 }
 
 //
-// WAPI
+// API
 //
 
 @dllExport('RegisterClassW')
 fun registerClassW(wc: WindowClass): Atom {
 	tofitaDebugLog("RegisterClassW called".utf16())
 
-	// TODO lpszClassName takes atoms?
+	// TODO utf16zClassName takes atoms? then utf16zClassName PossiblyAtom .toString
 	// TODO rename to just className, ci to require no \wlpsz[A-Z_][A-z_]+\w/etc prefixes
 	// to avoid headers copy-pasta law (print all places at once)
 
@@ -74,7 +74,7 @@ fun registerClassW(wc: WindowClass): Atom {
 	// TODO `new ClassesLinkedList()`
 	// TODO just use Hexa Map here
 	// TODO use SEH for string pointer validation? At least check it is not null ptr
-	var list = new ClassesLinkedList(named: String.fromUTF16zUpTo(wc.lpszClassName as! ConstArrayPointer<UInt16>, classNameLimit))
+	var list = new ClassesLinkedList(named: String.fromUTF16zUpTo(wc.utf16zClassName as! ConstArrayPointer<UInt16>, classNameLimit))
 	list.next = null
 
 	list.wc = new WindowClass() // TODO `new T() { ...wc }` to make a copy
@@ -89,6 +89,7 @@ fun registerClassW(wc: WindowClass): Atom {
 	return 0 as! Atom // TODO make atom
 }
 
+// TODO extract to createWindowEx taking Hexa Strings and be called from W and A
 @dllExport('CreateWindowExW')
 fun createWindowExW(
 	dwExStyle: UInt32,

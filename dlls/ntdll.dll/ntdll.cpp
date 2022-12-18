@@ -68,7 +68,7 @@ STUB(GetModuleHandleExW)
 STUB(GetModuleHandleW)
 STUB(GetOEMCP)
 STUB(GetProcAddress)
-uint32_t GetProcessHeap(void* value) { tofitaDebugLog(L"STUB --> called %S with value %u", (uint64_t)L"GetProcessHeap", (uint64_t)value); return 0xCAFECAFE; }
+uint32_t GetProcessHeap(void* value = nullptr) { tofitaDebugLog(L"STUB --> called %S with value %u", (uint64_t)L"GetProcessHeap", (uint64_t)value); return 0xCAFECAFE; }
 STUB(GetStartupInfoW)
 STUB(GetStdHandle)
 STUB(GetStringTypeW)

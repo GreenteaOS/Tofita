@@ -190,8 +190,8 @@ fun mapEfiRuntime(memoryMap: UefiMemoryMap) {
 	while offset < endOfMemoryMap {
 		if 0 != (descriptor.attribute & efi_memory_runtime) {
 			// TODO pointer fixups
-			// TODO should be RW or RO?
-			// Note: in VirtualBox, PhysicalStart seems way beyound RAM bounds
+			// TODO should be RW or RO? NX?
+			// Note: in VirtualBox, physicalStart seems way beyond RAM bounds
 			// Seems like fixup should be applied only if PhysicalStart < ramBytes?
 			mapMemory(descriptor.physicalStart, descriptor.physicalStart, descriptor.numberOfPages, 1u8)
 			sum += descriptor.numberOfPages

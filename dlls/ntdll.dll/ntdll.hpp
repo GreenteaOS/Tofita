@@ -28,7 +28,7 @@
 #else
 	__declspec(dllexport) const wchar_t* _wcmdln asm("_wcmdln") = L"_wcmdln TODO";
 #endif
-// TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
+
 extern "C" {
 
 #define STUB(name) NTDLL32_DLL uint32_t name(void* value) asm(#name);
