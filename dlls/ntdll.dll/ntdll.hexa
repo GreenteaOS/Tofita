@@ -27,6 +27,11 @@ declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason
 @rename('hexa_pid') declare let hexa_pid: UInt64 // TOSO size_r
 @rename('hexa_dllEntries') declare let hexa_dllEntries: UInt64 // TOSO size_r
 
+@dllExport('memset')
+fun memset(value: UInt32) {
+	// TODO !!
+}
+
 enum DllEntryReason : UInt32 {
 	DLL_PROCESS_ATTACH = 1
 }
