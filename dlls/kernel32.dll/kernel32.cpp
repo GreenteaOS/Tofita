@@ -25,12 +25,45 @@
 #include "../ntdll.dll/ntdll.hpp"
 
 extern "C" {
+#define HEXA_NO_DEFAULT_INCLUDES
+#define HEXA_MAIN mainHexa
+#define HEXA_NEW(z) ((void*)0)
+#define HeapAlloc(z,...) ((void*)0)
+#define strlen(z) 0
+#define memcpy(z,...) {}
+#define wprintf(z,...) {}
+#define HEAP_ZERO_MEMORY ((void*)0)
+#define fflush(z) {}
+#define HEXA_UNREACHABLE(z) {}
+#define stdout ((void*)0)
+int64_t _fltused = 0;
 
+#ifdef bit64
+#else
+int64_t __alldiv() asm("__alldiv");
+int64_t __alldiv() { return 0; } // TODO
 
+int64_t __allrem() asm("__allrem");
+int64_t __allrem() { return 0; } // TODO
 
+uint64_t __aulldiv() asm("__aulldiv");
+uint64_t __aulldiv() { return 0; } // TODO
 
+uint64_t __aullrem() asm("__aullrem");
+uint64_t __aullrem() { return 0; } // TODO
+
+void _memset() asm("_memset");
+void _memset() { } // TODO TODO TODO
+#endif
+
+#ifdef bit64
+	#include "kernel32.64.c"
+#else
+	#include "kernel32.32.c"
+#endif
 
 void startup() {
+	// TODO hexa
 }
 
 #ifdef bit64

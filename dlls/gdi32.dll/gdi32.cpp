@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <stdint.h>
+#include <stddef.h>
+
 #ifdef bit64
 	#define GDI32_DLL __declspec(dllexport)
 #else

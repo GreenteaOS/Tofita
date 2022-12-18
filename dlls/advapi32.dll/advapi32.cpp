@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <stdint.h>
+#include <stddef.h>
+
 #ifdef bit64
 	#define ADVAPI32_DLL __declspec(dllexport)
 #else
@@ -30,5 +33,6 @@ extern "C" __attribute__((fastcall)) void _DllMainCRTStartup() {
 // TODO must take proper arguments on 32-bit (like DLL_ATTACH)
 extern "C" __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 	startup();
+	// TODO must return something?
 }
 #endif

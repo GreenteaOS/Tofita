@@ -30,6 +30,7 @@ typedef void function;
 #define Void void
 #define Pointer(to) to *
 
+#if 0
 extern "C++"
 template<typename T, uint32_t s, uint32_t t> struct checkSize {
 	static_assert(s == t, "wrong size");
@@ -44,6 +45,7 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof");
 #define STR(x) STR_IMPL_(x) // indirection to expand argument macros
 
 // Constants
+#endif
 // Start of kernel sections in memory
 #define KernelVirtualBase (uint64_t)0xffff800000000000
 #define FramebufferStart (KernelVirtualBase + 768 * 1024 * 1024)
@@ -55,6 +57,7 @@ _Static_assert(sizeof(char16_t) == 2, "bad sizeof");
 #define WholePhysicalStart (FramebufferStart + 128 * 1024 * 1024)
 #define PAGE_SIZE 4096 // 4 KiB
 
+#if 0
 extern "C++" template <typename T> struct Physical {
 	uint64_t physical;
 
@@ -74,3 +77,4 @@ extern "C++" template <typename T> struct Physical {
 };
 
 _Static_assert(sizeof(Physical<char8_t>) == sizeof(uint64_t), "physical address has to have 64 bits");
+#endif

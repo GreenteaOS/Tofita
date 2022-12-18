@@ -20,7 +20,8 @@ extern "C" {
 #include <stdint.h>
 
 namespace efi { // TODO dont use ns cause C mode!
-#include <efi.hpp>
+typedef void *EFI_HANDLE;
+typedef void VOID;
 }
 
 #include <stddef.h>
@@ -35,17 +36,107 @@ extern const uint8_t binFontBitmap[];
 extern const uint8_t binLeavesBitmap[];
 int64_t _fltused = 0;
 
+extern "C++" {
+template <int v>
+struct display_non_zero_int_value;
+template <>
+struct display_non_zero_int_value<0> { static constexpr bool foo = true; };
+static constexpr int v = sizeof(int);
+//static_assert(v == 0 && display_non_zero_int_value<v>::foo, "v == 0");
+}
 
 efi::EFI_HANDLE imageHandle = nullptr;
-efi::EFI_SYSTEM_TABLE *systemTable = nullptr;
+struct EFI_SYSTEM_TABLE_;
+EFI_SYSTEM_TABLE_
+*systemTable = nullptr;
 
-#define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), __VA_ARGS__)
+#define Virtual_$Any_ void
+#define Physical_$Any_ void
+#define ArrayByValue_$uint16_t$Any_ void
+
+#define HEAP_ZERO_MEMORY 0
+#define stdout 0
+#define HANDLE void*
+
+static void ExitProcess(int32_t x) {
+}
+
+static void wprintf(const wchar_t* x, const void* y) {
+	serialPrintf(x, y);
+}
+
+static void fflush(void* x) {/*serialPrint(L"fflush;\n");*/}
+
+static void free(void* x) {/*serialPrint(L"free;\n");*/}
+
+static uint32_t strlen(const char *x) {
+	serialPrint(L"strlen;\n");
+	return kstrlen((const uint8_t *)x);
+}
+
+static void printf(const void* x,...) {serialPrint(L"printf;\n");}
+#define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), ## __VA_ARGS__)
+
+#define HEAP_C 655360
+static uint8_t heap[HEAP_C] = {0};
+static uint64_t heapOffset = 0;
+static void* HeapAlloc(int8_t x,int8_t u, uint64_t size) {
+	// size = ((size - 1) | 7) + 1; // Align by 8
+	size = ((size - 1) | 15) + 1; // Align by 16
+	if (size < 16) size = 16;
+	heapOffset += 8;
+	heapOffset += size;
+	if (heapOffset >= HEAP_C) {
+		serialPrint(L"Heap overflow\n");
+		serialPrint(L"Heap overflow\n");
+		serialPrint(L"Heap overflow\n");
+		while (1) {};
+	}
+	return &heap[heapOffset - size];
+}
+
+#define WriteFile(x,y,z,t,r) {}
+#define FlushFileBuffers(x) {}
+#define GetStdHandle(x) 0
+
+void *tmemcpy(void *dest, const void *src, uint64_t count);
+//extern "C" static
+void memcpy(void* x,const void* y,uint64_t z) {
+	serialPrintf(L"memcpy %8 %8 %u;\n", x,y,z);
+	tmemcpy(x,y,z);
+	serialPrintf(L"memcpy done %8 %8 %u;\n", x,y,z);
+}
+
+#define GetProcessHeap() 0
+#define DWORD uint32_t
+using namespace efi; // TODO remove this
+#define HEXA_NO_DEFAULT_INCLUDES
 
 // CR3 trampoline
 extern "C" function __attribute__((fastcall))
 trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
 			  volatile uint64_t entry);
+#include "../uefi.c"
+#if 0
+_Static_assert(sizeof(efi::EFI_GUID) == sizeof(EFI_GUID_), "sizeof");
+_Static_assert(sizeof(efi::EFI_TABLE_HEADER) == sizeof(EFI_TABLE_HEADER_), "sizeof");
+_Static_assert(sizeof(efi::EFI_SYSTEM_TABLE) == sizeof(EFI_SYSTEM_TABLE_), "sizeof");
+_Static_assert(sizeof(efi::EFI_RUNTIME_SERVICES) == sizeof(EFI_RUNTIME_SERVICES_), "sizeof");
+_Static_assert(sizeof(efi::EFI_BOOT_SERVICES) == sizeof(EFI_BOOT_SERVICES_), "sizeof");
+_Static_assert(sizeof(efi::EFI_CONFIGURATION_TABLE) == sizeof(EFI_CONFIGURATION_TABLE_), "sizeof");
+_Static_assert(sizeof(efi::EFI_STATUS) == sizeof(uint64_t), "sizeof");
+_Static_assert(sizeof(efi::EFI_GRAPHICS_OUTPUT_PROTOCOL) == sizeof(EFI_GRAPHICS_OUTPUT_PROTOCOL_), "sizeof");
+_Static_assert(sizeof(efi::EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE) == sizeof(EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE_), "sizeof");
+_Static_assert(sizeof(efi::EFI_GRAPHICS_OUTPUT_MODE_INFORMATION) == sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION_), "sizeof");
+_Static_assert(sizeof(efi::EFI_PIXEL_BITMASK) == sizeof(EFI_PIXEL_BITMASK_), "sizeof");
+_Static_assert(sizeof(efi::EFI_MEMORY_DESCRIPTOR) == sizeof(EFI_MEMORY_DESCRIPTOR_), "sizeof");
+_Static_assert(sizeof(efi::EFI_TIME_CAPABILITIES) == sizeof(EFI_TIME_CAPABILITIES_), "sizeof");
+_Static_assert(sizeof(efi::EFI_SIMPLE_FILE_SYSTEM_PROTOCOL) == sizeof(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_), "sizeof");
+_Static_assert(sizeof(efi::EFI_FILE_PROTOCOL) == sizeof(EFI_FILE_PROTOCOL_), "sizeof");
+_Static_assert(sizeof(efi::EFI_TIME) == sizeof(EFI_TIME_), "sizeof");
+#endif
 
+#if 0
 efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
 	efi::INT32 *g1, *g2, r;
 	g1 = (efi::INT32 *)guid1;
@@ -56,6 +147,7 @@ efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
 	r |= g1[3] - g2[3];
 	return r;
 }
+#endif
 
 void *tmemcpy(void *dest, const void *src, uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
@@ -68,6 +160,7 @@ void *tmemcpy(void *dest, const void *src, uint64_t count) {
 	return dest;
 }
 
+#if 0
 // Loading animation, progress 0...2
 function drawLoading(Framebuffer *framebuffer, uint8_t progress) {
 	for (uint8_t y = 0; y < leavesHeight; y++)
@@ -79,6 +172,7 @@ function drawLoading(Framebuffer *framebuffer, uint8_t progress) {
 					  y + (framebuffer->height / 4) * 3, pixel);
 		}
 }
+#endif
 
 void *memset(void *dest, int32_t e, uint64_t len) {
 	uint8_t *d = (uint8_t *)dest;
@@ -88,6 +182,7 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	return dest;
 }
 
+#if 0
 struct ACPITableHeader {
 	uint32_t type;
 	uint32_t length;
@@ -144,12 +239,17 @@ struct ACPI {
 	uint8_t checksum20;
 	uint8_t reserved[3];
 };
+#endif
 
 // Entry point
-efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle__, efi::EFI_SYSTEM_TABLE *systemTable__) {
+/*efi::EFI_STATUS*/uint64_t efi_main(/*efi::EFI_HANDLE*/void* imageHandle__, /*efi::EFI_SYSTEM_TABLE*/void *systemTable__) {
 	imageHandle = imageHandle__;
-	systemTable = systemTable__;
-
+	systemTable = (EFI_SYSTEM_TABLE_*)systemTable__;
+	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
+	if (systemTable) {
+		HEXA_MAIN(0, nullptr);
+	}
+#if 0
 	initSerial();
 	serialPrint(L"\n[[[efi_main]]] Tofita " versionName " UEFI bootloader. Welcome!\n");
 
@@ -487,7 +587,8 @@ efi::EFI_STATUS efi_main(efi::EFI_HANDLE imageHandle__, efi::EFI_SYSTEM_TABLE *s
 	serialPrint(L"\n");
 
 	startFunction((uint64_t)params, (uint64_t)paging::pml4entries, stack, upper + mAddressOfEntryPoint);
+#endif
 
-	return EFI_SUCCESS;
+	return 0;//EFI_SUCCESS;
 }
 }

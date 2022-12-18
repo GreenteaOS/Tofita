@@ -21,6 +21,7 @@
 #undef pow
 #undef memcpy
 
+#if 0
 Bitmap32 *loadPng32FromBuffer(uint8_t *data, uint32_t size) {
 	int32_t width, height, png_bpp;
 	uint8_t *colors = stbi_load_from_memory(data, size, &width, &height, &png_bpp, 4);
@@ -42,3 +43,4 @@ Bitmap32 *loadPng32FromBuffer(uint8_t *data, uint32_t size) {
 Bitmap32 *loadPng32(const RamDiskAsset *asset) {
 	return loadPng32FromBuffer(asset->data, asset->size);
 }
+#endif

@@ -26,12 +26,14 @@
 
 extern "C" {
 uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
-	return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
+	//TODO return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
+	return 0;
 }
 
+#define tofitaDebugLog(...) {};
 const wchar_t stubText[] = L"STUB --> called %S with value %u";
 #define STUB(name) uint32_t name(void* value) { tofitaDebugLog(stubText, (uint64_t)L"" #name, (uint64_t)value); return 0; }
-
+/*
 STUB(CloseHandle)
 STUB(CompareStringW)
 STUB(CreateFileW)
@@ -333,6 +335,7 @@ STUB(ceil)
 STUB(modf)
 STUB(_finite)
 STUB(_isnan)
+*/
 STUB(free)
 
 #ifdef bit64
@@ -345,6 +348,81 @@ STUB(free)
 typedef bool(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
 typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow);
 
+#define HEXA_NO_DEFAULT_INCLUDES
+#define HEXA_MAIN mainHexa
+#define HEAP_C 4096 * 16
+static volatile uint8_t heap[HEAP_C] = {0};
+static volatile uint64_t heapOffset = 0;
+static void* HeapAlloc(volatile int8_t x,volatile void* u, volatile uint64_t size) {
+	// size = ((size - 1) | 7) + 1; // Align by 8
+	size = ((size - 1) | 15) + 1; // Align by 16
+	if (size < 16) size = 16;
+	heapOffset += 8;
+	heapOffset += size;
+	if (heapOffset >= HEAP_C) {
+		tofitaDebugLog(L"!!! Heap overflow !!!\n");
+		while (1) {};
+	}
+	auto result = (void *)&heap[heapOffset - size];
+	tofitaDebugLog(L"HeapAlloc %u bytes at %8", size, (uint64_t)result);
+	return result;
+}
+static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, volatile int8_t x,volatile void* u, volatile uint64_t size) {
+	tofitaDebugLog(L"NTHeapAllocAt %s:%d\n", (uint64_t)functionName, lineNumber);
+	return HeapAlloc(x, u, size);
+}
+#define HeapAlloc(a, b, c) HeapAllocAt(__LINE__, __FILE__, __func__, a, b, c)
+#define HEXA_NEW(z) HeapAllocAt(__LINE__, __FILE__, __func__, 0,nullptr,z)
+
+#define strlen(z) 0
+void *tmemcpy(void *dest, const void *src, uint64_t count) {
+	uint8_t *dst8 = (uint8_t *)dest;
+	const uint8_t *src8 = (const uint8_t *)src;
+
+	while (count--) {
+		*dst8++ = *src8++;
+	}
+
+	return dest;
+}
+#define memcpy(z,u,x) tmemcpy(z,u,x)
+#define wprintf(z,...) {}
+#define HEAP_ZERO_MEMORY ((void*)0)
+#define GetProcessHeap() 0
+#define fflush(z) {}
+#define free(z) {}
+#define HEXA_UNREACHABLE(z) {}
+#define stdout ((void*)0)
+int64_t _fltused = 0;
+
+#ifdef bit64
+#else
+int64_t __alldiv() asm("__alldiv");
+int64_t __alldiv() { return 0; } // TODO
+
+int64_t __allrem() asm("__allrem");
+int64_t __allrem() { return 0; } // TODO
+
+uint64_t __aulldiv() asm("__aulldiv");
+uint64_t __aulldiv() { return 0; } // TODO
+
+uint64_t __aullrem() asm("__aullrem");
+uint64_t __aullrem() { return 0; } // TODO
+
+void _memset() asm("_memset");
+void _memset() { } // TODO TODO TODO
+#endif
+
+ExeEntry hexa_entry;
+uint64_t hexa_pid;
+uint64_t hexa_dllEntries;
+
+#ifdef bit64
+	#include "ntdll.64.c"
+#else
+	#include "ntdll.32.c"
+#endif
+
 // TODO Hehe just use uint32_t for PIDs
 void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, void* dllEntries) asm("greenteaosIsTheBest");
 void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, void* dllEntries) {
@@ -355,22 +433,30 @@ void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, vo
 	// TODO load DLLs in usermode
 	_wcmdln = L"_wcmdln";
 
+	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
+	heapOffset = 0;
+	hexa_entry = entry;
+	hexa_pid = (uint64_t)pid;
+	hexa_dllEntries = (uint64_t)dllEntries;
+	HEXA_MAIN(0, nullptr);
+
 	#ifdef bit64
 		tofitaDebugLog(L"64-bit CRT ready for PID %u", (uint64_t)pid);
 	#else
 		tofitaDebugLog(L"32-bit CRT ready for PID %u", (uint64_t)pid);
 	#endif
 
-	auto count = (size_t*)dllEntries;
+	size_t count = dllEntries? ((size_t*)dllEntries)[0] : 0;
 	auto dllMains = (DllEntry*)dllEntries;
 	size_t i = 0;
 	auto DLL_PROCESS_ATTACH = 1;
 
-	while (i < count[0]) {
+	while (i < count) {
 		i++;
 		dllMains[i](nullptr, DLL_PROCESS_ATTACH, nullptr);
 	}
 
+	// TODO unmap entries/etc if required
 	tofitaDebugLog(L"Done DLLs");
 
 	tofitaExitProcess_(entry(nullptr, nullptr, nullptr, 0));

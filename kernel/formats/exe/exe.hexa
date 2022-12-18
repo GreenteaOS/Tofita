@@ -159,6 +159,7 @@ fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
 
 					// TODO `#ifdef _WIN64`
 				case IMAGE_REL_BASED_DIR64: {
+					// TODO should be no-op on 32 bit
 					var patchAddr64 = (dest + offset) as! ArrayPointer<Int64>
 					serialPrintf("[loadDLL] dest=%8\n", dest)
 					serialPrintf("[loadDLL] offset=%8\n", offset)
@@ -172,6 +173,7 @@ fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
 					// TODO `#endif`
 
 				case _:
+					// TODO loader should fail
 					serialPrintf("[loadDLL] Unknown relocation: %d\n", type)
 					//break
 				}

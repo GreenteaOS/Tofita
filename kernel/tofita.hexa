@@ -95,6 +95,7 @@ fun kernelInit(params: UefiPayload) {
 
 	// disablePic()
 	setupInterruptsAndExceptions()
+	// TODO rename to initializeInterrupts()
 	enablePS2Mouse()
 
 	initText()
@@ -271,7 +272,13 @@ fun kernelThread() {
 							// Note this is still very unsafe
 							// TODO safer one, with SEH + check to addrs be at userspace
 							if probeForReadOkay((payload.message as! UInt64), 1) {
-								serialPrintf(payload.message, payload.extra, payload.more)
+								// TODO Probably SEH in %s of serialPrintf itself
+								// (at page boundary)
+								serialPrintf(
+									String.fromUTF16z(payload.message),
+									payload.extra,
+									payload.more
+								)
 							}
 						}
 
@@ -341,13 +348,6 @@ fun kernelThread() {
 @emitHeader @linkAsIs
 declare fun guiThreadStart(): Void
 
-// In case of kernel crash set instruction pointer to here
-fun kernelThreadLoop() {
-	serialPrintln("<Tofita> [looping forever]")
-	while true {
-		amd64.pause()
-	}
-}
 @emitHeader @linkAsIs
 declare fun kernelThreadStart(): Void
 
