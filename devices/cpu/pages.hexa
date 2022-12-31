@@ -64,31 +64,37 @@ fun getPageAddressView(virtualAddr: UInt64): ByValue<PageAddressView> {
 
 // TODO handle huge pages returned from bootloader
 fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
-	var entry: PageEntry = pt[getPageAddressView(virtualAddr).ref.pt].ref
+	let view = getPageAddressView(virtualAddr)
+	let entry: PageEntry = pt[view.ref.pt].ref
 	mapPage(entry, physicalAddr, writeAllowed)
 }
 
 fun mapPD(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pt = referOrCreatePage(pd, getPageAddressView(virtualAddr).ref.pd, writeAllowed)
+	let view = getPageAddressView(virtualAddr)
+	let pt = referOrCreatePage(pd, view.ref.pd, writeAllowed)
 	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
 }
 
 fun mapPDPT(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pd = referOrCreatePage(pdpt, getPageAddressView(virtualAddr).ref.pdpt, writeAllowed)
+	let view = getPageAddressView(virtualAddr)
+	let pd = referOrCreatePage(pdpt, view.ref.pdpt, writeAllowed)
 	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
 }
 
 fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
 							writeAllowed: UInt8): Void {
-	var pdpt = referOrCreatePage(pml4, getPageAddressView(virtualAddr).ref.pml4, writeAllowed)
+	let view = getPageAddressView(virtualAddr)
+	let pdpt = referOrCreatePage(pml4, view.ref.pml4, writeAllowed)
 	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
 }
 
 // Returns actual physical address from virtual address
 fun resolveAddr(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64): UInt64 {
-	var linear = getPageAddressView(virtualAddr).ref
+	// TODO unsupported by C `let linear = getPageAddressView(virtualAddr).ref`
+	let linear = getPageAddressView(virtualAddr)
+	let linear = linear.ref // TODO better idea
 	// pml4
 	var entry = pml4entries[linear.pml4] as! ArrayPointer<ByValue<PageEntry>>
 	if entry[0].ref.present == 0 {

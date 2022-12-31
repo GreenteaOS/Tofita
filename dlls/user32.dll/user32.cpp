@@ -53,7 +53,7 @@ void *tmemcpy(void *dest, const void *src, uint64_t count) {
 #define stdout ((void*)0)
 #define GetProcessHeap() 0
 
-extern "C" int64_t _fltused = 0;
+externC int64_t _fltused = 0;
 
 #ifdef bit64
 #else
@@ -87,11 +87,11 @@ void startup() {
 }
 
 #ifdef bit64
-extern "C" __attribute__((fastcall)) void _DllMainCRTStartup() {
+externC __attribute__((fastcall)) void _DllMainCRTStartup() {
 	startup();
 }
 #else
-extern "C" __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+externC __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 	startup();
 }
 #endif

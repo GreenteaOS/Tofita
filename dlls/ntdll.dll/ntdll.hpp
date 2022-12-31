@@ -15,6 +15,12 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+	#define externC extern "C"
+#else
+	#define externC
+#endif
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
@@ -29,7 +35,9 @@
 	__declspec(dllexport) const wchar_t* _wcmdln asm("_wcmdln") = L"_wcmdln TODO";
 #endif
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 #define STUB(name) NTDLL32_DLL uint32_t name(void* value) asm(#name);
 #define LSTUB(name, link) NTDLL32_DLL uint32_t name(void* value) asm("*" #link);
@@ -335,4 +343,6 @@ STUB(_finite)
 STUB(_isnan)
 */
 STUB(free)
+#ifdef __cplusplus
 }
+#endif

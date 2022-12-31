@@ -15,14 +15,14 @@
 
 // Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 #include <stdint.h>
 
-namespace efi { // TODO dont use ns cause C mode!
 typedef void *EFI_HANDLE;
 typedef void VOID;
-}
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -36,6 +36,7 @@ extern const uint8_t binFontBitmap[];
 extern const uint8_t binLeavesBitmap[];
 int64_t _fltused = 0;
 
+#ifdef __cplusplus
 extern "C++" {
 template <int v>
 struct display_non_zero_int_value;
@@ -44,10 +45,11 @@ struct display_non_zero_int_value<0> { static constexpr bool foo = true; };
 static constexpr int v = sizeof(int);
 //static_assert(v == 0 && display_non_zero_int_value<v>::foo, "v == 0");
 }
+#endif
 
-efi::EFI_HANDLE imageHandle = nullptr;
+EFI_HANDLE imageHandle = nullptr;
 struct EFI_SYSTEM_TABLE_;
-EFI_SYSTEM_TABLE_
+struct EFI_SYSTEM_TABLE_
 *systemTable = nullptr;
 
 #define Virtual_$Any_ void
@@ -109,11 +111,10 @@ void memcpy(void* x,const void* y,uint64_t z) {
 
 #define GetProcessHeap() 0
 #define DWORD uint32_t
-using namespace efi; // TODO remove this
 #define HEXA_NO_DEFAULT_INCLUDES
 
 // CR3 trampoline
-extern "C" function __attribute__((fastcall))
+externC function __attribute__((fastcall))
 trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
 			  volatile uint64_t entry);
 #include "../uefi.c"
@@ -591,4 +592,7 @@ struct ACPI {
 
 	return 0;//EFI_SUCCESS;
 }
+
+#ifdef __cplusplus
 }
+#endif

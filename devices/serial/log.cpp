@@ -56,9 +56,17 @@ uint64_t kstrlen(const uint8_t *data) {
 	return r;
 }
 
-extern "C" uint8_t portInb(volatile uint16_t port);
+#ifndef externC
+	#ifdef __cplusplus
+		#define externC extern "C"
+	#else
+		#define externC
+	#endif
+#endif
 
-extern "C" function portOutb(volatile uint16_t port, volatile uint8_t value);
+externC uint8_t portInb(volatile uint16_t port);
+
+externC function portOutb(volatile uint16_t port, volatile uint8_t value);
 
 uint8_t readSerialRegister(uint16_t offset) {
 	return portInb(SERIAL_REGISTER_BASE + offset * SERIAL_REGISTER_STRIDE);

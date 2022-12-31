@@ -17,7 +17,15 @@
 
 // Code Hexa-style for easier porting
 
-constexpr auto null = nullptr;
+#ifdef __cplusplus
+	constexpr auto null = nullptr;
+	#define externC extern "C"
+#else
+	#define externC
+	#define nullptr ((void*)0)
+	#define null nullptr
+#endif
+
 #define let const auto
 #define var auto
 typedef void function;

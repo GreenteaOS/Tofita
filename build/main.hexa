@@ -27,6 +27,7 @@ var dllTask = false
 var kernelTask = false
 var ramDiskTask = false
 var isoTask = false
+var useCpp = false
 // TODO ^ update readme if it calls build script
 
 // Removes folder recursively
@@ -172,6 +173,8 @@ for task in tasks {
 			ramDiskTask = true
 		case 'iso':
 			isoTask = true
+		case 'cpp':
+			useCpp = true
 		case _: // TODO capture as `case task:`
 			console.log('[Unknown task \(task)]')
 	}
@@ -263,7 +266,8 @@ fun runTasks() {
 			[
 				clang + ' ',
 				'-target x86_64-pc-win32-coff -fno-stack-protector',
-				'-x c++ -std=c++2a -fshort-wchar -w -mno-red-zone -Wall -Wextra -w',
+				useCpp? '-x c++ -std=c++2a' : '-x c -std=gnu17',
+				'-fshort-wchar -mno-red-zone -w',
 				'-fomit-frame-pointer',
 				'-D versionRolling=' + versionRolling, // TODO used?
 				'-D versionName=\\"' + versionName + '\\"', // TODO used?
@@ -335,7 +339,8 @@ fun runTasks() {
 						'-Dbit\(bit)',
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw',
 						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4', // Unsupported by some targeted CPUs
-						'-std=c++2a',
+						// TODO useCpp, fix C build
+						(dlls[i] == 'ntdll')? '-x c++ -std=c++2a' : '-x c -std=gnu17',
 						'-fomit-frame-pointer',
 						'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp',
 						'-o',
@@ -401,7 +406,8 @@ fun runTasks() {
 				'-w',
 				'-Wno-address-of-temporary',
 				debuggie? '-g' : '',
-				'-x c++ -std=c++2a -c kernel/tofita.cpp -o ',
+				useCpp? '-x c++ -std=c++2a' : '-x c -std=gnu17',
+				'-c kernel/tofita.cpp -o ',
 				config.tempFolder + '/' + teaFolder + '/tofita.obj '
 			].join(' ')
 		)

@@ -22,7 +22,7 @@
 #define abs libc_abs
 #define pow libc_pow
 
-extern "C" uint64_t PhysicalAllocator_$allocateBytes_(uint64_t);
+externC uint64_t PhysicalAllocator_$allocateBytes_(uint64_t);
 
 function libc_free(void *addr) {
 	// Do nothing for now

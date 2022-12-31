@@ -24,9 +24,12 @@
 
 #include "ntdll.hpp"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
-	//TODO return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
+	// TODO return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
 	return 0;
 }
 
@@ -309,7 +312,7 @@ STUB(wcscat)
 STUB(_strupr)
 STUB(_strdup)
 STUB(strlen)
-STUB(memset)
+//STUB(memset)
 STUB(memcpy)
 STUB(swscanf)
 STUB(swprintf)
@@ -345,7 +348,8 @@ STUB(free)
 #endif
 
 // DWORD == uint32_t // TODO write down all types sizes NTAPI callbacks etc
-typedef bool(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
+//typedef bool(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
+typedef int32_t(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
 typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow);
 
 #define HEXA_NO_DEFAULT_INCLUDES
@@ -447,9 +451,9 @@ void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, vo
 	#endif
 
 	size_t count = dllEntries? ((size_t*)dllEntries)[0] : 0;
-	auto dllMains = (DllEntry*)dllEntries;
+	DllEntry* dllMains = (DllEntry*)dllEntries;
 	size_t i = 0;
-	auto DLL_PROCESS_ATTACH = 1;
+	uint32_t DLL_PROCESS_ATTACH = 1;
 
 	while (i < count) {
 		i++;
@@ -462,4 +466,6 @@ void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, vo
 	tofitaExitProcess_(entry(nullptr, nullptr, nullptr, 0));
 	while (true) {};
 }
+#ifdef __cplusplus
 }
+#endif

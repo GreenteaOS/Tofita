@@ -15,7 +15,6 @@
 
 // AMD64 assembly instructions wrapper
 
-namespace amd64 {
 inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx,
 					  uint32_t *edx) {
 	uint32_t a, b, c, d;
@@ -26,22 +25,25 @@ inline function cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax, uint32_t *
 	*edx = d;
 }
 
-enum class MSR : uint32_t {
+// TODO support `enum class` in hexa cpp codegen `enum class MSR : uint32_t {`
+enum MSR {
 	IA32_APIC_BASE = 27,
 };
 
-uint64_t rdmsr(MSR addr) {
+uint64_t rdmsr(enum MSR addr) {
 	uint32_t low, high;
 	__asm__ __volatile__ ("rdmsr" : "=a"(low), "=d"(high) : "c"(addr));
-	return (static_cast<uint64_t>(high) << 32) | low;
+	return ((uint64_t)(high) << 32) | low;
+	// return (static_cast<uint64_t>(high) << 32) | low;
 }
 
-void wrmsr(MSR addr, uint64_t value) {
+void wrmsr(enum MSR addr, uint64_t value) {
 	uint32_t low = value & 0xffffffff;
 	uint32_t high = value >> 32;
 	__asm__ __volatile__ ("wrmsr" :: "c"(addr), "a"(low), "d"(high));
 }
 
+#if 0
 extern "C++" template <typename T>
 inline T readFrom(uint64_t pointer) {
 	return *reinterpret_cast<const T volatile *>(pointer);
@@ -52,17 +54,15 @@ inline void writeTo(uint64_t pointer, T value) {
 	auto dest = reinterpret_cast<T volatile*>(pointer);
 	*dest = value;
 }
+#endif
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
-extern "C" {
-function writeCr3(uint64_t value);
+externC function writeCr3(uint64_t value);
 // TODO asm("invd")
-function halt();
-function enableAllInterrupts();
+externC function halt();
+externC function enableAllInterrupts();
 // Except non-mascable
-function disableAllInterrupts();
-function enableAllInterruptsAndHalt();
-function pause();
-function yield();
-}
-} // namespace amd64
+externC function disableAllInterrupts();
+externC function enableAllInterruptsAndHalt();
+externC function pause();
+externC function yield();
