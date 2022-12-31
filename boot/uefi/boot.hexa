@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Boot loader: enters uefi, reads all UEFI data and starts kernel loader
+// Boot loader: entered by UEFI, reads all UEFI data and starts kernel loader
 
 fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64): Void {
 	for i in count {

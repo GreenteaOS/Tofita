@@ -166,6 +166,7 @@ fun getRAMSize(memoryMap: UefiMemoryMap): UInt64 {
 	var offset: UInt64 = startOfMemoryMap
 
 	while offset < endOfMemoryMap {
+		// TODO check attributes or something? specify that it maps *whole* ram to be accessed by the known offset
 		numberOfPages += descriptor.numberOfPages
 
 		offset += descriptorSize
@@ -190,7 +191,7 @@ fun mapEfiRuntime(memoryMap: UefiMemoryMap) {
 	while offset < endOfMemoryMap {
 		if 0 != (descriptor.attribute & efi_memory_runtime) {
 			// TODO pointer fixups
-			// TODO should be RW or RO? NX?
+			// TODO should be RW or RO? NX? Ring0?
 			// Note: in VirtualBox, physicalStart seems way beyond RAM bounds
 			// Seems like fixup should be applied only if PhysicalStart < ramBytes?
 			mapMemory(descriptor.physicalStart, descriptor.physicalStart, descriptor.numberOfPages, 1u8)

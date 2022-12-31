@@ -1,6 +1,10 @@
 # Ignore all but Tofita
 *.*
 *:*
+*\r
+*\n
+*~*
+.*
 
 # Tofita
 !*.reg
@@ -13,3 +17,4 @@ $*
 !*.dll/
 !.github
 !.vscode
+kernel-diff

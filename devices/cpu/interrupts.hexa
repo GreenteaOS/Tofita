@@ -588,7 +588,7 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 
 	if index == TofitaSyscalls.ExitProcess {
 		serialPrintf("[[ExitProcess:PID %d]] %d\n", currentProcess, frame.rdxArg1)
-		// TODO kernel wakeup
+		// TODO kernel wake up
 		// TODO destroy process
 		var process: UserProcess = processes[currentProcess]
 		process.schedulable = false
@@ -721,7 +721,7 @@ fun setupInterruptsAndExceptions() {
 	// upload
 	{
 		tssSetEntry(8, tssBase, sizeof_TssEntry)
-		// tssSetEntry(8, tssBase, sizeof_TssEntry - 1); TODO
+		// tssSetEntry(8, tssBase, sizeof_TssEntry - 1) TODO correct size?
 	}
 
 	if false {
@@ -744,13 +744,13 @@ fun setupInterruptsAndExceptions() {
 		}
 	}
 
-	// globalGdtr.limit = sizeOf(gdtTemplate) - 1
+	// globalGdtr.limit = sizeOf(gdtTemplate) - 1 TODO
 	globalGdtr.limit = (4 * 32) - 1u16
 	globalGdtr.base = gdtTemplate.ref as! UInt64
 	lgdt(globalGdtr)
 	{
 		setTsr(64)
-		// TODO setTsr(64 + 3)
+		// TODO setTsr(64 + 3) TODO
 	}
 
 	serialPrintln("[cpu] Initializing interrupts")

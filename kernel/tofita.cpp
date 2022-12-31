@@ -53,7 +53,7 @@ int32_t wcslen(const wchar_t *string_) {
 	return i;
 };
 void free(void *ptr) {
-	serialPrintf(L"<Hexa> free\n");
+	// serialPrintf(L"<Hexa> free\n");
 };
 typedef void FILE;
 #define HEXA_MAIN mainHexa
@@ -473,6 +473,7 @@ static uint8_t heapInitial[HEAP_C] = {0};
 static uint8_t* heap = nullptr;
 static uint64_t heapOffset = 0;
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, int8_t x,int8_t u, uint64_t size) {
+	// serialPrintf(L"HeapAlloc [%s:%d] %d", /*filename,*/ functionName, lineNumber, size);
 	// size = ((size - 1) | 7) + 1; // Align by 8
 	size = ((size - 1) | 15) + 1; // Align by 16
 	if (size < 16) size = 16;
