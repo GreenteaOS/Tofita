@@ -118,3 +118,40 @@ fun drawText(text: String, y: Int16, framebuffer: FrameBuffer) {
 		i++
 	}
 }
+
+// Loading animation, progress 0...2
+fun drawLoading(framebuffer: FrameBuffer, progress: UInt8) {
+	for y in leavesHeight {
+		for x in leavesWidth {
+			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
+			drawPixel(framebuffer,
+					  x + framebuffer.width / 2 - (leavesWidth / 2) + progress * leavesWidth * 2 -
+						  leavesWidth * 2,
+					  y + (framebuffer.height / 4) * 3, pixel)
+		}
+	}
+}
+
+fun drawCleanup(y: Int16, framebuffer: FrameBuffer) {
+	let leftOrigin: Int16 = (framebuffer.width / 2) - 128i16
+
+	for yy in 31u16 {
+		for x in 256u16 {
+			drawPixel(framebuffer, leftOrigin + x, y + yy, 0)
+		}
+	}
+}
+
+var errorY: Int16 = 0
+fun drawError(text: String, framebuffer: FrameBuffer) {
+	drawCleanup(errorY, framebuffer)
+	drawText(text, errorY, framebuffer)
+}
+
+// TODO outline infer `true` (for let) or `Bool` (for var)
+let verbose = true
+fun drawVerbose(text: String, framebuffer: FrameBuffer) {
+	drawCleanup(errorY + 32i16, framebuffer)
+	drawText(text, errorY + 32i16, framebuffer)
+	// TODO also to COM
+}

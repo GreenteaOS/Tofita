@@ -21,19 +21,6 @@ fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UIn
 	}
 }
 
-// Loading animation, progress 0...2
-fun drawLoading(framebuffer: FrameBuffer, progress: UInt8) {
-	for y in leavesHeight {
-		for x in leavesWidth {
-			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
-			drawPixel(framebuffer,
-					  x + framebuffer.width / 2 - (leavesWidth / 2) + progress * leavesWidth * 2 -
-						  leavesWidth * 2,
-					  y + (framebuffer.height / 4) * 3, pixel)
-		}
-	}
-}
-
 fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64): Void {
 	var d = dest as! ArrayPointer<UInt8>
 	for i in len {
@@ -108,16 +95,24 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	uefiSetFrameBufferMode(framebuffer, systemTable)
 	drawLoading(framebuffer, 0)
 	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag
+	let versionY = (framebuffer.height / 4) * 3 + 64 as! Int16
 	drawText(
 		versionText,
-		(framebuffer.height / 4) * 3 + 64 as! Int16,
+		versionY,
 		framebuffer
 	)
-	let errorY: Int16 = (framebuffer.height / 4) * 3 + 64 + 32 as! Int16
+	errorY = versionY + 32i16 // TODO simply `+ 32`
+	drawText(
+		"Copyright (C) " + versionMajor + " GNU LGPL v3.0",
+		// "Copyright (C) " + versionMajor + " GNU Lesser General Public License v3.0",
+		// TODO better ideas? "Copyright (C) " + versionMajor + " LGPL-3.0",
+		errorY,
+		framebuffer
+	)
 
 	// Check ACPI here, after framebuffer initialization
 	while acpiTable == null {
-		drawText("[ERROR] Tofita requires ACPI 2.0 [ERROR]", errorY, framebuffer)
+		drawError("[ERROR] Tofita requires ACPI 2.0 [ERROR]", framebuffer)
 	}
 
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
@@ -127,13 +122,15 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 
 	// Initial RAM disk
 	var ramdisk: RamDisk = new RamDisk()
+	drawVerbose("Searching for the RAM disk...", framebuffer)
 	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk)
 	while status != EFI_STATUS.EFI_SUCCESS {
-		drawText("[ERROR] Tofita cannot load ramdisk [ERROR]", errorY, framebuffer)
+		drawError("[ERROR] Tofita cannot load ramdisk [ERROR]", framebuffer)
 	}
 	drawLoading(framebuffer, 1)
 
 	serialPrintln("[[[uefi]]] begin: uefiGetMemoryMap")
+	drawVerbose("Getting memory map...", framebuffer)
 	var sizeAlloc: UInt64 = (ramdisk.size / pageSize + 1) * pageSize
 	var efiMemoryMap: UefiMemoryMap = new UefiMemoryMap()
 	efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64
@@ -152,6 +149,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	uefiGetMemoryMap(efiMemoryMap, systemTable)
 	serialPrintln("[[[uefi]]] done: uefiGetMemoryMap")
 
+	drawVerbose("Reading the time...", framebuffer)
 	var time: EFI_TIME = new EFI_TIME()
 	time.year = 2022
 	var capabilities: EFI_TIME_CAPABILITIES = new EFI_TIME_CAPABILITIES()
@@ -160,7 +158,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 		var status: EFI_STATUS = systemTable.runtimeServices.getTime(time, capabilities)
 		while status != EFI_STATUS.EFI_SUCCESS {
 			serialPrintln("[[[uefi]]] <ERROR> GetTime")
-			drawText("[ERROR] Cannot get current time from UEFI [ERROR]", errorY, framebuffer)
+			drawError("[ERROR] Cannot get current time from UEFI [ERROR]", framebuffer)
 		}
 
 		{
@@ -185,6 +183,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	}
 
 	serialPrintln("[[[uefi]]] begin: ExitBootServices")
+	drawVerbose("Exiting boot services...", framebuffer)
 	var oops: UInt8 = 0
 	status = EFI_STATUS.EFI_NOT_READY
 	while status != EFI_STATUS.EFI_SUCCESS {
@@ -192,22 +191,23 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 			serialPrintln("[[[uefi]]] try: ExitBootServices")
 		}
 
-		if oops == 100 {
+		if oops == 199 {
 			// Keep user aware of the loading process
-			drawText("Loading...", errorY, framebuffer)
+			drawVerbose("Exiting boot services loop...", framebuffer)
 			serialPrintln("[[[uefi]]] <ERROR?> probably infinite loop on ExitBootServices")
 			serialPrintln("[[[uefi]]] <ERROR?> system may or may not start")
 			// Do this once
 			oops = 200
 		}
 
-		if oops < 100 {
+		if oops < 199 {
 			oops++
 		}
 
 		status = systemTable.bootServices.exitBootServices(imageHandle, efiMemoryMap.mapKey)
 	}
 
+	// TODO this condition never happens (static analyze this case)
 	if status != EFI_STATUS.EFI_SUCCESS {
 		// TODO `status` to string
 		serialPrintln("[[[uefi]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR")
@@ -215,20 +215,24 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	}
 	serialPrintln("[[[uefi]]] done: ExitBootServices")
 
+	drawVerbose("Setting RAM disk...", framebuffer)
 	setRamDisk(ramdisk)
 
 	serialPrintln("[[[uefi]]] begin: preparing kernel loader")
 
 	// TODO forward constructor arguments `var asset: ByValue<RamDiskAsset> = new ByValue<RamDiskAsset>()`
 	var asset: RamDiskAsset = new RamDiskAsset()
+	drawVerbose("Load kernel assets...", framebuffer)
 	getRamDiskAsset(asset, "tofita.gnu")
 	serialPrintf("[[[uefi]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
 
+	drawVerbose("Allocate memory...", framebuffer)
 	let largeBuffer: UInt64 = conventionalAllocateLargest(efiMemoryMap)
 	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", largeBuffer)
 	conventionalOffset = largeBuffer
 	var mAddressOfEntryPoint: UInt64 = 0
 
+	drawVerbose("Load kernel file...", framebuffer)
 	{
 		var ptr = asset.data as! ArrayPointer<UInt8>
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! @readonly PeHeader
@@ -264,6 +268,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 		mAddressOfEntryPoint = peOptionalHeader.mAddressOfEntryPoint
 	}
 
+	drawVerbose("Prepare kernel parameters...", framebuffer)
 	var params = conventionalAllocateNext(sizeOf<UefiPayload>()) as! UefiPayload
 	{
 		var b = params as! ArrayPointer<UInt8>
@@ -311,6 +316,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	params.framebuffer.ref.pixelsPerScanLine = framebuffer.pixelsPerScanLine
 
 	// RAM usage bit-map
+	drawVerbose("Setup device memory...", framebuffer)
 
 	var ram: UInt64 = getRAMSize(params.efiMemoryMap.ref)
 	var megs: UInt32 = (ram / (1024u64 * 1024u64)) as! UInt32
@@ -318,7 +324,8 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
 	while megs < 1234 {
-		drawText("[ERROR] Tofita requires at least 2 GB of memory [ERROR]", errorY, framebuffer)
+		// TODO check only physical memory in this case (but map whole range reported by UEFI)
+		drawError("[ERROR] Tofita requires at least 2 GB of memory [ERROR]", framebuffer)
 		serialPrintf("Tofita requires at least 2 GB of memory\n")
 	}
 
@@ -338,6 +345,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	}
 
 	// Map memory
+	drawVerbose("Setup virtual memory...", framebuffer)
 
 	serialPrintln("[[[uefi]]] mapping pages for kernel loader")
 
@@ -349,6 +357,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	mapEfiRuntime(params.efiMemoryMap.ref)
 	mapMemoryHuge(wholePhysicalStart, 0, ram / pageSize)
 
+	drawVerbose("Setup kernel mode...", framebuffer)
 	let startFunction = (conventionalOffset + pageSize) as! InitKernelTrampoline
 	tmemcpy(startFunction as! ArrayPointer<UInt8>, trampolineCR3 as! ConstArrayPointer<UInt8>, 32)
 	mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0)
@@ -382,6 +391,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	serialPrintHex((pml4entries as! UInt64))
 	serialPrint("\n")
 
+	drawVerbose("Entering kernel mode...", framebuffer)
 	startFunction((params as! UInt64), (pml4entries as! UInt64), stack, upper + mAddressOfEntryPoint)
 
 	// Should never return in practice
