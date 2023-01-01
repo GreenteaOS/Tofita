@@ -2,19 +2,18 @@
 *.*
 *:*
 *\r
-*\n
 *~*
 .*
 
 # Tofita
 !*.reg
-!*.hexa
 !*.json
 report.*.json
-.*
 ~*
 $*
 !*.dll/
 !.github
+!*.hexa
+!.hexa
 !.vscode
 kernel-diff
