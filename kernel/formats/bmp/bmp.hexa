@@ -19,16 +19,26 @@ fun loadBitMap24(asset: RamDiskAsset): Bitmap32 {
 	// also int32_t is wrong
 	let width = ((buffer + 18) as! ArrayPointer<UInt32>)[0]
 	let height = ((buffer + 22) as! ArrayPointer<UInt32>)[0]
+	let start = ((buffer + 10) as! ArrayPointer<UInt32>)[0]
 
 	let bmp = allocateBitmap(width, height)
-	let colors = buffer + 54 as! ArrayPointer<UInt8>
+	let colors = buffer + start as! ArrayPointer<UInt8>
+	var stride = width
+	var pad = 0u64
+
+	if (stride % 4) != 0 {
+		pad = stride % 4
+	}
 
 	for y in bmp.height {
+		let colors = buffer + start + ((height - y - 1) * (stride * 3u64 + pad))
 		for x in bmp.width {
+			// TODO optimize to `@defer x += 3`
+			let color = (colors + (x * 3u64)) as! ArrayPointer<UInt8>
 			bmp.pixels[y * width + x].ref.rgba.ref.a = 255 // transparency
-			bmp.pixels[y * width + x].ref.rgba.ref.r = colors[((height - y - 1) * width + x) * 3 + 0]
-			bmp.pixels[y * width + x].ref.rgba.ref.g = colors[((height - y - 1) * width + x) * 3 + 1]
-			bmp.pixels[y * width + x].ref.rgba.ref.b = colors[((height - y - 1) * width + x) * 3 + 2]
+			bmp.pixels[y * width + x].ref.rgba.ref.r = color[0]
+			bmp.pixels[y * width + x].ref.rgba.ref.g = color[1]
+			bmp.pixels[y * width + x].ref.rgba.ref.b = color[2]
 		}
 	}
 
