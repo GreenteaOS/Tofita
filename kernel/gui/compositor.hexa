@@ -26,6 +26,7 @@ var leaves: Bitmap32 = null
 var trashCan: Bitmap32 = null
 var notepad16: Bitmap32 = null
 var notepad48: Bitmap32 = null
+var app16: Bitmap32 = null
 var link: Bitmap32 = null
 var cur: Cursor = null
 var darkTheme: Bool = true
@@ -226,6 +227,10 @@ fun initializeCompositor() {
 	link = loadPng32(e)
 
 	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/app16.png")
+	app16 = loadPng32(asset)
+
+	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Cursors/aero_arrow.cur")
 	// TODO cur = loadCursor(Buffer.fromBytes(asset.data))
 	cur = loadCursor(asset)
@@ -343,14 +348,70 @@ fun composite(startupMilliseconds: UInt64) {
 	let taskbarY = taskbarY as! Int16
 
 	// Start button
+	// TODO make pad an option
+	let leavesPadding = true
+	var leavesPad = 0u16
+	if leavesPadding {
+		leavesPad = 2u16
+	}
 	color.ref.rgba.ref.a = 128
 	color.ref.rgba.ref.a = 100
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
 	if mouseX < 40 && mouseY > (_framebuffer.height - 30) {
-		drawRectangleWithAlpha(color.ref, 0, taskbarY, 40, 30)
+		// TODO ^ use bounding rectangles for mouse detection, not imperative code
+		drawRectangleWithAlpha(color.ref, 0, taskbarY, 40 + leavesPad + leavesPad, 30)
 	}
-	drawBitmap32WithAlpha(leaves, 2i16, taskbarY + 2i16)
+	// TODO more lr space around for beauty
+	// TODO create Theme class with static fields
+	// TODO ^ move other elements to the right
+	// TODO finally unify, use Int16 ot UInt16 everywhere lol!
+	drawBitmap32WithAlpha(leaves, leavesPad + 2i16, taskbarY + 2i16)
+	// TODO ^ white leaves or dynamically recolored depending on wallpaper or something
+	// ^ change color on hover
+
+	// TODO smmoth transition between light and dark theme!
+	// ^ drawVibrancedRectangle should just take info from Theme directly,
+	// and dark-light transition from there too + it will request animation frame on it own
+
+	// TODO draw differentially desktop/windows/taskbar (full overlap detection?)
+
+	// Opened windows
+	var i = rootWindow
+	var windowIndex = 0
+	// Avoid infinite loop
+	for loop in windowsLimit {
+		let window = windowsList[i]
+
+		// TODO proper iteration
+		if window == null {
+			continue
+		}
+
+		if i != 0 && window.present {
+			// TODO if window.visible
+			// TODO ellipsis
+			let w = 148u16
+			let x = 24 + 40 + windowIndex * w
+			let y = _framebuffer.height - 30i16
+			if firstResponder == i {
+				color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
+				color.ref.rgba.ref.a = 64
+				drawRectangleWithAlpha(color.ref, x + 2i16, y, w - 4u16, 26u16)
+				color.ref.rgba.ref.a = 100
+			}
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
+			// TODO proper app icon
+			drawBitmap32WithAlpha(app16, x + 6i16, y + 5i16)
+			drawText(window.title, x + 29, y + 10i16, color.ref)
+			// TODO full width in active
+			// TODO animate
+			drawRectangleWithAlpha(color.ref, x + 2i16, y + 26i16, w - 4u16, 4u16)
+			windowIndex++
+		}
+
+		i++
+	}
 
 	// Taskbar shortcuts
 	let shortcutsStart = 5 + 36 + 4i16
