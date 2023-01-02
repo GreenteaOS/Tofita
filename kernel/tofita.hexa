@@ -170,6 +170,7 @@ fun kernelInit(params: UefiPayload) {
 			appendProcess(process)
 			process.present = false
 			process.schedulable = false
+			process.name = "Empty"
 			process.syscallToHandle = TofitaSyscalls.Noop
 		}
 
@@ -185,6 +186,7 @@ fun kernelInit(params: UefiPayload) {
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
 		idle.syscallToHandle = TofitaSyscalls.Noop
+		idle.name = "System Idle Process"
 		currentProcess = 0
 		pml4kernelThread = processes[0].pml4
 	}

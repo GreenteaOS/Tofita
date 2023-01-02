@@ -61,6 +61,7 @@ class UserProcess {
 	// 32-bit
 	var is64bit: Bool
 	var limits: AddressAwareness
+	var name: String
 
 	new () {}
 }
@@ -71,6 +72,7 @@ let processes: [UserProcess] = []
 // TODO must use locking for sane SMP
 fun appendProcess(process: UserProcess) {
 	if processes.includes(process) {
+		quakePrintf("Process '%S' is added twice to the scheduler, this is a bug\n".utf16(), process.name.utf16())
 		return
 	}
 
