@@ -191,7 +191,7 @@ fun kernelInit(params: UefiPayload) {
 
 
 	// GUI
-	if true {
+	if false {
 		{
 			let guiProcess: UserProcess = processCreate()
 			serialPrintf("<Tofita> GUI process ID == %u\n", guiProcess.pid)
