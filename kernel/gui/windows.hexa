@@ -81,12 +81,25 @@ fun drawWindowFrame(title: String, x: Int16, y: Int16, w: UInt16, h: UInt16, act
 	var shorterFrame: Bool = false // OSX style TODO
 
 	var color = new ByValue<Pixel32>()
-	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 
 	drawVibrancedRectangle(x + 1i16, y + 1i16, w - 1, 32, darkTheme)
 
 	// TODO " (Not responding)"
 	// TODO crop text to fit size, i.e. drawText to take optional argument
+	if active {
+		if darkTheme {
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
+		} else {
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x11u8
+		}
+	} else {
+		if darkTheme {
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x88u8
+		} else {
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x88u8
+		}
+	}
+
 	drawText(title, x + 8 + 4, y + 9i16 + 3i16, color.ref)
 
 	// Frame hairline
@@ -113,7 +126,13 @@ fun drawWindowFrame(title: String, x: Int16, y: Int16, w: UInt16, h: UInt16, act
 		color.ref.color = 0xFF000000u32
 	}
 
-	drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 19i16, 8, 1)
+	// TODO option to draw it at center by default
+	let centeredMinimize = true
+	if centeredMinimize {
+		drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 15i16, 8, 1)
+	} else {
+		drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 19i16, 8, 1)
+	}
 
 	// Maximize
 	// color.rgba.r = color.rgba.g = color.rgba.b = 229
