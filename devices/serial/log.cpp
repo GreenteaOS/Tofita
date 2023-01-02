@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020 Oleh Petrenko
+// Copyright (C) 2020-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -110,7 +110,7 @@ bool serialPortWritable() {
 }
 
 // Speeds up virtual machines
-volatile bool disableSerial = false;
+volatile uint8_t disableSerial = 0;
 
 uint64_t serialPortWrite(uint8_t *buffer, uint64_t size) {
 	if (disableSerial) {

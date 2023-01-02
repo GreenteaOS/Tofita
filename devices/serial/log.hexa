@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -38,6 +38,10 @@ if (string != null && probeForReadOkay((uint64_t)string, 2)) {
 	puts(sehLogError);
 }
 */
+
+// TODO `NativeBool`
+@rename('disableSerial') // TODO `@as`
+declare var disableSerial: UInt8
 
 let serial_register_base = 0x03F8u16
 let serial_baud_rate = 115200
