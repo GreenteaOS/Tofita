@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -323,6 +323,7 @@ fun composite(startupMilliseconds: UInt64) {
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x11u8
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 
+	// Time
 	let timeMilliseconds = uptimeMilliseconds + startupMilliseconds
 	var uptimeHours = (timeMilliseconds / (60 * 60 * 1000)) as! Int64
 	while uptimeHours >= 24 {
@@ -335,7 +336,8 @@ fun composite(startupMilliseconds: UInt64) {
 		uptimeHours -= 12
 	}
 
-	var trayTimeX = trayButtonX + 20
+	let trayTimeStartX = trayButtonX + 20
+	var trayTimeX = trayTimeStartX
 	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10i16, color.ref)
 	trayTimeX += drawAsciiText(":", trayTimeX, taskbarY + 10i16, color.ref)
 	if uptimeMinutes < 10 {
@@ -344,9 +346,19 @@ fun composite(startupMilliseconds: UInt64) {
 	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10i16, color.ref)
 	trayTimeX += drawAsciiText(pm ? " PM" : " AM", trayTimeX, taskbarY + 10i16, color.ref)
 
+	// Input
+	let languageId = 'ENG'
+	let languagePad = 8
+	var trayLanguageX = trayTimeStartX - getTextAdvance(languageId) - languagePad * 2
+	drawAsciiText(languageId, trayLanguageX, taskbarY + 10i16, color.ref)
+
+	// Tray ^ button
+	trayButtonX = trayLanguageX - languagePad - 16i16
+
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2i16, 6i16, 1i16)
 	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
 
+	// HUD
 	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
 	quake()
 }
