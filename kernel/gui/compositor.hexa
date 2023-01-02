@@ -28,7 +28,7 @@ var notepad16: Bitmap32 = null
 var notepad48: Bitmap32 = null
 var link: Bitmap32 = null
 var cur: Cursor = null
-
+var darkTheme: Bool = true
 var startupAnimation: UInt16 = 0
 
 enum WallpaperStyle : UInt8 {
@@ -50,7 +50,7 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 
 		for y in upscale.height {
 			for x in upscale.width {
-				var rgba = interpolatePixel(
+				let rgba = interpolatePixel(
 					bitmap,
 					(x * wReciprocal) * bitmap.width as! Float32, // TODO `as! _` or something
 					(y * hReciprocal) * (bitmap.height - 8) as! Float32
@@ -105,6 +105,7 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 					(x * wReciprocal) * downscale.width as! Float32, // TODO UInt32 is precise than Float32
 					(y * hReciprocal) * (downscale.height - 8) as! Float32
 				)
+
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
 			/// rgba.r = Blend255(rgba.r, 255, 168)
@@ -237,7 +238,7 @@ fun compositeWindows() {
 					window.y + frameHeight,
 					window.width,
 					window.height,
-					true
+					darkTheme
 				)
 			}
 		}
@@ -293,7 +294,8 @@ fun composite(startupMilliseconds: UInt64) {
 		0,
 		_framebuffer.height - animationTaskbarY as! Int16, // TODO upcast `a - b` to larger type
 		_framebuffer.width as! UInt16,
-		30
+		30,
+		darkTheme
 	)
 
 	let taskbarY = _framebuffer.height + 30 - animationTaskbarY * 2.0

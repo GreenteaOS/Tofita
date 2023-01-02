@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -83,7 +83,7 @@ fun drawWindowFrame(title: String, x: Int16, y: Int16, w: UInt16, h: UInt16, act
 	var color = new ByValue<Pixel32>()
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 
-	drawVibrancedRectangle(x + 1i16, y + 1i16, w - 1, 32, true)
+	drawVibrancedRectangle(x + 1i16, y + 1i16, w - 1, 32, darkTheme)
 
 	// TODO " (Not responding)"
 	// TODO crop text to fit size, i.e. drawText to take optional argument

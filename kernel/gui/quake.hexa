@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,8 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Quake-style console with ~
+// TODO change to `Start + ~` and change engine to cmd.exe + tabs etc
 
-var quakeHeight: UInt8 = 255
+var quakeHeight: UInt8 = 255 // TODO `256` better rror message aka too large to fit
 var quakeCommand: String = ""
 // `var quakeLines: [String] = [0]` // TODO `= [0]` not valid type
 var quakeLines: [String] = []
@@ -31,12 +32,12 @@ fun quake() {
 		return
 	}
 
-	drawVibrancedRectangle(0, 0, _framebuffer.width as! UInt16, quakeHeight)
+	drawVibrancedRectangle(0, 0, _framebuffer.width as! UInt16, quakeHeight, darkTheme)
 	var color = new ByValue<Pixel32>()
 	color.ref.color = 0x126099FF
 	lineHorizontal(color, 0, quakeHeight, _framebuffer.width as! UInt16)
 	// color.rgba.r = color.rgba.g = color.rgba.b = 48
-	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xDDu8
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = darkTheme? 0xDDu8 : 0x11u8
 	var x = drawAsciiText(quakeCommand, 2, quakeHeight - 14u8, color.ref)
 	drawAsciiText("|", x + 2, quakeHeight - 15u8, color.ref)
 
@@ -55,34 +56,38 @@ fun quakeHandleButtonDown(key: UInt8) {
 	}
 
 	if keyboardMap[key] == '\b' && quakeCommandSize > 0 {
-		quakeCommand = '' // TODO substr -1
+		quakeCommand = quakeCommand.substr(0, quakeCommand.length - 1)
 		quakeCommandSize--
 	}
 
 	if keyboardMap[key] == '\n' && quakeCommandSize > 0 {
-		if quakeCommand == 're' {
-			quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n".utf16())
-			var start: InitKernel = upper as! InitKernel // TODO `= (InitKernel)` compiles
-			start(paramsCache) // TODO pml4, stack
-		} else if quakeCommand == 'da' { // TODO startsWith
+		if quakeCommand == 're' or quakeCommand == 'reboot' {
+			//var start: InitKernel = upper as! InitKernel // TODO `= (InitKernel)` compiles
+			//start(paramsCache) // TODO pml4, stack
+		} else if quakeCommand == 'da' or quakeCommand == 'dark' { // TODO startsWith
 			// Dark theme
-			// TODO
-		} else if quakeCommand == 'li' {
+			darkTheme = true
+		} else if quakeCommand == 'li' or quakeCommand == 'light' {
 			// Light theme
-			// TODO
-		} else if quakeCommand == 'he' {
-			quakePrintf("Hit `~` to show/hide this terminal\n".utf16(), quakeCommand)
-			quakePrintf(("Command 'reload' does quick kernel restart (without actual reboot). Note: this "
-						+
-						"destroys all unsaved data and may crash the system!\n").utf16(),
-						quakeCommand)
+			darkTheme = false
+		} else if quakeCommand == 'he' or quakeCommand == 'help' {
+			quakePrintf("Hit `~` to show/hide this terminal\n".utf16())
+			quakePrintf("Enter 'da' or 'dark' to set the dark theme\n".utf16())
+			quakePrintf("Enter 'li' or 'light' to set the light theme\n".utf16())
+			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
+			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
 		} else {
+			// TODO fix %S
 			quakePrintf("Command '%S' not supported\n".utf16(), quakeCommand)
-			quakePrintf("Enter 'help' for commands\n".utf16())
+			quakePrintf("Enter 'help' or 'he' for commands\n".utf16())
 		}
 		quakeCommand = ''
 		quakeCommandSize = 0
 	}
+
+	// TODO when no command entered, left/right buttons swap between different terminals,
+	// clicking right on the right most opens new terminal
+	// (show this as help in pale color)
 
 	// TODO support string comparisons `if (keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z') ||`
 	if let char = keyboardMap[key] {
