@@ -191,7 +191,6 @@ fun kernelInit(params: UefiPayload) {
 		pml4kernelThread = processes[0].pml4
 	}
 
-
 	// GUI
 	if false {
 		{
@@ -200,7 +199,7 @@ fun kernelInit(params: UefiPayload) {
 			processInit(guiProcess)
 			disableSerial = 1
 			disableSerial = 0
-			guiProcess.name = "GreenteaGUI.exe"
+			guiProcess.name = "Greentea OS GUI"
 			guiProcess.schedulable = true
 		}
 	}

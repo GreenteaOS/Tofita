@@ -38,15 +38,45 @@ enum WallpaperStyle : UInt8 {
 	// TODO more options
 }
 
-fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
+fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: Bool = true) {
 	var bitmap = bitmap
 
 	{
 		serialPrintln("[compositor.setWallpaper] upscale wallpaper to screen size")
-		var upscale: Bitmap32 = allocateBitmap(_framebuffer.width, _framebuffer.height)
 
-		let hReciprocal = 1.0f32 / (_framebuffer.height as! Float32)
-		let wReciprocal = 1.0f32 / (_framebuffer.width as! Float32)
+		var scaler = 1.0
+		var scalerY = 1.0
+
+		if _framebuffer.width > bitmap.width {
+			// TODO just use float / division not \
+			// TODO lmao not works in code gen `scaler = (_framebuffer.width as Float) / (bitmap.width as Float)`
+			// TODO 123.toFloat without `()` and toFloat32 for compatible sizes
+			scaler = (_framebuffer.width as! Float) / (bitmap.width as! Float)
+		}
+
+		if _framebuffer.height > bitmap.height {
+			// TODO just use float / division not \
+			scalerY = (_framebuffer.height as! Float) / (bitmap.height as! Float)
+		}
+
+		// TODO more to Theme and re-scale on-demand
+		if not preserveAspectRatio {
+			scaler = 1.0
+		} else {
+			if scalerY > scaler {
+				scaler = scalerY
+			}
+		}
+
+		let newWidth = (bitmap.width * scaler * 0 + 1088) as! UInt32
+		let newWidth = (bitmap.width * scaler) as! UInt32
+		let newHeight = (bitmap.height * scaler * 0 + 1088) as! UInt32
+		let newHeight = (bitmap.height * scaler) as! UInt32
+
+		var upscale: Bitmap32 = allocateBitmap(newWidth, newHeight)
+
+		let hReciprocal = 1.0f32 / (newHeight as! Float32)
+		let wReciprocal = 1.0f32 / (newWidth as! Float32)
 
 		for y in upscale.height {
 			for x in upscale.width {
@@ -67,6 +97,8 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 
 	var blurScale: UInt8 = 8
 
+	// TODO blur is at wrong position due to centering after rescale
+	// it must be offset and than crop to the screen too
 	var downscale: Bitmap32 = allocateBitmap(
 		bitmap.width / blurScale - 1u32, // TODO infer int types, also integer division
 		bitmap.height / blurScale - 1u32 + 8
@@ -87,9 +119,12 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle) {
 		}
 	}
 
+	// TODO fix blur for small wallpapers (centered smaller than screen)
 	var blur: Bitmap32 = gaussBlur(downscale, 4)
 
 	// Upscale
+	// TODO half-res rendering of vibrance by default
+	// TODO add noise
 	var upscaleLight: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
 	var upscaleDark: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
 	var upscale: Bitmap32 = upscaleDark
@@ -264,7 +299,13 @@ fun composite(startupMilliseconds: UInt64) {
 		startupAnimation += 9 * 2u16
 	}
 
-	drawBitmap32(wallpaper, 0, 0)
+	// TODO non-centered drawBitmap32(wallpaper, 0, 0)
+	drawBitmap32(
+		wallpaper,
+		(_framebuffer.width / 2i16) - (wallpaper.width / 2i16),
+		(_framebuffer.height / 2i16) - (wallpaper.height / 2i16)
+	)
+
 	drawBitmap32WithAlpha(trashCan, 12i16, 10i16)
 	var color = new ByValue<Pixel32>()
 	color.ref.color = 0x00000000
