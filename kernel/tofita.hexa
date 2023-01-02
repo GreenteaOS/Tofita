@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -167,7 +167,7 @@ fun kernelInit(params: UefiPayload) {
 			// TODO optimizer: set Array.capacity to 256 upfront cause known value
 			let process = new UserProcess()
 			process.frame = new InterruptFrame()
-			processes[i] = process
+			appendProcess(process)
 			process.present = false
 			process.schedulable = false
 			process.syscallToHandle = TofitaSyscalls.Noop
@@ -189,16 +189,17 @@ fun kernelInit(params: UefiPayload) {
 		pml4kernelThread = processes[0].pml4
 	}
 
-	// Demo
-	// if false {
+
+	// GUI
 	if true {
-		//for i in 3
 		{
-			var demo: UserProcess = processCreate()
-			serialPrintf("<> pid == %u\n", demo.pid)
-			processInit(demo)
-			loadExeIntoProcess("desktop/wndapp.exe", demo)
-			demo.schedulable = true
+			let guiProcess: UserProcess = processCreate()
+			serialPrintf("<Tofita> GUI process ID == %u\n", guiProcess.pid)
+			processInit(guiProcess)
+			disableSerial = 1
+			disableSerial = 0
+			guiProcess.name = "GreenteaGUI.exe"
+			guiProcess.schedulable = true
 		}
 	}
 

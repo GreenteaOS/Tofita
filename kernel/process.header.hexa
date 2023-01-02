@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -65,8 +65,27 @@ class UserProcess {
 	new () {}
 }
 
-// TODO dynamic allocation of this list
-var processes: [UserProcess] = []
+/// List of all processes
+let processes: [UserProcess] = []
+
+// TODO must use locking for sane SMP
+fun appendProcess(process: UserProcess) {
+	if processes.includes(process) {
+		return
+	}
+
+	// TODO note `null`, handling of `T?` should be fixed in the `array.hexa`
+	let emptySlot = processes.indexOf(null)
+	if emptySlot != -1 {
+		processes[emptySlot] = process
+		return
+	}
+
+	processes.push(process)
+}
+
+// TODO split processes to threads
 
 // Working process pid, with restored state and active CR3
+// TODO convert to TLS
 @volatile var currentProcess: UInt64 = 0
