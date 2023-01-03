@@ -1,0 +1,78 @@
+name: 'Build image'
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '.github/workflows/**'
+      - 'assets/**'
+      - 'boot/**'
+      - 'build/**'
+      - 'devices/**'
+      - 'dlls/**'
+      - 'kernel/**'
+      - 'tools/**'
+      - 'config.json'
+      - 'hexa.json'
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - '.github/workflows/**'
+      - 'assets/**'
+      - 'boot/**'
+      - 'build/**'
+      - 'devices/**'
+      - 'dlls/**'
+      - 'kernel/**'
+      - 'tools/**'
+      - 'config.json'
+      - 'hexa.json'
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  build-image:
+    name: 'Building'
+
+    strategy:
+      matrix:
+        system:
+          - windows-2022
+
+    runs-on: ${{ matrix.system }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get Hexa
+        run: |
+          git clone --depth 1 https://github.com/hexalang/Hexa.git ../Hexa
+
+      - name: Get Teapot
+        run: |
+          git clone --depth 1 https://github.com/GreenteaOS/Teapot.git ../Teapot
+
+      - name: Prepare Hexa
+        run: |
+          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/bootstrap.js ../Hexa/hexa.json
+          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/hexa-node.js ../Hexa/hexa.json
+          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/hexa-node.js ../Hexa/hexa.json
+
+      - name: Building Tofita
+        run: |
+          $env:Path += ";.\..\Hexa"
+          $ErrorActionPreference = 'SilentlyContinue'
+          cmd.exe /c 'build.bat'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: greentea-uefi64-image-${{ github.sha }}
+          path: C:\Tea\greenteaos-uefi64.iso
