@@ -53,7 +53,7 @@ jobs:
 
       - name: Get Hexa
         run: |
-          git clone --depth 1 https://github.com/hexalang/Hexa.git
+          git clone --depth 1 https://github.com/hexalang/Hexa.git ../Hexa
 
       - name: Get Teapot
         run: |
@@ -61,13 +61,15 @@ jobs:
 
       - name: Prepare Hexa
         run: |
-          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ./Hexa/bootstrap.js ./Hexa/hexa.json
+          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/bootstrap.js ../Hexa/hexa.json
+          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/hexa-node.js ../Hexa/hexa.json
+          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/hexa-node.js ../Hexa/hexa.json
 
       - name: Building Tofita
         run: |
-          $env:Path += ";.\Hexa"
-          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ./Hexa/hexa-node.js build/hexa.json
-          ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ./build.js init-or-clean asm efi dll kernel ramdisk iso
+          $env:Path += ";.\..\Hexa"
+          $ErrorActionPreference = 'SilentlyContinue'
+          cmd.exe /c 'build.bat'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
