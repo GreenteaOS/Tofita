@@ -290,6 +290,9 @@ fun compositeWindows() {
 	}
 }
 
+fun requestAnimationFrame() {
+	haveToRender = true
+}
 
 fun composite(startupMilliseconds: UInt64) {
 	let mouseX = mouseX
@@ -297,8 +300,8 @@ fun composite(startupMilliseconds: UInt64) {
 
 	// Startup animation
 	if startupAnimation < 2000 {
-		haveToRender = true
-		startupAnimation += 9 * 2u16
+		requestAnimationFrame()
+	 	startupAnimation += 9 * 2u16
 	}
 
 	// TODO non-centered drawBitmap32(wallpaper, 0, 0)

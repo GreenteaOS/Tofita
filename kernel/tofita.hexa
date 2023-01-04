@@ -214,25 +214,24 @@ fun kernelInit(params: UefiPayload) {
 }
 
 fun switchToUserProcess() {
-	// if (processesCount == 0)
-	//	amd64.enableAllInterruptsAndHalt()
-	// TODO
 	var next = getNextProcess()
 
 	// TODO comparing `nullable == 0` error
 	if next == 0 {
 		markAllProcessessSchedulable()
+		// TODO markAllProcessesSchedulable() sess typo
 		next = getNextProcess()
+		// TODO ^ should return `Process?` not index
 	}
 
 	if next == 0 {
-		// serialPrintln("<Tofita> [halt]")
-		// amd64.enableAllInterruptsAndHalt() // Nothing to do
-		// TODO fix this feature
+		enableAllInterruptsAndHalt() // Nothing to do
+		// TODO yield into GUI thread if it has incomplete draws
+		// (otherwise it may wait for the timer and drop frames)
+	} else {
+		yield()
+		// TODO may timer somehow interrupt yield handler?
 	}
-	// else
-	yield()
-	// TODO
 }
 
 fun kernelThread() {
@@ -254,6 +253,7 @@ fun kernelThread() {
 		while index < 255 {		 // TODO
 			@volatile var process = processes[index]
 			if process != null, process.present == true {
+				// TODO global isAnythingHappened to avoid Noop check for every process. It also must me TLS?
 				if process.syscallToHandle != TofitaSyscalls.Noop {
 					kernelThreadBusy = true
 					@volatile let syscall = process.syscallToHandle
@@ -360,20 +360,38 @@ fun guiThread() {
 
 	while true {
 		if haveToRender == false {
-			switchToUserProcess()
+			yield()
 		}
 
+		// TODO not best place for this
+		if mouseActivity {
+			mouseActivity = false
+			handleMouseActivity()
+		}
+
+		if keyboardActivity {
+			keyboardActivity = false
+			handleKeyboardActivity()
+		}
+
+		// Overridden by `requestAnimationFrame`
+		let hadToRender = haveToRender
 		haveToRender = false
 
-		composite(startupMilliseconds)
-		copyToScreen()
+		if hadToRender {
+			composite(startupMilliseconds)
+			copyToScreen()
+		}
 
 		while qsodHappened {
 			disableAllInterrupts()
 			halt()
 		}
 
-		switchToUserProcess()
+		// Note: it must yield, otherwise never enters a kernel,
+		// because scheduler never switches to the kernel from GUI thread
+		// This allows to have better FPS
+		yield()
 	}
 }
 

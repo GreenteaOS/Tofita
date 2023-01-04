@@ -390,10 +390,11 @@ var taskBarRedraw: UInt8 = 0 // Re-paint task bar current time
 fun getNextProcess(): UInt64 {
 	// Note that idle process is ignored
 	var index: UInt64 = 1
-	while index < 255 {
-		if processes[index].present == true {
-			if processes[index].schedulable == true {
-				if processes[index].scheduleOnNextTick == true {
+	while index < 255 { // TODO processes.length
+		let process = processes[index]
+		if process.present == true, process.syscallToHandle == TofitaSyscalls.Noop {
+			if process.schedulable == true {
+				if process.scheduleOnNextTick == true {
 					return index
 				}
 			}
@@ -508,9 +509,9 @@ fun timerInterruptHandler(@volatile frame: InterruptFrame) {
 
 	if timerCalled % 121 == 0 {
 		taskBarRedraw++
-		if taskBarRedraw > 30 {
 		// TODO change to `requestAnimationFrame`
 		// Every N seconds
+		if taskBarRedraw > 30 {
 			haveToRender = true
 			taskBarRedraw = 0
 		}
