@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -29,6 +29,7 @@ class OverlappedWindow {
 	var hWnd: HWnd
 
 	var visible: Bool
+	// TODO var notResponding: Bool = false
 	var title: String
 
 	var x: Int16
@@ -58,6 +59,10 @@ var mouseDragCapturedWindow: Bool = false
 var mouseDragWindow: UInt64 = 0
 var mouseDragLastX: Int16 = 0
 var mouseDragLastY: Int16 = 0
+
+// Something happened
+var mouseActivity: Bool = false
+var keyboardActivity: Bool = false
 
 // Note: those are controlled by DWM
 @volatile var mouseX: Int16 = 256i16

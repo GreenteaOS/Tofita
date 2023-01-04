@@ -290,11 +290,8 @@ fun compositeWindows() {
 	}
 }
 
-fun composite(startupMilliseconds: UInt64) {
-	// TODO not best place for this
-	handleMouseActivity()
-	handleKeyboardActivity()
 
+fun composite(startupMilliseconds: UInt64) {
 	let mouseX = mouseX
 	let mouseY = mouseY
 

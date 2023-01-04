@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -172,6 +172,9 @@ fun handleMousePacket() {
 	}
 	}
 
+	// TODO DWM
+	mouseActivity = true
+
 	// EOI
 	// Disable those lines if polling is used
 	writePort(0xA0, 0x20)
@@ -181,6 +184,8 @@ fun handleMousePacket() {
 
 // TODO interrupt
 fun handleMouse() {
+	handleMousePacket()
+
 	// This is hack to avoid race condition in poller
 	// this way we handle mouse *only* in poller
 	// if true {

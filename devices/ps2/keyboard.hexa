@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -98,10 +98,13 @@ fun handleKeyboardPacket() {
 		// TODO should hint that `<` useless here for `uint8`
 		if keycode < 0 {
 			// lockMouse = false
+			// TODO this is why `@defer` is required, had a bug here
+			writePort(pic1_command, pic_eoi)
 			return
 		}
 
 		if keyboardMap[keycode] == null {
+			writePort(pic1_command, pic_eoi)
 			return
 		}
 
@@ -113,7 +116,6 @@ fun handleKeyboardPacket() {
 			if 41 == keycode {
 				haveToQuake = !haveToQuake
 				// TODO DWM
-				haveToRender = true
 			}
 
 			if haveToQuake {
@@ -136,6 +138,8 @@ fun handleKeyboardPacket() {
 	}
 
 	// Note: Quake terminal has higher priority than kernel itself
+	// TODO DWM
+	keyboardActivity = true
 
 	// keyDownHandler = null
 	// if (haveToQuake)
@@ -150,6 +154,6 @@ fun handleKeyboardPacket() {
 
 // TODO interrupt
 fun handleKeyboard() {
-	// let status = readPort(status_register)
+	handleKeyboardPacket()
 	// pollForce = status
 }

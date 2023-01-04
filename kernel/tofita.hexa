@@ -174,7 +174,7 @@ fun kernelInit(params: UefiPayload) {
 			process.syscallToHandle = TofitaSyscalls.Noop
 		}
 
-		// TODO yay
+		// TODO this is entirely useless
 		for i in windowsLimit {
 			let window = new OverlappedWindow()
 			window.present = false
@@ -359,9 +359,6 @@ fun guiThread() {
 	serialPrintln("<Tofita> [guiThread] thread started")
 
 	while true {
-		// Poll PS/2 devices
-		pollPS2Devices()
-
 		if haveToRender == false {
 			switchToUserProcess()
 		}

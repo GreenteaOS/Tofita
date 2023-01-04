@@ -32,6 +32,7 @@ fun quake() {
 		return
 	}
 
+	// TODO respect theme > set font color too
 	drawVibrancedRectangle(0, 0, _framebuffer.width as! UInt16, quakeHeight, darkTheme)
 	var color = new ByValue<Pixel32>()
 	color.ref.color = 0x126099FF
