@@ -59,6 +59,13 @@ class Executable {
 	new () {}
 }
 
+fun is64Exe(asset: RamDiskAsset) {
+	var ptr = asset.data as! ArrayPointer<UInt8>
+	var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
+	var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
+	return peOptionalHeader.magic == 0x020B
+}
+
 class ExeLoader<SIZE, HEADER> {
 	new() {}
 
@@ -69,9 +76,13 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
-		var asset: RamDiskAsset = new RamDiskAsset()
+		let asset: RamDiskAsset = new RamDiskAsset()
 		getRamDiskAsset(asset, name)
 		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name.utf16(), asset.size, asset.data)
+		return loadPeAsset(asset, root, exec)
+	}
+
+	fun loadPeAsset(asset: RamDiskAsset, root: PeExportLinkedList, exec: Executable) {
 		var ptr = asset.data as! ArrayPointer<UInt8>
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 		serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
@@ -334,10 +345,10 @@ class ExeLoader<SIZE, HEADER> {
 		}
 	}
 
-	fun loadExe(name: String, root: PeExportLinkedList, exec: Executable) {
+	fun loadExe(asset: RamDiskAsset, root: PeExportLinkedList, exec: Executable) {
 		var ei: ExeInterim = new ExeInterim()
 
-		ei.pei = loadPe(name, root, exec)
+		ei.pei = loadPeAsset(asset, root, exec)
 
 		// Allocate stack
 		{
@@ -433,9 +444,19 @@ fun loadExeIntoProcess(file: String, process: UserProcess) {
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
 
-		let loader = new ExeLoader<UInt64, Pe64OptionalHeader>()
+		let asset: RamDiskAsset = new RamDiskAsset()
+		getRamDiskAsset(asset, file)
 
-		let app = loader.loadExe(file, root, exec)
-		loader.loadRelatedDLLsAndMapIntoProcess(app, root, exec, process)
+		// TODO fix in codegen `if ExeLoader.is64(asset) {` for `static fun` of generic class
+		// TODO `if ExeLoader<UInt64, Pe64OptionalHeader>.is64(asset) {`
+		if is64Exe(asset) {
+			let loader = new ExeLoader<UInt64, Pe64OptionalHeader>()
+			let app = loader.loadExe(asset, root, exec)
+			loader.loadRelatedDLLsAndMapIntoProcess(app, root, exec, process)
+		} else {
+			let loader = new ExeLoader<UInt32, Pe32OptionalHeader>()
+			let app = loader.loadExe(asset, root, exec)
+			loader.loadRelatedDLLsAndMapIntoProcess(app, root, exec, process)
+		}
 	}
 }
