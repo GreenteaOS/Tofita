@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -175,7 +175,7 @@ enum ImageRelocationType : Int32 {
 	IMAGE_REL_BASED_HIGHLOW = 3
 }
 
-let image_sizeof_base_relocation = 8
+let image_sizeof_base_relocation = 8u64
 let image_rel_based_absolute = 0
 let image_rel_based_dir64 = 10
 let image_rel_based_highlow = 3
