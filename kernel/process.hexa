@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -29,6 +29,8 @@ fun processInit(process: UserProcess) {
 	process.syscallToHandle = TofitaSyscalls.Noop
 	process.frame.rdxArg1 = process.pid // Second argument
 	process.messages = null
+	// TODO init those fields in class declaration and constructor
+	// new (kind: ProcessKind.UserProcess)
 	process.awaitsGetMessage = false
 }
 
@@ -78,6 +80,7 @@ fun getOrCreateMessagesBuffer(@volatile process: UserProcess): /*TODO wapi.*/[Ms
 	return process.messages
 }
 
+// TODO make all this UserProcess class methods + @final
 fun postMessage(@volatile process: UserProcess, payload: PostMessagePayload): Bool {
 	// TODO do not allocate messages queue if no windows and not awaits for them
 	let messages = getOrCreateMessagesBuffer(process)
@@ -111,6 +114,7 @@ fun postMessage(@volatile process: UserProcess, payload: PostMessagePayload): Bo
 
 	process.messagesUsed++
 
+	// TODO describe the logic here
 	if process.awaitsGetMessage {
 		process.awaitsGetMessage = false
 		process.syscallToHandle = TofitaSyscalls.GetMessage
@@ -163,12 +167,13 @@ fun getMessage(@volatile process: UserProcess, payload: GetMessagePayload): Bool
 }
 
 fun processDestroy(@volatile process: UserProcess) {
-	// TODO deallocate stuff
+	// TODO de-allocate stuff
 	process.present = false
 	process.messages = null
 
 	var window = overlappedWindow_findAnyProcessWindow(process.pid)
 
+	// Destroy every process' window
 	while window != null {
 		overlappedWindow_destroy(window.windowId)
 		window = overlappedWindow_findAnyProcessWindow(process.pid)

@@ -33,7 +33,6 @@ fun kernelInit(params: UefiPayload) {
 	serialPrintf("<Tofita> CR3 points to: %8\n", params.pml4 as! UInt64)
 	// TODO `anyPtrOrObj as! UInt32` -> error precision lost on 64-bit
 	paramsCache = params
-	// DOWN_BYTES_TO_PAGES(params.ramBytes))
 	PhysicalAllocator.init(params)
 	PhysicalAllocator.resetCounter()
 	let trapeze_ = PhysicalAllocator.allocateOnePage()
@@ -57,7 +56,7 @@ fun kernelInit(params: UefiPayload) {
 					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 123))
 		serialPrintf("<> %8 == %8\n", (0 + 4096),
 					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 4096))
-		serialPrintf(
+		serialPrintf( // TODO hint that (wholePhysicalStart as! UInt64) useless cause it is same T already
 			"<> %8 == %8\n", (0 + 4096 * 1000 + 123),
 			resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 4096 * 1000 + 123))
 		serialPrintf("<> %8 == %8\n", (1048576),
@@ -254,21 +253,25 @@ fun kernelThread() {
 	serialPrintln("<Tofita> [kernelThread] thread started")
 
 	// TODO move to preTest with infinite loop on fail
-	serialPrintf("<seh> before\n")
+	//serialPrintf("<seh> before\n")
 	//serialPrintf("<seh> 0 == %u\n", probeForReadOkay(321, 1))
 	//serialPrintf("<seh> 1 == %u\n", probeForReadOkay(currentThread as! UInt64, 1))
 	//serialPrintf("<seh> 0 == %u\n", probeForReadOkay(999999999, 1))
 	//serialPrintf("<seh> 1 == %u\n", probeForReadOkay(guiStack as! UInt64, 1))
 	//serialPrintf("<seh> 0 == %u\n", probeForReadOkay(-1u64, 1)) // TODO `-1u64` is invalid, also fix `~1`
 	//serialPrintf("<seh> 1 == %u\n", probeForReadOkay(switchToNextProcess as! UInt64, 1))
-	serialPrintf("<seh> done\n")
+	//serialPrintf("<seh> done\n")
 
 	while true {
 		// TODO optimize cast to 1u64
+		// TODO no need for `@volatile` here and there
 		@volatile var index: UInt64 = 1 // Idle process ignored
 		while index < 255 {		 // TODO
-			@volatile var process = processes[index]
+			let process = processes[index]
+			// TODO `for process in processes { if process.pid == 0 { continue } }`
+			// TODO ^ interlocked iteration? interlocked processes?
 			if process != null, process.present == true {
+				// TODO `present` is useless when we have nullability?
 				// TODO global isAnythingHappened to avoid Noop check for every process. It also must me TLS?
 				if process.syscallToHandle != TofitaSyscalls.Noop {
 					kernelThreadBusy = true
@@ -276,15 +279,19 @@ fun kernelThread() {
 					process.syscallToHandle = TofitaSyscalls.Noop
 					@volatile var frame = process.frame
 
-					// Select pml4 to work within current process memory
 					// Remember pml4 for proper restore from scheduling
 					pml4kernelThread = process.pml4
+					// Select pml4 to work within current process memory
 					writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 					// TODO refactor to separate syscall handler per-DLL
 
 					if syscall == TofitaSyscalls.DebugLog {
-						serialPrintf("[[DebugLog:PID %d]] ", index)
+						if process.is64bit {
+							serialPrintf("[[DebugLog:PID %d]] ", index)
+						} else {
+							serialPrintf("[[DebugLog:PID %d (32-bit)]] ", index)
+						}
 						serialPrintf("[[rcx=%u rdx=%8 r8=%8]] ", frame.rcxArg0, frame.rdxArg1, frame.r8)
 
 						if probeForReadOkay(frame.rdxArg1, sizeOf<DebugLogPayload>()) {
@@ -295,6 +302,7 @@ fun kernelThread() {
 								// TODO Probably SEH in %s of serialPrintf itself
 								// (at page boundary)
 								serialPrintf(
+									// TODO just %S utf16 instead of allocation
 									String.fromUTF16z(payload.message),
 									payload.extra,
 									payload.more
@@ -317,19 +325,21 @@ fun kernelThread() {
 						// TODO as UserProcess class method
 						processDestroy(process)
 					} else if syscall == TofitaSyscalls.Cpu {
+						// TODO ^ rename to CpuException or something
 						process.present = false
 						serialPrintf("[[Cpu:PID %d]] %d\n", index, frame.rdxArg1)
-						quakePrintf("UserProcess #%d closed due to CPU exception #%u\n".utf16(), index, frame.index)
+						quakePrintf("Process #%d force quit due to a CPU exception #%u\n".utf16(), index, frame.index)
 
 						// Page fault
+						// TODO `switch`
 						if frame.index == 0x0E {
-							quakePrintf("#PF at %8\n".utf16(), process.cr2PageFaultAddress)
-						}
+							quakePrintf("#PF with CR2 at %8 and IP at %8\n".utf16(), process.cr2PageFaultAddress, frame.ip)
+						} else
 						if frame.index == 0x0D {
-							quakePrintf("#GPF at %8\n".utf16(), frame.ip)
-						}
+							quakePrintf("#GPF with IP at %8\n".utf16(), frame.ip)
+						} else
 						if frame.index == 0x03 {
-							quakePrintf("#BP at %8\n".utf16(), frame.ip)
+							quakePrintf("#BP with IP at %8\n".utf16(), frame.ip)
 						}
 
 						// Select pml4 of idle process for safety
@@ -337,7 +347,7 @@ fun kernelThread() {
 						// TODO `UserProcess.this.writeOwnCr3`
 						writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
-						// Deallocate process
+						// De-allocate process
 						processDestroy(process)
 					} else {
 						// TODO TofitaSyscalls.type.tagNameFromValue(syscall)
