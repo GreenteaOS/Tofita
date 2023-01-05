@@ -48,6 +48,7 @@ Get automatic build or make yours with Teapot (if you want to edit the code)
 ### Automatic builds
 
 If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts).
+Note that it also builds third-party pull requests.
 
 
 ### Build using Teapot
@@ -69,6 +70,8 @@ git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 ```
 
 #### Configure
+
+Add your apps, folders and other files into `assets\desktop` to see them in the built image.
 
 Create `R:` ram disk about 1 GB (you may download a free [AMD Radeon™ RAMDisk](http://radeonramdisk.com/files/Radeon_RAMDisk_4_4_0_RC36.msi)) for faster builds and configure `config.json > tempFolder`.
 Otherwise `C:` is used to store builds by default.
