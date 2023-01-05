@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,9 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Loads EXE and DLL files
-// TODO 32-bit loader
 
-// TODO ntdll should have tofitaStub(){} for unresolved dll imports . log them
+// TODO ntdll should have tofitaStub(){} for unresolved dll imports -> log them
+// TODO ^ should actually show a message box and abort in future
 
 fun offsetPointer(data: UInt64, offset: UInt64): ArrayPointer<UInt8> {
 	return (data + offset) as! ArrayPointer<UInt8>
@@ -59,6 +59,8 @@ class Executable {
 	new () {}
 }
 
+class ExeLoader {
+	new() {}
 // TODO probe for read/write
 fun loadDll(name: String, root: PeExportLinkedList, exec: Executable): PeInterim {
 	let name = "C:\\Windows\\System32\\" + name
@@ -109,10 +111,6 @@ fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
 				imageSectionHeader[i].ref.sizeOfRawData)
 	}
 
-	// TODO
-	{
-	}
-
 	// TODO `const ImageDataDirectory*` just `let` all the fields in class declaration?
 	var imageDataDirectory =
 		((peOptionalHeader as! UInt64) + sizeOf<Pe64OptionalHeader>()) as! ArrayPointer<ByValue<ImageDataDirectory>>
@@ -154,20 +152,13 @@ fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
 						var patchAddrHL: ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
 						patchAddrHL[0] += delta as! UInt32
 					}
-					serialPrintf("[loadDLL] Applied IMAGE_REL_BASED_HIGHLOW\n")
 					// break
 
 					// TODO `#ifdef _WIN64`
 				case IMAGE_REL_BASED_DIR64: {
 					// TODO should be no-op on 32 bit
 					var patchAddr64 = (dest + offset) as! ArrayPointer<Int64>
-					serialPrintf("[loadDLL] dest=%8\n", dest)
-					serialPrintf("[loadDLL] offset=%8\n", offset)
-					serialPrintf("[loadDLL] patchAddr64=%8\n", patchAddr64)
-					serialPrintf("[loadDLL] patchAddr64[0]=%8\n", patchAddr64[0])
-					serialPrintf("[loadDLL] delta=%u\n", delta)
 					patchAddr64[0] += delta as! Int64
-					serialPrintf("[loadDLL] Applied IMAGE_REL_BASED_DIR64\n")
 				}
 					// break
 					// TODO `#endif`
@@ -184,7 +175,6 @@ fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
 			}
 
 			// Advance to next relocation block
-			serialPrintf("[loadDLL] Advance to next relocation block\n")
 			relocation = offsetPointer(relocation as! UInt64, relocation.sizeOfBlock) as! IMAGE_BASE_RELOCATION
 		}
 	}
@@ -198,12 +188,9 @@ fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
 		tail = tail.next
 	}
 
-	serialPrintf("[loadDLL] PeExportLinkedList\n")
 	// TODO code gen over u8 must be `i` of u8 too
 	for i in 15u8 {
-		serialPrintf("[loadDLL] dir=%d\n", i)
 		if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
-			serialPrintf("[loadDLL] sub dir=%d\n", i)
 			var codeBase: UInt64 = (buffer as! UInt64)
 			let directory = imageDataDirectory[i].ref as! ImageDataDirectory
 
@@ -215,38 +202,27 @@ fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
 			var entry: UInt32 = 0
 
 			for i in exports.numberOfNames {
-				serialPrintf("[loadDLL] numberOfNames=%d\n", i)
 				let name = (codeBase + (nameRef[0] as! UInt64)) as! ConstArrayPointer<UInt8>
-				serialPrintf("[loadDLL] numberOfNames /1\n")
-				serialPrintf("[loadDLL] numberOfNames %s\n", name)
 				let idx: UInt64 = ordinal[0]
-				serialPrintf("[loadDLL] numberOfNames /2\n")
 
 				let addr = codeBase + (exports.addressOfFunctions as! UInt64) + (idx * 4u64)
-				serialPrintf("[loadDLL] numberOfNames /3\n")
 				let ptr = addr as! ArrayPointer<UInt32>
-				serialPrintf("[loadDLL] numberOfNames /4\n")
 
 				let func = (codeBase + ptr[0]) as! UInt64
-				serialPrintf("[loadDLL] numberOfNames /5\n")
 
 				let list =
 					PhysicalAllocator.allocateBytes(sizeOf<PeExportLinkedList>()) as! PeExportLinkedList
-				serialPrintf("[loadDLL] numberOfNames /6\n")
 				list.next = null
 				list.name = name
 				list.ptr = func
-				serialPrintf("[loadDLL] numberOfNames /7\n")
 
 				tail.next = list
 				tail = tail.next
-				serialPrintf("[loadDLL] numberOfNames /8\n")
 
 				// Next step
 				nameRef++
 				ordinal++
 				entry++
-				serialPrintf("[loadDLL] numberOfNames /9\n")
 			}
 		}
 	}
@@ -292,8 +268,6 @@ fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList): Pe
 
 // TODO `template<typename SIZE>`
 fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
-	serialPrintf("[resolveDllImports]\n")
-
 	var buffer: UInt64 = pei.base
 	var imageDataDirectory = pei.imageDataDirectory
 
@@ -302,24 +276,19 @@ fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
 		let at =
 			((buffer as! UInt64) + (imageDataDirectory[image_directory_entry_import].ref.virtualAddress as! UInt64)) as! ArrayPointer<UInt8>
 		var iid = at as! IMAGE_IMPORT_DESCRIPTOR
-		serialPrintf("[resolveDllImports] /2\n")
 
 		// DLL
 		// TODO must error `while iid.originalFirstThunk != null {` compares Int and null
 		while iid.originalFirstThunk != 0 {
-			serialPrintf("[resolveDllImports] /3\n")
 			var szName = ((buffer as! UInt64) + (iid.name as! UInt64)) as! ArrayPointer<UInt8>
 			var pThunkOrg = ((buffer as! UInt64) + (iid.originalFirstThunk as! UInt64)) as! IMAGE_THUNK_DATA
-			serialPrintf("[resolveDllImports] pThunkOrg=%8\n", pThunkOrg)
 			// TODO `(SIZE *)`
 			var funcRef = ((buffer as! UInt64) + (iid.firstThunk as! UInt64)) as! ArrayPointer<FARPROC>
 
-			serialPrintf("[resolveDllImports] /4\n")
 			while pThunkOrg.addressOfData != null {
 				var ord: UInt32 = 666
 				var func = null as! ArrayPointer<UInt8>
 
-				serialPrintf("[resolveDllImports] /5\n")
 				if (pThunkOrg.ordinal & 0x80000000u32) != 0 {
 					ord = pThunkOrg.ordinal & 0xffff
 					serialPrintf("[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
@@ -353,14 +322,10 @@ fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
 					}
 				}
 
-				serialPrintf("[resolveDllImports] /10\n")
 				funcRef[0] = func as! FARPROC
-				serialPrintf("[resolveDllImports] /11\n")
 				pThunkOrg++
-				serialPrintf("[resolveDllImports] /12\n")
 				let size = 8 // TODO 4
 				funcRef = (funcRef as! UInt64 + size) as! ArrayPointer<FARPROC>
-				serialPrintf("[resolveDllImports] /13\n")
 			}
 
 			iid++
@@ -408,6 +373,7 @@ fun addDllEntry(physical: UInt64, entry: UInt64) {
 	count[0] = count[0] + 1
 	count[count[0]] = entry
 }
+}
 
 fun loadExeIntoProcess(file: String, process: UserProcess) {
 	{
@@ -421,27 +387,32 @@ fun loadExeIntoProcess(file: String, process: UserProcess) {
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
 
-		let app = loadExe(file, root, exec)
+		let loader = new ExeLoader()
+
+		let app = loader.loadExe(file, root, exec)
 
 		// DLL entry points
 		let dllEntries = PhysicalAllocator.allocateOnePagePreZeroed()
 
 		// TODO parse DLLs in multiple threads
-		let ntdll = loadDll("ntdll.dll", root, exec) // TODO proper path!!!
-		let kernel32 = loadDll("kernel32.dll", root, exec)
-		let gdi32 = loadDll("gdi32.dll", root, exec)
-		let user32 = loadDll("user32.dll", root, exec)
+		let ntdll = loader.loadDll("ntdll.dll", root, exec) // TODO proper path!!!
+		let kernel32 = loader.loadDll("kernel32.dll", root, exec)
+		let gdi32 = loader.loadDll("gdi32.dll", root, exec)
+		let user32 = loader.loadDll("user32.dll", root, exec)
+		// TODO read dll files from the list of imports of .exe and .dlls, hardcode only ntdll
+		// TODO reuse loaded dlls in memory
+		// TODO load every DLL in separate thread
 
 		// TODO resolve in multiple threads (this is readonly operation over list of imports, but not for sections)
-		resolveDllImports(ntdll, root)
-		resolveDllImports(kernel32, root)
-		resolveDllImports(gdi32, root)
-		resolveDllImports(user32, root)
-		resolveExeImports(app, root)
+		loader.resolveDllImports(ntdll, root)
+		loader.resolveDllImports(kernel32, root)
+		loader.resolveDllImports(gdi32, root)
+		loader.resolveDllImports(user32, root)
+		loader.resolveExeImports(app, root)
 
-		addDllEntry(dllEntries, kernel32.entry)
-		addDllEntry(dllEntries, gdi32.entry)
-		addDllEntry(dllEntries, user32.entry)
+		loader.addDllEntry(dllEntries, kernel32.entry)
+		loader.addDllEntry(dllEntries, gdi32.entry)
+		loader.addDllEntry(dllEntries, user32.entry)
 		// TODO addDllEntry(dllEntries, advapi32.entry)
 
 		let whereEntries = findUserspaceMemory(

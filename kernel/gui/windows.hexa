@@ -100,6 +100,8 @@ fun drawWindowFrame(title: String, x: Int16, y: Int16, w: UInt16, h: UInt16, act
 		}
 	}
 
+	// TODO ellipsis
+	// TODO draw app icon in frame
 	drawText(title, x + 8 + 4, y + 9i16 + 3i16, color.ref)
 
 	// Frame hairline
