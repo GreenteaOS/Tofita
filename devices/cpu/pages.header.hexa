@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -38,6 +38,7 @@ class PageEntry {
 	// always giving the kernel write access (the default) or both user land and the kernel
 	// (see Intel Manuals 3A 2-20)
 	@bits(1) var writeAllowed: UInt8
+	// TODO flags could be merged into single `uint8` to make set them as `0b010` quickly
 
 	/// U/S: User mode allowed
 	@bits(1) var accessibleByAll: UInt8

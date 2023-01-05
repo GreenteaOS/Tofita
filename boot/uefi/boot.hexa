@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -44,6 +44,9 @@ trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile 
 
 // Entry point
 fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_STATUS {
+	// Workaround for Clang `memset`, but it may be not needed anymore
+	buffa[0] = 0
+
 	initSerial()
 
 	serialPrint("\n[[[uefi]]] Tofita " + versionMajor + "." +
@@ -118,14 +121,13 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
 	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
 	serialPrintln("[[[uefi]]] done: uefiSetFrameBufferMode")
-	// TODO: log all ^ these to framebuffer (optionally)
 
 	// Initial RAM disk
 	var ramdisk: RamDisk = new RamDisk()
 	drawVerbose("Searching for the RAM disk...", framebuffer)
 	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk)
 	while status != EFI_STATUS.EFI_SUCCESS {
-		drawError("[ERROR] Tofita cannot load ramdisk [ERROR]", framebuffer)
+		drawError("[ERROR] Tofita cannot load RAM disk [ERROR]", framebuffer)
 	}
 	drawLoading(framebuffer, 1)
 
@@ -151,7 +153,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 
 	drawVerbose("Reading the time...", framebuffer)
 	var time: EFI_TIME = new EFI_TIME()
-	time.year = 2022
+	time.year = 2023
 	var capabilities: EFI_TIME_CAPABILITIES = new EFI_TIME_CAPABILITIES()
 	{
 		serialPrintln("[[[uefi]]] begin: GetTime")
@@ -173,11 +175,12 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 						 capabilities.accuracy,
 						 capabilities.setsToZero)
 
-			// Set 2022 as least valid, so security/HTTPS certificates at least partially work
+			// Set 2023 as least valid, so security/HTTPS certificates at least partially work
 			// and file system is not messed
-			if time.year < 2022 {
-				time.year = 2022
+			if time.year < 2023 {
+				time.year = 2023
 			}
+			// TODO use constants from version numbers
 		}
 		serialPrintln("[[[uefi]]] done: GetTime")
 	}
@@ -230,22 +233,23 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	let largeBuffer: UInt64 = conventionalAllocateLargest(efiMemoryMap)
 	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", largeBuffer)
 	conventionalOffset = largeBuffer
-	var mAddressOfEntryPoint: UInt64 = 0
+	var addressOfEntryPoint: UInt64 = 0
 
 	drawVerbose("Load kernel file...", framebuffer)
 	{
-		var ptr = asset.data as! ArrayPointer<UInt8>
-		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! @readonly PeHeader
+		let ptr = asset.data as! ArrayPointer<UInt8>
+		// TODO `@readonly PeHeader` just make all fields `let` also decided to disallow `@` on types
+		let peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! @readonly PeHeader
 		serialPrintf("PE header signature 'PE' == '%s'\n", peHeader)
-		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! @readonly Pe32OptionalHeader
+		let peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! @readonly Pe32OptionalHeader
 		serialPrintf("PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.mMagic,
 					 0x020B)
 		serialPrintf("PE32(+) size of image == %d\n", peOptionalHeader.mSizeOfImage)
-		var kernelBase = conventionalAllocateNext(peOptionalHeader.mSizeOfImage)
+		let kernelBase = conventionalAllocateNext(peOptionalHeader.mSizeOfImage)
 		memset(kernelBase as! ArrayPointer<UInt8>, 0, peOptionalHeader.mSizeOfImage) // Zeroing
 
 		// Copy sections
-		var imageSectionHeader =
+		let imageSectionHeader =
 			((peOptionalHeader as! UInt64) + peHeader.mSizeOfOptionalHeader) as! ArrayPointer<ByValue<ImageSectionHeader>>
 
 		// TODO seems like normalizer cannot iterate over `UInt16`
@@ -258,18 +262,18 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 				imageSectionHeader[i].ref.mName.ref,
 				imageSectionHeader[i].ref.mSizeOfRawData
 			)
-			var where: UInt64 = (kernelBase as! UInt64) + imageSectionHeader[i].ref.mVirtualAddress
+			let where: UInt64 = (kernelBase as! UInt64) + imageSectionHeader[i].ref.mVirtualAddress
 
 			tmemcpy(where as! ArrayPointer<UInt8>,
 					((asset.data as! UInt64) + (imageSectionHeader[i].ref.mPointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
 					imageSectionHeader[i].ref.mSizeOfRawData)
 		}
 
-		mAddressOfEntryPoint = peOptionalHeader.mAddressOfEntryPoint
+		addressOfEntryPoint = peOptionalHeader.mAddressOfEntryPoint
 	}
 
 	drawVerbose("Prepare kernel parameters...", framebuffer)
-	var params = conventionalAllocateNext(sizeOf<UefiPayload>()) as! UefiPayload
+	let params = conventionalAllocateNext(sizeOf<UefiPayload>()) as! UefiPayload
 	{
 		var b = params as! ArrayPointer<UInt8>
 		for i in sizeOf<UefiPayload>() {
@@ -288,9 +292,9 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	params.capabilities.ref.accuracy = capabilities.accuracy
 	params.capabilities.ref.setsToZero = capabilities.setsToZero
 
-	// Note: stack grows from x to X-N, not X+N
+	// Note: stack grows from X to X-N, not X+N
 	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
-	var stack = conventionalAllocateNext(1024u64 * 1024) + 1024 * 1024
+	let stack = conventionalAllocateNext(1024u64 * 1024) + 1024 * 1024
 	{
 		var b = (stack - 1024 * 1024) as! ArrayPointer<UInt8>
 		for i in 1024 * 1024 {
@@ -298,6 +302,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 		}
 	}
 
+	// TODO better idea how to automate those field assignments
 	params.efiMemoryMap.ref.memoryMap = efiMemoryMap.memoryMap
 	params.efiMemoryMap.ref.memoryMapSize = efiMemoryMap.memoryMapSize
 	params.efiMemoryMap.ref.mapKey = efiMemoryMap.mapKey
@@ -337,8 +342,8 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 		conventionalAllocateNext(sizeOf<PageEntry>() * pageTableEntriesCount) as! ArrayPointer<ByValue<PageEntry>>
 
 	{
-		for i in conventionalOffset {
 		var b = pml4entries as! ArrayPointer<UInt8>
+		for i in conventionalOffset {
 			// TODO faster with uint64_t
 			b[i] = buffa[0]
 		}
@@ -359,6 +364,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 
 	drawVerbose("Setup kernel mode...", framebuffer)
 	let startFunction = (conventionalOffset + pageSize) as! InitKernelTrampoline
+	// TODO somehow ensure size is enough to copy whole trampoline (-D arg same as verison)
 	tmemcpy(startFunction as! ArrayPointer<UInt8>, trampolineCR3 as! ConstArrayPointer<UInt8>, 32)
 	mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0)
 
@@ -370,8 +376,10 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	params.ramdisk.ref.physical = params.ramdisk.ref.base
 	params.ramdisk.ref.base = wholePhysicalStart + params.ramdisk.ref.physical
 
-	params.pml4 = (pml4entries as! UInt64) // physical address for CPU
-	params.stack = stack // physical address for stack overflow detection
+	// Physical address is used for PML4
+	params.pml4 = (pml4entries as! UInt64)
+	// Physical address TODO elaborate purpose (used for stack overflow detection? trampoline?)
+	params.stack = stack
 	params.physicalBuffer = largeBuffer
 	params.physicalBytes = conventionalOffset - largeBuffer
 	params.efiRuntimeServices = systemTable.runtimeServices
@@ -381,9 +389,9 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 
 	// Convert addresses to upper half
 
-	stack = (wholePhysicalStart as! UInt64) + stack
+	let stack = (wholePhysicalStart as! UInt64) + stack
 	params.physicalRamBitMaskVirtual = (wholePhysicalStart as! UInt64) + params.physicalRamBitMaskVirtual
-	params = ((wholePhysicalStart as! UInt64) + (params as! UInt64)) as! UefiPayload
+	let params = ((wholePhysicalStart as! UInt64) + (params as! UInt64)) as! UefiPayload
 
 	serialPrintln("[[[uefi]]] done: all done, entering kernel loader")
 
@@ -392,7 +400,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	serialPrint("\n")
 
 	drawVerbose("Entering kernel mode...", framebuffer)
-	startFunction((params as! UInt64), (pml4entries as! UInt64), stack, upper + mAddressOfEntryPoint)
+	startFunction((params as! UInt64), (pml4entries as! UInt64), stack, upper + addressOfEntryPoint)
 
 	// Should never return in practice
 	return EFI_STATUS.EFI_SUCCESS
