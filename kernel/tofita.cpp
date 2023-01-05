@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020-2022 Oleh Petrenko
+// Copyright (C) 2020-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -58,7 +58,7 @@ int32_t wcslen(const wchar_t *string_) {
 	return i;
 };
 void free(void *ptr) {
-	// serialPrintf(L"<Hexa> free\n");
+	// TODO
 };
 typedef void FILE;
 #define HEXA_MAIN mainHexa
@@ -121,19 +121,9 @@ _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 #include "formats/stb_image/unlibc.cpp"
 
 #if 0
-const KernelParams *paramsCache = null;
-uint64_t startupMilliseconds = 0;
-
 static function kernelInit(const KernelParams *params) {
-	serialPrintln(L"<Tofita> Greentea OS kernel loaded and operational");
-	serialPrintf(L"<Tofita> CR3 points to: %8\n", (uint64_t)params->pml4);
-	paramsCache = params;
 	// PhysicalAllocator::init(&params->efiMemoryMap, params->physicalRamBitMaskVirtual,
 	// DOWN_BYTES_TO_PAGES(params->ramBytes));
-	PhysicalAllocator::init(params);
-	PhysicalAllocator::resetCounter();
-	let trapeze_ = PhysicalAllocator::allocateOnePage();
-	let trapeze = PhysicalAllocator::allocatePages(8); // Bootloader
 	let trapezePhysical = trapeze - (uint64_t)WholePhysicalStart;
 	if (trapezePhysical > 1068032) {
 		serialPrintln(L"<Tofita> cannot allocate trapeze under 1 MB");
@@ -142,82 +132,6 @@ static function kernelInit(const KernelParams *params) {
 
 	let available = PhysicalAllocator::getAvailablePages() * 4096;
 	pages::pml4entries = (pages::PageEntry *)((uint64_t)WholePhysicalStart + (uint64_t)(params->pml4));
-
-	if (false) {
-		pages::mapMemory(pages::pml4entries, 4096, 4096, 256);
-		pages::mapMemory(pages::pml4entries, 4096, 4096, 256);
-		pages::mapMemory(pages::pml4entries, 4096 * 20, 4096 * 10, 256);
-
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(4096 * 10),
-					 pages::resolveAddr(pages::pml4entries, 4096 * 20));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(4096 * 10 + 123),
-					 pages::resolveAddr(pages::pml4entries, 4096 * 20 + 123));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(0),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(0 + 123),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart + 123));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(0 + 4096),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart + 4096));
-		serialPrintf(
-			L"<> %8 == %8\n", (uint64_t)(0 + 4096 * 1000 + 123),
-			pages::resolveAddr(pages::pml4entries, (uint64_t)WholePhysicalStart + 4096 * 1000 + 123));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(1048576),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)0xffff800000000000));
-		serialPrintf(L"<> %8 == %8\n", (uint64_t)(1048576 + 123),
-					 pages::resolveAddr(pages::pml4entries, (uint64_t)0xffff800000000000 + 123));
-
-		// serialPrint(L"resolves from, to, wh, wh+8888: ");
-		// serialPrint(L"\n");
-		// serialPrintHex(4096 * 10);
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr(4096 * 20 + 123));
-		// serialPrint(L"==\n");
-		// serialPrintHex(pages::resolveAddr(4096 * 20));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)WholePhysicalStart));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)WholePhysicalStart + 8888));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)WholePhysicalStart + 4096 * 1000));
-		// serialPrint(L"\n");
-		// serialPrintHex(pages::resolveAddr((uint64_t)0xffff800000000000));
-		// serialPrint(L"\n");
-	};
-
-	setFramebuffer(&params->framebuffer);
-	setRamDisk(&params->ramdisk);
-
-	if (sizeof(uint8_t *) == 4)
-		serialPrintln(L"<Tofita> void*: 4 bytes");
-	if (sizeof(uint8_t *) == 8)
-		serialPrintln(L"<Tofita> void*: 8 bytes");
-
-#ifdef __cplusplus
-	serialPrintln(L"<Tofita> __cplusplus");
-#else
-	serialPrintln(L"<Tofita> !__cplusplus");
-#endif
-
-#if defined(__clang__)
-	serialPrintln(L"<Tofita> __clang__");
-#elif defined(__GNUC__) || defined(__GNUG__)
-	serialPrintln(L"<Tofita> __GNUC__");
-#elif defined(_MSC_VER)
-	serialPrintln(L"<Tofita> _MSC_VER");
-#endif
-
-	disablePic();
-	enableInterrupts();
-	enablePS2Mouse();
-
-	initText();
-	initializeCompositor();
-
-	quakePrintf(L"Greentea OS loaded and operational\n");
-
-	// enableLocalApic();
-
-	CPUID cpuid = getCPUID();
 
 	uint32_t megs = Math::round((double)params->ramBytes / (1024.0 * 1024.0));
 	uint32_t availableMegs = Math::round((double)available / (1024.0 * 1024.0));
@@ -231,102 +145,6 @@ static function kernelInit(const KernelParams *params) {
 		uint64_t trapeze = (uint64_t)0x8000 + (uint64_t)WholePhysicalStart;
 		tmemcpy((void *)trapeze, (const void *)asset.data, asset.size);
 	}
-
-	disablePic();
-	if (!ACPIParser::parse(params->acpiTablePhysical)) {
-		quakePrintf(L"ACPI is *not* loaded\n");
-	} else {
-		quakePrintf(L"ACPI 2.0 is loaded and ready\n");
-	}
-
-	quakePrintf(L"Enter 'help' for commands\n");
-
-	{
-		// TODO move to compositor
-		RamDiskAsset a = getRamDiskAsset(L"root/Windows/Web/Wallpaper/Tofita/default.bmp");
-		Bitmap32 *bmp = bmp::loadBmp24(&a);
-		setWallpaper(bmp, Center);
-	}
-
-	// var sandbox = sandbox::createSandbox();
-	dwm::initDwm();
-
-	// Setup scheduling
-	currentThread = THREAD_INIT;
-
-	// GUI thread
-	{
-		memset(&guiThreadFrame, 0, sizeof(InterruptFrame));		// Zeroing
-		memset(&guiStack, 0, sizeof(stackSizeForKernelThread)); // Zeroing
-
-		guiThreadFrame.ip = (uint64_t)&guiThreadStart;
-		guiThreadFrame.cs = SYS_CODE64_SEL;
-		// TODO allocate as physicall memory
-		guiThreadFrame.sp = (uint64_t)&guiStack + stackSizeForKernelThread;
-		guiThreadFrame.ss = SYS_DATA32_SEL;
-	}
-
-	// Main thread
-	{
-		memset(&kernelThreadFrame, 0, sizeof(InterruptFrame));	   // Zeroing
-		memset(&kernelStack, 0, sizeof(stackSizeForKernelThread)); // Zeroing
-
-		kernelThreadFrame.ip = (uint64_t)&kernelThreadStart;
-		kernelThreadFrame.cs = SYS_CODE64_SEL;
-		kernelThreadFrame.sp = (uint64_t)&kernelStack + stackSizeForKernelThread;
-		kernelThreadFrame.ss = SYS_DATA32_SEL;
-	}
-
-	// Idle process
-	{
-		memset(&process::processes, 0, sizeof(process::processes)); // Zeroing
-		process::Process *idle = &process::processes[0];
-		idle->pml4 = pages::pml4entries; // Save CR3 template to idle process
-		idle->schedulable = true;		 // At idle schedule to idle process
-		idle->present = true;
-		idle->syscallToHandle = TofitaSyscalls::Noop;
-		process::currentProcess = 0;
-		pml4kernelThread = process::processes[0].pml4;
-	}
-
-	// Demo
-	if (false) {
-		for (uint8_t i = 0; i < 3; ++i) {
-			process::Process *demo = process::Process_create();
-			serialPrintf(L"<> pid == %u\n", demo->pid);
-			process::Process_init(demo);
-			exe::loadExeIntoProcess(L"desktop/wndapp.exe", demo);
-			demo->schedulable = true;
-		}
-	}
-
-	startupMilliseconds = paramsCache->time.Hour * 60 * 60 * 1000 + paramsCache->time.Minute * 60 * 1000 +
-						  paramsCache->time.Second * 1000;
-
-	// Show something before scheduling delay
-	composite(startupMilliseconds);
-	copyToScreen();
-	serialPrintln(L"<Tofita> [ready for scheduling]");
-}
-
-function switchToUserProcess() {
-	// if (processesCount == 0)
-	//	amd64::enableAllInterruptsAndHalt();
-	// TODO
-	var next = getNextProcess();
-
-	if (next == 0) {
-		markAllProcessessSchedulable();
-		next = getNextProcess();
-	}
-
-	if (next == 0) {
-		// serialPrintln(L"<Tofita> [halt]");
-		// amd64::enableAllInterruptsAndHalt(); // Nothing to do
-	}
-	// else
-	amd64::yield();
-	// TODO
 }
 
 function kernelThread() {
@@ -425,38 +243,6 @@ function kernelThread() {
 		switchToUserProcess();
 	}
 }
-
-function guiThreadStart();
-
-function kernelThreadStart();
-
-// In case of kernel crash set instruction pointer to here
-function kernelThreadLoop() {
-	serialPrintln(L"<Tofita> [looping forever]");
-	while (true) {
-		amd64::pause();
-	};
-}
-
-function guiThread() {
-	serialPrintln(L"<Tofita> [guiThread] thread started");
-
-	while (true) {
-		// Poll PS/2 devices
-		pollPS2Devices();
-
-		if (haveToRender == false) {
-			switchToUserProcess();
-		}
-
-		haveToRender = false;
-
-		composite(startupMilliseconds);
-		copyToScreen();
-
-		switchToUserProcess();
-	}
-}
 #endif
 
 #define HEAP_ZERO_MEMORY 0
@@ -464,6 +250,7 @@ function guiThread() {
 #define HANDLE void*
 
 static void ExitProcess(int32_t x) {
+	// Stub
 }
 
 static void wprintf(const wchar_t* x, const void* y) {
@@ -520,27 +307,7 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 #include "../kernel-diff/kernel.c"
 
 externC function kernelMain(/*const TODO*/void *params) {
-	kernelParams = nullptr;
-
-	if (params) {
 	kernelParams = (UefiPayload_ *)params;
 	heap = &heapInitial[0];
 	HEXA_MAIN(0, nullptr);
-	} else {
-		//kernelInit(params);
-	}
-
-	__sync_synchronize();
-
-	// TODO composite here first frame!!!
-	// cause if crashes on hardware, at least it shows something
-
-	// sti -> start sheduling here
-	// It will erase whole stack on next sheduling
-	// TOOD kernel `yield`/`await`
-	while (true) {
-		enableAllInterruptsAndHalt();
-	}
-	// TODO hexa: error if code present in unreachable block
-	// (no break/continue/throw)
 }

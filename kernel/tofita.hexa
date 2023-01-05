@@ -41,6 +41,7 @@ fun kernelInit(params: UefiPayload) {
 
 	pml4entries = ((wholePhysicalStart as! UInt64) + (params.pml4 as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 
+	// TODO
 	if false {
 		mapMemory(pml4entries, 4096, 4096, 256)
 		mapMemory(pml4entries, 4096, 4096, 256)
@@ -64,6 +65,7 @@ fun kernelInit(params: UefiPayload) {
 		serialPrintf("<> %8 == %8\n", (1048576 + 123),
 					 resolveAddr(pml4entries, 0xffff800000000000u64 + 123))
 
+		// TODO move all these to SanityCheck module
 		// serialPrint("resolves from, to, wh, wh+8888: ")
 		// serialPrint("\n")
 		// serialPrintHex(4096 * 10)
@@ -86,14 +88,22 @@ fun kernelInit(params: UefiPayload) {
 	setRamDisk(params.ramdisk.ref)
 
 	// TODO >>
+	// TODO move to SanityCheck
+	// TODO this seems not to work?!
 	if sizeOf<ArrayPointer<UInt8> >() == 4 {
 		serialPrintln("<Tofita> void*: 4 bytes")
+		// TODO QSOD
+	} else {
+		// Ok
 	}
 	if sizeOf<ArrayPointer<UInt8> >() == 8 {
 		serialPrintln("<Tofita> void*: 8 bytes")
+		// Ok
+	} else {
+		// TODO QSOD
 	}
 
-	// disablePic()
+	// disablePic() TODO should be disabled after APIC
 	setupInterruptsAndExceptions()
 	// TODO rename to initializeInterrupts()
 	enablePS2Mouse()
@@ -112,6 +122,7 @@ fun kernelInit(params: UefiPayload) {
 	var megs: Int32 = Math.round(params.ramBytes / (1024.0 * 1024.0))
 	quakePrintf("[CPU] %s %s %d MB RAM\n".utf16(), cpuid.vendorID, cpuid.brandName, megs)
 
+	// disablePic() TODO may be required before activation
 	if !ACPIParser.parse(params.acpiTablePhysical) {
 		quakePrintf("ACPI is *not* loaded\n".utf16())
 	} else {
@@ -121,11 +132,12 @@ fun kernelInit(params: UefiPayload) {
 	quakePrintf("Enter 'help' for commands\n".utf16())
 
 	{
-		// TODO move to compositor
+		// TODO move to compositor/DWM
 		var a: RamDiskAsset = new RamDiskAsset()
 		getRamDiskAsset(a, "root/Windows/Web/Wallpaper/Tofita/default.bmp")
 		var bmp: Bitmap32 = loadBitMap24(a)
 		// TODO var bmp: Bitmap32 = loadBitMap24(Buffer.fromBytes(a.data))
+		// ^ Buffer should not create a copy of data
 		setWallpaper(bmp, WallpaperStyle.Center)
 	}
 
@@ -150,6 +162,7 @@ fun kernelInit(params: UefiPayload) {
 
 	// Main thread
 	{
+		// TODO InterruptFrame.fillWithZeros() in constructor
 		memset(kernelThreadFrame as! ArrayPointer<UInt8>, 0, sizeOf<InterruptFrame>()) // Zeroing
 		memset(kernelStack.ref, 0, stackSizeForKernelThread) // Zeroing
 
@@ -198,6 +211,7 @@ fun kernelInit(params: UefiPayload) {
 			serialPrintf("<Tofita> GUI process ID == %u\n", guiProcess.pid)
 			processInit(guiProcess)
 			disableSerial = 1
+			// TODO `@defer disableSerial = 0` <- `@` must have the lowest priority?
 			disableSerial = 0
 			guiProcess.name = "Greentea OS GUI"
 			guiProcess.schedulable = true
@@ -211,6 +225,8 @@ fun kernelInit(params: UefiPayload) {
 	composite(startupMilliseconds)
 	copyToScreen()
 	serialPrintln("<Tofita> [ready for scheduling]")
+	// TODO must disable scheduler until this function exits
+	// ^ currentThread = ThreadKind.THREAD_NOT_READY
 }
 
 fun switchToUserProcess() {
@@ -405,10 +421,10 @@ fun kernelMain(params: UefiPayload) {
 	// TODO composite here first frame!!!
 	// cause if crashes on hardware, at least it shows something
 
-	// sti . start sheduling here
-	// It will erase whole stack on next sheduling
+	// sti -> start scheduling here
+	// It will erase whole stack on next scheduling
 	// TODO kernel `yield`/`await`
-	// TODO dealloc pre-thread after first yield
+	// TODO de-allocate pre-thread after first yield
 	while true {
 		enableAllInterruptsAndHalt()
 	}
@@ -416,9 +432,8 @@ fun kernelMain(params: UefiPayload) {
 	// (no break/continue/throw)
 }
 
-// Entry point of the project
-
+// Data passed from UEFI
 @rename('kernelParams') declare let kernelParams: UefiPayload
 
-//
+// Entry point of the project
 kernelMain(kernelParams)
