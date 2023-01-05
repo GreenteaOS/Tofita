@@ -34,9 +34,12 @@ fun kernelInit(params: UefiPayload) {
 	// TODO `anyPtrOrObj as! UInt32` -> error precision lost on 64-bit
 	paramsCache = params
 	PhysicalAllocator.init(params)
+	// Ensure to allocate within 1 MB
 	PhysicalAllocator.resetCounter()
-	let trapeze_ = PhysicalAllocator.allocateOnePage()
+	let trapezePadding = PhysicalAllocator.allocateOnePage()
+	// TODO ^ rename to "first reserved 4k"? Does it even works like that? Clearify in comments
 	let trapeze = PhysicalAllocator.allocatePages(8) // Bootloader
+	let trapezePhysical = trapeze - (wholePhysicalStart as! UInt64)
 
 	pml4entries = ((wholePhysicalStart as! UInt64) + (params.pml4 as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 
@@ -120,6 +123,24 @@ fun kernelInit(params: UefiPayload) {
 
 	var megs: Int32 = Math.round(params.ramBytes / (1024.0 * 1024.0))
 	quakePrintf("[CPU] %s %s %d MB RAM\n".utf16(), cpuid.vendorID, cpuid.brandName, megs)
+
+	if trapezePhysical > 1068032 {
+		// TODO exact address should be 0x8000u64?
+		serialPrintln("<Tofita> cannot allocate trapeze under 1 MB")
+		qsod("Cannot allocate trapeze under 1 MB, got at %8\n".utf16(), trapezePhysical, 0)
+		while true {}
+		// TODO test by >1 if it even renders this message
+	}
+
+	// SMP trapeze
+	{
+		var asset: RamDiskAsset = new RamDiskAsset()
+		getRamDiskAsset(asset, "trapeze.tofita")
+		serialPrintf("Copy trapeze %d bytes\n", asset.size)
+		let trapeze = 0x8000u64 + (wholePhysicalStart as! UInt64)
+		// TODO why fixed address here? Wasn't it updated at BSP code?
+		tmemcpy(trapeze as! ArrayPointer<UInt8>, asset.data as! ConstArrayPointer<UInt8>, asset.size)
+	}
 
 	// disablePic() TODO may be required before activation
 	if !ACPIParser.parse(params.acpiTablePhysical) {
