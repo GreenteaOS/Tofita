@@ -61,324 +61,326 @@ class Executable {
 
 class ExeLoader<SIZE, HEADER> {
 	new() {}
-// TODO probe for read/write
-fun loadDll(name: String, root: PeExportLinkedList, exec: Executable): PeInterim {
-	let name = "C:\\Windows\\System32\\" + name
-	return loadPe(name, root, exec)
-}
 
-fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
-	var asset: RamDiskAsset = new RamDiskAsset()
-	getRamDiskAsset(asset, name)
-	serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name.utf16(), asset.size, asset.data)
-	var ptr = asset.data as! ArrayPointer<UInt8>
-	var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
-	serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
-	var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
-	serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
-				 0x020B)
-	serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
-
-	let pages = down_bytes_to_pages(peOptionalHeader.sizeOfImage) + 1u32
-	let physical = PhysicalAllocator.allocatePages(pages)
-
-	if exec.nextBase == 0 {
-		// TODO round to pages? or 64k?
-		exec.nextBase = peOptionalHeader.imageBase
+	// TODO probe for read/write
+	fun loadDll(name: String, root: PeExportLinkedList, exec: Executable): PeInterim {
+		let name = "C:\\Windows\\System32\\" + name
+		return loadPe(name, root, exec)
 	}
 
-	mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
+	fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
+		var asset: RamDiskAsset = new RamDiskAsset()
+		getRamDiskAsset(asset, name)
+		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name.utf16(), asset.size, asset.data)
+		var ptr = asset.data as! ArrayPointer<UInt8>
+		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
+		serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
+		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
+		serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
+					0x020B)
+		serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
 
-	let buffer: UInt64 = exec.nextBase
-	memset(buffer as! ArrayPointer<UInt8>, 0, peOptionalHeader.sizeOfImage) // Zeroing
-
-	exec.nextBase = exec.nextBase + pages * pageSize
-
-	// Copy sections
-	var imageSectionHeader =
-		((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader) as! ArrayPointer<ByValue<ImageSectionHeader>>
-
-	// TODO copy PE headers?
-	for i in peHeader.numberOfSections {
-		serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
-					 imageSectionHeader[i].ref.name.ref,
-					 imageSectionHeader[i].ref.sizeOfRawData,
-					 imageSectionHeader[i].ref.virtualAddress)
-		var where: UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
-
-		tmemcpy(where as! ArrayPointer<UInt8>,
-				((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
-				imageSectionHeader[i].ref.sizeOfRawData)
-	}
-
-	// TODO `const ImageDataDirectory*` just `let` all the fields in class declaration?
-	var imageDataDirectory =
-		((peOptionalHeader as! UInt64) + sizeOf<Pe64OptionalHeader>()) as! ArrayPointer<ByValue<ImageDataDirectory>>
-
-	// Relocate EXE or DLL to a new base
-	// TODO should return signed or something? used ptr_diff_t
-	// NOTE this is a user-mode address, so pointer delta is ok (TODO really?)
-	let delta: Int64 = (buffer as! Int64) - (peOptionalHeader.imageBase as! Int64)
-	if delta != 0 {
-		var codeBase: ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
-
-		var directory =
-			// TODO indexing by enum like `IMAGE_DIRECTORY_ENTRY_BASERELOC`
-			imageDataDirectory[image_directory_entry_basereloc].ref as! IMAGE_DATA_DIRECTORY
-
-		if directory.size == 0 {
-			// return (delta == 0)
-		}
-
-		var relocation = (codeBase + directory.virtualAddress) as! IMAGE_BASE_RELOCATION
-		while relocation.virtualAddress > 0 {
-			var dest: UInt64 = (codeBase as! UInt64) + (relocation.virtualAddress as! UInt64)
-			var relInfo = offsetPointer(relocation as! UInt64, image_sizeof_base_relocation) as! ArrayPointer<UInt16>
-
-			for i in (relocation.sizeOfBlock - image_sizeof_base_relocation) / 2 {
-				// The upper 4 bits define the type of relocation
-				var type: Int32 = relInfo[0] >> 12
-				// The lower 12 bits define the offset
-				var offset: UInt64 = relInfo[0] & 0xfff
-
-				switch type as! ImageRelocationType {
-				case IMAGE_REL_BASED_ABSOLUTE:
-					// Skip relocation
-					// TODO `break` will not work here?
-
-				case IMAGE_REL_BASED_HIGHLOW:
-					// Change complete 32 bit address
-					{
-						var patchAddrHL: ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
-						patchAddrHL[0] += delta as! UInt32
-					}
-					// break
-
-					// TODO `#ifdef _WIN64`
-				case IMAGE_REL_BASED_DIR64: {
-					// TODO should be no-op on 32 bit
-					var patchAddr64 = (dest + offset) as! ArrayPointer<Int64>
-					patchAddr64[0] += delta as! Int64
-				}
-					// break
-					// TODO `#endif`
-
-				case _:
-					// TODO loader should fail
-					serialPrintf("[loadDLL] Unknown relocation: %d\n", type)
-					//break
-				}
-
-				// Next step
-				// TODO must error `relInfo++`
-				relInfo++
-			}
-
-			// Advance to next relocation block
-			relocation = offsetPointer(relocation as! UInt64, relocation.sizeOfBlock) as! IMAGE_BASE_RELOCATION
-		}
-	}
-
-	serialPrintf("[loadDLL] Done relocations\n")
-
-	// Exports
-
-	var tail: PeExportLinkedList = root
-	while tail.next != null {
-		tail = tail.next
-	}
-
-	// TODO code gen over u8 must be `i` of u8 too
-	for i in 15u8 {
-		if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
-			var codeBase: UInt64 = (buffer as! UInt64)
-			let directory = imageDataDirectory[i].ref as! ImageDataDirectory
-
-			var exports = ((buffer as! UInt64) + (directory.virtualAddress as! UInt64)) as! IMAGE_EXPORT_DIRECTORY
-
-			//var i: UInt32 = 0
-			var nameRef: ArrayPointer<UInt32> = (codeBase + (exports.addressOfNames as! UInt64)) as! ArrayPointer<UInt32>
-			var ordinal: ArrayPointer<UInt16> = (codeBase + (exports.addressOfNameOrdinals as! UInt64)) as! ArrayPointer<UInt16>
-			var entry: UInt32 = 0
-
-			for i in exports.numberOfNames {
-				let name = (codeBase + (nameRef[0] as! UInt64)) as! ConstArrayPointer<UInt8>
-				let idx: UInt64 = ordinal[0]
-
-				let addr = codeBase + (exports.addressOfFunctions as! UInt64) + (idx * 4u64)
-				let ptr = addr as! ArrayPointer<UInt32>
-
-				let func = (codeBase + ptr[0]) as! UInt64
-
-				let list =
-					PhysicalAllocator.allocateBytes(sizeOf<PeExportLinkedList>()) as! PeExportLinkedList
-				list.next = null
-				list.name = name
-				list.ptr = func
-
-				tail.next = list
-				tail = tail.next
-
-				// Next step
-				nameRef++
-				ordinal++
-				entry++
-			}
-		}
-	}
-
-	var pei = new PeInterim()
-
-	pei.base = buffer
-	pei.entry = (buffer as! UInt64) + (peOptionalHeader.addressOfEntryPoint as! UInt64)
-	pei.imageDataDirectory = imageDataDirectory
-	pei.sizeOfStackReserve = peOptionalHeader.sizeOfStackReserve
-
-	return pei
-}
-
-// TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
-// may be moved between versions.
-// Search only selected .dll only within the user provided dlls
-fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList): PeExportLinkedList {
-	var list: PeExportLinkedList = root
-	// TODO compute crc for faster .dll import names lookup
-	while list.next != null {
-		// Step upfront, to ignore empty root
-		list = list.next
-
-		var i: UInt16 = 0
-		while true {
-			if (list.name[i] == name[i]) && (name[i] as! Int == 0) {
-				serialPrintf("[getProcAddress] import {%s} resolved to {%s}\n", name, list.name)
-				return list
-				break
-			}
-			if list.name[i] == name[i] {
-				i++
-				continue
-			}
-			break
-		}
-	}
-
-	serialPrintf("[getProcAddress] import {%s} unresolved\n", name)
-	return null
-}
-
-// TODO `template<typename SIZE>`
-fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
-	var buffer: UInt64 = pei.base
-	var imageDataDirectory = pei.imageDataDirectory
-
-	// Imports
-	{
-		let at =
-			((buffer as! UInt64) + (imageDataDirectory[image_directory_entry_import].ref.virtualAddress as! UInt64)) as! ArrayPointer<UInt8>
-		var iid = at as! IMAGE_IMPORT_DESCRIPTOR
-
-		// DLL
-		// TODO must error `while iid.originalFirstThunk != null {` compares Int and null
-		while iid.originalFirstThunk != 0 {
-			var szName = ((buffer as! UInt64) + (iid.name as! UInt64)) as! ArrayPointer<UInt8>
-			var pThunkOrg = ((buffer as! UInt64) + (iid.originalFirstThunk as! UInt64)) as! IMAGE_THUNK_DATA
-			// TODO `(SIZE *)`
-			var funcRef = ((buffer as! UInt64) + (iid.firstThunk as! UInt64)) as! ArrayPointer<FARPROC>
-
-			while pThunkOrg.addressOfData != null {
-				var ord: UInt32 = 666
-				var func = null as! ArrayPointer<UInt8>
-
-				if (pThunkOrg.ordinal & 0x80000000u32) != 0 {
-					ord = pThunkOrg.ordinal & 0xffff
-					serialPrintf("[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
-								+
-								"IMPLEMENTED YET!\n",
-								szName, ord, pThunkOrg.func
-					)
-				} else {
-					let pIBN = (
-						(buffer as! UInt64) +
-						(
-							(pThunkOrg.addressOfData as! UInt64) &
-							0xffffffffu32
-						) as! UInt64
-					) as! IMAGE_IMPORT_BY_NAME
-
-					ord = pIBN.hint
-					var szImportName: ConstArrayPointer<UInt8> = pIBN.name as! ConstArrayPointer<UInt8>
-					serialPrintf("[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
-								 szImportName, ord, pThunkOrg.func)
-
-					// Resolve import
-					func = null
-
-					var proc: PeExportLinkedList = getProcAddress(szImportName, root)
-
-					if proc != null {
-						func = proc.ptr as! ArrayPointer<UInt8>
-					} else {
-						func = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root).ptr as! ArrayPointer<UInt8>
-					}
-				}
-
-				funcRef[0] = func as! FARPROC
-				pThunkOrg++
-				let size = 8 // TODO 4
-				funcRef = (funcRef as! UInt64 + size) as! ArrayPointer<FARPROC>
-			}
-
-			iid++
-		}
-	}
-}
-
-fun loadExe(name: String, root: PeExportLinkedList, exec: Executable) {
-	var ei: ExeInterim = new ExeInterim()
-
-	ei.pei = loadPe(name, root, exec)
-
-	// Allocate stack
-	{
-		let pages = down_bytes_to_pages(ei.pei.sizeOfStackReserve) + 1u32
+		let pages = down_bytes_to_pages(peOptionalHeader.sizeOfImage) + 1u32
 		let physical = PhysicalAllocator.allocatePages(pages)
 
-		let buffer: UInt64 = exec.nextBase
+		if exec.nextBase == 0 {
+			// TODO round to pages? or 64k?
+			exec.nextBase = peOptionalHeader.imageBase
+		}
+
 		mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
-		memset(buffer as! ArrayPointer<UInt8>, 0, ei.pei.sizeOfStackReserve) // Zeroing
+
+		let buffer: UInt64 = exec.nextBase
+		memset(buffer as! ArrayPointer<UInt8>, 0, peOptionalHeader.sizeOfImage) // Zeroing
 
 		exec.nextBase = exec.nextBase + pages * pageSize
 
-		ei.stackVirtual = buffer
+		// Copy sections
+		var imageSectionHeader =
+			((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader) as! ArrayPointer<ByValue<ImageSectionHeader>>
+
+		// TODO copy PE headers?
+		for i in peHeader.numberOfSections {
+			serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
+						imageSectionHeader[i].ref.name.ref,
+						imageSectionHeader[i].ref.sizeOfRawData,
+						imageSectionHeader[i].ref.virtualAddress)
+			var where: UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
+
+			tmemcpy(where as! ArrayPointer<UInt8>,
+					((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
+					imageSectionHeader[i].ref.sizeOfRawData)
+		}
+
+		// TODO `const ImageDataDirectory*` just `let` all the fields in class declaration?
+		var imageDataDirectory =
+			((peOptionalHeader as! UInt64) + sizeOf<Pe64OptionalHeader>()) as! ArrayPointer<ByValue<ImageDataDirectory>>
+
+		// Relocate EXE or DLL to a new base
+		// TODO should return signed or something? used ptr_diff_t
+		// NOTE this is a user-mode address, so pointer delta is ok (TODO really?)
+		let delta: Int64 = (buffer as! Int64) - (peOptionalHeader.imageBase as! Int64)
+		if delta != 0 {
+			var codeBase: ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
+
+			var directory =
+				// TODO indexing by enum like `IMAGE_DIRECTORY_ENTRY_BASERELOC`
+				imageDataDirectory[image_directory_entry_basereloc].ref as! IMAGE_DATA_DIRECTORY
+
+			if directory.size == 0 {
+				// return (delta == 0)
+			}
+
+			var relocation = (codeBase + directory.virtualAddress) as! IMAGE_BASE_RELOCATION
+			while relocation.virtualAddress > 0 {
+				var dest: UInt64 = (codeBase as! UInt64) + (relocation.virtualAddress as! UInt64)
+				var relInfo = offsetPointer(relocation as! UInt64, image_sizeof_base_relocation) as! ArrayPointer<UInt16>
+
+				for i in (relocation.sizeOfBlock - image_sizeof_base_relocation) / 2 {
+					// The upper 4 bits define the type of relocation
+					var type: Int32 = relInfo[0] >> 12
+					// The lower 12 bits define the offset
+					var offset: UInt64 = relInfo[0] & 0xfff
+
+					switch type as! ImageRelocationType {
+					case IMAGE_REL_BASED_ABSOLUTE:
+						// Skip relocation
+						// TODO `break` will not work here?
+
+					case IMAGE_REL_BASED_HIGHLOW:
+						// Change complete 32 bit address
+						{
+							var patchAddrHL: ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
+							patchAddrHL[0] += delta as! UInt32
+						}
+						// break
+
+						// TODO `#ifdef _WIN64`
+					case IMAGE_REL_BASED_DIR64: {
+						// TODO should be no-op on 32 bit
+						var patchAddr64 = (dest + offset) as! ArrayPointer<Int64>
+						patchAddr64[0] += delta as! Int64
+					}
+						// break
+						// TODO `#endif`
+
+					case _:
+						// TODO loader should fail
+						serialPrintf("[loadDLL] Unknown relocation: %d\n", type)
+						//break
+					}
+
+					// Next step
+					// TODO must error `relInfo++`
+					relInfo++
+				}
+
+				// Advance to next relocation block
+				relocation = offsetPointer(relocation as! UInt64, relocation.sizeOfBlock) as! IMAGE_BASE_RELOCATION
+			}
+		}
+
+		serialPrintf("[loadDLL] Done relocations\n")
+
+		// Exports
+
+		var tail: PeExportLinkedList = root
+		while tail.next != null {
+			tail = tail.next
+		}
+
+		// TODO code gen over u8 must be `i` of u8 too
+		for i in 15u8 {
+			if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
+				var codeBase: UInt64 = (buffer as! UInt64)
+				let directory = imageDataDirectory[i].ref as! ImageDataDirectory
+
+				var exports = ((buffer as! UInt64) + (directory.virtualAddress as! UInt64)) as! IMAGE_EXPORT_DIRECTORY
+
+				//var i: UInt32 = 0
+				var nameRef: ArrayPointer<UInt32> = (codeBase + (exports.addressOfNames as! UInt64)) as! ArrayPointer<UInt32>
+				var ordinal: ArrayPointer<UInt16> = (codeBase + (exports.addressOfNameOrdinals as! UInt64)) as! ArrayPointer<UInt16>
+				var entry: UInt32 = 0
+
+				for i in exports.numberOfNames {
+					let name = (codeBase + (nameRef[0] as! UInt64)) as! ConstArrayPointer<UInt8>
+					let idx: UInt64 = ordinal[0]
+
+					let addr = codeBase + (exports.addressOfFunctions as! UInt64) + (idx * 4u64)
+					let ptr = addr as! ArrayPointer<UInt32>
+
+					let func = (codeBase + ptr[0]) as! UInt64
+
+					let list =
+						PhysicalAllocator.allocateBytes(sizeOf<PeExportLinkedList>()) as! PeExportLinkedList
+					list.next = null
+					list.name = name
+					list.ptr = func
+
+					tail.next = list
+					tail = tail.next
+
+					// Next step
+					nameRef++
+					ordinal++
+					entry++
+				}
+			}
+		}
+
+		var pei = new PeInterim()
+
+		pei.base = buffer
+		pei.entry = (buffer as! UInt64) + (peOptionalHeader.addressOfEntryPoint as! UInt64)
+		pei.imageDataDirectory = imageDataDirectory
+		pei.sizeOfStackReserve = peOptionalHeader.sizeOfStackReserve
+
+		return pei
 	}
 
-	return ei
-}
+	// TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
+	// may be moved between versions.
+	// Search only selected .dll only within the user provided dlls
+	fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList): PeExportLinkedList {
+		var list: PeExportLinkedList = root
+		// TODO compute crc for faster .dll import names lookup
+		while list.next != null {
+			// Step upfront, to ignore empty root
+			list = list.next
 
-fun resolveExeImports(ei: ExeInterim, root: PeExportLinkedList) {
-	resolveDllImports(ei.pei, root)
-}
+			var i: UInt16 = 0
+			while true {
+				if (list.name[i] == name[i]) && (name[i] as! Int == 0) {
+					serialPrintf("[getProcAddress] import {%s} resolved to {%s}\n", name, list.name)
+					return list
+					break
+				}
+				if list.name[i] == name[i] {
+					i++
+					continue
+				}
+				break
+			}
+		}
 
-// TODO `template<typename SIZE>` per function
-fun addDllEntry(physical: UInt64, entry: UInt64) {
-	let max = 511u64 // TODO any other limits?
-	// TODO ^ 32-bit limit is x2
-	let count = physical as! ArrayPointer<UInt64>
-
-	if count[0] >= 511 {
-		// TODO error
-		return
+		serialPrintf("[getProcAddress] import {%s} unresolved\n", name)
+		return null
 	}
 
-	// Yeah this is weird way to save DLLs count
-	count[0] = count[0] + 1
-	count[count[0]] = entry
-}
+	// TODO `template<typename SIZE>`
+	fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
+		var buffer: UInt64 = pei.base
+		var imageDataDirectory = pei.imageDataDirectory
+
+		// Imports
+		{
+			let at =
+				((buffer as! UInt64) + (imageDataDirectory[image_directory_entry_import].ref.virtualAddress as! UInt64)) as! ArrayPointer<UInt8>
+			var iid = at as! IMAGE_IMPORT_DESCRIPTOR
+
+			// DLL
+			// TODO must error `while iid.originalFirstThunk != null {` compares Int and null
+			while iid.originalFirstThunk != 0 {
+				var szName = ((buffer as! UInt64) + (iid.name as! UInt64)) as! ArrayPointer<UInt8>
+				var pThunkOrg = ((buffer as! UInt64) + (iid.originalFirstThunk as! UInt64)) as! IMAGE_THUNK_DATA
+				// TODO `(SIZE *)`
+				var funcRef = ((buffer as! UInt64) + (iid.firstThunk as! UInt64)) as! ArrayPointer<FARPROC>
+
+				while pThunkOrg.addressOfData != null {
+					var ord: UInt32 = 666
+					var func = null as! ArrayPointer<UInt8>
+
+					if (pThunkOrg.ordinal & 0x80000000u32) != 0 {
+						ord = pThunkOrg.ordinal & 0xffff
+						serialPrintf("[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
+									+
+									"IMPLEMENTED YET!\n",
+									szName, ord, pThunkOrg.func
+						)
+					} else {
+						let pIBN = (
+							(buffer as! UInt64) +
+							(
+								(pThunkOrg.addressOfData as! UInt64) &
+								0xffffffffu32
+							) as! UInt64
+						) as! IMAGE_IMPORT_BY_NAME
+
+						ord = pIBN.hint
+						var szImportName: ConstArrayPointer<UInt8> = pIBN.name as! ConstArrayPointer<UInt8>
+						serialPrintf("[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
+									szImportName, ord, pThunkOrg.func)
+
+						// Resolve import
+						func = null
+
+						var proc: PeExportLinkedList = getProcAddress(szImportName, root)
+
+						if proc != null {
+							func = proc.ptr as! ArrayPointer<UInt8>
+						} else {
+							func = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root).ptr as! ArrayPointer<UInt8>
+						}
+					}
+
+					funcRef[0] = func as! FARPROC
+					pThunkOrg++
+					let size = 8 // TODO 4
+					funcRef = (funcRef as! UInt64 + size) as! ArrayPointer<FARPROC>
+				}
+
+				iid++
+			}
+		}
+	}
+
+	fun loadExe(name: String, root: PeExportLinkedList, exec: Executable) {
+		var ei: ExeInterim = new ExeInterim()
+
+		ei.pei = loadPe(name, root, exec)
+
+		// Allocate stack
+		{
+			let pages = down_bytes_to_pages(ei.pei.sizeOfStackReserve) + 1u32
+			let physical = PhysicalAllocator.allocatePages(pages)
+
+			let buffer: UInt64 = exec.nextBase
+			mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
+			memset(buffer as! ArrayPointer<UInt8>, 0, ei.pei.sizeOfStackReserve) // Zeroing
+
+			exec.nextBase = exec.nextBase + pages * pageSize
+
+			ei.stackVirtual = buffer
+		}
+
+		return ei
+	}
+
+	fun resolveExeImports(ei: ExeInterim, root: PeExportLinkedList) {
+		resolveDllImports(ei.pei, root)
+	}
+
+	// TODO `template<typename SIZE>` per function
+	fun addDllEntry(physical: UInt64, entry: UInt64) {
+		let max = 511u64 // TODO any other limits?
+		// TODO ^ 32-bit limit is x2
+		let count = physical as! ArrayPointer<UInt64>
+
+		if count[0] >= 511 {
+			// TODO error
+			return
+		}
+
+		// Yeah this is weird way to save DLLs count
+		count[0] = count[0] + 1
+		count[count[0]] = entry
+	}
 
 	// DLL entry points
 	// TODO make it linked list, if it's not enough?
 	let dllEntries = PhysicalAllocator.allocateOnePagePreZeroed()
 
+	fun loadRelatedDLLsAndMapIntoProcess(app: ExeInterim, root: PeExportLinkedList, exec: Executable, process: UserProcess) {
 		// TODO parse DLLs in multiple threads
 		let ntdll = loadDll("ntdll.dll", root, exec) // TODO proper path!!!
 		let kernel32 = loadDll("kernel32.dll", root, exec)
@@ -416,7 +418,7 @@ fun addDllEntry(physical: UInt64, entry: UInt64) {
 		// TODO merge all to one argument (single structure)
 
 		// TODO unmap zero page to cause NPE
-}
+	}
 }
 
 fun loadExeIntoProcess(file: String, process: UserProcess) {
