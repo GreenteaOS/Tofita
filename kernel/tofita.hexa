@@ -226,6 +226,7 @@ fun kernelInit(params: UefiPayload) {
 
 	// GUI
 	if false {
+	// TODO should be done at main thread
 		{
 			let guiProcess: UserProcess = processCreate()
 			serialPrintf("<Tofita> GUI process ID == %u\n", guiProcess.pid)

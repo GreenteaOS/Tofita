@@ -191,20 +191,23 @@ let image_rel_based_highlow = 3
 	var firstThunk: UInt32
 }
 
-declare FARPROC = @closure(false) () => Void
-
 // TODO rename to TitleCase
+// TODO make all `let` not `var` same for other types
 @struct class IMAGE_IMPORT_BY_NAME {
 	var hint: UInt16
 	var name: ArrayByValue<UInt8, 1>
 }
 
-// TODO `template<typename SIZE>`
 @struct
 @union // TODO disallows `@struct`
-class IMAGE_THUNK_DATA {
-	var func: UInt64 // address of imported function
-	var ordinal: UInt32 // ordinal value of function
-	var addressOfData: IMAGE_IMPORT_BY_NAME? // RVA of imported name
-	var forwarderStringl: UInt32 // RVA to forwarder string
+class IMAGE_THUNK_DATA<SIZE> {
+	/// Address of imported function
+	var func: SIZE
+	/// Ordinal value of function
+	var ordinal: UInt32
+	/// RVA of imported name
+	/// ^ points to `IMAGE_IMPORT_BY_NAME?`
+	var addressOfData: SIZE
+	/// RVA to forwarder string
+	var forwarderString: UInt32
 }

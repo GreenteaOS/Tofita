@@ -15,6 +15,7 @@
         "ACPI",
         "Bootloader",
         "debuggie",
+        "fastcall",
         "Greentea",
         "Hexa",
         "lmao",

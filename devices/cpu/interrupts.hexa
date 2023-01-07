@@ -84,8 +84,9 @@ enum Selector : UInt64 {
 
 	// Just `+ 3` to above selectors
 	// TODO allow `0x30 + 3` in enum tags
-	USER_CODE64_SEL_USER_MODE = 0x33 // Execute/Read/UserNode
-	USER_DATA32_SEL_USER_MODE = 0x2b // Read/Write/UserNode
+	USER_CODE64_SEL_USER_MODE = 0x33 // Execute/Read/UserMode
+	USER_CODE32_SEL_USER_MODE = 0x23 // Execute/Read/UserMode
+	USER_DATA32_SEL_USER_MODE = 0x2b // Read/Write/UserMode
 }
 
 // Handling IDT
@@ -491,6 +492,7 @@ fun switchToGuiThread(@volatile frame: InterruptFrame) {
 			return // Wait to avoid race conditions
 		}
 		// Save
+		// TODO instead of manual frame copy, .asm must take a pointer to the frame and write there directly
 		tmemcpy(kernelThreadFrame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	}
 
@@ -504,9 +506,11 @@ fun yieldInterruptHandler(@volatile frame: InterruptFrame) {
 	switchToNextProcess(frame)
 }
 
+// TODO move to scheduler.hexa
 fun timerInterruptHandler(@volatile frame: InterruptFrame) {
 	disableAllInterrupts()
 
+	// TODO divier to constant
 	if timerCalled % 121 == 0 {
 		taskBarRedraw++
 		// TODO change to `requestAnimationFrame`

@@ -34,6 +34,7 @@ class PeInterim {
 	var entry: UInt64 // _DllMainCRTStartup
 	var imageDataDirectory: ArrayPointer<ByValue<ImageDataDirectory>>
 	var sizeOfStackReserve: UInt64
+	var is64bit: Bool
 	new () {}
 }
 
@@ -66,13 +67,21 @@ fun is64Exe(asset: RamDiskAsset) {
 	return peOptionalHeader.magic == 0x020B
 }
 
+// TODO access all memory safely via Buffer or something
 class ExeLoader<SIZE, HEADER> {
 	new() {}
 
 	// TODO probe for read/write
+	// TODO error if not found
+	// TODO more PATH support
 	fun loadDll(name: String, root: PeExportLinkedList, exec: Executable): PeInterim {
+		// TODO simple size ofs should be evaluated at normalizer to exclude ifs
+		let is64bit = sizeOf<SIZE>() == 8
+		let env = is64bit? "C:\\Windows\\System32\\" : "C:\\Windows\\SysWOW64\\"
+		let fullPath = env + @hide name // TODO dedup `//` and normalize `/` to `\`
+		// TODO Note: `@hide name` should disallow erroneus usage of `name` instead of `fullPath`
 		let name = "C:\\Windows\\System32\\" + name
-		return loadPe(name, root, exec)
+		return loadPe(fullPath, root, exec)
 	}
 
 	fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
@@ -86,7 +95,7 @@ class ExeLoader<SIZE, HEADER> {
 		var ptr = asset.data as! ArrayPointer<UInt8>
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 		serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
-		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
+		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
 		serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
 					0x020B)
 		serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
@@ -125,7 +134,7 @@ class ExeLoader<SIZE, HEADER> {
 
 		// TODO `const ImageDataDirectory*` just `let` all the fields in class declaration?
 		var imageDataDirectory =
-			((peOptionalHeader as! UInt64) + sizeOf<Pe64OptionalHeader>()) as! ArrayPointer<ByValue<ImageDataDirectory>>
+			((peOptionalHeader as! UInt64) + sizeOf<HEADER>()) as! ArrayPointer<ByValue<ImageDataDirectory>>
 
 		// Relocate EXE or DLL to a new base
 		// TODO should return signed or something? used ptr_diff_t
@@ -245,6 +254,7 @@ class ExeLoader<SIZE, HEADER> {
 		pei.entry = (buffer as! UInt64) + (peOptionalHeader.addressOfEntryPoint as! UInt64)
 		pei.imageDataDirectory = imageDataDirectory
 		pei.sizeOfStackReserve = peOptionalHeader.sizeOfStackReserve
+		pei.is64bit = sizeOf<SIZE>() == 8
 
 		return pei
 	}
@@ -293,13 +303,14 @@ class ExeLoader<SIZE, HEADER> {
 			// TODO must error `while iid.originalFirstThunk != null {` compares Int and null
 			while iid.originalFirstThunk != 0 {
 				var szName = ((buffer as! UInt64) + (iid.name as! UInt64)) as! ArrayPointer<UInt8>
-				var pThunkOrg = ((buffer as! UInt64) + (iid.originalFirstThunk as! UInt64)) as! IMAGE_THUNK_DATA
+				var pThunkOrg = ((buffer as! UInt64) + (iid.originalFirstThunk as! UInt64)) as! IMAGE_THUNK_DATA<SIZE>
 				// TODO `(SIZE *)`
-				var funcRef = ((buffer as! UInt64) + (iid.firstThunk as! UInt64)) as! ArrayPointer<FARPROC>
+				var funcRef = ((buffer as! UInt64) + (iid.firstThunk as! UInt64)) as! ArrayPointer<SIZE>
 
-				while pThunkOrg.addressOfData != null {
+				// TODO bad code gen for uint32_t$null `while pThunkOrg.addressOfData != null {`
+				while pThunkOrg.addressOfData != 0 {
 					var ord: UInt32 = 666
-					var func = null as! ArrayPointer<UInt8>
+					var func: SIZE = 0
 
 					if (pThunkOrg.ordinal & 0x80000000u32) != 0 {
 						ord = pThunkOrg.ordinal & 0xffff
@@ -313,7 +324,7 @@ class ExeLoader<SIZE, HEADER> {
 							(buffer as! UInt64) +
 							(
 								(pThunkOrg.addressOfData as! UInt64) &
-								0xffffffffu32
+								0xffffffffu64
 							) as! UInt64
 						) as! IMAGE_IMPORT_BY_NAME
 
@@ -323,21 +334,23 @@ class ExeLoader<SIZE, HEADER> {
 									szImportName, ord, pThunkOrg.func)
 
 						// Resolve import
-						func = null
+						// func = null // TODO This should error
+						func = 0
 
 						var proc: PeExportLinkedList = getProcAddress(szImportName, root)
 
 						if proc != null {
-							func = proc.ptr as! ArrayPointer<UInt8>
+							func = proc.ptr as! SIZE
 						} else {
-							func = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root).ptr as! ArrayPointer<UInt8>
+							func = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root).ptr as! SIZE
 						}
 					}
 
-					funcRef[0] = func as! FARPROC
+					funcRef[0] = func as! SIZE
 					pThunkOrg++
-					let size = 8 // TODO 4
-					funcRef = (funcRef as! UInt64 + size) as! ArrayPointer<FARPROC>
+					// TODO ^ well `++` should not be allowed for this
+					let size = sizeOf<SIZE>()
+					funcRef = (funcRef as! UInt64 + size) as! ArrayPointer<SIZE>
 				}
 
 				iid++
@@ -372,10 +385,11 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	// TODO `template<typename SIZE>` per function
+	// TODO make `entry` a generic too
 	fun addDllEntry(physical: UInt64, entry: UInt64) {
-		let max = 511u64 // TODO any other limits?
+		let max: SIZE = 511 // TODO any other limits?
 		// TODO ^ 32-bit limit is x2
-		let count = physical as! ArrayPointer<UInt64>
+		let count = physical as! ArrayPointer<SIZE>
 
 		if count[0] >= 511 {
 			// TODO error
@@ -387,7 +401,7 @@ class ExeLoader<SIZE, HEADER> {
 		count[count[0]] = entry
 	}
 
-	// DLL entry points
+	// DLL entry points aka `DllMain`
 	// TODO make it linked list, if it's not enough?
 	let dllEntries = PhysicalAllocator.allocateOnePagePreZeroed()
 
@@ -401,6 +415,8 @@ class ExeLoader<SIZE, HEADER> {
 		// TODO reuse loaded dlls in memory
 		// TODO load every DLL in separate thread
 
+		let is64bit = app.pei.is64bit
+
 		// TODO resolve in multiple threads (this is readonly operation over list of imports, but not for sections)
 		resolveDllImports(ntdll, root)
 		resolveDllImports(kernel32, root)
@@ -412,6 +428,19 @@ class ExeLoader<SIZE, HEADER> {
 		addDllEntry(dllEntries, gdi32.entry)
 		addDllEntry(dllEntries, user32.entry)
 		// TODO addDllEntry(dllEntries, advapi32.entry)
+
+		process.is64bit = is64bit
+
+		if is64bit {
+			process.frame.cs = Selector.USER_CODE64_SEL_USER_MODE
+		} else {
+			// Thirty two bits
+			process.frame.cs = Selector.USER_CODE32_SEL_USER_MODE
+			// TODO IMAGE_FILE_LARGE_ADDRESS_AWARE
+			// TODO IMAGE_FILE_LARGE_ADDRESS_AWARE with compatibility mode (3 GB, 128 TB)
+			process.limits = AddressAwareness.Bit32limit2GB
+			// TODO pager should respect those limits
+		}
 
 		let whereEntries = findUserspaceMemory(
 			process.pml4,
@@ -427,7 +456,6 @@ class ExeLoader<SIZE, HEADER> {
 		process.frame.rcxArg0 = app.pei.entry // First argument
 		process.frame.r8 = whereEntries // Third argument
 		// TODO merge all to one argument (single structure)
-
 		// TODO unmap zero page to cause NPE
 	}
 }

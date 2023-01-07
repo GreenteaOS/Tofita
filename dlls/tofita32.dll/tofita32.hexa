@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -101,7 +101,8 @@ fun tofitaStdStub(arg: ConstArrayPointer<UInt8>): UInt32 {
 #if bit64
 @linkName('tofitaFastSystemCallWrapper')
 #else
-@fastcall // Expected convention by assembly
+// Expected convention by assembly
+@convention('fastcall')
 @linkName('@tofitaFastSystemCallWrapper@8')
 #end
 declare fun tofitaFastSystemCallWrapper(rcx: TofitaSyscalls, rdx: #if bit64 UInt64 #else UInt32 #end): #if bit64 UInt64 #else UInt32 #end
