@@ -59,13 +59,18 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/GreenteaOS/Teapot.git ../Teapot
 
+      - name: Get assets
+        run: |
+          git clone --depth 1 https://github.com/GreenteaOS/Greentea.git ../Greentea
+          git clone --depth 1 https://github.com/GreenteaOS/Tongue.git ../Tongue
+
       - name: Prepare Hexa
         run: |
           ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/bootstrap.js ../Hexa/hexa.json
           ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/hexa-node.js ../Hexa/hexa.json
           ../Teapot/node-v18.1.0-win-x64/node --trace-uncaught ../Hexa/hexa-node.js ../Hexa/hexa.json
 
-      - name: Building Tofita
+      - name: Build Tofita
         run: |
           $env:Path += ";.\..\Hexa"
           $ErrorActionPreference = 'SilentlyContinue'
