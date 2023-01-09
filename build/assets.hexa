@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -43,7 +43,7 @@ let deps: [[String]] = [
 fun packFonts(config: Config) {
 		let fs = require('fs')
 		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
-			JSON.parse(fs.readFileSync('assets\\root\\Windows\\Fonts\\default.json').toString().trim())
+			JSON.parse(fs.readFileSync('..\\Greentea\\assets\\root\\Windows\\Fonts\\default.json').toString().trim())
 
 		let charSize = 2 + 2 + 8
 		let size = 256 * charSize // Just ASCII for now
@@ -93,18 +93,20 @@ fun packAssets(config: Config) {
 			if fs.existsSync(path) {
 				fs.readdirSync(path).forEach(fun(file, index) {
 					let curPath = path + "\\" + file
+					let assetFullName = curPath.substr('../Greentea/assets/'.length).split('\\').join('/')
+
 					if fs.lstatSync(curPath).isDirectory() {
 						addFolderRecursive(curPath)
 					} else {
-						assetName.push(curPath.substr('assets/'.length).split('\\').join('/'))
+						assetName.push(assetFullName)
 						assetPath.push(curPath)
 					}
 				})
 			}
 		}
 
-		addFolderRecursive('assets\\root')
-		addFolderRecursive('assets\\desktop')
+		addFolderRecursive('..\\Greentea\\assets\\root')
+		addFolderRecursive('..\\Greentea\\assets\\desktop')
 
 		// Compute RAM disk size
 		var ramDiskSize = 0
@@ -136,6 +138,7 @@ fun packAssets(config: Config) {
 		let assetInfoSize = 256 + 4 + 4
 		var assetInfoOffset = 4 + 4 + 4
 		var assetDataOffset = ramDiskSize
+
 		for i in assetName.length {
 			let asset = assetName[i]
 			let path = assetPath[i]

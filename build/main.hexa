@@ -193,7 +193,7 @@ fun runTasks() {
 
 		// Cleanup
 		deleteFolderRecursive(folder, noRemoveSelf: true)
-		fs.copyFileSync('assets\\tea.ico', folder + '\\icon.ico')
+		fs.copyFileSync('..\\Greentea\\assets\\tea.ico', folder + '\\icon.ico')
 		fs.copyFileSync('desktop.ini', folder + '\\desktop.ini')
 		require('child_process').execSync('cmd /c ATTRIB +S ' + folder, { stdio: 'inherit' })
 
@@ -501,10 +501,10 @@ fun runTasks() {
 
 			if isoTask {
 				fs.copyFileSync(
-					'assets\\autorun.ico',
+					'..\\Greentea\\assets\\autorun.ico',
 					folder + '\\spin-off\\autorun.ico')
 				fs.copyFileSync(
-					'assets\\autorun.inf',
+					'..\\Greentea\\assets\\autorun.inf',
 					folder + '\\spin-off\\autorun.inf')
 				fs.copyFileSync(
 					'LICENSE',
@@ -525,8 +525,8 @@ fun runTasks() {
 					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\TOFITA.DAT ::/TOFITA.DAT',
 					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\version.txt ::/version.txt',
 					mcopy + ' -i ' + folder + '\\DISK.IMG LICENSE ::/LICENSE.txt',
-					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.ico ::/autorun.ico',
-					mcopy + ' -i ' + folder + '\\DISK.IMG assets\\autorun.inf ::/autorun.inf'
+					mcopy + ' -i ' + folder + '\\DISK.IMG ..\\Greentea\\assets\\autorun.ico ::/autorun.ico',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ..\\Greentea\\assets\\autorun.inf ::/autorun.inf'
 				] {
 					child_process.execSync(
 						cmd, { stdio: 'inherit' }
