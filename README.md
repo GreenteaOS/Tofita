@@ -25,7 +25,7 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 
 [![Give a star](docs/star.png?raw=true)](https://github.com/GreenteaOS/Tofita/stargazers)
 
-Give some attention for Tofita be noticed
+Give some attention for Greentea OS be noticed
 
 [![Become a patron](docs/patreon.png?raw=true)](https://www.patreon.com/PeyTy)
 
@@ -53,11 +53,13 @@ Note that it also builds third-party pull requests.
 
 ### Build using Teapot
 
-Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-latest-zip) and place alongside of Tofita repo:
+Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-latest-zip) and others. Place alongside of Tofita repo:
 
 ```
 .\Teapot
 .\Tofita
+.\Greentea
+.\Tongue
 ```
 
 You should have extracted `Teapot-kawaii` and have folders like this `.\Teapot\LLVM-*.*.*`.
@@ -67,11 +69,13 @@ Teapot will take less space if cloned with limited depth of commit history:
 ```sh
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Tofita.git
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
+git clone --recursive --depth 1 https://github.com/GreenteaOS/Greentea.git
+git clone --recursive --depth 1 https://github.com/GreenteaOS/Tongue.git
 ```
 
 #### Configure
 
-Add your apps, folders and other files into `assets\desktop` to see them in the built image.
+Add your apps, folders and other files into `assets\desktop` of the `Greentea` repo to see them in the built image.
 
 Create `R:` ram disk about 1 GB (you may download a free [AMD Radeon™ RAMDisk](http://radeonramdisk.com/files/Radeon_RAMDisk_4_4_0_RC36.msi)) for faster builds and configure `config.json > tempFolder`.
 Otherwise `C:` is used to store builds by default.
