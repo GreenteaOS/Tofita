@@ -1,5 +1,0 @@
-Welcome to the Tofita kernel!
-
-This is example file.
-
-Put something into desktop folder to include in the build :)
