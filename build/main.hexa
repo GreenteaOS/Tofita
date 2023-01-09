@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -465,12 +465,12 @@ fun runTasks() {
 		if let cmd = cmd {
 			child_process.exec(cmd, fun(error: Bool?, stdout: String, stderr: String) {
 				if error != null {
-					console.error('[Build error] ' + cmd)
+					console.log('[Build error] ' + cmd)
 					if '' != '' + stdout {
-						console.error(stdout)
+						console.log(stdout)
 					}
 					if '' != '' + stderr {
-						console.error(stderr)
+						console.log(stderr)
 					}
 					process.exitCode = 123
 					process.stdout.once('drain', fun () { Process.exit(123) })
