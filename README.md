@@ -27,9 +27,10 @@ Greentea OS is aimed to provide complete operating system compatible with existi
 
 Give some attention for Greentea OS be noticed
 
+[![Become a sponsor](docs/sponsors.png?raw=true)](https://github.com/sponsors/PeyTy)
 [![Become a patron](docs/patreon.png?raw=true)](https://www.patreon.com/PeyTy)
 
-Help to hire developers and buy hardware
+Become a sponsor to help hire developers and test more hardware
 
 ## Tools
 
