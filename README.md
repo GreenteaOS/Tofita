@@ -7,8 +7,8 @@ All-new kernel to-fit-a [Greentea OS](https://github.com/GreenteaOS) (hence "Tof
 [![Telegram Channel](https://img.shields.io/badge/Telegram-Greentea%20NEWS-blue.svg)](https://t.me/s/greenteaos_news)
 [![Telegram Chatroom](https://img.shields.io/badge/Telegram-Greentea%20OS-blue.svg)](https://telegram.me/greenteaos)
 [![Join the chat at Discord!](https://img.shields.io/badge/Discord-Join%20Chat-677bc4.svg)](https://discord.gg/UGZq8GB)
-[![GPL License](https://img.shields.io/badge/License-GNU%20LGPLv3-green.svg?style=flat)](https://github.com/GreenteaOS/Tofita/blob/kawaii/LICENSE)
-[![Automatic Builds](https://img.shields.io/badge/Automatic-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
+[![GitHub Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/PeyTy)
+[![Automatic Builds](https://img.shields.io/badge/Get-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 [![Made with Hexa](https://img.shields.io/badge/Code-Hexa-FF7F50.svg?style=flat)](https://github.com/hexalang/hexa)
 
 Greentea OS is aimed to provide complete operating system compatible with existing apps
