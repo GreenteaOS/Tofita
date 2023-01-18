@@ -13,6 +13,10 @@
 *.inf text eol=crlf
 *.ini text eol=crlf
 *.reg text eol=crlf
+*.txt text eol=crlf
+*.html text eol=crlf
+*.htm text eol=crlf
+*.md text
 
 *.tofita binary
 *.ttf binary
