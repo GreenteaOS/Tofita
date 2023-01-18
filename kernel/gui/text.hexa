@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -76,28 +76,21 @@ fun getTextAdvance(text: String): UInt16 {
 fun drawChar(c: UInt8, x: Float, y: Int16, color: Pixel32): Float {
 	var textChar: TextFontList = textFontList[c as! Int].ref
 
-	var xx: Int16 = (x + 0.5) as! Int32 as! Int16
 	var w: UInt8 = (textChar.width + 0.5) as! Int32 as! UInt8
+	// TODO parses `let textChar: textChar.ref`
+	let xx: Int16 = (x + 0.5) as! Int32 as! Int16
+	let screenWidth = Screen.width
+	let screenHeight = Screen.height
 
 	for yi in 12 {
 		for xi in w {
 			let atx: Int32 = xx + xi
 			let aty: Int32 = y + yi
 
-			if atx >= _framebuffer.width {
-				continue
-			}
-			if atx < 0 {
-				continue
-			}
 
-			if aty >= _framebuffer.height {
+			if atx >= screenWidth or atx < 0 or aty >= screenHeight or aty < 0 {
 				continue
 			}
-			if aty < 0 {
-				continue
-			}
-
 			let font: Pixel32 =
 				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
 
@@ -185,8 +178,12 @@ fun drawAsciiText(text: String, x: Float, y: Int16, color: Pixel32): UInt16 {
 fun drawText(text: String, x: Float, y: Int16, color: Pixel32): UInt16 {
 	var i: UInt16 = 0
 	var xx: Float = x
+	// TODO compare for `length` not `255 * 255`
+	// TODO take pointer to `.utf16`
 
-	while (text.charCodeAt(i) as! UInt16) != 0 && i < 255 * 255 {
+	// TODO bad code gen cause optional->u16 `while (text.charCodeAt(i) as! UInt16) != 0 && i < 255 * 255 {`
+	// TODO same `while text.charCodeAt(i) != 0 && i < 255 * 255 {`
+	while text.utf16()[i] as! UInt16 != 0 && i < 255 * 255 {
 		xx += drawChar((text.charCodeAt(i) as! UInt16) & 0xFF as! UInt8, xx, y, color)
 		i++
 	}

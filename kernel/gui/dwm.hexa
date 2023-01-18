@@ -318,6 +318,7 @@ fun handleMouseActivity() {
 	if lockMouse {
 		return
 	}
+
 	// Swap buffers
 	mouseActionsUseZeta = !mouseActionsUseZeta
 
