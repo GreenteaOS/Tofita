@@ -134,6 +134,9 @@ fun overlappedWindow_destroy(windowId: UInt64) {
 	window.fbZeta = null
 	window.fbGama = null
 	window.title = null
+
+	// TODO make a better re-paint trigger
+	haveToRender = true
 }
 
 fun initDwm() {
