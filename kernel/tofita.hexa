@@ -349,7 +349,7 @@ fun kernelThread() {
 					} else if syscall == TofitaSyscalls.Cpu {
 						// TODO ^ rename to CpuException or something
 						process.present = false
-						serialPrintf("[[Cpu:PID %d]] %d\n", index, frame.rdxArg1)
+						serialPrintf("[[Cpu:PID %d]] rdx=%d\n", index, frame.rdxArg1)
 						quakePrintf("Process #%d force quit due to a CPU exception #%u\n".utf16(), index, frame.index)
 
 						// Page fault
@@ -407,10 +407,7 @@ fun guiThread() {
 	serialPrintln("<Tofita> [guiThread] thread started")
 
 	while true {
-		if haveToRender == false {
-			yield()
-		}
-
+		// TODO report as error useless boolean *statement* `haveToRender == false`
 		// TODO not best place for this
 		if mouseActivity {
 			mouseActivity = false
@@ -420,6 +417,10 @@ fun guiThread() {
 		if keyboardActivity {
 			keyboardActivity = false
 			handleKeyboardActivity()
+		}
+
+		if haveToRender == false {
+			yield()
 		}
 
 		// Overridden by `requestAnimationFrame`
