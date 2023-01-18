@@ -16,7 +16,7 @@
 		"uefi/boot",
 		"uefi/memory",
 		"uefi/pe",
-		"uefi/ramdisk",
+		"uefi/ramdiskLoader",
 		"uefi/visuals"
 	],
 	"targets": [
