@@ -26,6 +26,20 @@ var _framebuffer: FrameBuffer = null
 // TODO make sure this in the huge/epic pages and 4k aligned
 var _pixels: ArrayPointer<ByValue<Pixel32>> = null
 
+/// Current screen
+/// Allows to avoid pointer indirection
+class Screen {
+	static var width: UInt32 = 0
+	static var widthMinusOne: UInt32 = 0
+	static var height: UInt32 = 0
+	static var heightMinusOne: UInt32 = 0
+	static var pixels: ArrayPointer<ByValue<Pixel32>> = null
+	/// Actual pixel buffer to be used
+	// TODO just allocate memory instead of bitmap
+	// TODO should be per-screen
+	static var doublebuffer: Bitmap32 = null
+}
+
 fun allocateBitmap(width: UInt32, height: UInt32): Bitmap32 {
 	// TODO allocateStruct<T>
 	var result = PhysicalAllocator.allocateBytes(
@@ -46,33 +60,40 @@ fun setFramebuffer(framebuffer: FrameBuffer) {
 
 // Very fast, but not precise, alpha multiply
 fun mul255(a255: UInt32, c255: UInt32): UInt8 {
-	return ((a255 + 1) * c255 >> 8) as! UInt8
+	return ((a255 + 1u32) * c255 >> 8u32) as! UInt8
 }
 
-fun blend255(target: UInt32, color: UInt32, alpha: UInt32): UInt8 {
-	return (mul255(alpha, color) + mul255(255u32 - alpha, target)) as! UInt8
+fun blend255(target: UInt8, color: UInt8, alpha: UInt8): UInt8 {
+	return (mul255(alpha, color) + mul255(255u8 - alpha, target))
 }
 
-@fastcall fun blendPixel(x: Int64, y: Int64, pixel: Pixel32) {
-	let _framebuffer = _framebuffer // Faster access
-	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
+// TODO by val
+fun blendPixel(x: Int64, y: Int64, pixel: Pixel32) {
+	// TODO make all values like `width` global and overwrite them on FB switch
+	// TODO taken ifs are faster?
+	if (x > Screen.widthMinusOne) || (y > Screen.heightMinusOne) || (x < 0) || (y < 0) {
 		return
 	}
-	var p: Pixel32 = _pixels[y * _framebuffer.width + x].ref
 
-	p.rgba.ref.r = mul255(pixel.rgba.ref.a, pixel.rgba.ref.r) + mul255(255u32 - pixel.rgba.ref.a, p.rgba.ref.r)
-	p.rgba.ref.g = mul255(pixel.rgba.ref.a, pixel.rgba.ref.g) + mul255(255u32 - pixel.rgba.ref.a, p.rgba.ref.g)
-	p.rgba.ref.b = mul255(pixel.rgba.ref.a, pixel.rgba.ref.b) + mul255(255u32 - pixel.rgba.ref.a, p.rgba.ref.b)
+	let p = Screen.pixels[y * Screen.width + x].ref.rgba.ref
+	let a = pixel.rgba.ref.a
+	let aNegative = 255u32 - a
 
-	// TODO type check _pixels[y * _framebuffer.width + x] = p
+	p.r = mul255(a, pixel.rgba.ref.r) + mul255(aNegative, p.r)
+	p.g = mul255(a, pixel.rgba.ref.g) + mul255(aNegative, p.g)
+	p.b = mul255(a, pixel.rgba.ref.b) + mul255(aNegative, p.b)
+
+	// TODO type check _pixels[y * _framebuffer.width + x] = p // Pixel32
 }
 
-@fastcall fun setPixel(x: Int64, y: Int64, pixel: ByValue<Pixel32>) {
-	let _framebuffer = _framebuffer // Faster access
-	if (x > _framebuffer.width - 1) || (y > _framebuffer.height - 1) || (x < 0) || (y < 0) {
+fun setPixel(x: Int64, y: Int64, pixel: ByValue<Pixel32>) {
+	// TODO Faster access `let width = s.w`?
+	// TODO taken ifs are faster?
+	if (x > Screen.widthMinusOne) || (y > Screen.heightMinusOne) || (x < 0) || (y < 0) {
 		return
 	}
-	_pixels[y * _framebuffer.width + x] = pixel
+
+	Screen.pixels[y * Screen.width + x] = pixel
 }
 
 fun drawBitmap32WithAlpha(bitmap: Bitmap32, x: Int16, y: Int16) {

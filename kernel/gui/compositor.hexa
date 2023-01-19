@@ -200,11 +200,17 @@ fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, da
 	}
 }
 
-var doublebuffer: Bitmap32 = null
 fun initializeCompositor() {
 	serialPrintln("[compositor.initializeCompositor] begin")
-	doublebuffer = allocateBitmap(_framebuffer.width, _framebuffer.height)
-	_pixels = doublebuffer.pixels
+	// TODO must require `*=` and not `* =` for assign-ops
+	Screen.doublebuffer = allocateBitmap(_framebuffer.width, _framebuffer.height)
+	_pixels = Screen.doublebuffer.pixels
+
+	Screen.pixels = Screen.doublebuffer.pixels
+	Screen.width = Screen.doublebuffer.width
+	Screen.height = Screen.doublebuffer.height
+	Screen.widthMinusOne = Screen.doublebuffer.width - 1
+	Screen.heightMinusOne = Screen.doublebuffer.height - 1
 
 	let a = new RamDiskAsset()
 	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves.png")
@@ -532,7 +538,7 @@ fun copyToScreen() {
 	let width = _framebuffer.width / 2
 	let scanline: UInt64 = _framebuffer.width * 4
 	let pixelsPerScanLine: UInt64 = _framebuffer.pixelsPerScanLine * 4
-	var source = (_pixels as! UInt64) as! ArrayPointer<UInt64>
+	var source = (Screen.pixels as! UInt64) as! ArrayPointer<UInt64>
 	var destination = (_framebuffer.base as! UInt64) as! ArrayPointer<UInt64>
 
 	// TODO copy only dirty rect (at least cursor)
