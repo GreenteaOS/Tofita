@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -26,6 +26,9 @@ var paramsCache = null as! UefiPayload
 // Avoids PIT-triggered rendering
 // This is not a best solution
 @volatile var haveToRender = true
+
+// Mouse cursor repaint
+@volatile var haveToRenderMouseCursor = false
 
 var uptimeMilliseconds: UInt64 = 0
 

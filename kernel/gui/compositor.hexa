@@ -234,6 +234,7 @@ fun initializeCompositor() {
 	getRamDiskAsset(asset, "root/Windows/Cursors/aero_arrow.cur")
 	// TODO cur = loadCursor(Buffer.fromBytes(asset.data))
 	cur = loadCursor(asset)
+	initCursorBackplate()
 
 	serialPrintln("[compositor.initializeCompositor] done")
 }
@@ -307,6 +308,7 @@ fun composite(startupMilliseconds: UInt64) {
 	// TODO non-centered drawBitmap32(wallpaper, 0, 0)
 	drawBitmap32(
 		wallpaper,
+		// TODO pre-compute and save those coordinates
 		(_framebuffer.width / 2i16) - (wallpaper.width / 2i16),
 		(_framebuffer.height / 2i16) - (wallpaper.height / 2i16)
 	)
@@ -319,6 +321,7 @@ fun composite(startupMilliseconds: UInt64) {
 	drawAsciiText("Recycle Bin", 8, 62i16, color.ref)
 
 	color.ref.rgba.ref.a = 64
+	// TODO move to DWM handleMouseMove etc
 	if mouseX > 20 && mouseX < (20 + 32) && mouseY > 12 && mouseY < (12 + 60) {
 		let outlineX = 1i16
 		let outlineY = 10i16
@@ -358,6 +361,8 @@ fun composite(startupMilliseconds: UInt64) {
 	color.ref.rgba.ref.a = 100
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
+
+	// TODO move to DWM handleMouseMove etc
 	if mouseX < 40 && mouseY > (_framebuffer.height - 30) {
 		// TODO ^ use bounding rectangles for mouse detection, not imperative code
 		drawRectangleWithAlpha(color.ref, 0, taskbarY, 40 + leavesPad + leavesPad, 30)
@@ -463,21 +468,74 @@ fun composite(startupMilliseconds: UInt64) {
 	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
 
 	// HUD
+	invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
 	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
 	quake()
 }
 
+var cursorBackplate: Bitmap32 = null
+var cursorBackplateX: UInt16 = 0
+var cursorBackplateY: UInt16 = 0
+
+fun initCursorBackplate() {
+	cursorBackplate = allocateBitmap(cur.width, cur.height)
+}
+
+/// Copy current framebuffer into cache
+fun invalidateCursorBackplate(x: UInt16, y: UInt16) {
+	cursorBackplateX = x
+	cursorBackplateY = y
+
+	for yi in cur.height {
+		let scanlineScreen: UInt64 = Screen.width * (y + yi - cur.y + 1) - cur.x + 1 + x
+		let scanline: UInt64 = cursorBackplate.width * yi
+		for xi in cur.width {
+			cursorBackplate.pixels[scanline + xi] = Screen.pixels[scanlineScreen + xi]
+		}
+	}
+}
+
+fun drawCursorBackplate() {
+	let x = cursorBackplateX
+	let y = cursorBackplateY
+
+	for yi in cur.height {
+		let scanlineScreen: UInt64 = Screen.width * (y + yi - cur.y + 1) - cur.x + 1 + x
+		let scanline: UInt64 = cursorBackplate.width * yi
+		for xi in cur.width {
+			Screen.pixels[scanlineScreen + xi] = cursorBackplate.pixels[scanline + xi]
+		}
+	}
+}
+
+fun drawCursor(cur: Cursor, x: UInt16, y: UInt16) {
+	// TODO mirror cursor in this code if global setting for cursors mirroring is set
+	// to affect all apps
+	let pixel = new ByValue<Pixel32>()
+	let bmp = (cur.bmp as! UInt64 + cur.bmpStart) as! ArrayPointer<UInt32>
+
+	for yi in cur.height {
+		for xi in cur.width {
+			let yy: UInt32 = cur.height - yi - 1u32
+			pixel.ref.color = bmp[xi + yy * (cur.width as! UInt32)] as! UInt32
+			blendPixel(x + xi - cur.x + 1, y + yi - cur.y + 1, pixel.ref)
+		}
+	}
+}
+
+/// Copy the back buffer to the native framebuffer
 fun copyToScreen() {
 	// On 64-bit platform registers are 64-bit,
 	// so lets copy two pixels at a time
 	let height = _framebuffer.height
-	// Let's assume it is always divideable by 2
+	// Let's assume it is always dividable by 2
 	let width = _framebuffer.width / 2
 	let scanline: UInt64 = _framebuffer.width * 4
 	let pixelsPerScanLine: UInt64 = _framebuffer.pixelsPerScanLine * 4
 	var source = (_pixels as! UInt64) as! ArrayPointer<UInt64>
 	var destination = (_framebuffer.base as! UInt64) as! ArrayPointer<UInt64>
 
+	// TODO copy only dirty rect (at least cursor)
 	for y in height {
 		for x in width {
 			destination[x] = source[x]

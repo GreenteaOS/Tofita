@@ -183,6 +183,11 @@ fun handleMouseMove(mouseX: Int16, mouseY: Int16) {
 
 		window.x += diffX
 		window.y += diffY
+
+		// Assuming diff != 0
+		haveToRender = true
+
+		// TODO should do this smooth on mouse up
 		if window.y < 0 {
 			window.y = 0i16
 		}
@@ -194,9 +199,17 @@ fun handleMouseMove(mouseX: Int16, mouseY: Int16) {
 	}
 
 	if !frameHoverWindowDown {
+		let _frameHoverWindow = frameHoverWindow
+		let _frameHoverState = frameHoverState
+
 		frameHoverWindow = findWindowUnderCursor(mouseX, mouseY)
 		frameHoverState = getFrameButton(mouseX, mouseY, frameHoverWindow)
+
+		haveToRender = haveToRender or (frameHoverWindow != _frameHoverWindow) or (_frameHoverState != frameHoverState)
+		// TODO must error `=` assign `or (_frameHoverState = frameHoverState)` (both let and non-bool)
 	}
+
+	handleMouseMoveDesktop(mouseX, mouseY)
 }
 
 fun findWindowUnderCursor(mouseX: Int16, mouseY: Int16): UInt64 {
@@ -348,6 +361,7 @@ fun handleMouseActivity() {
 				mouseXtemp = 0
 			}
 
+			// TODO Screen. screen.hexa
 			if mouseXtemp > _framebuffer.width {
 				mouseXtemp = _framebuffer.width as! Int16 // TODO just make mouseX same precision
 			}
@@ -376,7 +390,7 @@ fun handleMouseActivity() {
 
 	// Atomically update
 	if mouseX != mouseXtemp || mouseY != mouseYtemp {
-		haveToRender = true
+		haveToRenderMouseCursor = true
 	}
 
 	mouseX = mouseXtemp

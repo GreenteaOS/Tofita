@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -107,19 +107,4 @@ fun loadCursor(asset: RamDiskAsset): Cursor {
 	cur.bmpStart = start
 
 	return cur
-}
-
-fun drawCursor(cur: Cursor, x: UInt16, y: UInt16) {
-	// TODO mirror cursor in this code if global setting for cursors mirroring is set
-	// to affect all apps
-	let pixel = new ByValue<Pixel32>()
-	let bmp = (cur.bmp as! UInt64 + cur.bmpStart) as! ArrayPointer<UInt32>
-
-	for yi in cur.height {
-		for xi in cur.width {
-			let yy: UInt32 = cur.height - yi - 1u32
-			pixel.ref.color = bmp[xi + yy * (cur.width as! UInt32)] as! UInt32
-			blendPixel(x + xi - cur.x + 1, y + yi - cur.y + 1, pixel.ref)
-		}
-	}
 }

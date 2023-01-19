@@ -28,6 +28,12 @@ var startupMilliseconds: UInt64 = 0
 @extern @rename('versionMinor') declare let versionMinor: Int
 @extern @rename('versionTag') declare let versionTag: Int
 
+@emitHeader @linkAsIs
+declare fun guiThreadStart(): Void
+
+@emitHeader @linkAsIs
+declare fun kernelThreadStart(): Void
+
 fun kernelInit(params: UefiPayload) {
 	serialPrintln("<Tofita> Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " kernel loaded and operational")
 	serialPrintf("<Tofita> CR3 points to: %8\n", params.pml4 as! UInt64)
@@ -397,18 +403,12 @@ fun kernelThread() {
 	}
 }
 
-@emitHeader @linkAsIs
-declare fun guiThreadStart(): Void
-
-@emitHeader @linkAsIs
-declare fun kernelThreadStart(): Void
-
 fun guiThread() {
 	serialPrintln("<Tofita> [guiThread] thread started")
 
 	while true {
 		// TODO report as error useless boolean *statement* `haveToRender == false`
-		// TODO not best place for this
+		// TODO not the best place for this
 		if mouseActivity {
 			mouseActivity = false
 			handleMouseActivity()
@@ -419,7 +419,7 @@ fun guiThread() {
 			handleKeyboardActivity()
 		}
 
-		if haveToRender == false {
+		if haveToRenderMouseCursor == false and haveToRender == false {
 			yield()
 		}
 
@@ -430,7 +430,15 @@ fun guiThread() {
 		if hadToRender {
 			composite(startupMilliseconds)
 			copyToScreen()
+		} else if haveToRenderMouseCursor {
+			drawCursorBackplate()
+			invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
+			drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
+			copyToScreen()
 		}
+
+		// Lesser priority than full repaint
+		haveToRenderMouseCursor = false
 
 		while qsodHappened {
 			disableAllInterrupts()

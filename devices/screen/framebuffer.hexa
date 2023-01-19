@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,9 +18,12 @@
 // Speed of rendering mostly depends on cache-locality
 // Remember: top-down, left-to-right: for(y) for(x) {}, not other way!
 
+/// Native framebuffer
 var _framebuffer: FrameBuffer = null
+// TODO for some reason this compiles `var _framebuffer: FrameBuffer = null/` note `/` at the end
 
 // Avoid one level of pointer indirection
+// TODO make sure this in the huge/epic pages and 4k aligned
 var _pixels: ArrayPointer<ByValue<Pixel32>> = null
 
 fun allocateBitmap(width: UInt32, height: UInt32): Bitmap32 {
@@ -37,6 +40,7 @@ fun allocateBitmap(width: UInt32, height: UInt32): Bitmap32 {
 
 fun setFramebuffer(framebuffer: FrameBuffer) {
 	_framebuffer = framebuffer
+	// TODO make clearer that this will be overwritten
 	_pixels = _framebuffer.base as! ArrayPointer<ByValue<Pixel32>>
 }
 

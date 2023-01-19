@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -42,8 +42,15 @@ fun handleMouseDownDesktop(type: MouseActionType, mouseX: Int16, mouseY: Int16) 
 		dragY = mouseY
 	}
 	drag = true
+
+	haveToRender = haveToRender or drag
 }
 
 fun handleMouseUpDesktop(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
+	haveToRender = haveToRender or drag
 	drag = false
+}
+
+fun handleMouseMoveDesktop(mouseX: Int16, mouseY: Int16) {
+	haveToRender = haveToRender or drag
 }
