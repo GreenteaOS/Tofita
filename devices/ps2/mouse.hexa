@@ -15,6 +15,10 @@
 
 // PS/2 Mouse
 
+@rename('mouseHandler')
+@linkName('mouseHandler')
+declare fun mouseHandler(): Void
+
 enum MouseActionType : UInt8 {
 	Noop = 0
 	LeftDown
@@ -172,7 +176,7 @@ fun handleMousePacket() {
 	}
 	}
 
-	// TODO DWM
+	// Trigger DWM to handle mouse packets
 	mouseActivity = true
 
 	// EOI

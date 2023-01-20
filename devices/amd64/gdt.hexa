@@ -1,0 +1,152 @@
+// The Tofita Kernel
+// Copyright (C) 2022-2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// Segment selectors are used to set user mode and 32-bit mode
+enum Selector : UInt64 {
+	SYS_CODE64_SEL = 0x10 // Execute/Read
+	SYS_DATA32_SEL = 0x18 // Read/Write
+	NULL_SEL = 0x00
+	USER_CODE32_SEL = 0x20 // Execute/Read
+	USER_DATA32_SEL = 0x28 // Read/Write
+	USER_CODE64_SEL = 0x30 // Execute/Read
+	SYS_CODE32_SEL = 0x60 // Execute/Read
+
+	// Just `+ 3` to above selectors
+	// TODO allow `0x30 + 3` in enum tags
+	USER_CODE64_SEL_USER_MODE = 0x33 // Execute/Read/UserMode
+	USER_CODE32_SEL_USER_MODE = 0x23 // Execute/Read/UserMode
+	USER_DATA32_SEL_USER_MODE = 0x2b // Read/Write/UserMode
+}
+
+// Global Descriptor Table aka GDT 16 records
+// TODO let
+@aligned(64) var gdtTemplate: ArrayByValue<UInt32, 32> = [
+	0x00000000u32, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209B00, 0x0000FFFF, 0x00CF9300,
+	0x0000FFFF, 0x00CFFA00, 0x0000FFFF, 0x00CFF300, 0x00000000, 0x0020FB00, 0x00000000, 0x00000000,
+	0x60800067, 0x00008BB9, 0xFFFFF800u32, 0x00000000, 0xE0003C00u32, 0xFF40F3FAu32, 0x00000000, 0x00000000,
+	0x0000FFFF, 0x00CF9A00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+]
+
+@emitHeader @linkAsIs
+declare fun lgdt(@volatile gdt: TablePtr): Void
+
+// TODO @bitMask
+enum GdtType : UInt8 {
+	Accessed = 0x01
+	Read_write = 0x02
+	Conforming = 0x04
+	Execute = 0x08
+	System = 0x10
+	Ring1 = 0x20
+	Ring2 = 0x40
+	Ring3 = 0x60
+	Present = 0x80
+}
+
+@struct @packed @sizeOf(8)
+class GdtDescriptor {
+	var limitLow: UInt16
+	var baseLow: UInt16
+	var baseMid: UInt8
+	var type: GdtType // Access
+	var size: UInt8
+	var baseHigh: UInt8
+}
+
+@struct @packed @sizeOf(8)
+class GdtDescriptorEx {
+	@bits(16) var limitLow: UInt16
+	@bits(16) var baseLow: UInt16
+	@bits(8) var baseMid: UInt8
+	// Access
+	@bits(1) var accessed: UInt8
+	@bits(1) var rw: UInt8 // 0 - read, 1 - read/write
+	@bits(1) var direction: UInt8 // or conform
+	// If 1 code in this segment can be executed from an equal or lower privilege level
+	// If 0 code in this segment can only be executed from the ring set in "privilege"
+	@bits(1) var execute: UInt8 // 1 = code, 0 = data
+	@bits(1) var one: UInt8
+	@bits(2) var privilege: UInt8 // 0 = ring0/kernel, 3 = ring3
+	@bits(1) var present: UInt8
+	// Flags
+	@bits(4) var limit: UInt8
+	@bits(2) var reserved: UInt8
+	@bits(1) var zero16one32: UInt8
+	@bits(1) var blocks: UInt8
+
+	@bits(8) var baseHigh: UInt8
+}
+
+fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, typed: GdtType) {
+	var gdtd: GdtDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! GdtDescriptor
+	gdtd.limitLow = limit & 0xFFFFu16
+	gdtd.size = (limit >> 16) & 0xFu8
+	// gdtd.size |= (is64 ? 0xa0 : 0xc0)
+	gdtd.size |= 0xA0
+	gdtd.size <<= 0x0D // Long mode
+
+	gdtd.baseLow = base & 0xFFFFu16
+	gdtd.baseMid = (base >> 16) & 0xFFu8
+	gdtd.baseHigh = (base >> 24) & 0xFFu8
+
+	gdtd.type =
+		(typed | GdtType.System | GdtType.Present)
+		as! GdtType
+}
+
+fun dumpGDT(desc: GdtDescriptorEx) {
+	serialPrintf("[dumpGDT]")
+
+	if desc.accessed != 0 {
+		serialPrintf(" accessed")
+	}
+	if desc.rw != 0 {
+		serialPrintf(" rw")
+	}
+	if desc.direction != 0 {
+		serialPrintf(" direction")
+	}
+	if desc.execute != 0 {
+		serialPrintf(" execute")
+	}
+	if desc.one != 0 {
+		serialPrintf(" one")
+	}
+
+	if desc.privilege == 0 {
+		serialPrintf(" privilege=ring0")
+	}
+	if desc.privilege == 1 {
+		serialPrintf(" privilege=ring1")
+	}
+	if desc.privilege == 2 {
+		serialPrintf(" privilege=ring2")
+	}
+	if desc.privilege == 3 {
+		serialPrintf(" privilege=ring3")
+	}
+
+	if desc.present != 0 {
+		serialPrintf(" present")
+	}
+	if desc.zero16one32 != 0 {
+		serialPrintf(" zero16one32")
+	}
+	if desc.blocks != 0 {
+		serialPrintf(" pages")
+	}
+
+	serialPrintf("\n")
+}

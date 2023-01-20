@@ -73,42 +73,12 @@ fun writePort(@volatile port: UInt16, @volatile value: UInt8) {
 @emitHeader @linkAsIs
 declare fun loadIdt(@volatile idtr: Idtr): Void
 
-enum Selector : UInt64 {
-	SYS_CODE64_SEL = 0x10 // Execute/Read
-	SYS_DATA32_SEL = 0x18 // Read/Write
-	NULL_SEL = 0x00
-	USER_CODE32_SEL = 0x20 // Execute/Read
-	USER_DATA32_SEL = 0x28 // Read/Write
-	USER_CODE64_SEL = 0x30 // Execute/Read
-	SYS_CODE32_SEL = 0x60 // Execute/Read
-
-	// Just `+ 3` to above selectors
-	// TODO allow `0x30 + 3` in enum tags
-	USER_CODE64_SEL_USER_MODE = 0x33 // Execute/Read/UserMode
-	USER_CODE32_SEL_USER_MODE = 0x23 // Execute/Read/UserMode
-	USER_DATA32_SEL_USER_MODE = 0x2b // Read/Write/UserMode
-}
-
 // Handling IDT
 let idt_size = 256
-// Records of the GDT - 16 items
-//let empty_sel = 0x08
-// Layout expected by SYSRET
-//let empty_sel = 0x38
-//let tss_sel = 0x40 // Index = 8
-//let tss_sel = 0x48
-//let user_data32_sel = 0x50 // Read/Write
-//let empty_sel = 0x58
-//let empty_sel = 0x68
-//let empty_sel = 0x70
-//let empty_sel = 0x78
-
 // TODO IdtEntry IDT[idt_size]
 var idt: ArrayByValue<ByValue<IdtEntry>, 256> = []
 
 // Handling keyboard interrupts
-@rename('keyboardHandler')
-@extern declare fun keyboardHandler(): Void
 fun initializeKeyboard(entry: IdtEntry) {
 	var keyboardAddress: UInt64 = ((keyboardHandler as! UInt64))
 	entry.offsetLowerBits = keyboardAddress & 0xFFFFu16
@@ -124,9 +94,6 @@ fun initializeKeyboard(entry: IdtEntry) {
 }
 
 // Handling mouse interrupts
-@rename('mouseHandler')
-@linkName('mouseHandler')
-declare fun mouseHandler(): Void
 fun initializeMouse(entry: IdtEntry) {
 	var mouseAddress: UInt64 = ((mouseHandler as! UInt64))
 	entry.offsetLowerBits = mouseAddress & 0xFFFFu16
@@ -141,8 +108,8 @@ fun initializeMouse(entry: IdtEntry) {
 }
 
 // Handling interrupts and exceptions
-fun initializeCallback(entry: IdtEntry, fallbackHandler: UInt64) {
-	var address: UInt64 = ((fallbackHandler as! UInt64))
+fun setIdtCallback(entry: IdtEntry, callbackHandler: UInt64) {
+	let address: UInt64 = ((callbackHandler as! UInt64))
 	entry.offsetLowerBits = address & 0xFFFFu16
 	entry.offsetHigherBits = (address & 0xFFFFFFFFFFFF0000u64) >> 16
 	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
@@ -242,56 +209,6 @@ declare class TablePtr {
 	new ()
 }
 
-@emitHeader @linkAsIs
-declare fun lgdt(@volatile gdt: TablePtr): Void
-
-// TODO @bitMask
-enum GdtType : UInt8 {
-	Accessed = 0x01
-	Read_write = 0x02
-	Conforming = 0x04
-	Execute = 0x08
-	System = 0x10
-	Ring1 = 0x20
-	Ring2 = 0x40
-	Ring3 = 0x60
-	Present = 0x80
-}
-
-@struct @packed @sizeOf(8)
-class GdtDescriptor {
-	var limitLow: UInt16
-	var baseLow: UInt16
-	var baseMid: UInt8
-	var type: GdtType // Access
-	var size: UInt8
-	var baseHigh: UInt8
-}
-
-@struct @packed @sizeOf(8)
-class GdtDescriptorEx {
-	@bits(16) var limitLow: UInt16
-	@bits(16) var baseLow: UInt16
-	@bits(8) var baseMid: UInt8
-	// Access
-	@bits(1) var accessed: UInt8
-	@bits(1) var rw: UInt8 // 0 - read, 1 - read/write
-	@bits(1) var direction: UInt8 // or conform
-	// If 1 code in this segment can be executed from an equal or lower privilege level
-	// If 0 code in this segment can only be executed from the ring set in "privilege"
-	@bits(1) var execute: UInt8 // 1 = code, 0 = data
-	@bits(1) var one: UInt8
-	@bits(2) var privilege: UInt8 // 0 = ring0/kernel, 3 = ring3
-	@bits(1) var present: UInt8
-	// Flags
-	@bits(4) var limit: UInt8
-	@bits(2) var reserved: UInt8
-	@bits(1) var zero16one32: UInt8
-	@bits(1) var blocks: UInt8
-
-	@bits(8) var baseHigh: UInt8
-}
-
 @struct @packed
 class TssDescriptor {
 	var limitLow: UInt16
@@ -377,6 +294,7 @@ let stackSizeForKernelThread: UInt64 = 1024 * 1024u64
 @aligned(64)
 // TODO let
 // TODO ArrayByValue cannot be `var`
+// TODO use `stackSizeForKernelThread` in <>
 var kernelStack: ArrayByValue<UInt8, 1048576> = [0]
 
 var guiThreadFrame: InterruptFrame = new InterruptFrame()
@@ -485,7 +403,7 @@ fun switchToGuiThread(@volatile frame: InterruptFrame) {
 
 	if currentThread == ThreadKind.THREAD_USER {
 		// Save
-		var process: UserProcess = processes[currentProcess]
+		let process: UserProcess = processes[currentProcess]
 		tmemcpy(process.frame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	} else if currentThread == ThreadKind.THREAD_KERNEL {
 		if kernelThreadBusy {
@@ -510,7 +428,8 @@ fun yieldInterruptHandler(@volatile frame: InterruptFrame) {
 fun timerInterruptHandler(@volatile frame: InterruptFrame) {
 	disableAllInterrupts()
 
-	// TODO divier to constant
+	// Happens once per second
+	// TODO divider to constant
 	if timerCalled % 121 == 0 {
 		taskBarRedraw++
 		// TODO change to `requestAnimationFrame`
@@ -613,34 +532,8 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 @emitHeader @linkAsIs
 declare fun setTsr(@volatile tsrData: UInt16): Void
 
-// 16 records
-// TODO let
-@aligned(64) var gdtTemplate: ArrayByValue<UInt32, 32> = [
-	0x00000000u32, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209B00, 0x0000FFFF, 0x00CF9300,
-	0x0000FFFF, 0x00CFFA00, 0x0000FFFF, 0x00CFF300, 0x00000000, 0x0020FB00, 0x00000000, 0x00000000,
-	0x60800067, 0x00008BB9, 0xFFFFF800u32, 0x00000000, 0xE0003C00u32, 0xFF40F3FAu32, 0x00000000, 0x00000000,
-	0x0000FFFF, 0x00CF9A00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
-]
-
 let ps2_data_port = 0x60u8
 let ps2_control_port = 0x64u8
-
-fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, typed: GdtType) {
-	var gdtd: GdtDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! GdtDescriptor
-	gdtd.limitLow = limit & 0xFFFFu16
-	gdtd.size = (limit >> 16) & 0xFu8
-	// gdtd.size |= (is64 ? 0xa0 : 0xc0)
-	gdtd.size |= 0xA0
-	gdtd.size <<= 0x0D // Long mode
-
-	gdtd.baseLow = base & 0xFFFFu16
-	gdtd.baseMid = (base >> 16) & 0xFFu8
-	gdtd.baseHigh = (base >> 24) & 0xFFu8
-
-	gdtd.type =
-		(typed | GdtType.System | GdtType.Present)
-		as! GdtType
-}
 
 // Takes 2 GDT entries
 fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
@@ -663,51 +556,6 @@ fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
 }
 
 @aligned(64) var cacheIdtr: Idtr = new Idtr()
-
-fun dumpGDT(desc: GdtDescriptorEx) {
-	serialPrintf("[dumpGDT]")
-
-	if desc.accessed != 0 {
-		serialPrintf(" accessed")
-	}
-	if desc.rw != 0 {
-		serialPrintf(" rw")
-	}
-	if desc.direction != 0 {
-		serialPrintf(" direction")
-	}
-	if desc.execute != 0 {
-		serialPrintf(" execute")
-	}
-	if desc.one != 0 {
-		serialPrintf(" one")
-	}
-
-	if desc.privilege == 0 {
-		serialPrintf(" privilege=ring0")
-	}
-	if desc.privilege == 1 {
-		serialPrintf(" privilege=ring1")
-	}
-	if desc.privilege == 2 {
-		serialPrintf(" privilege=ring2")
-	}
-	if desc.privilege == 3 {
-		serialPrintf(" privilege=ring3")
-	}
-
-	if desc.present != 0 {
-		serialPrintf(" present")
-	}
-	if desc.zero16one32 != 0 {
-		serialPrintf(" zero16one32")
-	}
-	if desc.blocks != 0 {
-		serialPrintf(" pages")
-	}
-
-	serialPrintf("\n")
-}
 
 fun setupInterruptsAndExceptions() {
 	var sizeof_TssEntry: UInt16 = sizeOf<TssEntry>() as! UInt16
@@ -769,41 +617,41 @@ fun setupInterruptsAndExceptions() {
 
 	// TODO 286 magic number
 	for i in 286 {
-		initializeCallback(idt[i].ref, unknownInterrupt as! UInt64)
+		setIdtCallback(idt[i].ref, unknownInterrupt as! UInt64)
 	}
 
 	// CPU exceptions
-	initializeCallback(idt[0x00].ref, cpu0x00 as! UInt64)
-	initializeCallback(idt[0x01].ref, cpu0x01 as! UInt64)
-	initializeCallback(idt[0x02].ref, cpu0x02 as! UInt64)
-	initializeCallback(idt[0x03].ref, cpu0x03 as! UInt64)
-	initializeCallback(idt[0x04].ref, cpu0x04 as! UInt64)
-	initializeCallback(idt[0x05].ref, cpu0x05 as! UInt64)
-	initializeCallback(idt[0x06].ref, cpu0x06 as! UInt64)
-	initializeCallback(idt[0x07].ref, cpu0x07 as! UInt64)
-	initializeCallback(idt[0x08].ref, cpu0x08 as! UInt64)
-	initializeCallback(idt[0x09].ref, cpu0x09 as! UInt64)
-	initializeCallback(idt[0x0A].ref, cpu0x0A as! UInt64)
-	initializeCallback(idt[0x0B].ref, cpu0x0B as! UInt64)
-	initializeCallback(idt[0x0C].ref, cpu0x0C as! UInt64)
-	initializeCallback(idt[0x0D].ref, cpu0x0D as! UInt64)
-	initializeCallback(idt[0x0E].ref, cpu0x0E as! UInt64)
-	initializeCallback(idt[0x0F].ref, cpu0x0F as! UInt64)
-	initializeCallback(idt[0x10].ref, cpu0x10 as! UInt64)
-	initializeCallback(idt[0x11].ref, cpu0x11 as! UInt64)
-	initializeCallback(idt[0x12].ref, cpu0x12 as! UInt64)
-	initializeCallback(idt[0x13].ref, cpu0x13 as! UInt64)
-	initializeCallback(idt[0x14].ref, cpu0x14 as! UInt64)
-	initializeCallback(idt[0x15].ref, cpu0x15 as! UInt64)
+	setIdtCallback(idt[0x00].ref, cpu0x00 as! UInt64)
+	setIdtCallback(idt[0x01].ref, cpu0x01 as! UInt64)
+	setIdtCallback(idt[0x02].ref, cpu0x02 as! UInt64)
+	setIdtCallback(idt[0x03].ref, cpu0x03 as! UInt64)
+	setIdtCallback(idt[0x04].ref, cpu0x04 as! UInt64)
+	setIdtCallback(idt[0x05].ref, cpu0x05 as! UInt64)
+	setIdtCallback(idt[0x06].ref, cpu0x06 as! UInt64)
+	setIdtCallback(idt[0x07].ref, cpu0x07 as! UInt64)
+	setIdtCallback(idt[0x08].ref, cpu0x08 as! UInt64)
+	setIdtCallback(idt[0x09].ref, cpu0x09 as! UInt64)
+	setIdtCallback(idt[0x0A].ref, cpu0x0A as! UInt64)
+	setIdtCallback(idt[0x0B].ref, cpu0x0B as! UInt64)
+	setIdtCallback(idt[0x0C].ref, cpu0x0C as! UInt64)
+	setIdtCallback(idt[0x0D].ref, cpu0x0D as! UInt64)
+	setIdtCallback(idt[0x0E].ref, cpu0x0E as! UInt64)
+	setIdtCallback(idt[0x0F].ref, cpu0x0F as! UInt64)
+	setIdtCallback(idt[0x10].ref, cpu0x10 as! UInt64)
+	setIdtCallback(idt[0x11].ref, cpu0x11 as! UInt64)
+	setIdtCallback(idt[0x12].ref, cpu0x12 as! UInt64)
+	setIdtCallback(idt[0x13].ref, cpu0x13 as! UInt64)
+	setIdtCallback(idt[0x14].ref, cpu0x14 as! UInt64)
+	setIdtCallback(idt[0x15].ref, cpu0x15 as! UInt64)
 
 	// PIC interrupts
-	initializeCallback(idt[irq0].ref, timerInterrupt as! UInt64)
+	setIdtCallback(idt[irq0].ref, timerInterrupt as! UInt64)
 	initializeKeyboard(idt[irq1].ref)
 	initializeMouse(idt[irq12].ref)
 
 	// Syscalls
-	initializeCallback(idt[0x80].ref, syscallInterrupt as! UInt64)
-	initializeCallback(idt[0x81].ref, yieldInterrupt as! UInt64)
+	setIdtCallback(idt[0x80].ref, syscallInterrupt as! UInt64)
+	setIdtCallback(idt[0x81].ref, yieldInterrupt as! UInt64)
 
 	cacheIdtr.limit = (sizeOf<IdtEntry>() * idt_size) - 1u16
 	cacheIdtr.offset = idt as! UInt64

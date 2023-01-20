@@ -32,6 +32,7 @@
         "kernel/formats/bmp/bmp",
         "kernel/formats/lnk/lnk",
         "kernel/formats/lnk/lnk.header",
+        "devices/amd64/gdt",
         "devices/acpi/acpi",
         "devices/efi/efi",
         "devices/pci/pci",
