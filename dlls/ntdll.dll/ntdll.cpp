@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020 Oleh Petrenko
+// Copyright (C) 2020-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -367,8 +367,7 @@ static void* HeapAlloc(volatile int8_t x,volatile void* u, volatile uint64_t siz
 		tofitaDebugLog(L"!!! Heap overflow !!!\n");
 		while (1) {};
 	}
-	auto result = (void *)&heap[heapOffset - size];
-	tofitaDebugLog(L"HeapAlloc %u bytes at %8", size, (uint64_t)result);
+	void* result = (void *)&heap[heapOffset - size];
 	return result;
 }
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, volatile int8_t x,volatile void* u, volatile uint64_t size) {

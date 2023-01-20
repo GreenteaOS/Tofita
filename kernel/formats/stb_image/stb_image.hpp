@@ -323,10 +323,6 @@ enum {
 typedef uint8_t stbi_uc;
 typedef uint16_t stbi_us;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef STB_IMAGE_STATIC
 #define STBIDEF static
 #else
@@ -476,10 +472,6 @@ STBIDEF char8_t *stbi_zlib_decode_noheader_malloc(const char8_t *buffer, int32_t
 STBIDEF int32_t stbi_zlib_decode_noheader_buffer(char8_t *obuffer, int32_t olen, const char8_t *ibuffer,
 												 int32_t ilen);
 
-#ifdef __cplusplus
-}
-#endif
-
 //
 //
 ////   end header file   /////////////////////////////////////////////////////
@@ -546,11 +538,7 @@ STBIDEF int32_t stbi_zlib_decode_noheader_buffer(char8_t *obuffer, int32_t olen,
 #endif
 
 #ifndef _MSC_VER
-#ifdef __cplusplus
-#define stbi_inline inline
-#else
 #define stbi_inline
-#endif
 #else
 #define stbi_inline __forceinline
 #endif

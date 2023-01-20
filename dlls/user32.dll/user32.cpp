@@ -82,16 +82,11 @@ void _memcpy() { } // TODO TODO TODO
 	#include "user32.32.c"
 #endif
 
-void startup() {
-	HEXA_MAIN(0, nullptr);
-}
-
 #ifdef bit64
+// TODO why separate fun? same arguments?
 externC __attribute__((fastcall)) void _DllMainCRTStartup() {
-	startup();
-}
 #else
 externC __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
-	startup();
-}
 #endif
+	HEXA_MAIN(0, nullptr);
+}
