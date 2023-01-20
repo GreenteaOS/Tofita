@@ -95,6 +95,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 
 	serialPrintln("[[[uefi]]] begin: uefiSetFrameBufferMode")
 	var framebuffer: FrameBuffer = new FrameBuffer()
+	// TODO should create fake fb on fail to work in headless mode
 	uefiSetFrameBufferMode(framebuffer, systemTable)
 	drawLoading(framebuffer, 0)
 	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag
@@ -226,8 +227,8 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	// TODO forward constructor arguments `var asset: ByValue<RamDiskAsset> = new ByValue<RamDiskAsset>()`
 	var asset: RamDiskAsset = new RamDiskAsset()
 	drawVerbose("Load kernel assets...", framebuffer)
-	getRamDiskAsset(asset, "tofita.gnu")
-	serialPrintf("[[[uefi]]] loaded asset 'tofita.gnu' %d bytes at %d\n", asset.size, asset.data)
+	getRamDiskAsset(asset, "tofita.exe")
+	serialPrintf("[[[uefi]]] loaded asset 'tofita.exe' %d bytes at %d\n", asset.size, asset.data)
 
 	drawVerbose("Allocate memory...", framebuffer)
 	let largeBuffer: UInt64 = conventionalAllocateLargest(efiMemoryMap)
@@ -303,6 +304,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	}
 
 	// TODO better idea how to automate those field assignments
+	// ^ `ByValue<T> { fun copyFrom(source T) }`
 	params.efiMemoryMap.ref.memoryMap = efiMemoryMap.memoryMap
 	params.efiMemoryMap.ref.memoryMapSize = efiMemoryMap.memoryMapSize
 	params.efiMemoryMap.ref.mapKey = efiMemoryMap.mapKey

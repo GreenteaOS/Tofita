@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -52,15 +52,3 @@ class InterruptFrame {
 
 	new ()
 }
-
-// Scheduling
-enum ThreadKind : UInt8 {
-	THREAD_INIT = 0 // kernelMain, it will be destroyed
-	THREAD_GUI = 1
-	THREAD_KERNEL = 2
-	THREAD_USER = 3
-}
-
-@volatile var currentThread: ThreadKind = ThreadKind.THREAD_INIT
-
-var kernelThreadFrame = new InterruptFrame()

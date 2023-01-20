@@ -78,47 +78,22 @@ let idt_size = 256
 // TODO IdtEntry IDT[idt_size]
 var idt: ArrayByValue<ByValue<IdtEntry>, 256> = []
 
-// Handling keyboard interrupts
-fun initializeKeyboard(entry: IdtEntry) {
-	var keyboardAddress: UInt64 = ((keyboardHandler as! UInt64))
-	entry.offsetLowerBits = keyboardAddress & 0xFFFFu16
-	entry.offsetHigherBits = (keyboardAddress & 0xFFFFFFFFFFFF0000u64) >> 16
-	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
-	entry.zero = 0
-	entry.ist = 2 // Stack
-	entry.z = 0
-	entry.dpl = 0 // Ring 0
-	entry.present = 1
-	entry.gateType = 0xE // Interrupt gate
-	// TODO fix vscode: 0xe is invalid, valid only oxE
-}
-
-// Handling mouse interrupts
-fun initializeMouse(entry: IdtEntry) {
-	var mouseAddress: UInt64 = ((mouseHandler as! UInt64))
-	entry.offsetLowerBits = mouseAddress & 0xFFFFu16
-	entry.offsetHigherBits = (mouseAddress & 0xFFFFFFFFFFFF0000u64) >> 16
-	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
-	entry.zero = 0
-	entry.ist = 2 // Stack
-	entry.z = 0
-	entry.dpl = 0 // Ring 0
-	entry.present = 1
-	entry.gateType = 0xE // Interrupt gate
-}
-
 // Handling interrupts and exceptions
-fun setIdtCallback(entry: IdtEntry, callbackHandler: UInt64) {
-	let address: UInt64 = ((callbackHandler as! UInt64))
+fun defineIdtCallback(entry: IdtEntry, address: UInt64, stack: UInt8, level: UInt8) {
 	entry.offsetLowerBits = address & 0xFFFFu16
 	entry.offsetHigherBits = (address & 0xFFFFFFFFFFFF0000u64) >> 16
 	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
 	entry.zero = 0
-	entry.ist = 1 // Stack
+	entry.ist = stack
 	entry.z = 0
-	entry.dpl = 3 // Ring 3
+	entry.dpl = level // Ring 0 or 3
 	entry.present = 1
 	entry.gateType = 0xE // Interrupt gate
+}
+
+fun setIdtCallback(entry: IdtEntry, callbackHandler: UInt64) {
+	// Ring 3 cause div by zero etc
+	defineIdtCallback(entry, callbackHandler, 1, 3)
 }
 
 // PIC http://wiki.osdev.org/8259_PIC
@@ -646,12 +621,12 @@ fun setupInterruptsAndExceptions() {
 
 	// PIC interrupts
 	setIdtCallback(idt[irq0].ref, timerInterrupt as! UInt64)
-	initializeKeyboard(idt[irq1].ref)
-	initializeMouse(idt[irq12].ref)
+	defineIdtCallback(idt[irq1].ref, keyboardHandler as! UInt64, 2, 0)
+	defineIdtCallback(idt[irq12].ref, mouseHandler as! UInt64, 2, 0)
 
 	// Syscalls
-	setIdtCallback(idt[0x80].ref, syscallInterrupt as! UInt64)
-	setIdtCallback(idt[0x81].ref, yieldInterrupt as! UInt64)
+	defineIdtCallback(idt[0x80].ref, syscallInterrupt as! UInt64, 1, 3)
+	defineIdtCallback(idt[0x81].ref, yieldInterrupt as! UInt64, 1, 3)
 
 	cacheIdtr.limit = (sizeOf<IdtEntry>() * idt_size) - 1u16
 	cacheIdtr.offset = idt as! UInt64

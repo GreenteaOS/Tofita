@@ -1,0 +1,47 @@
+// The Tofita Kernel
+// Copyright (C) 2022-2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// Scheduling
+enum ThreadKind : UInt8 {
+	THREAD_INIT = 0 // kernelMain, it will be destroyed
+	THREAD_GUI = 1
+	THREAD_KERNEL = 2
+	THREAD_USER = 3
+}
+
+@volatile var currentThread: ThreadKind = ThreadKind.THREAD_INIT
+
+var kernelThreadFrame = new InterruptFrame()
+
+fun switchToUserProcess() {
+	var next = getNextProcess()
+
+	// TODO comparing `nullable == 0` error
+	if next == 0 {
+		markAllProcessessSchedulable()
+		// TODO markAllProcessesSchedulable() sess typo
+		next = getNextProcess()
+		// TODO ^ should return `Process?` not index
+	}
+
+	if next == 0 {
+		enableAllInterruptsAndHalt() // Nothing to do
+		// TODO yield into GUI thread if it has incomplete draws
+		// (otherwise it may wait for the timer and drop frames)
+	} else {
+		yield()
+		// TODO may timer somehow interrupt yield handler?
+	}
+}

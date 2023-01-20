@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -53,6 +53,7 @@ fun uefiSetFrameBufferMode(fb: FrameBuffer, systemTable: EFI_SYSTEM_TABLE) {
 	let gop: EFI_GRAPHICS_OUTPUT_PROTOCOL = igop[0] as! EFI_GRAPHICS_OUTPUT_PROTOCOL
 
 	fb.base = gop.mode.frameBufferBase
+	// TODO take largest of `frameBufferSize` and `pixelsPerScanLine * h * 4`
 	fb.size = gop.mode.frameBufferSize as! UInt32
 
 	fb.width = gop.mode.info.horizontalResolution

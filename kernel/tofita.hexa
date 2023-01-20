@@ -21,18 +21,9 @@ fun memzero(dest: ArrayPointer<UInt8>, len: UInt64) {
 @rename('___chkstk_ms')
 fun chkstkStub(): Void {}
 
-// TODO wipe this feature for now? or fix?
-var startupMilliseconds: UInt64 = 0
-
 @extern @rename('versionMajor') declare let versionMajor: Int
 @extern @rename('versionMinor') declare let versionMinor: Int
 @extern @rename('versionTag') declare let versionTag: Int
-
-@emitHeader @linkAsIs
-declare fun guiThreadStart(): Void
-
-@emitHeader @linkAsIs
-declare fun kernelThreadStart(): Void
 
 fun kernelInit(params: UefiPayload) {
 	serialPrintln("<Tofita> Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " kernel loaded and operational")
@@ -256,27 +247,6 @@ fun kernelInit(params: UefiPayload) {
 	// ^ currentThread = ThreadKind.THREAD_NOT_READY
 }
 
-fun switchToUserProcess() {
-	var next = getNextProcess()
-
-	// TODO comparing `nullable == 0` error
-	if next == 0 {
-		markAllProcessessSchedulable()
-		// TODO markAllProcessesSchedulable() sess typo
-		next = getNextProcess()
-		// TODO ^ should return `Process?` not index
-	}
-
-	if next == 0 {
-		enableAllInterruptsAndHalt() // Nothing to do
-		// TODO yield into GUI thread if it has incomplete draws
-		// (otherwise it may wait for the timer and drop frames)
-	} else {
-		yield()
-		// TODO may timer somehow interrupt yield handler?
-	}
-}
-
 fun kernelThread() {
 	serialPrintln("<Tofita> [kernelThread] thread started")
 
@@ -400,55 +370,6 @@ fun kernelThread() {
 		}
 
 		switchToUserProcess()
-	}
-}
-
-fun guiThread() {
-	serialPrintln("<Tofita> [guiThread] thread started")
-
-	while true {
-		// TODO report as error useless boolean *statement* `haveToRender == false`
-		// TODO not the best place for this
-		if mouseActivity {
-			mouseActivity = false
-			handleMouseActivity()
-		}
-
-		if keyboardActivity {
-			keyboardActivity = false
-			handleKeyboardActivity()
-		}
-
-		if haveToRenderMouseCursor == false and haveToRender == false {
-			yield()
-		}
-
-		// Overridden by `requestAnimationFrame`
-		let hadToRender = haveToRender
-		haveToRender = false
-
-		if hadToRender {
-			composite(startupMilliseconds)
-			copyToScreen()
-		} else if haveToRenderMouseCursor {
-			drawCursorBackplate()
-			invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
-			drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
-			copyToScreen()
-		}
-
-		// Lesser priority than full repaint
-		haveToRenderMouseCursor = false
-
-		while qsodHappened {
-			disableAllInterrupts()
-			halt()
-		}
-
-		// Note: it must yield, otherwise never enters a kernel,
-		// because scheduler never switches to the kernel from GUI thread
-		// This allows to have better FPS
-		yield()
 	}
 }
 

@@ -1,0 +1,66 @@
+// The Tofita Kernel
+// Copyright (C) 2022-2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+@emitHeader @linkAsIs
+declare fun guiThreadStart(): Void
+
+fun guiThread() {
+	serialPrintln("<Tofita> [guiThread] thread started")
+
+	while true {
+		// TODO report as error useless boolean *statement* `haveToRender == false`
+		// TODO not the best place for this
+		if mouseActivity {
+			mouseActivity = false
+			handleMouseActivity()
+		}
+
+		if keyboardActivity {
+			keyboardActivity = false
+			handleKeyboardActivity()
+		}
+
+		if haveToRenderMouseCursor == false and haveToRender == false {
+			yield()
+		}
+
+		// Overridden by `requestAnimationFrame`
+		let hadToRender = haveToRender
+		haveToRender = false
+
+		if hadToRender {
+			composite(startupMilliseconds)
+			copyToScreen()
+		} else if haveToRenderMouseCursor {
+			drawCursorBackplate()
+			invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
+			drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
+			copyToScreen()
+		}
+
+		// Lesser priority than full repaint
+		haveToRenderMouseCursor = false
+
+		while qsodHappened {
+			disableAllInterrupts()
+			halt()
+		}
+
+		// Note: it must yield, otherwise never enters a kernel,
+		// because scheduler never switches to the kernel from GUI thread
+		// This allows to have better FPS
+		yield()
+	}
+}

@@ -67,10 +67,12 @@ fun packAssets(config: Config) {
 		let folder = config.tempFolder + tea
 		let fs = require('fs') // TODO import normally
 
+		/// Stored in the RAM disk file, used as a key to the asset
 		let assetName: [String] = []
+		/// Simply list of files, used only in the build process
 		let assetPath: [String] = []
 
-		assetName.push('tofita.gnu')
+		assetName.push('tofita.exe')
 		assetPath.push(folder + '\\tofita.exe')
 
 		assetName.push('trapeze.tofita')

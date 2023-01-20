@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -148,6 +148,7 @@ fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64, writ
 	}
 }
 
+// TODO make clearer about page count, cause in fact not 4k
 fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
 	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
 
