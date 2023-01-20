@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020 Oleh Petrenko
+// Copyright (C) 2020-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -57,12 +57,12 @@ inline void writeTo(uint64_t pointer, T value) {
 #endif
 
 // Note: this also a way to clear TLB cache even if cr3 not switched to another
-externC function writeCr3(uint64_t value);
+function writeCr3(uint64_t value);
 // TODO asm("invd")
-externC function halt();
-externC function enableAllInterrupts();
+function halt();
+function enableAllInterrupts();
 // Except non-mascable
-externC function disableAllInterrupts();
-externC function enableAllInterruptsAndHalt();
-externC function pause();
-externC function yield();
+function disableAllInterrupts();
+function enableAllInterruptsAndHalt();
+function pause();
+function yield();

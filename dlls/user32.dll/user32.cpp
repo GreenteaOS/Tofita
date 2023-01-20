@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020 Oleh Petrenko
+// Copyright (C) 2020-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -53,7 +53,7 @@ void *tmemcpy(void *dest, const void *src, uint64_t count) {
 #define stdout ((void*)0)
 #define GetProcessHeap() 0
 
-externC int64_t _fltused = 0;
+int64_t _fltused = 0;
 
 #ifdef bit64
 #else
@@ -84,9 +84,9 @@ void _memcpy() { } // TODO TODO TODO
 
 #ifdef bit64
 // TODO why separate fun? same arguments?
-externC __attribute__((fastcall)) void _DllMainCRTStartup() {
+__attribute__((fastcall)) void _DllMainCRTStartup() {
 #else
-externC __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 #endif
 	HEXA_MAIN(0, nullptr);
 }

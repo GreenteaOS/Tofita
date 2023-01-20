@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020-2022 Oleh Petrenko
+// Copyright (C) 2020-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,11 +15,13 @@
 
 // Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
+
+// Code Hexa-style for easier porting
+
+#define nullptr ((void*)0)
+#define null nullptr
+#define function void
 
 typedef void *EFI_HANDLE;
 typedef void VOID;
@@ -28,24 +30,12 @@ typedef void VOID;
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include "../shared/boot.hpp"
 #include "../../devices/serial/log.cpp"
 
 extern const uint8_t binFont[];
 extern const uint8_t binFontBitmap[];
 extern const uint8_t binLeavesBitmap[];
-int64_t _fltused = 0;
-
-#ifdef __cplusplus
-extern "C++" {
-template <int v>
-struct display_non_zero_int_value;
-template <>
-struct display_non_zero_int_value<0> { static constexpr bool foo = true; };
-static constexpr int v = sizeof(int);
-//static_assert(v == 0 && display_non_zero_int_value<v>::foo, "v == 0");
-}
-#endif
+int64_t _fltused = 0; // @keep
 
 EFI_HANDLE imageHandle = nullptr;
 struct EFI_SYSTEM_TABLE_;
@@ -102,7 +92,6 @@ static void* HeapAlloc(int8_t x,int8_t u, uint64_t size) {
 #define GetStdHandle(x) 0
 
 void *tmemcpy(void *dest, const void *src, uint64_t count);
-//extern "C" static
 void memcpy(void* x,const void* y,uint64_t z) {
 	serialPrintf(L"memcpy %8 %8 %u;\n", x,y,z);
 	tmemcpy(x,y,z);
@@ -114,41 +103,11 @@ void memcpy(void* x,const void* y,uint64_t z) {
 #define HEXA_NO_DEFAULT_INCLUDES
 
 // CR3 trampoline
-externC function __attribute__((fastcall))
+void __attribute__((fastcall))
 trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
 			  volatile uint64_t entry);
-#include "../uefi.c"
-#if 0
-_Static_assert(sizeof(efi::EFI_GUID) == sizeof(EFI_GUID_), "sizeof");
-_Static_assert(sizeof(efi::EFI_TABLE_HEADER) == sizeof(EFI_TABLE_HEADER_), "sizeof");
-_Static_assert(sizeof(efi::EFI_SYSTEM_TABLE) == sizeof(EFI_SYSTEM_TABLE_), "sizeof");
-_Static_assert(sizeof(efi::EFI_RUNTIME_SERVICES) == sizeof(EFI_RUNTIME_SERVICES_), "sizeof");
-_Static_assert(sizeof(efi::EFI_BOOT_SERVICES) == sizeof(EFI_BOOT_SERVICES_), "sizeof");
-_Static_assert(sizeof(efi::EFI_CONFIGURATION_TABLE) == sizeof(EFI_CONFIGURATION_TABLE_), "sizeof");
-_Static_assert(sizeof(efi::EFI_STATUS) == sizeof(uint64_t), "sizeof");
-_Static_assert(sizeof(efi::EFI_GRAPHICS_OUTPUT_PROTOCOL) == sizeof(EFI_GRAPHICS_OUTPUT_PROTOCOL_), "sizeof");
-_Static_assert(sizeof(efi::EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE) == sizeof(EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE_), "sizeof");
-_Static_assert(sizeof(efi::EFI_GRAPHICS_OUTPUT_MODE_INFORMATION) == sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION_), "sizeof");
-_Static_assert(sizeof(efi::EFI_PIXEL_BITMASK) == sizeof(EFI_PIXEL_BITMASK_), "sizeof");
-_Static_assert(sizeof(efi::EFI_MEMORY_DESCRIPTOR) == sizeof(EFI_MEMORY_DESCRIPTOR_), "sizeof");
-_Static_assert(sizeof(efi::EFI_TIME_CAPABILITIES) == sizeof(EFI_TIME_CAPABILITIES_), "sizeof");
-_Static_assert(sizeof(efi::EFI_SIMPLE_FILE_SYSTEM_PROTOCOL) == sizeof(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_), "sizeof");
-_Static_assert(sizeof(efi::EFI_FILE_PROTOCOL) == sizeof(EFI_FILE_PROTOCOL_), "sizeof");
-_Static_assert(sizeof(efi::EFI_TIME) == sizeof(EFI_TIME_), "sizeof");
-#endif
 
-#if 0
-efi::INTN compareGuid(efi::EFI_GUID *guid1, efi::EFI_GUID *guid2) {
-	efi::INT32 *g1, *g2, r;
-	g1 = (efi::INT32 *)guid1;
-	g2 = (efi::INT32 *)guid2;
-	r = g1[0] - g2[0];
-	r |= g1[1] - g2[1];
-	r |= g1[2] - g2[2];
-	r |= g1[3] - g2[3];
-	return r;
-}
-#endif
+#include "../uefi.c"
 
 void *tmemcpy(void *dest, const void *src, uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
@@ -229,7 +188,7 @@ struct ACPI {
 #endif
 
 // Entry point
-/*efi::EFI_STATUS*/uint64_t efi_main(/*efi::EFI_HANDLE*/void* imageHandle__, /*efi::EFI_SYSTEM_TABLE*/void *systemTable__) {
+uint64_t efi_main(void* imageHandle__, void *systemTable__) {
 	imageHandle = imageHandle__;
 	systemTable = (EFI_SYSTEM_TABLE_*)systemTable__;
 	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
@@ -302,7 +261,3 @@ struct ACPI {
 
 	return 0;
 }
-
-#ifdef __cplusplus
-}
-#endif

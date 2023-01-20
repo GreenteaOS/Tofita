@@ -13,23 +13,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-typedef void *EFI_HANDLE;
-typedef void VOID;
-
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdarg.h>
 
+typedef void *EFI_HANDLE;
+typedef void VOID;
 typedef void function;
-#ifdef __cplusplus
-	constexpr auto null = nullptr;
-	#define externC extern "C"
-#else
-	#define externC
-	#define nullptr ((void*)0)
-	#define null nullptr
-#endif
+#define nullptr ((void*)0)
+#define null nullptr
 
 struct UefiPayload_;
 struct UefiPayload_ *kernelParams; // Used by Hexa
@@ -76,7 +69,7 @@ function memzero(void *dest, uint64_t len) {
 	memset(dest, 0, len);
 }
 
-externC void ___chkstk_ms(){};
+void ___chkstk_ms(){};
 
 void vmemcpy(volatile void *dest, const volatile void *src, volatile uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
@@ -87,8 +80,8 @@ void vmemcpy(volatile void *dest, const volatile void *src, volatile uint64_t co
 	}
 }
 
-externC function mouseHandler();
-externC function keyboardHandler();
+function mouseHandler();
+function keyboardHandler();
 #define PACKED __attribute__((packed))
 #pragma pack(1)
 typedef struct {
@@ -103,9 +96,7 @@ struct TablePtr {
 	uint64_t base;
 } __attribute__((packed));
 typedef struct TablePtr TablePtr;
-#ifndef __cplusplus
 #define char8_t uint8_t
-#endif
 #pragma pack()
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
@@ -181,7 +172,7 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 
 #include "../kernel-diff/kernel.c"
 
-externC function kernelMain(/*const TODO*/void *params) {
+function kernelMain(/*const TODO*/void *params) {
 	kernelParams = (UefiPayload_ *)params;
 	heap = &heapInitial[0];
 	HEXA_MAIN(0, nullptr);

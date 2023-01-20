@@ -24,10 +24,6 @@
 
 #include "ntdll.hpp"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
 	// TODO return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
 	return 0;
@@ -465,6 +461,3 @@ void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, vo
 	tofitaExitProcess_(entry(nullptr, nullptr, nullptr, 0));
 	while (true) {};
 }
-#ifdef __cplusplus
-}
-#endif

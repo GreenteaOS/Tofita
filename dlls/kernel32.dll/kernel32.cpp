@@ -24,10 +24,6 @@
 
 #include "../ntdll.dll/ntdll.hpp"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define HEXA_NO_DEFAULT_INCLUDES
 #define HEXA_MAIN mainHexa
 #define HEXA_NEW(z) ((void*)0)
@@ -76,9 +72,5 @@ __attribute__((fastcall)) void _DllMainCRTStartup() {
 #else
 __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 	startup();
-}
-#endif
-
-#ifdef __cplusplus
 }
 #endif

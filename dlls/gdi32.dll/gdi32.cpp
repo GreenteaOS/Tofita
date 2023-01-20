@@ -23,21 +23,16 @@
 #endif
 
 void startup() {
+	// TODO hexa
 }
 
-#ifdef __cplusplus
-	#define externC extern "C"
-#else
-	#define externC
-#endif
-
 #ifdef bit64
-externC __attribute__((fastcall)) void _DllMainCRTStartup() {
+__attribute__((fastcall)) void _DllMainCRTStartup() {
 	startup();
 }
 #else
 // TODO must take proper arguments on 32-bit (like DLL_ATTACH)
-externC __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 	startup();
 }
 #endif
