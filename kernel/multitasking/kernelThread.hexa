@@ -15,3 +15,11 @@
 
 @emitHeader @linkAsIs
 declare fun kernelThreadStart(): Void
+
+let stackSizeForKernelThread: UInt64 = 1024 * 1024u64
+
+@aligned(64)
+// TODO let
+// TODO ArrayByValue cannot be `var`
+// TODO use `stackSizeForKernelThread` in <>
+var kernelStack: ArrayByValue<UInt8, 1048576> = [0]
