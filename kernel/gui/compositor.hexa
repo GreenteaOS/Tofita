@@ -474,9 +474,9 @@ fun composite(startupMilliseconds: UInt64) {
 	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
 
 	// HUD
+	quake()
 	invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
 	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
-	quake()
 }
 
 var cursorBackplate: Bitmap32 = null
