@@ -149,7 +149,7 @@ fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64, writ
 }
 
 // TODO make clearer about page count, cause in fact not 4k
-fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
+fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64) {
 	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
 
 	var vAddress: UInt64 = virtualAddr
@@ -214,7 +214,7 @@ fun mapEfiRuntime(memoryMap: UefiMemoryMap) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize)
 	}
 
-	serialPrintf("[paging] efi runtime mapped %u pages\n", sum)
+	serialPrintf("[paging] efi runtime mapped %8 pages\n", sum)
 }
 
 @struct class Buffa {
@@ -246,8 +246,9 @@ fun conventionalAllocateLargest(memoryMap: UefiMemoryMap) {
 		descriptor = getNextDescriptor(descriptor, descriptorSize)
 	}
 
-	serialPrintf("[paging] conventionalAllocateLargest is %u bytes, %d pages\n",
-				 largestPages * pageSize, largestPages)
+	// Note: causes a crash if not %8 and `largestPages * pageSize`
+	serialPrintf("[paging] conventionalAllocateLargest is %8 bytes, %8 pages\n",
+				 pageSize * largestPages, largestPages)
 
 	return result
 }

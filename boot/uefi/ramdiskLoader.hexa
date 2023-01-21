@@ -62,7 +62,9 @@ fun loadRamDiskFromVolume(
 
 	// TODO must error `size /` at `var sizeAlloc: ArrayByValue<UInt64, 1> = [(size / pageSize + 1) * pageSize]`
 	var sizeAlloc: ArrayByValue<UInt64, 1> = [(size[0] / pageSize + 1) * pageSize]
-	sizeAlloc[0] += sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64 // Combined allocation for mem map
+
+	// Combined allocation for mem map
+	sizeAlloc[0] += sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64 + 4096u64
 
 	var address: ArrayByValue<UInt64, 1> = [0]
 	let status = uefiAllocate(bootsvc, sizeAlloc.ref, address.ref)

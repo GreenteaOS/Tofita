@@ -228,7 +228,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 	var asset: RamDiskAsset = new RamDiskAsset()
 	drawVerbose("Load kernel assets...", framebuffer)
 	getRamDiskAsset(asset, "tofita.exe")
-	serialPrintf("[[[uefi]]] loaded asset 'tofita.exe' %d bytes at %d\n", asset.size, asset.data)
+	serialPrintf("[[[uefi]]] loaded asset 'tofita.exe' %d bytes at %8\n", asset.size, asset.data)
 
 	drawVerbose("Allocate memory...", framebuffer)
 	let largeBuffer: UInt64 = conventionalAllocateLargest(efiMemoryMap)
@@ -327,7 +327,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 
 	var ram: UInt64 = getRAMSize(params.efiMemoryMap.ref)
 	var megs: UInt32 = (ram / (1024u64 * 1024u64)) as! UInt32
-	serialPrintf("[paging] available RAM is ~%u bytes\n", ram)
+	serialPrintf("[paging] available RAM is ~%8 bytes\n", ram)
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
 	while megs < 1234 {

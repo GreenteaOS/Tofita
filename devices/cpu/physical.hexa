@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -77,8 +77,10 @@ class PhysicalAllocator {
 
 				var i: UInt64 = where
 				while i < steps {
-					// TODO bounds check - may be not in physycal area
-					buffer[i] = kind
+					// TODO bounds check - may be not in physical area
+					if i < count {
+						buffer[i] = kind
+					}
 					i++
 				}
 
