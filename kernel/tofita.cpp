@@ -97,7 +97,6 @@ typedef struct TablePtr TablePtr;
 #pragma pack()
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
-#include "../devices/cpu/amd64.cpp"
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO
@@ -138,6 +137,7 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 	heapOffset += size;
 	if (heapOffset >= HEAP_C) {
 		//serialPrint_(L"Heap overflow\n");
+		// TODO heap zero fill?
 		heap = (uint8_t*)PhysicalAllocator_$allocateBytes_(HEAP_C);
 		heapOffset = 16 + size;
 		while (heap == nullptr) {

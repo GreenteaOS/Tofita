@@ -48,20 +48,53 @@ declare fun cpuid(
 	edx[0] = d
 }*/
 
-// Note: this also a way to clear TLB cache even if cr3 not switched to another
-@rename('writeCr3')
+/// Note: this also a way to clear TLB cache even if cr3 not switched to another
+@rename('writeCr3') // TODO rename didn't work
+@emitHeader @linkAsIs
 declare fun writeCr3(value: UInt64): Void
+
 // TODO asm("invd")
 @rename('halt')
+@emitHeader @linkAsIs
 declare fun halt(): Void
+
 @rename('enableAllInterrupts')
+@emitHeader @linkAsIs
 declare fun enableAllInterrupts(): Void
-// Except non-mascable
+
+// Except non-maskable
 @rename('disableAllInterrupts')
+@emitHeader @linkAsIs
 declare fun disableAllInterrupts(): Void
+
 @rename('enableAllInterruptsAndHalt')
+@emitHeader @linkAsIs
 declare fun enableAllInterruptsAndHalt(): Void
+
 @rename('pause')
+@emitHeader @linkAsIs
 declare fun pause(): Void
+
 @rename('yield')
+@emitHeader @linkAsIs
 declare fun yield(): Void
+
+/*
+// TODO support `enum class` in hexa cpp codegen `enum class MSR : uint32_t {`
+enum MSR {
+	IA32_APIC_BASE = 27,
+};
+
+uint64_t rdmsr(enum MSR addr) {
+	uint32_t low, high;
+	__asm__ __volatile__ ("rdmsr" : "=a"(low), "=d"(high) : "c"(addr));
+	return ((uint64_t)(high) << 32) | low;
+	// return (static_cast<uint64_t>(high) << 32) | low;
+}
+
+void wrmsr(enum MSR addr, uint64_t value) {
+	uint32_t low = value & 0xffffffff;
+	uint32_t high = value >> 32;
+	__asm__ __volatile__ ("wrmsr" :: "c"(addr), "a"(low), "d"(high));
+}
+*/
