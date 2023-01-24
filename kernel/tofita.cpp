@@ -104,7 +104,14 @@ _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 #define STBI_ONLY_PNG
 #include "formats/stb_image/libc.cpp"
 #include "formats/stb_image/stb_image.hpp"
-#include "formats/stb_image/unlibc.cpp"
+
+#undef free
+#undef malloc
+#undef realloc
+#undef memset
+#undef abs
+#undef pow
+#undef memcpy
 
 #define HEAP_ZERO_MEMORY 0
 #define stdout 0

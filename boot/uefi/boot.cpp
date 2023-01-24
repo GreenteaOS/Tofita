@@ -16,16 +16,6 @@
 // Boot loader: enters efi_main, reads all UEFI data and starts kernel loader
 
 #include <stdint.h>
-
-// Code Hexa-style for easier porting
-
-#define nullptr ((void*)0)
-#define null nullptr
-#define function void
-
-typedef void *EFI_HANDLE;
-typedef void VOID;
-
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdarg.h>
@@ -35,14 +25,10 @@ extern const uint8_t binFontBitmap[];
 extern const uint8_t binLeavesBitmap[];
 int64_t _fltused = 0; // @keep
 
-EFI_HANDLE imageHandle = nullptr;
+void* imageHandle = NULL;
 struct EFI_SYSTEM_TABLE_;
 struct EFI_SYSTEM_TABLE_
-*systemTable = nullptr;
-
-#define Virtual_$Any_ void
-#define Physical_$Any_ void
-#define ArrayByValue_$uint16_t$Any_ void
+*systemTable = NULL;
 
 #define HEAP_ZERO_MEMORY 0
 #define stdout 0
@@ -59,7 +45,7 @@ static void fflush(void* x) {}
 static void free(void* x) {}
 
 uint64_t kstrlen_(const uint8_t*);
-static uint32_t strlen(const char *x) {
+static uint64_t strlen(const char *x) {
 	return kstrlen_((const uint8_t *)x);
 }
 
@@ -95,14 +81,12 @@ void memcpy(void* x,const void* y,uint64_t z) {
 
 #define GetProcessHeap() 0
 #define DWORD uint32_t
-#define HEXA_NO_DEFAULT_INCLUDES
+#define HEXA_NO_PLATFORM_INCLUDES
 
 // CR3 trampoline
 void __attribute__((fastcall))
 trampolineCR3(volatile uint64_t kernelParams, volatile uint64_t pml4, volatile uint64_t stack,
 			  volatile uint64_t entry);
-
-#include "../uefi.c"
 
 void *tmemcpy(void *dest, const void *src, uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
@@ -124,10 +108,13 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 }
 
 // Entry point
+#define HEXA_MAIN main
 uint64_t efi_main(void* imageHandle__, void *systemTable__) {
 	imageHandle = imageHandle__;
-	systemTable = (EFI_SYSTEM_TABLE_*)systemTable__;
+	systemTable = systemTable__;
 	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
-	HEXA_MAIN(0, nullptr);
+	HEXA_MAIN(0, NULL);
 	return 0;
 }
+
+#include "../uefi.c"
