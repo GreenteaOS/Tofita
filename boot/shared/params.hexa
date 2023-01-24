@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -41,6 +41,7 @@ class UserVirtual<T> {
 	// TODO `fun sehRead () T?` for convenience, `sizeOf<T>`
 }
 
+/* TODO
 @struct
 // @sizeOf(8)
 class Physical<T> {
@@ -60,7 +61,7 @@ class Physical<T> {
 		var result: UInt64 = (wholePhysicalStart as! UInt64) + physical + offset
 		return result as! Virtual<T>
 	}
-}
+}*/
 
 // Data transferred from UEFI application into kernel loader
 

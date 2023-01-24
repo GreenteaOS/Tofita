@@ -173,6 +173,12 @@ for task in tasks {
 			ramDiskTask = true
 		case 'iso':
 			isoTask = true
+		case 'riscv64': // TODO
+		case 'arm64': // TODO
+			// TODO disallow doc comment on non expr
+			{
+				/// TODO like this one
+			}
 		case 'cpp':
 			useCpp = true
 		case _: // TODO capture as `case task:`
@@ -275,6 +281,7 @@ fun runTasks() {
 				'-D versionMajor=' + versionMajor,
 				'-D versionMinor=' + versionMinor,
 				'-D versionTag=' + versionTag,
+				'-D HEXA_NO_PLATFORM_INCLUDES=1',
 
 				// TODO mno-sse avx etc DISABLE ALL FEATURES BUT SSE2
 				// SO CPUID CHECK WILL HANG BOOTLOADER WITH ERROR FOR SELECTED FEATURE
