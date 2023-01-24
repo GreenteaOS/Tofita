@@ -134,7 +134,7 @@ fun quakeNewline() {
 
 fun quakePutChar(c: UInt8): UInt8 {
 	if c != 0 {
-		putchar(c) // Copy to serial log
+		putChar(c) // Copy to serial log
 		if let char = '\n'.charCodeAt(0), c == char {
 			quakeNewline()
 			return c
@@ -213,8 +213,6 @@ fun quakePrintHex(n: UInt64) {
 // TODO why not just accept String as a first argument?
 @nativeVariadic
 fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
-	// serialPrintf("quakePrintf: {%S}\n", c)
-	// quakePutStringUnicode(c)
 	va_start(c)
 	let c = c as! ArrayPointer<UInt16>
 	var i = 0
@@ -292,65 +290,4 @@ fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
 		}
 		i++
 	}
-
-	/*
-	var s: ArrayPointer<UInt8>
-	va_list lst
-	va_start(lst, c)
-	while c[0] != '\0' {
-		if c[0] != '%' {
-			quakePutChar(c[0] & 0xFF)
-			c++
-			continue
-		}
-
-		c++
-
-		if c[0] == '\0' {
-			break
-		}
-
-		switch c[0] {
-		case 's':
-			quakePutString(vaArg<ArrayPointer<UInt8> >(lst))
-			break
-		case 'c':
-			quakePutChar(vaArg(lst, int32_t))
-			break
-		case 'd': {
-			var value: Int32 = vaArg<Int32>(lst)
-			var buffer: ArrayByValue<UInt8, 16>
-			for i in 16 {
-				buffer[i] = 0
-			}
-			quakeItoA(value, buffer)
-			var c: ArrayPointer<UInt8> = buffer
-			while c[0] != '\0' {
-				quakePutChar(c[0])
-				c++
-			}
-			break
-		}
-		case 'u': {
-			var value: UInt32 = va_arg(lst, uint32_t)
-			var buffer: ArrayByValue<UInt8, 16>
-			for i in 16 {
-				buffer[i] = 0
-			}
-			quakeItoA(value, buffer)
-			var c: ArrayPointer<UInt8> = buffer
-			while c[0] != '\0' {
-				quakePutChar(c[0])
-				c++
-			}
-			break
-		}
-		case '8': {
-			var value: UInt64 = va_arg(lst, uint64_t)
-			quakePrintHex(value)
-			break
-		}
-		}
-		c++
-	}*/
 }
