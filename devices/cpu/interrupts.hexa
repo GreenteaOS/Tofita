@@ -217,6 +217,8 @@ class TssEntry {
 // Stack used by kernel to handle syscalls/interrupts
 // `4096 * 32 = 131072`
 // TODO `let`
+let rspStackSize = 131072u64
+
 @aligned(64) var rsp0stack: ArrayByValue<UInt8, 131072> = [0]
 @aligned(64) var rsp1stack: ArrayByValue<UInt8, 131072> = [0]
 @aligned(64) var rsp2stack: ArrayByValue<UInt8, 131072> = [0]
@@ -333,19 +335,20 @@ fun setupInterruptsAndExceptions() {
 
 	memset(globalTss as! ArrayPointer<UInt8>, 0, sizeof_TssEntry)
 	globalTss.iomap_offset = sizeof_TssEntry
-	globalTss.rsp[0] = rsp0stack.ref as! UInt64
-	globalTss.rsp[1] = rsp1stack.ref as! UInt64
-	globalTss.rsp[2] = rsp2stack.ref as! UInt64
+	// TODO per-CPU core stacks required?
+	globalTss.rsp[0] = rsp0stack.ref as! UInt64 + rspStackSize
+	globalTss.rsp[1] = rsp1stack.ref as! UInt64 + rspStackSize
+	globalTss.rsp[2] = rsp2stack.ref as! UInt64 + rspStackSize
 	// TODO zero out stacks
 	// TODO more stacks
-	globalTss.ist[0] = ist0stack.ref as! UInt64
-	globalTss.ist[1] = ist1stack.ref as! UInt64
-	globalTss.ist[2] = ist2stack.ref as! UInt64
-	globalTss.ist[3] = ist3stack.ref as! UInt64
-	globalTss.ist[4] = ist4stack.ref as! UInt64
-	globalTss.ist[5] = ist5stack.ref as! UInt64
-	globalTss.ist[6] = ist6stack.ref as! UInt64
-	globalTss.ist[7] = ist7stack.ref as! UInt64
+	globalTss.ist[0] = ist0stack.ref as! UInt64 + rspStackSize
+	globalTss.ist[1] = ist1stack.ref as! UInt64 + rspStackSize
+	globalTss.ist[2] = ist2stack.ref as! UInt64 + rspStackSize
+	globalTss.ist[3] = ist3stack.ref as! UInt64 + rspStackSize
+	globalTss.ist[4] = ist4stack.ref as! UInt64 + rspStackSize
+	globalTss.ist[5] = ist5stack.ref as! UInt64 + rspStackSize
+	globalTss.ist[6] = ist6stack.ref as! UInt64 + rspStackSize
+	globalTss.ist[7] = ist7stack.ref as! UInt64 + rspStackSize
 
 	var tssBase: UInt64 = globalTss as! UInt64
 
