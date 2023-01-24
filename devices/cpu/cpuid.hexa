@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -50,6 +50,7 @@ fun getCPUID(): CPUID {
 		cpuid(
 			cpuidExtendedLevels + 2,
 			0,
+			// TODO trim?
 			(result.brandName.ref as! UInt64 + 0) as! ArrayPointer<UInt32>,
 			(result.brandName.ref as! UInt64 + 4) as! ArrayPointer<UInt32>,
 			(result.brandName.ref as! UInt64 + 8) as! ArrayPointer<UInt32>,

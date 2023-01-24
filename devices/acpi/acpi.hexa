@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -51,9 +51,9 @@ class AcpiMcfgEntry {
 }
 
 enum AcpiTypeId : UInt32 {
-	MCFG = 0x0 // TODO
-	APIC = 0x1 // TODO
-	XSDT = 0x2 // TODO
+	MCFG = 0x4d434647 // TODO Buffer.from('MCFG')
+	APIC = 0x41504943
+	XSDT = 0x58534454
 }
 
 @struct @packed
@@ -129,8 +129,10 @@ fun acpiValidateXSDT(t: XSDT): Bool {
 }
 
 fun putSig(into: ArrayPointer<UInt8>, type: AcpiTypeId): Void {
+	let typeId: ArrayByValue<UInt32, 1> = [type as! UInt32]
+	let typeRef = typeId.ref as! ArrayPointer<UInt8>
 	for j in 4 {
-		// into[j] = ((type))[j] as! ArrayPointer<UInt8>
+		into[j] = typeRef[j]
 	}
 }
 
@@ -254,8 +256,8 @@ class ACPIParser {
 		var sig: ArrayByValue<UInt8, 5> = [0, 0, 0, 0, 0]
 		serialPrintf("[ACPI] ACPI 2.0+ tables loading\n")
 		putSig(sig.ref, xsdt.header.ref.type)
-		serialPrintf("[ACPI] Found table %s\n", sig)
-		quakePrintf("[ACPI] Found table %s, ".utf16(), sig)
+		serialPrintf("[ACPI] Found table %s\n", sig.ref)
+		quakePrintf("[ACPI] Found table %s, ".utf16(), sig.ref)
 
 		var numTables: UInt64 = acpiTableEntriesXSDT(xsdt, 8)
 		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)

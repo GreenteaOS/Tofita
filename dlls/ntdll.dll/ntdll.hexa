@@ -23,9 +23,9 @@ declare Entry = (hInstance: ConstArrayPointer<Void>, hPrev: ConstArrayPointer<Vo
 declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, lpvReserved: ConstArrayPointer<Void>) => Bool32
 // TODO must error `hinstDLL` twice `declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, hinstDLL: ConstArrayPointer<Void>) => Bool32`
 
-@rename('hexa_entry') declare let hexa_entry: Entry // TOSO size_r
-@rename('hexa_pid') declare let hexa_pid: UInt64 // TOSO size_r
-@rename('hexa_dllEntries') declare let hexa_dllEntries: UInt64 // TOSO size_r
+@rename('hexa_entry') declare let hexa_entry: Entry // TODO size_t
+@rename('hexa_pid') declare let hexa_pid: UInt64 // TODO size_t
+@rename('hexa_dllEntries') declare let hexa_dllEntries: UInt64 // TODO size_t
 
 @dllExport('memset')
 fun memset(value: UInt32) {

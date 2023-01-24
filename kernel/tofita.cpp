@@ -41,6 +41,7 @@ void fflush(void *pipe) {
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, int8_t x,int8_t u, uint64_t size);
 void *malloc(uint64_t bytes) {
 	return (void *)HeapAllocAt(1, "unsafe", "unsafe", 1, 1, bytes);
+	// TODO return (void *)PhysicalAllocator_$allocateBytes_(((bytes - 1) | 15) + 1);
 };
 function memcpy(void *dest, const void *src, uint64_t n);
 int32_t wcslen(const wchar_t *string_) {

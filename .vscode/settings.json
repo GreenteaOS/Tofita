@@ -14,6 +14,7 @@
     "cSpell.words": [
         "ACPI",
         "Bootloader",
+        "cpuid",
         "debuggie",
         "fastcall",
         "framebuffer",

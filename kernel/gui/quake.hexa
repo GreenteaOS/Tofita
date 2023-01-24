@@ -184,7 +184,7 @@ fun quakePutStringUnicode(string: ConstArrayPointer<ClangWideChar>): Int32 {
 }
 
 fun quakePrintHex(n: UInt64) {
-	quakePutString("0x".utf16() as! ArrayPointer<UInt8>)
+	quakePutStringUnicode("0x".utf16())
 
 	var n = n
 	var buf: ArrayByValue<UInt8, 16> = [0]
@@ -210,10 +210,89 @@ fun quakePrintHex(n: UInt64) {
 	}
 }
 
+// TODO why not just accept String as a first argument?
+@nativeVariadic
 fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
-	// TODO
-	serialPrintf("quakePrintf: %S\n", c)
-	quakePutStringUnicode(c)
+	// serialPrintf("quakePrintf: {%S}\n", c)
+	// quakePutStringUnicode(c)
+	va_start(c)
+	let c = c as! ArrayPointer<UInt16>
+	var i = 0
+
+	while c[i] != 0 {
+		if c[i] != 37 { // `%`
+			quakePutChar(c[i] & 0xFFu8)
+			i++
+			continue
+		}
+
+		i++
+
+		if c[i] == 0 {
+			break
+		}
+
+		switch c[i] {
+			case 115: { // ASCII of UTF-8 `s`
+				let string = va_arg_uint64() as! ArrayPointer<UInt8>
+				if string != null {
+					// TODO probeForReadOkay((uint64_t)string, 1)
+					quakePutString(string)
+				} else {
+					quakePrintf("<STRING IS NULL>".utf16())
+				}
+			}
+			case 83: { // ASCII of UTF-16 `S`
+				var string = va_arg_uint64() as! ArrayPointer<UInt16>
+				var i: UInt32 = 0u32
+				if string != null {
+					// TODO probeForReadOkay((uint64_t)string, 2)
+					while string[i] != 0 {
+						quakePutChar(string[i] & 0xFFu8)
+						i++
+					}
+				} else {
+					quakePrintf("<STRING IS NULL>".utf16())
+				}
+			}
+			case 99: // `c`
+				quakePutChar(va_arg_int32() as! UInt8)
+			case 100: { // `d`
+				var value = va_arg_int32()
+				var buffer: ArrayByValue<UInt8, 16> = [0]
+				for i in 16 {
+					buffer[i] = 0
+				}
+				comItoA(value, buffer.ref)
+				var c: ArrayPointer<UInt8> = buffer.ref
+				var i = 0
+				while c[i] != 0 {
+					quakePutChar(c[i])
+					i++
+				}
+			}
+			case 117: { // `u`
+				var value: UInt32 = va_arg_uint32()
+				var buffer: ArrayByValue<UInt8, 16> = [0]
+				for i in 16 {
+					buffer[i] = 0
+				}
+				comItoA(value, buffer.ref)
+				var c: ArrayPointer<UInt8> = buffer.ref
+				var i = 0
+				while c[i] != 0 {
+					quakePutChar(c[i])
+					i++
+				}
+			}
+			case 56: { // `8`
+				var value: UInt64 = va_arg_uint64()
+				quakePrintHex(value)
+			}
+		}
+		i++
+	}
+
 	/*
 	var s: ArrayPointer<UInt8>
 	va_list lst
