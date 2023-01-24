@@ -30,8 +30,6 @@ typedef void VOID;
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include "../../devices/serial/log.cpp"
-
 extern const uint8_t binFont[];
 extern const uint8_t binFontBitmap[];
 extern const uint8_t binLeavesBitmap[];
@@ -54,19 +52,18 @@ static void ExitProcess(int32_t x) {
 }
 
 static void wprintf(const wchar_t* x, const void* y) {
-	serialPrintf(x, y);
 }
 
-static void fflush(void* x) {/*serialPrint(L"fflush;\n");*/}
+static void fflush(void* x) {}
 
-static void free(void* x) {/*serialPrint(L"free;\n");*/}
+static void free(void* x) {}
 
+uint64_t kstrlen_(const uint8_t*);
 static uint32_t strlen(const char *x) {
-	serialPrint(L"strlen;\n");
-	return kstrlen((const uint8_t *)x);
+	return kstrlen_((const uint8_t *)x);
 }
 
-static void printf(const void* x,...) {serialPrint(L"printf;\n");}
+static void printf(const void* x,...) {}
 #define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), ## __VA_ARGS__)
 
 #define HEAP_C 655360
@@ -79,9 +76,9 @@ static void* HeapAlloc(int8_t x,int8_t u, uint64_t size) {
 	heapOffset += 8;
 	heapOffset += size;
 	if (heapOffset >= HEAP_C) {
-		serialPrint(L"Heap overflow\n");
-		serialPrint(L"Heap overflow\n");
-		serialPrint(L"Heap overflow\n");
+		//serialPrint_(L"Heap overflow\n");
+		//serialPrint_(L"Heap overflow\n");
+		//serialPrint_(L"Heap overflow\n");
 		while (1) {};
 	}
 	return &heap[heapOffset - size];
@@ -93,9 +90,7 @@ static void* HeapAlloc(int8_t x,int8_t u, uint64_t size) {
 
 void *tmemcpy(void *dest, const void *src, uint64_t count);
 void memcpy(void* x,const void* y,uint64_t z) {
-	serialPrintf(L"memcpy %8 %8 %u;\n", x,y,z);
 	tmemcpy(x,y,z);
-	serialPrintf(L"memcpy done %8 %8 %u;\n", x,y,z);
 }
 
 #define GetProcessHeap() 0
@@ -128,136 +123,11 @@ void *memset(void *dest, int32_t e, uint64_t len) {
 	return dest;
 }
 
-#if 0
-struct ACPITableHeader {
-	uint32_t type;
-	uint32_t length;
-	uint8_t revision;
-	uint8_t checksum;
-	char8_t oem_id[6];
-	char8_t oem_table[8];
-	uint32_t oem_revision;
-	uint32_t creator_id;
-	uint32_t creator_revision;
-} __attribute__((packed));
-_Static_assert(sizeof(ACPITableHeader) == 36, "ACPITableHeader must be 36 bytes");
-
-#pragma pack(1)
-extern "C++"
-struct XSDT {
-	ACPITableHeader header;
-	ACPITableHeader *headers[1];
-
-	template <typename T> static uint64_t acpiTableEntries(const T *t, uint64_t size) {
-		return (t->header.length - sizeof(T)) / size;
-	}
-
-	static constexpr uint32_t byteswap(uint32_t x) {
-		return ((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) | ((x << 8) & 0x00ff0000) |
-			((x << 24) & 0xff000000);
-	}
-
-	static void putSig(char8_t *into, uint32_t type) {
-		for (int32_t j = 0; j < 4; ++j)
-			into[j] = reinterpret_cast<char8_t *>(&type)[j];
-	}
-} __attribute__((packed));
-#pragma pack()
-
-SIZEOF(XSDT, sizeof(ACPITableHeader) + 8)
-
-struct APIC {
-	ACPITableHeader header;
-	uint32_t localAddress;
-	uint32_t flags;
-	uint8_t controllerData[0];
-} __attribute__((packed));
-
-struct ACPI {
-	char8_t signature[8];
-	uint8_t checksum10;
-	char8_t oemID[6];
-	uint8_t revision;
-	uint32_t rsdtAddress;
-
-	uint32_t length;
-	uint64_t xsdtAddress;
-	uint8_t checksum20;
-	uint8_t reserved[3];
-};
-#endif
-
 // Entry point
 uint64_t efi_main(void* imageHandle__, void *systemTable__) {
 	imageHandle = imageHandle__;
 	systemTable = (EFI_SYSTEM_TABLE_*)systemTable__;
 	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
 	HEXA_MAIN(0, nullptr);
-#if 0
-	// TODO Validate ACPI signatures here instead of kernel
-	// Validate this is a multi-core CPU with Local APICs
-	{
-		// TODO If bit 1 in the flags field is set then you need to mask all the 8259 PIC's interrupts, but you should probably do this anyway.
-
-		const ACPI* tables = (ACPI *)acpiTable;
-		auto xsdt = (const XSDT *)((uint64_t)tables->xsdtAddress);
-		char8_t sig[5] = {0, 0, 0, 0, 0};
-		XSDT::putSig(sig, xsdt->header.type);
-		serialPrintf(L"[[[efi_main]]] XSDT table is %s\n", sig);
-
-		uint16_t cpus = 0;
-		uint64_t numTables = XSDT::acpiTableEntries(xsdt, sizeof(void *));
-		let apicSignature = XSDT::byteswap('APIC');
-
-		serialPrintf(L"[[[efi_main]]] XSDT has %d tables\n", numTables);
-
-		for (uint64_t i = 0; i < numTables; ++i) {
-			auto header = (const ACPITableHeader *)((uint64_t)xsdt->headers[i]);
-
-			XSDT::putSig(sig, header->type);
-			serialPrintf(L"[[[efi_main]]] Found table %s\n", sig);
-
-			switch (header->type) {
-			case apicSignature:
-				{
-					auto apic = (const APIC *)header;
-					let count = XSDT::acpiTableEntries(apic, 1);
-					uint8_t const *data = apic->controllerData;
-					uint8_t const *end = data + count;
-
-					while (data < end) {
-						const uint8_t type = data[0];
-						const uint8_t length = data[1];
-
-						switch (type) {
-							case 0:
-								// TODO If flags bit 0 is set the CPU is able to be enabled, if it is not set you need to check bit 1.
-								// If that one is set you can still enable it, if it is not the CPU cannot be enabled and the OS should not try.
-								cpus++;
-								break;
-						}
-
-						data += length;
-					}
-				}
-				break;
-
-			default:
-				break;
-			}
-		}
-
-		serialPrintf(L"[[[efi_main]]] Found %d CPUs\n", cpus);
-		while (cpus < 2) {
-			drawText(L"[ERROR] Tofita requires multi-core CPU [ERROR]", errorY, &framebuffer);
-			serialPrintf(L"");
-		};
-	}
-
-	// TODO: render something to show that loader is ok, because initial start form USB may take a while
-	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
-	serialPrintln(L"[[[efi_main]]] done: initializeFramebuffer");
-#endif
-
 	return 0;
 }

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2020 Oleh Petrenko
+// Copyright (C) 2020-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -26,16 +26,15 @@ uint64_t PhysicalAllocator_$allocateBytes_(uint64_t);
 
 function libc_free(void *addr) {
 	// Do nothing for now
-	serialPrintf(L"[libc] libc_free\n");
 }
 
 void *libc_malloc(uint64_t size) {
-	serialPrintf(L"[libc] libc_malloc of size %u\n", size);
+	// serialPrintf(L"[libc] libc_malloc of size %u\n", size);
 	return (void *)(kernelParams? PhysicalAllocator_$allocateBytes_(size) : /*PhysicalAllocator::allocateBytes(size)*/0);
 }
 
 void *libc_realloc(void *addr, uint64_t size) {
-	serialPrintf(L"[libc] libc_realloc %u of size %u\n", addr, size);
+	// serialPrintf(L"[libc] libc_realloc %u of size %u\n", addr, size);
 
 	{
 		uint64_t result = kernelParams? PhysicalAllocator_$allocateBytes_(size) : /*PhysicalAllocator::allocateBytes(size)*/0;

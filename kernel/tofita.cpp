@@ -31,12 +31,9 @@ struct UefiPayload_ *kernelParams; // Used by Hexa
 #define HEXA_NO_DEFAULT_INCLUDES
 #undef char
 #undef int
-function serialPrintf(const wchar_t *c, ...);
 static void printf(const void/*chat*/ *c, ...) {
-	serialPrintf(L"<Hexa> printf %s\n", c);
 };
 void fflush(void *pipe) {
-	serialPrintf(L"<Hexa> fflush\n");
 };
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, int8_t x,int8_t u, uint64_t size);
 void *malloc(uint64_t bytes) {
@@ -45,7 +42,6 @@ void *malloc(uint64_t bytes) {
 };
 function memcpy(void *dest, const void *src, uint64_t n);
 int32_t wcslen(const wchar_t *string_) {
-	serialPrintf(L"<Hexa> wcslen\n");
 	int32_t i = 0;
 	while (string_[i] != '\0')
 		i++;
@@ -102,7 +98,6 @@ typedef struct TablePtr TablePtr;
 _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
 #include "../devices/cpu/amd64.cpp"
-#include "../devices/serial/log.cpp"
 // STB library
 #define STBI_NO_SIMD
 #define STBI_NO_STDIO
@@ -121,11 +116,11 @@ static void ExitProcess(int32_t x) {
 }
 
 static void wprintf(const wchar_t* x, const void* y) {
-	serialPrintf(x, y);
 }
 
+uint64_t kstrlen_(const uint8_t*);
 static uint32_t strlen(const char *x) {
-	return kstrlen((const uint8_t *)x);
+	return kstrlen_((const uint8_t *)x);
 }
 
 #define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), ## __VA_ARGS__)
@@ -135,25 +130,25 @@ static uint8_t heapInitial[HEAP_C] = {0};
 static uint8_t* heap = nullptr;
 static uint64_t heapOffset = 0;
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, int8_t x,int8_t u, uint64_t size) {
-	// serialPrintf(L"HeapAlloc [%s:%d] %d", /*filename,*/ functionName, lineNumber, size);
+	// serialPrintf_(L"HeapAlloc [%s:%d] %d", /*filename,*/ functionName, lineNumber, size);
 	// size = ((size - 1) | 7) + 1; // Align by 8
 	size = ((size - 1) | 15) + 1; // Align by 16
 	if (size < 16) size = 16;
 	heapOffset += 16;
 	heapOffset += size;
 	if (heapOffset >= HEAP_C) {
-		serialPrint(L"Heap overflow\n");
+		//serialPrint_(L"Heap overflow\n");
 		heap = (uint8_t*)PhysicalAllocator_$allocateBytes_(HEAP_C);
 		heapOffset = 16 + size;
 		while (heap == nullptr) {
-			serialPrint(L"Heap total overflow\n");
+			//serialPrint_(L"Heap total overflow\n");
 		};
 	}
 	// TODO FILL WITH ZEROS RIGHT HERE!
 	return &heap[heapOffset - size];
 }
 #define HeapAlloc(a, b, c) HeapAllocAt(__LINE__, __FILE__, __func__, a, b, c)
-#define TRACER() serialPrintf(L"[%s:%d]\n", __func__, __LINE__)
+#define TRACER() serialPrintf_(L"[%s:%d]\n", __func__, __LINE__)
 
 #define HEXA_UNREACHABLE(where) {}
 

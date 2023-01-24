@@ -31,7 +31,7 @@ if (string != null && probeForReadOkay((uint64_t)string, 1)) {
 }
 if (string != null && probeForReadOkay((uint64_t)string, 2)) {
 	while (string[i] != 0) {
-		putchar(string[i] & 0xFF);
+		putChar(string[i] & 0xFF);
 		i++;
 	}
 } else {
@@ -40,8 +40,9 @@ if (string != null && probeForReadOkay((uint64_t)string, 2)) {
 */
 
 // TODO `NativeBool`
-@rename('disableSerial') // TODO `@as`
-declare var disableSerial: UInt8
+// @rename('disableSerial') // TODO `@as`
+// TODO @rename not work on no-declare
+var disableSerial: UInt8 = 0
 
 let serial_register_base = 0x03F8u16
 let serial_baud_rate = 115200
@@ -77,6 +78,8 @@ let b_uart_msr_dsr = (1 << 6)
 let b_uart_msr_ri = (1 << 7)
 let b_uart_msr_dcd = (1 << 8)
 
+// TODO renaming not works
+@rename('kstrlen')
 fun kstrlen(data: ConstArrayPointer<UInt8>) {
 	var r: UInt64 = 0u64
 
@@ -135,12 +138,17 @@ fun serialPortWritable(): Bool {
 }
 
 fun serialPortWrite(buffer: ArrayPointer<UInt8>, sizeOfBuffer: UInt64): UInt64 {
+	if disableSerial != 0 {
+		return 0
+	}
+
 	var size = sizeOfBuffer
 	var buffer = buffer
 
 	if buffer == null {
 		return 0u64
 	}
+
 	if size == 0 {
 		// Flush the hardware
 		//
@@ -235,6 +243,7 @@ fun serialPrintBits(value: UInt64): Void {
 	}
 }
 
+// TODO some fun call `putchar` while it is not defined anywhere but declared in c.hexa
 @convention(cdecl)
 fun putChar(c: UInt8): Int32 {
 	var buffer: ArrayByValue<UInt8, 2> = [c, 0]
@@ -263,6 +272,7 @@ fun comItoA(i: Int64, b: ArrayPointer<UInt8>) {
 	var i = i
 
 	if i < 0 {
+		// TODO `& 0xFFu8` if required
 		b[p] = '-'.charCodeAt(0)
 		p++
 		i *= -1
@@ -316,6 +326,7 @@ declare fun serialPrintf(c: String, ...rest): Void
 
 @nativeVariadic
 // TODO `rest.getNext<UInt>()` + auto gen va_start
+// TODO would be cooler to trace the file:line:function here
 fun serialPrintf(c: String, ...rest) {
 	va_start(c)
 	let c = c.utf16() as! ArrayPointer<UInt16>
@@ -337,69 +348,69 @@ fun serialPrintf(c: String, ...rest) {
 
 		// switch String.fromUTF16(string: c, offset: 0, chars: 1) { // TODO ClangWideChar
 		switch c[i] { // TODO ClangWideChar
-		// TODO some way to put ascii `case 's': {` // ASCII of UTF-8
-		case 115: { // ASCII of UTF-8 `s`
-			let string = va_arg_uint64() as! ArrayPointer<UInt8> // TODO va_arg<ArrayPointer<UInt8> >(lst)
-			if string != null {
-				// TODO probeForReadOkay((uint64_t)string, 1)
-				puts(string)
-			} else {
-				serialPrintf("<STRING IS NULL>")
+			// TODO some way to put ascii `case 's': {` // ASCII of UTF-8
+			case 115: { // ASCII of UTF-8 `s`
+				let string = va_arg_uint64() as! ArrayPointer<UInt8> // TODO va_arg<ArrayPointer<UInt8> >(lst)
+				if string != null {
+					// TODO probeForReadOkay((uint64_t)string, 1)
+					puts(string)
+				} else {
+					serialPrintf("<STRING IS NULL>")
+				}
 			}
-		}
-		// TODO `break` here converts switch to chain of `if`s, ensure this is correct and document
-		// ^ probably UInt16 is not recognised as switch-able
-		case 83: { // ASCII of UTF-16 `S`
-			var string = va_arg_uint64() as! ArrayPointer<UInt16> // TODO va_arg<ArrayPointer<UInt16> >(lst)
-			var i: UInt32 = 0u32
-			if string != null {
-				// TODO probeForReadOkay((uint64_t)string, 2)
-				while string[i] != 0 {
-					putChar(string[i] & 0xFFu8)
+			// TODO `break` here converts switch to chain of `if`s, ensure this is correct and document
+			// ^ probably UInt16 is not recognised as switch-able
+			case 83: { // ASCII of UTF-16 `S`
+				var string = va_arg_uint64() as! ArrayPointer<UInt16> // TODO va_arg<ArrayPointer<UInt16> >(lst)
+				var i: UInt32 = 0u32
+				if string != null {
+					// TODO probeForReadOkay((uint64_t)string, 2)
+					while string[i] != 0 {
+						putChar(string[i] & 0xFFu8)
+						i++
+					}
+				} else {
+					serialPrintf("<STRING IS NULL>")
+				}
+			}
+			case 99: // `c`
+				putChar(va_arg_int32() as! UInt8) // TODO lst, int32_t
+			case 100: { // `d`
+				var value = va_arg_int32() // TODO lst, int32_t
+				var buffer: ArrayByValue<UInt8, 16> = [0]
+				for i in 16 {
+					buffer[i] = 0
+				}
+				comItoA(value, buffer.ref)
+				var c: ArrayPointer<UInt8> = buffer.ref
+				var i = 0
+				while c[i] != 0 {
+					putChar(c[i])
 					i++
 				}
-			} else {
-				serialPrintf("<STRING IS NULL>")
 			}
-		}
-		case 99: // `c`
-			putChar(va_arg_int32() as! UInt8) // TODO lst, int32_t
-		case 100: { // `d`
-			var value = va_arg_int32() // TODO lst, int32_t
-			var buffer: ArrayByValue<UInt8, 16> = [0]
-			for i in 16 {
-				buffer[i] = 0
+			case 117: { // `u`
+				var value: UInt32 = va_arg_uint32() // TODO lst, int32_t
+				var buffer: ArrayByValue<UInt8, 16> = [0]
+				for i in 16 {
+					buffer[i] = 0
+				}
+				comItoA(value, buffer.ref)
+				var c: ArrayPointer<UInt8> = buffer.ref
+				var i = 0
+				while c[i] != 0 {
+					putChar(c[i])
+					i++
+				}
 			}
-			comItoA(value, buffer.ref)
-			var c: ArrayPointer<UInt8> = buffer.ref
-			var i = 0
-			while c[i] != 0 {
-				putChar(c[i])
-				i++
+			case 56: { // `8`
+				var value: UInt64 = va_arg_uint64() // TODO lst, uint64_t
+				serialPrintHex(value)
 			}
-		}
-		case 117: { // `u`
-			var value: UInt32 = va_arg_uint32() // TODO lst, int32_t
-			var buffer: ArrayByValue<UInt8, 16> = [0]
-			for i in 16 {
-				buffer[i] = 0
+			case 98: { // `b`
+				var value: UInt64 = va_arg_uint64() // TODO lst, uint64_t
+				serialPrintBits(value)
 			}
-			comItoA(value, buffer.ref)
-			var c: ArrayPointer<UInt8> = buffer.ref
-			var i = 0
-			while c[i] != 0 {
-				putChar(c[i])
-				i++
-			}
-		}
-		case 56: { // `8`
-			var value: UInt64 = va_arg_uint64() // TODO lst, uint64_t
-			serialPrintHex(value)
-		}
-		case 98: { // `b`
-			var value: UInt64 = va_arg_uint64() // TODO lst, uint64_t
-			serialPrintBits(value)
-		}
 		}
 		i++
 	}

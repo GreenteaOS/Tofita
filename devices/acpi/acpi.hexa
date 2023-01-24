@@ -175,7 +175,7 @@ class ACPIParser {
 		serialPrint("[ACPI] signature is '")
 
 		for i in sizeOf<ArrayByValue<UInt8, 8> >() {
-			putchar(acpi10.ref.signature[i])
+			putChar(acpi10.ref.signature[i])
 		}
 
 		serialPrint("'\n")
