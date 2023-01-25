@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,17 @@ enum TofitaSyscalls : UInt32 {
 	GetOrCreateWindowFramebuffer = 123005 // TODO auto compute
 	SwapWindowFramebuffer = 123006 // TODO auto compute
 	ExitProcess = 123007 // TODO auto compute
+}
+
+// Note: all pointers should be 64-bit even for 32-bit processes
+
+@sizeOfLessOrEqual(4096)
+@struct class ProcessStartupInformation {
+	var pid: UInt64 = 0
+	var entry: UInt64 = 0
+	var dllEntries: UInt64 = 0
+	var dllCount: UInt64 = 0
+	new () {}
 }
 
 @struct @sizeOf(8 * 3)

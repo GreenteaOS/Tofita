@@ -27,7 +27,6 @@ fun processInit(process: UserProcess) {
 	// process.frame.flags = 0x002 // No interrupts
 	process.frame.flags = 0x202
 	process.syscallToHandle = TofitaSyscalls.Noop
-	process.frame.rdxArg1 = process.pid // Second argument
 	process.messages = null
 	// TODO init those fields in class declaration and constructor
 	// new (kind: ProcessKind.UserProcess)

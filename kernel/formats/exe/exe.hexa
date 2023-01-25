@@ -264,6 +264,7 @@ class ExeLoader<SIZE, HEADER> {
 	// Search only selected .dll only within the user provided dlls
 	fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList): PeExportLinkedList {
 		var list: PeExportLinkedList = root
+		// TODO make it intrusive list
 		// TODO compute crc for faster .dll import names lookup
 		while list.next != null {
 			// Step upfront, to ignore empty root
@@ -330,7 +331,8 @@ class ExeLoader<SIZE, HEADER> {
 
 						ord = pIBN.hint
 						var szImportName: ConstArrayPointer<UInt8> = pIBN.name as! ConstArrayPointer<UInt8>
-						serialPrintf("[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n", szName,
+						serialPrintf("[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n",
+									szName,
 									szImportName, ord, pThunkOrg.func)
 
 						// Resolve import
@@ -342,6 +344,8 @@ class ExeLoader<SIZE, HEADER> {
 						if proc != null {
 							func = proc.ptr as! SIZE
 						} else {
+							// Set stub to avoid simple crash
+							// TODO `tofitaStdStub`
 							func = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root).ptr as! SIZE
 						}
 					}
@@ -386,24 +390,29 @@ class ExeLoader<SIZE, HEADER> {
 
 	// TODO `template<typename SIZE>` per function
 	// TODO make `entry` a generic too
-	fun addDllEntry(physical: UInt64, entry: UInt64) {
+	fun addDllEntry(physical: UInt64, entry: UInt64, startup: ProcessStartupInformation) {
 		let max: SIZE = 511 // TODO any other limits?
 		// TODO ^ 32-bit limit is x2
-		let count = physical as! ArrayPointer<SIZE>
+		let dllEntries = physical as! ArrayPointer<SIZE>
 
-		if count[0] >= 511 {
+		// TODO `if count[0] >= 511 {`
+		//let amount = count[0] as! SIZE
+		//if amount >= (511 as! SIZE) {
+		if startup.dllCount >= 511 {
 			// TODO error
 			return
 		}
 
-		// Yeah this is weird way to save DLLs count
-		count[0] = count[0] + 1
-		count[count[0]] = entry
+		dllEntries[startup.dllCount] = entry
+		startup.dllCount++
 	}
 
 	// DLL entry points aka `DllMain`
 	// TODO make it linked list, if it's not enough?
 	let dllEntries = PhysicalAllocator.allocateOnePagePreZeroed()
+
+	// Size is ensured by `@sizeOfLessOrEqual(4096)`
+	let startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
 
 	fun loadRelatedDLLsAndMapIntoProcess(app: ExeInterim, root: PeExportLinkedList, exec: Executable, process: UserProcess) {
 		// TODO parse DLLs in multiple threads
@@ -424,9 +433,9 @@ class ExeLoader<SIZE, HEADER> {
 		resolveDllImports(user32, root)
 		resolveExeImports(app, root)
 
-		addDllEntry(dllEntries, kernel32.entry)
-		addDllEntry(dllEntries, gdi32.entry)
-		addDllEntry(dllEntries, user32.entry)
+		addDllEntry(dllEntries, kernel32.entry, startup)
+		addDllEntry(dllEntries, gdi32.entry, startup)
+		addDllEntry(dllEntries, user32.entry, startup)
 		// TODO addDllEntry(dllEntries, advapi32.entry)
 
 		process.is64bit = is64bit
@@ -442,6 +451,7 @@ class ExeLoader<SIZE, HEADER> {
 			// TODO pager should respect those limits
 		}
 
+		// TODO this may fail/except, handle errors
 		let whereEntries = findUserspaceMemory(
 			process.pml4,
 			0,
@@ -449,12 +459,25 @@ class ExeLoader<SIZE, HEADER> {
 			process.limits
 		)
 
+		// TODO this may fail/except, handle errors (de-allocate all memory)
 		mapMemory(process.pml4, whereEntries, dllEntries - wholePhysicalStart, 1)
+
+		startup.dllEntries = whereEntries
+		startup.entry = app.pei.entry
+		startup.pid = process.pid
+
+		let whereStartup = findUserspaceMemory(
+			process.pml4,
+			0,
+			1,
+			process.limits
+		)
+
+		mapMemory(process.pml4, whereStartup, (startup as! UInt64) - wholePhysicalStart, 1)
 
 		process.frame.ip = ntdll.entry // Contains crt0
 		process.frame.sp = app.stackVirtual
-		process.frame.rcxArg0 = app.pei.entry // First argument
-		process.frame.r8 = whereEntries // Third argument
+		process.frame.rcxArg0 = whereStartup // First argument
 		// TODO merge all to one argument (single structure)
 		// TODO unmap zero page to cause NPE
 	}

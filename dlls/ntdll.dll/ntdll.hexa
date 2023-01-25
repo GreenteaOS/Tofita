@@ -23,9 +23,7 @@ declare Entry = (hInstance: ConstArrayPointer<Void>, hPrev: ConstArrayPointer<Vo
 declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, lpvReserved: ConstArrayPointer<Void>) => Bool32
 // TODO must error `hinstDLL` twice `declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, hinstDLL: ConstArrayPointer<Void>) => Bool32`
 
-@rename('hexa_entry') declare let hexa_entry: Entry // TODO size_t
-@rename('hexa_pid') declare let hexa_pid: UInt64 // TODO size_t
-@rename('hexa_dllEntries') declare let hexa_dllEntries: UInt64 // TODO size_t
+@rename('hexa_startup') declare let hexa_startup: UInt64 // TODO size_t aka PointerSizedUInt (size_t is guaranteed to be an unsigned type)
 
 @dllExport('memset')
 fun memset(value: UInt32) {
@@ -37,28 +35,35 @@ enum DllEntryReason : UInt32 {
 }
 
 //TODO set as entry @linkName('greenteaosIsTheBest')
-fun greenteaosIsTheBest(entry: Entry, pid: UInt64, dllEntries: UInt64) {
+fun greenteaosIsTheBest(startup: ProcessStartupInformation) {
+	let entry: Entry = startup.entry
+	let pid: UInt64 = startup.pid
+	let dllEntries: UInt64 = startup.dllEntries
 	// TODO entry arguments (argv, argc)
 	// TODO init DLLs
 	// TODO PEB/TEB
 	// TODO TLS callbacks
 	// TODO load DLLs in usermode
-	tofitaDebugLog("ENTRERED_HEXA".utf16())
 	tofitaDebugLog("CRT ready for PID %u".utf16(), pid)
 	// TODO as stricture `{ count UInt32, dllEntries ArrayByValue<...> }`
-	let count = (dllEntries != 0)? (dllEntries as! ConstArrayPointer<UInt32>)[0] : 0u32
+	let count = startup.dllCount
 	let dllMains = dllEntries as! ConstArrayPointer<DllEntry>
 
-	for i in count {
-		dllMains[i + 1](null, DllEntryReason.DLL_PROCESS_ATTACH, null)
+	if dllEntries == 0 {
+		tofitaDebugLog("dllEntries == 0 for PID %u".utf16(), pid)
 	}
 
-	// TODO unmap entries/etc if required
+	for i in count {
+		dllMains[i](null, DllEntryReason.DLL_PROCESS_ATTACH, null)
+	}
+
+	// TODO unmap entries/ProcessStartupInformation if required
 	tofitaDebugLog("Done %u DLLs".utf16(), count)
 
 	if entry != null {
 		tofitaDebugLog("entry != null OK for PID %u".utf16(), pid)
 	}
+
 	if entry == null {
 		tofitaDebugLog("entry == null ERROR for PID %u".utf16(), pid)
 	}
@@ -68,5 +73,4 @@ fun greenteaosIsTheBest(entry: Entry, pid: UInt64, dllEntries: UInt64) {
 	while (true) {}
 }
 
-tofitaDebugLog("PRE_ENTRERED_HEXA".utf16())
-greenteaosIsTheBest(hexa_entry, hexa_pid, hexa_dllEntries)
+greenteaosIsTheBest(hexa_startup as! ProcessStartupInformation)

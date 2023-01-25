@@ -360,14 +360,12 @@ static void* HeapAlloc(volatile int8_t x,volatile void* u, volatile uint64_t siz
 	heapOffset += 8;
 	heapOffset += size;
 	if (heapOffset >= HEAP_C) {
-		tofitaDebugLog(L"!!! Heap overflow !!!\n");
 		while (1) {};
 	}
 	void* result = (void *)&heap[heapOffset - size];
 	return result;
 }
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, volatile int8_t x,volatile void* u, volatile uint64_t size) {
-	tofitaDebugLog(L"NTHeapAllocAt %s:%d\n", (uint64_t)functionName, lineNumber);
 	return HeapAlloc(x, u, size);
 }
 #define HeapAlloc(a, b, c) HeapAllocAt(__LINE__, __FILE__, __func__, a, b, c)
@@ -412,9 +410,7 @@ void _memset() asm("_memset");
 void _memset() { } // TODO TODO TODO
 #endif
 
-ExeEntry hexa_entry;
-uint64_t hexa_pid;
-uint64_t hexa_dllEntries;
+uint64_t hexa_startup;
 
 #ifdef bit64
 	#include "ntdll.64.c"
@@ -423,8 +419,8 @@ uint64_t hexa_dllEntries;
 #endif
 
 // TODO Hehe just use uint32_t for PIDs
-void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, void* dllEntries) asm("greenteaosIsTheBest");
-void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, void* dllEntries) {
+void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) asm("greenteaosIsTheBest");
+void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) {
 	// TODO entry arguments (argv, argc)
 	// TODO init DLLs
 	// TODO PEB/TEB
@@ -434,10 +430,12 @@ void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, vo
 
 	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
 	heapOffset = 0;
-	hexa_entry = entry;
-	hexa_pid = (uint64_t)pid;
-	hexa_dllEntries = (uint64_t)dllEntries;
+	hexa_startup = startup;
 	HEXA_MAIN(0, nullptr);
+
+
+	// TODO DCE
+	/*tofitaDebugLog(L"Leaving HEXA_MAIN");
 
 	#ifdef bit64
 		tofitaDebugLog(L"64-bit CRT ready for PID %u", (uint64_t)pid);
@@ -459,5 +457,5 @@ void __attribute__((fastcall)) greenteaosIsTheBest(ExeEntry entry, void* pid, vo
 	tofitaDebugLog(L"Done DLLs");
 
 	tofitaExitProcess_(entry(nullptr, nullptr, nullptr, 0));
-	while (true) {};
+	while (true) {};*/
 }
