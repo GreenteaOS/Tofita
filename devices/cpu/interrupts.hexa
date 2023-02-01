@@ -354,28 +354,9 @@ fun setupInterruptsAndExceptions() {
 
 	// upload
 	{
+		serialPrintf("[cpu] TSS base is %8\n", tssBase)
 		tssSetEntry(8, tssBase, sizeof_TssEntry)
 		// tssSetEntry(8, tssBase, sizeof_TssEntry - 1) TODO correct size?
-	}
-
-	if false {
-		let gdt = gdtTemplate as! ArrayPointer<ByValue<GdtDescriptorEx>>
-		for i in 16 {
-			if i == 0 {
-				continue // Empty
-			}
-			if i == 8 {
-				continue // TSS
-			}
-			if i == 9 {
-				continue // TSS
-			}
-			if gdt[i].ref.present == 0 {
-				continue
-			}
-			serialPrintf("[dumpGDT] #%u\n", i)
-			dumpGDT(gdt[i].ref)
-		}
 	}
 
 	// globalGdtr.limit = sizeOf(gdtTemplate) - 1 TODO

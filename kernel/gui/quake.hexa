@@ -62,6 +62,11 @@ fun quakeHandleButtonDown(key: UInt8) {
 	}
 
 	if keyboardMap[key] == '\n' && quakeCommandSize > 0 {
+		if quakeCommand == 'gdt' {
+  			let gdt = gdtTemplate as! ArrayPointer<ByValue<GdtDescriptorEx>>
+			dumpGdtEntries(gdt)
+			quakePrintf("GDT was logged into serial\n".utf16())
+		} else
 		if quakeCommand == 're' or quakeCommand == 'reboot' {
 			//var start: InitKernel = upper as! InitKernel // TODO `= (InitKernel)` compiles
 			//start(paramsCache) // TODO pml4, stack
@@ -79,7 +84,7 @@ fun quakeHandleButtonDown(key: UInt8) {
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
 		} else {
 			// TODO fix %S
-			quakePrintf("Command '%S' not supported\n".utf16(), quakeCommand)
+			quakePrintf("Command '%S' not supported\n".utf16(), quakeCommand.utf16())
 			quakePrintf("Enter 'help' or 'he' for commands\n".utf16())
 		}
 		quakeCommand = ''

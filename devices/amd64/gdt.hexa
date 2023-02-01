@@ -55,6 +55,7 @@ enum GdtType : UInt8 {
 	Present = 0x80
 }
 
+// TODO this legacy part is useless
 @struct @packed @sizeOf(8)
 class GdtDescriptor {
 	var limitLow: UInt16
@@ -90,7 +91,7 @@ class GdtDescriptorEx {
 }
 
 fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, typed: GdtType) {
-	var gdtd: GdtDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! GdtDescriptor
+	var gdtd = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! GdtDescriptor
 	gdtd.limitLow = limit & 0xFFFFu16
 	gdtd.size = (limit >> 16) & 0xFu8
 	// gdtd.size |= (is64 ? 0xa0 : 0xc0)
@@ -106,8 +107,42 @@ fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, typed: GdtTyp
 		as! GdtType
 }
 
+fun dumpTSS(desc: TssDescriptor) {
+    serialPrintf("limit=%8 ", (desc.limitLow) as! UInt64)
+    serialPrintf("base=%8", (
+        (desc.base_00 as! UInt64) | ((desc.base_16 as! UInt64) << 16) | ((desc.base_24 as! UInt64) << 24) | ((desc.base_32 as! UInt64) << 32)
+    ) as! UInt64)
+
+    let type = desc.type as! UInt64
+
+    if (type & (GdtType.Accessed as! UInt64)) != 0 {
+		serialPrintf(" accessed")
+    }
+
+    if (type & (GdtType.Execute as! UInt64)) != 0 {
+		serialPrintf(" execute")
+    }
+
+    if (type & (GdtType.Ring3 as! UInt64)) != 0 {
+		serialPrintf(" ring3")
+    }
+
+    if (type & (GdtType.Present as! UInt64)) != 0 {
+		serialPrintf(" present")
+    }
+
+	serialPrintf("\n")
+}
+
 fun dumpGDT(desc: GdtDescriptorEx) {
-	serialPrintf("[dumpGDT]")
+    serialPrintf("limit=%8 ", (desc.limitLow | (desc.limit << 16)) as! UInt32)
+    serialPrintf("base=%8", (desc.baseLow | (desc.baseMid << 16) | (desc.baseHigh << 24)) as! UInt32)
+
+    /*serialPrintf("limit==%8 ", desc.limit)
+    serialPrintf("limitLow==%8 ", desc.limitLow)
+    serialPrintf("baseLow==%8 ", desc.baseLow)
+    serialPrintf("baseMid==%8 ", desc.baseMid)
+    serialPrintf("baseHigh==%8 ", desc.baseHigh)*/
 
 	if desc.accessed != 0 {
 		serialPrintf(" accessed")
@@ -142,11 +177,36 @@ fun dumpGDT(desc: GdtDescriptorEx) {
 		serialPrintf(" present")
 	}
 	if desc.zero16one32 != 0 {
-		serialPrintf(" zero16one32")
+		serialPrintf(" zero16one32==1")
 	}
 	if desc.blocks != 0 {
 		serialPrintf(" pages")
 	}
 
 	serialPrintf("\n")
+}
+
+fun dumpGdtEntries(gdt: ArrayPointer<ByValue<GdtDescriptorEx>>) {
+    for i in 16 {
+        if i == 0 {
+            serialPrintf("[GDT] #%u Empty\n", i)
+            continue // Empty
+        }
+        if i == 8 {
+            serialPrintf("[GDT] #%u TSS ", i)
+            dumpTSS(gdt[i].ref as! TssDescriptor)
+            continue // TSS
+        }
+        if i == 9 {
+            serialPrintf("[GDT] #%u TSS (part two)\n", i)
+            continue // TSS
+        }
+        if gdt[i].ref.present == 0 {
+            serialPrintf("[GDT] #%u Not present\n", i)
+            continue
+        }
+
+        serialPrintf("[GDT] #%u ", i)
+        dumpGDT(gdt[i].ref)
+    }
 }
