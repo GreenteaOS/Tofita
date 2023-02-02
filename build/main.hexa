@@ -290,7 +290,7 @@ fun runTasks() {
 				'-Wno-address-of-temporary',
 				'-fshort-wchar -mno-red-zone -O2 -ferror-limit=10',
 				' -c ',
-				'boot/uefi/boot.cpp',
+				'boot/uefi.c',
 				' -o ',
 				config.tempFolder + '/' + teaFolder + '/miniefi.o'
 			].join(' ')
