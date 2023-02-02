@@ -116,7 +116,7 @@ for task in ['tasks'] {
 							if fs.lstatSync(curPath).isDirectory() {
 								formatFolderRecursive(curPath)
 							} else {
-								if curPath.indexOf('external\\') == -1, curPath.endsWith('.cpp') || curPath.endsWith('.hpp') {
+								if curPath.indexOf('external\\') == -1, curPath.endsWith('.c') || curPath.endsWith('.hpp') {
 									files.push(curPath)
 								}
 							}
@@ -349,7 +349,7 @@ fun runTasks() {
 						// TODO useCpp, fix C build
 						useCpp? '-x c++ -std=c++2a' : '-x c -std=gnu17',
 						'-fomit-frame-pointer',
-						'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.cpp',
+						'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.c',
 						'-o',
 						outobj
 					].join(' ')
@@ -414,7 +414,7 @@ fun runTasks() {
 				'-Wno-address-of-temporary',
 				debuggie? '-g' : '',
 				useCpp? '-x c++ -std=c++2a' : '-x c -std=gnu17',
-				'-c kernel/tofita.cpp -o ',
+				'-c kernel/tofita.c -o ',
 				config.tempFolder + '/' + teaFolder + '/tofita.obj '
 			].join(' ')
 		)

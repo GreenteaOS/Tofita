@@ -70,10 +70,12 @@ uint64_t __aullrem() asm("__aullrem");
 uint64_t __aullrem() { return 0; } // TODO
 
 void _memset() asm("_memset");
-void _memset() { } // TODO TODO TODO
+void _memset() {
+} // TODO TODO TODO
 
 void _memcpy() asm("_memcpy");
-void _memcpy() { } // TODO TODO TODO
+void _memcpy() {
+} // TODO TODO TODO
 #endif
 
 #ifdef bit64
