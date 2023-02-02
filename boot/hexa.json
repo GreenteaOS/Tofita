@@ -6,8 +6,8 @@
 	"license": "LGPL-3.0-only",
 	"global": [
 		"shared/params",
-		"amd64/amd64Page",
-		"amd64/amd64Mapper",
+		"amd64/amd64pageInterim",
+		"amd64/amd64initialPaging",
 		"shared/paging",
 		"../devices/serial/init",
 		"../devices/serial/log",
