@@ -101,7 +101,8 @@ fun quakeHandleButtonDown(key: UInt8) {
 		// TODO nullables are incomparable, do some cool way to avoid this `if (charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0)) ||`
 		// TODO ^ better error `you are comparing nullable values`
 		if (charCode >= 97 && charCode <= 122) ||
-			(charCode >= 48 && charCode <= 57) || (charCode == 32) {
+			(charCode >= 48 && charCode <= 57) || (charCode == 32)
+			|| (charCode == 45) {
 			if quakeCommandSize < 255 {
 				// quakeCommand += keyboardMap[key]
 				quakeCommand = quakeCommand + char

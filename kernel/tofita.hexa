@@ -192,10 +192,10 @@ fun kernelInit(params: UefiPayload) {
 	// Idle process
 	{
 		// TODO must error `sizeOf(processes)`
-		// processes[0] = new UserProcess()
+		// processes[0] = new TofitaProcess()
 		for i in 256 {
 			// TODO optimizer: set Array.capacity to 256 upfront cause known value
-			let process = new UserProcess()
+			let process = new TofitaProcess()
 			process.frame = new InterruptFrame()
 			appendProcess(process)
 			process.present = false
@@ -211,7 +211,7 @@ fun kernelInit(params: UefiPayload) {
 			windowsList[i] = window
 		}
 
-		var idle: UserProcess = processes[0]
+		var idle: TofitaProcess = processes[0] // TODO new!!! not preallocated
 		idle.pml4 = pml4entries // Save CR3 template to idle process
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
@@ -225,7 +225,7 @@ fun kernelInit(params: UefiPayload) {
 	if false {
 	// TODO should be done at main thread
 		{
-			let guiProcess: UserProcess = processCreate()
+			let guiProcess: TofitaProcess = processCreate()
 			serialPrintf("<Tofita> GUI process ID == %u\n", guiProcess.pid)
 			processInit(guiProcess)
 			disableSerial = 1
@@ -315,12 +315,12 @@ fun kernelThread() {
 						process.present = false
 
 						// Select pml4 of idle process for safety
-						// TODO idle as `idle: UserProcess` var, not `[0]`
+						// TODO idle as `idle: TofitaProcess` var, not `[0]`
 						pml4kernelThread = processes[0].pml4
 						writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 						// Deallocate process
-						// TODO as UserProcess class method
+						// TODO as TofitaProcess class method
 						processDestroy(process)
 					} else if syscall == TofitaSyscalls.Cpu {
 						// TODO ^ rename to CpuException or something
@@ -342,7 +342,7 @@ fun kernelThread() {
 
 						// Select pml4 of idle process for safety
 						pml4kernelThread = processes[0].pml4
-						// TODO `UserProcess.this.writeOwnCr3`
+						// TODO `TofitaProcess.this.writeOwnCr3`
 						writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
 						// De-allocate process

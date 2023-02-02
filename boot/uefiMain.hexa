@@ -36,7 +36,7 @@
     static void ExitProcess(int32_t x) {
     }
 
-    static void wprintf(const wchar_t* x, const void* y) {
+    static void wprintf(const wchar_t* x, const void* y, ...) {
     }
 
     static void fflush(void* x) {}

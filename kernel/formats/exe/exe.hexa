@@ -414,7 +414,7 @@ class ExeLoader<SIZE, HEADER> {
 	// Size is ensured by `@sizeOfLessOrEqual(4096)`
 	let startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
 
-	fun loadRelatedDLLsAndMapIntoProcess(app: ExeInterim, root: PeExportLinkedList, exec: Executable, process: UserProcess) {
+	fun loadRelatedDLLsAndMapIntoProcess(app: ExeInterim, root: PeExportLinkedList, exec: Executable, process: TofitaProcess) {
 		// TODO parse DLLs in multiple threads
 		let ntdll = loadDll("ntdll.dll", root, exec) // TODO proper path!!!
 		let kernel32 = loadDll("kernel32.dll", root, exec)
@@ -483,7 +483,7 @@ class ExeLoader<SIZE, HEADER> {
 	}
 }
 
-fun loadExeIntoProcess(file: String, process: UserProcess) {
+fun loadExeIntoProcess(file: String, process: TofitaProcess) {
 	{
 		let root =
 			PhysicalAllocator.allocateBytes(sizeOf<PeExportLinkedList>()) as! PeExportLinkedList

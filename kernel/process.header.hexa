@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// TODO probably use Thread instead of UserProcess for easier scheduling & syscalls
+// TODO probably use Thread instead of TofitaProcess for easier scheduling & syscalls
 // and threads will have parentPID and that's
 // so we don't have linked list of threads per process
 @struct
-class UserProcess {
+class TofitaProcess {
 	// Is process exists at all and fully initialized
 	@volatile var present: Bool
 	// TODO SoA
@@ -67,10 +67,10 @@ class UserProcess {
 }
 
 /// List of all processes
-let processes: [UserProcess] = []
+let processes: [TofitaProcess] = []
 
 // TODO must use locking for sane SMP
-fun appendProcess(process: UserProcess) {
+fun appendProcess(process: TofitaProcess) {
 	if processes.includes(process) {
 		quakePrintf("Process '%S' is added twice to the scheduler, this is a bug\n".utf16(), process.name.utf16())
 		return

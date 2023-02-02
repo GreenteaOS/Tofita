@@ -317,7 +317,7 @@ fun handleMouseUp(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 				payload.wParam = null
 				payload.lParam = null
 
-				@volatile let process: UserProcess = processes[window.pid]
+				@volatile let process: TofitaProcess = processes[window.pid]
 				postMessage(process, payload)
 			}
 		}

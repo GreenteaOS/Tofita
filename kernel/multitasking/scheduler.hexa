@@ -91,7 +91,7 @@ fun switchToKernelThread(@volatile frame: InterruptFrame) {
 
 	if currentThread == ThreadKind.THREAD_USER {
 		// Save
-		var process: UserProcess = processes[currentProcess]
+		var process: TofitaProcess = processes[currentProcess]
 		tmemcpy(process.frame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	} else if currentThread == ThreadKind.THREAD_GUI {
 		// Save
@@ -112,7 +112,7 @@ fun switchToNextProcess(@volatile frame: InterruptFrame) {
 		next = getNextProcess()
 	}
 
-	var process: UserProcess = processes[next]
+	var process: TofitaProcess = processes[next]
 	@volatile let old = currentProcess
 	currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
@@ -127,7 +127,7 @@ fun switchToNextProcess(@volatile frame: InterruptFrame) {
 			tmemcpy(guiThreadFrame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 		} else if currentThread == ThreadKind.THREAD_USER {
 			// Save
-			var processOld: UserProcess = processes[old]
+			var processOld: TofitaProcess = processes[old]
 			tmemcpy(processOld.frame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 		} else if currentThread == ThreadKind.THREAD_KERNEL {
 			// Save
@@ -151,7 +151,7 @@ fun switchToGuiThread(@volatile frame: InterruptFrame) {
 
 	if currentThread == ThreadKind.THREAD_USER {
 		// Save
-		let process: UserProcess = processes[currentProcess]
+		let process: TofitaProcess = processes[currentProcess]
 		tmemcpy(process.frame as! ArrayPointer<UInt8>, frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	} else if currentThread == ThreadKind.THREAD_KERNEL {
 		if kernelThreadBusy {

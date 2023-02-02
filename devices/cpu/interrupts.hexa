@@ -265,7 +265,7 @@ fun anyInterruptHandler(frame: InterruptFrame): Void {
 
 fun syscallInterruptHandler(frame: InterruptFrame) {
 	disableAllInterrupts()
-	@volatile let process: UserProcess = processes[currentProcess]
+	@volatile let process: TofitaProcess = processes[currentProcess]
 	process.schedulable = false
 	@volatile let index = frame.rcxArg0 as! TofitaSyscalls
 
@@ -294,7 +294,7 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 		serialPrintf("[[ExitProcess:PID %d]] %d\n", currentProcess, frame.rdxArg1)
 		// TODO kernel wake up
 		// TODO destroy process
-		var process: UserProcess = processes[currentProcess]
+		var process: TofitaProcess = processes[currentProcess]
 		process.schedulable = false
 		switchToNextProcess(frame)
 		process.present = false

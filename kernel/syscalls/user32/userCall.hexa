@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun userCallHandled(@volatile process: UserProcess, syscall: TofitaSyscalls): Bool {
+fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): Bool {
 	@volatile var frame = process.frame
 
 	if syscall == TofitaSyscalls.CreateWindowEx {
@@ -23,6 +23,7 @@ fun userCallHandled(@volatile process: UserProcess, syscall: TofitaSyscalls): Bo
 
 		var payload = frame.rdxArg1 as! CreateWindowExPayload
 
+		// TODO why 16?
 		if probeForReadOkay((payload.lpClassName as! UInt64), 16) {
 			serialPrintf("<> lpClassName == %S\n", payload.lpClassName)
 		}
@@ -36,6 +37,7 @@ fun userCallHandled(@volatile process: UserProcess, syscall: TofitaSyscalls): Bo
 		window.hWnd = payload.hWnd
 
 		// TODO proper probe method, probably separate probeForWideCharOkay
+		// ^ probably should produce `String?` and separate `probeForCopyOkay`
 		if probeForReadOkay((payload.lpWindowName as! UInt64), 8) {
 			// TODO must error `candidate function not viable: no known conversion from 'const wchar_t *' to 'const uint16_t      *'` window.title = String.fromUTF16z(payload.lpWindowName)
 			window.title = String.fromUTF16z(payload.lpWindowName as! ConstArrayPointer<UInt16>)
@@ -105,12 +107,18 @@ fun userCallHandled(@volatile process: UserProcess, syscall: TofitaSyscalls): Bo
 	}
 
 	if syscall == TofitaSyscalls.SwapWindowFramebuffer {
+		// TODO should actually be probe for copy to stack
+		// Another idea: copy to safe 4k buffer and cast from it
+		// ^ well actually to know proper sizeof code gen would be better
+		// Also: could be locking virtual memory altering syscalls while handling them
+		// Anyway must guard the logic itself in probing, like returning optional null from probeForRead on fail
 		if !probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
 			return false
 		}
 
 		let payload = frame.rdxArg1 as! SwapWindowFramebufferPayload
 
+		// TODO should copy from stack complete filled fb to this location
 		if !probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
 			return false
 		}
