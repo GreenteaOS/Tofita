@@ -22,7 +22,7 @@
 	#define NTDLL32_DLL __declspec(dllexport) __stdcall
 #endif
 
-#include "ntdll.hpp"
+#include "ntdll.h"
 
 uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
 	// TODO return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
@@ -421,41 +421,9 @@ uint64_t hexa_startup;
 // TODO Hehe just use uint32_t for PIDs
 void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) asm("greenteaosIsTheBest");
 void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) {
-	// TODO entry arguments (argv, argc)
-	// TODO init DLLs
-	// TODO PEB/TEB
-	// TODO TLS callbacks
-	// TODO load DLLs in usermode
 	_wcmdln = L"_wcmdln";
-
 	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
 	heapOffset = 0;
 	hexa_startup = startup;
 	HEXA_MAIN(0, nullptr);
-
-
-	// TODO DCE
-	/*tofitaDebugLog(L"Leaving HEXA_MAIN");
-
-	#ifdef bit64
-		tofitaDebugLog(L"64-bit CRT ready for PID %u", (uint64_t)pid);
-	#else
-		tofitaDebugLog(L"32-bit CRT ready for PID %u", (uint64_t)pid);
-	#endif
-
-	size_t count = dllEntries? ((size_t*)dllEntries)[0] : 0;
-	DllEntry* dllMains = (DllEntry*)dllEntries;
-	size_t i = 0;
-	uint32_t DLL_PROCESS_ATTACH = 1;
-
-	while (i < count) {
-		i++;
-		dllMains[i](nullptr, DLL_PROCESS_ATTACH, nullptr);
-	}
-
-	// TODO unmap entries/etc if required
-	tofitaDebugLog(L"Done DLLs");
-
-	tofitaExitProcess_(entry(nullptr, nullptr, nullptr, 0));
-	while (true) {};*/
 }

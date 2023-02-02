@@ -102,8 +102,8 @@ _Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 #define STBI_NO_STDIO
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
-#include "formats/stb_image/libc.cpp"
-#include "formats/stb_image/stb_image.hpp"
+#include "formats/stb_image/libc.c"
+#include "formats/stb_image/stb_image.h"
 
 #undef free
 #undef malloc
@@ -121,7 +121,7 @@ static void ExitProcess(int32_t x) {
 	// Stub
 }
 
-static void wprintf(const wchar_t* x, const void* y) {
+static void wprintf(const wchar_t* x, const void* y, ...) {
 }
 
 uint64_t kstrlen_(const uint8_t*);

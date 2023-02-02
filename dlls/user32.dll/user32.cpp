@@ -22,7 +22,7 @@
 	#define USER32_DLL __declspec(dllexport) __stdcall
 #endif
 
-#include "../ntdll.dll/ntdll.hpp"
+#include "../ntdll.dll/ntdll.h"
 
 #define HEXA_NO_DEFAULT_INCLUDES
 #define HEXA_MAIN mainHexa
