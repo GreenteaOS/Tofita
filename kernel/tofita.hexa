@@ -197,7 +197,10 @@ fun kernelInit(params: UefiPayload) {
 			// TODO optimizer: set Array.capacity to 256 upfront cause known value
 			let process = new TofitaProcess()
 			process.frame = new InterruptFrame()
-			appendProcess(process)
+			if i == 0 {
+				appendProcess(process)
+			}
+
 			process.present = false
 			process.schedulable = false
 			process.name = "Empty"
@@ -264,7 +267,7 @@ fun kernelThread() {
 		// TODO optimize cast to 1u64
 		// TODO no need for `@volatile` here and there
 		@volatile var index: UInt64 = 1 // Idle process ignored
-		while index < 255 {		 // TODO
+		while index < processes.length {
 			let process = processes[index]
 			// TODO `for process in processes { if process.pid == 0 { continue } }`
 			// TODO ^ interlocked iteration? interlocked processes?

@@ -56,31 +56,28 @@ var taskBarRedraw: UInt8 = 0 // Re-paint task bar current time
 
 fun getNextProcess(): UInt64 {
 	// Note that idle process is ignored
-	var index: UInt64 = 1
-	while index < 255 { // TODO processes.length
+	for index in 1...processes.length {
 		let process = processes[index]
-		if process.present == true, process.syscallToHandle == TofitaSyscalls.Noop {
+		if process != null, process.present == true, process.syscallToHandle == TofitaSyscalls.Noop {
 			if process.schedulable == true {
 				if process.scheduleOnNextTick == true {
-					return index
+					return index as! UInt64
 				}
 			}
 		}
-		index++
 	}
 
 	return 0 // Idle
 }
 
 fun markAllProcessessSchedulable() {
-	var index: UInt64 = 0
-	while index < 255 { // TODO 256?
-		if processes[index].present == true {
-			if processes[index].schedulable == true {
-				processes[index].scheduleOnNextTick = true
+	for index in processes.length {
+		let process = processes[index]
+		if process != null, process.present == true {
+			if process.schedulable == true {
+				process.scheduleOnNextTick = true
 			}
 		}
-		index++
 	}
 }
 

@@ -89,6 +89,8 @@ fun defineIdtCallback(entry: IdtEntry, address: UInt64, stack: UInt8, level: UIn
 	entry.dpl = level // Ring 0 or 3
 	entry.present = 1
 	entry.gateType = 0xE // Interrupt gate
+	// Interrupt gate allow avoid dealing with nested interrupts
+	// TODO we need so much ISTs then?
 }
 
 fun setIdtCallback(entry: IdtEntry, callbackHandler: UInt64) {
@@ -427,7 +429,7 @@ fun setupInterruptsAndExceptions() {
 	enterKernelMode()
 
 	// Set PIT frequency
-	// Valid values: 57 Hz, 121 Hz, 173 Hz
+	// Valid values: 57 Hz, 121 Hz, 173 Hz, 209 Hz, 363 Hz
 	// Next valid: `i = 174; while (Math.round(1193181 / i) != (1193181 / i)) {i++;}; console.log(i)`
 	writePort(0x43, 0x36)
 	let frequency = 1193181 / 121
