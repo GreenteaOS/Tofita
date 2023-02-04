@@ -265,7 +265,7 @@ fun runTasks() {
 
 	if efiTask {
 		// Hexa
-		phase1.push('cmd /c hexa boot\\hexa.json')
+		phase1.push('cmd /c hexa --output-folder ' + config.tempFolder + '/' + teaFolder + ' boot\\hexa.json')
 
 		// EFI
 		phase2.push(
@@ -290,7 +290,7 @@ fun runTasks() {
 				'-Wno-address-of-temporary',
 				'-fshort-wchar -mno-red-zone -O2 -ferror-limit=10',
 				' -c ',
-				'boot/uefi.c',
+				config.tempFolder + '/' + teaFolder + '/uefi.c',
 				' -o ',
 				config.tempFolder + '/' + teaFolder + '/miniefi.o'
 			].join(' ')
