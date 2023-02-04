@@ -285,7 +285,7 @@ fun kernelThread() {
 					// Select pml4 to work within current process memory
 					writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
-					// TODO refactor to separate syscall handler per-DLL
+					// TODO refactor to separate syscall handler per-DLL and handlers table by syscall id
 
 					if syscall == TofitaSyscalls.DebugLog {
 						if process.is64bit {
@@ -298,17 +298,21 @@ fun kernelThread() {
 						if probeForReadOkay(frame.rdxArg1, sizeOf<DebugLogPayload>()) {
 							var payload = frame.rdxArg1 as! DebugLogPayload
 							// Note this is still very unsafe
-							// TODO safer one, with SEH + check to addrs be at userspace
-							if probeForReadOkay((payload.message as! UInt64), 1) {
+							// TODO safer one, with SEH + check to addresses be at user space
+							if probeForReadOkay(payload.message, 1) {
 								// TODO Probably SEH in %s of serialPrintf itself
 								// (at page boundary)
 								serialPrintf(
 									// TODO just %S utf16 instead of allocation
-									String.fromUTF16z(payload.message),
+									String.fromUTF16z(payload.message as! ConstArrayPointer<UInt16>),
 									payload.extra,
 									payload.more
 								)
+							} else {
+								serialPrintf("{payload.message read probe failed}")
 							}
+						} else {
+							serialPrintf("{rdx read probe failed}")
 						}
 
 						serialPrintf("\n")
@@ -322,7 +326,7 @@ fun kernelThread() {
 						pml4kernelThread = processes[0].pml4
 						writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 
-						// Deallocate process
+						// De-allocate process
 						// TODO as TofitaProcess class method
 						processDestroy(process)
 					} else if syscall == TofitaSyscalls.Cpu {
