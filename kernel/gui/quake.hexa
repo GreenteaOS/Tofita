@@ -115,12 +115,13 @@ fun quakeHandleButtonDown(key: UInt8) {
 }
 
 var qsodHappened = false
-fun qsod(format: ConstArrayPointer<ClangWideChar>, extra: UInt64, more: UInt64) {
+fun qsod(format: ConstArrayPointer<ClangWideChar>, extra: UInt64, more: UInt64, other: UInt64 = 0) {
 	qsodHappened = true
 	haveToQuake = true
 	quakePrintf("Kernel stopped working. Please, reboot.\n".utf16())
-	quakePrintf(format, extra, more)
-	kernelThreadBusy = false
+	quakePrintf(format, extra, more, other)
+	kernelThreadLoop()
+	// TODO reboot (to not having to print error message to screen)
 }
 
 // TODO `private`
