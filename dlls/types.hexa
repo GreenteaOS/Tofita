@@ -241,7 +241,8 @@ class Pixel32 {
 
 @struct
 class WindowFramebuffer {
-	var pixels: ArrayPointer<ByValue<Pixel32>>
+	// TODO map them again onto process memory space (<2Gb on 32 bit)
+	var pixels: UInt64 // ArrayPointer<ByValue<Pixel32>>
 	var width: UInt32
 	var height: UInt32
 }

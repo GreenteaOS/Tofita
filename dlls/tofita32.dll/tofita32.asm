@@ -1,5 +1,5 @@
 ; The Tofita Kernel
-; Copyright (C) 2021 Oleh Petrenko
+; Copyright (C) 2021-2023 Oleh Petrenko
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU Lesser General Public License as published by
@@ -20,6 +20,9 @@ section .head
 
 global @tofitaFastSystemCallWrapper@8
 @tofitaFastSystemCallWrapper@8:
+	; TODO set stack frame for debuggers?
+	; TODO inline this call into calling functions themselves?
+	; TODO is it called with fastcall for sure? @8?
 	int 0x80
 	ret
 

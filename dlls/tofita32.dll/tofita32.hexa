@@ -140,7 +140,10 @@ fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0,
 	let payload = new ByValue<DebugLogPayload>()
 	// TODO @stack
 	// TODO ^ optimize to allocate on stack, some lifetime flag on creation and usage?
-	payload.ref.message = message as! ConstArrayPointer<UInt16>
+	payload.ref.message = message as! UInt64 // TODO ConstArrayPointer.address UInt64/32
+	// TODO ConstArrayPointer.unsafeFromAddress(PointerAddress.unsafeFrom(123u64))
+	// TODO on the kernel side: ValidateUserPointer<DebugLogPayload>.clone() <= does SEH copy of sizeOf
+	// TODO hint `as! PointerAddress` use instead `fromAddress`
 	payload.ref.extra = extra
 	payload.ref.more = more
 	tofitaFastSystemCall(TofitaSyscalls.DebugLog, payload.ref as! Payload)
@@ -148,6 +151,7 @@ fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0,
 
 #if bit64
 	declare Payload = UInt64
+	// TODO instead of `.ref as! Payload` use `.asAddress PointerAddress` built-in type (aka size_t)
 #else
 	declare Payload = UInt32
 #end
@@ -160,7 +164,7 @@ fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0,
 fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
-	payload.fb = fb
+	payload.fb = fb as! UInt64
 	tofitaFastSystemCall(TofitaSyscalls.SwapWindowFramebuffer, payload as! #if bit64 UInt64 #else UInt32 #end)
 }
 
@@ -168,7 +172,7 @@ fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
 fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
-	payload.fb = fb
+	payload.fb = fb as! UInt64
 	tofitaFastSystemCall(TofitaSyscalls.GetOrCreateWindowFramebuffer, payload as! Payload)
 }
 

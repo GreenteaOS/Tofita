@@ -312,7 +312,7 @@ fun handleMouseUp(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 			if frameHoverState == FrameHover.Close {
 				var payload: PostMessagePayload = new PostMessagePayload()
 
-				payload.hWnd = window.hWnd
+				payload.hWnd = window.hWnd as! UInt64
 				payload.msg = Message.WM_CLOSE
 				payload.wParam = null
 				payload.lParam = null

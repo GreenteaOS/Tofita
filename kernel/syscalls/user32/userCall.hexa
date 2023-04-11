@@ -34,13 +34,26 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): 
 
 		var window = overlappedWindow_create(process.pid)
 
-		window.hWnd = payload.hWnd
+		// TODO ensure this opaque value, and not an accessible pointer
+		window.hWnd = payload.hWnd as! Handle
 
 		// TODO proper probe method, probably separate probeForWideCharOkay
 		// ^ probably should produce `String?` and separate `probeForCopyOkay`
 		if probeForReadOkay((payload.lpWindowName as! UInt64), 8) {
 			// TODO must error `candidate function not viable: no known conversion from 'const wchar_t *' to 'const uint16_t      *'` window.title = String.fromUTF16z(payload.lpWindowName)
+			// TODO should limit the max string length and be SEH-safe
+			// ^ maybe sehCountNonNull16bits(), oh no no no
+			// this way may go out of think if virtual memory changes
+			// instead String.consumeUTF16z that doesn't create a copy
+			// no no no no no! just copy into global (TLS) char16[MAX_PATH]
+			// and copy string from there! yeah! sehStringFromUTF16z(addr, limit: MAX_PATH - 1?)
 			window.title = String.fromUTF16z(payload.lpWindowName as! ConstArrayPointer<UInt16>)
+			// TODO ^ limit to lower address space, to not capable of reading kernel mem
+			// TODO another idea of temporal mapping to zero page?
+			// ^ this way values would be zero anyway so can be easily tested with guard
+		} else {
+			// TODO use app name here
+			window.title = "undefined"
 		}
 
 		frame.raxReturn = window.windowId
@@ -69,16 +82,15 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): 
 		return true
 	}
 
+	// TODO to exhaustive switch over selected syscall enum subset
+	// ^ just multi-inherit multiple enums
 	if syscall == TofitaSyscalls.GetMessage {
-		if !probeForReadOkay(frame.rdxArg1, sizeOf<GetMessagePayload>()) {
+		// TODO pointers should be validated to be not within kernel space!
+		if !probeForWriteOkay(frame.rdxArg1, sizeOf<GetMessagePayload>()) {
 			return false
 		}
 
-		var payload = frame.rdxArg1 as! GetMessagePayload
-
-		if !probeForWriteOkay((payload.msg as! UInt64), sizeOf<Msg>()) {
-			return false
-		}
+		let payload = frame.rdxArg1 as! GetMessagePayload
 
 		frame.raxReturn = getMessage(process, payload).toZeroOrOne
 
@@ -141,12 +153,13 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): 
 			if window.fbCurrentZeta {
 				// TODO triple buffer: screen<-fb<-zeta and no gama
 				tmemcpy(window.fbZeta.pixels as! ArrayPointer<UInt8>, window.fbGama.pixels as! ConstArrayPointer<UInt8>, bytes)
-				fb.pixels = window.fbZeta.pixels // as! Pixel32
+				// TODO pixels should be within process memory space
+				fb.pixels = window.fbZeta.pixels as! UInt64 // as! Pixel32
 				fb.width = window.fbZeta.width
 				fb.height = window.fbZeta.height
 			} else {
 				tmemcpy(window.fbGama.pixels as! ArrayPointer<UInt8>, window.fbZeta.pixels as! ConstArrayPointer<UInt8>, bytes)
-				fb.pixels = window.fbGama.pixels // as! Pixel32
+				fb.pixels = window.fbGama.pixels as! UInt64 // as! Pixel32
 				fb.width = window.fbGama.width
 				fb.height = window.fbGama.height
 			}
@@ -183,7 +196,7 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): 
 
 		var windowId: UInt64 = payload.windowId
 
-		var fb = payload.fb
+		var fb = payload.fb as! WindowFramebuffer
 		var window = overlappedWindow_find(process.pid, windowId)
 
 		if window == null {
@@ -214,11 +227,11 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): 
 		}
 
 		if window.fbCurrentZeta {
-			fb.pixels = window.fbZeta.pixels
+			fb.pixels = window.fbZeta.pixels as! UInt64
 			fb.width = window.fbZeta.width
 			fb.height = window.fbZeta.height
 		} else {
-			fb.pixels = window.fbGama.pixels
+			fb.pixels = window.fbGama.pixels as! UInt64
 			fb.width = window.fbGama.width
 			fb.height = window.fbGama.height
 		}

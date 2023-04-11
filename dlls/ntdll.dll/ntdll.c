@@ -52,7 +52,7 @@ typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, in
 #define HEAP_C 4096 * 16
 static volatile uint8_t heap[HEAP_C] = {0};
 static volatile uint64_t heapOffset = 0;
-static void* HeapAlloc(volatile int8_t x,volatile void* u, volatile uint64_t size) {
+static void* HeapAlloc(volatile int8_t x,volatile void* u, volatile /*uint64_t*/size_t size) {
 	// size = ((size - 1) | 7) + 1; // Align by 8
 	size = ((size - 1) | 15) + 1; // Align by 16
 	if (size < 16) size = 16;
@@ -71,7 +71,7 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 #define HEXA_NEW(z) HeapAllocAt(__LINE__, __FILE__, __func__, 0,nullptr,z)
 
 #define strlen(z) 0
-void *tmemcpy(void *dest, const void *src, uint64_t count) {
+void *tmemcpy(void *dest, const void *src, size_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
 	const uint8_t *src8 = (const uint8_t *)src;
 
@@ -125,7 +125,6 @@ void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) {
 	_wcmdln = L"_wcmdln";
 	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
 	heapOffset = 0;
-	tofitaDebugLog_(L"HEXA_MAIN", 0, 0);
 	hexa_startup = startup;
 	HEXA_MAIN(0, nullptr);
 }

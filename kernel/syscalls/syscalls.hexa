@@ -39,6 +39,8 @@ enum TofitaSyscalls : UInt32 {
 
 // Note: all pointers should be 64-bit even for 32-bit processes
 
+// Note: all pointers must be stored as `UInt64` to avoid in-kernel occasional dereferencing
+
 @sizeOfLessOrEqual(4096)
 @struct class ProcessStartupInformation {
 	var pid: UInt64 = 0
@@ -50,7 +52,8 @@ enum TofitaSyscalls : UInt32 {
 
 @struct @sizeOf(8 * 3)
 class DebugLogPayload {
-	var message: ConstArrayPointer<UInt16>
+	// ConstArrayPointer<UInt16>
+	var message: UInt64
 	// TODO count chars at user space, and transfer as length for SEH probing
 	var extra: UInt64 = 0
 	var more: UInt64 = 0
@@ -60,7 +63,7 @@ class DebugLogPayload {
 @struct @sizeOf(8 * 2)
 class SwapWindowFramebufferPayload {
 	var windowId: UInt64
-	var fb: WindowFramebuffer
+	var fb: UInt64 // WindowFramebuffer
 	new () {}
 }
 
@@ -84,38 +87,46 @@ class WParam {
 // TODO use pointer wrappers instead of raw pointers
 @struct @sizeOf(8 * 8 + 5 * 4 + 4)
 class CreateWindowExPayload {
-	var wc: WindowClass
-	var hWnd: HWnd
+	var wc: UInt64 // WindowClass
+	var hWnd: UInt64 // HWnd
 
 	// CreateWindowEx
-	var lpClassName: ConstArrayPointer<ClangWideChar>
+	var lpClassName: UInt64 // ConstArrayPointer<ClangWideChar>
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	var lpWindowName: ConstArrayPointer<ClangWideChar>
+	var lpWindowName: UInt64 // ConstArrayPointer<ClangWideChar>
 	var dwStyle: UInt32
 	var x: Int32
 	var y: Int32
 	var nWidth: Int32
 	var nHeight: Int32
-	var hWndParent: HWnd
-	var hMenu: HMenu
-	var hInstance: HInstance
-	var lpParam: LParam
+	var hWndParent: UInt64 // HWnd
+	var hMenu: UInt64 // HMenu
+	var hInstance: UInt64 // HInstance
+	var lpParam: UInt64 // LParam
 	new () {}
 }
 
 @struct @sizeOf(8 + 4 + 8 * 2 + 4)
 class PostMessagePayload {
-	var hWnd: HWnd
+	var hWnd: UInt64 // HWnd
 	var msg: Message
-	var wParam: WParam
-	var lParam: LParam
+	// TODO ^ rename to msgId or something, to make clear it's not a struct
+	var wParam: UInt64 // WParam
+	var lParam: UInt64 // LParam
 	new () {}
 }
 
 @struct @sizeOf(8 * 2 + 4 * 2)
 class GetMessagePayload {
-	var msg: Msg
-	var hWnd: HWnd
+	var hwnd: UInt64 // HWnd
+	var message: Message
+	var wParam: UInt64 // WParam
+	var lParam: UInt64 // LParam
+	var time: UInt32
+	var pt: ByValue<Point>
+	var lPrivate: UInt32
+
+	var hWnd: UInt64 // HWnd
 	var wMsgFilterMin: UInt32
 	var wMsgFilterMax: UInt32
 	new () {}

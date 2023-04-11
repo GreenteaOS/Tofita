@@ -86,7 +86,7 @@ void _memcpy() {
 
 #ifdef bit64
 // TODO why separate fun? same arguments?
-__attribute__((fastcall)) void _DllMainCRTStartup() {
+__attribute__((fastcall)) void _DllMainCRTStartup(void *a, void *b, void *c) {
 #else
 __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 #endif

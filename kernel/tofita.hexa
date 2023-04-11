@@ -250,12 +250,13 @@ fun kernelInit(params: UefiPayload) {
 	// ^ currentThread = ThreadKind.THREAD_NOT_READY
 }
 
-
 @rename('__sync_synchronize')
 declare fun __sync_synchronize(): Void
 
 fun kernelMain(params: UefiPayload) {
 	kernelInit(params)
+
+	// This is probably useless but looks cool
 	__sync_synchronize()
 
 	// TODO composite here first frame!!!

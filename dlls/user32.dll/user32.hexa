@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -138,26 +138,27 @@ fun createWindowExW(
 	// TODO stack alloc\dealloc by @owned/borrowed @struct refs
 	var payload: CreateWindowExPayload = new CreateWindowExPayload()
 
-	payload.wc = wc
+	payload.wc = wc as! UInt64
+	// TODO `wc.type.address` same for others
 
-	payload.lpClassName = lpClassName
-	payload.lpWindowName = lpWindowName
+	payload.lpClassName = lpClassName as! UInt64
+	payload.lpWindowName = lpWindowName as! UInt64
 	payload.dwStyle = dwStyle
 	payload.x = x
 	payload.y = y
 	payload.nWidth = nWidth
 	payload.nHeight = nHeight
-	payload.hWndParent = hWndParent
-	payload.hMenu = hMenu
-	payload.hInstance = hInstance
-	payload.lpParam = lpParam
+	payload.hWndParent = hWndParent as! UInt64
+	payload.hMenu = hMenu as! UInt64
+	payload.hInstance = hInstance as! UInt64
+	payload.lpParam = lpParam as! UInt64
 
 	// Create local window counterpart
 	var window = new Window()
 	tofitaDebugLog("window = {%8}\n".utf16(), (window as! UInt64))
 
 	let hWnd = window as! HWnd
-	payload.hWnd = hWnd
+	payload.hWnd = hWnd as! UInt64
 
 	// Create native window counterpart
 	var windowId: UInt64 = tofitaCreateWindowEx(payload)
@@ -211,12 +212,25 @@ fun getMessageW(msg: Msg, hWnd: HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt
 	tofitaDebugLog("GetMessageW called".utf16())
 	var result = Bool32.True // TODO `true`
 
-	var payload: GetMessagePayload = new GetMessagePayload() // TODO by value
-	payload.msg = msg
-	payload.hWnd = hWnd
+	let payload = new ByValue<GetMessagePayload>()
+	let payload = payload.ref
+	// TODO others by value too
+
+	payload.hWnd = hWnd as! UInt64
 	payload.wMsgFilterMin = wMsgFilterMin
 	payload.wMsgFilterMax = wMsgFilterMax
 	tofitaGetMessage(payload)
+
+	msg.hwnd = payload.hwnd as! Handle
+	msg.message = payload.message
+	msg.wParam = payload.wParam as! WParam
+	msg.lParam = payload.lParam as! LParam
+	msg.time = payload.time
+	msg.pt = payload.pt
+	//#if bit64
+		msg.lPrivate = payload.lPrivate
+	//#end
+	// TODO ^ lPrivate is present only on 32-bit
 
 	// Stop iteration
 	if msg.message == Message.WM_QUIT {
@@ -268,10 +282,10 @@ fun dispatchMessageW(msg: Msg): LResult? {
 fun postMessage(hWnd: HWnd, msg: Message, wParam: WParam, lParam: LParam): Bool32 {
 	var payload: PostMessagePayload = new PostMessagePayload()
 	// TODO ^ by value
-	payload.hWnd = hWnd
+	payload.hWnd = hWnd as! UInt64
 	payload.msg = msg
-	payload.wParam = wParam
-	payload.lParam = lParam
+	payload.wParam = wParam as! UInt64
+	payload.lParam = lParam as! UInt64
 	return tofitaPostMessage(payload)
 }
 
@@ -317,7 +331,17 @@ fun beginPaint(hWnd: HWnd, ps: PaintStruct): HDc {
 	}
 
 	// TODO this is not copy by value!!!
-	fb.pixels[y * fb.width + x] = pixel
+	let pixels = fb.pixels as! ArrayPointer<ByValue<Pixel32>>
+	// TODO `#if (bit64 == true)` or `#if bit64 == true`
+	// #if bit64
+	// TODO `if sizeOf<ArrayPointer<Int> >() == 8 {` generates into `sizeof(int32_t)`
+	if sizeOfPreferPointer<ArrayPointer<Int> >() == 8 {
+		pixels[y * fb.width + x] = pixel
+	}
+	//#else
+		// TODO compiler crashes without `#else`
+		// ^ or it's just vs hexa related
+	//#end
 }
 
 @dllExport('FillRect')
@@ -357,9 +381,11 @@ fun endPaint(hWnd: HWnd, ps: PaintStruct): Bool32 {
 	njraaSwapWindowFramebuffer(window.windowId, fb)
 	// TODO ^ could be there multiple End Paint event? Probably swap after primary WM_PAINT
 	tofitaDebugLog("EndPaint done".utf16())
+	// TODO ^ instead of explicit logging, create a trace-mode in normalizer with call tree
 	return Bool32.True
 }
 
+// TODO move message handling, drawing etc to separate modules
 @dllExport('DefWindowProcW')
 fun defWindowProcW(hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam): LResult? {
 	tofitaDebugLog("DefWindowProcW called".utf16())

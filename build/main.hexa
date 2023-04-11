@@ -313,7 +313,6 @@ fun runTasks() {
 		// DLL
 		fun buildDLLs(bit: String, arch: String) {
 			for i in dlls.length {
-
 				// TODO per-32/64-arch
 				// TODO libgen txt list here, to .lib in phase 2
 				// TODO --define bit32

@@ -105,10 +105,10 @@ fun postMessage(@volatile process: TofitaProcess, payload: PostMessagePayload): 
 		messages[process.messagesUsed] = message
 	}
 
-	message.hwnd = payload.hWnd
+	message.hwnd = payload.hWnd as! Handle
 	message.message = payload.msg
-	message.wParam = payload.wParam
-	message.lParam = payload.lParam
+	message.wParam = payload.wParam as! WParam
+	message.lParam = payload.lParam as! LParam
 
 	message.time = uptimeMilliseconds as! UInt32 // TODO `& 0xFF....` or better truncation method? `UInt64.truncate32(): UInt32`?
 	message.pt.ref.x = mouseX // TODO
@@ -146,13 +146,13 @@ fun getMessage(@volatile process: TofitaProcess, payload: GetMessagePayload): Bo
 	}
 
 	// TODO filters & hWnd
-	var message: Msg = messages[0]
-	var target: Msg = payload.msg
+	let message: Msg = messages[0]
+	let target = payload
 
-	target.hwnd = message.hwnd
+	target.hwnd = message.hwnd as! UInt64
 	target.message = message.message
-	target.wParam = message.wParam
-	target.lParam = message.lParam
+	target.wParam = message.wParam as! UInt64
+	target.lParam = message.lParam as! UInt64
 
 	target.time = message.time
 	target.pt.ref.x = message.pt.ref.x
