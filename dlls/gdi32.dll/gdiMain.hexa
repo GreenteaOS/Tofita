@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2021 Oleh Petrenko
+// Copyright (C) 2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,28 +13,27 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
-#include <stddef.h>
+// Entry point of the project
 
-#ifdef bit64
-	#define ADVAPI32_DLL __declspec(dllexport)
-#else
-	#define ADVAPI32_DLL __declspec(dllexport) __stdcall
-#endif
+@customHeader('
+    #ifdef bit64
+        #define GDI32_DLL __declspec(dllexport)
+    #else
+        #define GDI32_DLL __declspec(dllexport) __stdcall
+    #endif
 
-void startup() {
-	// TODO hexa
-}
+    void startup() {
+        // TODO hexa
+    }
 
-#ifdef bit64
-__attribute__((fastcall)) void _DllMainCRTStartup() {
-	startup();
-}
-#else
-// TODO must take proper arguments on 32-bit (like DLL_ATTACH)
-// TODO __attribute__((cdecl)) void _DllMainCRTStartup(void *, void *, void *) asm("__DllMainCRTStartup@12");
-__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
-	startup();
-	// TODO must return something?
-}
-#endif
+    #ifdef bit64
+    __attribute__((fastcall)) void _DllMainCRTStartup() {
+        startup();
+    }
+    #else
+    __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
+        startup();
+    }
+    #endif
+')
+declare fun entry(): Void

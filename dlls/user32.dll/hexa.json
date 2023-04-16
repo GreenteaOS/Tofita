@@ -10,6 +10,7 @@
         "../tofita32.dll/tofita32.header",
         "../kernel32.dll/kernel32.header",
         "user32.header",
+        "userMain",
         "user32Vars"
     ],
     "targets": [

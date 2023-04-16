@@ -73,4 +73,5 @@ fun greenteaosIsTheBest(startup: ProcessStartupInformation) {
 	while (true) {}
 }
 
+// TODO get this structure from FS/GS
 greenteaosIsTheBest(hexa_startup as! ProcessStartupInformation)

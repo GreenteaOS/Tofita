@@ -9,6 +9,7 @@
         "../../kernel/syscalls/syscalls",
         "../tofita32.dll/tofita32.header",
         "kernel32.header",
+        "kernelMain",
         "kernel32Vars"
     ],
     "targets": [

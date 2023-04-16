@@ -9,6 +9,7 @@
         "../../kernel/syscalls/syscalls",
         "../tofita32.dll/tofita32",
         "ntdll.header",
+        "ntdllMain",
         "ntdllVars"
     ],
     "targets": [
