@@ -317,9 +317,9 @@ fun runTasks() {
 				// TODO libgen txt list here, to .lib in phase 2
 				// TODO --define bit32
 				if bit == '32' {
-					phase1.push('cmd /c hexa --define bit64=false dlls\\\(dlls[i]).dll\\hexa.json --target i386')
+					phase1.push('cmd /c hexa --output-folder ' + folder + ' --define bit64=false dlls\\\(dlls[i]).dll\\hexa.json --target i386')
 				} else {
-					phase1.push('cmd /c hexa --define bit64=true dlls\\\(dlls[i]).dll\\hexa.json --target default')
+					phase1.push('cmd /c hexa --output-folder ' + folder + ' --define bit64=true dlls\\\(dlls[i]).dll\\hexa.json --target default')
 				}
 
 				// TODO refactor
@@ -349,7 +349,7 @@ fun runTasks() {
 						// TODO useCpp, fix C build
 						useCpp? '-x c++ -std=c++2a' : '-x c -std=gnu17',
 						'-fomit-frame-pointer',
-						'dlls/' + dlls[i]  + '.dll/' + dlls[i] + '.c',
+						folder + '\\' + dlls[i] + '.' + bit + '.c',
 						'-o',
 						outobj
 					].join(' ')
@@ -449,8 +449,8 @@ fun runTasks() {
 				// LIB GEN
 				for i in dlls.length {
 					let named = dlls[i]
-					let items64 = fs.readFileSync('dlls\\\(named).dll\\\(named).64.c.dllExport.txt').toString()
-					let items32 = fs.readFileSync('dlls\\\(named).dll\\\(named).32.c.dllExport.txt').toString()
+					let items64 = fs.readFileSync(config.tempFolder + '\\' + teaFolder + '\\\(named).64.c.dllExport.txt').toString()
+					let items32 = fs.readFileSync(config.tempFolder + '\\' + teaFolder + '\\\(named).32.c.dllExport.txt').toString()
 					let gen =
 						(
 							' bit named ' + config.tempFolder + '/' + teaFolder + '/!named.bit.lib '
