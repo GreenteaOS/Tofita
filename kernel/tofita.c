@@ -16,10 +16,4 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void *malloc(uint64_t bytes) asm("malloc");
-static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, int8_t x,int8_t u, uint64_t size);
-void *malloc(uint64_t bytes) {
-	return (void *)HeapAllocAt(1, "unsafe", "unsafe", 1, 1, bytes);
-	// TODO return (void *)PhysicalAllocator_$allocateBytes_(((bytes - 1) | 15) + 1);
-};
 #include "../kernel-diff/kernel.c"

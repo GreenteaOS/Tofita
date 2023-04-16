@@ -5,6 +5,7 @@
     "author": "PeyTy",
     "license": "LGPL-3.0-only",
     "global": [
+        "kernel/tofitaMain",
         "dlls/types",
         "boot/uefi",
         "boot/shared/params",
@@ -59,7 +60,6 @@
         "devices/cpu/seh",
         "devices/cpu/spinlock",
         "devices/serial/init",
-        "kernel/tofitaMain",
         "devices/serial/log"
     ],
     "targets": [

@@ -35,7 +35,7 @@ void fflush(void *pipe) {
 };
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, int8_t x,int8_t u, uint64_t size);
 //void *malloc(uint64_t bytes) asm("malloc");
-void *mallocx(uint64_t bytes) {
+void *malloc(uint64_t bytes) {
 	return (void *)HeapAllocAt(1, "unsafe", "unsafe", 1, 1, bytes);
 	// TODO return (void *)PhysicalAllocator_$allocateBytes_(((bytes - 1) | 15) + 1);
 };
@@ -103,7 +103,7 @@ function keyboardHandler();
 #include <stb_image.h>
 
 #undef free
-#undef malloc
+//#undef malloc
 #undef realloc
 #undef memset
 #undef abs
@@ -176,4 +176,5 @@ function kernelMain(/*const TODO*/void *params) {
 	HEXA_MAIN(0, nullptr);
 }
 `)
-declare fun entry(): Void
+// TODO Calling it `entry` causes renaming bug in `struct PeInterim .entry`
+declare fun entryWrapper(): Void

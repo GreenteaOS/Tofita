@@ -16,7 +16,7 @@
 // Used only for STB
 
 #define free libc_free
-#define malloc libc_malloc
+//#define malloc libc_malloc
 #define realloc libc_realloc
 #define memset libc_memset
 #define abs libc_abs
