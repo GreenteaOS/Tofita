@@ -383,7 +383,7 @@ fun runTasks() {
 
 	if kernelTask {
 		// Hexa
-		phase1.push('cmd /c hexa hexa.json')
+		phase1.push('cmd /c hexa --output-folder ' + folder + ' hexa.json')
 
 		// KERNEL
 		phase2.push(
@@ -416,7 +416,7 @@ fun runTasks() {
 				'-Wno-address-of-temporary',
 				debuggie? '-g' : '',
 				useCpp? '-x c++ -std=c++2a' : '-x c -std=gnu17',
-				'-c kernel/tofita.c -o ',
+				'-c ' + config.tempFolder + '/' + teaFolder + '/tofita.c -o ',
 				config.tempFolder + '/' + teaFolder + '/tofita.obj '
 			].join(' ')
 		)

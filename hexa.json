@@ -66,7 +66,7 @@
         {
             "name": "default",
             "generator": "c",
-            "output": "kernel-diff/kernel.c",
+            "output": "tofita.c",
             "options": []
         }
     ],

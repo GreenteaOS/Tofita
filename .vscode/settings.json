@@ -1,6 +1,11 @@
 {
     "files.exclude": {
-        ".vscode": true
+        ".vscode": true,
+        "**/**.h": true,
+        "**/**.hpp": true,
+        "**/**.c": true,
+        "**/**.cpp": true,
+        "**/**.inc": true
     },
     "files.trimFinalNewlines": true,
     "html.format.maxPreserveNewLines": 1,
@@ -22,8 +27,10 @@
         "greenteaos",
         "Hexa",
         "lmao",
+        "NTDLL",
         "Oleh",
         "scanline",
+        "struct",
         "syscall",
         "Syscalls",
         "tofita",
