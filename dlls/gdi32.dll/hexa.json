@@ -5,6 +5,10 @@
     "author": "PeyTy",
     "license": "LGPL-3.0-only",
     "global": [
+        "../types",
+        "../../kernel/syscalls/syscalls",
+        "../kernel32.dll/kernel32.header",
+        "../ntdll.dll/ntdll.header",
         "gdi32.header",
         "gdiMain",
         "gdi32Vars"

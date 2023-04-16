@@ -13,25 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
-#include <stddef.h>
-
 #ifdef bit64
-	#define GDI32_DLL __declspec(dllexport)
+	#include "gdi32.64.c"
 #else
-	#define GDI32_DLL __declspec(dllexport) __stdcall
-#endif
-
-void startup() {
-	// TODO hexa
-}
-
-#ifdef bit64
-__attribute__((fastcall)) void _DllMainCRTStartup() {
-	startup();
-}
-#else
-__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
-	startup();
-}
+	#include "gdi32.32.c"
 #endif

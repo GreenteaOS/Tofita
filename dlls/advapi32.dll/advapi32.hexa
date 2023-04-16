@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,7 +16,7 @@
 @dllExport('advapi32stub')
 fun stub() {}
 
-@linkName('_DllMainCRTStartup')
+@linkName('_DllMainCRTStartup_TODO')
 #if bit32
     @stdcall
 #else

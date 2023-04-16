@@ -16,7 +16,7 @@
 @dllExport('gdi32stub')
 fun stub() {}
 
-@linkName('_DllMainCRTStartup')
+@linkName('_DllMainCRTStartup_TODO')
 #if bit32
     @stdcall
 #else

@@ -28,12 +28,12 @@
 
         return dest;
     }
+    // TODO
     #define memcpy(z,u,x) tmemcpy(z,u,x)
 
     #define wprintf(z,...) {}
     #define HEAP_ZERO_MEMORY 0
     #define fflush(z) {}
-    #define HEXA_UNREACHABLE(z) {}
     #define stdout ((void*)0)
     #define GetProcessHeap() 0
 

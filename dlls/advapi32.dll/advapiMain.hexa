@@ -16,6 +16,7 @@
 // Entry point of the project
 
 @customHeader('
+    #if 0
     #ifdef bit64
         #define ADVAPI32_DLL __declspec(dllexport)
     #else
@@ -38,5 +39,6 @@
         // TODO must return something?
     }
     #endif
+    #endif
 ')
-declare fun entry(): Void
+declare fun entryTODO(): Void

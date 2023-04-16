@@ -13,28 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
-#include <stddef.h>
-
 #ifdef bit64
-	#define ADVAPI32_DLL __declspec(dllexport)
+	#include "advapi32.64.c"
 #else
-	#define ADVAPI32_DLL __declspec(dllexport) __stdcall
-#endif
-
-void startup() {
-	// TODO hexa
-}
-
-#ifdef bit64
-__attribute__((fastcall)) void _DllMainCRTStartup() {
-	startup();
-}
-#else
-// TODO must take proper arguments on 32-bit (like DLL_ATTACH)
-// TODO __attribute__((cdecl)) void _DllMainCRTStartup(void *, void *, void *) asm("__DllMainCRTStartup@12");
-__attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
-	startup();
-	// TODO must return something?
-}
+	#include "advapi32.32.c"
 #endif
