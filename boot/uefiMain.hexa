@@ -43,9 +43,9 @@
 
     static void free(void* x) {}
 
-    uint64_t kstrlen_(const uint8_t*);
+    uint64_t kstrlen(const uint8_t*);
     static uint64_t strlen(const char *x) {
-        return kstrlen_((const uint8_t *)x);
+        return kstrlen((const uint8_t *)x);
     }
 
     static void printf(const void* x,...) {}

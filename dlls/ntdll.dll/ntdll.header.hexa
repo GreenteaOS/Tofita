@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,3 +15,8 @@
 
 // TODO https://en.cppreference.com/w/cpp/numeric/bit_cast
 // TODO ^ fix link high `_-%~`
+@linkName('free')
+@dllImport
+@rename('free')
+declare
+fun freeNtdll(bytes: SizeOfPointer): Void

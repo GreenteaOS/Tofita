@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,6 +16,12 @@
 @linkName('LocalAlloc')
 declare
 fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal
+
+@linkName('HeapAlloc')
+@dllImport
+@rename('HeapAlloc')
+declare
+fun heapAlloc(heap: UInt32, flags: UInt32, bytes: SizeOfPointer): ArrayPointer<Void>
 // TODO
 // let kernel32 = "kernel32.dll" (uppercase?)
 // @dllImport(kernel32) (fpc)

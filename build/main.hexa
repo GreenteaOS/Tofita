@@ -343,6 +343,7 @@ fun runTasks() {
 						'-mno-ms-bitfields -fno-threadsafe-statics',
 						'-ferror-limit=10',
 						'-Dbit\(bit)',
+						'-DHEXA_NO_PLATFORM_INCLUDES',
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw',
 						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4', // Unsupported by some targeted CPUs
 						// TODO useCpp, fix C build

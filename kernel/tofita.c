@@ -66,8 +66,6 @@ function memzero(void *dest, uint64_t len) {
 	memset(dest, 0, len);
 }
 
-void ___chkstk_ms(){};
-
 void vmemcpy(volatile void *dest, const volatile void *src, volatile uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
 	uint8_t *src8 = (uint8_t *)src;
@@ -124,9 +122,9 @@ static void ExitProcess(int32_t x) {
 static void wprintf(const wchar_t* x, const void* y, ...) {
 }
 
-uint64_t kstrlen_(const uint8_t*);
+uint64_t kstrlen(const uint8_t*);
 static uint32_t strlen(const char *x) {
-	return kstrlen_((const uint8_t *)x);
+	return kstrlen((const uint8_t *)x);
 }
 
 #define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), ## __VA_ARGS__)

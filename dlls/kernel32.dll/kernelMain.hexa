@@ -21,6 +21,7 @@
 #define HEXA_NEW(z) ((void*)0)
 #define HeapAlloc(z,...) ((void*)0)
 #define strlen(z) 0
+// TODO ^
 #define memcpy(z,...) {}
 #define wprintf(z,...) {}
 #define HEAP_ZERO_MEMORY ((void*)0)

@@ -13,19 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
-#include <stddef.h>
-
-#include "../ntdll.dll/ntdll.h"
-
-#define HEXA_NO_DEFAULT_INCLUDES
-#ifdef bit64
-	#define KERNEL32_DLL __declspec(dllimport)
-#else
-	#define KERNEL32_DLL __declspec(dllimport) __stdcall
-#endif
-KERNEL32_DLL void *HeapAlloc(uint32_t heap, uint32_t flags, size_t bytes) asm("HeapAlloc");
-
 #ifdef bit64
 	#include "user32.64.c"
 #else
