@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,7 +16,7 @@
 @struct
 class ClassesLinkedList {
 	// TODO let name String (late init)
-	var name: String // TODO = null or in constructior `new (named: String? = null)`
+	var name: String // TODO = null or in constructor `new (named: String? = null)`
 	var wc: WindowClass
 	var next: ClassesLinkedList = null // TODO Pointer useless for struct?
 	new (named: String) {
@@ -28,6 +28,7 @@ class ClassesLinkedList {
 // TODO use Map instead of linked list
 var rootClass = new ClassesLinkedList(null)
 //: ClassesLinkedList
+rootClass.next = null // TODO why I do this?
 
 // TODO some HandleWrapper with handle type field?
 // TODO to enums

@@ -428,5 +428,3 @@ fun destroyWindow(hWnd: HWnd): Bool32 {
 	// TODO how to handle in Hexa? just HX_MAIN?
 	rootClass.next = null
 }
-
-rootClass.next = null

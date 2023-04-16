@@ -13,11 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <stdint.h>
-#include <stddef.h>
-
-#include "../ntdll.dll/ntdll.h"
-#define HEXA_NO_PLATFORM_INCLUDES
 #ifdef bit64
 	#include "kernel32.64.c"
 #else

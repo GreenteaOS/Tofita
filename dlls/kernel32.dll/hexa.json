@@ -8,6 +8,7 @@
         "../types",
         "../../kernel/syscalls/syscalls",
         "../tofita32.dll/tofita32.header",
+        "../ntdll.dll/ntdll.header",
         "kernel32.header",
         "kernelMain",
         "kernel32Vars"
