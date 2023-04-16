@@ -16,6 +16,18 @@
 // Entry point of the project
 
 @customHeader('
+
+    // Main
+    uint64_t hexa_startup;
+    // TODO He he just use uint32_t for PIDs
+    void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) asm("greenteaosIsTheBest");
+    void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) {
+        _wcmdln = L"_wcmdln";
+        for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
+        heapOffset = 0;
+        hexa_startup = startup;
+        HEXA_MAIN(0, nullptr);
+    }
 ')
 // TODO @keep
 declare fun entry(): Void

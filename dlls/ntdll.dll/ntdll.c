@@ -22,28 +22,21 @@
 	#define NTDLL32_DLL __declspec(dllexport) __stdcall
 #endif
 
-#ifndef NTDLL32_DLL
-	#ifdef bit64
-		#define NTDLL32_DLL __declspec(dllimport)
-	#else
-		#define NTDLL32_DLL __declspec(dllimport) __stdcall
-	#endif
-	extern const wchar_t* _wcmdln asm("_wcmdln");
-#else
-	// TODO describe the purpose
-	__declspec(dllexport) const wchar_t* _wcmdln asm("_wcmdln") = L"_wcmdln TODO";
-#endif
+// TODO describe the purpose
+// extern const wchar_t* _wcmdln asm("_wcmdln");
+__declspec(dllexport) const wchar_t* _wcmdln asm("_wcmdln") = L"_wcmdln TODO";
 
+// TODO
 NTDLL32_DLL uint32_t free(void* value) asm("free");
 
+// TODO on 32-bit, stub should be std call
 uint64_t KiFastSystemCall(uint64_t rcx, uint64_t rdx) {
 	// TODO return tofitaFastSystemCall((TofitaSyscalls)rcx, rdx);
 	return 0;
 }
 
-#define tofitaDebugLog(...) {};
-const wchar_t stubText[] = L"STUB --> called %S with value %u";
-#define STUB(name) uint32_t name(void* value) { tofitaDebugLog(stubText, (uint64_t)L"" #name, (uint64_t)value); return 0; }
+//const wchar_t stubText[] = L"STUB --> called %S with value %u";
+#define STUB(name) uint32_t name(void* value) { /*tofitaDebugLog(stubText, (uint64_t)L"" #name, (uint64_t)value);*/ return 0; }
 /*
 STUB(CloseHandle)
 STUB(CompareStringW)
@@ -281,7 +274,6 @@ uint32_t InitializeCriticalSectionAndSpinCount(void* value) { tofitaDebugLog(stu
 uint32_t LoadLibraryExW(void* value) { tofitaDebugLog(L"STUB --> called %S with value %S", (uint64_t)L"LoadLibraryExW", 0*(uint64_t)value); return 0; }
 uint32_t TlsSetValue(void* value) { tofitaDebugLog(L"STUB --> called %S with value %u", (uint64_t)L"TlsSetValue", (uint64_t)value); return 1; }
 
-
 STUB(LCMapStringA)
 STUB(LoadImageW)
 STUB(LoadLibraryA)
@@ -355,7 +347,7 @@ STUB(free)
 //	#define CONV __cdecl
 //#endif
 
-// DWORD == uint32_t // TODO write down all types sizes NTAPI callbacks etc
+// DWORD == uint32_t // TODO write down all types sizes NT API callbacks etc
 // typedef int32_t(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
 // typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow);
 
@@ -380,8 +372,8 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 	//tofitaDebugLog_(L"NTHeapAllocAt %s:%d\n", (uint64_t)functionName, lineNumber);
 	return HeapAlloc(x, u, size);
 }
-#define HeapAlloc(a, b, c) HeapAllocAt(__LINE__, __FILE__, __func__, a, b, c)
-#define HEXA_NEW(z) HeapAllocAt(__LINE__, __FILE__, __func__, 0,nullptr,z)
+//#define HeapAlloc(a, b, c) HeapAllocAt(__LINE__, __FILE__, __func__, a, b, c)
+//#define HEXA_NEW(z) HeapAllocAt(__LINE__, __FILE__, __func__, 0,nullptr,z)
 
 // TODO replace impl!
 #define strlen(z) 0
@@ -399,7 +391,6 @@ void *memcpy(void *dest, const void *src, size_t count) {
 #define HEAP_ZERO_MEMORY ((void*)0)
 #define GetProcessHeap() 0
 #define fflush(z) {}
-#define free(z) {}
 #define HEXA_UNREACHABLE(z) {}
 #define stdout ((void*)0)
 int64_t _fltused = 0;
@@ -422,22 +413,10 @@ void _memset() asm("_memset");
 void _memset() { } // TODO TODO TODO
 #endif
 
-uint64_t hexa_startup;
-
-#define TRACER() tofitaDebugLog_(L"~TRACER~ [%s:%d]\n", __func__, __LINE__);
+//#define TRACER() tofitaDebugLog_(L"~TRACER~ [%s:%d]\n", __func__, __LINE__);
 
 #ifdef bit64
 	#include "ntdll.64.c"
 #else
 	#include "ntdll.32.c"
 #endif
-
-// TODO He he just use uint32_t for PIDs
-void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) asm("greenteaosIsTheBest");
-void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) {
-	_wcmdln = L"_wcmdln";
-	for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
-	heapOffset = 0;
-	hexa_startup = startup;
-	HEXA_MAIN(0, nullptr);
-}
