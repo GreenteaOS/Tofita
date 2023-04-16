@@ -349,18 +349,16 @@ STUB(_isnan)
 */
 STUB(free)
 
-#ifdef bit64
-	#define CONV
-#else // __cdecl __stdcall
-	#define CONV __cdecl
-#endif
+//#ifdef bit64
+//	#define CONV
+//#else // __cdecl __stdcall
+//	#define CONV __cdecl
+//#endif
 
 // DWORD == uint32_t // TODO write down all types sizes NTAPI callbacks etc
-typedef int32_t(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
-typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow);
+// typedef int32_t(CONV *DllEntry)(void* hinstDLL, uint32_t fdwReason, void* lpvReserved);
+// typedef int32_t(CONV *ExeEntry)(void* hInstance, void* hPrev, void* pCmdLine, int nCmdShow);
 
-#define HEXA_NO_DEFAULT_INCLUDES
-#define HEXA_MAIN mainHexa
 #define HEAP_C 4096 * 16
 static volatile uint8_t heap[HEAP_C] = {0};
 static volatile uint64_t heapOffset = 0;
@@ -371,19 +369,23 @@ static void* HeapAlloc(volatile int8_t x,volatile void* u, volatile /*uint64_t*/
 	heapOffset += 8;
 	heapOffset += size;
 	if (heapOffset >= HEAP_C) {
+		//tofitaDebugLog_(L"!!! Heap overflow !!!\n",0,0);
 		while (1) {};
 	}
 	void* result = (void *)&heap[heapOffset - size];
+	//tofitaDebugLog_(L"HeapAlloc %u bytes at %8", size, (uint64_t)result);
 	return result;
 }
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, volatile int8_t x,volatile void* u, volatile uint64_t size) {
+	//tofitaDebugLog_(L"NTHeapAllocAt %s:%d\n", (uint64_t)functionName, lineNumber);
 	return HeapAlloc(x, u, size);
 }
 #define HeapAlloc(a, b, c) HeapAllocAt(__LINE__, __FILE__, __func__, a, b, c)
 #define HEXA_NEW(z) HeapAllocAt(__LINE__, __FILE__, __func__, 0,nullptr,z)
 
+// TODO replace impl!
 #define strlen(z) 0
-void *tmemcpy(void *dest, const void *src, size_t count) {
+void *memcpy(void *dest, const void *src, size_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
 	const uint8_t *src8 = (const uint8_t *)src;
 
@@ -393,7 +395,6 @@ void *tmemcpy(void *dest, const void *src, size_t count) {
 
 	return dest;
 }
-#define memcpy(z,u,x) tmemcpy(z,u,x)
 #define wprintf(z,...) {}
 #define HEAP_ZERO_MEMORY ((void*)0)
 #define GetProcessHeap() 0
@@ -431,7 +432,7 @@ uint64_t hexa_startup;
 	#include "ntdll.32.c"
 #endif
 
-// TODO Hehe just use uint32_t for PIDs
+// TODO He he just use uint32_t for PIDs
 void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) asm("greenteaosIsTheBest");
 void __attribute__((fastcall)) greenteaosIsTheBest(size_t startup) {
 	_wcmdln = L"_wcmdln";

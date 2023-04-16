@@ -58,6 +58,7 @@ __attribute__((fastcall)) void _DllMainCRTStartup() {
 	startup();
 }
 #else
+// void* hinstDLL, uint32_t fdwReason, void* lpvReserved
 __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 	startup();
 }
