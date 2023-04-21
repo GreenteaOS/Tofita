@@ -79,6 +79,8 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: B
 		let hReciprocal = 1.0f32 / (newHeight as! Float32)
 		let wReciprocal = 1.0f32 / (newWidth as! Float32)
 
+		// TODO don't interpolate if size the same as the screen
+		// TODO rename _framebuffer to `Screen.` elsewhere
 		for y in upscale.height {
 			for x in upscale.width {
 				let rgba = interpolatePixel(
@@ -119,6 +121,8 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: B
 				bitmap.pixels[bitmap.width * (bitmap.height - 1) + x * blurScale].ref.color
 		}
 	}
+	// TODO Theme.greyScale
+	// ^ also affect icons and previews optionally
 
 	// TODO fix blur for small wallpapers (centered smaller than screen)
 	var blur: Bitmap32 = gaussBlur(downscale, 4)
@@ -236,6 +240,8 @@ fun initializeCompositor() {
 	getRamDiskAsset(asset, "root/Windows/Resources/Icons/app16.png")
 	app16 = loadPng32(asset)
 
+	// TODO move all those assets to desktop.hexa ^ taskbar.hexa
+
 	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Cursors/aero_arrow.cur")
 	// TODO cur = loadCursor(Buffer.fromBytes(asset.data))
@@ -337,10 +343,10 @@ fun composite(startupMilliseconds: UInt64) {
 		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH)
 	}
 
-	// Desktop below everything
+	// Desktop is below everything
 	compositeDesktop(mouseX, mouseY)
 
-	// Windows below taskbar
+	// Windows are below taskbar
 	compositeWindows()
 
 	// Taskbar
@@ -402,6 +408,8 @@ fun composite(startupMilliseconds: UInt64) {
 		if i != 0 && window.present {
 			// TODO if window.visible
 			// TODO ellipsis
+			// TODO more windows - less width
+			// TODO measure default width
 			let w = 148u16
 			let x = 24 + 40 + windowIndex * w
 			let y = _framebuffer.height - 30i16
@@ -414,9 +422,13 @@ fun composite(startupMilliseconds: UInt64) {
 			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 			// TODO proper app icon
 			drawBitmap32WithAlpha(app16, x + 6i16, y + 5i16)
+			// TODO widthLimit Int16, wrapAround Bool, heightLimit Int16
+			// TODO ellipsis ...
 			drawText(window.title, x + 29, y + 10i16, color.ref)
 			// TODO full width in active
 			// TODO animate
+			// TODO to not look like win10 by default, draw them as vertical
+			// gradients as I did want long ago!!!
 			drawRectangleWithAlpha(color.ref, x + 2i16, y + 26i16, w - 4u16, 4u16)
 			windowIndex++
 		}
@@ -535,13 +547,16 @@ fun copyToScreen() {
 	// so lets copy two pixels at a time
 	let height = _framebuffer.height
 	// Let's assume it is always dividable by 2
+	// TODO ^ add some stride to the Screen.fb itself to ensure this
+	// or make loop to copy rightmost pixels separately
 	let width = _framebuffer.width / 2
 	let scanline: UInt64 = _framebuffer.width * 4
+	// TODO byte offset should respect bytes-per-pixel (may be 3?)
 	let pixelsPerScanLine: UInt64 = _framebuffer.pixelsPerScanLine * 4
 	var source = (Screen.pixels as! UInt64) as! ArrayPointer<UInt64>
 	var destination = (_framebuffer.base as! UInt64) as! ArrayPointer<UInt64>
 
-	// TODO copy only dirty rect (at least cursor)
+	// TODO copy only dirty rect (at least cursor) (must be aligned to the stride too)
 	for y in height {
 		for x in width {
 			destination[x] = source[x]

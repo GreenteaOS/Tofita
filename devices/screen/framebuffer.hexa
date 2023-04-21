@@ -75,6 +75,8 @@ fun blendPixel(x: Int64, y: Int64, pixel: Pixel32) {
 		return
 	}
 
+	// TODO .rgba.ref
+	// TODO on stack!
 	let p = Screen.pixels[y * Screen.width + x].ref.rgba.ref
 	let a = pixel.rgba.ref.a
 	let aNegative = 255u32 - a

@@ -39,6 +39,7 @@ declare fun vmemcpy(@volatile dest: ArrayPointer<UInt8>, @volatile src: ConstArr
 	}
 }*/
 
+// TODO @byValue
 @struct @packed @sizeOf(10)
 @rename('Idtr')
 @asIs
@@ -56,6 +57,8 @@ class IdtEntry {
 	@bits(8) var ist: UInt8
 	@bits(4) var gateType: UInt8
 	@bits(1) var z: UInt8
+
+	// TODO Make it enum for safety/sanity
 	@bits(2) var dpl: UInt8
 	@bits(1) var present: UInt8
 	@bits(48) var offsetHigherBits: UInt64

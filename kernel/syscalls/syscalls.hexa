@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// TODO protocol generator should make wrappers around user pointers,
+// to validate them be within < lower user space otherwise nullify them or cancel syscall
 // TODO randomize on every build (use version number)
 // @randomize(min: 2, max: 123456)
 let userSyscalls = 123000

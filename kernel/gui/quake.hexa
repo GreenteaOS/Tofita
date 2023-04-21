@@ -82,6 +82,14 @@ fun quakeHandleButtonDown(key: UInt8) {
 			quakePrintf("Enter 'li' or 'light' to set the light theme\n".utf16())
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
+		} else if quakeCommand == 'apt-get moo' {
+			// TODO print last command as `> %S`
+			quakePrintf('                 (__)
+                 (oo)
+           /------\\/
+          / |    ||
+         *  /\\---/\\
+            ~~   ~~\n'.utf16())
 		} else {
 			// TODO fix %S
 			quakePrintf("Command '%S' not supported\n".utf16(), quakeCommand.utf16())

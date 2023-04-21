@@ -208,6 +208,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 			oops++
 		}
 
+		// TODO must do 1:1 mapping + whole ram, right here, and fix memory map before exit bs?
 		status = systemTable.bootServices.exitBootServices(imageHandle, efiMemoryMap.mapKey)
 	}
 
@@ -338,7 +339,9 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_S
 
 	params.ramBytes = ram
 	params.physicalRamBitMaskVirtual = conventionalAllocateNext(ram >> 12)
+	// TODO rename to ramBitMaskVirtual
 
+	// TODO move this constant to paging
 	let pageTableEntriesCount = 512u64
 	pml4entries =
 		conventionalAllocateNext(sizeOf<PageEntry>() * pageTableEntriesCount) as! ArrayPointer<ByValue<PageEntry>>

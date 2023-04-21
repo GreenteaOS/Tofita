@@ -66,6 +66,7 @@ class PhysicalAllocator {
 			var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 			var offset: UInt64 = startOfMemoryMap
 
+			// TODO ensure that allocated in bootloader is reserved here (like initial PML4) or discarded
 			while offset < endOfMemoryMap {
 				let kind: UInt8 = (descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory) ? page_free : page_reserved
 				let where = down_bytes_to_pages(descriptor.physicalStart)

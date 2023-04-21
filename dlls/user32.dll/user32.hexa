@@ -191,6 +191,7 @@ fun showWindow(hWnd: HWnd, nCmdShow: CmdShow): Bool32 {
 			tofitaShowWindow(window.windowId, nCmdShow)
 			result = Bool32.True
 		}
+		// TODO this one is probably `case SW_SHOW or SW_SHOWNORMAL or SW_SHOWDEFAUL:`
 		case SW_SHOW:
 		case SW_SHOWNORMAL:
 		case SW_SHOWDEFAULT: {

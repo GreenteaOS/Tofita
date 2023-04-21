@@ -393,6 +393,7 @@ class ExeLoader<SIZE, HEADER> {
 	fun addDllEntry(physical: UInt64, entry: UInt64, startup: ProcessStartupInformation) {
 		let max: SIZE = 511 // TODO any other limits?
 		// TODO ^ 32-bit limit is x2
+		// TODO in NT DLL count[0] is expected to be u32
 		let dllEntries = physical as! ArrayPointer<SIZE>
 
 		// TODO `if count[0] >= 511 {`

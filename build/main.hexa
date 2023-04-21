@@ -68,6 +68,7 @@ let libgen = '\(teapot)\\libgen.exe'
 
 // NOTE Splitting into separate lines helps review process
 let warn = if config.warnings {
+	// TODO use task `warn` instead of json config
 	[
 		"-Wall",
 		"-Wextra",
@@ -339,6 +340,8 @@ fun runTasks() {
 						'-mtune=nocona -fno-stack-protector -mno-red-zone',
 						'-fno-rtti -fno-exceptions -fvisibility=default', // TODO hidden?
 						'-fno-stack-check',
+						// TODO -Waggressive-loop-optimizations
+						// TODO fwrapv
 						'-fshort-wchar',
 						'-mno-ms-bitfields -fno-threadsafe-statics',
 						'-ferror-limit=10',
@@ -557,6 +560,16 @@ fun runTasks() {
 						'-e --interval:appended_partition_2:all:: -no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
 				)
+			}
+
+			// Debuggers should catch .hexa files
+			if not debuggie {
+				let path = folder
+				fs.readdirSync(path).forEach(fun(file, index) {
+					if file.endsWith('.c') {
+						fs.unlinkSync(path + '\\' + file)
+					}
+				})
 			}
 
 			console.log("[All tasks finished in \(Date.now() - begin) ms, upto \(maxBusy) parallel tasks performed]")

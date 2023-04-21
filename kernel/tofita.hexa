@@ -209,12 +209,14 @@ fun kernelInit(params: UefiPayload) {
 
 		// TODO this is entirely useless
 		for i in windowsLimit {
+			// TODO ^ remove this limit
 			let window = new OverlappedWindow()
 			window.present = false
 			windowsList[i] = window
 		}
 
 		var idle: TofitaProcess = processes[0] // TODO new!!! not preallocated
+		// TODO idle process must have NxN threads, thread per CPU core?
 		idle.pml4 = pml4entries // Save CR3 template to idle process
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true

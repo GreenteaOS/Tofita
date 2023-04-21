@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,12 +13,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Multiuser support
+// Support for multiple users
 
 // A "user" is the one we can login into
 // Note: Toast sandbox has it's own set of users
 @struct
 class User {
 	var name: String
+	var home: String
 	var sandbox: Sandbox
+
+	new () {
+
+	}
 }
+
+let defaultUser = new User() // TODO `User {name:}` syntax
+defaultUser.name = 'User'
+defaultUser.name = 'User1'
+defaultUser.sandbox = new Sandbox()
+defaultUser.sandbox.name = 'Sandbox'

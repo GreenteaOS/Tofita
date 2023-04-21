@@ -135,8 +135,8 @@ fun packAssets(config: Config) {
 
 		let buffer = Buffer.alloc(ramDiskSize) // zeroed
 		buffer.writeUInt32LE(0, 0)
-		buffer.writeUInt32LE(ramDiskSize,     4)
 		buffer.writeUInt32LE(assetName.length,   8)
+		buffer.writeUInt32LE(ramDiskSize, 4)
 		let assetInfoSize = 256 + 4 + 4
 		var assetInfoOffset = 4 + 4 + 4
 		var assetDataOffset = ramDiskSize

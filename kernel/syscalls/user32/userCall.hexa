@@ -87,6 +87,8 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): 
 	if syscall == TofitaSyscalls.GetMessage {
 		// TODO pointers should be validated to be not within kernel space!
 		if !probeForWriteOkay(frame.rdxArg1, sizeOf<GetMessagePayload>()) {
+			// TODO wrote here %S instead of %8 and it crashed, must think about such safety
+			// serialPrintf("<> GetMessage frame.rdxArg1 probe fail %8\n", frame.rdxArg1)
 			return false
 		}
 
@@ -131,6 +133,9 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls): 
 		let payload = frame.rdxArg1 as! SwapWindowFramebufferPayload
 
 		// TODO should copy from stack complete filled fb to this location
+		// TODO not that (ptr + size) should be saturating add, to not wrap around,
+		// cause otherwise it will be again under <lower and pass checks for
+		// user memory pointer validity, but be pointing at kernel memory
 		if !probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
 			return false
 		}
