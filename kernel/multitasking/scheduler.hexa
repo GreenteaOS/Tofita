@@ -81,7 +81,7 @@ fun markAllProcessessSchedulable() {
 	}
 }
 
-fun switchToKernelThread(@volatile frame: InterruptFrame) {
+fun switchToKernelThread(@volatile frame InterruptFrame) {
 	if currentThread == ThreadKind.THREAD_KERNEL {
 		return
 	}
@@ -101,7 +101,7 @@ fun switchToKernelThread(@volatile frame: InterruptFrame) {
 	tmemcpy(frame as! ArrayPointer<UInt8>, kernelThreadFrame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 }
 
-fun switchToNextProcess(@volatile frame: InterruptFrame) {
+fun switchToNextProcess(@volatile frame InterruptFrame) {
 	@volatile var next = getNextProcess()
 
 	if next == 0 {
@@ -141,7 +141,7 @@ fun switchToNextProcess(@volatile frame: InterruptFrame) {
 }
 
 var kernelThreadBusy = false
-fun switchToGuiThread(@volatile frame: InterruptFrame) {
+fun switchToGuiThread(@volatile frame InterruptFrame) {
 	if currentThread == ThreadKind.THREAD_GUI {
 		return
 	}
@@ -164,13 +164,13 @@ fun switchToGuiThread(@volatile frame: InterruptFrame) {
 	tmemcpy(frame as! ArrayPointer<UInt8>, guiThreadFrame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 }
 
-fun yieldInterruptHandler(@volatile frame: InterruptFrame) {
+fun yieldInterruptHandler(@volatile frame InterruptFrame) {
 	disableAllInterrupts()
 	switchToNextProcess(frame)
 }
 
 // TODO move to scheduler.hexa
-fun timerInterruptHandler(@volatile frame: InterruptFrame) {
+fun timerInterruptHandler(@volatile frame InterruptFrame) {
 	disableAllInterrupts()
 
 	// Happens once per second

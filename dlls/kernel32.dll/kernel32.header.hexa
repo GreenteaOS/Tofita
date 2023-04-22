@@ -15,13 +15,13 @@
 
 @linkName('LocalAlloc')
 declare
-fun localAlloc(flags: UInt32, bytes: SizeOfPointer) HLocal
+fun localAlloc(flags UInt32, bytes SizeOfPointer) HLocal
 
 @linkName('HeapAlloc')
 @dllImport
 @rename('HeapAlloc')
 declare
-fun heapAlloc(heap: UInt32, flags: UInt32, bytes: SizeOfPointer) ArrayPointer<Void>
+fun heapAlloc(heap UInt32, flags UInt32, bytes SizeOfPointer) ArrayPointer<Void>
 // TODO
 // let kernel32 = "kernel32.dll" (uppercase?)
 // @dllImport(kernel32) (fpc)

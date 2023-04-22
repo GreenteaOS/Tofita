@@ -14,11 +14,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // TODO rename to `toUInt32`
-fun toInt32(a: UInt8, b: UInt8, c: UInt8, d: UInt8) UInt32 {
+fun toInt32(a UInt8, b UInt8, c UInt8, d UInt8) UInt32 {
 	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFFu32
 }
 
-fun loadIcon(buffer: ConstArrayPointer<UInt8>, width: Int) Bitmap32 {
+fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
 	// Reserved. Must always be 0.
 	if buffer[0] != 0 {
 		return null

@@ -15,13 +15,13 @@
 
 // Boot loader: entered by UEFI, reads all UEFI data and starts kernel loader
 
-fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64) Void {
+fun tmemcpy(dest ArrayPointer<UInt8>, src ConstArrayPointer<UInt8>, count UInt64) Void {
 	for i in count {
 		dest[i] = src[i]
 	}
 }
 
-fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64) Void {
+fun memset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void {
 	var d = dest as! ArrayPointer<UInt8>
 	for i in len {
 		d[i] = e
@@ -33,8 +33,8 @@ fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64) Void {
 @rename("trampolineCR3") // TODO
 @convention(fastcall) @fastcall // TODO
 declare fun
-trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile stack: UInt64,
-			  @volatile entry: UInt64) Void
+trampolineCR3(@volatile kernelParams UInt64, @volatile pml4 UInt64, @volatile stack UInt64,
+			  @volatile entry UInt64) Void
 
 @extern @rename('versionMajor') declare let versionMajor Int
 @extern @rename('versionMinor') declare let versionMinor Int
@@ -43,7 +43,7 @@ trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile 
 // @deep
 
 // Entry point
-fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_STATUS {
+fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STATUS {
 	// Workaround for Clang `memset`, but it may be not needed anymore
 	buffa[0] = 0
 
@@ -70,25 +70,25 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 
 	var acpiTable EFI_PHYSICAL_ADDRESS? = null
 	{
-		serialPrintln("[[[uefi]]] begin: ACPI")
-		var acpi20: EFI_GUID = new ACPI_20_TABLE_GUID()
+		serialPrintln("[[[uefi]]] begin ACPI")
+		var acpi20 EFI_GUID = new ACPI_20_TABLE_GUID()
 		var acpi EFI_GUID = new ACPI_TABLE_GUID()
 
 		for i in systemTable.numberOfTableEntries {
 			var efiTable EFI_CONFIGURATION_TABLE = systemTable.configurationTable[i].ref
 			if areSame(efiTable.vendorGuid.ref, acpi20) { // Prefer ACPI 2.0
 				acpiTable = efiTable.vendorTable as! EFI_PHYSICAL_ADDRESS?
-				serialPrintln("[[[uefi]]] found: ACPI 2.0")
+				serialPrintln("[[[uefi]]] found ACPI 2.0")
 				break
 			} else if areSame(efiTable.vendorGuid.ref, acpi) {
 				// ACPI 2.0 is required by Tofita
 				// So we don't need to support ACPI 1.0
-				serialPrintln("[[[uefi]]] found: ACPI 1.0, ignoring")
+				serialPrintln("[[[uefi]]] found ACPI 1.0, ignoring")
 			}
 		}
 
 		// TODO also transfer ACPI version to report SandyBridge
-		serialPrintln("[[[uefi]]] done: ACPI")
+		serialPrintln("[[[uefi]]] done ACPI")
 	}
 
 	var status = EFI_STATUS.EFI_NOT_READY
@@ -157,7 +157,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	time.year = 2023
 	var capabilities EFI_TIME_CAPABILITIES = new EFI_TIME_CAPABILITIES()
 	{
-		serialPrintln("[[[uefi]]] begin: GetTime")
+		serialPrintln("[[[uefi]]] begin GetTime")
 		var status EFI_STATUS = systemTable.runtimeServices.getTime(time, capabilities)
 		while status != EFI_STATUS.EFI_SUCCESS {
 			serialPrintln("[[[uefi]]] <ERROR> GetTime")
@@ -183,16 +183,16 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 			}
 			// TODO use constants from version numbers
 		}
-		serialPrintln("[[[uefi]]] done: GetTime")
+		serialPrintln("[[[uefi]]] done GetTime")
 	}
 
-	serialPrintln("[[[uefi]]] begin: ExitBootServices")
+	serialPrintln("[[[uefi]]] begin ExitBootServices")
 	drawVerbose("Exiting boot services...", framebuffer)
 	var oops UInt8 = 0
 	status = EFI_STATUS.EFI_NOT_READY
 	while status != EFI_STATUS.EFI_SUCCESS {
 		if oops < 10 {
-			serialPrintln("[[[uefi]]] try: ExitBootServices")
+			serialPrintln("[[[uefi]]] try ExitBootServices")
 		}
 
 		if oops == 199 {
@@ -215,10 +215,10 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	// TODO this condition never happens (static analyze this case)
 	if status != EFI_STATUS.EFI_SUCCESS {
 		// TODO `status` to string
-		serialPrintln("[[[uefi]]] <ERROR> ExitBootServices: EFI_LOAD_ERROR")
+		serialPrintln("[[[uefi]]] <ERROR> ExitBootServices EFI_LOAD_ERROR")
 		return EFI_STATUS.EFI_LOAD_ERROR
 	}
-	serialPrintln("[[[uefi]]] done: ExitBootServices")
+	serialPrintln("[[[uefi]]] done ExitBootServices")
 
 	drawVerbose("Setting RAM disk...", framebuffer)
 	setRamDisk(ramdisk)

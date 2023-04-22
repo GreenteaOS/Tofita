@@ -33,7 +33,7 @@ class TofitaProcess {
 	@volatile var scheduleOnNextTick Bool
 
 	// CR3, should be page aligned
-	@volatile var pml4: ArrayPointer<ByValue<PageEntry>>
+	@volatile var pml4 ArrayPointer<ByValue<PageEntry>>
 
 	// TODO 32-bit
 
@@ -41,7 +41,7 @@ class TofitaProcess {
 	var frame InterruptFrame
 
 	// Filled on #PF
-	@volatile var cr2PageFaultAddress: UInt64
+	@volatile var cr2PageFaultAddress UInt64
 
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
@@ -59,7 +59,7 @@ class TofitaProcess {
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
 
 	// 32-bit
-	var is64bit: Bool
+	var is64bit Bool
 	var limits AddressAwareness
 	var name String
 
@@ -70,7 +70,7 @@ class TofitaProcess {
 let processes [TofitaProcess] = []
 
 // TODO must use locking for sane SMP
-fun appendProcess(process: TofitaProcess) {
+fun appendProcess(process TofitaProcess) {
 	if processes.includes(process) {
 		quakePrintf("Process '%S' is added twice to the scheduler, this is a bug\n".utf16(), process.name.utf16())
 		return

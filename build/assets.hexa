@@ -40,7 +40,7 @@ let deps [[String]] = [
 	['ntdll', 'kernel32']
 ]
 
-fun packFonts(config: Config) {
+fun packFonts(config Config) {
 		let fs = require('fs')
 		let chars [{code:Int, x:Int, y:Int, width:Float}] =
 			JSON.parse(fs.readFileSync('..\\Greentea\\assets\\root\\Windows\\Fonts\\default.json').toString().trim())
@@ -63,7 +63,7 @@ fun packFonts(config: Config) {
 		fs.writeFileSync(config.tempFolder + tea + '\\ascii.tofita', buffer, "binary")
 }
 
-fun packAssets(config: Config) {
+fun packAssets(config Config) {
 		let folder = config.tempFolder + tea
 		let fs = require('fs') // TODO import normally
 
@@ -121,7 +121,7 @@ fun packAssets(config: Config) {
 		ramDiskSize += 4 // UInt32 assetsCount
 		ramDiskSize += ( //struct assetDefinition
 			//{
-			256 + //	var path[256]: UInt8
+			256 + //	var path[256] UInt8
 			4 + //	    UInt32 size
 			4 //	    UInt32 offsetFromRamDiskFirstByte // NOT relative to `data`
 			//}

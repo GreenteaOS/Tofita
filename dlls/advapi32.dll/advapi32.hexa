@@ -23,9 +23,9 @@ fun stub() {}
     @fastcall
 #end
 fun _DllMainCRTStartup(
-    unusedX: Any,
-    unusedY: Any,
-    unusedZ: Any
+    unusedX Any,
+    unusedY Any,
+    unusedZ Any
 ) Void {
     // TODO
 }

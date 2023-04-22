@@ -22,12 +22,12 @@
 let defaultReserveMegabytes = #if bit64 4096u16 #else 128u16 #end
 let reserveAtVirtualMegabyte = #if bit64 4096*4096*4 #else (4096/4)*3 - (defaultReserveMegabytes*2) #end
 
-fun reserveIgnore(megabytes: UInt16) {
+fun reserveIgnore(megabytes UInt16) {
 	// Nothing, already did reserve
 }
 
 // TODO take custom reserveAtVirtualMegabyte
-fun reserve(megabytes: UInt16) {
+fun reserve(megabytes UInt16) {
 	// TODO
 	wrapReserve = reserveIgnore
 	wrapAllocate = allocate
@@ -38,12 +38,12 @@ fun allocate(size: UInt32): #if bit64 UInt64 #else UInt32 #end {
 	return 0
 }
 
-fun allocateFirst(size: UInt32): #if bit64 UInt64 #else UInt32 #end {
+fun allocateFirst(size UInt32): #if bit64 UInt64 #else UInt32 #end {
 	reserve(defaultReserveMegabytes)
 	return allocate(size)
 }
 
-fun freeStub(pointer: UInt64, size: UInt32) {
+fun freeStub(pointer UInt64, size UInt32) {
 	// Nothing, not yet ready
 }
 
@@ -59,13 +59,13 @@ var wrapFree = freeStub
 // TODO Use higher allocation density on 32-bit to prolong buffer usage
 @draft
 @dllExport('tofitaHexaReserve')
-fun tofitaHexaReserve(megabytes: UInt16) {
+fun tofitaHexaReserve(megabytes UInt16) {
 	wrapReserve(megabytes)
 }
 
 @draft
 @dllExport('tofitaHexaAllocate')
-fun tofitaHexaAllocate(size: UInt32) {
+fun tofitaHexaAllocate(size UInt32) {
 	return wrapAllocate(size)
 }
 
@@ -83,14 +83,14 @@ fun tofitaHexaFree(pointer: #if bit64 UInt64 #else UInt32 #end, size: UInt32) {
 // TODO link names
 @fastcall
 @dllExport('tofitaFastStub')
-fun tofitaFastStub(rcx: UInt64, rdx: UInt64) UInt32 {
+fun tofitaFastStub(rcx UInt64, rdx UInt64) UInt32 {
 	tofitaDebugLog("--> tofitaFastStub --> rcx=%8 rdx=%8".utf16(), rcx, rdx)
 	return 0
 }
 
 @stdcall
 @dllExport('tofitaStdStub')
-fun tofitaStdStub(arg: ConstArrayPointer<UInt8>) UInt32 {
+fun tofitaStdStub(arg ConstArrayPointer<UInt8>) UInt32 {
 	tofitaDebugLog("--> tofitaStdStub --> arg=%8".utf16(), arg as! UInt64)
 	return 0
 }
@@ -104,7 +104,7 @@ fun tofitaStdStub(arg: ConstArrayPointer<UInt8>) UInt32 {
 @convention('fastcall')
 @linkName('@tofitaFastSystemCallWrapper@8')
 #end
-declare fun tofitaFastSystemCallWrapper(rcx: TofitaSyscalls, rdx: #if bit64 UInt64 #else UInt32 #end): #if bit64 UInt64 #else UInt32 #end
+declare fun tofitaFastSystemCallWrapper(rcx TofitaSyscalls, rdx: #if bit64 UInt64 #else UInt32 #end): #if bit64 UInt64 #else UInt32 #end
 
 // Return value is placed into RAX
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
@@ -114,11 +114,11 @@ declare fun tofitaFastSystemCallWrapper(rcx: TofitaSyscalls, rdx: #if bit64 UInt
 #else
 @dllExport('@tofitaFastSystemCall@8')
 #end
-fun tofitaFastSystemCall(rcx: TofitaSyscalls,
+fun tofitaFastSystemCall(rcx TofitaSyscalls,
 #if bit64
-	rdx: UInt64 = 0
+	rdx UInt64 = 0
 #else
-	rdx: UInt32 = 0
+	rdx UInt32 = 0
 #end
 ): #if bit64 UInt64 #else UInt32 #end
 // TODO bit64 or bits64?
@@ -131,18 +131,18 @@ fun tofitaFastSystemCall(rcx: TofitaSyscalls,
 //
 
 @dllExport('tofitaExitProcess')
-fun tofitaExitProcess(exitCode: UInt32) Void {
+fun tofitaExitProcess(exitCode UInt32) Void {
 	tofitaFastSystemCall(TofitaSyscalls.ExitProcess, exitCode)
 }
 
 @dllExport('tofitaDebugLog')
-fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0) Void {
+fun tofitaDebugLog(message ConstArrayPointer<ClangWideChar>, extra UInt64 = 0, more UInt64 = 0) Void {
 	let payload = new ByValue<DebugLogPayload>()
 	// TODO @stack
 	// TODO ^ optimize to allocate on stack, some lifetime flag on creation and usage?
 	payload.ref.message = message as! UInt64 // TODO ConstArrayPointer.address UInt64/32
 	// TODO ConstArrayPointer.unsafeFromAddress(PointerAddress.unsafeFrom(123u64))
-	// TODO on the kernel side: ValidateUserPointer<DebugLogPayload>.clone() <= does SEH copy of sizeOf
+	// TODO on the kernel side ValidateUserPointer<DebugLogPayload>.clone() <= does SEH copy of sizeOf
 	// TODO hint `as! PointerAddress` use instead `fromAddress`
 	payload.ref.extra = extra
 	payload.ref.more = more
@@ -161,7 +161,7 @@ fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0,
 //
 
 @dllExport('njraaSwapWindowFramebuffer')
-fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) Void {
+fun njraaSwapWindowFramebuffer(windowId UInt64, fb WindowFramebuffer) Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
 	payload.fb = fb as! UInt64
@@ -169,7 +169,7 @@ fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) Void {
 }
 
 @dllExport('njraaGetOrCreateWindowFramebuffer')
-fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) Void {
+fun njraaGetOrCreateWindowFramebuffer(windowId UInt64, fb WindowFramebuffer) Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
 	payload.fb = fb as! UInt64
@@ -181,12 +181,12 @@ fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) V
 //
 
 @dllExport('tofitaCreateWindowEx')
-fun tofitaCreateWindowEx(payload: CreateWindowExPayload) UInt64 {
+fun tofitaCreateWindowEx(payload CreateWindowExPayload) UInt64 {
 	return tofitaFastSystemCall(TofitaSyscalls.CreateWindowEx as! TofitaSyscalls, payload as! Payload)
 }
 
 @dllExport('tofitaShowWindow')
-fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow) Void {
+fun tofitaShowWindow(windowId UInt64, nCmdShow CmdShow) Void {
 	let payload = new ShowWindowPayload()
 	payload.windowId = windowId
 	payload.nCmdShow = nCmdShow
@@ -194,13 +194,13 @@ fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow) Void {
 }
 
 @dllExport('tofitaGetMessage')
-fun tofitaGetMessage(payload: GetMessagePayload) Bool32 {
+fun tofitaGetMessage(payload GetMessagePayload) Bool32 {
 	// TODO filters
 	// TODO UInt64 -> Bool32 is a lossy conversion, type check it somehow
 	return tofitaFastSystemCall(TofitaSyscalls.GetMessage as! TofitaSyscalls, payload as! Payload) as! Bool32
 }
 
 @dllExport('tofitaPostMessage')
-fun tofitaPostMessage(payload: PostMessagePayload) Bool32 {
+fun tofitaPostMessage(payload PostMessagePayload) Bool32 {
 	return tofitaFastSystemCall(TofitaSyscalls.PostMessage as! TofitaSyscalls, payload as! Payload) as! Bool32
 }

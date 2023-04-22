@@ -46,7 +46,7 @@ class Pe64OptionalHeader {
 	var minorImageVersion UInt16
 	var majorSubsystemVersion UInt16
 	var minorSubsystemVersion UInt16
-	var win32VersionValue: UInt32
+	var win32VersionValue UInt32
 	var sizeOfImage UInt32
 	var sizeOfHeaders UInt32
 	var checkSum UInt32
@@ -81,7 +81,7 @@ class Pe32OptionalHeader {
 	var minorImageVersion UInt16
 	var majorSubsystemVersion UInt16
 	var minorSubsystemVersion UInt16
-	var win32VersionValue: UInt32
+	var win32VersionValue UInt32
 	var sizeOfImage UInt32
 	var sizeOfHeaders UInt32
 	var checkSum UInt32

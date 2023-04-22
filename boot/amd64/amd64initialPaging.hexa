@@ -15,14 +15,14 @@
 
 /// Align to 4096
 let addressBits = 12u64
-var pml4entries: ArrayPointer<ByValue<PageEntry>> = null
+var pml4entries ArrayPointer<ByValue<PageEntry>> = null
 
 fun conventionalAllocatePage() ArrayPointer<ByValue<PageEntry>> {
 	// TODO bounds check
 	return conventionalAllocateNext(pageSize) as! ArrayPointer<ByValue<PageEntry>>
 }
 
-fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
+fun mapPage(entry PageEntry, address UInt64, writeAllowed UInt8) {
 	entry.address = address >> addressBits
 	entry.present = 1u64
 	entry.writeAllowed = (writeAllowed == 1) ? 1u64 : 0u64
@@ -30,7 +30,7 @@ fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
 	// TODO all fields must be set to zero, filled by kernel later
 }
 
-fun mapPageHuge(entry: PageEntry, address: UInt64) {
+fun mapPageHuge(entry PageEntry, address UInt64) {
 	entry.address = address >> addressBits
 	entry.present = 1u64
 	entry.writeAllowed = 1u64
@@ -38,7 +38,7 @@ fun mapPageHuge(entry: PageEntry, address: UInt64) {
 	entry.accessibleByAll = 1u64 // TODO
 }
 
-fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8) ArrayPointer<ByValue<PageEntry>> {
+fun referOrCreatePage(table ArrayPointer<ByValue<PageEntry>>, entryId UInt64, writeAllowed UInt8) ArrayPointer<ByValue<PageEntry>> {
 	var entry PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
@@ -58,64 +58,64 @@ class PageAddressView {
 	@bits(9) var pt UInt64
 	@bits(9) var pd UInt64
 	@bits(9) var pdpt UInt64
-	@bits(9) var pml4: UInt64
+	@bits(9) var pml4 UInt64
 	@bits(16) var padding UInt64
 }
 
-fun getPageAddressView(address: UInt64) ByValue<PageAddressView> {
+fun getPageAddressView(address UInt64) ByValue<PageAddressView> {
 	return address as! ByValue<PageAddressView>
 }
 
-fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
+fun mapPT(pt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, writeAllowed UInt8) {
 	let view = getPageAddressView(virtualAddr)
 	let entry PageEntry = pt[view.ref.pt].ref
 	// TODO unsupported by C `var entry PageEntry = pt[getPageAddressView(virtualAddr).ref.pt].ref`
 	mapPage(entry, physicalAddr, writeAllowed)
 }
 
-fun mapP2Huge(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64) {
+fun mapP2Huge(pd ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64) {
 	let view = getPageAddressView(virtualAddr)
 	let entry PageEntry = pd[view.ref.pd].ref
 	// TODO var entry PageEntry = pd[getPageAddressView(virtualAddr).ref.pd].ref
 	mapPageHuge(entry, physicalAddr)
 }
 
-fun mapPD(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8) Void {
+fun mapPD(pd ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
+							writeAllowed UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pt = referOrCreatePage(pd, view.ref.pd, writeAllowed)
 	// TODO var pt = referOrCreatePage(pd, getPageAddressView(virtualAddr).ref.pd, writeAllowed)
 	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPDPT(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8) Void {
+fun mapPDPT(pdpt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
+							writeAllowed UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	var pd = referOrCreatePage(pdpt, view.ref.pdpt, writeAllowed)
 	// TODO var pd = referOrCreatePage(pdpt, getPageAddressView(virtualAddr).ref.pdpt, writeAllowed)
 	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8) Void {
+fun mapPML4(pml4 ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
+							writeAllowed UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pdpt = referOrCreatePage(pml4, view.ref.pml4, writeAllowed)
 	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapP3Huge(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64) Void {
+fun mapP3Huge(pdpt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pd = referOrCreatePage(pdpt, view.ref.pdpt, 1u8)
 	mapP2Huge(pd, virtualAddr, physicalAddr)
 }
 
-fun mapP4Huge(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64) Void {
+fun mapP4Huge(pml4 ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pdpt = referOrCreatePage(pml4, view.ref.pml4, 1u8)
 	mapP3Huge(pdpt, virtualAddr, physicalAddr)
 }
 
-fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64, writeAllowed: UInt8) {
+fun mapMemory(virtualAddr UInt64, physicalAddr UInt64, pageCount UInt64, writeAllowed UInt8) {
 	serialPrintln("[paging] mapping memory range")
 
 	var virtualAddrEnd UInt64 = virtualAddr + pageCount * pageSize
@@ -150,7 +150,7 @@ fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64, writ
 }
 
 // TODO make clearer about page count, cause in fact not 4k
-fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64) {
+fun mapMemoryHuge(virtualAddr UInt64, physicalAddr UInt64, pageCount UInt64) {
 	var virtualAddrEnd UInt64 = virtualAddr + pageCount * pageSize
 
 	var vAddress UInt64 = virtualAddr

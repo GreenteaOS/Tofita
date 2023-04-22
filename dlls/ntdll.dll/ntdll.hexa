@@ -13,20 +13,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun kiFastSystemCall(rcx: UInt64, rdx: Payload) UInt64 {
+fun kiFastSystemCall(rcx UInt64, rdx Payload) UInt64 {
 	return tofitaFastSystemCall(rcx as! TofitaSyscalls, rdx)
 }
 
 // TODO calling convention
 // TODO no capture `@closure(false)`
-declare Entry = (hInstance: ConstArrayPointer<Void>, hPrev: ConstArrayPointer<Void>, pCmdLine: ConstArrayPointer<Void>, nCmdShow: Int) => UInt32
-declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, lpvReserved: ConstArrayPointer<Void>) => Bool32
-// TODO must error `hinstDLL` twice `declare DllEntry = (hinstDLL: ConstArrayPointer<Void>, fdwReason: DllEntryReason, hinstDLL: ConstArrayPointer<Void>) => Bool32`
+declare Entry = (hInstance ConstArrayPointer<Void>, hPrev ConstArrayPointer<Void>, pCmdLine ConstArrayPointer<Void>, nCmdShow Int) => UInt32
+declare DllEntry = (hinstDLL ConstArrayPointer<Void>, fdwReason DllEntryReason, lpvReserved ConstArrayPointer<Void>) => Bool32
+// TODO must error `hinstDLL` twice `declare DllEntry = (hinstDLL ConstArrayPointer<Void>, fdwReason DllEntryReason, hinstDLL ConstArrayPointer<Void>) => Bool32`
 
 @rename('hexa_startup') declare let hexa_startup UInt64 // TODO size_t aka PointerSizedUInt (size_t is guaranteed to be an unsigned type)
 
 @dllExport('memset')
-fun memset(value: UInt32) {
+fun memset(value UInt32) {
 	// TODO !!
 }
 
@@ -35,7 +35,7 @@ enum DllEntryReason : UInt32 {
 }
 
 //TODO set as entry @linkName('greenteaosIsTheBest')
-fun greenteaosIsTheBest(startup: ProcessStartupInformation) {
+fun greenteaosIsTheBest(startup ProcessStartupInformation) {
 	let entry Entry = startup.entry
 	let pid UInt64 = startup.pid
 	let dllEntries UInt64 = startup.dllEntries

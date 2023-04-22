@@ -91,16 +91,16 @@ fun kstrlen(data: ConstArrayPointer<UInt8>) {
 }
 
 @rename('portInb')
-declare fun portInb(@volatile port: UInt16) UInt8
+declare fun portInb(@volatile port UInt16) UInt8
 
 @rename('portOutb')
-declare fun portOutb(@volatile port: UInt16, @volatile value: UInt8) Void
+declare fun portOutb(@volatile port UInt16, @volatile value UInt8) Void
 
-fun readSerialRegister(offset: UInt16) {
+fun readSerialRegister(offset UInt16) {
 	return portInb(serial_register_base + offset * serial_register_stride)
 }
 
-fun writeSerialRegister(offset: UInt16, d: UInt8) {
+fun writeSerialRegister(offset UInt16, d UInt8) {
 	portOutb(serial_register_base + offset * serial_register_stride, d)
 }
 
@@ -137,7 +137,7 @@ fun serialPortWritable() Bool {
 	return true
 }
 
-fun serialPortWrite(buffer: ArrayPointer<UInt8>, sizeOfBuffer: UInt64) UInt64 {
+fun serialPortWrite(buffer ArrayPointer<UInt8>, sizeOfBuffer UInt64) UInt64 {
 	if disableSerial != 0 {
 		return 0
 	}
@@ -192,7 +192,7 @@ fun serialPortWrite(buffer: ArrayPointer<UInt8>, sizeOfBuffer: UInt64) UInt64 {
 	return size
 }
 
-fun serialPrintInt(n: UInt64) Void {
+fun serialPrintInt(n UInt64) Void {
 	var n = n
 	var buf ArrayByValue<UInt8, 24> = [0]
 	for i in 24 {
@@ -210,7 +210,7 @@ fun serialPrintInt(n: UInt64) Void {
 	serialPortWrite(bp as! ArrayPointer<UInt8>, buf - bp + 24u64)
 }
 
-fun serialPrintHex(n: UInt64) Void {
+fun serialPrintHex(n UInt64) Void {
 	serialPrintf("0x")
 	var n = n
 	var buf ArrayByValue<UInt8, 16> = [0]
@@ -234,7 +234,7 @@ fun serialPrintHex(n: UInt64) Void {
 	serialPortWrite(buf.ref as! ArrayPointer<UInt8>, 16u64)
 }
 
-fun serialPrintBits(value: UInt64) Void {
+fun serialPrintBits(value UInt64) Void {
 	serialPrintf("0b")
 	for i in 64u64 { // TODO does `in u64` work?
 		if 0 != value & (1u64 << i) {
@@ -245,13 +245,13 @@ fun serialPrintBits(value: UInt64) Void {
 
 // TODO some fun call `putchar` while it is not defined anywhere but declared in c.hexa
 @convention(cdecl)
-fun putChar(c: UInt8) Int32 {
+fun putChar(c UInt8) Int32 {
 	var buffer ArrayByValue<UInt8, 2> = [c, 0]
 	serialPortWrite(buffer.ref as! ArrayPointer<UInt8>, 1u64)
 	return c
 }
 
-fun puts(string: ArrayPointer<UInt8>) Int32 {
+fun puts(string ArrayPointer<UInt8>) Int32 {
 	let eof = 0
 	var i Int32 = 0
 	// TODO should type check as `while Bool`
@@ -266,7 +266,7 @@ fun puts(string: ArrayPointer<UInt8>) Int32 {
 	return 1 // to meet spec.
 }
 
-fun comItoA(i: Int64, b: ArrayPointer<UInt8>) {
+fun comItoA(i Int64, b ArrayPointer<UInt8>) {
 	var digit ArrayByValue<UInt8, 11> = "0123456789"
 	var p = 0
 	var i = i
@@ -297,7 +297,7 @@ fun comItoA(i: Int64, b: ArrayPointer<UInt8>) {
 //declare class VA_List {}
 //@rename('va_start')
 // TODO firstArgument Any
-//declare fun va_start(lst: VA_List, firstArgument: String) Void
+//declare fun va_start(lst VA_List, firstArgument String) Void
 @rename('va_start_') @customHeader('
 	#define va_start_(arg) va_list va_list__; va_start(va_list__, arg)
 ')
@@ -318,18 +318,18 @@ declare fun va_arg_uint32() UInt32
 	#define va_arg_uint64() va_arg(va_list__, uint64_t)
 ')
 declare fun va_arg_uint64() UInt64
-// declare fun va_arg<T>(lst: VA_List) Any
+// declare fun va_arg<T>(lst VA_List) Any
 
 /*
 @nativeVariadic
 @rename('macro_serialPrintf')
-declare fun serialPrintf(c: String, ...rest) Void
+declare fun serialPrintf(c String, ...rest) Void
 */
 
 @nativeVariadic
 // TODO `rest.getNext<UInt>()` + auto gen va_start
 // TODO would be cooler to trace the file:line:function here
-fun serialPrintf(c: String, ...rest) {
+fun serialPrintf(c String, ...rest) {
 	va_start(c)
 	let c = c.utf16() as! ArrayPointer<UInt16>
 	var i = 0
@@ -418,12 +418,12 @@ fun serialPrintf(c: String, ...rest) {
 	}
 }
 
-fun serialPrint(print: String) {
+fun serialPrint(print String) {
 	// TODO should print un-formatted
 	serialPrintf(print)
 }
 
-fun serialPrintln(print: String) {
+fun serialPrintln(print String) {
 	// TODO should print un-formatted
 	serialPrintf(print)
 	serialPrintf("\n") // TODO

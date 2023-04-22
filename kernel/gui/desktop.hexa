@@ -19,7 +19,7 @@ var dragX = 255i16
 var dragY = 255i16
 var drag = false
 
-fun compositeDesktop(mouseX: Int16, mouseY: Int16) {
+fun compositeDesktopSelectionRectangle(mouseX Int16, mouseY Int16) {
 	var color = new ByValue<Pixel32>()
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 	color.ref.rgba.ref.a = 64
@@ -36,7 +36,11 @@ fun compositeDesktop(mouseX: Int16, mouseY: Int16) {
 	}
 }
 
-fun handleMouseDownDesktop(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
+fun compositeDesktop(mouseX Int16, mouseY Int16) {
+	compositeDesktopSelectionRectangle(mouseX, mouseY)
+}
+
+fun handleMouseDownDesktop(type MouseActionType, mouseX Int16, mouseY Int16) {
 	if drag == false {
 		dragX = mouseX
 		dragY = mouseY
@@ -46,11 +50,11 @@ fun handleMouseDownDesktop(type: MouseActionType, mouseX: Int16, mouseY: Int16) 
 	haveToRender = haveToRender or drag
 }
 
-fun handleMouseUpDesktop(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
+fun handleMouseUpDesktop(type MouseActionType, mouseX Int16, mouseY Int16) {
 	haveToRender = haveToRender or drag
 	drag = false
 }
 
-fun handleMouseMoveDesktop(mouseX: Int16, mouseY: Int16) {
+fun handleMouseMoveDesktop(mouseX Int16, mouseY Int16) {
 	haveToRender = haveToRender or drag
 }

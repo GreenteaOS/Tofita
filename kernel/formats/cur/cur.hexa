@@ -24,7 +24,7 @@ class Cursor {
 	new () {}
 }
 
-fun loadCursor(asset: RamDiskAsset) Cursor {
+fun loadCursor(asset RamDiskAsset) Cursor {
 	let buffer = asset.data as! ArrayPointer<UInt8>
 
 	// Reserved. Must always be 0.

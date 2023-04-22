@@ -18,22 +18,22 @@ class InterruptFrame {
 	// SSE
 	@volatile var xmm ArrayByValue<UInt64, 16>
 
-	@volatile var r15: UInt64
-	@volatile var r14: UInt64
-	@volatile var r13: UInt64
-	@volatile var r12: UInt64
-	@volatile var r11: UInt64
-	@volatile var r10: UInt64
-	@volatile var r9: UInt64
-	@volatile var r8: UInt64
+	@volatile var r15 UInt64
+	@volatile var r14 UInt64
+	@volatile var r13 UInt64
+	@volatile var r12 UInt64
+	@volatile var r11 UInt64
+	@volatile var r10 UInt64
+	@volatile var r9 UInt64
+	@volatile var r8 UInt64
 
 	// Note: ECX is RCX, EAX is RAX, etc in 32-bit mode
 	@volatile var rdi UInt64
 	@volatile var rsi UInt64
 	@volatile var rbp UInt64
 	@volatile var rbx UInt64
-	@volatile var rdxArg1: UInt64
-	@volatile var rcxArg0: UInt64
+	@volatile var rdxArg1 UInt64
+	@volatile var rcxArg0 UInt64
 	@volatile var raxReturn UInt64
 
 	// IRQ index

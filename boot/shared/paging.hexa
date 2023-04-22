@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun getNextDescriptor(@readonly descriptor: EFI_MEMORY_DESCRIPTOR, descriptorSize: UInt64) {
+fun getNextDescriptor(@readonly descriptor EFI_MEMORY_DESCRIPTOR, descriptorSize UInt64) {
 	let desc = (descriptor as! UInt64) + descriptorSize
 	return desc as! @readonly EFI_MEMORY_DESCRIPTOR
 }
 
-fun getRAMSize(memoryMap: UefiMemoryMap) UInt64 {
+fun getRAMSize(memoryMap UefiMemoryMap) UInt64 {
 	var descriptor = memoryMap.memoryMap
 	let descriptorSize UInt64 = memoryMap.descriptorSize
 	var numberOfPages UInt64 = 0u64
@@ -39,7 +39,7 @@ fun getRAMSize(memoryMap: UefiMemoryMap) UInt64 {
 }
 
 // TODO this should be reconsidered (i.e. pointer fixups)
-fun mapEfiRuntime(memoryMap: UefiMemoryMap) {
+fun mapEfiRuntime(memoryMap UefiMemoryMap) {
 	serialPrintln("[paging] mapping efi runtime")
 
 	var descriptor EFI_MEMORY_DESCRIPTOR = memoryMap.memoryMap
@@ -75,7 +75,7 @@ let buffaStorage = new Buffa()
 let buffa = buffaStorage as! ArrayPointer<UInt8>
 // TODO ^ simple array by value
 
-fun conventionalAllocateLargest(memoryMap: UefiMemoryMap) {
+fun conventionalAllocateLargest(memoryMap UefiMemoryMap) {
 	var descriptor = memoryMap.memoryMap
 	let descriptorSize UInt64 = memoryMap.descriptorSize
 	var result UInt64 = 0u64
@@ -104,7 +104,7 @@ fun conventionalAllocateLargest(memoryMap: UefiMemoryMap) {
 }
 
 var conventionalOffset UInt64 = 0u64
-fun conventionalAllocateNext(bytes: UInt64) UInt64 {
+fun conventionalAllocateNext(bytes UInt64) UInt64 {
 	let result = conventionalOffset
 	let pages = bytes / pageSize // Math.floor
 	conventionalOffset += pages * pageSize
@@ -115,7 +115,7 @@ fun conventionalAllocateNext(bytes: UInt64) UInt64 {
 }
 
 	// TODO map with hugepages!!!
-fun mapFrameBuffer(@readonly fb: FrameBuffer) {
+fun mapFrameBuffer(@readonly fb FrameBuffer) {
 	// TODO map ALL with EPIC pages?
 	mapMemory(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u64, 1u8)
 }

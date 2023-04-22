@@ -24,7 +24,7 @@ let pic_eoi = 0x20u8	  // end-of-interrupt command code
 let pic_eoi_0x20 = 0x20u8 // end-of-interrupt command code
 
 @rename('vmemcpy')
-declare fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64) Void
+declare fun tmemcpy(dest ArrayPointer<UInt8>, src ConstArrayPointer<UInt8>, count UInt64) Void
 /* {
 	for i in count {
 		dest[0] = src[0]
@@ -32,7 +32,7 @@ declare fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, co
 }*/
 
 @rename('vmemcpy')
-declare fun vmemcpy(@volatile dest: ArrayPointer<UInt8>, @volatile src: ConstArrayPointer<UInt8>, @volatile count: UInt64) Void
+declare fun vmemcpy(@volatile dest ArrayPointer<UInt8>, @volatile src ConstArrayPointer<UInt8>, @volatile count UInt64) Void
 /* {
 	for i in count {
 		dest[0] = src[0]
@@ -65,16 +65,16 @@ class IdtEntry {
 	@bits(32) var zero UInt32
 }
 
-fun readPort(@volatile port: UInt16) UInt8 {
+fun readPort(@volatile port UInt16) UInt8 {
 	return portInb(port)
 }
 
-fun writePort(@volatile port: UInt16, @volatile value: UInt8) {
+fun writePort(@volatile port UInt16, @volatile value UInt8) {
 	portOutb(port, value)
 }
 
 @emitHeader @linkAsIs
-declare fun loadIdt(@volatile idtr: Idtr) Void
+declare fun loadIdt(@volatile idtr Idtr) Void
 
 // Handling IDT
 let idt_size = 256
@@ -82,7 +82,7 @@ let idt_size = 256
 var idt ArrayByValue<ByValue<IdtEntry>, 256> = []
 
 // Handling interrupts and exceptions
-fun defineIdtCallback(entry: IdtEntry, address: UInt64, stack: UInt8, level: UInt8) {
+fun defineIdtCallback(entry IdtEntry, address UInt64, stack UInt8, level UInt8) {
 	entry.offsetLowerBits = address & 0xFFFFu16
 	entry.offsetHigherBits = (address & 0xFFFFFFFFFFFF0000u64) >> 16
 	entry.selector = Selector.SYS_CODE64_SEL as! UInt16
@@ -96,7 +96,7 @@ fun defineIdtCallback(entry: IdtEntry, address: UInt64, stack: UInt8, level: UIn
 	// TODO we need so much ISTs then?
 }
 
-fun setIdtCallback(entry: IdtEntry, callbackHandler: UInt64) {
+fun setIdtCallback(entry IdtEntry, callbackHandler UInt64) {
 	// Ring 3 cause div by zero etc
 	defineIdtCallback(entry, callbackHandler, 1, 3)
 }
@@ -147,7 +147,7 @@ fun disablePic() {
 	serialPrintln("[cpu] done: disable PIC")
 }
 
-fun physicalToVirtual(physical: UInt64) UInt64 {
+fun physicalToVirtual(physical UInt64) UInt64 {
 	var result UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
 	return result
 }
@@ -192,24 +192,24 @@ declare class TablePtr {
 @struct @packed
 class TssDescriptor {
 	var limitLow UInt16
-	var base_00: UInt16
-	var base_16: UInt8
+	var base_00 UInt16
+	var base_16 UInt8
 	var type GdtType
 	var size UInt8
-	var base_24: UInt8
-	var base_32: UInt32
+	var base_24 UInt8
+	var base_32 UInt32
 	var reserved UInt32
 }
 
 @struct @packed
 class TssEntry {
-	var reserved0: UInt32
+	var reserved0 UInt32
 
 	var rsp ArrayByValue<UInt64, 3> // stack pointers for CPL 0-2
 	var ist ArrayByValue<UInt64, 8> // ist[0] is reserved
 
-	var reserved1: UInt64
-	var reserved2: UInt16
+	var reserved1 UInt64
+	var reserved2 UInt16
 	var iomap_offset UInt16
 
 	new () {}
@@ -224,18 +224,18 @@ class TssEntry {
 // TODO `let`
 let rspStackSize = 131072u64
 
-@aligned(64) var rsp0stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var rsp1stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var rsp2stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var rsp0stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var rsp1stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var rsp2stack ArrayByValue<UInt8, 131072> = [0]
 
-@aligned(64) var ist0stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var ist1stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var ist2stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var ist3stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var ist4stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var ist5stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var ist6stack: ArrayByValue<UInt8, 131072> = [0]
-@aligned(64) var ist7stack: ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist0stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist1stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist2stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist3stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist4stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist5stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist6stack ArrayByValue<UInt8, 131072> = [0]
+@aligned(64) var ist7stack ArrayByValue<UInt8, 131072> = [0]
 
 // LLVM did the magic expected of it. It only saved registers that are clobbered by your fun (hence rax).
 // All other register are left unchanged hence there’s no need of saving and restoring them.
@@ -249,12 +249,12 @@ let rspStackSize = 131072u64
 //declare fun anyInterruptHandler(frame: <InterruptFrame>) Void
 
 // TODO remove
-@aligned(64) @interrupt fun unknownInterrupt(frame: InterruptFrame) Void {
+@aligned(64) @interrupt fun unknownInterrupt(frame InterruptFrame) Void {
 	// TODO Find a better way to avoid LLVM bugs
 	anyInterruptHandler(frame)
 }
 
-fun anyInterruptHandler(frame: InterruptFrame) Void {
+fun anyInterruptHandler(frame InterruptFrame) Void {
 	disableAllInterrupts()
 	#if false
 		let stack = ((frame as! UInt64) - 200) as! InterruptStack
@@ -268,7 +268,7 @@ fun anyInterruptHandler(frame: InterruptFrame) Void {
 	// For instance GS register to access the TLS (thread local storage)
 }
 
-fun syscallInterruptHandler(frame: InterruptFrame) {
+fun syscallInterruptHandler(frame InterruptFrame) {
 	disableAllInterrupts()
 	@volatile let process TofitaProcess = processes[currentProcess]
 	process.schedulable = false
@@ -308,13 +308,13 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 }
 
 @emitHeader @linkAsIs
-declare fun setTsr(@volatile tsrData: UInt16) Void
+declare fun setTsr(@volatile tsrData UInt16) Void
 
 let ps2_data_port = 0x60u8
 let ps2_control_port = 0x64u8
 
 // Takes 2 GDT entries
-fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
+fun tssSetEntry(i UInt8, base UInt64, limit UInt64) {
 	var tssd TssDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! TssDescriptor
 	tssd.limitLow = limit & 0xFFFFu16
 	tssd.size = (limit >> 16) & 0xFu8

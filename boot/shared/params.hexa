@@ -46,7 +46,7 @@ class UserVirtual<T> {
 // @sizeOf(8)
 class Physical<T> {
 	//var physical UInt64
-	static fun toPhysical(physical: UInt64) Physical<T> {
+	static fun toPhysical(physical UInt64) Physical<T> {
 		return physical as! Physical<T>
 	}
 
@@ -56,7 +56,7 @@ class Physical<T> {
 		return result as! Virtual<T>
 	}
 
-	fun toVirtualOffset(offset: UInt64) Virtual<T> {
+	fun toVirtualOffset(offset UInt64) Virtual<T> {
 		var physical UInt64 = this as! UInt64
 		var result UInt64 = (wholePhysicalStart as! UInt64) + physical + offset
 		return result as! Virtual<T>
@@ -109,7 +109,7 @@ class RamDisk {
 @struct
 // TODO sizeOf
 class UefiPayload {
-	var pml4: UInt64
+	var pml4 UInt64
 	var stack UInt64
 	/// Physical address of where kernel loader placed
 	var physicalBuffer UInt64
@@ -131,7 +131,7 @@ class UefiPayload {
 	// like "let it in without entering a login-password")
 }
 
-declare InitKernel = @convention(fastcall) (params: UefiPayload) => Void
+declare InitKernel = @convention(fastcall) (params UefiPayload) => Void
 // TODO ^ fix that in quake
-declare InitKernelTrampoline = @convention(fastcall) (kernelParams: UInt64, pml4: UInt64, stack: UInt64,
-												entry: UInt64) => Void
+declare InitKernelTrampoline = @convention(fastcall) (kernelParams UInt64, pml4 UInt64, stack UInt64,
+												entry UInt64) => Void

@@ -17,7 +17,7 @@
 
 var nextDefaultWindowPosition UInt8 = 0
 
-fun overlappedWindow_create(pid: UInt64) OverlappedWindow {
+fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	var index UInt64 = 0
 	while index < windowsLimit - 1 {
 		index++ // Null-window not used directly
@@ -52,7 +52,7 @@ fun overlappedWindow_create(pid: UInt64) OverlappedWindow {
 	return window
 }
 
-fun overlappedWindow_find(pid: UInt64, windowId: UInt64) OverlappedWindow {
+fun overlappedWindow_find(pid UInt64, windowId UInt64) OverlappedWindow {
 	var index UInt64 = 0
 	while index < windowsLimit - 1 {
 		index++
@@ -67,7 +67,7 @@ fun overlappedWindow_find(pid: UInt64, windowId: UInt64) OverlappedWindow {
 	return null
 }
 
-fun overlappedWindow_findAnyProcessWindow(pid: UInt64) OverlappedWindow {
+fun overlappedWindow_findAnyProcessWindow(pid UInt64) OverlappedWindow {
 	var index UInt64 = 0
 	while index < windowsLimit - 1 {
 		index++
@@ -82,7 +82,7 @@ fun overlappedWindow_findAnyProcessWindow(pid: UInt64) OverlappedWindow {
 	return null
 }
 
-fun overlappedWindow_detach(windowId: UInt64) {
+fun overlappedWindow_detach(windowId UInt64) {
 	var window = windowsList[windowId]
 
 	windowsList[window.prevId].nextId = window.nextId
@@ -108,7 +108,7 @@ fun overlappedWindow_detach(windowId: UInt64) {
 	window.nextId = 0
 }
 
-fun overlappedWindow_attach(windowId: UInt64) {
+fun overlappedWindow_attach(windowId UInt64) {
 	windowsList[topmostWindow].nextId = windowId
 
 	windowsList[windowId].prevId = topmostWindow
@@ -124,7 +124,7 @@ fun overlappedWindow_attach(windowId: UInt64) {
 	}
 }
 
-fun overlappedWindow_destroy(windowId: UInt64) {
+fun overlappedWindow_destroy(windowId UInt64) {
 	var window = windowsList[windowId]
 	overlappedWindow_detach(windowId)
 
@@ -144,7 +144,7 @@ fun initDwm() {
 	mouseY = _framebuffer.height / 2i16
 }
 
-fun getFrameButton(mouseX: Int16, mouseY: Int16, windowId: UInt64) FrameHover {
+fun getFrameButton(mouseX Int16, mouseY Int16, windowId UInt64) FrameHover {
 	if windowId == 0 {
 		return FrameHover.Noop
 	}
@@ -174,7 +174,7 @@ fun getFrameButton(mouseX: Int16, mouseY: Int16, windowId: UInt64) FrameHover {
 	return FrameHover.Noop
 }
 
-fun handleMouseMove(mouseX: Int16, mouseY: Int16) {
+fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	var window = windowsList[mouseDragWindow]
 
 	if mouseDragCapturedWindow && window.present && window.visible {
@@ -212,7 +212,7 @@ fun handleMouseMove(mouseX: Int16, mouseY: Int16) {
 	handleMouseMoveDesktop(mouseX, mouseY)
 }
 
-fun findWindowUnderCursor(mouseX: Int16, mouseY: Int16) UInt64 {
+fun findWindowUnderCursor(mouseX Int16, mouseY Int16) UInt64 {
 	var windowId = topmostWindow
 
 	do {
@@ -243,12 +243,12 @@ fun findWindowUnderCursor(mouseX: Int16, mouseY: Int16) UInt64 {
 	return 0
 }
 
-fun selectMouseNextResponder(mouseX: Int16, mouseY: Int16) {
+fun selectMouseNextResponder(mouseX Int16, mouseY Int16) {
 	// TODO hexa unconditional recursion firstResponder = selectMouseNextResponder(mouseX, mouseY)
 	firstResponder = findWindowUnderCursor(mouseX, mouseY)
 }
 
-fun isDraggableFrame(mouseX: Int16, mouseY: Int16, windowId: UInt64) Bool {
+fun isDraggableFrame(mouseX Int16, mouseY Int16, windowId UInt64) Bool {
 	if windowId == 0 {
 		return false
 	}
@@ -271,7 +271,7 @@ fun isDraggableFrame(mouseX: Int16, mouseY: Int16, windowId: UInt64) Bool {
 	return false
 }
 
-fun handleMouseDown(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
+fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 	selectMouseNextResponder(mouseX, mouseY)
 
 	if firstResponder != 0 && firstResponder != topmostWindow {
@@ -296,7 +296,7 @@ fun handleMouseDown(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 	}
 }
 
-fun handleMouseUp(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
+fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 	if type == MouseActionType.LeftUp {
 		mouseDragCapturedWindow = false
 	}

@@ -18,7 +18,7 @@
 // TODO ntdll should have tofitaStub(){} for unresolved dll imports -> log them
 // TODO ^ should actually show a message box and abort in future
 
-fun offsetPointer(data: UInt64, offset: UInt64) ArrayPointer<UInt8> {
+fun offsetPointer(data UInt64, offset UInt64) ArrayPointer<UInt8> {
 	return (data + offset) as! ArrayPointer<UInt8>
 }
 
@@ -34,7 +34,7 @@ class PeInterim {
 	var entry UInt64 // _DllMainCRTStartup
 	var imageDataDirectory ArrayPointer<ByValue<ImageDataDirectory>>
 	var sizeOfStackReserve UInt64
-	var is64bit: Bool
+	var is64bit Bool
 	new () {}
 }
 
@@ -56,11 +56,11 @@ class PeExportLinkedList {
 @struct
 class Executable {
 	var nextBase UInt64
-	var pml4: ArrayPointer<ByValue<PageEntry>>
+	var pml4 ArrayPointer<ByValue<PageEntry>>
 	new () {}
 }
 
-fun is64Exe(asset: RamDiskAsset) {
+fun is64Exe(asset RamDiskAsset) {
 	var ptr = asset.data as! ArrayPointer<UInt8>
 	var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 	var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
@@ -74,7 +74,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO probe for read/write
 	// TODO error if not found
 	// TODO more PATH support
-	fun loadDll(name: String, root: PeExportLinkedList, exec: Executable) PeInterim {
+	fun loadDll(name String, root PeExportLinkedList, exec Executable) PeInterim {
 		// TODO simple size ofs should be evaluated at normalizer to exclude ifs
 		let is64bit = sizeOf<SIZE>() == 8
 		let env = is64bit? "C:\\Windows\\System32\\" : "C:\\Windows\\SysWOW64\\"
@@ -84,14 +84,14 @@ class ExeLoader<SIZE, HEADER> {
 		return loadPe(fullPath, root, exec)
 	}
 
-	fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
+	fun loadPe(name String, root PeExportLinkedList, exec Executable) {
 		let asset RamDiskAsset = new RamDiskAsset()
 		getRamDiskAsset(asset, name)
 		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name.utf16(), asset.size, asset.data)
 		return loadPeAsset(asset, root, exec)
 	}
 
-	fun loadPeAsset(asset: RamDiskAsset, root: PeExportLinkedList, exec: Executable) {
+	fun loadPeAsset(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
 		var ptr = asset.data as! ArrayPointer<UInt8>
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 		serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
@@ -262,7 +262,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
 	// may be moved between versions.
 	// Search only selected .dll only within the user provided dlls
-	fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList) PeExportLinkedList {
+	fun getProcAddress(name ConstArrayPointer<UInt8>, root PeExportLinkedList) PeExportLinkedList {
 		var list PeExportLinkedList = root
 		// TODO make it intrusive list
 		// TODO compute crc for faster .dll import names lookup
@@ -290,7 +290,7 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	// TODO `template<typename SIZE>`
-	fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
+	fun resolveDllImports(pei PeInterim, root PeExportLinkedList) {
 		var buffer UInt64 = pei.base
 		var imageDataDirectory = pei.imageDataDirectory
 
@@ -362,7 +362,7 @@ class ExeLoader<SIZE, HEADER> {
 		}
 	}
 
-	fun loadExe(asset: RamDiskAsset, root: PeExportLinkedList, exec: Executable) {
+	fun loadExe(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
 		var ei ExeInterim = new ExeInterim()
 
 		ei.pei = loadPeAsset(asset, root, exec)
@@ -384,13 +384,13 @@ class ExeLoader<SIZE, HEADER> {
 		return ei
 	}
 
-	fun resolveExeImports(ei: ExeInterim, root: PeExportLinkedList) {
+	fun resolveExeImports(ei ExeInterim, root PeExportLinkedList) {
 		resolveDllImports(ei.pei, root)
 	}
 
 	// TODO `template<typename SIZE>` per function
 	// TODO make `entry` a generic too
-	fun addDllEntry(physical: UInt64, entry: UInt64, startup: ProcessStartupInformation) {
+	fun addDllEntry(physical UInt64, entry UInt64, startup ProcessStartupInformation) {
 		let max SIZE = 511 // TODO any other limits?
 		// TODO ^ 32-bit limit is x2
 		// TODO in NT DLL count[0] is expected to be u32
@@ -415,7 +415,7 @@ class ExeLoader<SIZE, HEADER> {
 	// Size is ensured by `@sizeOfLessOrEqual(4096)`
 	let startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
 
-	fun loadRelatedDLLsAndMapIntoProcess(app: ExeInterim, root: PeExportLinkedList, exec: Executable, process: TofitaProcess) {
+	fun loadRelatedDLLsAndMapIntoProcess(app ExeInterim, root PeExportLinkedList, exec Executable, process TofitaProcess) {
 		// TODO parse DLLs in multiple threads
 		let ntdll = loadDll("ntdll.dll", root, exec) // TODO proper path!!!
 		let kernel32 = loadDll("kernel32.dll", root, exec)
@@ -484,7 +484,7 @@ class ExeLoader<SIZE, HEADER> {
 	}
 }
 
-fun loadExeIntoProcess(file: String, process: TofitaProcess) {
+fun loadExeIntoProcess(file String, process TofitaProcess) {
 	{
 		let root =
 			PhysicalAllocator.allocateBytes(sizeOf<PeExportLinkedList>()) as! PeExportLinkedList

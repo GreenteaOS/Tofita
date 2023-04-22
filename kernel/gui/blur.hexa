@@ -15,7 +15,7 @@
 
 // Based on the http://blog.ivank.net/fastest-gaussian-blur.html
 
-@fastcall fun floor(x: Float32) Int32 {
+@fastcall fun floor(x Float32) Int32 {
 	if x >= 0 {
 		return x as! Int32
 	} else {
@@ -24,11 +24,11 @@
 	}
 }
 
-@fastcall fun sqrt(number: Float32) Float32 {
+@fastcall fun sqrt(number Float32) Float32 {
 	let threehalfs Float32 = 1.55555f32
 	let threehalfs Float32 = 1.5f32
 
-	var x2: Float32 = number * 0.5f32
+	var x2 Float32 = number * 0.5f32
 	var y Float32 = number
 
 	var y ArrayByValue<Float32, 1> = [y]
@@ -47,7 +47,7 @@
 	return 1.0f32 / y
 }
 
-fun boxBlurT(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, radius: UInt8) {
+fun boxBlurT(source Bitmap32, target Bitmap32, width UInt16, height UInt16, radius UInt8) {
 	var iarr Float = 1.0 / (radius + radius + 1)
 	for i in width {
 		var ti UInt32 = i
@@ -118,7 +118,7 @@ fun boxBlurT(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, 
 }
 
 @fastcall fun
-boxBlurH(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, radius: UInt8) {
+boxBlurH(source Bitmap32, target Bitmap32, width UInt16, height UInt16, radius UInt8) {
 	var iarr Float = 1.0 / (radius + radius + 1)
 	for i in height {
 		var ti UInt32 = i * width
@@ -179,7 +179,7 @@ boxBlurH(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, radi
 	}
 }
 
-fun boxBlur(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, radius: UInt8) {
+fun boxBlur(source Bitmap32, target Bitmap32, width UInt16, height UInt16, radius UInt8) {
 	for i in source.width * source.height {
 		target.pixels[i].ref.color = source.pixels[i].ref.color
 	}
@@ -187,7 +187,7 @@ fun boxBlur(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, r
 	boxBlurT(source, target, width, height, radius)
 }
 
-fun boxesForGauss(sigma: Float, n: UInt8) ArrayPointer<UInt8> {
+fun boxesForGauss(sigma Float, n UInt8) ArrayPointer<UInt8> {
 	// TODO show "Incompatible types FOR ARGUMENT NAME"
 	var wIdeal Float32 = sqrt((12.0f32 * sigma * sigma / n as! Float32) + 1.0f32) // Ideal averaging filter width
 	// TODO show "Incompatible types ASSIGNED TO VAR NAME"
@@ -198,7 +198,7 @@ fun boxesForGauss(sigma: Float, n: UInt8) ArrayPointer<UInt8> {
 	var wu UInt8 = wl + 2u8
 
 	var mIdeal Float = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
- 	fun round(x: Float) {
+ 	fun round(x Float) {
 		return ((x) >= 0 ? (((x) + 0.5) as! Int64) : (((x)-0.5) as! Int64))
 	}
 	var m Int8 = round(mIdeal) as! Int8
@@ -210,7 +210,7 @@ fun boxesForGauss(sigma: Float, n: UInt8) ArrayPointer<UInt8> {
 	return sizes
 }
 
-fun gaussBlur(bitmap: Bitmap32, radius: Float) Bitmap32 {
+fun gaussBlur(bitmap Bitmap32, radius Float) Bitmap32 {
 	var target Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
 
 	var boxes ArrayPointer<UInt8> = boxesForGauss(radius, 3)
@@ -224,7 +224,7 @@ fun gaussBlur(bitmap: Bitmap32, radius: Float) Bitmap32 {
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
 @fastcall fun
-interpolatePixel(bitmap: Bitmap32, x: Float32, y: Float32) ByValue<PixelRGBAData> {
+interpolatePixel(bitmap Bitmap32, x Float32, y Float32) ByValue<PixelRGBAData> {
 	let px UInt16 = x as! UInt16 // Same as floor(x)
 	let py UInt16 = y as! UInt16 // Same as floor(y)
 	let stride UInt16 = bitmap.width as! UInt16
@@ -235,22 +235,22 @@ interpolatePixel(bitmap: Bitmap32, x: Float32, y: Float32) ByValue<PixelRGBAData
 	// Calculate the weights
 	let fx Float32 = x - px
 	let fy Float32 = y - py
-	let fx1: Float32 = 1.0f32 - fx
-	let fy1: Float32 = 1.0f32 - fy
+	let fx1 Float32 = 1.0f32 - fx
+	let fy1 Float32 = 1.0f32 - fy
 
-	let w1: UInt32 = fx1 * fy1 * 256u32
-	let w2: UInt32 = fx * fy1 * 256u32
-	let w3: UInt32 = fx1 * fy * 256u32
-	let w4: UInt32 = fx * fy * 256u32
+	let w1 UInt32 = fx1 * fy1 * 256u32
+	let w2 UInt32 = fx * fy1 * 256u32
+	let w3 UInt32 = fx1 * fy * 256u32
+	let w4 UInt32 = fx * fy * 256u32
 
 	var resultValue = new ByValue<PixelRGBAData>()
 	var result = resultValue.ref
 
 	// Neighboring pixels
-	let p1: PixelRGBAData = p0[0].ref
-	let p2: PixelRGBAData = p0[1].ref
-	let p3: PixelRGBAData = p0[stride].ref
-	let p4: PixelRGBAData = p0[1 + stride].ref
+	let p1 PixelRGBAData = p0[0].ref
+	let p2 PixelRGBAData = p0[1].ref
+	let p3 PixelRGBAData = p0[stride].ref
+	let p4 PixelRGBAData = p0[1 + stride].ref
 
 	// Weighted sum of pixels
 	result.r = (p1.r * w1 + p2.r * w2 + p3.r * w3 + p4.r * w4) >> 8u8

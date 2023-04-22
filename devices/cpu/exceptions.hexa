@@ -25,9 +25,9 @@ fun kernelThreadLoop() {
 	}
 }
 
-fun exceptionHandler(frame: InterruptFrame) {
+fun exceptionHandler(frame InterruptFrame) {
 	// Page fault
-	@volatile var cr2: UInt64 = 0
+	@volatile var cr2 UInt64 = 0
 	if frame.index == 0x0E {
 		cr2 = getCr2()
 	}

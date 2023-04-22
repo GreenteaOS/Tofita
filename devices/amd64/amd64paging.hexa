@@ -19,9 +19,9 @@
 let addressBits = 12
 
 // TODO remove this
-@aligned(4096) var pml4entries: ArrayPointer<ByValue<PageEntry>> = null as! ArrayPointer<ByValue<PageEntry>>
+@aligned(4096) var pml4entries ArrayPointer<ByValue<PageEntry>> = null as! ArrayPointer<ByValue<PageEntry>>
 
-fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
+fun mapPage(entry PageEntry, address UInt64, writeAllowed UInt8) {
 	entry.address = address >> addressBits
 	entry.present = 1
 	entry.writeAllowed = (writeAllowed == 1) ? 1u8 : 0u8 // TODO simply Bool
@@ -30,7 +30,7 @@ fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
 	entry.accessibleByAll = 1
 }
 
-fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8) ArrayPointer<ByValue<PageEntry>> {
+fun referOrCreatePage(table ArrayPointer<ByValue<PageEntry>>, entryId UInt64, writeAllowed UInt8) ArrayPointer<ByValue<PageEntry>> {
 	let entry PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
@@ -53,38 +53,38 @@ class PageAddressView {
 	@bits(9) var pt UInt64 = 0
 	@bits(9) var pd UInt64 = 0
 	@bits(9) var pdpt UInt64 = 0
-	@bits(9) var pml4: UInt64 = 0
+	@bits(9) var pml4 UInt64 = 0
 	@bits(16) var padding UInt64 = 0
 	// new () // TODO
 }
 
-fun getPageAddressView(virtualAddr: UInt64) ByValue<PageAddressView> {
+fun getPageAddressView(virtualAddr UInt64) ByValue<PageAddressView> {
 	return virtualAddr as! ByValue<PageAddressView>
 }
 
 // TODO handle huge pages returned from bootloader
-fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
+fun mapPT(pt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, writeAllowed UInt8) {
 	let view = getPageAddressView(virtualAddr)
 	let entry PageEntry = pt[view.ref.pt].ref
 	mapPage(entry, physicalAddr, writeAllowed)
 }
 
-fun mapPD(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8) Void {
+fun mapPD(pd ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
+							writeAllowed UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pt = referOrCreatePage(pd, view.ref.pd, writeAllowed)
 	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPDPT(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8) Void {
+fun mapPDPT(pdpt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
+							writeAllowed UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pd = referOrCreatePage(pdpt, view.ref.pdpt, writeAllowed)
 	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
 }
 
-fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8) Void {
+fun mapPML4(pml4 ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
+							writeAllowed UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pdpt = referOrCreatePage(pml4, view.ref.pml4, writeAllowed)
 	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
@@ -94,7 +94,7 @@ fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physica
 }
 
 // Returns actual physical address from virtual address
-fun resolveAddr(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64) UInt64 {
+fun resolveAddr(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64) UInt64 {
 	// TODO unsupported by C `let linear = getPageAddressView(virtualAddr).ref`
 	let linear = getPageAddressView(virtualAddr)
 	let linear = linear.ref // TODO better idea
@@ -133,7 +133,7 @@ fun resolveAddr(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt
 // TODO ^ same clang warning
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
-fun mapMemory(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
+fun mapMemory(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, pageCount UInt32) {
 	serialPrintln("[paging] mapping memory range")
 
 	var virtualAddrEnd UInt64 = virtualAddr + pageCount * pageSize
@@ -173,7 +173,7 @@ fun mapMemory(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64
 
 // Unmaps pages without actually deallocating them, still deallocates unused page tables
 // (page tables are managed only and only here anyway)
-fun unmapMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: UInt32) {
+fun unmapMemory(pml4entries PageEntry, virtualAddr UInt64, pageCount UInt32) {
 	// TODO do NOT unmap reserved pages, i.e. wholePhysicalStart and upper half region!
 	// TODO probably special shared buffer allocator+mapper which uses linked list
 	// way upper than wholePhysicalStart limit
@@ -181,7 +181,7 @@ fun unmapMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: UInt32) 
 }
 
 // Completely unmaps and deallocates pages and page tables
-fun unmapAndFreeMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: UInt32) {
+fun unmapAndFreeMemory(pml4entries PageEntry, virtualAddr UInt64, pageCount UInt32) {
 	// TODO resolve and dealloc pages
 	unmapMemory(pml4entries, virtualAddr, pageCount)
 }
@@ -189,7 +189,7 @@ fun unmapAndFreeMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: U
 // Upper half
 // Just makes a copy of upper half's PML4,
 // because it is always the same between processes
-fun copyKernelMemoryMap(pml4source: ArrayPointer<ByValue<PageEntry>>, pml4destination: ArrayPointer<ByValue<PageEntry>>) {
+fun copyKernelMemoryMap(pml4source ArrayPointer<ByValue<PageEntry>>, pml4destination ArrayPointer<ByValue<PageEntry>>) {
 	var i UInt32 = 255 // TODO validate that this is where upper half starts
 	let pageTableEntriesCount = 512u64
 
@@ -200,7 +200,7 @@ fun copyKernelMemoryMap(pml4source: ArrayPointer<ByValue<PageEntry>>, pml4destin
 }
 
 // Creates new PML4 for new process
-fun newCR3(pml4source: ArrayPointer<ByValue<PageEntry>>) ArrayPointer<ByValue<PageEntry>> {
+fun newCR3(pml4source ArrayPointer<ByValue<PageEntry>>) ArrayPointer<ByValue<PageEntry>> {
 	var pml4result = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>
 	if pml4result != null {
 		copyKernelMemoryMap(pml4source, pml4result)
@@ -208,15 +208,15 @@ fun newCR3(pml4source: ArrayPointer<ByValue<PageEntry>>) ArrayPointer<ByValue<Pa
 	return pml4result
 }
 
-fun freeCR3(pml4: PageEntry) Void {
+fun freeCR3(pml4 PageEntry) Void {
 	// TODO deallocate full lower half
 }
 
 // Lower half
 // TODO protection ring
 // TODO lower half limit bounds check (it is less than upper starting range)
-fun mapUserspaceMemory(pml4entries: PageEntry, virtualAddr: UInt64, physicalAddr: UInt64,
-							pageCount: UInt32) {}
+fun mapUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, physicalAddr UInt64,
+							pageCount UInt32) {}
 
 // Same as VirtualAlloc
 // TODO protection ring
@@ -225,7 +225,7 @@ fun mapUserspaceMemory(pml4entries: PageEntry, virtualAddr: UInt64, physicalAddr
 // Decides automatically where to allocate
 // if virtualAddr == 0
 // Note: also allocates physical pages, i.e consumes extra memory
-fun allocUserspaceMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: UInt32) {}
+fun allocUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, pageCount UInt32) {}
 
 // TODO protection ring
 // TODO respect WoW limits
@@ -235,10 +235,10 @@ fun allocUserspaceMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount:
 // Does NOT allocate physical memory for the requested range
 // Returns 0 if requested pointer is occupied
 fun findUserspaceMemory(
-	pml4entries: ArrayPointer<ByValue<PageEntry>>,
-	virtualAddr: UInt64,
-	pageCount: UInt32,
-	limits: AddressAwareness
+	pml4entries ArrayPointer<ByValue<PageEntry>>,
+	virtualAddr UInt64,
+	pageCount UInt32,
+	limits AddressAwareness
 ) UInt64 {
 	let upperBound = 0x7FFFFFFFFFFFu64
 

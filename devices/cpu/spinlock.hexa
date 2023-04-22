@@ -17,14 +17,14 @@
 
 @rename('__sync_bool_compare_and_swap')
 declare fun __sync_bool_compare_and_swap(
-	ptr: ArrayPointer<UInt32>,
-	compVal: UInt32,
-	exchVal: UInt32
+	ptr ArrayPointer<UInt32>,
+	compVal UInt32,
+	exchVal UInt32
 ) Bool
 
 @rename('__sync_lock_release')
 declare fun __sync_lock_release(
-	ptr: ArrayPointer<UInt32>
+	ptr ArrayPointer<UInt32>
 ) Void
 
 @struct @sizeOf(4)

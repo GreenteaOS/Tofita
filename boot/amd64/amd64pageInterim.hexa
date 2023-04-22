@@ -58,7 +58,7 @@ class PageEntry {
 	@bits(40) var address UInt64
 
 	/// AVL: Not used by the processor
-	@bits(7) var metadata2: UInt64
+	@bits(7) var metadata2 UInt64
 
 	/// PK: Protection Key
 	@bits(4) var protectionKey UInt64

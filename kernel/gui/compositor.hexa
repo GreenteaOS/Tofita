@@ -24,9 +24,9 @@ var vibranceLight Bitmap32 = null // Size of framebuffer
 var vibranceDark Bitmap32 = null // Size of framebuffer
 var leaves Bitmap32 = null
 var trashCan Bitmap32 = null
-var notepad16: Bitmap32 = null
-var notepad48: Bitmap32 = null
-var app16: Bitmap32 = null
+var notepad16 Bitmap32 = null
+var notepad48 Bitmap32 = null
+var app16 Bitmap32 = null
 var link Bitmap32 = null
 var cur Cursor = null
 var darkTheme Bool = true
@@ -39,7 +39,7 @@ enum WallpaperStyle : UInt8 {
 	// TODO more options
 }
 
-fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: Bool = true) {
+fun setWallpaper(bitmap Bitmap32, style WallpaperStyle, preserveAspectRatio Bool = true) {
 	var bitmap = bitmap
 
 	{
@@ -182,7 +182,7 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: B
 	vibranceLight = upscaleLight
 }
 
-fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, dark: Bool = true) {
+fun drawVibrancedRectangle(x Int16, y Int16, width UInt16, height UInt16, dark Bool = true) {
 	let vibrance = dark ? vibranceDark : vibranceLight // Avoit non-register global access
 	for yy in height {
 		for xx in width {
@@ -307,7 +307,7 @@ fun requestAnimationFrame() {
 	haveToRender = true
 }
 
-fun composite(startupMilliseconds: UInt64) {
+fun composite(startupMilliseconds UInt64) {
 	let mouseX = mouseX
 	let mouseY = mouseY
 
@@ -500,7 +500,7 @@ fun initCursorBackplate() {
 }
 
 /// Copy current framebuffer into cache
-fun invalidateCursorBackplate(x: UInt16, y: UInt16) {
+fun invalidateCursorBackplate(x UInt16, y UInt16) {
 	cursorBackplateX = x
 	cursorBackplateY = y
 
@@ -526,7 +526,7 @@ fun drawCursorBackplate() {
 	}
 }
 
-fun drawCursor(cur: Cursor, x: UInt16, y: UInt16) {
+fun drawCursor(cur Cursor, x UInt16, y UInt16) {
 	// TODO mirror cursor in this code if global setting for cursors mirroring is set
 	// to affect all apps
 	let pixel = new ByValue<Pixel32>()

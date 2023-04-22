@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun processInit(process: TofitaProcess) {
+fun processInit(process TofitaProcess) {
 	process.pml4 = newCR3(processes[0].pml4)
 	process.schedulable = false // Not yet ready
 	process.scheduleOnNextTick = false // Prevent DoS attack
@@ -62,7 +62,7 @@ fun processCreate() TofitaProcess {
 // Note: supposedly 10.000 system-wise
 let messagesBufferSize UInt64 = 256 // TODO better idea
 
-fun getOrCreateMessagesBuffer(@volatile process: TofitaProcess): /*TODO wapi.*/[Msg]? {
+fun getOrCreateMessagesBuffer(@volatile process TofitaProcess): /*TODO wapi.*/[Msg]? {
 	if process.messages == null {
 		process.messages = []
 		process.messagesUsed = 0
@@ -84,7 +84,7 @@ fun getOrCreateMessagesBuffer(@volatile process: TofitaProcess): /*TODO wapi.*/[
 }
 
 // TODO make all this TofitaProcess class methods + @final
-fun postMessage(@volatile process: TofitaProcess, payload: PostMessagePayload) Bool {
+fun postMessage(@volatile process TofitaProcess, payload PostMessagePayload) Bool {
 	// TODO do not allocate messages queue if no windows and not awaits for them
 	let messages = getOrCreateMessagesBuffer(process)
 	if messages == null {
@@ -126,7 +126,8 @@ fun postMessage(@volatile process: TofitaProcess, payload: PostMessagePayload) B
 	return true
 }
 
-fun getMessage(@volatile process: TofitaProcess, payload: GetMessagePayload) Bool {
+
+fun getMessage(@volatile process TofitaProcess, payload GetMessagePayload) Bool {
 	// Do not allocate until needed
 	if process.messages == null {
 		return false
@@ -169,7 +170,7 @@ fun getMessage(@volatile process: TofitaProcess, payload: GetMessagePayload) Boo
 	return true
 }
 
-fun processDestroy(@volatile process: TofitaProcess) {
+fun processDestroy(@volatile process TofitaProcess) {
 	// TODO de-allocate stuff
 	process.present = false
 	process.messages = null

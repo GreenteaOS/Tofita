@@ -38,7 +38,7 @@ fun initText() {
 	textFontBitmap = loadPng32(font)
 }
 
-fun getLigatureAdvance(left: UInt8, right: UInt8) Int8 {
+fun getLigatureAdvance(left UInt8, right UInt8) Int8 {
 	if left == 0 {
 		return 0i8 // TODO i8
 	}
@@ -50,7 +50,7 @@ fun getLigatureAdvance(left: UInt8, right: UInt8) Int8 {
 	return 8i8
 }
 
-fun getCharAdvance(c: UInt8) Float {
+fun getCharAdvance(c UInt8) Float {
 	if textFontList == null {
 		return 8
 	}
@@ -60,7 +60,7 @@ fun getCharAdvance(c: UInt8) Float {
 	return textChar.width
 }
 
-fun getTextAdvance(text: String) UInt16 {
+fun getTextAdvance(text String) UInt16 {
 	var i UInt16 = 0
 	var xx Float = 0
 	let text = text.utf16() as! ConstArrayPointer<UInt16>
@@ -74,9 +74,9 @@ fun getTextAdvance(text: String) UInt16 {
 }
 
 	var textChar: TextFontList = textFontList[c as! Int].ref
+fun drawChar(c UInt8, x Float, y Int16, color Pixel32) Float {
 
 	var w: UInt8 = (textChar.width + 0.5) as! Int32 as! UInt8
-fun drawChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 	// TODO parses `let textChar: textChar.ref`
 	let xx: Int16 = (x + 0.5) as! Int32 as! Int16
 	let screenWidth = Screen.width
@@ -106,7 +106,7 @@ fun drawChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 	return textChar.width
 }
 
-fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
+fun drawAlphaChar(c UInt8, x Float, y Int16, color Pixel32) Float {
 	var textChar TextFontList = textFontList[c as! Int].ref
 
 	var xx Int16 = (x + 0.5) as! Int16
@@ -135,7 +135,7 @@ fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
 
 			let p = _pixels[aty * _framebuffer.width + atx]
-			let p: Pixel32 = p.ref
+			let p Pixel32 = p.ref
 			p.rgba.ref.r = blend255(p.rgba.ref.r, color.rgba.ref.r, font.rgba.ref.r)
 			p.rgba.ref.g = blend255(p.rgba.ref.g, color.rgba.ref.g, font.rgba.ref.g)
 			p.rgba.ref.b = blend255(p.rgba.ref.b, color.rgba.ref.b, font.rgba.ref.b)
@@ -161,7 +161,7 @@ fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 }
 
 /// Returns advance after last character
-fun drawAsciiText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
+fun drawAsciiText(text String, x Float, y Int16, color Pixel32) UInt16 {
 	var i UInt16 = 0
 	var xx Float = x
 	let text = text.utf16() as! ConstArrayPointer<ClangWideChar>
@@ -175,7 +175,7 @@ fun drawAsciiText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
 }
 
 /// Returns advance after last character
-fun drawText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
+fun drawText(text String, x Float, y Int16, color Pixel32) UInt16 {
 	var i UInt16 = 0
 	var xx Float = x
 	// TODO compare for `length` not `255 * 255`
@@ -192,7 +192,7 @@ fun drawText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
 }
 
 let digits [String] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-fun drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) UInt16 {
+fun drawIntegerText(value Int64, x Float, y Int16, color Pixel32) UInt16 {
 	var xx Float = x
 	var value = value as! Int
 
@@ -220,7 +220,7 @@ fun drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) UInt16 {
 	return (xx - x) as! UInt16 // TODO `round`
 }
 
-fun drawShadowText(text: String, x: Float, y: Int16) {
+fun drawShadowText(text String, x Float, y Int16) {
 	var i UInt16 = 0
 	var xx Float = x
 	var color = new ByValue<Pixel32>()

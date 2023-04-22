@@ -312,7 +312,7 @@ fun runTasks() {
 
 	if dllTask {
 		// DLL
-		fun buildDLLs(bit: String, arch: String) {
+		fun buildDLLs(bit String, arch String) {
 			for i in dlls.length {
 				// TODO per-32/64-arch
 				// TODO libgen txt list here, to .lib in phase 2
@@ -475,7 +475,7 @@ fun runTasks() {
 		let cmd = currentWave.shift()
 
 		if let cmd = cmd {
-			child_process.exec(cmd, fun(error: Bool?, stdout: String, stderr: String) {
+			child_process.exec(cmd, fun(error Bool?, stdout String, stderr String) {
 				if error != null {
 					console.log('[Build error] ' + cmd)
 					if '' != '' + stdout {

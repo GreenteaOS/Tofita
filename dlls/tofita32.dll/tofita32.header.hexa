@@ -19,35 +19,35 @@ let _fltused Int64 = 0
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 @convention('fastcall')
 // TODO ^ template substitution for var names in decorators by default
-declare fun tofitaFastSystemCall(rcx: TofitaSyscalls,
+declare fun tofitaFastSystemCall(rcx TofitaSyscalls,
 #if bit64
-	rdx: UInt64 = 0
+	rdx UInt64 = 0
 #else
-	rdx: UInt32 = 0
+	rdx UInt32 = 0
 #end
 ): #if bit64 UInt64 #else UInt32 #end
 // TODO link name + dll import
-@fastcall declare fun tofitaFastStub(rcx: UInt64, rdx: UInt64) UInt32
-@stdcall declare fun tofitaStdStub(arg: ConstArrayPointer<UInt8>) UInt32
+@fastcall declare fun tofitaFastStub(rcx UInt64, rdx UInt64) UInt32
+@stdcall declare fun tofitaStdStub(arg ConstArrayPointer<UInt8>) UInt32
 @dllImport @linkAsIs
-declare fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0) Void
+declare fun tofitaDebugLog(message ConstArrayPointer<ClangWideChar>, extra UInt64 = 0, more UInt64 = 0) Void
 
 // Kernel32
 @dllImport @linkAsIs
-declare fun tofitaExitProcess(exitCode: UInt32) Void
+declare fun tofitaExitProcess(exitCode UInt32) Void
 
 // User32
 @dllImport @linkAsIs
-declare fun tofitaCreateWindowEx(payload: CreateWindowExPayload) UInt64
+declare fun tofitaCreateWindowEx(payload CreateWindowExPayload) UInt64
 @dllImport @linkAsIs
-declare fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow) Void
+declare fun tofitaShowWindow(windowId UInt64, nCmdShow CmdShow) Void
 @dllImport @linkAsIs
-declare fun tofitaGetMessage(payload: GetMessagePayload) Bool32
+declare fun tofitaGetMessage(payload GetMessagePayload) Bool32
 @dllImport @linkAsIs
-declare fun tofitaPostMessage(payload: PostMessagePayload) Bool32
+declare fun tofitaPostMessage(payload PostMessagePayload) Bool32
 
 // NjRAA
 @dllImport @linkAsIs
-declare fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) Void
+declare fun njraaGetOrCreateWindowFramebuffer(windowId UInt64, fb WindowFramebuffer) Void
 @dllImport @linkAsIs
-declare fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) Void
+declare fun njraaSwapWindowFramebuffer(windowId UInt64, fb WindowFramebuffer) Void

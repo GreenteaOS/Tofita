@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun memzero(dest: ArrayPointer<UInt8>, len: UInt64) {
+fun memzero(dest ArrayPointer<UInt8>, len UInt64) {
 	memset(dest, 0, len)
 }
 
@@ -25,7 +25,7 @@ fun chkstkStub() Void {}
 @extern @rename('versionMinor') declare let versionMinor Int
 @extern @rename('versionTag') declare let versionTag Int
 
-fun kernelInit(params: UefiPayload) {
+fun kernelInit(params UefiPayload) {
 	serialPrintln("<Tofita> Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " kernel loaded and operational")
 	serialPrintf("<Tofita> CR3 points to: %8\n", params.pml4 as! UInt64)
 	// TODO `anyPtrOrObj as! UInt32` -> error precision lost on 64-bit

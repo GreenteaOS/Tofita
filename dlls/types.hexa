@@ -184,7 +184,7 @@ class Msg {
 }
 
 // TODO convention (actually may be any so must build universal call frame)
-declare WindowProcedure = (hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam) => LResult
+declare WindowProcedure = (hWnd HWnd, uMsg Message, wParam WParam, lParam LParam) => LResult
 
 @struct @sizeOf(72)
 class WindowClass {
@@ -197,7 +197,7 @@ class WindowClass {
 	var hCursor HCursor
 	var hbrBackground HBrush
 	var lpszMenuName ConstArrayPointer<ClangWideChar>
-	var utf16zClassName: ConstArrayPointer<ClangWideChar>
+	var utf16zClassName ConstArrayPointer<ClangWideChar>
 	new () {}
 }
 
