@@ -38,14 +38,14 @@ class TofitaProcess {
 	// TODO 32-bit
 
 	// State
-	var frame: InterruptFrame
+	var frame InterruptFrame
 
 	// Filled on #PF
 	@volatile var cr2PageFaultAddress: UInt64
 
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
-	@volatile var syscallToHandle: @volatile TofitaSyscalls // = Noop if no actions required
+	@volatile var syscallToHandle: TofitaSyscalls // = Noop if no actions required
 													  // TODO do this on per-thread basis
 
 	// TODO separate syscall arguments, cause they differ in 32-bit
@@ -53,9 +53,9 @@ class TofitaProcess {
 	// oh probably
 
 	// Ring buffer
-	var messages: [Msg]
-	var messagesUsed: UInt64
-	var awaitsGetMessage: Bool
+	var messages [Msg]
+	var messagesUsed UInt64
+	var awaitsGetMessage Bool
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
 
 	// 32-bit

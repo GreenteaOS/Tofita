@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,13 +13,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun validateLnk(data: ConstArrayPointer<UInt8>, bytes: UInt64): Bool {
+fun validateLnk(data ConstArrayPointer<UInt8>, bytes UInt64) Bool {
 	if bytes < sizeOf<Lnk>() {
 		return false
 	}
+
 	let lnk = data as! Lnk
 	if lnk.magucka != magic {
 		return false
 	}
+
 	return true
 }

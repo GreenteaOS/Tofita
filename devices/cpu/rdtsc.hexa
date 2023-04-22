@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -17,4 +17,4 @@
 
 // 123 // TODO constant\ident cannot be top level expr
 @rename('rdtscTicks')
-declare fun rdtscTicks(@volatile result: ArrayPointer<UInt64>): Void
+declare fun rdtscTicks(@volatile result ArrayPointer<UInt64>) Void

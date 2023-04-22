@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,16 +16,16 @@
 @struct
 @packed
 class Bitmap32Interim {
-	var width: UInt32
-	var height: UInt32
-	var pixels: ArrayPointer<ByValue<Pixel32>>
+	var width UInt32
+	var height UInt32
+	var pixels ArrayPointer<ByValue<Pixel32>>
 }
 
 @struct
 @packed
 class Bitmap32 {
-	let width: UInt32
-	let height: UInt32
+	let width UInt32
+	let height UInt32
 	// TODO let
-	var pixels: ArrayPointer<ByValue<Pixel32>>
+	var pixels ArrayPointer<ByValue<Pixel32>>
 }

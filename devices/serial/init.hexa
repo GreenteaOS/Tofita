@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,21 +15,21 @@
 
 // Based on https://gitlab.com/nagisa/huehuehuehuehue/blob/master/src/serial.c
 
-fun initSerial(): UInt8 {
+fun initSerial() UInt8 {
 	// Calculate divisor for baud generator
 	//    Ref_Clk_Rate / Baud_Rate / 16
-	var divisor: UInt32 = serial_clock_rate / (serial_baud_rate * 16u32)
+	var divisor UInt32 = serial_clock_rate / (serial_baud_rate * 16u32)
 	if (serial_clock_rate % (serial_baud_rate * 16)) >= serial_baud_rate * 8 {
 		divisor++
 	}
 	// See if the serial port is already initialized
-	var initialized: Bool = true
+	var initialized Bool = true
 	if (readSerialRegister(r_uart_lcr) & 0x3F) != (serial_line_control & 0x3F) {
 		initialized = false
 	}
 	// Calculate current divisor
 	writeSerialRegister(r_uart_lcr, readSerialRegister(r_uart_lcr) | b_uart_lcr_dlab)
-	var currentDivisor: UInt32 = readSerialRegister(r_uart_baud_high) << 8u32
+	var currentDivisor UInt32 = readSerialRegister(r_uart_baud_high) << 8u32
 	currentDivisor |= readSerialRegister(r_uart_baud_low) as! UInt32
 	writeSerialRegister(r_uart_lcr, readSerialRegister(r_uart_lcr) & ~b_uart_lcr_dlab)
 	// Fast path

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,18 +18,18 @@
 
 @struct
 class Module {
-	var name: ArrayPointer<ClangChar>
-	var dll: RamDiskAsset
-	var base: UInt64
+	var name ArrayPointer<ClangChar>
+	var dll RamDiskAsset
+	var base UInt64
 }
 
 @struct
 class ModuleInterim {
-	var name: ArrayPointer<ClangChar>
-	var dll: RamDiskAsset
+	var name ArrayPointer<ClangChar>
+	var dll RamDiskAsset
 }
 
-fun loadModule(params: ModuleInterim): Module {
+fun loadModule(params ModuleInterim) Module {
 	var module = PhysicalAllocator.allocateBytes(sizeOf<Module>()) as! Module // TODO new Module
 	module.name = params.name // TODO copy string
 	module.dll = params.dll
@@ -56,7 +56,7 @@ fun loadModule(params: ModuleInterim): Module {
 			imageSectionHeader.name,
 			imageSectionHeader.sizeOfRawData
 		)
-		var where: UInt64 = (base as! UInt64) + imageSectionHeader.virtualAddress
+		var where UInt64 = (base as! UInt64) + imageSectionHeader.virtualAddress
 
 		tmemcpy(where as! ArrayPointer<UInt8>,
 				((params.dll.data as! UInt64) + (imageSectionHeader.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,

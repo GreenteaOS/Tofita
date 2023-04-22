@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,14 +14,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 @dllExport('ExitProcess')
-fun exitProcess(exitCode: UInt32) {
+fun exitProcess(exitCode UInt32) {
 	tofitaExitProcess(exitCode)
 	// TODO jump to NtDLL or something
 	while true {}
 }
 
 @dllExport('LocalAlloc')
-fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal {
+fun localAlloc(flags UInt32, bytes SizeOfPointer) HLocal {
 	// TODO better way to take pointer to array element `&buffer[bufferOffset]`
 	var result = (buffer as! UInt64) + bufferOffset
 	bufferOffset += bytes as! UInt64 // TODO .toInt()
@@ -39,19 +39,19 @@ fun localAlloc(flags: UInt32, bytes: SizeOfPointer): HLocal {
 }
 
 @dllExport('GlobalAlloc')
-fun globalAlloc(flags: UInt32, bytes: SizeOfPointer): HGlobal {
+fun globalAlloc(flags UInt32, bytes SizeOfPointer) HGlobal {
 	return localAlloc(0, bytes) as! HGlobal
 }
 
 @dllExport('HeapAlloc')
-fun heapAlloc(heap: Handle, flags: UInt32, bytes: SizeOfPointer): ArrayPointer<UInt8> {
+fun heapAlloc(heap Handle, flags UInt32, bytes SizeOfPointer) ArrayPointer<UInt8> {
 	return localAlloc(0, bytes) as! ArrayPointer<UInt8>
 }
 
 @dllExport('free')
-fun free(pointer: SizeOfPointer): Void {
+fun free(pointer SizeOfPointer) Void {
 	// TODO
 }
 
 // TODO @linkName('_DllMainCRTStartup')
-@fastcall fun _DllMainCRTStartup(): Void {}
+@fastcall fun _DllMainCRTStartup() Void {}

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,18 +14,18 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // trampoline.asm -> incbin
-@extern @rename('binFont') declare let binFont: ConstArrayPointer<UInt8>
-@extern @rename('binFontBitmap') declare let binFontBitmap: ConstArrayPointer<UInt8>
-let fontWidth: UInt32 = 512
-let fontHeight: UInt32 = 32
+@extern @rename('binFont') declare let binFont ConstArrayPointer<UInt8>
+@extern @rename('binFontBitmap') declare let binFontBitmap ConstArrayPointer<UInt8>
+let fontWidth UInt32 = 512
+let fontHeight UInt32 = 32
 
-@extern @rename('binLeavesBitmap') declare let binLeavesBitmap: ConstArrayPointer<UInt8>
-let leavesWidth: UInt32 = 36
-let leavesHeight: UInt32 = 25
+@extern @rename('binLeavesBitmap') declare let binLeavesBitmap ConstArrayPointer<UInt8>
+let leavesWidth UInt32 = 36
+let leavesHeight UInt32 = 25
 
-let _fltused: Int64 = 0
+let _fltused Int64 = 0
 
-fun drawPixel(framebuffer: FrameBuffer, x: UInt32, y: UInt32, color: UInt32) {
+fun drawPixel(framebuffer FrameBuffer, x UInt32, y UInt32, color UInt32) {
 	var pixels = framebuffer.base as! ArrayPointer<UInt32>
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
 }
@@ -33,16 +33,16 @@ fun drawPixel(framebuffer: FrameBuffer, x: UInt32, y: UInt32, color: UInt32) {
 @struct @packed @sizeOf(4)
 @stack
 class UefiPixel {
-	var b: UInt8
-	var g: UInt8
-	var r: UInt8
-	var a: UInt8
+	var b UInt8
+	var g UInt8
+	var r UInt8
+	var a UInt8
 }
 
-fun getBitmapPixel(bmp: ConstArrayPointer<UInt8>, x: UInt32, y: UInt32, width: UInt32, height: UInt32): UInt32 {
+fun getBitmapPixel(bmp ConstArrayPointer<UInt8>, x UInt32, y UInt32, width UInt32, height UInt32) UInt32 {
 	let bmpHeaderSize = 54u64
-	let colors: ConstArrayPointer<UInt8> = (bmp as! UInt64 + bmpHeaderSize) as! ConstArrayPointer<UInt8>
-	var pixel: ByValue<UefiPixel> = new ByValue<UefiPixel>()
+	let colors ConstArrayPointer<UInt8> = (bmp as! UInt64 + bmpHeaderSize) as! ConstArrayPointer<UInt8>
+	var pixel ByValue<UefiPixel> = new ByValue<UefiPixel>()
 	pixel.ref.b = colors[((height - y - 1) * width + x) * 3 + 0]
 	pixel.ref.g = colors[((height - y - 1) * width + x) * 3 + 1]
 	pixel.ref.r = colors[((height - y - 1) * width + x) * 3 + 2]
@@ -55,9 +55,9 @@ fun getBitmapPixel(bmp: ConstArrayPointer<UInt8>, x: UInt32, y: UInt32, width: U
 
 @struct @packed @sizeOf(12)
 class TextFontList {
-	var x: UInt16
-	var y: UInt16
-	var width: Float
+	var x UInt16
+	var y UInt16
+	var width Float
 }
 
 var textFontList = null as! ArrayPointer<ByValue<TextFontList>>
@@ -67,23 +67,23 @@ fun initText() {
 	textFontList = binFont as! ArrayPointer<ByValue<TextFontList>> // TODO as! _
 }
 
-fun getCharAdvance(c: UInt8) {
-	var textChar: TextFontList = textFontList[c as! UInt64].ref
+fun getCharAdvance(c UInt8) {
+	var textChar TextFontList = textFontList[c as! UInt64].ref
 	return textChar.width
 }
 
-fun drawChar(c: UInt8, x: Float, y: Int16, framebuffer: FrameBuffer) {
-	var textChar: TextFontList = textFontList[c as! UInt64].ref
+fun drawChar(c UInt8, x Float, y Int16, framebuffer FrameBuffer) {
+	var textChar TextFontList = textFontList[c as! UInt64].ref
 
-	var xx: Int16 = (x + 0.5) as! Int32 as! Int16
-	var w: UInt16 = (textChar.width + 0.5) as! Int32 as! UInt16
+	var xx Int16 = (x + 0.5) as! Int32 as! Int16
+	var w UInt16 = (textChar.width + 0.5) as! Int32 as! UInt16
 
-	var yi: UInt16 = 0
+	var yi UInt16 = 0
 	while yi < 12 {
-		var xi: UInt16 = 0
+		var xi UInt16 = 0
 		while xi < w {
-			let atx: UInt32 = xx + xi
-			let aty: UInt32 = y + yi
+			let atx UInt32 = xx + xi
+			let aty UInt32 = y + yi
 
 			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight)
 
@@ -98,19 +98,19 @@ fun drawChar(c: UInt8, x: Float, y: Int16, framebuffer: FrameBuffer) {
 	return textChar.width
 }
 
-fun drawText(text: String, y: Int16, framebuffer: FrameBuffer) {
-	let text: ConstArrayPointer<ClangWideChar> = text.utf16()
-	var i: UInt16 = 0
+fun drawText(text String, y Int16, framebuffer FrameBuffer) {
+	let text ConstArrayPointer<ClangWideChar> = text.utf16()
+	var i UInt16 = 0
 
 	// Get width to center text on screen
-	var width: Float = 0
+	var width Float = 0
 
 	while (text[i] as! UInt16) != 0 && i < 255 * 255 {
 		width += getCharAdvance((text[i] as! UInt16) & 0xFF as! UInt8)
 		i++
 	}
 
-	var xx: Float = (framebuffer.width / 2) - (width / 2)
+	var xx Float = (framebuffer.width / 2) - (width / 2)
 
 	i = 0
 	while (text[i] as! UInt16) != 0 && i < 255 * 255 {
@@ -120,7 +120,7 @@ fun drawText(text: String, y: Int16, framebuffer: FrameBuffer) {
 }
 
 // Loading animation, progress 0...2
-fun drawLoading(framebuffer: FrameBuffer, progress: UInt8) {
+fun drawLoading(framebuffer FrameBuffer, progress UInt8) {
 	for y in leavesHeight {
 		for x in leavesWidth {
 			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
@@ -132,8 +132,8 @@ fun drawLoading(framebuffer: FrameBuffer, progress: UInt8) {
 	}
 }
 
-fun drawCleanup(y: Int16, framebuffer: FrameBuffer) {
-	let leftOrigin: Int16 = (framebuffer.width / 2) - 128i16
+fun drawCleanup(y Int16, framebuffer FrameBuffer) {
+	let leftOrigin Int16 = (framebuffer.width / 2) - 128i16
 
 	for yy in 31u16 {
 		for x in 256u16 {
@@ -142,15 +142,15 @@ fun drawCleanup(y: Int16, framebuffer: FrameBuffer) {
 	}
 }
 
-var errorY: Int16 = 0
-fun drawError(text: String, framebuffer: FrameBuffer) {
+var errorY Int16 = 0
+fun drawError(text String, framebuffer FrameBuffer) {
 	drawCleanup(errorY, framebuffer)
 	drawText(text, errorY, framebuffer)
 }
 
 // TODO outline infer `true` (for let) or `Bool` (for var)
 let verbose = true
-fun drawVerbose(text: String, framebuffer: FrameBuffer) {
+fun drawVerbose(text String, framebuffer FrameBuffer) {
 	drawCleanup(errorY + 32i16, framebuffer)
 	drawText(text, errorY + 32i16, framebuffer)
 	// TODO also to COM

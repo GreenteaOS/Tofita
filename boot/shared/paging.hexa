@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-fun getNextDescriptor(descriptor: @readonly EFI_MEMORY_DESCRIPTOR, descriptorSize: UInt64) {
+fun getNextDescriptor(@readonly descriptor: EFI_MEMORY_DESCRIPTOR, descriptorSize: UInt64) {
 	let desc = (descriptor as! UInt64) + descriptorSize
 	return desc as! @readonly EFI_MEMORY_DESCRIPTOR
 }
@@ -114,8 +114,8 @@ fun conventionalAllocateNext(bytes: UInt64): UInt64 {
 	return result
 }
 
-fun mapFrameBuffer(fb: @readonly FrameBuffer) {
 	// TODO map with hugepages!!!
+fun mapFrameBuffer(@readonly fb: FrameBuffer) {
 	// TODO map ALL with EPIC pages?
 	mapMemory(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u64, 1u8)
 }

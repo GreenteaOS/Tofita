@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,51 +13,52 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-let magic: UInt32 = 0x0000004C
-var cls: ArrayByValue<UInt8, 16> = [0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46]
+let magic UInt32 = 0x0000004C
+var cls ArrayByValue<UInt8, 16> = [0, 0x02, 0x14, 0x01, 0, 0, 0, 0, 0xC0, 0, 0, 0, 0, 0, 0, 0x46]
 
+// TODO `let`
 @packed @struct @sizeOf(4)
 class LnkFlags {
-	@bits(1) var shellItemIdListIsPresent: UInt8
-	@bits(1) var pointsToFileOrDirectory: UInt8
-	@bits(1) var hasDescription: UInt8
-	@bits(1) var hasRelativePath: UInt8
-	@bits(1) var hasWorkingDirectory: UInt8
-	@bits(1) var hasCommandLineArguments: UInt8
-	@bits(1) var hasCustomIcon: UInt8
-	@bits(25) var padding: UInt32
+	@bits(1) var shellItemIdListIsPresent UInt8
+	@bits(1) var pointsToFileOrDirectory UInt8
+	@bits(1) var hasDescription UInt8
+	@bits(1) var hasRelativePath UInt8
+	@bits(1) var hasWorkingDirectory UInt8
+	@bits(1) var hasCommandLineArguments UInt8
+	@bits(1) var hasCustomIcon UInt8
+	@bits(25) var padding UInt32
 }
 
 @packed @struct @sizeOf(4)
 class LnkAttributes {
-	@bits(1) var readOnly: UInt8
-	@bits(1) var hidden: UInt8
-	@bits(1) var systemFile: UInt8
-	@bits(1) var volumeLabel: UInt8
-	@bits(1) var directory: UInt8
-	@bits(1) var targetArchiveChanged: UInt8
-	@bits(1) var encrypted: UInt8
-	@bits(1) var none: UInt8
-	@bits(1) var temporary: UInt8
-	@bits(1) var sparseFile: UInt8
-	@bits(1) var hasReparsePointData: UInt8
-	@bits(1) var compressed: UInt8
-	@bits(1) var offline: UInt8
-	@bits(19) var padding: UInt32
+	@bits(1) var readOnly UInt8
+	@bits(1) var hidden UInt8
+	@bits(1) var systemFile UInt8
+	@bits(1) var volumeLabel UInt8
+	@bits(1) var directory UInt8
+	@bits(1) var targetArchiveChanged UInt8
+	@bits(1) var encrypted UInt8
+	@bits(1) var none UInt8
+	@bits(1) var temporary UInt8
+	@bits(1) var sparseFile UInt8
+	@bits(1) var hasReparsePointData UInt8
+	@bits(1) var compressed UInt8
+	@bits(1) var offline UInt8
+	@bits(19) var padding UInt32
 }
 
 @packed @struct @sizeOf(0x0000004C)
 class Lnk {
-	var magucka: UInt32
-	var clus: ArrayByValue<UInt8, 16>
-	var flugs: LnkFlags
-	var atts: LnkAttributes
-	var timeOfCreation: UInt64
-	var timeOfModification: UInt64
-	var timeOfAccess: UInt64
-	var lengthOfTargetFileBytesOfLeastBits: UInt32
-	var iconIndex: UInt32
-	var showWund: UInt32
-	var hotKey: UInt16
-	var padding: ArrayByValue<UInt8, 10>
+	var magucka UInt32
+	var clus ArrayByValue<UInt8, 16>
+	var flugs LnkFlags
+	var atts LnkAttributes
+	var timeOfCreation UInt64
+	var timeOfModification UInt64
+	var timeOfAccess UInt64
+	var lengthOfTargetFileBytesOfLeastBits UInt32
+	var iconIndex UInt32
+	var showWund UInt32
+	var hotKey UInt16
+	var padding ArrayByValue<UInt8, 10>
 }

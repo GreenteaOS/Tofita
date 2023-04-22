@@ -255,7 +255,7 @@ fun kernelInit(params: UefiPayload) {
 @rename('__sync_synchronize')
 declare fun __sync_synchronize(): Void
 
-fun kernelMain(params: UefiPayload) {
+fun kernelMain(params UefiPayload) {
 	kernelInit(params)
 
 	// This is probably useless but looks cool

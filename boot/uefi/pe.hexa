@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,61 +16,62 @@
 // 1 byte aligned
 @struct @packed @sizeOf(24)
 class PeHeader {
-	var mMagic: UInt32 // PE\0\0 or 0x00004550
-	var mMachine: UInt16
-	var mNumberOfSections: UInt16
-	var mTimeDateStamp: UInt32
-	var mPointerToSymbolTable: UInt32
-	var mNumberOfSymbols: UInt32
-	var mSizeOfOptionalHeader: UInt16
-	var mCharacteristics: UInt16
+	var mMagic UInt32 // PE\0\0 or 0x00004550
+	var mMachine UInt16
+	var mNumberOfSections UInt16
+	var mTimeDateStamp UInt32
+	var mPointerToSymbolTable UInt32
+	var mNumberOfSymbols UInt32
+	var mSizeOfOptionalHeader UInt16
+	var mCharacteristics UInt16
 }
 
 // 1 byte aligned
 @struct @packed @sizeOf(112)
 class Pe32OptionalHeader {
-	var mMagic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	var mMajorLinkerVersion: UInt8
-	var mMinorLinkerVersion: UInt8
-	var mSizeOfCode: UInt32
-	var mSizeOfInitializedData: UInt32
-	var mSizeOfUninitializedData: UInt32
-	var mAddressOfEntryPoint: UInt32
-	var mBaseOfCode: UInt32
+	var mMagic UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	var mMajorLinkerVersion UInt8
+	var mMinorLinkerVersion UInt8
+	var mSizeOfCode UInt32
+	var mSizeOfInitializedData UInt32
+	var mSizeOfUninitializedData UInt32
+	var mAddressOfEntryPoint UInt32
+	var mBaseOfCode UInt32
 	// UInt32 mBaseOfData // present only in 32-bit
-	var mImageBase: UInt64 // UInt32 mImageBase
-	var mSectionAlignment: UInt32
-	var mFileAlignment: UInt32
-	var mMajorOperatingSystemVersion: UInt16
-	var mMinorOperatingSystemVersion: UInt16
-	var mMajorImageVersion: UInt16
-	var mMinorImageVersion: UInt16
-	var mMajorSubsystemVersion: UInt16
-	var mMinorSubsystemVersion: UInt16
-	var mWin32VersionValue: UInt32
-	var mSizeOfImage: UInt32
-	var mSizeOfHeaders: UInt32
-	var mCheckSum: UInt32
-	var mSubsystem: UInt16
-	var mDllCharacteristics: UInt16
-	var mSizeOfStackReserve: UInt64 // UInt32 mSizeOfStackReserve
-	var mSizeOfStackCommit: UInt64 // UInt32 mSizeOfStackCommit
-	var mSizeOfHeapReserve: UInt64 // UInt32 mSizeOfHeapReserve
-	var mSizeOfHeapCommit: UInt64 // UInt32 mSizeOfHeapCommit
-	var mLoaderFlags: UInt32
-	var mNumberOfRvaAndSizes: UInt32
+	var mImageBase UInt64 // UInt32 mImageBase
+	var mSectionAlignment UInt32
+	var mFileAlignment UInt32
+	var mMajorOperatingSystemVersion UInt16
+	var mMinorOperatingSystemVersion UInt16
+	var mMajorImageVersion UInt16
+	var mMinorImageVersion UInt16
+	var mMajorSubsystemVersion UInt16
+	var mMinorSubsystemVersion UInt16
+	var mWin32VersionValue UInt32
+	var mSizeOfImage UInt32
+	var mSizeOfHeaders UInt32
+	var mCheckSum UInt32
+	var mSubsystem UInt16
+	var mDllCharacteristics UInt16
+	var mSizeOfStackReserve UInt64 // UInt32 mSizeOfStackReserve
+	var mSizeOfStackCommit UInt64 // UInt32 mSizeOfStackCommit
+	var mSizeOfHeapReserve UInt64 // UInt32 mSizeOfHeapReserve
+	var mSizeOfHeapCommit UInt64 // UInt32 mSizeOfHeapCommit
+	var mLoaderFlags UInt32
+	var mNumberOfRvaAndSizes UInt32
 }
 
+// TODO all fields should be `let`
 @struct @packed @sizeOf(40)
 class ImageSectionHeader { // size 40 bytes
-	var mName: ArrayByValue<UInt8, 8>
-	var mVirtualSize: UInt32
-	var mVirtualAddress: UInt32
-	var mSizeOfRawData: UInt32
-	var mPointerToRawData: UInt32
-	var mPointerToRealocations: UInt32
-	var mPointerToLinenumbers: UInt32
-	var mNumberOfRealocations: UInt16
-	var mNumberOfLinenumbers: UInt16
-	var mCharacteristics: UInt32
+	var mName ArrayByValue<UInt8, 8>
+	var mVirtualSize UInt32
+	var mVirtualAddress UInt32
+	var mSizeOfRawData UInt32
+	var mPointerToRawData UInt32
+	var mPointerToReallocations UInt32
+	var mPointerToLineNumbers UInt32
+	var mNumberOfReallocations UInt16
+	var mNumberOfLineNumbers UInt16
+	var mCharacteristics UInt32
 }

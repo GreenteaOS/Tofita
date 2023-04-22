@@ -91,10 +91,10 @@ fun kstrlen(data: ConstArrayPointer<UInt8>) {
 }
 
 @rename('portInb')
-declare fun portInb(port: @volatile UInt16): UInt8
+declare fun portInb(@volatile port: UInt16): UInt8
 
 @rename('portOutb')
-declare fun portOutb(port: @volatile UInt16, value: @volatile UInt8): Void
+declare fun portOutb(@volatile port: UInt16, @volatile value: UInt8): Void
 
 fun readSerialRegister(offset: UInt16) {
 	return portInb(serial_register_base + offset * serial_register_stride)

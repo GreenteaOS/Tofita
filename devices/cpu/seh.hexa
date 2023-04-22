@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -48,7 +48,7 @@
 @volatile @noInline
 @rename('hexa_probeForReadOkay')
 declare
-fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool /*{
+fun probeForReadOkay(@volatile at UInt64, @volatile bytes UInt64) Bool /*{
 	sehProbe = true
 	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
@@ -62,8 +62,8 @@ fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool /*{
 	sehProbe = false
 	return true
 }*/
-//@volatile Bool (*@volatile const probeForReadOkay)(@volatile at: UInt64,
-//												 @volatile bytes: UInt64) = _probeForReadOkay
+//@volatile Bool (*@volatile const probeForReadOkay)(@volatile at UInt64,
+//												 @volatile bytes UInt64) = _probeForReadOkay
 
 @customHeader('
 	volatile bool __attribute__((noinline))
@@ -87,7 +87,7 @@ fun probeForReadOkay(@volatile at: UInt64, bytes: @volatile UInt64): Bool /*{
 ')
 @volatile @noInline
 @rename('hexa_probeForWriteOkay') declare
-fun probeForWriteOkay(@volatile at: UInt64, @volatile bytes: UInt64): Bool /*{
+fun probeForWriteOkay(@volatile at UInt64, @volatile bytes UInt64) Bool /*{
 	sehProbe = true
 	// TODO per-page not per-byte
 	@volatile let ptr = at as! @volatile ArrayPointer<UInt8>
@@ -99,8 +99,8 @@ fun probeForWriteOkay(@volatile at: UInt64, @volatile bytes: UInt64): Bool /*{
 	return true
 }*/
 
-//@volatile Bool (*@volatile const probeForWriteOkay)(@volatile at: UInt64,
-//												  @volatile bytes: UInt64) = _probeForWriteOkay
+//@volatile Bool (*@volatile const probeForWriteOkay)(@volatile at UInt64,
+//												  @volatile bytes UInt64) = _probeForWriteOkay
 // This is a fascinating way to not allow compiler to optimize return value
 //let probeForReadOkay = _probeForReadOkay
 //let probeForWriteOkay = _probeForWriteOkay
