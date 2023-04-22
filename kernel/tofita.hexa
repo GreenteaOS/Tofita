@@ -19,7 +19,7 @@ fun memzero(dest: ArrayPointer<UInt8>, len: UInt64) {
 
 @keep
 @rename('___chkstk_ms')
-fun chkstkStub(): Void {}
+fun chkstkStub() Void {}
 
 @extern @rename('versionMajor') declare let versionMajor: Int
 @extern @rename('versionMinor') declare let versionMinor: Int
@@ -253,7 +253,7 @@ fun kernelInit(params: UefiPayload) {
 }
 
 @rename('__sync_synchronize')
-declare fun __sync_synchronize(): Void
+declare fun __sync_synchronize() Void
 
 fun kernelMain(params UefiPayload) {
 	kernelInit(params)

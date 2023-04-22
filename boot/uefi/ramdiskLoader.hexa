@@ -17,7 +17,7 @@ fun loadRamDiskFromVolume(
 	bootsvc: EFI_BOOT_SERVICES,
 	root: EFI_FILE_PROTOCOL,
 	ramdisk: RamDisk
-): EFI_STATUS {
+) EFI_STATUS {
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] begin\n")
 	var name = "TOFITA.DAT"
 
@@ -104,7 +104,7 @@ fun loadRamDiskFromVolume(
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
 // ^ TODO encode this in the type itself or return `RamDisk?`
-fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk): EFI_STATUS {
+fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk) EFI_STATUS {
 	var status: EFI_STATUS = EFI_STATUS.EFI_NOT_READY
 	var handleBuffer: ArrayPointer<ByValue<EFI_HANDLE>> = null // TODO `= nullPtr`
 	var handleCount: UInt64 = 0

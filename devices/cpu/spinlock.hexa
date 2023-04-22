@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -20,12 +20,12 @@ declare fun __sync_bool_compare_and_swap(
 	ptr: ArrayPointer<UInt32>,
 	compVal: UInt32,
 	exchVal: UInt32
-): Bool
+) Bool
 
 @rename('__sync_lock_release')
 declare fun __sync_lock_release(
 	ptr: ArrayPointer<UInt32>
-): Void
+) Void
 
 @struct @sizeOf(4)
 class SpinLock {

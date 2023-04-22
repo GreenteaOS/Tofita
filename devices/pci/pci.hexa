@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,3 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // TODO read from ACPI table MCFG
+class McfgParser {
+    // TODO Parse into device tree and init devices with separate driver-loader
+}

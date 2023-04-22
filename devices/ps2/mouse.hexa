@@ -17,7 +17,7 @@
 
 @rename('mouseHandler')
 @linkName('mouseHandler')
-declare fun mouseHandler(): Void
+declare fun mouseHandler() Void
 
 enum MouseActionType : UInt8 {
 	Noop = 0
@@ -90,7 +90,7 @@ fun pushMouseAction(type: MouseActionType, mouseXdiff: Int16 = 0, mouseYdiff: In
 	}
 }
 
-fun getBit(byte: UInt8, bit: UInt8): UInt8 {
+fun getBit(byte: UInt8, bit: UInt8) UInt8 {
 	return (byte & (1 << bit)) >> bit
 }
 
@@ -267,7 +267,7 @@ fun mouseWrite(@volatile aWrite: UInt8) {
 	writePort(ps2_data_port, aWrite)
 }
 
-fun mouseRead(): UInt8 {
+fun mouseRead() UInt8 {
 	mouseWait(0)
 	return readPort(ps2_data_port)
 }

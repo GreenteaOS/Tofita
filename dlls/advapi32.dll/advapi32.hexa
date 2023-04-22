@@ -26,6 +26,6 @@ fun _DllMainCRTStartup(
     unusedX: Any,
     unusedY: Any,
     unusedZ: Any
-): Void {
+) Void {
     // TODO
 }

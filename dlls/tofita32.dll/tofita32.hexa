@@ -83,14 +83,14 @@ fun tofitaHexaFree(pointer: #if bit64 UInt64 #else UInt32 #end, size: UInt32) {
 // TODO link names
 @fastcall
 @dllExport('tofitaFastStub')
-fun tofitaFastStub(rcx: UInt64, rdx: UInt64): UInt32 {
+fun tofitaFastStub(rcx: UInt64, rdx: UInt64) UInt32 {
 	tofitaDebugLog("--> tofitaFastStub --> rcx=%8 rdx=%8".utf16(), rcx, rdx)
 	return 0
 }
 
 @stdcall
 @dllExport('tofitaStdStub')
-fun tofitaStdStub(arg: ConstArrayPointer<UInt8>): UInt32 {
+fun tofitaStdStub(arg: ConstArrayPointer<UInt8>) UInt32 {
 	tofitaDebugLog("--> tofitaStdStub --> arg=%8".utf16(), arg as! UInt64)
 	return 0
 }
@@ -131,12 +131,12 @@ fun tofitaFastSystemCall(rcx: TofitaSyscalls,
 //
 
 @dllExport('tofitaExitProcess')
-fun tofitaExitProcess(exitCode: UInt32): Void {
+fun tofitaExitProcess(exitCode: UInt32) Void {
 	tofitaFastSystemCall(TofitaSyscalls.ExitProcess, exitCode)
 }
 
 @dllExport('tofitaDebugLog')
-fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0): Void {
+fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0, more: UInt64 = 0) Void {
 	let payload = new ByValue<DebugLogPayload>()
 	// TODO @stack
 	// TODO ^ optimize to allocate on stack, some lifetime flag on creation and usage?
@@ -161,7 +161,7 @@ fun tofitaDebugLog(message: ConstArrayPointer<ClangWideChar>, extra: UInt64 = 0,
 //
 
 @dllExport('njraaSwapWindowFramebuffer')
-fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
+fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
 	payload.fb = fb as! UInt64
@@ -169,7 +169,7 @@ fun njraaSwapWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
 }
 
 @dllExport('njraaGetOrCreateWindowFramebuffer')
-fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): Void {
+fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer) Void {
 	let payload = new SwapWindowFramebufferPayload()
 	payload.windowId = windowId
 	payload.fb = fb as! UInt64
@@ -181,12 +181,12 @@ fun njraaGetOrCreateWindowFramebuffer(windowId: UInt64, fb: WindowFramebuffer): 
 //
 
 @dllExport('tofitaCreateWindowEx')
-fun tofitaCreateWindowEx(payload: CreateWindowExPayload): UInt64 {
+fun tofitaCreateWindowEx(payload: CreateWindowExPayload) UInt64 {
 	return tofitaFastSystemCall(TofitaSyscalls.CreateWindowEx as! TofitaSyscalls, payload as! Payload)
 }
 
 @dllExport('tofitaShowWindow')
-fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow): Void {
+fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow) Void {
 	let payload = new ShowWindowPayload()
 	payload.windowId = windowId
 	payload.nCmdShow = nCmdShow
@@ -194,13 +194,13 @@ fun tofitaShowWindow(windowId: UInt64, nCmdShow: CmdShow): Void {
 }
 
 @dllExport('tofitaGetMessage')
-fun tofitaGetMessage(payload: GetMessagePayload): Bool32 {
+fun tofitaGetMessage(payload: GetMessagePayload) Bool32 {
 	// TODO filters
 	// TODO UInt64 -> Bool32 is a lossy conversion, type check it somehow
 	return tofitaFastSystemCall(TofitaSyscalls.GetMessage as! TofitaSyscalls, payload as! Payload) as! Bool32
 }
 
 @dllExport('tofitaPostMessage')
-fun tofitaPostMessage(payload: PostMessagePayload): Bool32 {
+fun tofitaPostMessage(payload: PostMessagePayload) Bool32 {
 	return tofitaFastSystemCall(TofitaSyscalls.PostMessage as! TofitaSyscalls, payload as! Payload) as! Bool32
 }

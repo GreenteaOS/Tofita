@@ -24,7 +24,7 @@ let pic_eoi = 0x20u8	  // end-of-interrupt command code
 let pic_eoi_0x20 = 0x20u8 // end-of-interrupt command code
 
 @rename('vmemcpy')
-declare fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64): Void
+declare fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64) Void
 /* {
 	for i in count {
 		dest[0] = src[0]
@@ -32,7 +32,7 @@ declare fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, co
 }*/
 
 @rename('vmemcpy')
-declare fun vmemcpy(@volatile dest: ArrayPointer<UInt8>, @volatile src: ConstArrayPointer<UInt8>, @volatile count: UInt64): Void
+declare fun vmemcpy(@volatile dest: ArrayPointer<UInt8>, @volatile src: ConstArrayPointer<UInt8>, @volatile count: UInt64) Void
 /* {
 	for i in count {
 		dest[0] = src[0]
@@ -65,7 +65,7 @@ class IdtEntry {
 	@bits(32) var zero: UInt32
 }
 
-fun readPort(@volatile port: UInt16): UInt8 {
+fun readPort(@volatile port: UInt16) UInt8 {
 	return portInb(port)
 }
 
@@ -74,7 +74,7 @@ fun writePort(@volatile port: UInt16, @volatile value: UInt8) {
 }
 
 @emitHeader @linkAsIs
-declare fun loadIdt(@volatile idtr: Idtr): Void
+declare fun loadIdt(@volatile idtr: Idtr) Void
 
 // Handling IDT
 let idt_size = 256
@@ -147,7 +147,7 @@ fun disablePic() {
 	serialPrintln("[cpu] done: disable PIC")
 }
 
-fun physicalToVirtual(physical: UInt64): UInt64 {
+fun physicalToVirtual(physical: UInt64) UInt64 {
 	var result: UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
 	return result
 }
@@ -246,15 +246,15 @@ let rspStackSize = 131072u64
 // uint64_t
 // extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
-//declare fun anyInterruptHandler(frame: <InterruptFrame>): Void
+//declare fun anyInterruptHandler(frame: <InterruptFrame>) Void
 
 // TODO remove
-@aligned(64) @interrupt fun unknownInterrupt(frame: InterruptFrame): Void {
+@aligned(64) @interrupt fun unknownInterrupt(frame: InterruptFrame) Void {
 	// TODO Find a better way to avoid LLVM bugs
 	anyInterruptHandler(frame)
 }
 
-fun anyInterruptHandler(frame: InterruptFrame): Void {
+fun anyInterruptHandler(frame: InterruptFrame) Void {
 	disableAllInterrupts()
 	#if false
 		let stack = ((frame as! UInt64) - 200) as! InterruptStack
@@ -308,7 +308,7 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 }
 
 @emitHeader @linkAsIs
-declare fun setTsr(@volatile tsrData: UInt16): Void
+declare fun setTsr(@volatile tsrData: UInt16) Void
 
 let ps2_data_port = 0x60u8
 let ps2_control_port = 0x64u8

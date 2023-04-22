@@ -65,4 +65,4 @@ __attribute__((stdcall)) void _DllMainCRTStartup(void *, void *, void *) {
 #endif
 
 ')
-declare fun entry(): Void
+declare fun entry() Void

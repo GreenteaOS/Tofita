@@ -36,7 +36,7 @@ var uptimeMilliseconds: UInt64 = 0
 var startupMilliseconds: UInt64 = 0
 
 @rename('libc_memset')
-declare fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64): Void
+declare fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64) Void
 /*{
 	var d = dest
 	for i in len {

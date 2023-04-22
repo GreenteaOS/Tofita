@@ -428,4 +428,4 @@
     }
 ')
 // TODO @keep
-declare fun entry(): Void
+declare fun entry() Void

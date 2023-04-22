@@ -147,7 +147,7 @@ fun quakeNewline() {
 	}
 }
 
-fun quakePutChar(c: UInt8): UInt8 {
+fun quakePutChar(c: UInt8) UInt8 {
 	if c != 0 {
 		putChar(c) // Copy to serial log
 		if let char = '\n'.charCodeAt(0), c == char {
@@ -175,7 +175,7 @@ fun quakePutChar(c: UInt8): UInt8 {
 	return 0
 }
 
-fun quakePutString(string: ArrayPointer<UInt8>): Int32 {
+fun quakePutString(string: ArrayPointer<UInt8>) Int32 {
 	var i: Int32 = 0
 	while string[i] != 0 {
 		if quakePutChar(string[i]) == 0 {
@@ -187,7 +187,7 @@ fun quakePutString(string: ArrayPointer<UInt8>): Int32 {
 }
 
 // TODO batch whole lines or store separate chars as strings to avoid `+=char`
-fun quakePutStringUnicode(string: ConstArrayPointer<ClangWideChar>): Int32 {
+fun quakePutStringUnicode(string: ConstArrayPointer<ClangWideChar>) Int32 {
 	var i: Int32 = 0
 	while string[i] != 0 as! ClangWideChar {
 		if quakePutChar(string[i] as! UInt8) == 0 { // TODO

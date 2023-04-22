@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 @emitHeader @linkAsIs
-declare fun kernelThreadStart(): Void
+declare fun kernelThreadStart() Void
 
 let stackSizeForKernelThread: UInt64 = 1024 * 1024u64
 

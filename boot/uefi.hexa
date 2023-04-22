@@ -68,7 +68,7 @@ class EFI_GUID {
 	// TODO let data4: ArrayByValue<UInt8, 8>
 	var data4: ArrayByValue<UInt8, 8>
 
-	/*fun areSame(other: EFI_GUID): Bool /*{
+	/*fun areSame(other: EFI_GUID) Bool /*{
 		return
 			this.data1 == other.data1 and
 			this.data2 == other.data2 and
@@ -86,7 +86,7 @@ class EFI_GUID {
 }
 
 // TODO as method
-fun areSame(one: EFI_GUID, other: EFI_GUID): Bool {
+fun areSame(one: EFI_GUID, other: EFI_GUID) Bool {
 	return
 		one.data1 == other.data1 and
 		one.data2 == other.data2 and

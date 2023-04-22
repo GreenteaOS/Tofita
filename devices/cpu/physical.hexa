@@ -26,7 +26,7 @@ let page_mask = 0b1111u8
 // TODO mask user-mode pages differently than kernel-mode
 // TODO let granular_partial = 0b1010
 // TODO let granular_full = 0b1001
-@inline fun down_bytes_to_pages(bytes: UInt64): UInt64 {
+@inline fun down_bytes_to_pages(bytes: UInt64) UInt64 {
 	return ((bytes) >> 12u64)
 }
 // 4095 >> 12 == 0
@@ -139,7 +139,7 @@ class PhysicalAllocator {
 	}
 
 	// Returns physical 64-bit address, not page number
-	static fun allocateOnePage(): UInt64 {
+	static fun allocateOnePage() UInt64 {
 		if last != physical_not_found {
 			let where = last
 			last = physical_not_found
@@ -162,7 +162,7 @@ class PhysicalAllocator {
 		return physical_not_found
 	}
 
-	static fun allocateOnePagePreZeroed(): UInt64 {
+	static fun allocateOnePagePreZeroed() UInt64 {
 		var result = allocateOnePage()
 		if result != physical_not_found {
 			memset(result as! ArrayPointer<UInt8>, 0, pageSize)
@@ -174,7 +174,7 @@ class PhysicalAllocator {
 	// TODO modify available
 	// TODO each process should have some private extra pages (1 megabyte)
 	// ^ means that available_now = (available - 1mb * process_count)
-	static fun allocateSafeUserspaceOnePagePreZeroed(): UInt64 {
+	static fun allocateSafeUserspaceOnePagePreZeroed() UInt64 {
 		if available > kernel_reserved_pages {
 			return allocateOnePagePreZeroed()
 		}
@@ -182,7 +182,7 @@ class PhysicalAllocator {
 	}
 
 	// TODO faster
-	static fun allocatePages(pages: UInt64): UInt64 {
+	static fun allocatePages(pages: UInt64) UInt64 {
 		// 0 or 1 == 1 page anyway
 		if pages < 2u64 {
 			return allocateOnePage()
@@ -252,13 +252,13 @@ class PhysicalAllocator {
 	}
 
 	// Current granularity: 4096 bytes
-	static fun allocateBytes(bytes: UInt64): UInt64 {
+	static fun allocateBytes(bytes: UInt64) UInt64 {
 		// TODO
 		return allocatePages(down_bytes_to_pages(bytes) + 1u64)
 	}
 
 	// Current granularity: xxx bytes
-	static fun allocateFileCacheBlock(bytes: UInt64): UInt64 {
+	static fun allocateFileCacheBlock(bytes: UInt64) UInt64 {
 		// TODO
 		// The idea is to use very fast wide search over bitmask
 		// too quickly find large chunks of memory
@@ -309,6 +309,6 @@ class PhysicalAllocator {
 	}
 }
 
-fun allocateBytes(bytes: UInt64): UInt64 {
+fun allocateBytes(bytes: UInt64) UInt64 {
 	return PhysicalAllocator.allocateBytes(bytes)
 }

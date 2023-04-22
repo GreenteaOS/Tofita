@@ -16,7 +16,7 @@
 // Based on http://www.osdever.net/bkerndev/Docs/keyboard.htm
 
 @rename('keyboardHandler')
-@extern declare fun keyboardHandler(): Void
+@extern declare fun keyboardHandler() Void
 
 // TODO this is just array of booleans
 var keyboardPressedState: ArrayByValue<UInt8, 128> = [0]

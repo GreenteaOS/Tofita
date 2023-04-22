@@ -18,7 +18,7 @@ fun getNextDescriptor(@readonly descriptor: EFI_MEMORY_DESCRIPTOR, descriptorSiz
 	return desc as! @readonly EFI_MEMORY_DESCRIPTOR
 }
 
-fun getRAMSize(memoryMap: UefiMemoryMap): UInt64 {
+fun getRAMSize(memoryMap: UefiMemoryMap) UInt64 {
 	var descriptor = memoryMap.memoryMap
 	let descriptorSize: UInt64 = memoryMap.descriptorSize
 	var numberOfPages: UInt64 = 0u64
@@ -104,7 +104,7 @@ fun conventionalAllocateLargest(memoryMap: UefiMemoryMap) {
 }
 
 var conventionalOffset: UInt64 = 0u64
-fun conventionalAllocateNext(bytes: UInt64): UInt64 {
+fun conventionalAllocateNext(bytes: UInt64) UInt64 {
 	let result = conventionalOffset
 	let pages = bytes / pageSize // Math.floor
 	conventionalOffset += pages * pageSize

@@ -34,7 +34,7 @@ fun processInit(process: TofitaProcess) {
 	process.awaitsGetMessage = false
 }
 
-fun processCreate(): TofitaProcess {
+fun processCreate() TofitaProcess {
 	var index: UInt64 = 1 // Ignore Idle
 	while index < processes.length {
 		if processes[index] == null {
@@ -84,7 +84,7 @@ fun getOrCreateMessagesBuffer(@volatile process: TofitaProcess): /*TODO wapi.*/[
 }
 
 // TODO make all this TofitaProcess class methods + @final
-fun postMessage(@volatile process: TofitaProcess, payload: PostMessagePayload): Bool {
+fun postMessage(@volatile process: TofitaProcess, payload: PostMessagePayload) Bool {
 	// TODO do not allocate messages queue if no windows and not awaits for them
 	let messages = getOrCreateMessagesBuffer(process)
 	if messages == null {
@@ -110,7 +110,7 @@ fun postMessage(@volatile process: TofitaProcess, payload: PostMessagePayload): 
 	message.wParam = payload.wParam as! WParam
 	message.lParam = payload.lParam as! LParam
 
-	message.time = uptimeMilliseconds as! UInt32 // TODO `& 0xFF....` or better truncation method? `UInt64.truncate32(): UInt32`?
+	message.time = uptimeMilliseconds as! UInt32 // TODO `& 0xFF....` or better truncation method? `UInt64.truncate32() UInt32`?
 	message.pt.ref.x = mouseX // TODO
 	message.pt.ref.y = mouseY // TODO
 	message.lPrivate = 0
@@ -126,7 +126,7 @@ fun postMessage(@volatile process: TofitaProcess, payload: PostMessagePayload): 
 	return true
 }
 
-fun getMessage(@volatile process: TofitaProcess, payload: GetMessagePayload): Bool {
+fun getMessage(@volatile process: TofitaProcess, payload: GetMessagePayload) Bool {
 	// Do not allocate until needed
 	if process.messages == null {
 		return false

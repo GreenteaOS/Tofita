@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022 Oleh Petrenko
+// Copyright (C) 2022-2023 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
 
 // Based on the http://blog.ivank.net/fastest-gaussian-blur.html
 
-@fastcall fun floor(x: Float32): Int32 {
+@fastcall fun floor(x: Float32) Int32 {
 	if x >= 0 {
 		return x as! Int32
 	} else {
@@ -24,7 +24,7 @@
 	}
 }
 
-@fastcall fun sqrt(number: Float32): Float32 {
+@fastcall fun sqrt(number: Float32) Float32 {
 	let threehalfs: Float32 = 1.55555f32
 	let threehalfs: Float32 = 1.5f32
 
@@ -187,7 +187,7 @@ fun boxBlur(source: Bitmap32, target: Bitmap32, width: UInt16, height: UInt16, r
 	boxBlurT(source, target, width, height, radius)
 }
 
-fun boxesForGauss(sigma: Float, n: UInt8): ArrayPointer<UInt8> {
+fun boxesForGauss(sigma: Float, n: UInt8) ArrayPointer<UInt8> {
 	// TODO show "Incompatible types FOR ARGUMENT NAME"
 	var wIdeal: Float32 = sqrt((12.0f32 * sigma * sigma / n as! Float32) + 1.0f32) // Ideal averaging filter width
 	// TODO show "Incompatible types ASSIGNED TO VAR NAME"
@@ -210,7 +210,7 @@ fun boxesForGauss(sigma: Float, n: UInt8): ArrayPointer<UInt8> {
 	return sizes
 }
 
-fun gaussBlur(bitmap: Bitmap32, radius: Float): Bitmap32 {
+fun gaussBlur(bitmap: Bitmap32, radius: Float) Bitmap32 {
 	var target: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
 
 	var boxes: ArrayPointer<UInt8> = boxesForGauss(radius, 3)
@@ -224,7 +224,7 @@ fun gaussBlur(bitmap: Bitmap32, radius: Float): Bitmap32 {
 
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
 @fastcall fun
-interpolatePixel(bitmap: Bitmap32, x: Float32, y: Float32): ByValue<PixelRGBAData> {
+interpolatePixel(bitmap: Bitmap32, x: Float32, y: Float32) ByValue<PixelRGBAData> {
 	let px: UInt16 = x as! UInt16 // Same as floor(x)
 	let py: UInt16 = y as! UInt16 // Same as floor(y)
 	let stride: UInt16 = bitmap.width as! UInt16

@@ -18,7 +18,7 @@
 // ^ delphi file stream? read-at, read-and-offset, seek
 // may load whole scan line and reorder it later to avoid bound checking every pixel
 // stream.readUInt8At(123) ?? throw-guard or default
-fun loadBitMap24(asset: RamDiskAsset): Bitmap32 {
+fun loadBitMap24(asset: RamDiskAsset) Bitmap32 {
 	let buffer = asset.data as! UInt64
 	// TODO uint32_t width_ = (buffer_ + (uint32_t*)((int32_t)18))[(int32_t)0];
 	// also int32_t is wrong

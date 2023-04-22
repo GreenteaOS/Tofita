@@ -1,5 +1,5 @@
 ; The Tofita Kernel
-; Copyright (C) 2021 Oleh Petrenko
+; Copyright (C) 2021-2023 Oleh Petrenko
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU Lesser General Public License as published by
@@ -21,8 +21,10 @@ default abs ; All addresses are relative to 0x00008000
 org 0x00008000 ; Known absolute address in NON-virtual memory
 section .head ; Required for proper linking, but no sections actually created
 
+; Pointer-sized padding
 %define PADDING 8
 
+; Make types unambiguous
 %define uint8_t db
 %define uint16_t dw
 %define uint32_t dd
@@ -38,6 +40,8 @@ arguments:
     jmp short realModeApStart
 
     ; Known padding
+    ; (this code makes `arguments` "function" to be exactly PADDING bytes of size)
+    ; (this way position of .cpuIndex is easy to calculate by fixed offset)
     times PADDING - ($ - arguments) nop
 
     ; This memory overwitten directly as a way to pass parameters

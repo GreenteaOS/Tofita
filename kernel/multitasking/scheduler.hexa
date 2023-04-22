@@ -54,7 +54,7 @@ var taskBarRedraw: UInt8 = 0 // Re-paint task bar current time
 @volatile var nextIsUserProcess: Bool = false
 @volatile var nextIsGuiThread: Bool = true
 
-fun getNextProcess(): UInt64 {
+fun getNextProcess() UInt64 {
 	// Note that idle process is ignored
 	for index in 1...processes.length {
 		let process = processes[index]

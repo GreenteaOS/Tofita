@@ -114,7 +114,7 @@
         return 0;
     }
 ')
-declare fun entry(): Void
+declare fun entry() Void
 
 @draft // TODO those are conceptual decorators
 @entryPoint // TODO those are conceptual decorators

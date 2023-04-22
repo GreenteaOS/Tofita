@@ -19,4 +19,4 @@
 @dllImport
 @rename('free')
 declare
-fun freeNtdll(bytes: SizeOfPointer): Void
+fun freeNtdll(bytes: SizeOfPointer) Void

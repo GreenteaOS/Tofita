@@ -40,7 +40,7 @@ enum Selector : UInt64 {
 ]
 
 @emitHeader @linkAsIs
-declare fun lgdt(@volatile gdt: TablePtr): Void
+declare fun lgdt(@volatile gdt: TablePtr) Void
 
 // TODO @bitMask
 enum GdtType : UInt8 {

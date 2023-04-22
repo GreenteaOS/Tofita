@@ -18,7 +18,7 @@
 // TODO ntdll should have tofitaStub(){} for unresolved dll imports -> log them
 // TODO ^ should actually show a message box and abort in future
 
-fun offsetPointer(data: UInt64, offset: UInt64): ArrayPointer<UInt8> {
+fun offsetPointer(data: UInt64, offset: UInt64) ArrayPointer<UInt8> {
 	return (data + offset) as! ArrayPointer<UInt8>
 }
 
@@ -74,7 +74,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO probe for read/write
 	// TODO error if not found
 	// TODO more PATH support
-	fun loadDll(name: String, root: PeExportLinkedList, exec: Executable): PeInterim {
+	fun loadDll(name: String, root: PeExportLinkedList, exec: Executable) PeInterim {
 		// TODO simple size ofs should be evaluated at normalizer to exclude ifs
 		let is64bit = sizeOf<SIZE>() == 8
 		let env = is64bit? "C:\\Windows\\System32\\" : "C:\\Windows\\SysWOW64\\"
@@ -262,7 +262,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
 	// may be moved between versions.
 	// Search only selected .dll only within the user provided dlls
-	fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList): PeExportLinkedList {
+	fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList) PeExportLinkedList {
 		var list: PeExportLinkedList = root
 		// TODO make it intrusive list
 		// TODO compute crc for faster .dll import names lookup

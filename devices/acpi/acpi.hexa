@@ -31,13 +31,13 @@ class AcpiTableHeader {
 	var creatorId: UInt32
 	var creatorRevision: UInt32
 
-	fun validate(expectedType: AcpiTypeId): Bool {
+	fun validate(expectedType: AcpiTypeId) Bool {
 		return expectedType == type
 	}
 }
 
 // TODO this is probably useless
-fun validate(expectedType: AcpiTypeId, type: AcpiTypeId): Bool {
+fun validate(expectedType: AcpiTypeId, type: AcpiTypeId) Bool {
 	return expectedType == type
 }
 
@@ -105,30 +105,30 @@ class ACPI {
 }
 
 // TODO
-fun acpiTableEntries<T>(t: T, size: UInt64): UInt64 {
+fun acpiTableEntries<T>(t: T, size: UInt64) UInt64 {
 	return 0 // (t.header.length - sizeOf<T>()) / size
 }
 
-fun acpiTableEntriesXSDT(t: XSDT, size: UInt64): UInt64 {
+fun acpiTableEntriesXSDT(t: XSDT, size: UInt64) UInt64 {
 	return (t.header.ref.length - sizeOf<XSDT>()) / size
 }
 
-fun acpiTableEntriesAcpiMcfg(t: AcpiMcfg, size: UInt64): UInt64 {
+fun acpiTableEntriesAcpiMcfg(t: AcpiMcfg, size: UInt64) UInt64 {
 	return (t.header.ref.length - sizeOf<AcpiMcfg>()) / size
 }
 
 // TODO
-fun acpiValidate<T>(t: T): Bool {
+fun acpiValidate<T>(t: T) Bool {
 	// TODO `return t.header.validate(T.typeId)`
 	return true
 }
 
-fun acpiValidateXSDT(t: XSDT): Bool {
+fun acpiValidateXSDT(t: XSDT) Bool {
 	// TODO `return t.header.validate(T.typeId)`
 	return true
 }
 
-fun putSig(into: ArrayPointer<UInt8>, type: AcpiTypeId): Void {
+fun putSig(into: ArrayPointer<UInt8>, type: AcpiTypeId) Void {
 	let typeId: ArrayByValue<UInt32, 1> = [type as! UInt32]
 	let typeRef = typeId.ref as! ArrayPointer<UInt8>
 	for j in 4 {
@@ -137,7 +137,7 @@ fun putSig(into: ArrayPointer<UInt8>, type: AcpiTypeId): Void {
 }
 
 @inline
-fun busAddr(bus: UInt8, device: UInt8, func: UInt8): UInt16 {
+fun busAddr(bus: UInt8, device: UInt8, func: UInt8) UInt16 {
 	return bus << 8 | device << 3 | func
 }
 
@@ -148,17 +148,17 @@ class PciGroup {
 	var busEnd: UInt16
 	var base: ArrayPointer<UInt32>
 
-	fun baseFor(bus: UInt8, device: UInt8, func: UInt8): ArrayPointer<UInt32> {
+	fun baseFor(bus: UInt8, device: UInt8, func: UInt8) ArrayPointer<UInt32> {
 		return (base as! UInt64 + busAddr(bus, device, func) << 12) as! ArrayPointer<UInt32>
 	}
 
-	fun hasDevice(bus: UInt8, device: UInt8, func: UInt8): Bool {
+	fun hasDevice(bus: UInt8, device: UInt8, func: UInt8) Bool {
 		return (baseFor(bus, device, func)[0] & 0xffff) != 0xffff
 	}
 }
 
 class ACPIParser {
-	static fun parse(acpiVendorTable: UInt64): Bool {
+	static fun parse(acpiVendorTable: UInt64) Bool {
 		serialPrint("[ACPI] parsing started at physical ")
 		serialPrintHex(acpiVendorTable as! UInt64)
 		serialPrint("\n")
@@ -226,7 +226,7 @@ class ACPIParser {
 		return true
 	}
 
-	static /*TODO private*/ fun physicalToVirtual(physical: UInt64): UInt64 {
+	static /*TODO private*/ fun physicalToVirtual(physical: UInt64) UInt64 {
 		var result: UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
 		return result
 	}
@@ -313,7 +313,7 @@ class ACPIParser {
 		probePci(mPci, count)
 	}
 
-	static fun multi(group: PciGroup, bus: UInt8, device: UInt8, func: UInt8): Bool {
+	static fun multi(group: PciGroup, bus: UInt8, device: UInt8, func: UInt8) Bool {
 		// TODO ^ proper name
 		var mBase: ArrayPointer<UInt32> = group.baseFor(bus, device, func)
 		var mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
@@ -338,12 +338,12 @@ class ACPIParser {
 
 /// `false` if failed to do so
 /// TODO `poweroff` quake command
-fun shutdownComputer(): Bool {
+fun shutdownComputer() Bool {
 	return false
 }
 
 /// `false` if failed to do so
 /// TODO `reboot` quake command
-fun rebootComputer(): Bool {
+fun rebootComputer() Bool {
 	return false
 }

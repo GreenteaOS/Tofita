@@ -36,7 +36,7 @@ fun shadow(x: Int16, y: Int16, darkness: UInt8) {
 	blendPixel(x, y, pixel.ref)
 }
 
-fun distance(x1: Int16, y1: Int16, x2: Int16, y2: Int16): Int32 {
+fun distance(x1: Int16, y1: Int16, x2: Int16, y2: Int16) Int32 {
 	// TODO floor?
 	return Math.round(Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)))
 }

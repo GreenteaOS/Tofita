@@ -30,7 +30,7 @@ fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
 	entry.accessibleByAll = 1
 }
 
-fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8): ArrayPointer<ByValue<PageEntry>> {
+fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8) ArrayPointer<ByValue<PageEntry>> {
 	let entry: PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
@@ -58,7 +58,7 @@ class PageAddressView {
 	// new () // TODO
 }
 
-fun getPageAddressView(virtualAddr: UInt64): ByValue<PageAddressView> {
+fun getPageAddressView(virtualAddr: UInt64) ByValue<PageAddressView> {
 	return virtualAddr as! ByValue<PageAddressView>
 }
 
@@ -70,21 +70,21 @@ fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAdd
 }
 
 fun mapPD(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8): Void {
+							writeAllowed: UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pt = referOrCreatePage(pd, view.ref.pd, writeAllowed)
 	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
 }
 
 fun mapPDPT(pdpt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8): Void {
+							writeAllowed: UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pd = referOrCreatePage(pdpt, view.ref.pdpt, writeAllowed)
 	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
 }
 
 fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64,
-							writeAllowed: UInt8): Void {
+							writeAllowed: UInt8) Void {
 	let view = getPageAddressView(virtualAddr)
 	let pdpt = referOrCreatePage(pml4, view.ref.pml4, writeAllowed)
 	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
@@ -94,7 +94,7 @@ fun mapPML4(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physica
 }
 
 // Returns actual physical address from virtual address
-fun resolveAddr(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64): UInt64 {
+fun resolveAddr(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64) UInt64 {
 	// TODO unsupported by C `let linear = getPageAddressView(virtualAddr).ref`
 	let linear = getPageAddressView(virtualAddr)
 	let linear = linear.ref // TODO better idea
@@ -200,7 +200,7 @@ fun copyKernelMemoryMap(pml4source: ArrayPointer<ByValue<PageEntry>>, pml4destin
 }
 
 // Creates new PML4 for new process
-fun newCR3(pml4source: ArrayPointer<ByValue<PageEntry>>): ArrayPointer<ByValue<PageEntry>> {
+fun newCR3(pml4source: ArrayPointer<ByValue<PageEntry>>) ArrayPointer<ByValue<PageEntry>> {
 	var pml4result = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>
 	if pml4result != null {
 		copyKernelMemoryMap(pml4source, pml4result)
@@ -208,7 +208,7 @@ fun newCR3(pml4source: ArrayPointer<ByValue<PageEntry>>): ArrayPointer<ByValue<P
 	return pml4result
 }
 
-fun freeCR3(pml4: PageEntry): Void {
+fun freeCR3(pml4: PageEntry) Void {
 	// TODO deallocate full lower half
 }
 
@@ -239,7 +239,7 @@ fun findUserspaceMemory(
 	virtualAddr: UInt64,
 	pageCount: UInt32,
 	limits: AddressAwareness
-): UInt64 {
+) UInt64 {
 	let upperBound = 0x7FFFFFFFFFFFu64
 
 	// TODO return 0 if virtualAddr not page aligned (virtualAddr & ADDRESS_BITS != 0)

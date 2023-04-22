@@ -34,7 +34,7 @@ declare fun cpuid(
 	ebx: ArrayPointer<UInt32>,
 	ecx: ArrayPointer<UInt32>,
 	edx: ArrayPointer<UInt32>
-): Void
+) Void
 /* {
 	var a: UInt32 = 0
 	var b: UInt32 = 0
@@ -51,33 +51,33 @@ declare fun cpuid(
 /// Note: this also a way to clear TLB cache even if cr3 not switched to another
 @rename('writeCr3') // TODO rename didn't work
 @emitHeader @linkAsIs
-declare fun writeCr3(value: UInt64): Void
+declare fun writeCr3(value: UInt64) Void
 
 // TODO asm("invd")
 @rename('halt')
 @emitHeader @linkAsIs
-declare fun halt(): Void
+declare fun halt() Void
 
 @rename('enableAllInterrupts')
 @emitHeader @linkAsIs
-declare fun enableAllInterrupts(): Void
+declare fun enableAllInterrupts() Void
 
 // Except non-maskable
 @rename('disableAllInterrupts')
 @emitHeader @linkAsIs
-declare fun disableAllInterrupts(): Void
+declare fun disableAllInterrupts() Void
 
 @rename('enableAllInterruptsAndHalt')
 @emitHeader @linkAsIs
-declare fun enableAllInterruptsAndHalt(): Void
+declare fun enableAllInterruptsAndHalt() Void
 
 @rename('pause')
 @emitHeader @linkAsIs
-declare fun pause(): Void
+declare fun pause() Void
 
 @rename('yield')
 @emitHeader @linkAsIs
-declare fun yield(): Void
+declare fun yield() Void
 
 /*
 // TODO support `enum class` in hexa cpp codegen `enum class MSR : uint32_t {`

@@ -15,13 +15,13 @@
 
 // Boot loader: entered by UEFI, reads all UEFI data and starts kernel loader
 
-fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64): Void {
+fun tmemcpy(dest: ArrayPointer<UInt8>, src: ConstArrayPointer<UInt8>, count: UInt64) Void {
 	for i in count {
 		dest[i] = src[i]
 	}
 }
 
-fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64): Void {
+fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64) Void {
 	var d = dest as! ArrayPointer<UInt8>
 	for i in len {
 		d[i] = e
@@ -34,7 +34,7 @@ fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64): Void {
 @convention(fastcall) @fastcall // TODO
 declare fun
 trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile stack: UInt64,
-			  @volatile entry: UInt64): Void
+			  @volatile entry: UInt64) Void
 
 @extern @rename('versionMajor') declare let versionMajor: Int
 @extern @rename('versionMinor') declare let versionMinor: Int
@@ -43,7 +43,7 @@ trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile 
 // @deep
 
 // Entry point
-fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE): EFI_STATUS {
+fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_STATUS {
 	// Workaround for Clang `memset`, but it may be not needed anymore
 	buffa[0] = 0
 

@@ -177,4 +177,4 @@ function kernelMain(/*const TODO*/void *params) {
 }
 `)
 // TODO Calling it `entry` causes renaming bug in `struct PeInterim .entry`
-declare fun entryWrapper(): Void
+declare fun entryWrapper() Void

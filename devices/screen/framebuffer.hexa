@@ -40,7 +40,7 @@ class Screen {
 	static var doublebuffer: Bitmap32 = null
 }
 
-fun allocateBitmap(width: UInt32, height: UInt32): Bitmap32 {
+fun allocateBitmap(width: UInt32, height: UInt32) Bitmap32 {
 	// TODO allocateStruct<T>
 	var result = PhysicalAllocator.allocateBytes(
 		sizeOf<Bitmap32Interim>() +
@@ -59,11 +59,11 @@ fun setFramebuffer(framebuffer: FrameBuffer) {
 }
 
 // Very fast, but not precise, alpha multiply
-fun mul255(a255: UInt32, c255: UInt32): UInt8 {
+fun mul255(a255: UInt32, c255: UInt32) UInt8 {
 	return ((a255 + 1u32) * c255 >> 8u32) as! UInt8
 }
 
-fun blend255(target: UInt8, color: UInt8, alpha: UInt8): UInt8 {
+fun blend255(target: UInt8, color: UInt8, alpha: UInt8) UInt8 {
 	return (mul255(alpha, color) + mul255(255u8 - alpha, target))
 }
 

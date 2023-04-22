@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 @emitHeader @linkAsIs
-declare fun guiThreadStart(): Void
+declare fun guiThreadStart() Void
 
 var guiThreadFrame: InterruptFrame = new InterruptFrame()
 @aligned(64)

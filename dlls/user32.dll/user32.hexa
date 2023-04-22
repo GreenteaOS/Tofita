@@ -23,7 +23,7 @@ let classNameLimit = 256u16
 //
 // TODO regions and separate modules
 
-fun handleToWindow(hWnd: HWnd): Window {
+fun handleToWindow(hWnd: HWnd) Window {
 	if hWnd == null {
 		// TODO ^ assumes `HWnd?` so must error here or something
 		return null // TODO return desktop
@@ -44,7 +44,7 @@ fun handleToWindow(hWnd: HWnd): Window {
 	return hWnd as! Window
 }
 
-fun windowToHandle(window: Window): HWnd {
+fun windowToHandle(window: Window) HWnd {
 	// TODO offset ptr 8-byte aligned + reserved space
 	// os it fits into upper half of virtual space
 	return window as! HWnd
@@ -55,7 +55,7 @@ fun windowToHandle(window: Window): HWnd {
 //
 
 @dllExport('RegisterClassW')
-fun registerClassW(wc: WindowClass): Atom {
+fun registerClassW(wc: WindowClass) Atom {
 	tofitaDebugLog("RegisterClassW called".utf16())
 
 	// TODO utf16zClassName takes atoms? then utf16zClassName PossiblyAtom .toString
@@ -104,7 +104,7 @@ fun createWindowExW(
 	hMenu: HMenu,
 	hInstance: HInstance,
 	lpParam: LParam
-): HWnd {
+) HWnd {
 	tofitaDebugLog("CreateWindowExW called".utf16())
 
 	// Find class
@@ -179,7 +179,7 @@ fun createWindowExW(
 }
 
 @dllExport('ShowWindow')
-fun showWindow(hWnd: HWnd, nCmdShow: CmdShow): Bool32 {
+fun showWindow(hWnd: HWnd, nCmdShow: CmdShow) Bool32 {
 	tofitaDebugLog("ShowWindow called".utf16())
 	// TODO ^ remove all debug logs, make them traceable with external tool
 	var window = handleToWindow(hWnd)
@@ -209,7 +209,7 @@ fun showWindow(hWnd: HWnd, nCmdShow: CmdShow): Bool32 {
 
 // TODO take 2 or more messages at a time for better perf (this is pretty common)
 @dllExport('GetMessageW')
-fun getMessageW(msg: Msg, hWnd: HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32): Bool32 {
+fun getMessageW(msg: Msg, hWnd: HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt32) Bool32 {
 	tofitaDebugLog("GetMessageW called".utf16())
 	var result = Bool32.True // TODO `true`
 
@@ -243,7 +243,7 @@ fun getMessageW(msg: Msg, hWnd: HWnd, wMsgFilterMin: UInt32, wMsgFilterMax: UInt
 }
 
 @dllExport('TranslateMessage')
-fun translateMessage(msg: Msg): Bool32 {
+fun translateMessage(msg: Msg) Bool32 {
 	tofitaDebugLog("TranslateMessage called".utf16())
 	// TODO
 	tofitaDebugLog("TranslateMessage done".utf16())
@@ -251,7 +251,7 @@ fun translateMessage(msg: Msg): Bool32 {
 }
 
 @dllExport('DispatchMessageW')
-fun dispatchMessageW(msg: Msg): LResult? {
+fun dispatchMessageW(msg: Msg) LResult? {
 	tofitaDebugLog("DispatchMessageW called (hexa)".utf16())
 	var result: LResult? = null
 	// TODO ^ clearer result type? LResult.zero
@@ -280,7 +280,7 @@ fun dispatchMessageW(msg: Msg): LResult? {
 }
 
 @dllExport('PostMessage')
-fun postMessage(hWnd: HWnd, msg: Message, wParam: WParam, lParam: LParam): Bool32 {
+fun postMessage(hWnd: HWnd, msg: Message, wParam: WParam, lParam: LParam) Bool32 {
 	var payload: PostMessagePayload = new PostMessagePayload()
 	// TODO ^ by value
 	payload.hWnd = hWnd as! UInt64
@@ -291,7 +291,7 @@ fun postMessage(hWnd: HWnd, msg: Message, wParam: WParam, lParam: LParam): Bool3
 }
 
 @dllExport('PostQuitMessage')
-fun postQuitMessage(nExitCode: Int32): Void {
+fun postQuitMessage(nExitCode: Int32) Void {
 	tofitaDebugLog("PostQuitMessage called".utf16())
 	postMessage(null, Message.WM_QUIT, nExitCode as! WParam, null)
 	tofitaDebugLog("PostQuitMessage done".utf16())
@@ -299,7 +299,7 @@ fun postQuitMessage(nExitCode: Int32): Void {
 }
 
 @dllExport('BeginPaint')
-fun beginPaint(hWnd: HWnd, ps: PaintStruct): HDc {
+fun beginPaint(hWnd: HWnd, ps: PaintStruct) HDc {
 	tofitaDebugLog("BeginPaint called".utf16())
 	var window = handleToWindow(hWnd)
 	// TODO guard `let window = window ?? return null`
@@ -322,7 +322,7 @@ fun beginPaint(hWnd: HWnd, ps: PaintStruct): HDc {
 // TODO reimplement into SEH writer instead of `if`? is it any safer for overflows? faster? x/y bounds?
 // TODO @inline ?
 // TODO Clang may NOT pass Pixel32 as a single uint32_t in argument and cause perf loss
-@fastcall fun setPixel(fb: WindowFramebuffer, x: Int32, y: Int32, pixel: ByValue<Pixel32>): Void {
+@fastcall fun setPixel(fb: WindowFramebuffer, x: Int32, y: Int32, pixel: ByValue<Pixel32>) Void {
 	// TODO merge to single comparison
 	if (x < 0) || (y < 0) {
 		return
@@ -346,7 +346,7 @@ fun beginPaint(hWnd: HWnd, ps: PaintStruct): HDc {
 }
 
 @dllExport('FillRect')
-fun fillRect(dc: HDc, lprc: Rect, brush: HBrush): Int32 {
+fun fillRect(dc: HDc, lprc: Rect, brush: HBrush) Int32 {
 	tofitaDebugLog("FillRect called".utf16())
 
 	var fb = dc as! WindowFramebuffer
@@ -370,7 +370,7 @@ fun fillRect(dc: HDc, lprc: Rect, brush: HBrush): Int32 {
 }
 
 @dllExport('EndPaint')
-fun endPaint(hWnd: HWnd, ps: PaintStruct): Bool32 {
+fun endPaint(hWnd: HWnd, ps: PaintStruct) Bool32 {
 	// TODO respect ps
 	tofitaDebugLog("EndPaint called".utf16())
 	// TODO `?? return 0` (hardcoded `return\throw` for now)
@@ -388,7 +388,7 @@ fun endPaint(hWnd: HWnd, ps: PaintStruct): Bool32 {
 
 // TODO move message handling, drawing etc to separate modules
 @dllExport('DefWindowProcW')
-fun defWindowProcW(hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam): LResult? {
+fun defWindowProcW(hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam) LResult? {
 	tofitaDebugLog("DefWindowProcW called".utf16())
 	var window = handleToWindow(hWnd)
 	if window == null {
@@ -407,7 +407,7 @@ fun defWindowProcW(hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LParam): L
 }
 
 @dllExport('DestroyWindow')
-fun destroyWindow(hWnd: HWnd): Bool32 {
+fun destroyWindow(hWnd: HWnd) Bool32 {
 	tofitaDebugLog("DestroyWindow called".utf16())
 	return Bool32.False // TODO
 
@@ -425,7 +425,7 @@ fun destroyWindow(hWnd: HWnd): Bool32 {
 }
 
 @linkName('NO_DllMainCRTStartup')
-@fastcall fun _DllMainCRTStartup(): Void {
+@fastcall fun _DllMainCRTStartup() Void {
 	// TODO how to handle in Hexa? just HX_MAIN?
 	rootClass.next = null
 }

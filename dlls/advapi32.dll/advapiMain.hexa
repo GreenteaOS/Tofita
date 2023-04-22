@@ -41,4 +41,4 @@
     #endif
     #endif
 ')
-declare fun entryTODO(): Void
+declare fun entryTODO() Void
