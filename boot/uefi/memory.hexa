@@ -14,12 +14,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 fun uefiGetMemoryMap(efiMemoryMap: UefiMemoryMap, systemTable: EFI_SYSTEM_TABLE) {
-	var memoryMapSize: ArrayByValue<UINTN, 1> = [efiMemoryMap.memoryMapSize]
-	var mapKey: ArrayByValue<UINTN, 1> = [efiMemoryMap.mapKey]
-	var descriptorSize: ArrayByValue<UINTN, 1> = [efiMemoryMap.descriptorSize]
-	var descriptorVersion: ArrayByValue<UInt32, 1> = [efiMemoryMap.descriptorVersion]
+	var memoryMapSize ArrayByValue<UINTN, 1> = [efiMemoryMap.memoryMapSize]
+	var mapKey ArrayByValue<UINTN, 1> = [efiMemoryMap.mapKey]
+	var descriptorSize ArrayByValue<UINTN, 1> = [efiMemoryMap.descriptorSize]
+	var descriptorVersion ArrayByValue<UInt32, 1> = [efiMemoryMap.descriptorVersion]
 
-	var status: EFI_STATUS = systemTable.bootServices.getMemoryMap(
+	var status EFI_STATUS = systemTable.bootServices.getMemoryMap(
 		memoryMapSize.ref,
 		efiMemoryMap.memoryMap,
 		mapKey.ref,
@@ -41,16 +41,16 @@ fun uefiGetMemoryMap(efiMemoryMap: UefiMemoryMap, systemTable: EFI_SYSTEM_TABLE)
 }
 
 fun uefiSetFrameBufferMode(fb: FrameBuffer, systemTable: EFI_SYSTEM_TABLE) {
-	var gopGuid: EFI_GUID = new EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID()
-	var igop: ArrayByValue<UInt64, 1> = [] // TODO must error: should'nt be empty
+	var gopGuid EFI_GUID = new EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID()
+	var igop ArrayByValue<UInt64, 1> = [] // TODO must error: should'nt be empty
 	// TODO ^ also `<..., 1> = [1,2,3, too much]` error
 	// TODO `ByValue.ref`
 
 	// TODO handle EFI_STATUS of locateProtocol
-	// TODO `@checkReturn let locateProtocol: () => EFI_STATUS` to force result check
+	// TODO `@checkReturn let locateProtocol () => EFI_STATUS` to force result check
 	systemTable.bootServices.locateProtocol(gopGuid, 0, igop.ref)
 
-	let gop: EFI_GRAPHICS_OUTPUT_PROTOCOL = igop[0] as! EFI_GRAPHICS_OUTPUT_PROTOCOL
+	let gop EFI_GRAPHICS_OUTPUT_PROTOCOL = igop[0] as! EFI_GRAPHICS_OUTPUT_PROTOCOL
 
 	fb.base = gop.mode.frameBufferBase
 	// TODO take largest of `frameBufferSize` and `pixelsPerScanLine * h * 4`
@@ -74,9 +74,9 @@ fun uefiAllocate(bootServices: EFI_BOOT_SERVICES, bytes: ArrayPointer<UInt64>, d
 		EFI_MEMORY_TYPE.EfiLoaderCode // Use `*Code` not `*Data` to avoid NX-bit crash if data executed
 
 	// Round to page size
-	var pages: UInt64 = ((bytes[0] - 1) / pageSize) + 1
-	var addr: EFI_PHYSICAL_ADDRESS = destination[0] as! EFI_PHYSICAL_ADDRESS
-	var saddr: ArrayByValue<EFI_PHYSICAL_ADDRESS, 1> = [addr]
+	var pages UInt64 = ((bytes[0] - 1) / pageSize) + 1
+	var addr EFI_PHYSICAL_ADDRESS = destination[0] as! EFI_PHYSICAL_ADDRESS
+	var saddr ArrayByValue<EFI_PHYSICAL_ADDRESS, 1> = [addr]
 
 	let status = bootServices.allocatePages(
 		EFI_ALLOCATE_TYPE.AllocateAnyPages,

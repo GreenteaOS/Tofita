@@ -16,17 +16,17 @@
 // Simple bitmap font drawing
 // Non-monospace
 
-var textFontBitmap: Bitmap32 = null
+var textFontBitmap Bitmap32 = null
 
 @struct @packed @sizeOf(12)
 class TextFontList {
-	var x: UInt16
-	var y: UInt16
-	var width: Float
+	var x UInt16
+	var y UInt16
+	var width Float
 }
 
 // TODO just use `[Const]ArrayPointer`? cause same meaning? `ArrayByValuePointer`?
-var textFontList: ArrayPointer<ByValue<TextFontList>> = null as! ArrayPointer<ByValue<TextFontList>>
+var textFontList ArrayPointer<ByValue<TextFontList>> = null as! ArrayPointer<ByValue<TextFontList>>
 
 fun initText() {
 	var textFont = new RamDiskAsset()
@@ -55,14 +55,14 @@ fun getCharAdvance(c: UInt8) Float {
 		return 8
 	}
 
-	var textChar: TextFontList = textFontList[c].ref
+	var textChar TextFontList = textFontList[c].ref
 
 	return textChar.width
 }
 
 fun getTextAdvance(text: String) UInt16 {
-	var i: UInt16 = 0
-	var xx: Float = 0
+	var i UInt16 = 0
+	var xx Float = 0
 	let text = text.utf16() as! ConstArrayPointer<UInt16>
 
 	while text[i] != 0 && i < 255 * 255 {
@@ -84,8 +84,8 @@ fun drawChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 
 	for yi in 12 {
 		for xi in w {
-			let atx: Int32 = xx + xi
-			let aty: Int32 = y + yi
+			let atx Int32 = xx + xi
+			let aty Int32 = y + yi
 
 
 			if atx >= screenWidth or atx < 0 or aty >= screenHeight or aty < 0 {
@@ -107,15 +107,15 @@ fun drawChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 }
 
 fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
-	var textChar: TextFontList = textFontList[c as! Int].ref
+	var textChar TextFontList = textFontList[c as! Int].ref
 
-	var xx: Int16 = (x + 0.5) as! Int16
-	var w: UInt8 = (textChar.width + 0.5) as! UInt8
+	var xx Int16 = (x + 0.5) as! Int16
+	var w UInt8 = (textChar.width + 0.5) as! UInt8
 
 	for yi in 12 {
 		for xi in w {
-			let atx: Int16 = (xx as! Int16) + (xi as! Int16)
-			let aty: Int16 = (y as! Int16) + (yi as! Int16)
+			let atx Int16 = (xx as! Int16) + (xi as! Int16)
+			let aty Int16 = (y as! Int16) + (yi as! Int16)
 
 			if atx >= _framebuffer.width {
 				continue
@@ -131,7 +131,7 @@ fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 				continue
 			}
 
-			let font: Pixel32 =
+			let font Pixel32 =
 				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
 
 			let p = _pixels[aty * _framebuffer.width + atx]
@@ -142,7 +142,7 @@ fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 
 			// Grayscale
 			// TODO probably just blend color.rgb all with p.g?
-			var sum: UInt16 =
+			var sum UInt16 =
 				(p.rgba.ref.r as! UInt16) +
 				(p.rgba.ref.g as! UInt16) +
 				(p.rgba.ref.b as! UInt16)
@@ -162,8 +162,8 @@ fun drawAlphaChar(c: UInt8, x: Float, y: Int16, color: Pixel32) Float {
 
 /// Returns advance after last character
 fun drawAsciiText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
-	var i: UInt16 = 0
-	var xx: Float = x
+	var i UInt16 = 0
+	var xx Float = x
 	let text = text.utf16() as! ConstArrayPointer<ClangWideChar>
 
 	while text[i] as! UInt16 != 0 && i < 255 * 255 {
@@ -176,8 +176,8 @@ fun drawAsciiText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
 
 /// Returns advance after last character
 fun drawText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
-	var i: UInt16 = 0
-	var xx: Float = x
+	var i UInt16 = 0
+	var xx Float = x
 	// TODO compare for `length` not `255 * 255`
 	// TODO take pointer to `.utf16`
 
@@ -191,9 +191,9 @@ fun drawText(text: String, x: Float, y: Int16, color: Pixel32) UInt16 {
 	return (xx - x) as! UInt16
 }
 
-let digits: [String] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+let digits [String] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 fun drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) UInt16 {
-	var xx: Float = x
+	var xx Float = x
 	var value = value as! Int
 
 	if value < 0 {
@@ -201,8 +201,8 @@ fun drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) UInt16 {
 		value = -value
 	}
 
-	let chars: [String] = []
-	var count: Int8 = 0
+	let chars [String] = []
+	var count Int8 = 0
 
 	do {
 		chars[23 - count] = digits[value % 10]
@@ -221,8 +221,8 @@ fun drawIntegerText(value: Int64, x: Float, y: Int16, color: Pixel32) UInt16 {
 }
 
 fun drawShadowText(text: String, x: Float, y: Int16) {
-	var i: UInt16 = 0
-	var xx: Float = x
+	var i UInt16 = 0
+	var xx Float = x
 	var color = new ByValue<Pixel32>()
 	var color = color.ref
 	let text = text.utf16() as! ConstArrayPointer<ClangWideChar>
@@ -232,7 +232,7 @@ fun drawShadowText(text: String, x: Float, y: Int16) {
 
 	// TODO `while let char = .charCodeAt(i)`
 	while text[i] as! UInt16 != 0 && i < 255 * 255 {
-		var ch: UInt8 = text[i] as! UInt8
+		var ch UInt8 = text[i] as! UInt8
 		// TODO charCodeAt return zero? oh wait, `while let` checks for null!
 
 		drawAlphaChar(ch, xx + 1, y + 1i16, color)

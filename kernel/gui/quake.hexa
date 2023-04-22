@@ -16,16 +16,16 @@
 // Quake-style console with ~
 // TODO change to `Start + ~` and change engine to cmd.exe + tabs etc
 
-var quakeHeight: UInt8 = 255 // TODO `256` better rror message aka too large to fit
-var quakeCommand: String = ""
-// `var quakeLines: [String] = [0]` // TODO `= [0]` not valid type
-var quakeLines: [String] = []
+var quakeHeight UInt8 = 255 // TODO `256` better error message aka too large to fit
+var quakeCommand String = ""
+// `var quakeLines [String] = [0]` // TODO `= [0]` not valid type
+var quakeLines [String] = []
 // TODO `= []` is inferred as `Array_$Any_$new_(0);`
-var quakeLine: UInt8 = 0
-var quakeRow: UInt8 = 0
-var quakeAdvance: Float = 0.0
-var quakeCommandSize: UInt8 = 0
-var haveToQuake: Bool = false
+var quakeLine UInt8 = 0
+var quakeRow UInt8 = 0
+var quakeAdvance Float = 0.0
+var quakeCommandSize UInt8 = 0
+var haveToQuake Bool = false
 
 fun quake() {
 	if haveToQuake == false {
@@ -176,7 +176,7 @@ fun quakePutChar(c: UInt8) UInt8 {
 }
 
 fun quakePutString(string: ArrayPointer<UInt8>) Int32 {
-	var i: Int32 = 0
+	var i Int32 = 0
 	while string[i] != 0 {
 		if quakePutChar(string[i]) == 0 {
 			return 0
@@ -188,7 +188,7 @@ fun quakePutString(string: ArrayPointer<UInt8>) Int32 {
 
 // TODO batch whole lines or store separate chars as strings to avoid `+=char`
 fun quakePutStringUnicode(string: ConstArrayPointer<ClangWideChar>) Int32 {
-	var i: Int32 = 0
+	var i Int32 = 0
 	while string[i] != 0 as! ClangWideChar {
 		if quakePutChar(string[i] as! UInt8) == 0 { // TODO
 			return 0
@@ -202,7 +202,7 @@ fun quakePrintHex(n: UInt64) {
 	quakePutStringUnicode("0x".utf16())
 
 	var n = n
-	var buf: ArrayByValue<UInt8, 16> = [0]
+	var buf ArrayByValue<UInt8, 16> = [0]
 	var bp = ((buf as! UInt64) + 16) as! ArrayPointer<UInt8>
 
 	for i in 16 {
@@ -211,7 +211,7 @@ fun quakePrintHex(n: UInt64) {
 
 	do {
 		bp--
-		var mod: UInt8 = (n % 16) as! UInt8
+		var mod UInt8 = (n % 16) as! UInt8
 		if mod < 10 {
 			bp[0] = '0'.charCodeAt(0) + mod
 		} else {
@@ -257,7 +257,7 @@ fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
 			}
 			case 83: { // ASCII of UTF-16 `S`
 				var string = va_arg_uint64() as! ArrayPointer<UInt16>
-				var i: UInt32 = 0u32
+				var i UInt32 = 0u32
 				if string != null {
 					// TODO probeForReadOkay((uint64_t)string, 2)
 					while string[i] != 0 {
@@ -272,12 +272,12 @@ fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
 				quakePutChar(va_arg_int32() as! UInt8)
 			case 100: { // `d`
 				var value = va_arg_int32()
-				var buffer: ArrayByValue<UInt8, 16> = [0]
+				var buffer ArrayByValue<UInt8, 16> = [0]
 				for i in 16 {
 					buffer[i] = 0
 				}
 				comItoA(value, buffer.ref)
-				var c: ArrayPointer<UInt8> = buffer.ref
+				var c ArrayPointer<UInt8> = buffer.ref
 				var i = 0
 				while c[i] != 0 {
 					quakePutChar(c[i])
@@ -285,13 +285,13 @@ fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
 				}
 			}
 			case 117: { // `u`
-				var value: UInt32 = va_arg_uint32()
-				var buffer: ArrayByValue<UInt8, 16> = [0]
+				var value UInt32 = va_arg_uint32()
+				var buffer ArrayByValue<UInt8, 16> = [0]
 				for i in 16 {
 					buffer[i] = 0
 				}
 				comItoA(value, buffer.ref)
-				var c: ArrayPointer<UInt8> = buffer.ref
+				var c ArrayPointer<UInt8> = buffer.ref
 				var i = 0
 				while c[i] != 0 {
 					quakePutChar(c[i])
@@ -299,7 +299,7 @@ fun quakePrintf(c: ConstArrayPointer<ClangWideChar>, ...args) {
 				}
 			}
 			case 56: { // `8`
-				var value: UInt64 = va_arg_uint64()
+				var value UInt64 = va_arg_uint64()
 				quakePrintHex(value)
 			}
 		}

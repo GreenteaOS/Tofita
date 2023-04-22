@@ -78,7 +78,7 @@ fun drawShadowBox(x: Int16, y: Int16, w: UInt16, h: UInt16) {
 
 fun drawWindowFrame(title: String, x: Int16, y: Int16, w: UInt16, h: UInt16, active: Bool,
 						 hover: FrameHover, down: Bool) {
-	var shorterFrame: Bool = false // OSX style TODO
+	var shorterFrame Bool = false // OSX style TODO
 
 	var color = new ByValue<Pixel32>()
 

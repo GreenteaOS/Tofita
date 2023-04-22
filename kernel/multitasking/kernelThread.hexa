@@ -16,13 +16,13 @@
 @emitHeader @linkAsIs
 declare fun kernelThreadStart() Void
 
-let stackSizeForKernelThread: UInt64 = 1024 * 1024u64
+let stackSizeForKernelThread UInt64 = 1024 * 1024u64
 
 @aligned(64)
 // TODO let
 // TODO ArrayByValue cannot be `var`
 // TODO use `stackSizeForKernelThread` in <>
-var kernelStack: ArrayByValue<UInt8, 1048576> = [0]
+var kernelStack ArrayByValue<UInt8, 1048576> = [0]
 
 fun kernelThread() {
 	serialPrintln("<Tofita> [kernelThread] thread started")
@@ -40,7 +40,7 @@ fun kernelThread() {
 	while true {
 		// TODO optimize cast to 1u64
 		// TODO no need for `@volatile` here and there
-		@volatile var index: UInt64 = 1 // Idle process ignored
+		@volatile var index UInt64 = 1 // Idle process ignored
 		while index < processes.length {
 			let process = processes[index]
 			// TODO `for process in processes { if process.pid == 0 { continue } }`

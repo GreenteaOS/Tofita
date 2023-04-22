@@ -14,13 +14,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class Cursor {
-	var x: UInt16
-	var y: UInt16
-	var width: UInt8
-	var height: UInt8
-	var bmp: ArrayPointer<UInt8>
+	var x UInt16
+	var y UInt16
+	var width UInt8
+	var height UInt8
+	var bmp ArrayPointer<UInt8>
 	// TODO just use Bitmap32
-	var bmpStart: UInt64
+	var bmpStart UInt64
 	new () {}
 }
 
@@ -37,7 +37,7 @@ fun loadCursor(asset: RamDiskAsset) Cursor {
 		return null
 	}
 	// Specifies number of images in the file.
-	let count: Int = buffer[4] + buffer[5] * 0xFF
+	let count Int = buffer[4] + buffer[5] * 0xFF
 	serialPrintf("%d images in a cursor\n", count)
 	if count == 0 {
 		return null

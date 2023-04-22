@@ -30,10 +30,10 @@ var paramsCache = null as! UefiPayload
 // Mouse cursor repaint
 @volatile var haveToRenderMouseCursor = false
 
-var uptimeMilliseconds: UInt64 = 0
+var uptimeMilliseconds UInt64 = 0
 
 // TODO wipe this feature for now? or fix?
-var startupMilliseconds: UInt64 = 0
+var startupMilliseconds UInt64 = 0
 
 @rename('libc_memset')
 declare fun memset(dest: ArrayPointer<UInt8>, e: Int32, len: UInt64) Void

@@ -21,15 +21,15 @@
 
 @struct @packed
 class AcpiTableHeader {
-	var type: AcpiTypeId
-	var length: UInt32
-	var revision: UInt8
-	var checksum: UInt8
-	var oemId: ArrayByValue<UInt8, 6>
-	var oemTable: ArrayByValue<UInt8, 8>
-	var oemRevision: UInt32
-	var creatorId: UInt32
-	var creatorRevision: UInt32
+	var type AcpiTypeId
+	var length UInt32
+	var revision UInt8
+	var checksum UInt8
+	var oemId ArrayByValue<UInt8, 6>
+	var oemTable ArrayByValue<UInt8, 8>
+	var oemRevision UInt32
+	var creatorId UInt32
+	var creatorRevision UInt32
 
 	fun validate(expectedType: AcpiTypeId) Bool {
 		return expectedType == type
@@ -43,11 +43,11 @@ fun validate(expectedType: AcpiTypeId, type: AcpiTypeId) Bool {
 
 @struct @packed
 class AcpiMcfgEntry {
-	var base: UInt64
-	var group: UInt16
-	var busStart: UInt8
-	var busEnd: UInt8
-	var reserved: UInt32
+	var base UInt64
+	var group UInt16
+	var busStart UInt8
+	var busEnd UInt8
+	var reserved UInt32
 }
 
 enum AcpiTypeId : UInt32 {
@@ -59,43 +59,43 @@ enum AcpiTypeId : UInt32 {
 @struct @packed
 class AcpiMcfg {
 	// TODO static let sign = @acpiHeaderSignature 'MCFG'
-	var header: ByValue<AcpiTableHeader>
-	var reserved: UInt64
-	var entries: ArrayByValue<ByValue<AcpiMcfgEntry>, 0>
+	var header ByValue<AcpiTableHeader>
+	var reserved UInt64
+	var entries ArrayByValue<ByValue<AcpiMcfgEntry>, 0>
 }
 
 @struct @packed
 class AcpiApic {
 	// TODO static let sign = @acpiHeaderSignature 'APIC'
-	var header: AcpiTableHeader
-	var localAddress: UInt32
-	var flags: UInt32
-	var controllerData: ArrayByValue<UInt8, 0>
+	var header AcpiTableHeader
+	var localAddress UInt32
+	var flags UInt32
+	var controllerData ArrayByValue<UInt8, 0>
 }
 
 @struct @packed
 class XSDT {
 	// TODO static let sign = @acpiHeaderSignature 'XSDT'
-	var header: ByValue<AcpiTableHeader>
+	var header ByValue<AcpiTableHeader>
 	// TODO ArrayByValueArbitarySized <- otherwise check bounds at ctime where possible
-	var headers: ArrayByValue<AcpiTableHeader, 0>
+	var headers ArrayByValue<AcpiTableHeader, 0>
 }
 
 @struct @packed
 class Acpi20 {
-	var length: UInt32
-	var xsdtAddress: XSDT
-	var checksum: UInt8
-	var reserved: ArrayByValue<UInt8, 3>
+	var length UInt32
+	var xsdtAddress XSDT
+	var checksum UInt8
+	var reserved ArrayByValue<UInt8, 3>
 }
 
 @struct @packed
 class Acpi10 {
-	var signature: ArrayByValue<UInt8, 8>
-	var checksum: UInt8
-	var oemID: ArrayByValue<UInt8, 6>
-	var revision: UInt8
-	var rsdtAddress: UInt32
+	var signature ArrayByValue<UInt8, 8>
+	var checksum UInt8
+	var oemID ArrayByValue<UInt8, 6>
+	var revision UInt8
+	var rsdtAddress UInt32
 }
 
 @struct @packed
@@ -129,7 +129,7 @@ fun acpiValidateXSDT(t: XSDT) Bool {
 }
 
 fun putSig(into: ArrayPointer<UInt8>, type: AcpiTypeId) Void {
-	let typeId: ArrayByValue<UInt32, 1> = [type as! UInt32]
+	let typeId ArrayByValue<UInt32, 1> = [type as! UInt32]
 	let typeRef = typeId.ref as! ArrayPointer<UInt8>
 	for j in 4 {
 		into[j] = typeRef[j]
@@ -143,10 +143,10 @@ fun busAddr(bus: UInt8, device: UInt8, func: UInt8) UInt16 {
 
 @struct
 class PciGroup {
-	var group: UInt16
-	var busStart: UInt16
-	var busEnd: UInt16
-	var base: ArrayPointer<UInt32>
+	var group UInt16
+	var busStart UInt16
+	var busEnd UInt16
+	var base ArrayPointer<UInt32>
 
 	fun baseFor(bus: UInt8, device: UInt8, func: UInt8) ArrayPointer<UInt32> {
 		return (base as! UInt64 + busAddr(bus, device, func) << 12) as! ArrayPointer<UInt32>
@@ -183,7 +183,7 @@ class ACPIParser {
 		serialPrintf("[ACPI] revision is %d\n", acpi10.ref.revision)
 
 		// TODO ensure \0 at end of array
-		var signature: ArrayByValue<UInt8, 9> = "RSD PTR "
+		var signature ArrayByValue<UInt8, 9> = "RSD PTR "
 
 		// TODO sizeOf accepts 0 args! `for i in sizeOf(acpi10.ref.signature) {`
 		for i in sizeOf<ArrayByValue<UInt8, 8> >() {
@@ -193,7 +193,7 @@ class ACPIParser {
 			}
 		}
 
-		var checksum: UInt8 = 0
+		var checksum UInt8 = 0
 
 		for i in sizeOf<Acpi10>() {
 			checksum += (acpi10 as! ArrayPointer<UInt8>)[i]
@@ -227,7 +227,7 @@ class ACPIParser {
 	}
 
 	static /*TODO private*/ fun physicalToVirtual(physical: UInt64) UInt64 {
-		var result: UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
+		var result UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
 		return result
 	}
 
@@ -237,7 +237,7 @@ class ACPIParser {
 		let y = virtualAddress as! ArrayPointer<UInt8>
 
 		for j in 8 {
-			var buffer: ArrayByValue<UInt16, 2> = [0, 0]
+			var buffer ArrayByValue<UInt16, 2> = [0, 0]
 			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?'.charCodeAt(0) as! UInt8 : x[j]
 			buffer[1] = 0 as! UInt8
 			serialPrint(String.fromUTF16z(buffer.ref as! ConstArrayPointer<UInt16>))
@@ -253,13 +253,13 @@ class ACPIParser {
 
 		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", acpiValidateXSDT(xsdt))
 
-		var sig: ArrayByValue<UInt8, 5> = [0, 0, 0, 0, 0]
+		var sig ArrayByValue<UInt8, 5> = [0, 0, 0, 0, 0]
 		serialPrintf("[ACPI] ACPI 2.0+ tables loading\n")
 		putSig(sig.ref, xsdt.header.ref.type)
 		serialPrintf("[ACPI] Found table %s\n", sig.ref)
 		quakePrintf("[ACPI] Found table %s, ".utf16(), sig.ref)
 
-		var numTables: UInt64 = acpiTableEntriesXSDT(xsdt, 8)
+		var numTables UInt64 = acpiTableEntriesXSDT(xsdt, 8)
 		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)
 
 		for i in numTables {
@@ -290,14 +290,14 @@ class ACPIParser {
 	}
 
 	static fun loadApic(apic: AcpiApic) {
-		var local: ArrayPointer<UInt32> = (apic.localAddress) as! ArrayPointer<UInt32>
+		var local ArrayPointer<UInt32> = (apic.localAddress) as! ArrayPointer<UInt32>
 		serialPrintf("loadApic\n")
 	}
 
 	static fun loadMcfg(mcfg: AcpiMcfg) {
 		serialPrintf("loadMcfg\n")
-		var count: UInt64 = acpiTableEntriesAcpiMcfg(mcfg, sizeOf<AcpiMcfgEntry>()) // TODO sizeOf must error
-		var mPci: [PciGroup] = []
+		var count UInt64 = acpiTableEntriesAcpiMcfg(mcfg, sizeOf<AcpiMcfgEntry>()) // TODO sizeOf must error
+		var mPci [PciGroup] = []
 
 		for i in count {
 			let mcfge = mcfg.entries[i].ref
@@ -307,7 +307,7 @@ class ACPIParser {
 			mPci[i].busEnd = mcfge.busEnd
 			mPci[i].base = (mcfge.base) as! ArrayPointer<UInt32>
 
-			var busses: Int32 = mPci[i].busEnd - mPci[i].busStart + 1
+			var busses Int32 = mPci[i].busEnd - mPci[i].busStart + 1
 		}
 
 		probePci(mPci, count)
@@ -315,7 +315,7 @@ class ACPIParser {
 
 	static fun multi(group: PciGroup, bus: UInt8, device: UInt8, func: UInt8) Bool {
 		// TODO ^ proper name
-		var mBase: ArrayPointer<UInt32> = group.baseFor(bus, device, func)
+		var mBase ArrayPointer<UInt32> = group.baseFor(bus, device, func)
 		var mMulti = ((mBase[3] >> 16) & 0x80) == 0x80
 		return mMulti
 		// TODO ^ proper name

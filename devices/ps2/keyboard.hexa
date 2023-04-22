@@ -19,8 +19,8 @@
 @extern declare fun keyboardHandler() Void
 
 // TODO this is just array of booleans
-var keyboardPressedState: ArrayByValue<UInt8, 128> = [0]
-let keyboardMap: [String] = [
+var keyboardPressedState ArrayByValue<UInt8, 128> = [0]
+let keyboardMap [String] = [
 	'', ''/*ESC*/, '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
 	'9',  '0', '-', '=',
@@ -96,7 +96,7 @@ fun handleKeyboardPacket() {
 
 	// TODO if status & 0x1 != 0
 	{
-		var keycode: UInt8 = readPort(dataPort)
+		var keycode UInt8 = readPort(dataPort)
 
 		// TODO should hint that `<` useless here for `uint8`
 		if keycode < 0 {

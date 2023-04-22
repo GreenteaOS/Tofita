@@ -36,10 +36,10 @@ declare fun cpuid(
 	edx: ArrayPointer<UInt32>
 ) Void
 /* {
-	var a: UInt32 = 0
-	var b: UInt32 = 0
-	var c: UInt32 = 0
-	var d: UInt32 = 0
+	var a UInt32 = 0
+	var b UInt32 = 0
+	var c UInt32 = 0
+	var d UInt32 = 0
 	// asm volatile("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "a"(leaf), "c"(subleaf))
 	// TODO to cpu.asm
 	eax[0] = a

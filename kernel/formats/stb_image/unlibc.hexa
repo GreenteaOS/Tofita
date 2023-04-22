@@ -27,11 +27,11 @@ declare fun stbi_load_from_memory(
 
 fun loadPng32FromBuffer(data: ArrayPointer<UInt8>, size: UInt32) Bitmap32 {
 	// TODO better idea, like `ArrayByValue` or just `ByValue`?
-	var width: ArrayByValue<Int32, 1> = [0]
-	var height: ArrayByValue<Int32, 1> = [0]
-	var bpp: ArrayByValue<Int32, 1> = [0]
+	var width ArrayByValue<Int32, 1> = [0]
+	var height ArrayByValue<Int32, 1> = [0]
+	var bpp ArrayByValue<Int32, 1> = [0]
 
-	var colors: ArrayPointer<UInt8> = stbi_load_from_memory(
+	var colors ArrayPointer<UInt8> = stbi_load_from_memory(
 		data,
 		size,
 		width.ref,
@@ -47,16 +47,16 @@ fun loadPng32FromBuffer(data: ArrayPointer<UInt8>, size: UInt32) Bitmap32 {
 
 	serialPrintln("<Tofita> loadPng32FromBuffer before allocateBitmap")
 
-	// TODO should error due to data loss `ArrayByValue<Int32, 1> as! UInt32` `var bitmap: Bitmap32 = allocateBitmap(width as! UInt32, height as! UInt32)`
-	var bitmap: Bitmap32 = allocateBitmap(width as! UInt32, height as! UInt32)
+	// TODO should error due to data loss `ArrayByValue<Int32, 1> as! UInt32` `var bitmap Bitmap32 = allocateBitmap(width as! UInt32, height as! UInt32)`
+	var bitmap Bitmap32 = allocateBitmap(width as! UInt32, height as! UInt32)
 
 	serialPrintln("<Tofita> loadPng32FromBuffer before rgba")
-	var rgba: ArrayPointer<UInt32> = colors as! ArrayPointer<UInt32>
+	var rgba ArrayPointer<UInt32> = colors as! ArrayPointer<UInt32>
 	for y in height {
 		for x in width {
 			bitmap.pixels[y * width + x].ref.color = rgba[y * width + x]
 			// This should be fixed in framebuffer? Or PNG really BGRA?
-			var temp: UInt8 = bitmap.pixels[y * width + x].ref.rgba.ref.r
+			var temp UInt8 = bitmap.pixels[y * width + x].ref.rgba.ref.r
 			bitmap.pixels[y * width + x].ref.rgba.ref.r = bitmap.pixels[y * width + x].ref.rgba.ref.b
 			bitmap.pixels[y * width + x].ref.rgba.ref.b = temp
 		}

@@ -16,97 +16,97 @@
 // 1 byte aligned
 @struct @packed @sizeOf(24)
 class PeHeader {
-	var magic: UInt32 // PE\0\0 or 0x00004550
-	var machine: UInt16
-	var numberOfSections: UInt16
-	var timeDateStamp: UInt32
-	var pointerToSymbolTable: UInt32
-	var numberOfSymbols: UInt32
-	var sizeOfOptionalHeader: UInt16
-	var characteristics: UInt16
+	var magic UInt32 // PE\0\0 or 0x00004550
+	var machine UInt16
+	var numberOfSections UInt16
+	var timeDateStamp UInt32
+	var pointerToSymbolTable UInt32
+	var numberOfSymbols UInt32
+	var sizeOfOptionalHeader UInt16
+	var characteristics UInt16
 }
 
 // 1 byte aligned
 @struct @packed
 class Pe64OptionalHeader {
-	var magic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	var majorLinkerVersion: UInt8
-	var minorLinkerVersion: UInt8
-	var sizeOfCode: UInt32
-	var sizeOfInitializedData: UInt32
-	var sizeOfUninitializedData: UInt32
-	var addressOfEntryPoint: UInt32
-	var baseOfCode: UInt32
-	var imageBase: UInt64
-	var sectionAlignment: UInt32
-	var fileAlignment: UInt32
-	var majorOperatingSystemVersion: UInt16
-	var minorOperatingSystemVersion: UInt16
-	var majorImageVersion: UInt16
-	var minorImageVersion: UInt16
-	var majorSubsystemVersion: UInt16
-	var minorSubsystemVersion: UInt16
+	var magic UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	var majorLinkerVersion UInt8
+	var minorLinkerVersion UInt8
+	var sizeOfCode UInt32
+	var sizeOfInitializedData UInt32
+	var sizeOfUninitializedData UInt32
+	var addressOfEntryPoint UInt32
+	var baseOfCode UInt32
+	var imageBase UInt64
+	var sectionAlignment UInt32
+	var fileAlignment UInt32
+	var majorOperatingSystemVersion UInt16
+	var minorOperatingSystemVersion UInt16
+	var majorImageVersion UInt16
+	var minorImageVersion UInt16
+	var majorSubsystemVersion UInt16
+	var minorSubsystemVersion UInt16
 	var win32VersionValue: UInt32
-	var sizeOfImage: UInt32
-	var sizeOfHeaders: UInt32
-	var checkSum: UInt32
-	var subsystem: UInt16
-	var dllCharacteristics: UInt16
-	var sizeOfStackReserve: UInt64
-	var sizeOfStackCommit: UInt64
-	var sizeOfHeapReserve: UInt64
-	var sizeOfHeapCommit: UInt64
-	var loaderFlags: UInt32
-	var numberOfRvaAndSizes: UInt32
+	var sizeOfImage UInt32
+	var sizeOfHeaders UInt32
+	var checkSum UInt32
+	var subsystem UInt16
+	var dllCharacteristics UInt16
+	var sizeOfStackReserve UInt64
+	var sizeOfStackCommit UInt64
+	var sizeOfHeapReserve UInt64
+	var sizeOfHeapCommit UInt64
+	var loaderFlags UInt32
+	var numberOfRvaAndSizes UInt32
 }
 
 // 1 byte aligned
 @struct @packed
 class Pe32OptionalHeader {
-	var magic: UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
-	var majorLinkerVersion: UInt8
-	var minorLinkerVersion: UInt8
-	var sizeOfCode: UInt32
-	var sizeOfInitializedData: UInt32
-	var sizeOfUninitializedData: UInt32
-	var addressOfEntryPoint: UInt32
-	var baseOfCode: UInt32
-	var baseOfData: UInt32 // present only in 32-bit
-	var imageBase: UInt32
-	var sectionAlignment: UInt32
-	var fileAlignment: UInt32
-	var majorOperatingSystemVersion: UInt16
-	var minorOperatingSystemVersion: UInt16
-	var majorImageVersion: UInt16
-	var minorImageVersion: UInt16
-	var majorSubsystemVersion: UInt16
-	var minorSubsystemVersion: UInt16
+	var magic UInt16 // 0x010b - PE32, 0x020b - PE32+ (64 bit)
+	var majorLinkerVersion UInt8
+	var minorLinkerVersion UInt8
+	var sizeOfCode UInt32
+	var sizeOfInitializedData UInt32
+	var sizeOfUninitializedData UInt32
+	var addressOfEntryPoint UInt32
+	var baseOfCode UInt32
+	var baseOfData UInt32 // present only in 32-bit
+	var imageBase UInt32
+	var sectionAlignment UInt32
+	var fileAlignment UInt32
+	var majorOperatingSystemVersion UInt16
+	var minorOperatingSystemVersion UInt16
+	var majorImageVersion UInt16
+	var minorImageVersion UInt16
+	var majorSubsystemVersion UInt16
+	var minorSubsystemVersion UInt16
 	var win32VersionValue: UInt32
-	var sizeOfImage: UInt32
-	var sizeOfHeaders: UInt32
-	var checkSum: UInt32
-	var subsystem: UInt16
-	var dllCharacteristics: UInt16
-	var sizeOfStackReserve: UInt32
-	var sizeOfStackCommit: UInt32
-	var sizeOfHeapReserve: UInt32
-	var sizeOfHeapCommit: UInt32
-	var loaderFlags: UInt32
-	var numberOfRvaAndSizes: UInt32
+	var sizeOfImage UInt32
+	var sizeOfHeaders UInt32
+	var checkSum UInt32
+	var subsystem UInt16
+	var dllCharacteristics UInt16
+	var sizeOfStackReserve UInt32
+	var sizeOfStackCommit UInt32
+	var sizeOfHeapReserve UInt32
+	var sizeOfHeapCommit UInt32
+	var loaderFlags UInt32
+	var numberOfRvaAndSizes UInt32
 }
 
 @struct @packed @sizeOf(40)
 class ImageSectionHeader { // size 40 bytes
-	var name: ArrayByValue<UInt8, 8>
-	var virtualSize: UInt32
-	var virtualAddress: UInt32
-	var sizeOfRawData: UInt32
-	var pointerToRawData: UInt32
-	var pointerToRealocations: UInt32
-	var pointerToLinenumbers: UInt32
-	var numberOfRealocations: UInt16
-	var numberOfLinenumbers: UInt16
-	var characteristics: UInt32
+	var name ArrayByValue<UInt8, 8>
+	var virtualSize UInt32
+	var virtualAddress UInt32
+	var sizeOfRawData UInt32
+	var pointerToRawData UInt32
+	var pointerToRealocations UInt32
+	var pointerToLinenumbers UInt32
+	var numberOfRealocations UInt16
+	var numberOfLinenumbers UInt16
+	var characteristics UInt32
 }
 
 let image_directory_entry_export = 0	  // Export Directory
@@ -146,27 +146,27 @@ enum ImageDirectoryType : UInt8 {
 }
 
 @struct class IMAGE_EXPORT_DIRECTORY {
-	var characteristics: UInt32
-	var timeDateStamp: UInt32
-	var majorVersion: UInt16
-	var minorVersion: UInt16
-	var name: UInt32
-	var base: UInt32
-	var numberOfFunctions: UInt32
-	var numberOfNames: UInt32
-	var addressOfFunctions: UInt32
-	var addressOfNames: UInt32
-	var addressOfNameOrdinals: UInt32
+	var characteristics UInt32
+	var timeDateStamp UInt32
+	var majorVersion UInt16
+	var minorVersion UInt16
+	var name UInt32
+	var base UInt32
+	var numberOfFunctions UInt32
+	var numberOfNames UInt32
+	var addressOfFunctions UInt32
+	var addressOfNames UInt32
+	var addressOfNameOrdinals UInt32
 }
 
 @struct class IMAGE_BASE_RELOCATION { // TODO invalid name _Name
-	var virtualAddress: UInt32
-	var sizeOfBlock: UInt32
+	var virtualAddress UInt32
+	var sizeOfBlock UInt32
 }
 
 @struct class IMAGE_DATA_DIRECTORY {
-	var virtualAddress: UInt32
-	var size: UInt32
+	var virtualAddress UInt32
+	var size UInt32
 }
 
 enum ImageRelocationType : Int32 {
@@ -182,32 +182,32 @@ let image_rel_based_highlow = 3
 
 @struct @packed class IMAGE_IMPORT_DESCRIPTOR {
 	//_ANONYMOUS_UNION union {
-	//	var characteristics: UInt32
-	var originalFirstThunk: UInt32
+	//	var characteristics UInt32
+	var originalFirstThunk UInt32
 	//} DUMMYUNIONNAME
-	var timeDateStamp: UInt32
-	var forwarderChain: UInt32
-	var name: UInt32
-	var firstThunk: UInt32
+	var timeDateStamp UInt32
+	var forwarderChain UInt32
+	var name UInt32
+	var firstThunk UInt32
 }
 
 // TODO rename to TitleCase
 // TODO make all `let` not `var` same for other types
 @struct class IMAGE_IMPORT_BY_NAME {
-	var hint: UInt16
-	var name: ArrayByValue<UInt8, 1>
+	var hint UInt16
+	var name ArrayByValue<UInt8, 1>
 }
 
 @struct
 @union // TODO disallows `@struct`
 class IMAGE_THUNK_DATA<SIZE> {
 	/// Address of imported function
-	var func: SIZE
+	var func SIZE
 	/// Ordinal value of function
-	var ordinal: UInt32
+	var ordinal UInt32
 	/// RVA of imported name
 	/// ^ points to `IMAGE_IMPORT_BY_NAME?`
-	var addressOfData: SIZE
+	var addressOfData SIZE
 	/// RVA to forwarder string
-	var forwarderString: UInt32
+	var forwarderString UInt32
 }

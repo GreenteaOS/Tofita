@@ -16,9 +16,9 @@
 @struct
 class ClassesLinkedList {
 	// TODO let name String (late init)
-	var name: String // TODO = null or in constructor `new (named: String? = null)`
-	var wc: WindowClass
-	var next: ClassesLinkedList = null // TODO Pointer useless for struct?
+	var name String // TODO = null or in constructor `new (named: String? = null)`
+	var wc WindowClass
+	var next ClassesLinkedList = null // TODO Pointer useless for struct?
 	new (named: String) {
 		name = named
 	}
@@ -32,27 +32,27 @@ rootClass.next = null // TODO why I do this?
 
 // TODO some HandleWrapper with handle type field?
 // TODO to enums
-let windowIsWindow: UInt16 = 0xA1CE
+let windowIsWindow UInt16 = 0xA1CE
 
 @struct
 class Window {
 	// @rename('windowIsWindow_') // TODO renames due to global
-	var windowIsWindowSecret: UInt16
-	var windowId: UInt64
+	var windowIsWindowSecret UInt16
+	var windowId UInt64
 	// TODO Bool isNativeWindow
-	var proc: WindowProcedure
-	var fb: ByValue<WindowFramebuffer>
-	var instanceId: UInt64 // Random unique ID
+	var proc WindowProcedure
+	var fb ByValue<WindowFramebuffer>
+	var instanceId UInt64 // Random unique ID
 	new () {}
 }
 
-let windowIsRemoteWindow: UInt16 = 0xA1CB
+let windowIsRemoteWindow UInt16 = 0xA1CB
 
 // Window of other process
 @struct
 class RemoteWindow {
-	var windowIsRemoteWindow: UInt16
-	var pid: UInt64
-	var hWnd: HWnd
-	var instanceId: UInt64 // Random unique ID
+	var windowIsRemoteWindow UInt16
+	var pid UInt64
+	var hWnd HWnd
+	var instanceId UInt64 // Random unique ID
 }

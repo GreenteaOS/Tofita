@@ -16,16 +16,16 @@
 // Constants: shared data from the bootloader to the kernel
 
 // Kernel memory upper half starts from here
-let upper: UInt64 = 0xffff800000000000u64
+let upper UInt64 = 0xffff800000000000u64
 // TODO map pixels right here to avoid pointer indirection?
-let frameBufferVirtualBase: UInt64 = (upper + 768u64 * 1024u64 * 1024u64)
+let frameBufferVirtualBase UInt64 = (upper + 768u64 * 1024u64 * 1024u64)
 // TODO: no need for mapping frameBufferVirtualBase if wholePhysicalStart used
 // TODO proper dynamically computed numbers
 
 // Mapping of 1:1 of physical memory as virtual = physical + wholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-let wholePhysicalStart: UInt64 = (frameBufferVirtualBase + 128 * 1024 * 1024)
-let pageSize: UInt16 = 4096u16 // 4 KiB
+let wholePhysicalStart UInt64 = (frameBufferVirtualBase + 128 * 1024 * 1024)
+let pageSize UInt16 = 4096u16 // 4 KiB
 
 // Helpers
 @struct
@@ -45,20 +45,20 @@ class UserVirtual<T> {
 @struct
 // @sizeOf(8)
 class Physical<T> {
-	//var physical: UInt64
+	//var physical UInt64
 	static fun toPhysical(physical: UInt64) Physical<T> {
 		return physical as! Physical<T>
 	}
 
 	fun toVirtual() Virtual<T> {
-		var physical: UInt64 = this as! UInt64
-		var result: UInt64 = (wholePhysicalStart as! UInt64) + physical
+		var physical UInt64 = this as! UInt64
+		var result UInt64 = (wholePhysicalStart as! UInt64) + physical
 		return result as! Virtual<T>
 	}
 
 	fun toVirtualOffset(offset: UInt64) Virtual<T> {
-		var physical: UInt64 = this as! UInt64
-		var result: UInt64 = (wholePhysicalStart as! UInt64) + physical + offset
+		var physical UInt64 = this as! UInt64
+		var result UInt64 = (wholePhysicalStart as! UInt64) + physical + offset
 		return result as! Virtual<T>
 	}
 }*/
@@ -69,11 +69,11 @@ class Physical<T> {
 @sizeOf(40)
 // TODO ^ implement actual check in code gen
 class UefiMemoryMap {
-	var memoryMap: EFI_MEMORY_DESCRIPTOR
-	var memoryMapSize: UInt64
-	var mapKey: UInt64
-	var descriptorSize: UInt64
-	var descriptorVersion: UInt32
+	var memoryMap EFI_MEMORY_DESCRIPTOR
+	var memoryMapSize UInt64
+	var mapKey UInt64
+	var descriptorSize UInt64
+	var descriptorVersion UInt32
 	new () {}
 }
 
@@ -81,16 +81,16 @@ class UefiMemoryMap {
 @sizeOf(32)
 class FrameBuffer {
 	/// Virtual address of pixels buffer
-	var base: UInt64
+	var base UInt64
 	// TODO ^ equals to `frameBufferVirtualBase`?
 	/// Physical address of pixels buffer
-	var physical: UInt64
+	var physical UInt64
 	// TODO ^ seems useless cause easy to compute
 	/// Bytes for mapping
-	var size: UInt32 // TODO should be a method, respecting `pixelsPerScanLine` and bpp
-	var width: UInt32
-	var height: UInt32
-	var pixelsPerScanLine: UInt32
+	var size UInt32 // TODO should be a method, respecting `pixelsPerScanLine` and bpp
+	var width UInt32
+	var height UInt32
+	var pixelsPerScanLine UInt32
 	new () {}
 }
 
@@ -98,11 +98,11 @@ class FrameBuffer {
 @sizeOf(24)
 class RamDisk {
 	/// Virtual
-	var base: UInt64
+	var base UInt64
 	/// Physical
-	var physical: UInt64
+	var physical UInt64
 	/// Bytes for mapping
-	var size: UInt64
+	var size UInt64
 	new () {}
 }
 
@@ -110,22 +110,22 @@ class RamDisk {
 // TODO sizeOf
 class UefiPayload {
 	var pml4: UInt64
-	var stack: UInt64
+	var stack UInt64
 	/// Physical address of where kernel loader placed
-	var physicalBuffer: UInt64
-	var physicalBytes: UInt64
+	var physicalBuffer UInt64
+	var physicalBytes UInt64
 	/// Virtual address of where RAM usage bit-map stored
-	var physicalRamBitMaskVirtual: UInt64
-	var imageHandle: EFI_HANDLE
-	var efiMemoryMap: ByValue<UefiMemoryMap>
-	var efiRuntimeServices: EFI_RUNTIME_SERVICES = null
-	var framebuffer: ByValue<FrameBuffer>
-	var ramdisk: ByValue<RamDisk>
-	var acpiTablePhysical: UInt64
-	var ramBytes: UInt64
+	var physicalRamBitMaskVirtual UInt64
+	var imageHandle EFI_HANDLE
+	var efiMemoryMap ByValue<UefiMemoryMap>
+	var efiRuntimeServices EFI_RUNTIME_SERVICES = null
+	var framebuffer ByValue<FrameBuffer>
+	var ramdisk ByValue<RamDisk>
+	var acpiTablePhysical UInt64
+	var ramBytes UInt64
 
-	var time: ByValue<EFI_TIME>
-	var capabilities: ByValue<EFI_TIME_CAPABILITIES>
+	var time ByValue<EFI_TIME>
+	var capabilities ByValue<EFI_TIME_CAPABILITIES>
 	// UInt8 isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and
 	// don't allow to login! in the sense that it looks like a security hole
 	// like "let it in without entering a login-password")

@@ -49,11 +49,11 @@ fun deleteFolderRecursive(path, noRemoveSelf) {
 }
 
 // Modes
-var debuggie: Bool = false
-var strict: Bool = false
+var debuggie Bool = false
+var strict Bool = false
 
-let config: Config = JSON.parse(fs.readFileSync('config.json').toString())
-let tasks: [String] = process.argv.slice()
+let config Config = JSON.parse(fs.readFileSync('config.json').toString())
+let tasks [String] = process.argv.slice()
 let llvm = 'LLVM-14.0.6-2'
 tasks.shift()
 tasks.shift()
@@ -108,7 +108,7 @@ for task in ['tasks'] {
 		case 'clang-format':
 			{
 				let clang = '\(teapot)\\\(llvm)\\bin\\clang-format'
-				let files: [String] = []
+				let files [String] = []
 
 				fun formatFolderRecursive(path) {
 					if fs.existsSync(path) {
@@ -227,8 +227,8 @@ fun runTasks() {
 		}
 	}
 
-	// var wave: [String] = []
-	// let waves: [String] = [wave] TODO wrong type, not `String`
+	// var wave [String] = []
+	// let waves [String] = [wave] TODO wrong type, not `String`
 	let phase1: [String] = []
 	let phase2: [String] = []
 	let phase3: [String] = []

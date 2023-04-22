@@ -30,7 +30,7 @@ declare fun __sync_lock_release(
 @struct @sizeOf(4)
 class SpinLock {
 	// TODO is it faster to use uint8_t?
-	@volatile private var counter: ArrayByValue<UInt32, 1> = [0]
+	@volatile private var counter ArrayByValue<UInt32, 1> = [0]
 
 	@inline fun lock() {
 		// TODO instant return if a lock held without loops

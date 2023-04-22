@@ -19,18 +19,18 @@
 @struct
 class TofitaProcess {
 	// Is process exists at all and fully initialized
-	@volatile var present: Bool
+	@volatile var present Bool
 	// TODO SoA
 
 	// Index
-	@volatile var pid: UInt64
+	@volatile var pid UInt64
 
 	// Is it allowed to make this process current
-	@volatile var schedulable: Bool
+	@volatile var schedulable Bool
 	// TODO combine booleans into bit/flag mask?
 
 	// Should be false after creation
-	@volatile var scheduleOnNextTick: Bool
+	@volatile var scheduleOnNextTick Bool
 
 	// CR3, should be page aligned
 	@volatile var pml4: ArrayPointer<ByValue<PageEntry>>
@@ -45,7 +45,7 @@ class TofitaProcess {
 
 	// When syscall happens, process halted and handled retroactively
 	// in the kernel's event loop
-	@volatile var syscallToHandle: TofitaSyscalls // = Noop if no actions required
+	@volatile var syscallToHandle TofitaSyscalls // = Noop if no actions required
 													  // TODO do this on per-thread basis
 
 	// TODO separate syscall arguments, cause they differ in 32-bit
@@ -60,14 +60,14 @@ class TofitaProcess {
 
 	// 32-bit
 	var is64bit: Bool
-	var limits: AddressAwareness
-	var name: String
+	var limits AddressAwareness
+	var name String
 
 	new () {}
 }
 
 /// List of all processes
-let processes: [TofitaProcess] = []
+let processes [TofitaProcess] = []
 
 // TODO must use locking for sane SMP
 fun appendProcess(process: TofitaProcess) {
@@ -90,4 +90,4 @@ fun appendProcess(process: TofitaProcess) {
 
 // Working process pid, with restored state and active CR3
 // TODO convert to TLS
-@volatile var currentProcess: UInt64 = 0
+@volatile var currentProcess UInt64 = 0

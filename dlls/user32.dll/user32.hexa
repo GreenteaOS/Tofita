@@ -112,7 +112,7 @@ fun createWindowExW(
 	var name = String.fromUTF16zUpTo(lpClassName as! ConstArrayPointer<UInt16>, classNameLimit)
 	// TODO ^ check string pointer for null/SEH
 	var found = false
-	var wc: WindowClass = null
+	var wc WindowClass = null
 
 	while list.next != null {
 		// Step upfront, to ignore empty root
@@ -136,7 +136,7 @@ fun createWindowExW(
 	// Prepare for syscall
 	// TODO proper `new CreateWindowExPayload {} ()`
 	// TODO stack alloc\dealloc by @owned/borrowed @struct refs
-	var payload: CreateWindowExPayload = new CreateWindowExPayload()
+	var payload CreateWindowExPayload = new CreateWindowExPayload()
 
 	payload.wc = wc as! UInt64
 	// TODO `wc.type.address` same for others
@@ -161,7 +161,7 @@ fun createWindowExW(
 	payload.hWnd = hWnd as! UInt64
 
 	// Create native window counterpart
-	var windowId: UInt64 = tofitaCreateWindowEx(payload)
+	var windowId UInt64 = tofitaCreateWindowEx(payload)
 	// TODO ^ check the result if it succeeded
 
 	window.windowId = windowId
@@ -253,7 +253,7 @@ fun translateMessage(msg: Msg) Bool32 {
 @dllExport('DispatchMessageW')
 fun dispatchMessageW(msg: Msg) LResult? {
 	tofitaDebugLog("DispatchMessageW called (hexa)".utf16())
-	var result: LResult? = null
+	var result LResult? = null
 	// TODO ^ clearer result type? LResult.zero
 	if msg.hwnd != null {
 		tofitaDebugLog("msg.hwnd != null".utf16())
@@ -281,7 +281,7 @@ fun dispatchMessageW(msg: Msg) LResult? {
 
 @dllExport('PostMessage')
 fun postMessage(hWnd: HWnd, msg: Message, wParam: WParam, lParam: LParam) Bool32 {
-	var payload: PostMessagePayload = new PostMessagePayload()
+	var payload PostMessagePayload = new PostMessagePayload()
 	// TODO ^ by value
 	payload.hWnd = hWnd as! UInt64
 	payload.msg = msg

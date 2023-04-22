@@ -45,24 +45,24 @@ declare fun vmemcpy(@volatile dest: ArrayPointer<UInt8>, @volatile src: ConstArr
 @asIs
 declare
 class Idtr {
-	var limit: UInt16
-	var offset: UInt64
+	var limit UInt16
+	var offset UInt64
 	new ()
 }
 
 @struct @packed
 class IdtEntry {
-	@bits(16) var offsetLowerBits: UInt16
-	@bits(16) var selector: UInt16
-	@bits(8) var ist: UInt8
-	@bits(4) var gateType: UInt8
-	@bits(1) var z: UInt8
+	@bits(16) var offsetLowerBits UInt16
+	@bits(16) var selector UInt16
+	@bits(8) var ist UInt8
+	@bits(4) var gateType UInt8
+	@bits(1) var z UInt8
 
 	// TODO Make it enum for safety/sanity
-	@bits(2) var dpl: UInt8
-	@bits(1) var present: UInt8
-	@bits(48) var offsetHigherBits: UInt64
-	@bits(32) var zero: UInt32
+	@bits(2) var dpl UInt8
+	@bits(1) var present UInt8
+	@bits(48) var offsetHigherBits UInt64
+	@bits(32) var zero UInt32
 }
 
 fun readPort(@volatile port: UInt16) UInt8 {
@@ -79,7 +79,7 @@ declare fun loadIdt(@volatile idtr: Idtr) Void
 // Handling IDT
 let idt_size = 256
 // TODO IdtEntry IDT[idt_size]
-var idt: ArrayByValue<ByValue<IdtEntry>, 256> = []
+var idt ArrayByValue<ByValue<IdtEntry>, 256> = []
 
 // Handling interrupts and exceptions
 fun defineIdtCallback(entry: IdtEntry, address: UInt64, stack: UInt8, level: UInt8) {
@@ -148,7 +148,7 @@ fun disablePic() {
 }
 
 fun physicalToVirtual(physical: UInt64) UInt64 {
-	var result: UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
+	var result UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
 	return result
 }
 
@@ -157,7 +157,7 @@ fun enableLocalApic() {
 	serialPrintln("[cpu] begin: enableLocalApic")
 
 	var ptr = physicalToVirtual(0xFEE000F0u32) as! ArrayPointer<UInt32>
-	var val: UInt32 = ptr[0]
+	var val UInt32 = ptr[0]
 	quakePrintf("APIC value is %u\n".utf16(), val)
 
 	serialPrintln("[cpu] done: enableLocalApic")
@@ -184,39 +184,39 @@ let irq15 = 47u16
 @asIs
 @rename('TablePtr')
 declare class TablePtr {
-	var limit: UInt16
-	var base: UInt64
+	var limit UInt16
+	var base UInt64
 	new ()
 }
 
 @struct @packed
 class TssDescriptor {
-	var limitLow: UInt16
+	var limitLow UInt16
 	var base_00: UInt16
 	var base_16: UInt8
-	var type: GdtType
-	var size: UInt8
+	var type GdtType
+	var size UInt8
 	var base_24: UInt8
 	var base_32: UInt32
-	var reserved: UInt32
+	var reserved UInt32
 }
 
 @struct @packed
 class TssEntry {
 	var reserved0: UInt32
 
-	var rsp: ArrayByValue<UInt64, 3> // stack pointers for CPL 0-2
-	var ist: ArrayByValue<UInt64, 8> // ist[0] is reserved
+	var rsp ArrayByValue<UInt64, 3> // stack pointers for CPL 0-2
+	var ist ArrayByValue<UInt64, 8> // ist[0] is reserved
 
 	var reserved1: UInt64
 	var reserved2: UInt16
-	var iomap_offset: UInt16
+	var iomap_offset UInt16
 
 	new () {}
 }
 
-@aligned(64) @volatile var globalGdtr: TablePtr = new TablePtr()
-@aligned(64) @volatile var globalTss: TssEntry = new TssEntry()
+@aligned(64) @volatile var globalGdtr TablePtr = new TablePtr()
+@aligned(64) @volatile var globalTss TssEntry = new TssEntry()
 
 // rsp0stack = exp0 in TSS
 // Stack used by kernel to handle syscalls/interrupts
@@ -270,7 +270,7 @@ fun anyInterruptHandler(frame: InterruptFrame) Void {
 
 fun syscallInterruptHandler(frame: InterruptFrame) {
 	disableAllInterrupts()
-	@volatile let process: TofitaProcess = processes[currentProcess]
+	@volatile let process TofitaProcess = processes[currentProcess]
 	process.schedulable = false
 	@volatile let index = frame.rcxArg0 as! TofitaSyscalls
 
@@ -299,7 +299,7 @@ fun syscallInterruptHandler(frame: InterruptFrame) {
 		serialPrintf("[[ExitProcess:PID %d]] %d\n", currentProcess, frame.rdxArg1)
 		// TODO kernel wake up
 		// TODO destroy process
-		var process: TofitaProcess = processes[currentProcess]
+		var process TofitaProcess = processes[currentProcess]
 		process.schedulable = false
 		switchToNextProcess(frame)
 		process.present = false
@@ -315,7 +315,7 @@ let ps2_control_port = 0x64u8
 
 // Takes 2 GDT entries
 fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
-	var tssd: TssDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! TssDescriptor
+	var tssd TssDescriptor = (gdtTemplate.ref as! UInt64 + i * 2 * 4) as! TssDescriptor
 	tssd.limitLow = limit & 0xFFFFu16
 	tssd.size = (limit >> 16) & 0xFu8
 
@@ -333,10 +333,10 @@ fun tssSetEntry(i: UInt8, base: UInt64, limit: UInt64) {
 	) as! GdtType
 }
 
-@aligned(64) var cacheIdtr: Idtr = new Idtr()
+@aligned(64) var cacheIdtr Idtr = new Idtr()
 
 fun setupInterruptsAndExceptions() {
-	var sizeof_TssEntry: UInt16 = sizeOf<TssEntry>() as! UInt16
+	var sizeof_TssEntry UInt16 = sizeOf<TssEntry>() as! UInt16
 
 	memset(globalTss as! ArrayPointer<UInt8>, 0, sizeof_TssEntry)
 	globalTss.iomap_offset = sizeof_TssEntry
@@ -355,7 +355,7 @@ fun setupInterruptsAndExceptions() {
 	globalTss.ist[6] = ist6stack.ref as! UInt64 + rspStackSize
 	globalTss.ist[7] = ist7stack.ref as! UInt64 + rspStackSize
 
-	var tssBase: UInt64 = globalTss as! UInt64
+	var tssBase UInt64 = globalTss as! UInt64
 
 	// upload
 	{

@@ -21,10 +21,10 @@ fun loadRamDiskFromVolume(
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] begin\n")
 	var name = "TOFITA.DAT"
 
-	var file: EFI_FILE_PROTOCOL = null
-	var sfile: ArrayByValue<EFI_FILE_PROTOCOL, 1> = []
+	var file EFI_FILE_PROTOCOL = null
+	var sfile ArrayByValue<EFI_FILE_PROTOCOL, 1> = []
 
-	let status: EFI_STATUS = root.open(
+	let status EFI_STATUS = root.open(
 		root,
 		sfile.ref,
 		name.utf16() as! ArrayPointer<UInt16>,
@@ -49,24 +49,24 @@ fun loadRamDiskFromVolume(
 	// TODO `uint8_t info[sizeOf(efi::EFI_FILE_INFO) + 100];`
 	// TODO `uint64_t infoSize = sizeOf(info);`
 	let info = new EFI_FILE_INFO()
-	var infoSize: ArrayByValue<UInt64, 1> = [4096]
+	var infoSize ArrayByValue<UInt64, 1> = [4096]
 
-	var genericFileInfo: EFI_GUID = new EFI_FILE_INFO_ID()
+	var genericFileInfo EFI_GUID = new EFI_FILE_INFO_ID()
 
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] file.getInfo\n")
 	let status = file.getInfo(file, genericFileInfo, infoSize.ref, info)
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status: GetInfo %d\n", status)
 
-	var size: ArrayByValue<UInt64, 1> = [(info as! EFI_FILE_INFO).fileSize]
+	var size ArrayByValue<UInt64, 1> = [(info as! EFI_FILE_INFO).fileSize]
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] FileSize %d\n", size[0])
 
-	// TODO must error `size /` at `var sizeAlloc: ArrayByValue<UInt64, 1> = [(size / pageSize + 1) * pageSize]`
-	var sizeAlloc: ArrayByValue<UInt64, 1> = [(size[0] / pageSize + 1) * pageSize]
+	// TODO must error `size /` at `var sizeAlloc ArrayByValue<UInt64, 1> = [(size / pageSize + 1) * pageSize]`
+	var sizeAlloc ArrayByValue<UInt64, 1> = [(size[0] / pageSize + 1) * pageSize]
 
 	// Combined allocation for mem map
 	sizeAlloc[0] += sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64 + 4096u64
 
-	var address: ArrayByValue<UInt64, 1> = [0]
+	var address ArrayByValue<UInt64, 1> = [0]
 	let status = uefiAllocate(bootsvc, sizeAlloc.ref, address.ref)
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status: uefiAllocate %d, size %d at %d\n", status,
 				 size[0], address)
@@ -83,8 +83,8 @@ fun loadRamDiskFromVolume(
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status: Close %d\n", status)
 
 	var uints = address[0] as! ArrayPointer<UInt32>
-	var checksize: UInt64 = size[0] / 4 // `size` is rounded upto 4 bytes by assets generator
-	var checksum: UInt32 = 0
+	var checksize UInt64 = size[0] / 4 // `size` is rounded upto 4 bytes by assets generator
+	var checksum UInt32 = 0
 
 	for i in 1u64 ... checksize { // Start from 1, coz 0 contains original checksum
 		checksum = uints[i] & 0xFFFF ^ checksum
@@ -105,15 +105,15 @@ fun loadRamDiskFromVolume(
 // returns EFI_SUCCESS or EFI_NOT_FOUND
 // ^ TODO encode this in the type itself or return `RamDisk?`
 fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk) EFI_STATUS {
-	var status: EFI_STATUS = EFI_STATUS.EFI_NOT_READY
-	var handleBuffer: ArrayPointer<ByValue<EFI_HANDLE>> = null // TODO `= nullPtr`
-	var handleCount: UInt64 = 0
-	var handleCountStorage: ArrayByValue<UINTN, 1> = [0]
-	var handleBufferStorage: ArrayByValue<EFI_HANDLE, 1> = [0]
+	var status EFI_STATUS = EFI_STATUS.EFI_NOT_READY
+	var handleBuffer ArrayPointer<ByValue<EFI_HANDLE>> = null // TODO `= nullPtr`
+	var handleCount UInt64 = 0
+	var handleCountStorage ArrayByValue<UINTN, 1> = [0]
+	var handleBufferStorage ArrayByValue<EFI_HANDLE, 1> = [0]
 	handleCountStorage[0] = handleCount
 	handleBufferStorage[0] = handleBuffer[0].ref
 
-	var simpleFileSystemProtocol: EFI_GUID = new EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID()
+	var simpleFileSystemProtocol EFI_GUID = new EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID()
 
 	status = bootsvc.locateHandleBuffer(
 		EFI_LOCATE_SEARCH_TYPE.ByProtocol,
@@ -135,8 +135,8 @@ fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk) EFI_STATUS 
 
 	for i in handleCount {
 		serialPrintf("[[[uefi.findAndLoadRamDisk]]] loading handle #%d of %d handles\n", i, handleCount)
-		// var fileSystem: EFI_SIMPLE_FILE_SYSTEM_PROTOCOL = null // TODO should error cause non-nullable
-		var fileSystemStorage: ByValue<EFI_PHYSICAL_VOID> = new ByValue<EFI_PHYSICAL_VOID>()
+		// var fileSystem EFI_SIMPLE_FILE_SYSTEM_PROTOCOL = null // TODO should error cause non-nullable
+		var fileSystemStorage ByValue<EFI_PHYSICAL_VOID> = new ByValue<EFI_PHYSICAL_VOID>()
 
 		status = bootsvc.handleProtocol(
 			handleBuffer[i],
@@ -145,7 +145,7 @@ fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk) EFI_STATUS 
 		)
 
 		let fileSystemStorages = fileSystemStorage as! ArrayPointer<EFI_SIMPLE_FILE_SYSTEM_PROTOCOL>
-		var fileSystem: EFI_SIMPLE_FILE_SYSTEM_PROTOCOL = fileSystemStorages[0]
+		var fileSystem EFI_SIMPLE_FILE_SYSTEM_PROTOCOL = fileSystemStorages[0]
 
 		if status != EFI_STATUS.EFI_SUCCESS {
 			serialPrintf(
@@ -157,7 +157,7 @@ fun findAndLoadRamDisk(bootsvc: EFI_BOOT_SERVICES, ramdisk: RamDisk) EFI_STATUS 
 		}
 
 		serialPrintln("[[[uefi.findAndLoadRamDisk]]] success: HandleProtocol found a file system")
-		var rootStorage: ArrayByValue<EFI_FILE_PROTOCOL, 1> = [0]
+		var rootStorage ArrayByValue<EFI_FILE_PROTOCOL, 1> = [0]
 		status = fileSystem.openVolume(fileSystem, rootStorage.ref)
 		var root = rootStorage[0] as! EFI_FILE_PROTOCOL
 		if status != EFI_STATUS.EFI_SUCCESS {

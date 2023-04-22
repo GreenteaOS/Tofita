@@ -14,9 +14,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 declare class Config {
-	let warnings: Bool
-	let teapot: String
-	var tempFolder: String
+	let warnings Bool
+	let teapot String
+	var tempFolder String
 }
 
 let teaFolder = 'Tea'
@@ -32,7 +32,7 @@ let dlls = [
 	'advapi32'
 ]
 
-let deps: [[String]] = [
+let deps [[String]] = [
 	[],
 	['ntdll'],
 	['ntdll', 'kernel32'],
@@ -42,7 +42,7 @@ let deps: [[String]] = [
 
 fun packFonts(config: Config) {
 		let fs = require('fs')
-		let chars: [{code:Int, x:Int, y:Int, width:Float}] =
+		let chars [{code:Int, x:Int, y:Int, width:Float}] =
 			JSON.parse(fs.readFileSync('..\\Greentea\\assets\\root\\Windows\\Fonts\\default.json').toString().trim())
 
 		let charSize = 2 + 2 + 8
@@ -68,9 +68,9 @@ fun packAssets(config: Config) {
 		let fs = require('fs') // TODO import normally
 
 		/// Stored in the RAM disk file, used as a key to the asset
-		let assetName: [String] = []
+		let assetName [String] = []
 		/// Simply list of files, used only in the build process
-		let assetPath: [String] = []
+		let assetPath [String] = []
 
 		assetName.push('tofita.exe')
 		assetPath.push(folder + '\\tofita.exe')

@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Tofita
-let _fltused: Int64 = 0
+let _fltused Int64 = 0
 
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 @convention('fastcall')

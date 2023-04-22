@@ -45,34 +45,34 @@ enum TofitaSyscalls : UInt32 {
 
 @sizeOfLessOrEqual(4096)
 @struct class ProcessStartupInformation {
-	var pid: UInt64 = 0
-	var entry: UInt64 = 0
-	var dllEntries: UInt64 = 0
-	var dllCount: UInt64 = 0
+	var pid UInt64 = 0
+	var entry UInt64 = 0
+	var dllEntries UInt64 = 0
+	var dllCount UInt64 = 0
 	new () {}
 }
 
 @struct @sizeOf(8 * 3)
 class DebugLogPayload {
 	// ConstArrayPointer<UInt16>
-	var message: UInt64
+	var message UInt64
 	// TODO count chars at user space, and transfer as length for SEH probing
-	var extra: UInt64 = 0
-	var more: UInt64 = 0
+	var extra UInt64 = 0
+	var more UInt64 = 0
 	new () {}
 }
 
 @struct @sizeOf(8 * 2)
 class SwapWindowFramebufferPayload {
-	var windowId: UInt64
-	var fb: UInt64 // WindowFramebuffer
+	var windowId UInt64
+	var fb UInt64 // WindowFramebuffer
 	new () {}
 }
 
 @struct @sizeOf(8 * 2)
 class ShowWindowPayload {
-	var nCmdShow: CmdShow
-	var windowId: UInt64
+	var nCmdShow CmdShow
+	var windowId UInt64
 	new () {}
 }
 
@@ -89,47 +89,47 @@ class WParam {
 // TODO use pointer wrappers instead of raw pointers
 @struct @sizeOf(8 * 8 + 5 * 4 + 4)
 class CreateWindowExPayload {
-	var wc: UInt64 // WindowClass
-	var hWnd: UInt64 // HWnd
+	var wc UInt64 // WindowClass
+	var hWnd UInt64 // HWnd
 
 	// CreateWindowEx
-	var lpClassName: UInt64 // ConstArrayPointer<ClangWideChar>
+	var lpClassName UInt64 // ConstArrayPointer<ClangWideChar>
 	// TODO count chars at userspace, and transfer as length for SEH probing
-	var lpWindowName: UInt64 // ConstArrayPointer<ClangWideChar>
-	var dwStyle: UInt32
-	var x: Int32
-	var y: Int32
-	var nWidth: Int32
-	var nHeight: Int32
-	var hWndParent: UInt64 // HWnd
-	var hMenu: UInt64 // HMenu
-	var hInstance: UInt64 // HInstance
-	var lpParam: UInt64 // LParam
+	var lpWindowName UInt64 // ConstArrayPointer<ClangWideChar>
+	var dwStyle UInt32
+	var x Int32
+	var y Int32
+	var nWidth Int32
+	var nHeight Int32
+	var hWndParent UInt64 // HWnd
+	var hMenu UInt64 // HMenu
+	var hInstance UInt64 // HInstance
+	var lpParam UInt64 // LParam
 	new () {}
 }
 
 @struct @sizeOf(8 + 4 + 8 * 2 + 4)
 class PostMessagePayload {
-	var hWnd: UInt64 // HWnd
-	var msg: Message
+	var hWnd UInt64 // HWnd
+	var msg Message
 	// TODO ^ rename to msgId or something, to make clear it's not a struct
-	var wParam: UInt64 // WParam
-	var lParam: UInt64 // LParam
+	var wParam UInt64 // WParam
+	var lParam UInt64 // LParam
 	new () {}
 }
 
 @struct @sizeOf(8 * 2 + 4 * 2)
 class GetMessagePayload {
-	var hwnd: UInt64 // HWnd
-	var message: Message
-	var wParam: UInt64 // WParam
-	var lParam: UInt64 // LParam
-	var time: UInt32
-	var pt: ByValue<Point>
-	var lPrivate: UInt32
+	var hwnd UInt64 // HWnd
+	var message Message
+	var wParam UInt64 // WParam
+	var lParam UInt64 // LParam
+	var time UInt32
+	var pt ByValue<Point>
+	var lPrivate UInt32
 
-	var hWnd: UInt64 // HWnd
-	var wMsgFilterMin: UInt32
-	var wMsgFilterMax: UInt32
+	var hWnd UInt64 // HWnd
+	var wMsgFilterMin UInt32
+	var wMsgFilterMax UInt32
 	new () {}
 }

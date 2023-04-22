@@ -16,9 +16,9 @@
 @emitHeader @linkAsIs
 declare fun guiThreadStart() Void
 
-var guiThreadFrame: InterruptFrame = new InterruptFrame()
+var guiThreadFrame InterruptFrame = new InterruptFrame()
 @aligned(64)
-var guiStack: ArrayByValue<UInt8, 1048576> = [0]
+var guiStack ArrayByValue<UInt8, 1048576> = [0]
 
 fun guiThread() {
 	serialPrintln("<Tofita> [guiThread] thread started")

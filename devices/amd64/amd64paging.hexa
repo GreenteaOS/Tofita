@@ -31,7 +31,7 @@ fun mapPage(entry: PageEntry, address: UInt64, writeAllowed: UInt8) {
 }
 
 fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8) ArrayPointer<ByValue<PageEntry>> {
-	let entry: PageEntry = table[entryId].ref
+	let entry PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
 		// TODO `.present` is not always means allocated
@@ -49,12 +49,12 @@ fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, 
 /// allows to access separate address by page table levels
 @struct @packed @sizeOf(8)
 class PageAddressView {
-	@bits(12) var offset: UInt64 = 0 // TODO `let` and no `= 0`
-	@bits(9) var pt: UInt64 = 0
-	@bits(9) var pd: UInt64 = 0
-	@bits(9) var pdpt: UInt64 = 0
+	@bits(12) var offset UInt64 = 0 // TODO `let` and no `= 0`
+	@bits(9) var pt UInt64 = 0
+	@bits(9) var pd UInt64 = 0
+	@bits(9) var pdpt UInt64 = 0
 	@bits(9) var pml4: UInt64 = 0
-	@bits(16) var padding: UInt64 = 0
+	@bits(16) var padding UInt64 = 0
 	// new () // TODO
 }
 
@@ -65,7 +65,7 @@ fun getPageAddressView(virtualAddr: UInt64) ByValue<PageAddressView> {
 // TODO handle huge pages returned from bootloader
 fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
 	let view = getPageAddressView(virtualAddr)
-	let entry: PageEntry = pt[view.ref.pt].ref
+	let entry PageEntry = pt[view.ref.pt].ref
 	mapPage(entry, physicalAddr, writeAllowed)
 }
 
@@ -136,10 +136,10 @@ fun resolveAddr(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt
 fun mapMemory(pml4entries: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt32) {
 	serialPrintln("[paging] mapping memory range")
 
-	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
+	var virtualAddrEnd UInt64 = virtualAddr + pageCount * pageSize
 
-	var vAddress: UInt64 = virtualAddr
-	var pAddress: UInt64 = physicalAddr
+	var vAddress UInt64 = virtualAddr
+	var pAddress UInt64 = physicalAddr
 
 	serialPrintf("[paging.range] bytes = %d or %d\n", virtualAddrEnd - virtualAddr, pageCount * pageSize)
 
@@ -190,7 +190,7 @@ fun unmapAndFreeMemory(pml4entries: PageEntry, virtualAddr: UInt64, pageCount: U
 // Just makes a copy of upper half's PML4,
 // because it is always the same between processes
 fun copyKernelMemoryMap(pml4source: ArrayPointer<ByValue<PageEntry>>, pml4destination: ArrayPointer<ByValue<PageEntry>>) {
-	var i: UInt32 = 255 // TODO validate that this is where upper half starts
+	var i UInt32 = 255 // TODO validate that this is where upper half starts
 	let pageTableEntriesCount = 512u64
 
 	while i < pageTableEntriesCount {

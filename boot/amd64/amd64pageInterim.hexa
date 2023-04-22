@@ -20,49 +20,49 @@
 @struct @packed @sizeOf(8)
 class PageEntry {
 	/// P: Is the page present in physical memory?
-	@bits(1) var present: UInt64
+	@bits(1) var present UInt64
 
 	/// R/W: Pages are read-only by default
-	@bits(1) var writeAllowed: UInt64
+	@bits(1) var writeAllowed UInt64
 
 	/// U/S: Pages are only accessible by supervisor by default
-	@bits(1) var accessibleByAll: UInt64
+	@bits(1) var accessibleByAll UInt64
 
 	/// PWT: Write through abilities of the page
-	@bits(1) var writeThrough: UInt64
+	@bits(1) var writeThrough UInt64
 
 	/// PCD: If set, the page will not be cached
-	@bits(1) var cacheDisabled: UInt64
+	@bits(1) var cacheDisabled UInt64
 
 	/// A: Was the page accessed?
-	@bits(1) var accessed: UInt64
+	@bits(1) var accessed UInt64
 
 	/// D: Has the page been written to?
-	@bits(1) var dirty: UInt64
+	@bits(1) var dirty UInt64
 
 	/// PS: Page size by default is small, enabling this bit makes it bigger.
 	// PAT: Page Attribute Table along with PCD and PWT shall indicate the memory caching type.
 	// Otherwise, it is reserved and must be set to 0.
-	@bits(1) var largePage: UInt64
+	@bits(1) var largePage UInt64
 
 	/// G: Prevent the translations cache from updating
 	// the address in cache if CR3 is reset.
 	// Page global enable bit (bit 7 PGE) in CR4 has to be set to
 	// enable global pages.
-	@bits(1) var global: UInt64
+	@bits(1) var global UInt64
 
 	/// AVL: Not used by the processor
-	@bits(3) var metadata: UInt64
+	@bits(3) var metadata UInt64
 
 	/// Physical address of the child table/page
-	@bits(40) var address: UInt64
+	@bits(40) var address UInt64
 
 	/// AVL: Not used by the processor
 	@bits(7) var metadata2: UInt64
 
 	/// PK: Protection Key
-	@bits(4) var protectionKey: UInt64
+	@bits(4) var protectionKey UInt64
 
 	/// XD/NX: Disable execution of code from this page
-	@bits(1) var disableExecution: UInt64
+	@bits(1) var disableExecution UInt64
 }

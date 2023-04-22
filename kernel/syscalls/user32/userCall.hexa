@@ -69,7 +69,7 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls) B
 
 		let payload = frame.rdxArg1 as! ShowWindowPayload
 
-		let windowId: UInt64 = payload.windowId
+		let windowId UInt64 = payload.windowId
 		let nCmdShow = payload.nCmdShow
 		var window = overlappedWindow_find(process.pid, windowId)
 
@@ -140,7 +140,7 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls) B
 			return false
 		}
 
-		var windowId: UInt64 = payload.windowId
+		var windowId UInt64 = payload.windowId
 
 		var fb = payload.fb as! WindowFramebuffer
 		var window = overlappedWindow_find(process.pid, windowId)
@@ -199,7 +199,7 @@ fun userCallHandled(@volatile process: TofitaProcess, syscall: TofitaSyscalls) B
 			return false
 		}
 
-		var windowId: UInt64 = payload.windowId
+		var windowId UInt64 = payload.windowId
 
 		var fb = payload.fb as! WindowFramebuffer
 		var window = overlappedWindow_find(process.pid, windowId)

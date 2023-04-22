@@ -16,7 +16,7 @@
 @struct @sizeOf(0xb0 + 128)
 class InterruptFrame {
 	// SSE
-	@volatile var xmm: ArrayByValue<UInt64, 16>
+	@volatile var xmm ArrayByValue<UInt64, 16>
 
 	@volatile var r15: UInt64
 	@volatile var r14: UInt64
@@ -28,27 +28,27 @@ class InterruptFrame {
 	@volatile var r8: UInt64
 
 	// Note: ECX is RCX, EAX is RAX, etc in 32-bit mode
-	@volatile var rdi: UInt64
-	@volatile var rsi: UInt64
-	@volatile var rbp: UInt64
-	@volatile var rbx: UInt64
+	@volatile var rdi UInt64
+	@volatile var rsi UInt64
+	@volatile var rbp UInt64
+	@volatile var rbx UInt64
 	@volatile var rdxArg1: UInt64
 	@volatile var rcxArg0: UInt64
-	@volatile var raxReturn: UInt64
+	@volatile var raxReturn UInt64
 
 	// IRQ index
-	@volatile var index: UInt64
+	@volatile var index UInt64
 
 	// IRQ error code
-	@volatile var code: UInt64
+	@volatile var code UInt64
 
-	@volatile var ip: UInt64 // Instruction pointer
-	@volatile var cs: Selector // Code segment
-	@volatile var flags: UInt64 // RFLAGS\EFLAGS (same on AMD64 and x86)
-	@volatile var sp: UInt64 // Stack pointer
-	@volatile var ss: Selector // Stack segment
-	@volatile var fs: UInt64 // 32-bit PEB
-	@volatile var gs: UInt64 // 64-bit PEB
+	@volatile var ip UInt64 // Instruction pointer
+	@volatile var cs Selector // Code segment
+	@volatile var flags UInt64 // RFLAGS\EFLAGS (same on AMD64 and x86)
+	@volatile var sp UInt64 // Stack pointer
+	@volatile var ss Selector // Stack segment
+	@volatile var fs UInt64 // 32-bit PEB
+	@volatile var gs UInt64 // 64-bit PEB
 
 	new ()
 }

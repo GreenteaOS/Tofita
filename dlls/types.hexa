@@ -58,25 +58,25 @@ declare Atom = UInt16
 
 @struct
 class Rect {
-	var left: Int32
-	var top: Int32
-	var right: Int32
-	var bottom: Int32
+	var left Int32
+	var top Int32
+	var right Int32
+	var bottom Int32
 	// TODO const all fields or `Rect extends ConstRect`
 }
 
 @struct
 class PaintStruct {
-	//var xdc: Handle // TODO Unused?
-	//var udc: Handle
-	var hdc: HDc
-	var fErase: Bool32
+	//var xdc Handle // TODO Unused?
+	//var udc Handle
+	var hdc HDc
+	var fErase Bool32
 	// TODO this and other ByValue fields must be `let` to avoid unnecessary copy
 	// TODO how to disallow copy-from, not only copy-to?
-	var rcPaint: ByValue<Rect>
-	var fRestore: Bool32
-	var fIncUpdate: Bool32
-	var rgbReserved: ArrayByValue<UInt8, 32>
+	var rcPaint ByValue<Rect>
+	var fRestore Bool32
+	var fIncUpdate Bool32
+	var rgbReserved ArrayByValue<UInt8, 32>
 }
 
 enum Message : UInt32 {
@@ -166,19 +166,19 @@ enum Message : UInt32 {
 
 @struct
 class Point {
-	var x: Int32
-	var y: Int32
+	var x Int32
+	var y Int32
 }
 
 @struct @sizeOf(48)
 class Msg {
-	var hwnd: HWnd
-	var message: Message
-	var wParam: WParam
-	var lParam: LParam
-	var time: UInt32
-	var pt: ByValue<Point>
-	var lPrivate: UInt32
+	var hwnd HWnd
+	var message Message
+	var wParam WParam
+	var lParam LParam
+	var time UInt32
+	var pt ByValue<Point>
+	var lPrivate UInt32
 
 	new () {}
 }
@@ -188,15 +188,15 @@ declare WindowProcedure = (hWnd: HWnd, uMsg: Message, wParam: WParam, lParam: LP
 
 @struct @sizeOf(72)
 class WindowClass {
-	var style: UInt32
-	var lpfnWndProc: WindowProcedure
-	var cbClsExtra: Int32
-	var cbWndExtra: Int32
-	var hInstance: HInstance
-	var hIcon: HIcon
-	var hCursor: HCursor
-	var hbrBackground: HBrush
-	var lpszMenuName: ConstArrayPointer<ClangWideChar>
+	var style UInt32
+	var lpfnWndProc WindowProcedure
+	var cbClsExtra Int32
+	var cbWndExtra Int32
+	var hInstance HInstance
+	var hIcon HIcon
+	var hCursor HCursor
+	var hbrBackground HBrush
+	var lpszMenuName ConstArrayPointer<ClangWideChar>
 	var utf16zClassName: ConstArrayPointer<ClangWideChar>
 	new () {}
 }
@@ -222,10 +222,10 @@ enum CmdShow : Int32 {
 // TODO `@byValue`
 @struct @packed @sizeOf(4) // TODO generate `sizeof` check in code
 class PixelRGBAData {
-	var r: UInt8
-	var g: UInt8
-	var b: UInt8
-	var a: UInt8
+	var r UInt8
+	var g UInt8
+	var b UInt8
+	var a UInt8
 	new () {}
 }
 
@@ -234,15 +234,15 @@ class PixelRGBAData {
 @union @sizeOf(4)
 @struct
 class Pixel32 {
-	var rgba: ByValue<PixelRGBAData>
-	var color: UInt32
+	var rgba ByValue<PixelRGBAData>
+	var color UInt32
 	new () {}
 }
 
 @struct
 class WindowFramebuffer {
 	// TODO map them again onto process memory space (<2Gb on 32 bit)
-	var pixels: UInt64 // ArrayPointer<ByValue<Pixel32>>
-	var width: UInt32
-	var height: UInt32
+	var pixels UInt64 // ArrayPointer<ByValue<Pixel32>>
+	var width UInt32
+	var height UInt32
 }

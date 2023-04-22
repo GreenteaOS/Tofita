@@ -33,7 +33,7 @@ fun exceptionHandler(frame: InterruptFrame) {
 	}
 
 	if currentThread == ThreadKind.THREAD_USER {
-		@volatile let process: TofitaProcess = processes[currentProcess]
+		@volatile let process TofitaProcess = processes[currentProcess]
 		process.schedulable = false
 		process.syscallToHandle = TofitaSyscalls.Cpu
 		process.cr2PageFaultAddress = cr2
@@ -46,7 +46,7 @@ fun exceptionHandler(frame: InterruptFrame) {
 			return
 		}
 
-		@volatile let process: TofitaProcess = processes[0]
+		@volatile let process TofitaProcess = processes[0]
 		process.cr2PageFaultAddress = cr2
 
 		// TODO re-enable serial here

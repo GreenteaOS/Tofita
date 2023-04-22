@@ -32,7 +32,7 @@ enum Selector : UInt64 {
 
 // Global Descriptor Table aka GDT 16 records
 // TODO let
-@aligned(64) var gdtTemplate: ArrayByValue<UInt32, 32> = [
+@aligned(64) var gdtTemplate ArrayByValue<UInt32, 32> = [
 	0x00000000u32, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209B00, 0x0000FFFF, 0x00CF9300,
 	0x0000FFFF, 0x00CFFA00, 0x0000FFFF, 0x00CFF300, 0x00000000, 0x0020FB00, 0x00000000, 0x00000000,
 	0x60800067, 0x00008BB9, 0xFFFFF800u32, 0x00000000, 0xE0003C00u32, 0xFF40F3FAu32, 0x00000000, 0x00000000,
@@ -58,36 +58,36 @@ enum GdtType : UInt8 {
 // TODO this legacy part is useless
 @struct @packed @sizeOf(8)
 class GdtDescriptor {
-	var limitLow: UInt16
-	var baseLow: UInt16
-	var baseMid: UInt8
-	var type: GdtType // Access
-	var size: UInt8
-	var baseHigh: UInt8
+	var limitLow UInt16
+	var baseLow UInt16
+	var baseMid UInt8
+	var type GdtType // Access
+	var size UInt8
+	var baseHigh UInt8
 }
 
 @struct @packed @sizeOf(8)
 class GdtDescriptorEx {
-	@bits(16) var limitLow: UInt16
-	@bits(16) var baseLow: UInt16
-	@bits(8) var baseMid: UInt8
+	@bits(16) var limitLow UInt16
+	@bits(16) var baseLow UInt16
+	@bits(8) var baseMid UInt8
 	// Access
-	@bits(1) var accessed: UInt8
-	@bits(1) var rw: UInt8 // 0 - read, 1 - read/write
-	@bits(1) var direction: UInt8 // or conform
+	@bits(1) var accessed UInt8
+	@bits(1) var rw UInt8 // 0 - read, 1 - read/write
+	@bits(1) var direction UInt8 // or conform
 	// If 1 code in this segment can be executed from an equal or lower privilege level
 	// If 0 code in this segment can only be executed from the ring set in "privilege"
-	@bits(1) var execute: UInt8 // 1 = code, 0 = data
-	@bits(1) var one: UInt8
-	@bits(2) var privilege: UInt8 // 0 = ring0/kernel, 3 = ring3
-	@bits(1) var present: UInt8
+	@bits(1) var execute UInt8 // 1 = code, 0 = data
+	@bits(1) var one UInt8
+	@bits(2) var privilege UInt8 // 0 = ring0/kernel, 3 = ring3
+	@bits(1) var present UInt8
 	// Flags
-	@bits(4) var limit: UInt8
-	@bits(2) var reserved: UInt8
+	@bits(4) var limit UInt8
+	@bits(2) var reserved UInt8
 	@bits(1) var zero16one32: UInt8
-	@bits(1) var blocks: UInt8
+	@bits(1) var blocks UInt8
 
-	@bits(8) var baseHigh: UInt8
+	@bits(8) var baseHigh UInt8
 }
 
 fun gdtSetEntry(i: UInt8, base: UInt32, limit: UInt64, is64: Bool, typed: GdtType) {

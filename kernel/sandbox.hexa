@@ -22,7 +22,7 @@ class NtUser {}
 
 @struct
 class Sandbox {
-	var name: String
+	var name String
 
 	new () {
 

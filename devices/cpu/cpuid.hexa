@@ -16,18 +16,18 @@
 @struct
 class CPUID {
 	// TODO implement value arrays init in constructor
-	var vendorID: ArrayByValue<UInt8, 13> = [0]
-	var brandName: ArrayByValue<UInt8, 48> = [0]
-	var data: ArrayByValue<UInt32, 1> = [0]
-	var extras: ArrayByValue<UInt32, 1> = [0]
+	var vendorID ArrayByValue<UInt8, 13> = [0]
+	var brandName ArrayByValue<UInt8, 48> = [0]
+	var data ArrayByValue<UInt32, 1> = [0]
+	var extras ArrayByValue<UInt32, 1> = [0]
 	new () {}
 }
 
-let cpuidExtendedLevels: UInt32 = 0x80000000u32 // TODO valid values u/i8/16/32/64
+let cpuidExtendedLevels UInt32 = 0x80000000u32 // TODO valid values u/i8/16/32/64
 
 fun getCPUID() CPUID {
 	var result = new CPUID()
-	var stub: ArrayByValue<UInt32, 1> = [0]
+	var stub ArrayByValue<UInt32, 1> = [0]
 	cpuid(
 		0,
 		0,

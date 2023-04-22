@@ -15,10 +15,10 @@
 
 // Desktop window manager (i.e. GUI logic)
 
-var nextDefaultWindowPosition: UInt8 = 0
+var nextDefaultWindowPosition UInt8 = 0
 
 fun overlappedWindow_create(pid: UInt64) OverlappedWindow {
-	var index: UInt64 = 0
+	var index UInt64 = 0
 	while index < windowsLimit - 1 {
 		index++ // Null-window not used directly
 		if index == windowsLimit {
@@ -53,7 +53,7 @@ fun overlappedWindow_create(pid: UInt64) OverlappedWindow {
 }
 
 fun overlappedWindow_find(pid: UInt64, windowId: UInt64) OverlappedWindow {
-	var index: UInt64 = 0
+	var index UInt64 = 0
 	while index < windowsLimit - 1 {
 		index++
 		if index == windowsLimit {
@@ -68,7 +68,7 @@ fun overlappedWindow_find(pid: UInt64, windowId: UInt64) OverlappedWindow {
 }
 
 fun overlappedWindow_findAnyProcessWindow(pid: UInt64) OverlappedWindow {
-	var index: UInt64 = 0
+	var index UInt64 = 0
 	while index < windowsLimit - 1 {
 		index++
 		if index == windowsLimit {
@@ -150,7 +150,7 @@ fun getFrameButton(mouseX: Int16, mouseY: Int16, windowId: UInt64) FrameHover {
 	}
 
 	var window = windowsList[windowId]
-	let frameButtonsWidth: UInt16 = 137
+	let frameButtonsWidth UInt16 = 137
 
 	let y = window.y
 	let x = window.x + window.width - frameButtonsWidth
@@ -161,7 +161,7 @@ fun getFrameButton(mouseX: Int16, mouseY: Int16, windowId: UInt64) FrameHover {
 	let yy = y + frameHeight
 
 	if mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy {
-		let diff: UInt8 = (mouseX - x) / 46u8
+		let diff UInt8 = (mouseX - x) / 46u8
 		if diff == 0 {
 			return FrameHover.Min
 		}
@@ -259,7 +259,7 @@ fun isDraggableFrame(mouseX: Int16, mouseY: Int16, windowId: UInt64) Bool {
 	let x = window.x
 
 	let frameHeight = 30 + 3
-	let frameButtonsWidth: UInt16 = 137
+	let frameButtonsWidth UInt16 = 137
 
 	let xx = x + window.width - frameButtonsWidth
 	let yy = y + frameHeight
@@ -310,14 +310,14 @@ fun handleMouseUp(type: MouseActionType, mouseX: Int16, mouseY: Int16) {
 			if frameHoverState == FrameHover.Min {}
 			if frameHoverState == FrameHover.Max {}
 			if frameHoverState == FrameHover.Close {
-				var payload: PostMessagePayload = new PostMessagePayload()
+				var payload PostMessagePayload = new PostMessagePayload()
 
 				payload.hWnd = window.hWnd as! UInt64
 				payload.msg = Message.WM_CLOSE
 				payload.wParam = null
 				payload.lParam = null
 
-				@volatile let process: TofitaProcess = processes[window.pid]
+				@volatile let process TofitaProcess = processes[window.pid]
 				postMessage(process, payload)
 			}
 		}
@@ -338,9 +338,9 @@ fun handleMouseActivity() {
 	// Swap buffers
 	mouseActionsUseZeta = !mouseActionsUseZeta
 
-	@volatile let mouseActions: [MouseAction] = (!mouseActionsUseZeta) ? mouseActionsZeta : mouseActionsGama
+	@volatile let mouseActions [MouseAction] = (!mouseActionsUseZeta) ? mouseActionsZeta : mouseActionsGama
 
-	let mouseActionsAmount: UInt8 =
+	let mouseActionsAmount UInt8 =
 		(!mouseActionsUseZeta) ? mouseActionsZetaAmount : mouseActionsGamaAmount
 
 	var mouseXtemp = mouseX

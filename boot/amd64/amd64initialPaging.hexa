@@ -39,7 +39,7 @@ fun mapPageHuge(entry: PageEntry, address: UInt64) {
 }
 
 fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, writeAllowed: UInt8) ArrayPointer<ByValue<PageEntry>> {
-	var entry: PageEntry = table[entryId].ref
+	var entry PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
 		return (entry.address << addressBits) as! ArrayPointer<ByValue<PageEntry>>
@@ -54,12 +54,12 @@ fun referOrCreatePage(table: ArrayPointer<ByValue<PageEntry>>, entryId: UInt64, 
 /// allows to access separate address by page table levels
 @struct @packed @sizeOf(8)
 class PageAddressView {
-	@bits(12) var offset: UInt64
-	@bits(9) var pt: UInt64
-	@bits(9) var pd: UInt64
-	@bits(9) var pdpt: UInt64
+	@bits(12) var offset UInt64
+	@bits(9) var pt UInt64
+	@bits(9) var pd UInt64
+	@bits(9) var pdpt UInt64
 	@bits(9) var pml4: UInt64
-	@bits(16) var padding: UInt64
+	@bits(16) var padding UInt64
 }
 
 fun getPageAddressView(address: UInt64) ByValue<PageAddressView> {
@@ -68,15 +68,15 @@ fun getPageAddressView(address: UInt64) ByValue<PageAddressView> {
 
 fun mapPT(pt: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64, writeAllowed: UInt8) {
 	let view = getPageAddressView(virtualAddr)
-	let entry: PageEntry = pt[view.ref.pt].ref
-	// TODO unsupported by C `var entry: PageEntry = pt[getPageAddressView(virtualAddr).ref.pt].ref`
+	let entry PageEntry = pt[view.ref.pt].ref
+	// TODO unsupported by C `var entry PageEntry = pt[getPageAddressView(virtualAddr).ref.pt].ref`
 	mapPage(entry, physicalAddr, writeAllowed)
 }
 
 fun mapP2Huge(pd: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physicalAddr: UInt64) {
 	let view = getPageAddressView(virtualAddr)
-	let entry: PageEntry = pd[view.ref.pd].ref
-	// TODO var entry: PageEntry = pd[getPageAddressView(virtualAddr).ref.pd].ref
+	let entry PageEntry = pd[view.ref.pd].ref
+	// TODO var entry PageEntry = pd[getPageAddressView(virtualAddr).ref.pd].ref
 	mapPageHuge(entry, physicalAddr)
 }
 
@@ -118,10 +118,10 @@ fun mapP4Huge(pml4: ArrayPointer<ByValue<PageEntry>>, virtualAddr: UInt64, physi
 fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64, writeAllowed: UInt8) {
 	serialPrintln("[paging] mapping memory range")
 
-	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
+	var virtualAddrEnd UInt64 = virtualAddr + pageCount * pageSize
 
-	var vAddress: UInt64 = virtualAddr
-	var pAddress: UInt64 = physicalAddr
+	var vAddress UInt64 = virtualAddr
+	var pAddress UInt64 = physicalAddr
 
 	serialPrintf("[paging.range] Bytes to map %d == %d\n", virtualAddrEnd - virtualAddr, pageCount * pageSize)
 
@@ -151,10 +151,10 @@ fun mapMemory(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64, writ
 
 // TODO make clearer about page count, cause in fact not 4k
 fun mapMemoryHuge(virtualAddr: UInt64, physicalAddr: UInt64, pageCount: UInt64) {
-	var virtualAddrEnd: UInt64 = virtualAddr + pageCount * pageSize
+	var virtualAddrEnd UInt64 = virtualAddr + pageCount * pageSize
 
-	var vAddress: UInt64 = virtualAddr
-	var pAddress: UInt64 = physicalAddr
+	var vAddress UInt64 = virtualAddr
+	var pAddress UInt64 = physicalAddr
 
 	while vAddress < virtualAddrEnd {
 		mapP4Huge(pml4entries, vAddress, pAddress)

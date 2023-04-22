@@ -19,9 +19,9 @@
 // Note: Toast sandbox has it's own set of users
 @struct
 class User {
-	var name: String
-	var home: String
-	var sandbox: Sandbox
+	var name String
+	var home String
+	var sandbox Sandbox
 
 	new () {
 

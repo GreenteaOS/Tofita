@@ -33,8 +33,8 @@ enum MouseActionType : UInt8 {
 }
 
 @volatile var lockMouse = false
-@volatile var mouseCycle: UInt8 = 0
-@volatile var mouseByte: ArrayByValue<UInt8, 3> = [0]
+@volatile var mouseCycle UInt8 = 0
+@volatile var mouseByte ArrayByValue<UInt8, 3> = [0]
 
 // Note: those are controlled by driver
 @volatile var leftDown = false
@@ -43,19 +43,19 @@ enum MouseActionType : UInt8 {
 
 @struct
 class MouseAction {
-	var mouseXdiff: Int16
-	var mouseYdiff: Int16
-	var type: MouseActionType
+	var mouseXdiff Int16
+	var mouseYdiff Int16
+	var type MouseActionType
 	// TODO time stamp
 	new () {}
 }
 
-let mouseActionsLimit: UInt8 = 255
-@volatile let mouseActionsZeta: [MouseAction] = []
-@volatile let mouseActionsGama: [MouseAction] = []
-@volatile var mouseActionsUseZeta: Bool = false
-@volatile var mouseActionsZetaAmount: UInt8 = 0
-@volatile var mouseActionsGamaAmount: UInt8 = 0
+let mouseActionsLimit UInt8 = 255
+@volatile let mouseActionsZeta [MouseAction] = []
+@volatile let mouseActionsGama [MouseAction] = []
+@volatile var mouseActionsUseZeta Bool = false
+@volatile var mouseActionsZetaAmount UInt8 = 0
+@volatile var mouseActionsGamaAmount UInt8 = 0
 
 fun pushMouseAction(type: MouseActionType, mouseXdiff: Int16 = 0, mouseYdiff: Int16 = 0) {
 	if mouseActionsUseZeta {
@@ -113,8 +113,8 @@ fun handleMousePacket() {
 	case 2: {
 		mouseByte[2] = mouseRead()
 
-		var mouseXd: Int16 = mouseByte[1]
-		var mouseYd: Int16 = mouseByte[2]
+		var mouseXd Int16 = mouseByte[1]
+		var mouseYd Int16 = mouseByte[2]
 		mouseYd = -mouseYd
 
 		// Overflow
@@ -145,9 +145,9 @@ fun handleMousePacket() {
 			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
 		}
 
-		let left: Bool = getBit(mouseByte[0], 0) != 0
-		let right: Bool = getBit(mouseByte[0], 1) != 0
-		let middle: Bool = getBit(mouseByte[0], 2) != 0
+		let left Bool = getBit(mouseByte[0], 0) != 0
+		let right Bool = getBit(mouseByte[0], 1) != 0
+		let middle Bool = getBit(mouseByte[0], 2) != 0
 
 		if left == false && leftDown == true {
 			pushMouseAction(MouseActionType.LeftUp)
@@ -224,7 +224,7 @@ fun enablePS2Mouse() {
 	writePort(ps2_control_port, 0x20)
 	mouseWait(0)
 	// IRQ12
-	var status: UInt8 = (readPort(ps2_data_port) | 2u8)
+	var status UInt8 = (readPort(ps2_data_port) | 2u8)
 	// status &= ~0x20 // TODO Clock
 	mouseWait(1)
 	writePort(ps2_control_port, 0x60)
@@ -242,7 +242,7 @@ fun enablePS2Mouse() {
 }
 
 fun mouseWait(@volatile aType: UInt8) {
-	@volatile var timeOut: UInt32 = 1000000
+	@volatile var timeOut UInt32 = 1000000
 	if aType == 0 {
 		while timeOut-- { // TODO Should error (not Bool)
 			// Data

@@ -19,25 +19,25 @@
 // Remember: top-down, left-to-right: for(y) for(x) {}, not other way!
 
 /// Native framebuffer
-var _framebuffer: FrameBuffer = null
-// TODO for some reason this compiles `var _framebuffer: FrameBuffer = null/` note `/` at the end
+var _framebuffer FrameBuffer = null
+// TODO for some reason this compiles `var _framebuffer FrameBuffer = null/` note `/` at the end
 
 // Avoid one level of pointer indirection
 // TODO make sure this in the huge/epic pages and 4k aligned
-var _pixels: ArrayPointer<ByValue<Pixel32>> = null
+var _pixels ArrayPointer<ByValue<Pixel32>> = null
 
 /// Current screen
 /// Allows to avoid pointer indirection
 class Screen {
-	static var width: UInt32 = 0
-	static var widthMinusOne: UInt32 = 0
-	static var height: UInt32 = 0
-	static var heightMinusOne: UInt32 = 0
-	static var pixels: ArrayPointer<ByValue<Pixel32>> = null
+	static var width UInt32 = 0
+	static var widthMinusOne UInt32 = 0
+	static var height UInt32 = 0
+	static var heightMinusOne UInt32 = 0
+	static var pixels ArrayPointer<ByValue<Pixel32>> = null
 	/// Actual pixel buffer to be used
 	// TODO just allocate memory instead of bitmap
 	// TODO should be per-screen
-	static var doublebuffer: Bitmap32 = null
+	static var doublebuffer Bitmap32 = null
 }
 
 fun allocateBitmap(width: UInt32, height: UInt32) Bitmap32 {
@@ -145,7 +145,7 @@ fun drawRectangleOutline(color: ByValue<Pixel32>, x: Int16, y: Int16, width: UIn
 
 fun line45smooth(color: ByValue<Pixel32>, x: Int16, y: Int16, width: Int16, mod: Int16) {
 	color.ref.rgba.ref.a = 98
-	var xx: Int16 = 0
+	var xx Int16 = 0
 	for xi in width - 1 {
 		xx += mod
 		setPixel(xx + x, y + xi, color)

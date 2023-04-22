@@ -42,7 +42,7 @@ if (string != null && probeForReadOkay((uint64_t)string, 2)) {
 // TODO `NativeBool`
 // @rename('disableSerial') // TODO `@as`
 // TODO @rename not work on no-declare
-var disableSerial: UInt8 = 0
+var disableSerial UInt8 = 0
 
 let serial_register_base = 0x03F8u16
 let serial_baud_rate = 115200
@@ -81,7 +81,7 @@ let b_uart_msr_dcd = (1 << 8)
 // TODO renaming not works
 @rename('kstrlen')
 fun kstrlen(data: ConstArrayPointer<UInt8>) {
-	var r: UInt64 = 0u64
+	var r UInt64 = 0u64
 
 	while data[r] != 0 {
 		r++
@@ -161,7 +161,7 @@ fun serialPortWrite(buffer: ArrayPointer<UInt8>, sizeOfBuffer: UInt64) UInt64 {
 		return 0u64
 	}
 	// Compute the maximum size of the Tx FIFO
-	var fifoSize: UInt64 = 1u64
+	var fifoSize UInt64 = 1u64
 	if (serial_fifo_control & b_uart_fcr_fifoe) != 0 {
 		if (serial_fifo_control & b_uart_fcr_fifo64) == 0 {
 			fifoSize = 16u64
@@ -175,7 +175,7 @@ fun serialPortWrite(buffer: ArrayPointer<UInt8>, sizeOfBuffer: UInt64) UInt64 {
 		while (readSerialRegister(r_uart_lsr) & b_uart_lsr_temt) == 0 {}
 
 		// Fill then entire Tx FIFO
-		var index: UInt64 = 0u64
+		var index UInt64 = 0u64
 		while index < fifoSize && size != 0 {
 			// Wait for the hardware flow control signal
 			while !serialPortWritable() {}
@@ -194,13 +194,13 @@ fun serialPortWrite(buffer: ArrayPointer<UInt8>, sizeOfBuffer: UInt64) UInt64 {
 
 fun serialPrintInt(n: UInt64) Void {
 	var n = n
-	var buf: ArrayByValue<UInt8, 24> = [0]
+	var buf ArrayByValue<UInt8, 24> = [0]
 	for i in 24 {
 		buf[i] = 0
 	}
 
 	// TODO disallow this pointer math
-	var bp: ArrayPointer<UInt8> = (buf + 24) as! ArrayPointer<UInt8>
+	var bp ArrayPointer<UInt8> = (buf + 24) as! ArrayPointer<UInt8>
 	do {
 		bp--
 		// TODO `bp[0] = '0' + n % 10` should error
@@ -213,7 +213,7 @@ fun serialPrintInt(n: UInt64) Void {
 fun serialPrintHex(n: UInt64) Void {
 	serialPrintf("0x")
 	var n = n
-	var buf: ArrayByValue<UInt8, 16> = [0]
+	var buf ArrayByValue<UInt8, 16> = [0]
 	var bp = 16
 
 	for i in 16 {
@@ -223,7 +223,7 @@ fun serialPrintHex(n: UInt64) Void {
 
 	do {
 		bp--
-		var mod: UInt8 = n % 16u8
+		var mod UInt8 = n % 16u8
 		if mod < 10 {
 			buf[bp] = '0'.charCodeAt(0) + mod
 		} else {
@@ -246,14 +246,14 @@ fun serialPrintBits(value: UInt64) Void {
 // TODO some fun call `putchar` while it is not defined anywhere but declared in c.hexa
 @convention(cdecl)
 fun putChar(c: UInt8) Int32 {
-	var buffer: ArrayByValue<UInt8, 2> = [c, 0]
+	var buffer ArrayByValue<UInt8, 2> = [c, 0]
 	serialPortWrite(buffer.ref as! ArrayPointer<UInt8>, 1u64)
 	return c
 }
 
 fun puts(string: ArrayPointer<UInt8>) Int32 {
 	let eof = 0
-	var i: Int32 = 0
+	var i Int32 = 0
 	// TODO should type check as `while Bool`
 	while string[i] // standard c idiom for looping through a null-terminated string
 	{
@@ -267,7 +267,7 @@ fun puts(string: ArrayPointer<UInt8>) Int32 {
 }
 
 fun comItoA(i: Int64, b: ArrayPointer<UInt8>) {
-	var digit: ArrayByValue<UInt8, 11> = "0123456789"
+	var digit ArrayByValue<UInt8, 11> = "0123456789"
 	var p = 0
 	var i = i
 
@@ -364,7 +364,7 @@ fun serialPrintf(c: String, ...rest) {
 			// ^ probably UInt16 is not recognised as switch-able
 			case 83: { // ASCII of UTF-16 `S`
 				var string = va_arg_uint64() as! ArrayPointer<UInt16> // TODO va_arg<ArrayPointer<UInt16> >(lst)
-				var i: UInt32 = 0u32
+				var i UInt32 = 0u32
 				if string != null {
 					// TODO probeForReadOkay((uint64_t)string, 2)
 					while string[i] != 0 {
@@ -379,12 +379,12 @@ fun serialPrintf(c: String, ...rest) {
 				putChar(va_arg_int32() as! UInt8) // TODO lst, int32_t
 			case 100: { // `d`
 				var value = va_arg_int32() // TODO lst, int32_t
-				var buffer: ArrayByValue<UInt8, 16> = [0]
+				var buffer ArrayByValue<UInt8, 16> = [0]
 				for i in 16 {
 					buffer[i] = 0
 				}
 				comItoA(value, buffer.ref)
-				var c: ArrayPointer<UInt8> = buffer.ref
+				var c ArrayPointer<UInt8> = buffer.ref
 				var i = 0
 				while c[i] != 0 {
 					putChar(c[i])
@@ -392,13 +392,13 @@ fun serialPrintf(c: String, ...rest) {
 				}
 			}
 			case 117: { // `u`
-				var value: UInt32 = va_arg_uint32() // TODO lst, int32_t
-				var buffer: ArrayByValue<UInt8, 16> = [0]
+				var value UInt32 = va_arg_uint32() // TODO lst, int32_t
+				var buffer ArrayByValue<UInt8, 16> = [0]
 				for i in 16 {
 					buffer[i] = 0
 				}
 				comItoA(value, buffer.ref)
-				var c: ArrayPointer<UInt8> = buffer.ref
+				var c ArrayPointer<UInt8> = buffer.ref
 				var i = 0
 				while c[i] != 0 {
 					putChar(c[i])
@@ -406,11 +406,11 @@ fun serialPrintf(c: String, ...rest) {
 				}
 			}
 			case 56: { // `8`
-				var value: UInt64 = va_arg_uint64() // TODO lst, uint64_t
+				var value UInt64 = va_arg_uint64() // TODO lst, uint64_t
 				serialPrintHex(value)
 			}
 			case 98: { // `b`
-				var value: UInt64 = va_arg_uint64() // TODO lst, uint64_t
+				var value UInt64 = va_arg_uint64() // TODO lst, uint64_t
 				serialPrintBits(value)
 			}
 		}

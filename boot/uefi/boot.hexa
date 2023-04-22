@@ -36,9 +36,9 @@ declare fun
 trampolineCR3(@volatile kernelParams: UInt64, @volatile pml4: UInt64, @volatile stack: UInt64,
 			  @volatile entry: UInt64) Void
 
-@extern @rename('versionMajor') declare let versionMajor: Int
-@extern @rename('versionMinor') declare let versionMinor: Int
-@extern @rename('versionTag') declare let versionTag: Int
+@extern @rename('versionMajor') declare let versionMajor Int
+@extern @rename('versionMinor') declare let versionMinor Int
+@extern @rename('versionTag') declare let versionTag Int
 // TODO ^ to C++n't about -D
 // @deep
 
@@ -58,9 +58,9 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	systemTable.bootServices.setWatchdogTimer(0, 0, 0, null)
 
 	{
-		var revision: UInt32 = systemTable.firmwareRevision
-		var minor: UInt16 = revision as! UInt16
-		var major: UInt16 = (revision >> 16) as! UInt16
+		var revision UInt32 = systemTable.firmwareRevision
+		var minor UInt16 = revision as! UInt16
+		var major UInt16 = (revision >> 16) as! UInt16
 		serialPrintf("[[[uefi]]] UEFI revision %d.%d\n", major, minor)
 	}
 
@@ -68,14 +68,14 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	// after calling cr3 at the first instruction
 	// so it is safe to allocate it at random position in conventional memory
 
-	var acpiTable: EFI_PHYSICAL_ADDRESS? = null
+	var acpiTable EFI_PHYSICAL_ADDRESS? = null
 	{
 		serialPrintln("[[[uefi]]] begin: ACPI")
 		var acpi20: EFI_GUID = new ACPI_20_TABLE_GUID()
-		var acpi: EFI_GUID = new ACPI_TABLE_GUID()
+		var acpi EFI_GUID = new ACPI_TABLE_GUID()
 
 		for i in systemTable.numberOfTableEntries {
-			var efiTable: EFI_CONFIGURATION_TABLE = systemTable.configurationTable[i].ref
+			var efiTable EFI_CONFIGURATION_TABLE = systemTable.configurationTable[i].ref
 			if areSame(efiTable.vendorGuid.ref, acpi20) { // Prefer ACPI 2.0
 				acpiTable = efiTable.vendorTable as! EFI_PHYSICAL_ADDRESS?
 				serialPrintln("[[[uefi]]] found: ACPI 2.0")
@@ -94,7 +94,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	var status = EFI_STATUS.EFI_NOT_READY
 
 	serialPrintln("[[[uefi]]] begin: uefiSetFrameBufferMode")
-	var framebuffer: FrameBuffer = new FrameBuffer()
+	var framebuffer FrameBuffer = new FrameBuffer()
 	// TODO should create fake fb on fail to work in headless mode
 	uefiSetFrameBufferMode(framebuffer, systemTable)
 	drawLoading(framebuffer, 0)
@@ -124,7 +124,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	serialPrintln("[[[uefi]]] done: uefiSetFrameBufferMode")
 
 	// Initial RAM disk
-	var ramdisk: RamDisk = new RamDisk()
+	var ramdisk RamDisk = new RamDisk()
 	drawVerbose("Searching for the RAM disk...", framebuffer)
 	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk)
 	while status != EFI_STATUS.EFI_SUCCESS {
@@ -134,8 +134,8 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 
 	serialPrintln("[[[uefi]]] begin: uefiGetMemoryMap")
 	drawVerbose("Getting memory map...", framebuffer)
-	var sizeAlloc: UInt64 = (ramdisk.size / pageSize + 1) * pageSize
-	var efiMemoryMap: UefiMemoryMap = new UefiMemoryMap()
+	var sizeAlloc UInt64 = (ramdisk.size / pageSize + 1) * pageSize
+	var efiMemoryMap UefiMemoryMap = new UefiMemoryMap()
 	efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64
 	// TODO bug efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512
 	// TODO sizeOf<EFI_MEMORY_DESCRIPTOR>() ?
@@ -153,12 +153,12 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	serialPrintln("[[[uefi]]] done: uefiGetMemoryMap")
 
 	drawVerbose("Reading the time...", framebuffer)
-	var time: EFI_TIME = new EFI_TIME()
+	var time EFI_TIME = new EFI_TIME()
 	time.year = 2023
-	var capabilities: EFI_TIME_CAPABILITIES = new EFI_TIME_CAPABILITIES()
+	var capabilities EFI_TIME_CAPABILITIES = new EFI_TIME_CAPABILITIES()
 	{
 		serialPrintln("[[[uefi]]] begin: GetTime")
-		var status: EFI_STATUS = systemTable.runtimeServices.getTime(time, capabilities)
+		var status EFI_STATUS = systemTable.runtimeServices.getTime(time, capabilities)
 		while status != EFI_STATUS.EFI_SUCCESS {
 			serialPrintln("[[[uefi]]] <ERROR> GetTime")
 			drawError("[ERROR] Cannot get current time from UEFI [ERROR]", framebuffer)
@@ -188,7 +188,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 
 	serialPrintln("[[[uefi]]] begin: ExitBootServices")
 	drawVerbose("Exiting boot services...", framebuffer)
-	var oops: UInt8 = 0
+	var oops UInt8 = 0
 	status = EFI_STATUS.EFI_NOT_READY
 	while status != EFI_STATUS.EFI_SUCCESS {
 		if oops < 10 {
@@ -225,17 +225,17 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 
 	serialPrintln("[[[uefi]]] begin: preparing kernel loader")
 
-	// TODO forward constructor arguments `var asset: ByValue<RamDiskAsset> = new ByValue<RamDiskAsset>()`
-	var asset: RamDiskAsset = new RamDiskAsset()
+	// TODO forward constructor arguments `var asset ByValue<RamDiskAsset> = new ByValue<RamDiskAsset>()`
+	var asset RamDiskAsset = new RamDiskAsset()
 	drawVerbose("Load kernel assets...", framebuffer)
 	getRamDiskAsset(asset, "tofita.exe")
 	serialPrintf("[[[uefi]]] loaded asset 'tofita.exe' %d bytes at %8\n", asset.size, asset.data)
 
 	drawVerbose("Allocate memory...", framebuffer)
-	let largeBuffer: UInt64 = conventionalAllocateLargest(efiMemoryMap)
+	let largeBuffer UInt64 = conventionalAllocateLargest(efiMemoryMap)
 	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", largeBuffer)
 	conventionalOffset = largeBuffer
-	var addressOfEntryPoint: UInt64 = 0
+	var addressOfEntryPoint UInt64 = 0
 
 	drawVerbose("Load kernel file...", framebuffer)
 	{
@@ -256,7 +256,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 
 		// TODO seems like normalizer cannot iterate over `UInt16`
 		// `for i in peHeader.mNumberOfSections {`
-		let mNumberOfSections: Int = peHeader.mNumberOfSections
+		let mNumberOfSections Int = peHeader.mNumberOfSections
 		for i in mNumberOfSections {
 			serialPrintf(
 				"Copy section [%d] named '%s' of size %d\n",
@@ -264,7 +264,7 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 				imageSectionHeader[i].ref.mName.ref,
 				imageSectionHeader[i].ref.mSizeOfRawData
 			)
-			let where: UInt64 = (kernelBase as! UInt64) + imageSectionHeader[i].ref.mVirtualAddress
+			let where UInt64 = (kernelBase as! UInt64) + imageSectionHeader[i].ref.mVirtualAddress
 
 			tmemcpy(where as! ArrayPointer<UInt8>,
 					((asset.data as! UInt64) + (imageSectionHeader[i].ref.mPointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
@@ -326,8 +326,8 @@ fun uefi(imageHandle: ByValue<EFI_HANDLE>, systemTable: EFI_SYSTEM_TABLE) EFI_ST
 	// RAM usage bit-map
 	drawVerbose("Setup device memory...", framebuffer)
 
-	var ram: UInt64 = getRAMSize(params.efiMemoryMap.ref)
-	var megs: UInt32 = (ram / (1024u64 * 1024u64)) as! UInt32
+	var ram UInt64 = getRAMSize(params.efiMemoryMap.ref)
+	var megs UInt32 = (ram / (1024u64 * 1024u64)) as! UInt32
 	serialPrintf("[paging] available RAM is ~%8 bytes\n", ram)
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 

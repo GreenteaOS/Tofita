@@ -24,38 +24,38 @@ fun offsetPointer(data: UInt64, offset: UInt64) ArrayPointer<UInt8> {
 
 @struct
 class ImageDataDirectory {
-	var virtualAddress: UInt32
-	var size: UInt32
+	var virtualAddress UInt32
+	var size UInt32
 }
 
 @struct
 class PeInterim {
-	var base: UInt64 // TODO UserPointer?
-	var entry: UInt64 // _DllMainCRTStartup
-	var imageDataDirectory: ArrayPointer<ByValue<ImageDataDirectory>>
-	var sizeOfStackReserve: UInt64
+	var base UInt64 // TODO UserPointer?
+	var entry UInt64 // _DllMainCRTStartup
+	var imageDataDirectory ArrayPointer<ByValue<ImageDataDirectory>>
+	var sizeOfStackReserve UInt64
 	var is64bit: Bool
 	new () {}
 }
 
 @struct
 class ExeInterim {
-	var pei: PeInterim
-	var stackVirtual: UInt64
+	var pei PeInterim
+	var stackVirtual UInt64
 	new () {}
 }
 
 @struct
 class PeExportLinkedList {
-	var name: ConstArrayPointer<UInt8>
-	var ptr: UInt64
-	var next: PeExportLinkedList
-	var hash: UInt8
+	var name ConstArrayPointer<UInt8>
+	var ptr UInt64
+	var next PeExportLinkedList
+	var hash UInt8
 }
 
 @struct
 class Executable {
-	var nextBase: UInt64
+	var nextBase UInt64
 	var pml4: ArrayPointer<ByValue<PageEntry>>
 	new () {}
 }
@@ -85,7 +85,7 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	fun loadPe(name: String, root: PeExportLinkedList, exec: Executable) {
-		let asset: RamDiskAsset = new RamDiskAsset()
+		let asset RamDiskAsset = new RamDiskAsset()
 		getRamDiskAsset(asset, name)
 		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name.utf16(), asset.size, asset.data)
 		return loadPeAsset(asset, root, exec)
@@ -110,7 +110,7 @@ class ExeLoader<SIZE, HEADER> {
 
 		mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
 
-		let buffer: UInt64 = exec.nextBase
+		let buffer UInt64 = exec.nextBase
 		memset(buffer as! ArrayPointer<UInt8>, 0, peOptionalHeader.sizeOfImage) // Zeroing
 
 		exec.nextBase = exec.nextBase + pages * pageSize
@@ -125,7 +125,7 @@ class ExeLoader<SIZE, HEADER> {
 						imageSectionHeader[i].ref.name.ref,
 						imageSectionHeader[i].ref.sizeOfRawData,
 						imageSectionHeader[i].ref.virtualAddress)
-			var where: UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
+			var where UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
 
 			tmemcpy(where as! ArrayPointer<UInt8>,
 					((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
@@ -139,9 +139,9 @@ class ExeLoader<SIZE, HEADER> {
 		// Relocate EXE or DLL to a new base
 		// TODO should return signed or something? used ptr_diff_t
 		// NOTE this is a user-mode address, so pointer delta is ok (TODO really?)
-		let delta: Int64 = (buffer as! Int64) - (peOptionalHeader.imageBase as! Int64)
+		let delta Int64 = (buffer as! Int64) - (peOptionalHeader.imageBase as! Int64)
 		if delta != 0 {
-			var codeBase: ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
+			var codeBase ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
 
 			var directory =
 				// TODO indexing by enum like `IMAGE_DIRECTORY_ENTRY_BASERELOC`
@@ -153,14 +153,14 @@ class ExeLoader<SIZE, HEADER> {
 
 			var relocation = (codeBase + directory.virtualAddress) as! IMAGE_BASE_RELOCATION
 			while relocation.virtualAddress > 0 {
-				var dest: UInt64 = (codeBase as! UInt64) + (relocation.virtualAddress as! UInt64)
+				var dest UInt64 = (codeBase as! UInt64) + (relocation.virtualAddress as! UInt64)
 				var relInfo = offsetPointer(relocation as! UInt64, image_sizeof_base_relocation) as! ArrayPointer<UInt16>
 
 				for i in (relocation.sizeOfBlock - image_sizeof_base_relocation) / 2 {
 					// The upper 4 bits define the type of relocation
-					var type: Int32 = relInfo[0] >> 12
+					var type Int32 = relInfo[0] >> 12
 					// The lower 12 bits define the offset
-					var offset: UInt64 = relInfo[0] & 0xfff
+					var offset UInt64 = relInfo[0] & 0xfff
 
 					switch type as! ImageRelocationType {
 					case IMAGE_REL_BASED_ABSOLUTE:
@@ -170,7 +170,7 @@ class ExeLoader<SIZE, HEADER> {
 					case IMAGE_REL_BASED_HIGHLOW:
 						// Change complete 32 bit address
 						{
-							var patchAddrHL: ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
+							var patchAddrHL ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
 							patchAddrHL[0] += delta as! UInt32
 						}
 						// break
@@ -204,7 +204,7 @@ class ExeLoader<SIZE, HEADER> {
 
 		// Exports
 
-		var tail: PeExportLinkedList = root
+		var tail PeExportLinkedList = root
 		while tail.next != null {
 			tail = tail.next
 		}
@@ -212,19 +212,19 @@ class ExeLoader<SIZE, HEADER> {
 		// TODO code gen over u8 must be `i` of u8 too
 		for i in 15u8 {
 			if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
-				var codeBase: UInt64 = (buffer as! UInt64)
+				var codeBase UInt64 = (buffer as! UInt64)
 				let directory = imageDataDirectory[i].ref as! ImageDataDirectory
 
 				var exports = ((buffer as! UInt64) + (directory.virtualAddress as! UInt64)) as! IMAGE_EXPORT_DIRECTORY
 
-				//var i: UInt32 = 0
-				var nameRef: ArrayPointer<UInt32> = (codeBase + (exports.addressOfNames as! UInt64)) as! ArrayPointer<UInt32>
-				var ordinal: ArrayPointer<UInt16> = (codeBase + (exports.addressOfNameOrdinals as! UInt64)) as! ArrayPointer<UInt16>
-				var entry: UInt32 = 0
+				//var i UInt32 = 0
+				var nameRef ArrayPointer<UInt32> = (codeBase + (exports.addressOfNames as! UInt64)) as! ArrayPointer<UInt32>
+				var ordinal ArrayPointer<UInt16> = (codeBase + (exports.addressOfNameOrdinals as! UInt64)) as! ArrayPointer<UInt16>
+				var entry UInt32 = 0
 
 				for i in exports.numberOfNames {
 					let name = (codeBase + (nameRef[0] as! UInt64)) as! ConstArrayPointer<UInt8>
-					let idx: UInt64 = ordinal[0]
+					let idx UInt64 = ordinal[0]
 
 					let addr = codeBase + (exports.addressOfFunctions as! UInt64) + (idx * 4u64)
 					let ptr = addr as! ArrayPointer<UInt32>
@@ -263,14 +263,14 @@ class ExeLoader<SIZE, HEADER> {
 	// may be moved between versions.
 	// Search only selected .dll only within the user provided dlls
 	fun getProcAddress(name: ConstArrayPointer<UInt8>, root: PeExportLinkedList) PeExportLinkedList {
-		var list: PeExportLinkedList = root
+		var list PeExportLinkedList = root
 		// TODO make it intrusive list
 		// TODO compute crc for faster .dll import names lookup
 		while list.next != null {
 			// Step upfront, to ignore empty root
 			list = list.next
 
-			var i: UInt16 = 0
+			var i UInt16 = 0
 			while true {
 				if (list.name[i] == name[i]) && (name[i] as! Int == 0) {
 					serialPrintf("[getProcAddress] import {%s} resolved to {%s}\n", name, list.name)
@@ -291,7 +291,7 @@ class ExeLoader<SIZE, HEADER> {
 
 	// TODO `template<typename SIZE>`
 	fun resolveDllImports(pei: PeInterim, root: PeExportLinkedList) {
-		var buffer: UInt64 = pei.base
+		var buffer UInt64 = pei.base
 		var imageDataDirectory = pei.imageDataDirectory
 
 		// Imports
@@ -310,8 +310,8 @@ class ExeLoader<SIZE, HEADER> {
 
 				// TODO bad code gen for uint32_t$null `while pThunkOrg.addressOfData != null {`
 				while pThunkOrg.addressOfData != 0 {
-					var ord: UInt32 = 666
-					var func: SIZE = 0
+					var ord UInt32 = 666
+					var func SIZE = 0
 
 					if (pThunkOrg.ordinal & 0x80000000u32) != 0 {
 						ord = pThunkOrg.ordinal & 0xffff
@@ -330,7 +330,7 @@ class ExeLoader<SIZE, HEADER> {
 						) as! IMAGE_IMPORT_BY_NAME
 
 						ord = pIBN.hint
-						var szImportName: ConstArrayPointer<UInt8> = pIBN.name as! ConstArrayPointer<UInt8>
+						var szImportName ConstArrayPointer<UInt8> = pIBN.name as! ConstArrayPointer<UInt8>
 						serialPrintf("[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n",
 									szName,
 									szImportName, ord, pThunkOrg.func)
@@ -339,7 +339,7 @@ class ExeLoader<SIZE, HEADER> {
 						// func = null // TODO This should error
 						func = 0
 
-						var proc: PeExportLinkedList = getProcAddress(szImportName, root)
+						var proc PeExportLinkedList = getProcAddress(szImportName, root)
 
 						if proc != null {
 							func = proc.ptr as! SIZE
@@ -363,7 +363,7 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	fun loadExe(asset: RamDiskAsset, root: PeExportLinkedList, exec: Executable) {
-		var ei: ExeInterim = new ExeInterim()
+		var ei ExeInterim = new ExeInterim()
 
 		ei.pei = loadPeAsset(asset, root, exec)
 
@@ -372,7 +372,7 @@ class ExeLoader<SIZE, HEADER> {
 			let pages = down_bytes_to_pages(ei.pei.sizeOfStackReserve) + 1u32
 			let physical = PhysicalAllocator.allocatePages(pages)
 
-			let buffer: UInt64 = exec.nextBase
+			let buffer UInt64 = exec.nextBase
 			mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
 			memset(buffer as! ArrayPointer<UInt8>, 0, ei.pei.sizeOfStackReserve) // Zeroing
 
@@ -391,7 +391,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO `template<typename SIZE>` per function
 	// TODO make `entry` a generic too
 	fun addDllEntry(physical: UInt64, entry: UInt64, startup: ProcessStartupInformation) {
-		let max: SIZE = 511 // TODO any other limits?
+		let max SIZE = 511 // TODO any other limits?
 		// TODO ^ 32-bit limit is x2
 		// TODO in NT DLL count[0] is expected to be u32
 		let dllEntries = physical as! ArrayPointer<SIZE>
@@ -492,11 +492,11 @@ fun loadExeIntoProcess(file: String, process: TofitaProcess) {
 		root.name = null
 		root.ptr = 0
 
-		let exec: Executable = new Executable()
+		let exec Executable = new Executable()
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
 
-		let asset: RamDiskAsset = new RamDiskAsset()
+		let asset RamDiskAsset = new RamDiskAsset()
 		getRamDiskAsset(asset, file)
 
 		// TODO fix in codegen `if ExeLoader.is64(asset) {` for `static fun` of generic class

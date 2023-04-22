@@ -19,18 +19,18 @@
 
 // Differential composition is not yet supported, performance with large amount of apps may be low
 
-var wallpaper: Bitmap32 = null // Size of framebuffer
-var vibranceLight: Bitmap32 = null // Size of framebuffer
-var vibranceDark: Bitmap32 = null // Size of framebuffer
-var leaves: Bitmap32 = null
-var trashCan: Bitmap32 = null
+var wallpaper Bitmap32 = null // Size of framebuffer
+var vibranceLight Bitmap32 = null // Size of framebuffer
+var vibranceDark Bitmap32 = null // Size of framebuffer
+var leaves Bitmap32 = null
+var trashCan Bitmap32 = null
 var notepad16: Bitmap32 = null
 var notepad48: Bitmap32 = null
 var app16: Bitmap32 = null
-var link: Bitmap32 = null
-var cur: Cursor = null
-var darkTheme: Bool = true
-var startupAnimation: UInt16 = 0
+var link Bitmap32 = null
+var cur Cursor = null
+var darkTheme Bool = true
+var startupAnimation UInt16 = 0
 
 enum WallpaperStyle : UInt8 {
 	Center
@@ -74,7 +74,7 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: B
 		let newHeight = (bitmap.height * scaler * 0 + 1088) as! UInt32
 		let newHeight = (bitmap.height * scaler) as! UInt32
 
-		var upscale: Bitmap32 = allocateBitmap(newWidth, newHeight)
+		var upscale Bitmap32 = allocateBitmap(newWidth, newHeight)
 
 		let hReciprocal = 1.0f32 / (newHeight as! Float32)
 		let wReciprocal = 1.0f32 / (newWidth as! Float32)
@@ -98,11 +98,11 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: B
 		bitmap = wallpaper
 	}
 
-	var blurScale: UInt8 = 8
+	var blurScale UInt8 = 8
 
 	// TODO blur is at wrong position due to centering after rescale
 	// it must be offset and than crop to the screen too
-	var downscale: Bitmap32 = allocateBitmap(
+	var downscale Bitmap32 = allocateBitmap(
 		bitmap.width / blurScale - 1u32, // TODO infer int types, also integer division
 		bitmap.height / blurScale - 1u32 + 8
 	)
@@ -125,14 +125,14 @@ fun setWallpaper(bitmap: Bitmap32, style: WallpaperStyle, preserveAspectRatio: B
 	// ^ also affect icons and previews optionally
 
 	// TODO fix blur for small wallpapers (centered smaller than screen)
-	var blur: Bitmap32 = gaussBlur(downscale, 4)
+	var blur Bitmap32 = gaussBlur(downscale, 4)
 
 	// Upscale
 	// TODO half-res rendering of vibrance by default
 	// TODO add noise
-	var upscaleLight: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
-	var upscaleDark: Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
-	var upscale: Bitmap32 = upscaleDark
+	var upscaleLight Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
+	var upscaleDark Bitmap32 = allocateBitmap(bitmap.width, bitmap.height)
+	var upscale Bitmap32 = upscaleDark
 
 	let hReciprocal = 1.0f32 / (upscale.height as! Float32)
 	let wReciprocal = 1.0f32 / (upscale.width as! Float32)
@@ -198,7 +198,7 @@ fun drawVibrancedRectangle(x: Int16, y: Int16, width: UInt16, height: UInt16, da
 			if y + yy > vibrance.height {
 				continue
 			}
-			var pixel: UInt32 = (y + yy) * vibrance.width + xx + x as! UInt32
+			var pixel UInt32 = (y + yy) * vibrance.width + xx + x as! UInt32
 			setPixel(x + xx, y + yy, vibrance.pixels[pixel])
 		}
 	}
@@ -277,9 +277,9 @@ fun compositeWindows() {
 			)
 
 			// TODO just untyped `let frameHeight = 30 + 3`, see below
-			// TODO also `let frameHeight: Int16 = 30 + 3`
-			let frameHeight: Int16 = 30 + 3i16
-			let frameWidth: Int16 = 1i16
+			// TODO also `let frameHeight Int16 = 30 + 3`
+			let frameHeight Int16 = 30 + 3i16
+			let frameWidth Int16 = 1i16
 
 			if window.fbZeta != null && window.fbGama != null {
 
@@ -458,7 +458,7 @@ fun composite(startupMilliseconds: UInt64) {
 	}
 	let uptimeMinutes = ((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000)) as! UInt8
 
-	var pm: Bool = uptimeHours >= 12
+	var pm Bool = uptimeHours >= 12
 	if uptimeHours > 12 {
 		uptimeHours -= 12
 	}
@@ -491,9 +491,9 @@ fun composite(startupMilliseconds: UInt64) {
 	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
 }
 
-var cursorBackplate: Bitmap32 = null
-var cursorBackplateX: UInt16 = 0
-var cursorBackplateY: UInt16 = 0
+var cursorBackplate Bitmap32 = null
+var cursorBackplateX UInt16 = 0
+var cursorBackplateY UInt16 = 0
 
 fun initCursorBackplate() {
 	cursorBackplate = allocateBitmap(cur.width, cur.height)
@@ -505,8 +505,8 @@ fun invalidateCursorBackplate(x: UInt16, y: UInt16) {
 	cursorBackplateY = y
 
 	for yi in cur.height {
-		let scanlineScreen: UInt64 = Screen.width * (y + yi - cur.y + 1) - cur.x + 1 + x
-		let scanline: UInt64 = cursorBackplate.width * yi
+		let scanlineScreen UInt64 = Screen.width * (y + yi - cur.y + 1) - cur.x + 1 + x
+		let scanline UInt64 = cursorBackplate.width * yi
 		for xi in cur.width {
 			cursorBackplate.pixels[scanline + xi] = Screen.pixels[scanlineScreen + xi]
 		}
@@ -518,8 +518,8 @@ fun drawCursorBackplate() {
 	let y = cursorBackplateY
 
 	for yi in cur.height {
-		let scanlineScreen: UInt64 = Screen.width * (y + yi - cur.y + 1) - cur.x + 1 + x
-		let scanline: UInt64 = cursorBackplate.width * yi
+		let scanlineScreen UInt64 = Screen.width * (y + yi - cur.y + 1) - cur.x + 1 + x
+		let scanline UInt64 = cursorBackplate.width * yi
 		for xi in cur.width {
 			Screen.pixels[scanlineScreen + xi] = cursorBackplate.pixels[scanline + xi]
 		}
@@ -534,7 +534,7 @@ fun drawCursor(cur: Cursor, x: UInt16, y: UInt16) {
 
 	for yi in cur.height {
 		for xi in cur.width {
-			let yy: UInt32 = cur.height - yi - 1u32
+			let yy UInt32 = cur.height - yi - 1u32
 			pixel.ref.color = bmp[xi + yy * (cur.width as! UInt32)] as! UInt32
 			blendPixel(x + xi - cur.x + 1, y + yi - cur.y + 1, pixel.ref)
 		}
@@ -550,9 +550,9 @@ fun copyToScreen() {
 	// TODO ^ add some stride to the Screen.fb itself to ensure this
 	// or make loop to copy rightmost pixels separately
 	let width = _framebuffer.width / 2
-	let scanline: UInt64 = _framebuffer.width * 4
+	let scanline UInt64 = _framebuffer.width * 4
 	// TODO byte offset should respect bytes-per-pixel (may be 3?)
-	let pixelsPerScanLine: UInt64 = _framebuffer.pixelsPerScanLine * 4
+	let pixelsPerScanLine UInt64 = _framebuffer.pixelsPerScanLine * 4
 	var source = (Screen.pixels as! UInt64) as! ArrayPointer<UInt64>
 	var destination = (_framebuffer.base as! UInt64) as! ArrayPointer<UInt64>
 

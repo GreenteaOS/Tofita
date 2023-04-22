@@ -33,23 +33,23 @@ let page_mask = 0b1111u8
 // 4096 >> 12 == 1
 // 8191 >> 12 == 1
 // 8192 >> 12 == 2
-let kernel_reserved_pages: UInt64 = 4096u64
+let kernel_reserved_pages UInt64 = 4096u64
 // == 16 megabytes
 // ^ this amount of memory cannot be allocated by user process
 // to avoid system crash on our of memory
 
 class PhysicalAllocator {
 	// Approx. 1 megabyte per each 4 gygabyte of RAM
-	static var buffer: ArrayPointer<UInt8> // TODO use bits, not bytes
-	static var count: UInt64
-	static var countUser: UInt64 // count - kernel_reserved_pages
-	static var available: UInt64
-	static var last: UInt64
+	static var buffer ArrayPointer<UInt8> // TODO use bits, not bytes
+	static var count UInt64
+	static var countUser UInt64 // count - kernel_reserved_pages
+	static var available UInt64
+	static var last UInt64
 	// TODO those fields must have ` = default`
 
 	static fun init(params: UefiPayload) {
 		buffer = params.physicalRamBitMaskVirtual as! ArrayPointer<UInt8>
-		let memoryMap: UefiMemoryMap = params.efiMemoryMap.ref
+		let memoryMap UefiMemoryMap = params.efiMemoryMap.ref
 		count = down_bytes_to_pages(params.ramBytes)
 		countUser = count - kernel_reserved_pages
 		last = physical_not_found
@@ -58,17 +58,17 @@ class PhysicalAllocator {
 
 		// Reserve UEFI memory map
 		{
-			var descriptor: EFI_MEMORY_DESCRIPTOR = memoryMap.memoryMap
-			let descriptorSize: UInt64 = memoryMap.descriptorSize
-			var numberOfPages: UInt64 = 0
+			var descriptor EFI_MEMORY_DESCRIPTOR = memoryMap.memoryMap
+			let descriptorSize UInt64 = memoryMap.descriptorSize
+			var numberOfPages UInt64 = 0
 
-			var startOfMemoryMap: UInt64 = (memoryMap.memoryMap as! UInt64)
-			var endOfMemoryMap: UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
-			var offset: UInt64 = startOfMemoryMap
+			var startOfMemoryMap UInt64 = (memoryMap.memoryMap as! UInt64)
+			var endOfMemoryMap UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
+			var offset UInt64 = startOfMemoryMap
 
 			// TODO ensure that allocated in bootloader is reserved here (like initial PML4) or discarded
 			while offset < endOfMemoryMap {
-				let kind: UInt8 = (descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory) ? page_free : page_reserved
+				let kind UInt8 = (descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory) ? page_free : page_reserved
 				let where = down_bytes_to_pages(descriptor.physicalStart)
 				let steps = descriptor.numberOfPages
 
@@ -76,7 +76,7 @@ class PhysicalAllocator {
 					serialPrintf("[physical] Reserve %u pages from %u page\n", steps, where)
 				}
 
-				var i: UInt64 = where
+				var i UInt64 = where
 				while i < steps {
 					// TODO bounds check - may be not in physical area
 					if i < count {
@@ -94,10 +94,10 @@ class PhysicalAllocator {
 
 		// Reserve bootloader buffer
 		{
-			var physical: UInt64 = params.physicalBuffer
+			var physical UInt64 = params.physicalBuffer
 			serialPrintf("[physical] Reserve %u bytes at %u of bootloader buffer\n", params.physicalBytes,
 						 physical)
-			var i: UInt64 = down_bytes_to_pages(params.physicalBytes) + 1u64
+			var i UInt64 = down_bytes_to_pages(params.physicalBytes) + 1u64
 			while i > 0 {
 				i--
 				reserveOnePage(physical + i * (pageSize as! UInt64))
@@ -106,7 +106,7 @@ class PhysicalAllocator {
 
 		{
 			available = 0
-			var i: UInt64 = count
+			var i UInt64 = count
 			while i > 0 {
 				i--
 				if buffer[i] == page_free {
@@ -146,9 +146,9 @@ class PhysicalAllocator {
 			return where * (pageSize as! UInt64) + (wholePhysicalStart as! UInt64)
 		}
 
-		var i: UInt64 = 0
+		var i UInt64 = 0
 		// TODO fast large-step outer search with uint64_t
-		var steps: UInt64 = count // Avoid non-register access
+		var steps UInt64 = count // Avoid non-register access
 		while i < steps {
 			if buffer[i] == page_free {
 				buffer[i] = page_full
@@ -191,14 +191,14 @@ class PhysicalAllocator {
 		last = physical_not_found
 
 		// Find largest free block
-		var largest: UInt64 = 0
-		var largestAt: UInt64 = 0
+		var largest UInt64 = 0
+		var largestAt UInt64 = 0
 
 		{
-			var current: UInt64 = 0
-			var currentAt: UInt64 = 0
-			var i: UInt64 = 0
-			var steps: UInt64 = count // Avoid non-register access
+			var current UInt64 = 0
+			var currentAt UInt64 = 0
+			var i UInt64 = 0
+			var steps UInt64 = count // Avoid non-register access
 			// TODO ^ same for buffer[]
 			// TODO probably UInt32 is completely enough to represent pages
 			while i < steps {
@@ -239,7 +239,7 @@ class PhysicalAllocator {
 		}
 
 		if largest >= pages {
-			var i: UInt64 = pages
+			var i UInt64 = pages
 			while i > 0u64 {
 				i--
 				buffer[largestAt + i] = page_full
