@@ -43,11 +43,6 @@
 
     static void free(void* x) {}
 
-    uint64_t kstrlen(const uint8_t*);
-    static uint64_t strlen(const char *x) {
-        return kstrlen((const uint8_t *)x);
-    }
-
     static void printf(const void* x,...) {}
     #define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), ## __VA_ARGS__)
 
