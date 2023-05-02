@@ -28,12 +28,12 @@
 ')
 @rename('amd64cpuid')
 declare fun cpuid(
-	leaf: UInt32,
-	subLeaf: UInt32,
-	eax: ArrayPointer<UInt32>,
-	ebx: ArrayPointer<UInt32>,
-	ecx: ArrayPointer<UInt32>,
-	edx: ArrayPointer<UInt32>
+	leaf UInt32,
+	subLeaf UInt32,
+	eax ArrayPointer<UInt32>,
+	ebx ArrayPointer<UInt32>,
+	ecx ArrayPointer<UInt32>,
+	edx ArrayPointer<UInt32>
 ) Void
 /* {
 	var a UInt32 = 0
@@ -51,7 +51,7 @@ declare fun cpuid(
 /// Note: this also a way to clear TLB cache even if cr3 not switched to another
 @rename('writeCr3') // TODO rename didn't work
 @emitHeader @linkAsIs
-declare fun writeCr3(value: UInt64) Void
+declare fun writeCr3(value UInt64) Void
 
 // TODO asm("invd")
 @rename('halt')

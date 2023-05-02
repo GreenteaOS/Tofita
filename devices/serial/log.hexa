@@ -329,6 +329,7 @@ declare fun serialPrintf(c String, ...rest) Void
 @nativeVariadic
 // TODO `rest.getNext<UInt>()` + auto gen va_start
 // TODO would be cooler to trace the file:line:function here
+// TODO for perf (tofitaDebugLogs) func with C-strings ptr maybe for template?
 fun serialPrintf(c String, ...rest) {
 	va_start(c)
 	let c = c.utf16() as! ArrayPointer<UInt16>
@@ -355,19 +356,24 @@ fun serialPrintf(c String, ...rest) {
 				let string = va_arg_uint64() as! ArrayPointer<UInt8> // TODO va_arg<ArrayPointer<UInt8> >(lst)
 				if string != null {
 					// TODO probeForReadOkay((uint64_t)string, 1)
+					// TODO actually should sehReadUInt8 for every char
 					puts(string)
 				} else {
 					serialPrintf("<STRING IS NULL>")
 				}
 			}
 			// TODO `break` here converts switch to chain of `if`s, ensure this is correct and document
-			// ^ probably UInt16 is not recognised as switch-able
+			// ^ probably UInt16 is not recognized as switch-able
 			case 83: { // ASCII of UTF-16 `S`
 				var string = va_arg_uint64() as! ArrayPointer<UInt16> // TODO va_arg<ArrayPointer<UInt16> >(lst)
 				var i UInt32 = 0u32
 				if string != null {
-					// TODO probeForReadOkay((uint64_t)string, 2)
+					// TODO probeForReadOkay((uint64_t)string, 2) of pointer itself?
+					// TODO disallow reading of higher half! thus sehUserReadUInt16
+					// TODO actually should sehReadUInt16(, defaultValue: 0) for every char
+					// TODO same ^ for the `c String` template string itself
 					while string[i] != 0 {
+						// TODO limit to 4096 iterations
 						putChar(string[i] & 0xFFu8)
 						i++
 					}

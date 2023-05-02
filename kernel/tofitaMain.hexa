@@ -119,6 +119,7 @@ static void ExitProcess(int32_t x) {
 }
 
 static void wprintf(const wchar_t* x, const void* y, ...) {
+	// TODO actually working console.log
 }
 
 #define macro_serialPrintf(print_, ...) serialPrintf((const wchar_t *)print_->_->utf16_(print_), ## __VA_ARGS__)

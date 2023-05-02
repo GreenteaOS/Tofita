@@ -96,7 +96,7 @@ fun kernelThread() {
 						process.present = false
 
 						// Select pml4 of idle process for safety
-						// TODO idle as `idle: TofitaProcess` var, not `[0]`
+						// TODO idle as `idle TofitaProcess` var, not `[0]`
 						pml4kernelThread = processes[0].pml4
 						writeCr3((pml4kernelThread as! UInt64) - (wholePhysicalStart as! UInt64))
 

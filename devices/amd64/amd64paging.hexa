@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// AMD64 pages format and map/unmap internal implementation
+// AMD64 pages format and map/un-map internal implementation
 
 /// Align to 4096
 let addressBits = 12
@@ -26,7 +26,7 @@ fun mapPage(entry PageEntry, address UInt64, writeAllowed UInt8) {
 	entry.present = 1
 	entry.writeAllowed = (writeAllowed == 1) ? 1u8 : 0u8 // TODO simply Bool
 
-	// TODO
+	// TODO `v < highest-lower` note `<` not `<= hl-4k`
 	entry.accessibleByAll = 1
 }
 

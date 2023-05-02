@@ -30,7 +30,7 @@ fun processInit(process TofitaProcess) {
 	process.syscallToHandle = TofitaSyscalls.Noop
 	process.messages = null
 	// TODO init those fields in class declaration and constructor
-	// new (kind: ProcessKind.UserProcess)
+	// new (kind ProcessKind.TofitaProcess)
 	process.awaitsGetMessage = false
 }
 
@@ -62,7 +62,7 @@ fun processCreate() TofitaProcess {
 // Note: supposedly 10.000 system-wise
 let messagesBufferSize UInt64 = 256 // TODO better idea
 
-fun getOrCreateMessagesBuffer(@volatile process TofitaProcess): /*TODO wapi.*/[Msg]? {
+fun getOrCreateMessagesBuffer(@volatile process TofitaProcess) /*TODO wapi.*/[Msg]? {
 	if process.messages == null {
 		process.messages = []
 		process.messagesUsed = 0

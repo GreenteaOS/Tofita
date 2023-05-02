@@ -21,6 +21,7 @@
 class User {
 	var name String
 	var home String
+	var admin Bool
 	var sandbox Sandbox
 
 	new () {

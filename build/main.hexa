@@ -229,9 +229,9 @@ fun runTasks() {
 
 	// var wave [String] = []
 	// let waves [String] = [wave] TODO wrong type, not `String`
-	let phase1: [String] = []
-	let phase2: [String] = []
-	let phase3: [String] = []
+	let phase1 [String] = []
+	let phase2 [String] = []
+	let phase3 [String] = []
 
 	if asmTask {
 		// CR3 TRAMPOLINE

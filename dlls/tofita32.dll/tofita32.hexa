@@ -33,12 +33,12 @@ fun reserve(megabytes UInt16) {
 	wrapAllocate = allocate
 }
 
-fun allocate(size: UInt32): #if bit64 UInt64 #else UInt32 #end {
+fun allocate(size UInt32) #if bit64 UInt64 #else UInt32 #end {
 	// TODO
 	return 0
 }
 
-fun allocateFirst(size UInt32): #if bit64 UInt64 #else UInt32 #end {
+fun allocateFirst(size UInt32) #if bit64 UInt64 #else UInt32 #end {
 	reserve(defaultReserveMegabytes)
 	return allocate(size)
 }
@@ -71,7 +71,7 @@ fun tofitaHexaAllocate(size UInt32) {
 
 @draft
 @dllExport('tofitaHexaFree')
-fun tofitaHexaFree(pointer: #if bit64 UInt64 #else UInt32 #end, size: UInt32) {
+fun tofitaHexaFree(pointer #if bit64 UInt64 #else UInt32 #end, size UInt32) {
 	wrapFree(pointer, size)
 }
 
@@ -104,7 +104,7 @@ fun tofitaStdStub(arg ConstArrayPointer<UInt8>) UInt32 {
 @convention('fastcall')
 @linkName('@tofitaFastSystemCallWrapper@8')
 #end
-declare fun tofitaFastSystemCallWrapper(rcx TofitaSyscalls, rdx: #if bit64 UInt64 #else UInt32 #end): #if bit64 UInt64 #else UInt32 #end
+declare fun tofitaFastSystemCallWrapper(rcx TofitaSyscalls, rdx #if bit64 UInt64 #else UInt32 #end) #if bit64 UInt64 #else UInt32 #end
 
 // Return value is placed into RAX
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
@@ -120,7 +120,7 @@ fun tofitaFastSystemCall(rcx TofitaSyscalls,
 #else
 	rdx UInt32 = 0
 #end
-): #if bit64 UInt64 #else UInt32 #end
+) #if bit64 UInt64 #else UInt32 #end
 // TODO bit64 or bits64?
 {
 	return tofitaFastSystemCallWrapper(rcx as! TofitaSyscalls, rdx)

@@ -321,7 +321,7 @@ class ACPIParser {
 		// TODO ^ proper name
 	}
 
-	static fun probePci(mPci: [PciGroup], count UInt64) {
+	static fun probePci(mPci [PciGroup], count UInt64) {
 		serialPrintf("[PCI] probePci\n")
 		for i in count {
 			var pci = mPci[i]

@@ -76,9 +76,9 @@ fun getTextAdvance(text String) UInt16 {
 	var textChar: TextFontList = textFontList[c as! Int].ref
 fun drawChar(c UInt8, x Float, y Int16, color Pixel32) Float {
 
-	var w: UInt8 = (textChar.width + 0.5) as! Int32 as! UInt8
 	// TODO parses `let textChar: textChar.ref`
 	let xx: Int16 = (x + 0.5) as! Int32 as! Int16
+	let w UInt8 = (textChar.width + 0.5) as! Int32 as! UInt8
 	let screenWidth = Screen.width
 	let screenHeight = Screen.height
 

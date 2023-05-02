@@ -71,7 +71,7 @@ fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
 	serialPrintf("The best image is %dx%d, palette = %d, id %d\n", buffer[best], buffer[best + 1], buffer[best + 2], bestId)
 
 	/* TODO
-	let bmp {width: Int, height: Int, planes: Int, bits: Int, pixels: Buffer} = {
+	let bmp {width Int, height Int, planes Int, bits Int, pixels Buffer} = {
 		// Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
 		width: buffer[best],
 		// Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
