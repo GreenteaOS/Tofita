@@ -1,0 +1,80 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+enum ColliderEventType : UInt8 {
+	MouseDown = 1
+	MouseUp = 2
+	MouseMove = 3
+}
+
+class ColliderRectangle {
+	var enabled Bool = true
+	var cursor UInt64 // TODO
+	//var onMove (id UInt64) => Void
+	// or better some handler class with id internally or something
+	//var onStartDrag (id UInt64) => Void
+	//var onLeftDown (id UInt64) => Void
+	//var onLeftUp (id UInt64) => Void
+	// TODO `@capture(closure: true)`
+	var handler (id UInt64, event ColliderEventType) => Void // TODO `let`
+	// TODO Hexa: instead of `= 0` ensure init by {}
+	var relativeX Int16 = 0
+	var relativeY Int16 = 0
+	var width Int16 = 0
+	var height Int16 = 0
+	// TODO track mouse enter-exit and roll-over
+
+	/// Some unique ID
+	var id UInt64 // TODO `let`
+
+	var children [ColliderRectangle] = []
+
+	// TODO extract handler type to type alias
+	new (id UInt64, handler (id UInt64, event ColliderEventType) => Void) {
+		this.handler = handler
+		this.id = id
+	}
+
+	fun collides(relX Int16, relY Int16) {
+		return
+			relX >= relativeX and
+			relY >= relativeY and
+			relX < (relativeX + width) and
+			relY < (relativeY + height) and
+			enabled
+	}
+
+	fun trySendEvent(relX Int16, relY Int16, event ColliderEventType) Bool {
+		if not collides(relX, relY) {
+			// Early exit
+			return false
+		}
+
+		for child in children {
+			let x = relX - relativeX
+			let y = relY - relativeY
+			if child.trySendEvent(x, y, event) {
+				return true
+			}
+		}
+
+		// Self clicked
+		// TODO Hexa: fix! it does v table call instead
+		let handler = this.handler
+		handler(id, event)
+		return true
+		// TODO ^ Hexa: ensure returning fun *always* returns something
+	}
+}

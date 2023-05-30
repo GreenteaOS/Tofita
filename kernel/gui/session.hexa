@@ -1,0 +1,89 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// The state of the DWM
+class GraphicalSession {
+	// TODO probably user owns session, not the other way around? it's 1:1 after all
+	var user User // TODO `let`
+	// TODO Hexa: ensure theme is embedded (as struct by value) in allocation
+	let theme = new Theme()
+
+	// Clickable zones
+	// TODO move this rect to Desktop
+	var desktopZone ColliderRectangle
+	var taskbarZone ColliderRectangle
+	var windowsZone ColliderRectangle
+
+	// Zones
+	var desktop Desktop
+	var counter Int = 0
+
+	fun desktopHandle(id UInt64, event ColliderEventType) Void {
+		// TODO
+		quakePrintf("desktopHandle %8 %d\n".utf16(), id, counter)
+		counter++
+	}
+
+	new (owner User) {
+		this.user = owner
+		// TODO Hexa: this should be pre-embed-allocated too
+		desktop = new Desktop()
+		desktopZone = new ColliderRectangle(0, desktopHandler)
+		taskbarZone = new ColliderRectangle(0, desktopHandler)
+		windowsZone = new ColliderRectangle(0, desktopHandler)
+
+		//taskbarZone.width = 256 TODO Hexa: infer as i16
+		taskbarZone.width = 256i16
+		taskbarZone.height = 256i16
+		taskbarZone.id = 0xAAA
+
+		desktopZone.relativeY = 256i16
+		desktopZone.width = 256i16
+		desktopZone.height = 256i16
+		desktopZone.id = 0xBBB
+	}
+
+	// TODO just mouseEvent?
+	fun mouseMove(mouseX Int16, mouseY Int16) {
+		let event = ColliderEventType.MouseMove
+
+		// Taskbar is topmost
+		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
+			return
+		}
+
+		if windowsZone.trySendEvent(mouseX, mouseY, event) {
+			return
+		}
+
+		if desktopZone.trySendEvent(mouseX, mouseY, event) {
+			return
+		}
+	}
+}
+
+// TODO Hexa: ensure `defaultUser` is initialized
+// ^ every module-level expression could have some number attached,
+// (also `static var/let`)
+// that means N-index in global order of expressions (same as import order)
+// and it will be enough just to compare current one with used external one
+// TODO proper dynamic init
+let defaultSession GraphicalSession = new GraphicalSession(defaultUser)
+// `let defaultSession = new GraphicalSession` inference bug
+
+// TODO Hexa: capturing lambdas
+fun desktopHandler(id UInt64, event ColliderEventType) Void {
+	defaultSession.desktopHandle(id, event)
+}

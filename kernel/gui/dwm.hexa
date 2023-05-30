@@ -175,8 +175,14 @@ fun getFrameButton(mouseX Int16, mouseY Int16, windowId UInt64) FrameHover {
 }
 
 fun handleMouseMove(mouseX Int16, mouseY Int16) {
+	defaultSession.mouseMove(mouseX, mouseY)
+	// TODO Hexa: this was actually error as if (as!) was calling expr(as!)
+	// (defaultSession as! GraphicalSession).desktopHandle(0, ColliderEventType.MouseUp)
+
+	// TODO window is nullable
 	var window = windowsList[mouseDragWindow]
 
+	// TODO Hexa: `and` instead of `&&` here, btw `,`
 	if mouseDragCapturedWindow && window.present && window.visible {
 		let diffX = mouseX - mouseDragLastX
 		let diffY = mouseY - mouseDragLastY
@@ -197,7 +203,9 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 
 		return
 	}
+	// TODO `else mouseDragCapturedWindow = false`?
 
+	// TODO Hexa: `not`
 	if !frameHoverWindowDown {
 		let _frameHoverWindow = frameHoverWindow
 		let _frameHoverState = frameHoverState
@@ -326,7 +334,8 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 	}
 
 	frameHoverWindowDown = false
-	haveToRender = true
+	haveToRender = true // TODO not always
+
 	handleMouseUpDesktop(type, mouseX, mouseY)
 }
 

@@ -229,6 +229,10 @@ fun quakePrintHex(n UInt64) {
 @nativeVariadic
 fun quakePrintf(c ConstArrayPointer<ClangWideChar>, ...args) {
 	va_start(c)
+
+	// TODO better idea?
+	requestAnimationFrame()
+
 	let c = c as! ArrayPointer<UInt16>
 	var i = 0
 

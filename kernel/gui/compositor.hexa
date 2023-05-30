@@ -456,8 +456,10 @@ fun composite(startupMilliseconds UInt64) {
 	while uptimeHours >= 24 {
 		uptimeHours -= 24
 	}
+
 	let uptimeMinutes = ((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000)) as! UInt8
 
+	// TODO theme should decide AM/PM or 24H format
 	var pm Bool = uptimeHours >= 12
 	if uptimeHours > 12 {
 		uptimeHours -= 12
