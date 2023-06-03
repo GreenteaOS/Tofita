@@ -221,6 +221,8 @@ fun quakePrintHex(n UInt64) {
 	} while (n != 0)
 
 	for i in 16 {
+		// TODO Hexa: this array access is obviously unsafe,
+		// and should be marked like this (with effect and search-by-effect?)
 		quakePutChar(buf[i] as! UInt8)
 	}
 }

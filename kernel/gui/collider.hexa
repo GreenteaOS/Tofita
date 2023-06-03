@@ -13,15 +13,30 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// TODO left/ri/mi
 enum ColliderEventType : UInt8 {
 	MouseDown = 1
 	MouseUp = 2
 	MouseMove = 3
 }
 
+enum ColliderState : UInt8 {
+	Default = 0
+	Hover = 1
+
+	/// Mouse is over collider and is down
+	// TODO Should capture and keep pressed even when
+	// mouse leaves the area while kept pressed
+	LeftPressed = 2
+}
+
 class ColliderRectangle {
 	var enabled Bool = true
+	/// Disable for simple container
+	var clickable Bool = true
 	var cursor UInt64 // TODO
+	var state ColliderState = ColliderState.Default // TODO
+	// TODO:
 	//var onMove (id UInt64) => Void
 	// or better some handler class with id internally or something
 	//var onStartDrag (id UInt64) => Void
@@ -41,6 +56,22 @@ class ColliderRectangle {
 
 	var children [ColliderRectangle] = []
 
+	/// Used for drag'n'drop and hover
+	static var current ColliderRectangle? = null
+
+	static fun clearState() {
+		// Un-hover
+		if let current = current {
+			if current.state == ColliderState.Hover {
+				current.state = ColliderState.Default
+				// TODO better idea?
+				requestAnimationFrame()
+			}
+		}
+
+		current = null
+	}
+
 	// TODO extract handler type to type alias
 	new (id UInt64, handler (id UInt64, event ColliderEventType) => Void) {
 		this.handler = handler
@@ -51,8 +82,9 @@ class ColliderRectangle {
 		return
 			relX >= relativeX and
 			relY >= relativeY and
-			relX < (relativeX + width) and
-			relY < (relativeY + height) and
+			// TODO with `<` it's kinda not what expected, validate `<=`
+			relX <= (relativeX + width) and
+			relY <= (relativeY + height) and
 			enabled
 	}
 
@@ -62,7 +94,9 @@ class ColliderRectangle {
 			return false
 		}
 
-		for child in children {
+		// TODO Hexa: `for child in children {`
+		for index in children.length {
+			let child = children[index]
 			let x = relX - relativeX
 			let y = relY - relativeY
 			if child.trySendEvent(x, y, event) {
@@ -73,8 +107,30 @@ class ColliderRectangle {
 		// Self clicked
 		// TODO Hexa: fix! it does v table call instead
 		let handler = this.handler
-		handler(id, event)
-		return true
+
+		if clickable {
+			if let current = current, current != this {
+				if current.state == ColliderState.Hover {
+					current.state = ColliderState.Default
+				}
+			}
+
+			// TODO set hover only on mouse move and UPPED
+			current = this
+			// TODO `state == ColliderState.Hover` hint unused `==` here in vs hexa
+			let old = state
+			state = ColliderState.Hover
+
+			if old != state {
+				// TODO better idea?
+				// TODO BTW could set dirty areas too? cause rectangles are known
+				requestAnimationFrame()
+			}
+
+			handler(id, event)
+		}
+
+		return clickable
 		// TODO ^ Hexa: ensure returning fun *always* returns something
 	}
 }

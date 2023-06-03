@@ -23,7 +23,15 @@ class GraphicalSession {
 	// Clickable zones
 	// TODO move this rect to Desktop
 	var desktopZone ColliderRectangle
+
 	var taskbarZone ColliderRectangle
+	var taskbarStart ColliderRectangle
+	var taskbarPin ColliderRectangle
+	var taskbarDesktopPeek ColliderRectangle
+	var taskbarTime ColliderRectangle
+	var taskbarInput ColliderRectangle
+	var taskbarTrayOpener ColliderRectangle
+
 	var windowsZone ColliderRectangle
 
 	// Zones
@@ -36,41 +44,126 @@ class GraphicalSession {
 		counter++
 	}
 
+	fun windowHandle(id UInt64, event ColliderEventType) Void {
+		// TODO
+		counter++
+	}
+
+	fun taskbarHandle(id UInt64, event ColliderEventType) Void {
+		// TODO
+		counter++
+	}
+
 	new (owner User) {
 		this.user = owner
-		// TODO Hexa: this should be pre-embed-allocated too
+		// TODO Hexa: desktop should be pre-embed-allocated too
 		desktop = new Desktop()
 		desktopZone = new ColliderRectangle(0, desktopHandler)
-		taskbarZone = new ColliderRectangle(0, desktopHandler)
-		windowsZone = new ColliderRectangle(0, desktopHandler)
+		taskbarZone = new ColliderRectangle(0, taskbarHandler)
+		windowsZone = new ColliderRectangle(0, windowHandler)
 
+		// Taskbar
 		//taskbarZone.width = 256 TODO Hexa: infer as i16
-		taskbarZone.width = 256i16
-		taskbarZone.height = 256i16
-		taskbarZone.id = 0xAAA
+		taskbarZone.width = 1920i16 // TODO actual screen size
+		taskbarZone.height = 31i16 // TODO 31 lol? related to <= in collider?
+		taskbarZone.relativeY = 1080i16 - taskbarZone.height
 
-		desktopZone.relativeY = 256i16
-		desktopZone.width = 256i16
-		desktopZone.height = 256i16
-		desktopZone.id = 0xBBB
+		// Start button
+		{
+			let rectangle = new ColliderRectangle(1, taskbarHandler)
+			rectangle.width = 44i16 // TODO respect Theme.leavesPad
+			rectangle.height = 31i16 // TODO Meh just 32 is ok
+			rectangle.relativeX = 0
+			rectangle.relativeY = 1i16
+			taskbarZone.children.push(rectangle)
+			taskbarStart = rectangle
+		}
+
+		// Pins
+		{
+			let rectangle = new ColliderRectangle(2, taskbarHandler)
+			rectangle.width = 36i16
+			rectangle.height = 32i16 // TODO Always same as taskbar
+			// TODO make Start consistent with this?
+			rectangle.relativeX = 44i16 // TODO respect Start padding... actually just = start.w
+			// rectangle.relativeY = 0i16 // TODO Hexa: hint that this is same `0` value as class' default
+			taskbarZone.children.push(rectangle)
+			taskbarPin = rectangle
+			// TODO multiple pins
+			// TODO click actually opens (an associated) app
+			// (allow any file - welcoming readme by default)
+		}
+
+		// List of windows (this is a separate clickable zone)
+		{
+			// windowHandler by windowId, but this thing just taskbarHandler
+		}
+
+		// Tray
+		{
+			let rectangle = new ColliderRectangle(3, taskbarHandler)
+			rectangle.width = 4i16
+			rectangle.height = 32i16 // TODO Always same as taskbar
+			rectangle.relativeX = taskbarZone.width - rectangle.width
+			taskbarZone.children.push(rectangle)
+			taskbarDesktopPeek = rectangle
+
+			let rectangle = new ColliderRectangle(4, taskbarHandler)
+			rectangle.width = 64i16
+			rectangle.height = 32i16 // TODO Always same as taskbar
+			rectangle.relativeX = taskbarDesktopPeek.relativeX - rectangle.width
+			taskbarZone.children.push(rectangle)
+			taskbarTime = rectangle
+
+			let rectangle = new ColliderRectangle(5, taskbarHandler)
+			rectangle.width = 16i16 + 22i16
+			rectangle.height = 32i16 // TODO Always same as taskbar
+			rectangle.relativeX = taskbarTime.relativeX - rectangle.width
+			taskbarZone.children.push(rectangle)
+			taskbarInput = rectangle
+
+			let rectangle = new ColliderRectangle(6, taskbarHandler)
+			rectangle.width = 12i16 + 20i16
+			rectangle.height = 32i16 // TODO Always same as taskbar
+			rectangle.relativeX = taskbarInput.relativeX - rectangle.width
+			taskbarZone.children.push(rectangle)
+			taskbarTrayOpener = rectangle
+		}
+
+		// Desktop
+		//desktopZone.relativeY = 0
+		desktopZone.width = 1920i16 // TODO actual screen size256i16
+		desktopZone.height = 1080i16 // Bottom is covered by taskbar
+
+		windowsZone.width = 1920i16 // TODO actual screen size
+		windowsZone.height = 1080i16 // TODO actual screen size
+		windowsZone.clickable = false
 	}
 
 	// TODO just mouseEvent?
-	fun mouseMove(mouseX Int16, mouseY Int16) {
+	// TODO actually handlers must be in DWM
+	fun mouseMove(mouseX Int16, mouseY Int16) Bool {
 		let event = ColliderEventType.MouseMove
 
 		// Taskbar is topmost
 		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
-			return
+			return true
 		}
 
-		if windowsZone.trySendEvent(mouseX, mouseY, event) {
-			return
+		// Windows go under taskbar
+		let windowId = findWindowUnderCursor(mouseX, mouseY)
+		if windowId != 0 {
+			ColliderRectangle.clearState()
+			return false // TODO call DWM
 		}
 
+		// Desktop icons
 		if desktopZone.trySendEvent(mouseX, mouseY, event) {
-			return
+			return true
 		}
+
+		// Fallback to DWM
+		return false
 	}
 }
 
@@ -86,4 +179,12 @@ let defaultSession GraphicalSession = new GraphicalSession(defaultUser)
 // TODO Hexa: capturing lambdas
 fun desktopHandler(id UInt64, event ColliderEventType) Void {
 	defaultSession.desktopHandle(id, event)
+}
+
+fun windowHandler(id UInt64, event ColliderEventType) Void {
+	defaultSession.windowHandle(id, event)
+}
+
+fun taskbarHandler(id UInt64, event ColliderEventType) Void {
+	defaultSession.taskbarHandle(id, event)
 }

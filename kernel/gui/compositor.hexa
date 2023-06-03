@@ -374,11 +374,14 @@ fun composite(startupMilliseconds UInt64) {
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
 
-	// TODO move to DWM handleMouseMove etc
-	if mouseX < 40 && mouseY > (_framebuffer.height - 30) {
-		// TODO ^ use bounding rectangles for mouse detection, not imperative code
-		drawRectangleWithAlpha(color.ref, 0, taskbarY, 40 + leavesPad + leavesPad, 30)
+	// Save the color
+	// TODO different color for light theme
+	let hoverColor = color
+
+	if defaultSession.taskbarStart.state == ColliderState.Hover {
+		drawRectangleWithAlpha(hoverColor.ref, 0, taskbarY, 40 + leavesPad + leavesPad, 30)
 	}
+
 	// TODO more lr space around for beauty
 	// TODO create Theme class with static fields
 	// TODO ^ move other elements to the right
@@ -387,11 +390,21 @@ fun composite(startupMilliseconds UInt64) {
 	// TODO ^ white leaves or dynamically recolored depending on wallpaper or something
 	// ^ change color on hover
 
-	// TODO smmoth transition between light and dark theme!
+	// TODO smooth transition between light and dark theme!
 	// ^ drawVibrancedRectangle should just take info from Theme directly,
 	// and dark-light transition from there too + it will request animation frame on it own
+	// TODO draw differentially (optimization) desktop/windows/taskbar (full overlap detection?)
 
-	// TODO draw differentially desktop/windows/taskbar (full overlap detection?)
+	// Taskbar shortcuts (pins)
+	// TODO just use specs from collider
+	let shortcutsWidth = 36u16 // 24 is too small
+	// TODO respect leaves padding
+	let shortcutsIconX = 44i16 + (shortcutsWidth / 2i16) - (16 / 2i16)
+	let shortcutsEnd = shortcutsWidth + 44
+	if defaultSession.taskbarPin.state == ColliderState.Hover {
+		drawRectangleWithAlpha(color.ref, 44i16, taskbarY, shortcutsWidth, 30)
+	}
+	drawBitmap32WithAlpha(notepad16, shortcutsIconX + 0i16, taskbarY + 7i16)
 
 	// Opened windows
 	var i = rootWindow
@@ -411,7 +424,7 @@ fun composite(startupMilliseconds UInt64) {
 			// TODO more windows - less width
 			// TODO measure default width
 			let w = 148u16
-			let x = 24 + 40 + windowIndex * w
+			let x = shortcutsEnd + windowIndex * w
 			let y = _framebuffer.height - 30i16
 			if firstResponder == i {
 				color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
@@ -436,11 +449,19 @@ fun composite(startupMilliseconds UInt64) {
 		i++
 	}
 
-	// Taskbar shortcuts
-	let shortcutsStart = 5 + 36 + 4i16
-	drawBitmap32WithAlpha(notepad16, shortcutsStart, taskbarY + 7i16)
+	// TODO tray space should be computed *before* window list
 
 	// Tray | line
+	if defaultSession.taskbarDesktopPeek.state == ColliderState.Hover {
+		drawRectangleWithAlpha(
+			hoverColor.ref,
+			defaultSession.taskbarDesktopPeek.relativeX,
+			taskbarY,
+			// TODO some proper conversion like `Int16.clampToUInt16(value)` or as method
+			defaultSession.taskbarDesktopPeek.width as! UInt16,
+			30
+		)
+	}
 	color.ref.color = 0x00000000
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x66u8
 	drawRectangle(color, _framebuffer.width - 4i16, taskbarY, 1, 30)
@@ -451,12 +472,22 @@ fun composite(startupMilliseconds UInt64) {
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 
 	// Time
+	if defaultSession.taskbarTime.state == ColliderState.Hover {
+		drawRectangleWithAlpha(
+			hoverColor.ref,
+			defaultSession.taskbarTime.relativeX,
+			taskbarY,
+			defaultSession.taskbarTime.width as! UInt16,
+			30
+		)
+	}
 	let timeMilliseconds = uptimeMilliseconds + startupMilliseconds
 	var uptimeHours = (timeMilliseconds / (60 * 60 * 1000)) as! Int64
 	while uptimeHours >= 24 {
 		uptimeHours -= 24
 	}
 
+	// TODO must subtract days here too, like `-= 24` for hours
 	let uptimeMinutes = ((timeMilliseconds - (uptimeHours * (60 * 60 * 1000))) / (60 * 1000)) as! UInt8
 
 	// TODO theme should decide AM/PM or 24H format
@@ -466,7 +497,7 @@ fun composite(startupMilliseconds UInt64) {
 	}
 
 	let trayTimeStartX = trayButtonX + 20
-	var trayTimeX = trayTimeStartX
+	var trayTimeX = trayTimeStartX + 4
 	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10i16, color.ref)
 	trayTimeX += drawAsciiText(":", trayTimeX, taskbarY + 10i16, color.ref)
 	if uptimeMinutes < 10 {
@@ -476,12 +507,31 @@ fun composite(startupMilliseconds UInt64) {
 	trayTimeX += drawAsciiText(pm ? " PM" : " AM", trayTimeX, taskbarY + 10i16, color.ref)
 
 	// Input
+	if defaultSession.taskbarInput.state == ColliderState.Hover {
+		drawRectangleWithAlpha(
+			hoverColor.ref,
+			defaultSession.taskbarInput.relativeX,
+			taskbarY,
+			defaultSession.taskbarInput.width as! UInt16,
+			30
+		)
+	}
 	let languageId = 'ENG'
 	let languagePad = 8
 	var trayLanguageX = trayTimeStartX - getTextAdvance(languageId) - languagePad * 2
 	drawAsciiText(languageId, trayLanguageX, taskbarY + 10i16, color.ref)
 
 	// Tray ^ button
+	if defaultSession.taskbarTrayOpener.state == ColliderState.Hover {
+		drawRectangleWithAlpha(
+			hoverColor.ref,
+			defaultSession.taskbarTrayOpener.relativeX,
+			taskbarY,
+			defaultSession.taskbarTrayOpener.width as! UInt16,
+			30
+		)
+	}
+
 	trayButtonX = trayLanguageX - languagePad - 16i16
 
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2i16, 6i16, 1i16)

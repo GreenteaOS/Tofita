@@ -29,6 +29,7 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 		}
 	}
 
+	// TODO new Window instead of [i]
 	var window = windowsList[index]
 	window.windowId = index
 	window.pid = pid
@@ -36,12 +37,15 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	window.visible = false
 	window.width = 500 // TODO actual wapi default values
 	window.height = 300 // TODO actual wapi default values
+
+	// Calculate default position
 	window.x = 200 + 48 * nextDefaultWindowPosition // TODO actual wapi default values
 	window.y = 100 + 48 * nextDefaultWindowPosition // TODO actual wapi default values
 	nextDefaultWindowPosition++
 	if nextDefaultWindowPosition > 8 {
 		nextDefaultWindowPosition = 0
 	}
+
 	window.fbZeta = null
 	window.fbGama = null
 	window.fbCurrentZeta = true
@@ -175,12 +179,15 @@ fun getFrameButton(mouseX Int16, mouseY Int16, windowId UInt64) FrameHover {
 }
 
 fun handleMouseMove(mouseX Int16, mouseY Int16) {
-	defaultSession.mouseMove(mouseX, mouseY)
+	if defaultSession.mouseMove(mouseX, mouseY) {
+		return
+	}
+
 	// TODO Hexa: this was actually error as if (as!) was calling expr(as!)
 	// (defaultSession as! GraphicalSession).desktopHandle(0, ColliderEventType.MouseUp)
 
 	// TODO window is nullable
-	var window = windowsList[mouseDragWindow]
+	let window = windowsList[mouseDragWindow]
 
 	// TODO Hexa: `and` instead of `&&` here, btw `,`
 	if mouseDragCapturedWindow && window.present && window.visible {
@@ -220,11 +227,12 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	handleMouseMoveDesktop(mouseX, mouseY)
 }
 
+/// Returns zero by default, otherwise index in windows list
 fun findWindowUnderCursor(mouseX Int16, mouseY Int16) UInt64 {
 	var windowId = topmostWindow
 
 	do {
-		var window = windowsList[windowId]
+		let window = windowsList[windowId]
 
 		// TODO
 		if window == null {

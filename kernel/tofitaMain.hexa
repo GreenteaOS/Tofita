@@ -40,7 +40,7 @@ void *malloc(uint64_t bytes) {
 	// TODO return (void *)PhysicalAllocator_$allocateBytes_(((bytes - 1) | 15) + 1);
 };
 function memcpy(void *dest, const void *src, uint64_t n);
-int32_t wcslen(const wchar_t *string_) {
+int32_t wcslen(const wchar_t *string_) { // TODO needed?
 	int32_t i = 0;
 	while (string_[i] != '\0')
 		i++;
