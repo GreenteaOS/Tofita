@@ -18,6 +18,7 @@ enum ColliderEventType : UInt8 {
 	MouseDown = 1
 	MouseUp = 2
 	MouseMove = 3
+	// TODO probably stuff like double click? oh wait, the collider generates them
 }
 
 enum ColliderState : UInt8 {

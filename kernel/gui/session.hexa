@@ -37,21 +37,29 @@ class GraphicalSession {
 
 	// Zones
 	var desktop Desktop
-	var counter Int = 0
 
 	fun desktopHandle(id UInt64, event ColliderEventType) Void {
 		// TODO
-		counter++
 	}
 
 	fun windowHandle(id UInt64, event ColliderEventType) Void {
 		// TODO
-		counter++
+		if event == ColliderEventType.MouseUp {
+			// TODO non-raw click event from the collider engine
+			if firstResponder != id {
+				firstResponder = id
+				bringWindowToFront(firstResponder)
+				// TODO Hexa: must be null-safe
+				windowsList[id].minimized = false
+			} else {
+				minimize(id)
+			}
+			requestAnimationFrame()
+		}
 	}
 
 	fun taskbarHandle(id UInt64, event ColliderEventType) Void {
 		// TODO
-		counter++
 	}
 
 	new (owner User) {
@@ -170,6 +178,28 @@ class GraphicalSession {
 		}
 
 		// Fallback to DWM
+		return false
+	}
+
+	fun mouseUp(type MouseActionType, mouseX Int16, mouseY Int16) Bool {
+		let event = ColliderEventType.MouseUp // TODO left/ri/mi maybe just reuse MouseActionType?
+
+		// Taskbar is topmost
+		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
+			return true
+		}
+
+		return false
+	}
+
+	fun mouseDown(type MouseActionType, mouseX Int16, mouseY Int16) Bool {
+		let event = ColliderEventType.MouseDown
+
+		// Taskbar is topmost
+		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
+			return true
+		}
+
 		return false
 	}
 }

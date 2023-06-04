@@ -263,7 +263,7 @@ fun compositeWindows() {
 		}
 
 		// TODO better use max int or whatever instead of 0 for desktop window/others
-		if i != 0 && window.present && window.visible {
+		if i != 0 && window.present && window.visible && not window.minimized {
 			let hover = frameHoverWindow == i ? frameHoverState : FrameHover.Noop
 
 			drawWindowFrame(
@@ -422,6 +422,7 @@ fun composite(startupMilliseconds UInt64) {
 			continue
 		}
 
+		// TODO and visible?
 		if i != 0 && window.present {
 			var rectangle = defaultSession.taskbarWindowList.children[0]
 			for r in defaultSession.taskbarWindowList.children.length {

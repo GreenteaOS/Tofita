@@ -18,18 +18,32 @@
 // Zero for system GUI (like taskbar)
 var firstResponder UInt64 = 0 // Active window to catch keyboard input
 
+// TODO move this declaration somewhere else
 @struct
 class OverlappedWindow {
 	var present Bool
 	var pid UInt64 // Owner
 	// TODO tid - thread id
+
+	// TODO this id is kinda useless and may go out of sync
+	// when topmost updated
 	var windowId UInt64
 	var nextId UInt64
 	var prevId UInt64
 	var hWnd HWnd
 
 	var visible Bool
+
+	/// Aka "hidden to taskbar", unrelated to `maximized`
+	var minimized Bool = false
+
+	/// Aka "full screen", unrelated to `minimized`
+	var maximized Bool = false
+
 	// TODO var notResponding Bool = false
+	// TODO var respondingTimeoutMs UInt16 = 0
+	// ^ count milliseconds>N before setting notResponding
+
 	var title String
 
 	var x Int16

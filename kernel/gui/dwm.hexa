@@ -61,7 +61,7 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	// TODO Separate method of all those things adjust
 	rectangle.height = 32i16
 	rectangle.width = 148i16
-	rectangle.relativeX = 
+	rectangle.relativeX =
 		(index - 1) * rectangle.width
 	// TODO Hexa: hint when var fields are set etc, but var itself not used
 	// ^ cause forgot to push that rect to array
@@ -192,9 +192,16 @@ fun getFrameButton(mouseX Int16, mouseY Int16, windowId UInt64) FrameHover {
 	return FrameHover.Noop
 }
 
+fun isShouldIgnoreOutsideWindow() {
+	// TODO ignore everything when is down-in-window-and-moved outside of window
+	return mouseDragCapturedWindow or frameHoverWindowDown
+}
+
 fun handleMouseMove(mouseX Int16, mouseY Int16) {
-	if defaultSession.mouseMove(mouseX, mouseY) {
-		return
+	if not isShouldIgnoreOutsideWindow() {
+		if defaultSession.mouseMove(mouseX, mouseY) {
+			return
+		}
 	}
 
 	// TODO Hexa: this was actually error as if (as!) was calling expr(as!)
@@ -263,8 +270,11 @@ fun findWindowUnderCursor(mouseX Int16, mouseY Int16) UInt64 {
 		let xx = x + window.width + frameWidth
 		let yy = y + window.height + frameHeight
 
-		if mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy {
-			return windowId
+		// TODO .visible? active etc?
+		if not window.minimized {
+			if mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy {
+				return windowId
+			}
 		}
 
 		windowId = window.prevId
@@ -301,13 +311,24 @@ fun isDraggableFrame(mouseX Int16, mouseY Int16, windowId UInt64) Bool {
 	return false
 }
 
+fun bringWindowToFront(windowId UInt64) {
+	if windowId == 0 {
+		return
+	}
+	overlappedWindow_detach(windowId)
+	overlappedWindow_attach(windowId)
+}
+
 fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
+	if defaultSession.mouseDown(type, mouseX, mouseY) {
+		return
+	}
+
 	selectMouseNextResponder(mouseX, mouseY)
 
 	if firstResponder != 0 && firstResponder != topmostWindow {
-		let id = firstResponder
-		overlappedWindow_detach(id)
-		overlappedWindow_attach(id)
+		bringWindowToFront(firstResponder)
+		// TODO repaint?
 	}
 
 	if type == MouseActionType.LeftDown && isDraggableFrame(mouseX, mouseY, firstResponder) {
@@ -319,6 +340,8 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 
 	if type == MouseActionType.LeftDown && frameHoverState != FrameHover.Noop {
 		frameHoverWindowDown = true
+ 		// TODO Hexa: fun as st useless error `requestAnimationFrame` note lack of `()`
+		requestAnimationFrame()
 	}
 
 	if firstResponder == 0 {
@@ -326,7 +349,25 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 	}
 }
 
+fun minimize(windowId UInt64) {
+	var window = windowsList[windowId]
+	window.minimized = true // Do this upfront!
+	// TODO ensure prevId can be valid 0 and not garbage
+	// Here we find next non-minimized window and un-minimize it
+	while firstResponder != 0 and window.minimized {
+		// First iteration is current window itself
+		firstResponder = window.prevId
+		window = windowsList[firstResponder]
+	}
+
+	bringWindowToFront(firstResponder)
+}
+
 fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
+	if defaultSession.mouseUp(type, mouseX, mouseY) {
+		return
+	}
+
 	if type == MouseActionType.LeftUp {
 		mouseDragCapturedWindow = false
 	}
@@ -337,8 +378,16 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 		var window = windowsList[frameHoverWindow]
 
 		if hover == frameHoverState && window.present {
-			if frameHoverState == FrameHover.Min {}
-			if frameHoverState == FrameHover.Max {}
+			if frameHoverState == FrameHover.Min {
+				// TODO send message to wapi
+				minimize(frameHoverWindow)
+				requestAnimationFrame()
+			}
+
+			if frameHoverState == FrameHover.Max {
+				// TODO send message to wapi
+			}
+
 			if frameHoverState == FrameHover.Close {
 				var payload PostMessagePayload = new PostMessagePayload()
 
