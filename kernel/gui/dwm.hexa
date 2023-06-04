@@ -146,7 +146,7 @@ fun overlappedWindow_destroy(windowId UInt64) {
 	var window = windowsList[windowId]
 	overlappedWindow_detach(windowId)
 
-	// TODO deallocate
+	// TODO de-allocate
 	window.present = false
 	window.visible = false
 	window.fbZeta = null
@@ -211,6 +211,7 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	let window = windowsList[mouseDragWindow]
 
 	// TODO Hexa: `and` instead of `&&` here, btw `,`
+	// TODO disallow drag past taskbar + respect taskbar position on screen
 	if mouseDragCapturedWindow && window.present && window.visible {
 		let diffX = mouseX - mouseDragLastX
 		let diffY = mouseY - mouseDragLastY
@@ -243,6 +244,10 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 
 		haveToRender = haveToRender or (frameHoverWindow != _frameHoverWindow) or (_frameHoverState != frameHoverState)
 		// TODO must error `=` assign `or (_frameHoverState = frameHoverState)` (both let and non-bool)
+	} else {
+		let _frameHoverWindowInsideButtonArea = frameHoverWindowInsideButtonArea
+		frameHoverWindowInsideButtonArea = getFrameButton(mouseX, mouseY, frameHoverWindow) == frameHoverState
+		haveToRender = haveToRender or (frameHoverWindowInsideButtonArea != _frameHoverWindowInsideButtonArea)
 	}
 
 	handleMouseMoveDesktop(mouseX, mouseY)
@@ -340,6 +345,7 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 
 	if type == MouseActionType.LeftDown && frameHoverState != FrameHover.Noop {
 		frameHoverWindowDown = true
+		frameHoverWindowInsideButtonArea = true
  		// TODO Hexa: fun as st useless error `requestAnimationFrame` note lack of `()`
 		requestAnimationFrame()
 	}

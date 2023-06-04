@@ -275,7 +275,9 @@ fun compositeWindows() {
 				window.height + 34,
 				firstResponder == i,
 				hover,
-				frameHoverWindowDown
+				// Note this is kinda different than original
+				// but I like it more this way
+				frameHoverWindowDown and frameHoverWindowInsideButtonArea
 			)
 
 			// TODO just untyped `let frameHeight = 30 + 3`, see below

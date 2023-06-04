@@ -91,4 +91,5 @@ enum FrameHover : UInt8 {
 
 var frameHoverWindow UInt64 = 0
 var frameHoverWindowDown Bool = false
+var frameHoverWindowInsideButtonArea Bool = false
 var frameHoverState FrameHover = FrameHover.Noop
