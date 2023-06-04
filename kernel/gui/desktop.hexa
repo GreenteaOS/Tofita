@@ -14,6 +14,17 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Desktop (i.e. icons)
+class Desktop {
+	var trashCanHover Bool = false
+
+	new () {}
+
+	fun handleEvent(id UInt64, event ColliderEventType) {
+		if id == 1 {
+			trashCanHover = true
+		}
+	}
+}
 
 var dragX = 255i16
 var dragY = 255i16

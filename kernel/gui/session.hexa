@@ -31,6 +31,7 @@ class GraphicalSession {
 	var taskbarTime ColliderRectangle
 	var taskbarInput ColliderRectangle
 	var taskbarTrayOpener ColliderRectangle
+	var taskbarWindowList ColliderRectangle
 
 	var windowsZone ColliderRectangle
 
@@ -40,7 +41,6 @@ class GraphicalSession {
 
 	fun desktopHandle(id UInt64, event ColliderEventType) Void {
 		// TODO
-		quakePrintf("desktopHandle %8 %d\n".utf16(), id, counter)
 		counter++
 	}
 
@@ -94,11 +94,6 @@ class GraphicalSession {
 			// (allow any file - welcoming readme by default)
 		}
 
-		// List of windows (this is a separate clickable zone)
-		{
-			// windowHandler by windowId, but this thing just taskbarHandler
-		}
-
 		// Tray
 		{
 			let rectangle = new ColliderRectangle(3, taskbarHandler)
@@ -130,6 +125,17 @@ class GraphicalSession {
 			taskbarTrayOpener = rectangle
 		}
 
+		// List of windows (this is a separate clickable zone)
+		{
+			// windowHandler by windowId, but this thing just taskbarHandler
+			let rectangle = new ColliderRectangle(7, taskbarHandler)
+			rectangle.width = 1620i16 // TODO
+			rectangle.height = 32i16 // TODO Always same as taskbar
+			rectangle.relativeX = taskbarPin.relativeX + taskbarPin.width
+			taskbarZone.children.push(rectangle)
+			taskbarWindowList = rectangle
+		}
+
 		// Desktop
 		//desktopZone.relativeY = 0
 		desktopZone.width = 1920i16 // TODO actual screen size256i16
@@ -137,6 +143,7 @@ class GraphicalSession {
 
 		windowsZone.width = 1920i16 // TODO actual screen size
 		windowsZone.height = 1080i16 // TODO actual screen size
+		// TODO maybe just set handler to null?
 		windowsZone.clickable = false
 	}
 

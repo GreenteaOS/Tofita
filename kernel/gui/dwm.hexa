@@ -19,6 +19,7 @@ var nextDefaultWindowPosition UInt8 = 0
 
 fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	var index UInt64 = 0
+	// TODO old way here, simply push
 	while index < windowsLimit - 1 {
 		index++ // Null-window not used directly
 		if index == windowsLimit {
@@ -53,6 +54,19 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	window.hWnd = null
 	window.prevId = 0
 	window.nextId = 0
+
+	// Adding a mouse handler
+	let rectangle = new ColliderRectangle(window.windowId, windowHandler)
+	// TODO probably just use UInt16 for rect size
+	// TODO Separate method of all those things adjust
+	rectangle.height = 32i16
+	rectangle.width = 148i16
+	rectangle.relativeX = 
+		(index - 1) * rectangle.width
+	// TODO Hexa: hint when var fields are set etc, but var itself not used
+	// ^ cause forgot to push that rect to array
+	defaultSession.taskbarWindowList.children.push(rectangle)
+
 	return window
 }
 

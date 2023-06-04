@@ -262,6 +262,7 @@ fun compositeWindows() {
 			continue
 		}
 
+		// TODO better use max int or whatever instead of 0 for desktop window/others
 		if i != 0 && window.present && window.visible {
 			let hover = frameHoverWindow == i ? frameHoverState : FrameHover.Noop
 
@@ -269,6 +270,7 @@ fun compositeWindows() {
 				window.title,
 				window.x,
 				window.y,
+				// TODO frameHeight & frameWidth in overlappedWindow_create
 				window.width + 2,
 				window.height + 34,
 				firstResponder == i,
@@ -296,6 +298,7 @@ fun compositeWindows() {
 			}
 		}
 
+		// TODO does this imply that [0] is valid to get nextId?
 		i = windowsList[i].nextId
 		if i == 0 {
 			break
@@ -404,9 +407,10 @@ fun composite(startupMilliseconds UInt64) {
 	if defaultSession.taskbarPin.state == ColliderState.Hover {
 		drawRectangleWithAlpha(color.ref, 44i16, taskbarY, shortcutsWidth, 30)
 	}
-	drawBitmap32WithAlpha(notepad16, shortcutsIconX + 0i16, taskbarY + 7i16)
+	drawBitmap32WithAlpha(notepad16, shortcutsIconX, taskbarY + 7i16)
 
 	// Opened windows
+	// Sorted in the creation order
 	var i = rootWindow
 	var windowIndex = 0
 	// Avoid infinite loop
@@ -419,6 +423,15 @@ fun composite(startupMilliseconds UInt64) {
 		}
 
 		if i != 0 && window.present {
+			var rectangle = defaultSession.taskbarWindowList.children[0]
+			for r in defaultSession.taskbarWindowList.children.length {
+				let rect = defaultSession.taskbarWindowList.children[r]
+				if rect.id == i {
+					// TODO Yeah, could just use Array.find
+					rectangle = rect
+				}
+			}
+
 			// TODO if window.visible
 			// TODO ellipsis
 			// TODO more windows - less width
@@ -431,6 +444,16 @@ fun composite(startupMilliseconds UInt64) {
 				color.ref.rgba.ref.a = 64
 				drawRectangleWithAlpha(color.ref, x + 2i16, y, w - 4u16, 26u16)
 				color.ref.rgba.ref.a = 100
+			} else {
+				if let rectangle = rectangle, rectangle.state == ColliderState.Hover {
+					drawRectangleWithAlpha(
+						hoverColor.ref,
+						rectangle.relativeX + defaultSession.taskbarWindowList.relativeX,
+						taskbarY,
+						rectangle.width as! UInt16,
+						30
+					)
+				}
 			}
 			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 			// TODO proper app icon
