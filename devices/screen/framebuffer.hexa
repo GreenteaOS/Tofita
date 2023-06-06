@@ -42,13 +42,30 @@ class Screen {
 
 fun allocateBitmap(width UInt32, height UInt32) Bitmap32 {
 	// TODO allocateStruct<T>
-	var result = PhysicalAllocator.allocateBytes(
+	let result = PhysicalAllocator.allocateBytes(
 		sizeOf<Bitmap32Interim>() +
 		(sizeOf<Pixel32>() * width * height)
 	) as! Bitmap32Interim
+	// TODO for the max perf should probably place header after pixels
 	result.width = width
 	result.height = height
 	result.pixels = (result as! UInt64 + 8 + 8) as! ArrayPointer<ByValue<Pixel32>>
+	return result as! Bitmap32
+}
+
+/// Pretty much the same, but allocates pixels separately
+/// This is done because we don't want user to *overwrite the header*
+/// if we map the `pixels` to the lower space
+// TODO maybe separate (UserSafe)PageAlignedBitmap32
+fun allocatePageAlignedBitmap(width UInt32, height UInt32) Bitmap32 {
+	// TODO allocateStruct<T>
+	let result = PhysicalAllocator.allocateBytes(
+		sizeOf<Bitmap32Interim>()
+	) as! Bitmap32Interim
+	let pixels = PhysicalAllocator.allocateBytes(sizeOf<Pixel32>() * width * height)
+	result.width = width
+	result.height = height
+	result.pixels = pixels as! ArrayPointer<ByValue<Pixel32>>
 	return result as! Bitmap32
 }
 

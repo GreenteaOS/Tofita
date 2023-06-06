@@ -49,6 +49,7 @@ class PageEntry {
 	// the address in cache if CR3 is reset.
 	// Page global enable bit (bit 7 PGE) in CR4 has to be set to
 	// enable global pages.
+	// TODO use this for upper half for faster context switches
 	@bits(1) var global UInt64
 
 	/// AVL: Not used by the processor
