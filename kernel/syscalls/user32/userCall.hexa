@@ -126,6 +126,10 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 		// ^ well actually to know proper sizeof code gen would be better
 		// Also: could be locking virtual memory altering syscalls while handling them
 		// Anyway must guard the logic itself in probing, like returning optional null from probeForRead on fail
+
+		// TODO Note: temporal page must be kernel-only for read and write to avoid
+		// other user *threads* accessing it
+		// TODO if page is zero just step over to next instruction? except of conditional mov
 		if !probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
 			return false
 		}
@@ -159,12 +163,12 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 				// TODO triple buffer: screen<-fb<-zeta and no gama
 				tmemcpy(window.fbZeta.pixels as! ArrayPointer<UInt8>, window.fbGama.pixels as! ConstArrayPointer<UInt8>, bytes)
 				// TODO pixels should be within process memory space
-				fb.pixels = window.fbZeta.pixels as! UInt64 // as! Pixel32
+				fb.pixels = window.fbZetaUserAddress
 				fb.width = window.fbZeta.width
 				fb.height = window.fbZeta.height
 			} else {
 				tmemcpy(window.fbGama.pixels as! ArrayPointer<UInt8>, window.fbZeta.pixels as! ConstArrayPointer<UInt8>, bytes)
-				fb.pixels = window.fbGama.pixels as! UInt64 // as! Pixel32
+				fb.pixels = window.fbGamaUserAddress
 				fb.width = window.fbGama.width
 				fb.height = window.fbGama.height
 			}
@@ -180,7 +184,7 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 		//			{
 		//				pixelsKernel[i] = pixelsUser[i]
 		//			}
-		//		}
+		//		} TODO dce
 
 		// frame.raxReturn = 0
 		process.schedulable = true
@@ -219,9 +223,12 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 			// window.fbGama.pixels = PhysicalAllocator.allocateBytes(bytes) as! Pixel32
 
 			// TODO client width
-			window.fbZeta = allocateBitmap(width, height)
-			window.fbGama = allocateBitmap(width, height)
+			// TODO fail-able allocation and protection of too-big window size (use same limit as original)
+			// TODO ensure they are 4k-aligned or respect in-page offset
+			window.fbZeta = allocatePageAlignedBitmap(width, height)
+			window.fbGama = allocatePageAlignedBitmap(width, height)
 
+			// TODO 0x0? or use vibrance? describe decision
 			memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
 			memset(window.fbGama.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
 
@@ -229,14 +236,57 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 			// window.fbZeta.height = height
 			// window.fbGama.width = width // TODO client width
 			// window.fbGama.height = height
+
+			// Now map into user memory
+			let pages = down_bytes_to_pages(bytes) + 1u32
+
+			// TODO handle failure (and de-allocate)
+			// ^ user code should know about failure by error code or null pointer
+			window.fbZetaUserAddress = findUserspaceMemory(
+				process.pml4,
+				0, // Any address
+				pages,
+				process.limits
+			)
+
+			let physicalAddr = resolveAddr(process.pml4, window.fbZeta.pixels as! UInt64)
+
+			// TODO handle failure
+			mapMemory(
+				process.pml4,
+				virtualAddr: window.fbZetaUserAddress,
+				physicalAddr: physicalAddr,
+				pages,
+				accessibleByUser: true
+			)
+
+			// TODO handle failure
+			window.fbGamaUserAddress = findUserspaceMemory(
+				process.pml4,
+				0, // Any address
+				pages,
+				process.limits
+			)
+
+			// TODO is `resolveAddr` good choice here?
+			let physicalAddr = resolveAddr(process.pml4, window.fbGama.pixels as! UInt64)
+
+			// TODO handle failure
+			mapMemory(
+				process.pml4,
+				virtualAddr: window.fbGamaUserAddress,
+				physicalAddr: physicalAddr,
+				pages,
+				accessibleByUser: true
+			)
 		}
 
 		if window.fbCurrentZeta {
-			fb.pixels = window.fbZeta.pixels as! UInt64
+			fb.pixels = window.fbZetaUserAddress
 			fb.width = window.fbZeta.width
 			fb.height = window.fbZeta.height
 		} else {
-			fb.pixels = window.fbGama.pixels as! UInt64
+			fb.pixels = window.fbGamaUserAddress
 			fb.width = window.fbGama.width
 			fb.height = window.fbGama.height
 		}

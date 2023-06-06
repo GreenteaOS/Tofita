@@ -57,6 +57,8 @@ class OverlappedWindow {
 	var fbZeta Bitmap32
 	var fbGama Bitmap32
 	var fbCurrentZeta Bool // Use to swap chain
+	var fbZetaUserAddress UInt64
+	var fbGamaUserAddress UInt64
 
 	new () {}
 }
