@@ -30,6 +30,12 @@ fun handleToWindow(hWnd HWnd) Window {
 	}
 	// TODO some bits of HANDLE should be ignored before reading
 	// and comparison
+	// Due to 16-byte aligned allocations
+	// we may provide 4 bits for tagging
+	// TODO how much actually in the original design?
+	// `((v|0b1111) - 15) == v`
+	// ^ Hexa: infer size_t for 0b here
+
 	if hWnd == invalid_handle_value {
 		return null
 	}
@@ -152,6 +158,7 @@ fun createWindowExW(
 	payload.hMenu = hMenu as! UInt64
 	payload.hInstance = hInstance as! UInt64
 	payload.lpParam = lpParam as! UInt64
+	// TODO pass params as tags? are all those params even needed in server?
 
 	// Create local window counterpart
 	var window = new Window()
@@ -336,9 +343,7 @@ fun beginPaint(hWnd HWnd, ps PaintStruct) HDc {
 	// TODO `#if (bit64 == true)` or `#if bit64 == true`
 	// #if bit64
 	// TODO `if sizeOf<ArrayPointer<Int> >() == 8 {` generates into `sizeof(int32_t)`
-	if sizeOfPreferPointer<ArrayPointer<Int> >() == 8 {
-		pixels[y * fb.width + x] = pixel
-	}
+	pixels[y * fb.width + x] = pixel
 	//#else
 		// TODO compiler crashes without `#else`
 		// ^ or it's just vs hexa related
@@ -374,7 +379,7 @@ fun endPaint(hWnd HWnd, ps PaintStruct) Bool32 {
 	// TODO respect ps
 	tofitaDebugLog("EndPaint called".utf16())
 	// TODO `?? return 0` (hardcoded `return\throw` for now)
-	var window = handleToWindow(hWnd)
+	let window = handleToWindow(hWnd)
 	if window == null {
 		return Bool32.False
 	}
@@ -390,7 +395,7 @@ fun endPaint(hWnd HWnd, ps PaintStruct) Bool32 {
 @dllExport('DefWindowProcW')
 fun defWindowProcW(hWnd HWnd, uMsg Message, wParam WParam, lParam LParam) LResult? {
 	tofitaDebugLog("DefWindowProcW called".utf16())
-	var window = handleToWindow(hWnd)
+	let window = handleToWindow(hWnd)
 	if window == null {
 		return null
 	}
@@ -411,7 +416,7 @@ fun destroyWindow(hWnd HWnd) Bool32 {
 	tofitaDebugLog("DestroyWindow called".utf16())
 	return Bool32.False // TODO
 
-	var window = handleToWindow(hWnd)
+	let window = handleToWindow(hWnd)
 	if window == null {
 		// TODO ^ guard (not just if let)
 		return Bool32.False
