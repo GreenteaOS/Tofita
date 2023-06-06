@@ -26,6 +26,9 @@ let page_mask = 0b1111u8
 // TODO mask user-mode pages differently than kernel-mode
 // TODO let granular_partial = 0b1010
 // TODO let granular_full = 0b1001
+// TODO should return UInt64, cause x86-64 supports a 48-bit virtual address space
+// and 2^32 of 4096 is only exactly 2^44
+// ^ UPDATE THE VIRTUAL PAGE ALLOCATOR ACCORDINGLY
 @inline fun down_bytes_to_pages(bytes UInt64) UInt64 {
 	return ((bytes) >> 12u64)
 }
@@ -38,14 +41,19 @@ let kernel_reserved_pages UInt64 = 4096u64
 // ^ this amount of memory cannot be allocated by user process
 // to avoid system crash on our of memory
 
+// TODO rename to just Physical
 class PhysicalAllocator {
-	// Approx. 1 megabyte per each 4 gygabyte of RAM
+	// Approx. 1 megabyte per each 4 gigabyte of RAM
 	static var buffer ArrayPointer<UInt8> // TODO use bits, not bytes
 	static var count UInt64
 	static var countUser UInt64 // count - kernel_reserved_pages
 	static var available UInt64
 	static var last UInt64
 	// TODO those fields must have ` = default`
+
+	static fun physicalToVirtual(physical UInt64) UInt64 {
+		return physical + wholePhysicalStart
+	}
 
 	static fun init(params UefiPayload) {
 		buffer = params.physicalRamBitMaskVirtual as! ArrayPointer<UInt8>
@@ -252,8 +260,8 @@ class PhysicalAllocator {
 	}
 
 	// Current granularity: 4096 bytes
+	// TODO rename to allocateBytesRoundedToPages
 	static fun allocateBytes(bytes UInt64) UInt64 {
-		// TODO
 		return allocatePages(down_bytes_to_pages(bytes) + 1u64)
 	}
 

@@ -21,16 +21,15 @@ let addressBits = 12
 // TODO remove this
 @aligned(4096) var pml4entries ArrayPointer<ByValue<PageEntry>> = null as! ArrayPointer<ByValue<PageEntry>>
 
-fun mapPage(entry PageEntry, address UInt64, writeAllowed UInt8) {
+// TODO combine flags into bit mask
+fun mapPage(entry PageEntry, address UInt64, writeAllowed Bool, accessibleByUser Bool) {
 	entry.address = address >> addressBits
 	entry.present = 1
-	entry.writeAllowed = (writeAllowed == 1) ? 1u8 : 0u8 // TODO simply Bool
-
-	// TODO `v < highest-lower` note `<` not `<= hl-4k`
-	entry.accessibleByAll = 1
+	entry.writeAllowed = writeAllowed ? 1u8 : 0u8
+	entry.accessibleByUser = accessibleByUser ? 1u8 : 0u8
 }
 
-fun referOrCreatePage(table ArrayPointer<ByValue<PageEntry>>, entryId UInt64, writeAllowed UInt8) ArrayPointer<ByValue<PageEntry>> {
+fun referOrCreatePage(table ArrayPointer<ByValue<PageEntry>>, entryId UInt64, writeAllowed Bool, accessibleByUser Bool) ArrayPointer<ByValue<PageEntry>> {
 	let entry PageEntry = table[entryId].ref
 
 	if entry.present == 1 {
@@ -39,7 +38,7 @@ fun referOrCreatePage(table ArrayPointer<ByValue<PageEntry>>, entryId UInt64, wr
 	} else {
 		var newPage = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>
 		if newPage != null {
-			mapPage(entry, (newPage as! UInt64) - (wholePhysicalStart as! UInt64), writeAllowed)
+			mapPage(entry, (newPage as! UInt64) - (wholePhysicalStart as! UInt64), writeAllowed, accessibleByUser)
 			// TODO else error
 		}
 		return newPage
@@ -63,31 +62,31 @@ fun getPageAddressView(virtualAddr UInt64) ByValue<PageAddressView> {
 }
 
 // TODO handle huge pages returned from bootloader
-fun mapPT(pt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, writeAllowed UInt8) {
+fun mapPT(pt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, writeAllowed Bool, accessibleByUser Bool) {
 	let view = getPageAddressView(virtualAddr)
 	let entry PageEntry = pt[view.ref.pt].ref
-	mapPage(entry, physicalAddr, writeAllowed)
+	mapPage(entry, physicalAddr, writeAllowed, accessibleByUser)
 }
 
 fun mapPD(pd ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
-							writeAllowed UInt8) Void {
+							writeAllowed Bool, accessibleByUser Bool) Void {
 	let view = getPageAddressView(virtualAddr)
-	let pt = referOrCreatePage(pd, view.ref.pd, writeAllowed)
-	mapPT(pt, virtualAddr, physicalAddr, writeAllowed)
+	let pt = referOrCreatePage(pd, view.ref.pd, writeAllowed, accessibleByUser)
+	mapPT(pt, virtualAddr, physicalAddr, writeAllowed, accessibleByUser)
 }
 
 fun mapPDPT(pdpt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
-							writeAllowed UInt8) Void {
+							writeAllowed Bool, accessibleByUser Bool) Void {
 	let view = getPageAddressView(virtualAddr)
-	let pd = referOrCreatePage(pdpt, view.ref.pdpt, writeAllowed)
-	mapPD(pd, virtualAddr, physicalAddr, writeAllowed)
+	let pd = referOrCreatePage(pdpt, view.ref.pdpt, writeAllowed, accessibleByUser)
+	mapPD(pd, virtualAddr, physicalAddr, writeAllowed, accessibleByUser)
 }
 
 fun mapPML4(pml4 ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
-							writeAllowed UInt8) Void {
+							writeAllowed Bool, accessibleByUser Bool) Void {
 	let view = getPageAddressView(virtualAddr)
-	let pdpt = referOrCreatePage(pml4, view.ref.pml4, writeAllowed)
-	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed)
+	let pdpt = referOrCreatePage(pml4, view.ref.pml4, writeAllowed, accessibleByUser)
+	mapPDPT(pdpt, virtualAddr, physicalAddr, writeAllowed, accessibleByUser)
 	// TODO present = true must be set in reverse order to avoid race condition on un-cached access?
 	// i.e. PT then PD then PDPT, currently it set PD present before PT
 	// TODO inv pg asm to invalidate page cache
@@ -133,7 +132,7 @@ fun resolveAddr(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64
 // TODO ^ same clang warning
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
-fun mapMemory(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, pageCount UInt32) {
+fun mapMemory(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, pageCount UInt32, accessibleByUser Bool) {
 	serialPrintln("[paging] mapping memory range")
 
 	var virtualAddrEnd UInt64 = virtualAddr + pageCount * pageSize
@@ -160,8 +159,8 @@ fun mapMemory(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, 
 	serialPrint("\n")
 
 	while vAddress < virtualAddrEnd {
-		let writeAllowed = 1u8 // TODO
-		mapPML4(pml4entries, vAddress, pAddress, writeAllowed)
+		let writeAllowed = true // TODO
+		mapPML4(pml4entries, vAddress, pAddress, writeAllowed, accessibleByUser)
 
 		vAddress += pageSize
 		pAddress += pageSize
@@ -231,9 +230,10 @@ fun allocUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, pageCount UI
 // TODO respect WoW limits
 // TODO VirtualAllocEx-like behavior (i.e. alloc for other processes, not only current)
 // Decides automatically where to allocate
-// if virtualAddr == 0
+// if virtualAddr == 0 TODO separate func isAvailableUserMemoryRange and findAvailableUserMemoryRange
 // Does NOT allocate physical memory for the requested range
 // Returns 0 if requested pointer is occupied
+// TODO rename to findUserMemory or findLowerMemory or findProcessMemory
 fun findUserspaceMemory(
 	pml4entries ArrayPointer<ByValue<PageEntry>>,
 	virtualAddr UInt64,

@@ -38,10 +38,11 @@ class PageEntry {
 	// always giving the kernel write access (the default) or both user land and the kernel
 	// (see Intel Manuals 3A 2-20)
 	@bits(1) var writeAllowed UInt8
+	// TODO can be just `Bool` cause booleans in Hexa are `uint8_t`
 	// TODO flags could be merged into single `uint8` to make set them as `0b010` quickly
 
 	/// U/S: User mode allowed
-	@bits(1) var accessibleByAll UInt8
+	@bits(1) var accessibleByUser UInt8
 
 	/// PWT: Write through
 	@bits(1) var writeThrough UInt8

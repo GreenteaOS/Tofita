@@ -98,6 +98,7 @@ class ExeLoader<SIZE, HEADER> {
 		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
 		serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
 					0x020B)
+		// TODO require all .dlls ARCH be the same or show loader error
 		serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
 
 		let pages = down_bytes_to_pages(peOptionalHeader.sizeOfImage) + 1u32
@@ -108,7 +109,13 @@ class ExeLoader<SIZE, HEADER> {
 			exec.nextBase = peOptionalHeader.imageBase
 		}
 
-		mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
+		mapMemory(
+			exec.pml4,
+			exec.nextBase,
+			physical - (wholePhysicalStart as! UInt64),
+			pages,
+			accessibleByUser: true
+		)
 
 		let buffer UInt64 = exec.nextBase
 		memset(buffer as! ArrayPointer<UInt8>, 0, peOptionalHeader.sizeOfImage) // Zeroing
@@ -373,7 +380,15 @@ class ExeLoader<SIZE, HEADER> {
 			let physical = PhysicalAllocator.allocatePages(pages)
 
 			let buffer UInt64 = exec.nextBase
-			mapMemory(exec.pml4, exec.nextBase, physical - (wholePhysicalStart as! UInt64), pages)
+
+			mapMemory(
+				exec.pml4,
+				exec.nextBase,
+				physical - (wholePhysicalStart as! UInt64),
+				pages,
+				accessibleByUser: true
+			)
+
 			memset(buffer as! ArrayPointer<UInt8>, 0, ei.pei.sizeOfStackReserve) // Zeroing
 
 			exec.nextBase = exec.nextBase + pages * pageSize
@@ -461,7 +476,13 @@ class ExeLoader<SIZE, HEADER> {
 		)
 
 		// TODO this may fail/except, handle errors (de-allocate all memory)
-		mapMemory(process.pml4, whereEntries, dllEntries - wholePhysicalStart, 1)
+		mapMemory(
+			process.pml4,
+			whereEntries,
+			dllEntries - wholePhysicalStart,
+			1,
+			accessibleByUser: true
+		)
 
 		startup.dllEntries = whereEntries
 		startup.entry = app.pei.entry
@@ -474,7 +495,13 @@ class ExeLoader<SIZE, HEADER> {
 			process.limits
 		)
 
-		mapMemory(process.pml4, whereStartup, (startup as! UInt64) - wholePhysicalStart, 1)
+		mapMemory(
+			process.pml4,
+			whereStartup,
+			(startup as! UInt64) - wholePhysicalStart,
+			1,
+			accessibleByUser: true
+		)
 
 		process.frame.ip = ntdll.entry // Contains crt0
 		process.frame.sp = app.stackVirtual

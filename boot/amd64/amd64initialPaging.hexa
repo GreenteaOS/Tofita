@@ -26,7 +26,7 @@ fun mapPage(entry PageEntry, address UInt64, writeAllowed UInt8) {
 	entry.address = address >> addressBits
 	entry.present = 1u64
 	entry.writeAllowed = (writeAllowed == 1) ? 1u64 : 0u64
-	entry.accessibleByAll = 1u64 // TODO
+	entry.accessibleByAll = 0u64
 	// TODO all fields must be set to zero, filled by kernel later
 }
 
@@ -35,8 +35,11 @@ fun mapPageHuge(entry PageEntry, address UInt64) {
 	entry.present = 1u64
 	entry.writeAllowed = 1u64
 	entry.largePage = 1u64
-	entry.accessibleByAll = 1u64 // TODO
+	entry.accessibleByAll = 0u64
+	// TODO ^ should NX be explicitly enabled on AMD64?
 }
+
+// TODO epic pages if CPU ID supports them
 
 fun referOrCreatePage(table ArrayPointer<ByValue<PageEntry>>, entryId UInt64, writeAllowed UInt8) ArrayPointer<ByValue<PageEntry>> {
 	var entry PageEntry = table[entryId].ref

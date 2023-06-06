@@ -42,9 +42,9 @@ fun kernelInit(params UefiPayload) {
 
 	// TODO
 	if false {
-		mapMemory(pml4entries, 4096, 4096, 256)
-		mapMemory(pml4entries, 4096, 4096, 256)
-		mapMemory(pml4entries, 4096 * 20u64, 4096 * 10u64, 256)
+		mapMemory(pml4entries, 4096, 4096, 256, accessibleByUser: false)
+		mapMemory(pml4entries, 4096, 4096, 256, accessibleByUser: false)
+		mapMemory(pml4entries, 4096 * 20u64, 4096 * 10u64, 256, accessibleByUser: false)
 
 		serialPrintf("<> %8 == %8\n", (4096u64 * 10),
 					 resolveAddr(pml4entries, 4096u64 * 20))
