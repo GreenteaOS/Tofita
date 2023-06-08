@@ -162,6 +162,7 @@ fun initDwm() {
 	mouseY = _framebuffer.height / 2i16
 }
 
+/// Detects frame button under cursor like `Close`
 fun getFrameButton(mouseX Int16, mouseY Int16, windowId UInt64) FrameHover {
 	if windowId == 0 {
 		return FrameHover.Noop
@@ -175,10 +176,10 @@ fun getFrameButton(mouseX Int16, mouseY Int16, windowId UInt64) FrameHover {
 
 	let frameHeight = 30 + 3
 
-	let xx = x + window.width
+	let xx = x + frameButtonsWidth
 	let yy = y + frameHeight
 
-	if mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy {
+	if mouseX >= x, mouseX <= xx, mouseY >= y, mouseY <= yy {
 		let diff UInt8 = (mouseX - x) / 46u8
 		if diff == 0 {
 			return FrameHover.Min
@@ -370,7 +371,7 @@ fun minimize(windowId UInt64) {
 }
 
 fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
-	if defaultSession.mouseUp(type, mouseX, mouseY) {
+	if not frameHoverWindowDown, defaultSession.mouseUp(type, mouseX, mouseY) {
 		return
 	}
 
@@ -408,10 +409,9 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 		}
 
 		frameHoverState = hover
+		frameHoverWindowDown = false
+		requestAnimationFrame()
 	}
-
-	frameHoverWindowDown = false
-	haveToRender = true // TODO not always
 
 	handleMouseUpDesktop(type, mouseX, mouseY)
 }
