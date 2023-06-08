@@ -40,8 +40,25 @@ class GraphicalSession {
 	// Zones
 	var desktop Desktop
 
+	/// Desktop icons and selection rectangle
 	fun desktopHandle(id UInt64, event ColliderEventType) Void {
-		// TODO
+		if event == ColliderEventType.MouseMove {
+			// TODO set mouse coordinates properly
+			handleMouseMoveDesktop(mouseX, mouseY)
+			return
+		}
+
+		if event == ColliderEventType.MouseDown, firstResponder == 0 {
+			// TODO set mouse coordinates ant event type properly
+			handleMouseDownDesktop(MouseActionType.LeftDown, mouseX, mouseY)
+			return
+		}
+
+		if event == ColliderEventType.MouseUp {
+			// TODO set mouse coordinates ant event type properly
+			handleMouseUpDesktop(MouseActionType.LeftUp, mouseX, mouseY)
+			return
+		}
 	}
 
 	/// Selects the clicked window that is shown on the taskbar
@@ -175,13 +192,15 @@ class GraphicalSession {
 		let event = ColliderEventType.MouseMove
 
 		// Taskbar is topmost
-		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
+		// TODO some global way to detect drag of any collider to ignore any other collider
+		let drag = drag as! Bool // TODO Hexa
+		if not drag, taskbarZone.trySendEvent(mouseX, mouseY, event) {
 			return true
 		}
 
 		// Windows go under taskbar
 		let windowId = findWindowUnderCursor(mouseX, mouseY)
-		if windowId != 0 {
+		if not drag, windowId != 0 {
 			ColliderRectangle.clearState()
 			return false // TODO call DWM
 		}
@@ -199,7 +218,20 @@ class GraphicalSession {
 		let event = ColliderEventType.MouseUp // TODO left/ri/mi maybe just reuse MouseActionType?
 
 		// Taskbar is topmost
-		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
+		let drag = drag as! Bool // TODO Hexa
+		if not drag, taskbarZone.trySendEvent(mouseX, mouseY, event) {
+			return true
+		}
+
+		// Windows go under taskbar
+		let windowId = findWindowUnderCursor(mouseX, mouseY)
+		if not drag, windowId != 0 {
+			ColliderRectangle.clearState()
+			return false // TODO call DWM
+		}
+
+		// Desktop icons
+		if desktopZone.trySendEvent(mouseX, mouseY, event) {
 			return true
 		}
 
@@ -210,7 +242,20 @@ class GraphicalSession {
 		let event = ColliderEventType.MouseDown
 
 		// Taskbar is topmost
-		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
+		let drag = drag as! Bool // TODO Hexa
+		if not drag, taskbarZone.trySendEvent(mouseX, mouseY, event) {
+			return true
+		}
+
+		// Windows go under taskbar
+		let windowId = findWindowUnderCursor(mouseX, mouseY)
+		if not drag, windowId != 0 {
+			ColliderRectangle.clearState()
+			return false // TODO call DWM
+		}
+
+		// Desktop icons
+		if desktopZone.trySendEvent(mouseX, mouseY, event) {
 			return true
 		}
 

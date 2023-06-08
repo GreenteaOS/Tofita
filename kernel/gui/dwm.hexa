@@ -209,6 +209,7 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	// (defaultSession as! GraphicalSession).desktopHandle(0, ColliderEventType.MouseUp)
 
 	// TODO window is nullable
+	// TODO could be just `mouseDragWindow Window? = current` instead of getting by id, same for others
 	let window = windowsList[mouseDragWindow]
 
 	// TODO Hexa: `and` instead of `&&` here, btw `,`
@@ -250,8 +251,6 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 		frameHoverWindowInsideButtonArea = getFrameButton(mouseX, mouseY, frameHoverWindow) == frameHoverState
 		haveToRender = haveToRender or (frameHoverWindowInsideButtonArea != _frameHoverWindowInsideButtonArea)
 	}
-
-	handleMouseMoveDesktop(mouseX, mouseY)
 }
 
 /// Returns zero by default, otherwise index in windows list
@@ -291,7 +290,13 @@ fun findWindowUnderCursor(mouseX Int16, mouseY Int16) UInt64 {
 
 fun selectMouseNextResponder(mouseX Int16, mouseY Int16) {
 	// TODO hexa unconditional recursion firstResponder = selectMouseNextResponder(mouseX, mouseY)
-	firstResponder = findWindowUnderCursor(mouseX, mouseY)
+	let newResponder = findWindowUnderCursor(mouseX, mouseY)
+
+	if firstResponder != newResponder {
+		requestAnimationFrame()
+	}
+
+	firstResponder = newResponder
 }
 
 fun isDraggableFrame(mouseX Int16, mouseY Int16, windowId UInt64) Bool {
@@ -326,15 +331,14 @@ fun bringWindowToFront(windowId UInt64) {
 }
 
 fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
+	selectMouseNextResponder(mouseX, mouseY)
 	if defaultSession.mouseDown(type, mouseX, mouseY) {
 		return
 	}
 
-	selectMouseNextResponder(mouseX, mouseY)
-
 	if firstResponder != 0 && firstResponder != topmostWindow {
 		bringWindowToFront(firstResponder)
-		// TODO repaint?
+		requestAnimationFrame()
 	}
 
 	if type == MouseActionType.LeftDown && isDraggableFrame(mouseX, mouseY, firstResponder) {
@@ -349,10 +353,6 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 		frameHoverWindowInsideButtonArea = true
  		// TODO Hexa: fun as st useless error `requestAnimationFrame` note lack of `()`
 		requestAnimationFrame()
-	}
-
-	if firstResponder == 0 {
-		handleMouseDownDesktop(type, mouseX, mouseY)
 	}
 }
 
@@ -412,8 +412,6 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 		frameHoverWindowDown = false
 		requestAnimationFrame()
 	}
-
-	handleMouseUpDesktop(type, mouseX, mouseY)
 }
 
 fun handleMouseActivity() {

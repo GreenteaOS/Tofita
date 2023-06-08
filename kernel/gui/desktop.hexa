@@ -28,7 +28,8 @@ class Desktop {
 
 var dragX = 255i16
 var dragY = 255i16
-var drag = false
+// TODO Hexa: obvious typing fail `var drag = false` at `fun mouseMove`
+var drag Bool = false
 
 fun compositeDesktopSelectionRectangle(mouseX Int16, mouseY Int16) {
 	var color = new ByValue<Pixel32>()
