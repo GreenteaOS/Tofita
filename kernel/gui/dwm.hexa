@@ -201,6 +201,11 @@ fun isShouldIgnoreOutsideWindow() {
 fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	if not isShouldIgnoreOutsideWindow() {
 		if defaultSession.mouseMove(mouseX, mouseY) {
+			if frameHoverState != FrameHover.Noop {
+				// TODO Hexa: Disallow `==` *statements* is really must have
+				frameHoverState = FrameHover.Noop
+				requestAnimationFrame()
+			}
 			return
 		}
 	}
@@ -393,7 +398,7 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 	if frameHoverWindowDown {
 		frameHoverWindow = findWindowUnderCursor(mouseX, mouseY)
 		let hover = getFrameButton(mouseX, mouseY, frameHoverWindow)
-		var window = windowsList[frameHoverWindow]
+		let window = windowsList[frameHoverWindow]
 
 		if hover == frameHoverState && window.present {
 			if frameHoverState == FrameHover.Min {

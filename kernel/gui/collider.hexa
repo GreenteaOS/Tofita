@@ -18,17 +18,19 @@ enum ColliderEventType : UInt8 {
 	MouseDown = 1
 	MouseUp = 2
 	MouseMove = 3
+	MouseScroll = 4
 	// TODO probably stuff like double click? oh wait, the collider generates them
+	DragStart = 5 // TODO implement
+	DragStop = 6
 }
 
 enum ColliderState : UInt8 {
 	Default = 0
 	Hover = 1
 
-	/// Mouse is over collider and is down
-	// TODO Should capture and keep pressed even when
-	// mouse leaves the area while kept pressed
-	LeftPressed = 2
+	/// Capture and keep pressed even when
+	/// mouse leaves the area while kept pressed
+	Drag = 2
 }
 
 class ColliderRectangle {
@@ -61,11 +63,12 @@ class ColliderRectangle {
 	static var current ColliderRectangle? = null
 
 	static fun clearState() {
-		// Un-hover
+		// Un-hover and un-drag
 		if let current = current {
-			if current.state == ColliderState.Hover {
+			if current.state != ColliderState.Default {
 				current.state = ColliderState.Default
 				// TODO better idea?
+				// TODO should send stop drag etc?
 				requestAnimationFrame()
 			}
 		}
@@ -108,19 +111,57 @@ class ColliderRectangle {
 		// Self clicked
 		// TODO Hexa: fix! it does v table call instead
 		let handler = this.handler
+		let old = state
+		var event = event // Override
+
+		if let current = current, current != this, current.state == ColliderState.Drag {
+			// Something else is drag'n'dropped
+			if event == ColliderEventType.MouseMove {
+				// Redirect event
+				let handler = current.handler
+				handler(current.id, ColliderEventType.MouseMove)
+
+				return false
+			}
+
+			if event == ColliderEventType.MouseUp {
+				event = ColliderEventType.MouseMove // Override
+			}
+		}
 
 		if clickable {
 			if let current = current, current != this {
 				if current.state == ColliderState.Hover {
 					current.state = ColliderState.Default
+					// TODO send un-hover event? to reset tooltip timer
+				}
+
+				if current.state == ColliderState.Drag {
+					current.state = ColliderState.Default
+					// TODO should send event of un-drag? but not mouse-up cause would cause click
+					let handler = current.handler
+					handler(current.id, ColliderEventType.DragStop)
 				}
 			}
 
 			// TODO set hover only on mouse move and UPPED
 			current = this
+
 			// TODO `state == ColliderState.Hover` hint unused `==` here in vs hexa
-			let old = state
-			state = ColliderState.Hover
+			if state != ColliderState.Drag {
+				state = ColliderState.Hover
+			}
+
+			if event == ColliderEventType.MouseDown {
+				// Note that child will be dragged, not parent
+				// TODO should also preserve mouse cursor (like text selection cursor)
+				state = ColliderState.Drag
+			}
+
+			if event == ColliderEventType.MouseUp and state == ColliderState.Drag {
+				state = ColliderState.Hover
+				event = ColliderEventType.DragStop
+			}
 
 			if old != state {
 				// TODO better idea?
