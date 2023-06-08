@@ -95,3 +95,7 @@ var frameHoverWindow UInt64 = 0
 var frameHoverWindowDown Bool = false
 var frameHoverWindowInsideButtonArea Bool = false
 var frameHoverState FrameHover = FrameHover.Noop
+var clickStartTimestamp UInt64 = 0
+var isDoubleClick Bool = false
+var clickStartX Int16 = 0i16
+var clickStartY Int16 = 0i16

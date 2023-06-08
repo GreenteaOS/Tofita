@@ -332,6 +332,10 @@ fun bringWindowToFront(windowId UInt64) {
 
 fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 	selectMouseNextResponder(mouseX, mouseY)
+
+	// TODO should reset on different responder id?
+	startClick(mouseX, mouseY)
+
 	if defaultSession.mouseDown(type, mouseX, mouseY) {
 		return
 	}
@@ -342,6 +346,13 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 	}
 
 	if type == MouseActionType.LeftDown && isDraggableFrame(mouseX, mouseY, firstResponder) {
+		if isDoubleClick {
+			// TODO send message to wapi
+			minimize(firstResponder) // TODO should actually maximize and normalize
+			requestAnimationFrame()
+			return
+		}
+
 		mouseDragCapturedWindow = true
 		mouseDragWindow = firstResponder
 		mouseDragLastX = mouseX
@@ -484,4 +495,14 @@ fun handleMouseActivity() {
 fun handleKeyboardActivity() {
 	// TODO
 	haveToRender = true
+}
+
+fun startClick(mouseX Int16, mouseY Int16) {
+	let diff = uptimeMilliseconds - clickStartTimestamp
+	clickStartTimestamp = uptimeMilliseconds
+	// TODO get from theme
+	// TODO some valid zone even when newX != oldX
+	isDoubleClick = diff < 480 and clickStartX == mouseX and clickStartY == mouseY
+	clickStartX = mouseX
+	clickStartY = mouseY
 }
