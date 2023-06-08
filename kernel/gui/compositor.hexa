@@ -563,6 +563,17 @@ fun composite(startupMilliseconds UInt64) {
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2i16, 6i16, 1i16)
 	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
 
+	// Start
+	if defaultSession.showStart {
+		let w = 640u16
+		let h = 480u16
+		let x = 0i16
+		let y = taskbarY - h
+		drawVibrancedRectangle(x, y as! Int16, w, h, darkTheme)
+		// TODO probably `w - 2` to avoid some overdraw?
+		drawRectangleOutline(color, x, y as! Int16, w, h)
+	}
+
 	// HUD
 	quake()
 	invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)

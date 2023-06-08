@@ -32,7 +32,9 @@ class GraphicalSession {
 	var taskbarInput ColliderRectangle
 	var taskbarTrayOpener ColliderRectangle
 	var taskbarWindowList ColliderRectangle
+	var showStart = false
 
+	// TODO probably useless
 	var windowsZone ColliderRectangle
 
 	// Zones
@@ -42,6 +44,7 @@ class GraphicalSession {
 		// TODO
 	}
 
+	/// Selects the clicked window that is shown on the taskbar
 	fun windowHandle(id UInt64, event ColliderEventType) Void {
 		// TODO
 		if event == ColliderEventType.MouseUp {
@@ -58,8 +61,19 @@ class GraphicalSession {
 		}
 	}
 
+	/// Taskbar buttons like `Start`
 	fun taskbarHandle(id UInt64, event ColliderEventType) Void {
 		// TODO
+		// TODO Hexa: switch over computable values like `case (taskbarStart.id):`
+		if id == taskbarStart.id {
+			// TODO left mouse button only
+			if event == ColliderEventType.MouseUp {
+				showStart = not showStart
+				requestAnimationFrame()
+				// TODO cover whole screen with clickable area to hide `Start`
+			}
+			return
+		}
 	}
 
 	new (owner User) {

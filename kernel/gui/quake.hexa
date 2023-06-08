@@ -228,6 +228,7 @@ fun quakePrintHex(n UInt64) {
 }
 
 // TODO why not just accept String as a first argument?
+// TODO ensure unicode
 @nativeVariadic
 fun quakePrintf(c ConstArrayPointer<ClangWideChar>, ...args) {
 	va_start(c)
