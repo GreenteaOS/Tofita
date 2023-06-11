@@ -209,14 +209,23 @@ fun drawTextBox(text String, x Float, y Int16, color Pixel32, w UInt16, h UInt16
 
 	var end = xx + w - ellipsisWidth
 
+	var previousCode = 0u16
+
 	while text.utf16()[i] as! UInt16 != 0 and i < 255 * 255 {
 		let code = (text.charCodeAt(i) as! UInt16) & 0xFF as! UInt8
 		if xx + getCharAdvance(code) > end {
 			// Has spare chars
 			drawText("...", xx, y, color)
+			// Ignore SPACE cause `text ...` looks weird
+			if previousCode == 32 {
+				xx -= getCharAdvance(32)
+			}
 			break
 		}
 		xx += drawChar(code, xx, y, color)
+		
+		previousCode = code
+
 		i++
 	}
 
