@@ -109,6 +109,7 @@ fun kernelInit(params UefiPayload) {
 
 	initText()
 	initializeCompositor()
+	defaultSession.resize()
 
 	serialPrintln("<Tofita> quakePrintf(versionText.utf16())")
 	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " loaded and operational\n"
