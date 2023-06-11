@@ -33,6 +33,7 @@ class GraphicalSession {
 	var taskbarTrayOpener ColliderRectangle
 	var taskbarWindowList ColliderRectangle
 	var showStart = false
+	var showTray = false
 
 	// TODO probably useless
 	var windowsZone ColliderRectangle
@@ -42,6 +43,12 @@ class GraphicalSession {
 
 	/// Desktop icons and selection rectangle
 	fun desktopHandle(id UInt64, event ColliderEventType) Void {
+		// TODO better idea
+		if event == ColliderEventType.MouseDown {
+			showStart = false
+			showTray = false
+		}
+
 		if event == ColliderEventType.MouseMove {
 			// TODO set mouse coordinates properly
 			handleMouseMoveDesktop(mouseX, mouseY)
@@ -71,6 +78,12 @@ class GraphicalSession {
 
 	/// Selects the clicked window that is shown on the taskbar
 	fun windowHandle(id UInt64, event ColliderEventType) Void {
+		// TODO better idea
+		if event == ColliderEventType.MouseDown {
+			showStart = false
+			showTray = false
+		}
+
 		if event == ColliderEventType.MouseDown {
 			taskbarResponder = id
 		}
@@ -112,8 +125,20 @@ class GraphicalSession {
 			// TODO left mouse button only
 			if event == ColliderEventType.MouseUp {
 				showStart = not showStart
+				showTray = false
 				requestAnimationFrame()
 				// TODO cover whole screen with clickable area to hide `Start`
+			}
+			return
+		}
+
+		if id == taskbarTrayOpener.id {
+			// TODO left mouse button only
+			if event == ColliderEventType.MouseUp {
+				showTray = not showTray
+				showStart = false
+				requestAnimationFrame()
+				// TODO cover whole screen with clickable area to hide `Tray`
 			}
 			return
 		}
@@ -282,6 +307,10 @@ class GraphicalSession {
 		// Windows go under taskbar
 		let windowId = findWindowUnderCursor(mouseX, mouseY)
 		if not drag, windowId != 0 {
+			// TODO better idea, maybe currentPopup = Popup.Tray/Start?
+			showStart = false
+			showTray = false
+
 			ColliderRectangle.clearState()
 			return false // TODO call DWM
 		}

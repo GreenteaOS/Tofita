@@ -309,6 +309,7 @@ fun compositeWindows() {
 	}
 }
 
+/// Forces repaint
 fun requestAnimationFrame() {
 	haveToRender = true
 }
