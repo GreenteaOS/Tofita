@@ -222,7 +222,7 @@ fun drawTextBox(text String, x Float, y Int16, color Pixel32, w UInt16, h UInt16
 			drawTextBox("...", xx, y, color, 128, 128, false, alpha)
 			break
 		}
-		
+
 		xx += alpha? drawAlphaChar(code, xx, y, color) : drawChar(code, xx, y, color)
 		previousCode = code
 
@@ -261,27 +261,25 @@ fun drawIntegerText(value Int64, x Float, y Int16, color Pixel32) UInt16 {
 	return (xx - x) as! UInt16 // TODO `round`
 }
 
-fun drawShadowText(text String, x Float, y Int16) {
-	var i UInt16 = 0
-	var xx Float = x
+// TODO multiline and wrap
+/// Use this to render file names on desktop, other use cases currently are not assumed
+fun drawShadowText(text String, x Float, y Int16, w UInt16, primaryColor Pixel32) {
 	var color = new ByValue<Pixel32>()
 	var color = color.ref
-	let text = text.utf16() as! ConstArrayPointer<ClangWideChar>
+	// Used to align at center
+	let advance = getTextAdvance(text)
+	let offset = advance > w ? 0 : (w / 2) - (advance / 2)
 
 	color.color = 0x00000000
 	color.rgba.ref.a = 70
 
-	// TODO `while let char = .charCodeAt(i)`
-	while text[i] as! UInt16 != 0 && i < 255 * 255 {
-		var ch UInt8 = text[i] as! UInt8
-		// TODO charCodeAt return zero? oh wait, `while let` checks for null!
+	// Shadow
+	// TODO Hexa: ensure `Float + 1` assumes `1.0` here, not `1i32`
+	drawTextBox(text, offset + x + 1, y + 1i16, color, w, 32u16, true, true)
+	drawTextBox(text, offset + x + 1, y + 2i16, color, w, 32u16, true, true)
+	drawTextBox(text, offset + x - 1, y + 1i16, color, w, 32u16, true, true)
+	drawTextBox(text, offset + x - 1, y + 2i16, color, w, 32u16, true, true)
 
-		drawAlphaChar(ch, xx + 1, y + 1i16, color)
-		drawAlphaChar(ch, xx + 1, y + 2i16, color)
-
-		drawAlphaChar(ch, xx - 1, y + 1i16, color)
-		xx += drawAlphaChar(ch, xx - 1, y + 2i16, color)
-
-		i++
-	}
+	// Primary text
+	drawTextBox(text, x + offset, y, primaryColor, w, 32u16, true, alpha: false)
 }
