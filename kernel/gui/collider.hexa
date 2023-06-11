@@ -38,6 +38,15 @@ class ColliderRectangle {
 	/// Disable for simple container
 	var clickable Bool = true
 	var cursor UInt64 // TODO
+
+	/// Is mouse over this element or holds it
+	/// Use this for visual effects
+	var mouseOver Bool = false
+
+	/// Is mouse presses or drags this element
+	/// Use this for visual effects
+	var mouseHold Bool = false
+
 	var state ColliderState = ColliderState.Default // TODO
 	// TODO:
 	//var onMove (id UInt64) => Void
@@ -67,6 +76,7 @@ class ColliderRectangle {
 		if let current = current {
 			if current.state != ColliderState.Default {
 				current.state = ColliderState.Default
+				current.updateVisualState()
 				// TODO better idea?
 				// TODO should send stop drag etc?
 				requestAnimationFrame()
@@ -90,6 +100,12 @@ class ColliderRectangle {
 			relX <= (relativeX + width) and
 			relY <= (relativeY + height) and
 			enabled
+	}
+
+	// TODO Hexa: it is much move robust to just use getters instead
+	fun updateVisualState() Void {
+		this.mouseOver = state != ColliderState.Default
+		this.mouseHold = state == ColliderState.Drag
 	}
 
 	fun trySendEvent(relX Int16, relY Int16, event ColliderEventType) Bool {
@@ -133,11 +149,13 @@ class ColliderRectangle {
 			if let current = current, current != this {
 				if current.state == ColliderState.Hover {
 					current.state = ColliderState.Default
+					current.updateVisualState()
 					// TODO send un-hover event? to reset tooltip timer
 				}
 
 				if current.state == ColliderState.Drag {
 					current.state = ColliderState.Default
+					current.updateVisualState()
 					// TODO should send event of un-drag? but not mouse-up cause would cause click
 					let handler = current.handler
 					handler(current.id, ColliderEventType.DragStop)
@@ -161,6 +179,8 @@ class ColliderRectangle {
 
 			if event == ColliderEventType.MouseUp and state == ColliderState.Drag {
 				state = ColliderState.Hover
+				updateVisualState()
+
 				if passMouseUp {
 					handler(id, ColliderEventType.DragStop)
 				} else {
@@ -169,6 +189,7 @@ class ColliderRectangle {
 			}
 
 			if old != state {
+				updateVisualState()
 				// TODO repaint ~always when drag
 				// TODO better idea?
 				// TODO BTW could set dirty areas too? cause rectangles are known
