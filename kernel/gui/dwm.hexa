@@ -335,6 +335,11 @@ fun bringWindowToFront(windowId UInt64) {
 	overlappedWindow_attach(windowId)
 }
 
+fun isFrontWindow(windowId UInt64) Bool {
+	// TODO Hexa: well still value-returning assign seems harmful `return topmostWindow = windowId`
+	return topmostWindow == windowId
+}
+
 fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 	selectMouseNextResponder(mouseX, mouseY)
 
@@ -377,6 +382,7 @@ fun minimize(windowId UInt64) {
 	window.minimized = true // Do this upfront!
 	// TODO ensure prevId can be valid 0 and not garbage
 	// Here we find next non-minimized window and un-minimize it
+	firstResponder = window.prevId
 	while firstResponder != 0 and window.minimized {
 		// First iteration is current window itself
 		firstResponder = window.prevId
@@ -510,4 +516,9 @@ fun startClick(mouseX Int16, mouseY Int16) {
 	isDoubleClick = diff < 480 and clickStartX == mouseX and clickStartY == mouseY
 	clickStartX = mouseX
 	clickStartY = mouseY
+	// Gamers have achieved more than 8 CPS in regular clicking
+	// Someone said the practical limit is 17 clicks per second
+	// Some games ban for >20 CPS
+	// Thus it should at least ignore >20-25 CPS
+	// TODO `isDoubleClick = isDoubleClick and diff > N` to ignore faulty mouses
 }
