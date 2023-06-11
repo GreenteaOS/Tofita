@@ -588,6 +588,35 @@ fun composite(startupMilliseconds UInt64) {
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2i16, 6i16, 1i16)
 	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
 
+	// Tray
+	if defaultSession.showTray {
+		let w = defaultSession.taskbarTrayOpener.width * 3 as! UInt16
+		let h = defaultSession.taskbarTrayOpener.width * 3 as! UInt16
+		let x = defaultSession.taskbarTrayOpener.relativeX - defaultSession.taskbarTrayOpener.width
+		let y = taskbarY - h
+		drawVibrancedRectangle(x, y as! Int16, w, h, darkTheme)
+		// TODO probably `w - 2` to avoid some overdraw?
+		color.ref.color = 0x126099FF
+		drawRectangleOutline(color, x, y as! Int16, w, h)
+
+		let color = hoverColor
+		color.ref.rgba.ref.a += 32u8
+
+		for xx in 3 {
+			for yy in 3 {
+				drawRectangleWithAlpha(
+					color.ref,
+					// TODO instead of +1 do 2px wider outline
+					1 + (defaultSession.taskbarTrayOpener.width * xx) + x,
+					1 + (defaultSession.taskbarTrayOpener.width * yy) + y as! Int16,
+					defaultSession.taskbarTrayOpener.width as! UInt16,
+					defaultSession.taskbarTrayOpener.width as! UInt16
+				)
+				color.ref.rgba.ref.a -= 16u8
+			}
+		}
+	}
+
 	// Start
 	if defaultSession.showStart {
 		let w = 640u16
@@ -596,6 +625,7 @@ fun composite(startupMilliseconds UInt64) {
 		let y = taskbarY - h
 		drawVibrancedRectangle(x, y as! Int16, w, h, darkTheme)
 		// TODO probably `w - 2` to avoid some overdraw?
+		color.ref.color = 0x126099FF
 		drawRectangleOutline(color, x, y as! Int16, w, h)
 	}
 
