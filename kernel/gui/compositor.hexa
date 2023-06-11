@@ -183,7 +183,7 @@ fun setWallpaper(bitmap Bitmap32, style WallpaperStyle, preserveAspectRatio Bool
 }
 
 fun drawVibrancedRectangle(x Int16, y Int16, width UInt16, height UInt16, dark Bool = true) {
-	let vibrance = dark ? vibranceDark : vibranceLight // Avoit non-register global access
+	let vibrance = dark ? vibranceDark : vibranceLight // Avoid non-register global access
 	for yy in height {
 		for xx in width {
 			if x + xx < 0 {
@@ -383,8 +383,14 @@ fun composite(startupMilliseconds UInt64) {
 	// TODO different color for light theme
 	let hoverColor = color
 
-	if defaultSession.taskbarStart.state == ColliderState.Hover {
-		drawRectangleWithAlpha(hoverColor.ref, 0, taskbarY, 40 + leavesPad + leavesPad, 30)
+	if let rectangle = defaultSession.taskbarStart, rectangle.mouseOver {
+		drawRectangleWithAlpha(
+			rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+			0,
+			taskbarY,
+			40 + leavesPad + leavesPad,
+			30
+		)
 	}
 
 	// TODO more lr space around for beauty
@@ -406,8 +412,14 @@ fun composite(startupMilliseconds UInt64) {
 	// TODO respect leaves padding
 	let shortcutsIconX = 44i16 + (shortcutsWidth / 2i16) - (16 / 2i16)
 	let shortcutsEnd = shortcutsWidth + 44
-	if defaultSession.taskbarPin.state == ColliderState.Hover {
-		drawRectangleWithAlpha(color.ref, 44i16, taskbarY, shortcutsWidth, 30)
+	if let rectangle = defaultSession.taskbarPin, rectangle.mouseOver {
+		drawRectangleWithAlpha(
+			rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+			44i16,
+			taskbarY,
+			shortcutsWidth,
+			30
+		)
 	}
 	drawBitmap32WithAlpha(notepad16, shortcutsIconX, taskbarY + 7i16)
 
@@ -448,9 +460,9 @@ fun composite(startupMilliseconds UInt64) {
 				drawRectangleWithAlpha(color.ref, x + 2i16, y, w - 4u16, 26u16)
 				color.ref.rgba.ref.a = 100
 			} else {
-				if let rectangle = rectangle, rectangle.state == ColliderState.Hover {
+				if let rectangle = rectangle, rectangle.mouseOver {
 					drawRectangleWithAlpha(
-						hoverColor.ref,
+						rectangle.mouseHold? holdColor.ref : hoverColor.ref,
 						rectangle.relativeX + defaultSession.taskbarWindowList.relativeX,
 						taskbarY,
 						rectangle.width as! UInt16,
@@ -478,13 +490,13 @@ fun composite(startupMilliseconds UInt64) {
 	// TODO tray space should be computed *before* window list
 
 	// Tray | line
-	if defaultSession.taskbarDesktopPeek.state == ColliderState.Hover {
+	if let rectangle = defaultSession.taskbarDesktopPeek, rectangle.mouseOver {
 		drawRectangleWithAlpha(
-			hoverColor.ref,
-			defaultSession.taskbarDesktopPeek.relativeX,
+			rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+			rectangle.relativeX,
 			taskbarY,
 			// TODO some proper conversion like `Int16.clampToUInt16(value)` or as method
-			defaultSession.taskbarDesktopPeek.width as! UInt16,
+			rectangle.width as! UInt16,
 			30
 		)
 	}
@@ -498,12 +510,12 @@ fun composite(startupMilliseconds UInt64) {
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 
 	// Time
-	if defaultSession.taskbarTime.state == ColliderState.Hover {
+	if let rectangle = defaultSession.taskbarTime, rectangle.mouseOver {
 		drawRectangleWithAlpha(
-			hoverColor.ref,
-			defaultSession.taskbarTime.relativeX,
+			rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+			rectangle.relativeX,
 			taskbarY,
-			defaultSession.taskbarTime.width as! UInt16,
+			rectangle.width as! UInt16,
 			30
 		)
 	}
@@ -532,8 +544,8 @@ fun composite(startupMilliseconds UInt64) {
 	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10i16, color.ref)
 	trayTimeX += drawAsciiText(pm ? " PM" : " AM", trayTimeX, taskbarY + 10i16, color.ref)
 
-	// Input
-	if defaultSession.taskbarInput.state == ColliderState.Hover {
+	// Input language
+	if let rectangle = defaultSession.taskbarInput, rectangle.mouseOver {
 		drawRectangleWithAlpha(
 			hoverColor.ref,
 			defaultSession.taskbarInput.relativeX,
@@ -548,9 +560,10 @@ fun composite(startupMilliseconds UInt64) {
 	drawAsciiText(languageId, trayLanguageX, taskbarY + 10i16, color.ref)
 
 	// Tray ^ button
-	if defaultSession.taskbarTrayOpener.state == ColliderState.Hover {
+	// TODO Hexa: try `if let item = defaultSession.taskbarTrayOpener, item.mouseOver { item.xxx }` pattern
+	if defaultSession.taskbarTrayOpener.mouseOver {
 		drawRectangleWithAlpha(
-			hoverColor.ref,
+			defaultSession.taskbarTrayOpener.mouseHold? holdColor.ref : hoverColor.ref,
 			defaultSession.taskbarTrayOpener.relativeX,
 			taskbarY,
 			defaultSession.taskbarTrayOpener.width as! UInt16,
