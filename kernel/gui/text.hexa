@@ -196,7 +196,7 @@ fun drawText(text String, x Float, y Int16, color Pixel32) UInt16 {
 
 /// Returns advance after last character
 // TODO respect `h`
-fun drawTextBox(text String, x Float, y Int16, color Pixel32, w UInt16, h UInt16, ellipsis Bool) UInt16 {
+fun drawTextBox(text String, x Float, y Int16, color Pixel32, w UInt16, h UInt16, ellipsis Bool, alpha Bool = false) UInt16 {
 	var i UInt16 = 0
 	var xx Float = x
 
@@ -215,15 +215,15 @@ fun drawTextBox(text String, x Float, y Int16, color Pixel32, w UInt16, h UInt16
 		let code = (text.charCodeAt(i) as! UInt16) & 0xFF as! UInt8
 		if xx + getCharAdvance(code) > end {
 			// Has spare chars
-			drawText("...", xx, y, color)
 			// Ignore SPACE cause `text ...` looks weird
 			if previousCode == 32 {
 				xx -= getCharAdvance(32)
 			}
+			drawTextBox("...", xx, y, color, 128, 128, false, alpha)
 			break
 		}
-		xx += drawChar(code, xx, y, color)
 		
+		xx += alpha? drawAlphaChar(code, xx, y, color) : drawChar(code, xx, y, color)
 		previousCode = code
 
 		i++
