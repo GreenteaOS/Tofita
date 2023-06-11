@@ -67,20 +67,41 @@ class GraphicalSession {
 		}
 	}
 
+	var taskbarResponder UInt64 = 0
+
 	/// Selects the clicked window that is shown on the taskbar
 	fun windowHandle(id UInt64, event ColliderEventType) Void {
-		if event == ColliderEventType.MouseUp {
+		if event == ColliderEventType.MouseDown {
+			taskbarResponder = id
+		}
+
+		else if event == ColliderEventType.MouseUp {
 			// TODO non-raw click event from the collider engine
-			if firstResponder != id {
-				firstResponder = id
-				// TODO responder must be collider to handle concept of focus and keyboard input
-				bringWindowToFront(firstResponder)
-				// TODO Hexa: must be null-safe
-				windowsList[id].minimized = false
-			} else {
-				minimize(id)
+			if taskbarResponder == id {
+				if let window = windowsList[taskbarResponder] {
+					if window.minimized {
+						firstResponder = id
+						// TODO responder must be collider to handle concept of focus and keyboard input
+						bringWindowToFront(firstResponder)
+						// TODO Hexa: must be null-safe
+						windowsList[id].minimized = false
+					} else {
+						if isFrontWindow(id) {
+							// TODO make it `window.minimize()` and `minimize.toggleMinimized()`?
+							minimize(id)
+						} else {
+							firstResponder = id
+							bringWindowToFront(firstResponder)
+						}
+					}
+				}
 			}
+
 			requestAnimationFrame()
+			taskbarResponder = 0
+		}
+
+		else if event == ColliderEventType.DragStop {
 		}
 	}
 
