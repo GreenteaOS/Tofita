@@ -18,7 +18,7 @@ enum ColliderEventType : UInt8 {
 	MouseDown = 1
 	MouseUp = 2
 	MouseMove = 3
-	MouseScroll = 4
+	MouseScroll = 4 // TODO implement
 	// TODO probably stuff like double click? oh wait, the collider generates them
 	DragStart = 5 // TODO implement
 	DragStop = 6
@@ -145,6 +145,7 @@ class ColliderRectangle {
 			}
 
 			// TODO set hover only on mouse move and UPPED
+			let passMouseUp = current == this
 			current = this
 
 			// TODO `state == ColliderState.Hover` hint unused `==` here in vs hexa
@@ -160,10 +161,15 @@ class ColliderRectangle {
 
 			if event == ColliderEventType.MouseUp and state == ColliderState.Drag {
 				state = ColliderState.Hover
-				event = ColliderEventType.DragStop
+				if passMouseUp {
+					handler(id, ColliderEventType.DragStop)
+				} else {
+					event = ColliderEventType.DragStop
+				}
 			}
 
 			if old != state {
+				// TODO repaint ~always when drag
 				// TODO better idea?
 				// TODO BTW could set dirty areas too? cause rectangles are known
 				requestAnimationFrame()
