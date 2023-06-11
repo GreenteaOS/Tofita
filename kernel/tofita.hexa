@@ -108,6 +108,7 @@ fun kernelInit(params UefiPayload) {
 	enablePS2Mouse()
 
 	initText()
+	versionText = "Development copy. Build " + versionMajor + "." + versionMinor + "." + versionTag
 	initializeCompositor()
 	defaultSession.resize()
 

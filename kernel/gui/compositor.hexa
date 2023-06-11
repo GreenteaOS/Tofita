@@ -31,6 +31,7 @@ var link Bitmap32 = null
 var cur Cursor = null
 var darkTheme Bool = true
 var startupAnimation UInt16 = 0
+var versionText = ""
 
 enum WallpaperStyle : UInt8 {
 	Center
@@ -382,6 +383,8 @@ fun composite(startupMilliseconds UInt64) {
 	// Save the color
 	// TODO different color for light theme
 	let hoverColor = color
+	let holdColor = color
+	holdColor.ref.rgba.ref.a = 64
 
 	if let rectangle = defaultSession.taskbarStart, rectangle.mouseOver {
 		drawRectangleWithAlpha(
@@ -422,6 +425,15 @@ fun composite(startupMilliseconds UInt64) {
 		)
 	}
 	drawBitmap32WithAlpha(notepad16, shortcutsIconX, taskbarY + 7i16)
+
+	// Version
+	{
+		let name = "Greentea OS Insider Preview"
+		let color = new ByValue<Pixel32>()
+		color.ref.color = 0xFFFFFFFFu32
+		drawTextBox(name, _framebuffer.width - getTextAdvance(name) - 5i16, taskbarY - 32i16, color.ref, 512, 32, true)
+		drawTextBox(versionText, _framebuffer.width - getTextAdvance(versionText) - 5i16, taskbarY - 16i16, color.ref, 512, 32, true)
+	}
 
 	// Opened windows
 	// Sorted in the creation order
@@ -547,10 +559,10 @@ fun composite(startupMilliseconds UInt64) {
 	// Input language
 	if let rectangle = defaultSession.taskbarInput, rectangle.mouseOver {
 		drawRectangleWithAlpha(
-			hoverColor.ref,
-			defaultSession.taskbarInput.relativeX,
+			rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+			rectangle.relativeX,
 			taskbarY,
-			defaultSession.taskbarInput.width as! UInt16,
+			rectangle.width as! UInt16,
 			30
 		)
 	}
