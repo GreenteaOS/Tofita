@@ -69,7 +69,6 @@ class GraphicalSession {
 
 	/// Selects the clicked window that is shown on the taskbar
 	fun windowHandle(id UInt64, event ColliderEventType) Void {
-		// TODO
 		if event == ColliderEventType.MouseUp {
 			// TODO non-raw click event from the collider engine
 			if firstResponder != id {
@@ -86,7 +85,6 @@ class GraphicalSession {
 
 	/// Taskbar buttons like `Start`
 	fun taskbarHandle(id UInt64, event ColliderEventType) Void {
-		// TODO
 		// TODO Hexa: switch over computable values like `case (taskbarStart.id):`
 		if id == taskbarStart.id {
 			// TODO left mouse button only
@@ -107,11 +105,15 @@ class GraphicalSession {
 		taskbarZone = new ColliderRectangle(0, taskbarHandler)
 		windowsZone = new ColliderRectangle(0, windowHandler)
 
+		// TODO set actual screen size dynamically
+		let screenWidth Int16 = _framebuffer.width
+		let screenHeight Int16 = _framebuffer.height
+
 		// Taskbar
 		//taskbarZone.width = 256 TODO Hexa: infer as i16
-		taskbarZone.width = 1920i16 // TODO actual screen size
+		taskbarZone.width = screenWidth
 		taskbarZone.height = 31i16 // TODO 31 lol? related to <= in collider?
-		taskbarZone.relativeY = 1080i16 - taskbarZone.height
+		taskbarZone.relativeY = screenHeight - taskbarZone.height
 
 		// Start button
 		{
@@ -183,11 +185,11 @@ class GraphicalSession {
 
 		// Desktop
 		//desktopZone.relativeY = 0
-		desktopZone.width = 1920i16 // TODO actual screen size256i16
-		desktopZone.height = 1080i16 // Bottom is covered by taskbar
+		desktopZone.width = screenWidth
+		desktopZone.height = screenHeight // Bottom is covered by taskbar
 
-		windowsZone.width = 1920i16 // TODO actual screen size
-		windowsZone.height = 1080i16 // TODO actual screen size
+		windowsZone.width = screenWidth
+		windowsZone.height = screenHeight
 		// TODO maybe just set handler to null?
 		windowsZone.clickable = false
 	}
