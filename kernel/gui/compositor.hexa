@@ -631,35 +631,11 @@ fun composite(startupMilliseconds UInt64) {
 
 		// Interior
 		{
+			// Layout
 			let userPanelHeight = 64i16
 
 			// TODO capture click zone inside Start so it is not auto closed on click itself
 			// TODO internal colliders and their hover/hold states
-			// User panel
-			{
-				color.ref.color = 0x126099FF
-				color.ref.rgba.ref.a = 128
-				lineHorizontalWithAlpha(color.ref, x, y + userPanelHeight, w)
-
-				color.ref.rgba.ref.r = 8
-				color.ref.rgba.ref.g = 8
-				color.ref.rgba.ref.b = 8
-				drawRectangleWithAlpha(
-					color.ref,
-					x,
-					y + 0i16,
-					w,
-					userPanelHeight - 1u16
-				)
-
-				color.ref.color = 0xFFFFFFFFu32
-				let welcome = "Hello, dear User"
-				// TODO user pic
-				drawTextBox(welcome, x + 16, y + 29i16, color.ref, w, 32, true)
-				// TODO folders
-				// TODO settings gear
-				// TODO power
-			}
 
 			// Pins panel
 			{
@@ -687,6 +663,32 @@ fun composite(startupMilliseconds UInt64) {
 				}
 			}
 
+			// User panel
+			{
+				color.ref.color = 0x126099FF
+				color.ref.rgba.ref.a = 128
+				lineHorizontalWithAlpha(color.ref, x, y + userPanelHeight, w)
+
+				color.ref.rgba.ref.r = 8
+				color.ref.rgba.ref.g = 8
+				color.ref.rgba.ref.b = 8
+				drawRectangleWithAlpha(
+					color.ref,
+					x,
+					y + 0i16,
+					w,
+					userPanelHeight - 1u16
+				)
+
+				color.ref.color = 0xFFFFFFFFu32
+				let welcome = "Hello, dear User"
+				// TODO user pic
+				drawTextBox(welcome, x + 16, y + 29i16, color.ref, w, 32, true)
+				// TODO folders
+				// TODO settings gear
+				// TODO power
+			}
+
 			// All apps panel
 			{
 				// TODO Move dark bg from search to here
@@ -696,8 +698,15 @@ fun composite(startupMilliseconds UInt64) {
 			}
 
 			// Search panel
+			// This panel is here for:
+			// 1. Discover-ability: users should know that search in Start menu is possible
+			// 2. Aesthetics: looks way better than not having one
+			// 3. Familiarity: being above is good for older users
 			{
 				// TODO |__ cool outline
+				// TODO icon
+				// TODO PiP button
+				// TODO Text edit: focus, caret and kb input
 				color.ref.color = 0x126099FF
 				color.ref.rgba.ref.a = 128
 				lineHorizontalWithAlpha(color.ref, x, y + h - userPanelHeight, w)
@@ -705,6 +714,7 @@ fun composite(startupMilliseconds UInt64) {
 				color.ref.rgba.ref.r = 8
 				color.ref.rgba.ref.g = 8
 				color.ref.rgba.ref.b = 8
+				// TODO darken only under text field
 				drawRectangleWithAlpha(
 					color.ref,
 					x,
