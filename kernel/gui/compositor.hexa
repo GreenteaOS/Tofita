@@ -621,13 +621,103 @@ fun composite(startupMilliseconds UInt64) {
 	// Start
 	if defaultSession.showStart {
 		let w = 640u16
-		let h = 480u16
+		let h = 730u16
 		let x = 0i16
 		let y = taskbarY - h
 		drawVibrancedRectangle(x, y as! Int16, w, h, darkTheme)
 		// TODO probably `w - 2` to avoid some overdraw?
 		color.ref.color = 0x126099FF
 		drawRectangleOutline(color, x, y as! Int16, w, h)
+
+		// Interior
+		{
+			let userPanelHeight = 64i16
+
+			// TODO capture click zone inside Start so it is not auto closed on click itself
+			// TODO internal colliders and their hover/hold states
+			// User panel
+			{
+				color.ref.color = 0x126099FF
+				color.ref.rgba.ref.a = 128
+				lineHorizontalWithAlpha(color.ref, x, y + userPanelHeight, w)
+
+				color.ref.rgba.ref.r = 8
+				color.ref.rgba.ref.g = 8
+				color.ref.rgba.ref.b = 8
+				drawRectangleWithAlpha(
+					color.ref,
+					x,
+					y + 0i16,
+					w,
+					userPanelHeight - 1u16
+				)
+
+				color.ref.color = 0xFFFFFFFFu32
+				let welcome = "Hello, dear User"
+				// TODO user pic
+				drawTextBox(welcome, x + 16, y + 29i16, color.ref, w, 32, true)
+				// TODO folders
+				// TODO settings gear
+				// TODO power
+			}
+
+			// Pins panel
+			{
+				let title = "Pinned apps and files"
+				drawTextBox(title, x + 16, y + 24i16 + userPanelHeight, color.ref, w, 32, true)
+
+				// Scroll "bar"
+				let currentScrollIndex = 1 // TODO
+				let scrollIndexes = 3u16
+				let scrollWidth = 6u16
+				color.ref.color = 0xF0F0F0
+				color.ref.rgba.ref.a = 128
+
+				for index in scrollIndexes {
+					// TODO Hexa: infer constant types here
+					color.ref.rgba.ref.a = index == currentScrollIndex? 128u8 : 64u8
+					drawRectangleWithAlpha(
+						color.ref,
+						x + w - scrollWidth - 12i16,
+						// TODO current larger by h + 2px
+						y + userPanelHeight + 256i16 + (index * scrollWidth * 2i16),
+						scrollWidth,
+						scrollWidth
+					)
+				}
+			}
+
+			// All apps panel
+			{
+				// TODO Move dark bg from search to here
+				// TODO "Apps and suggestions"
+				// TODO "Show all apps..." or "All A/apps"
+				// TODO _ _ _ blocks
+			}
+
+			// Search panel
+			{
+				// TODO |__ cool outline
+				color.ref.color = 0x126099FF
+				color.ref.rgba.ref.a = 128
+				lineHorizontalWithAlpha(color.ref, x, y + h - userPanelHeight, w)
+
+				color.ref.rgba.ref.r = 8
+				color.ref.rgba.ref.g = 8
+				color.ref.rgba.ref.b = 8
+				drawRectangleWithAlpha(
+					color.ref,
+					x,
+					y + h - userPanelHeight,
+					w,
+					userPanelHeight - 1u16
+				)
+
+				color.ref.color = 0xFFFFFFFFu32
+				let welcome = "Type anything to start search"
+				drawTextBox(welcome, x + 16, y + h - userPanelHeight + 29i16, color.ref, w, 32, true)
+			}
+		}
 	}
 
 	// HUD
