@@ -639,6 +639,11 @@ fun composite(startupMilliseconds UInt64) {
 var cursorBackplate Bitmap32 = null
 var cursorBackplateX UInt16 = 0
 var cursorBackplateY UInt16 = 0
+// TODO class Box + fun max
+var cursorDirtyX Int16 = 0
+var cursorDirtyY Int16 = 0
+var cursorDirtyBottomX UInt16 = 0
+var cursorDirtyBottomY UInt16 = 0
 
 fun initCursorBackplate() {
 	cursorBackplate = allocateBitmap(cur.width, cur.height)
@@ -658,9 +663,16 @@ fun invalidateCursorBackplate(x UInt16, y UInt16) {
 	}
 }
 
+/// Draw backplate onto framebuffer to emulate erase
 fun drawCursorBackplate() {
 	let x = cursorBackplateX
 	let y = cursorBackplateY
+
+	// Hexa: `as` here breaks code gen
+	cursorDirtyX = (x as! Int16) - cur.x + 1i16
+	cursorDirtyY = (y as! Int16) - cur.y + 1i16
+	cursorDirtyBottomX = cursorDirtyX + cur.width
+	cursorDirtyBottomY = cursorDirtyY + cur.height
 
 	for yi in cur.height {
 		let scanlineScreen UInt64 = Screen.width * (y + yi - cur.y + 1) - cur.x + 1 + x
@@ -671,7 +683,13 @@ fun drawCursorBackplate() {
 	}
 }
 
+/// Draw cursor itself
 fun drawCursor(cur Cursor, x UInt16, y UInt16) {
+	cursorDirtyX = (x as! Int16) - cur.x + 1i16
+	cursorDirtyY = (y as! Int16) - cur.y + 1i16
+	cursorDirtyBottomX = cursorDirtyX + cur.width
+	cursorDirtyBottomY = cursorDirtyY + cur.height
+
 	// TODO mirror cursor in this code if global setting for cursors mirroring is set
 	// to affect all apps
 	let pixel = new ByValue<Pixel32>()
@@ -686,10 +704,32 @@ fun drawCursor(cur Cursor, x UInt16, y UInt16) {
 	}
 }
 
+/// Copy the part of back buffer to the native framebuffer
+fun copyDirtyToScreen(x Int16, y Int16, bottomX Int16, bottomY Int16) {
+	var source = Screen.pixels as! ArrayPointer<UInt32>
+	var destination = _framebuffer.base as! ArrayPointer<UInt32>
+	let width = _framebuffer.width
+	let height = _framebuffer.height
+
+	// TODO Hexa: infer `0` to `0i16` at `let y = y < 0? 0<-here : y`
+	let y = y < 0? 0i16 : y
+	let x = x < 0? 0i16 : x
+	let bottomX = bottomX > width? width as! Int16 : bottomX
+	let bottomY = bottomY > height? height as! Int16 : bottomY
+
+	for yi in y ... bottomY {
+		let scanline UInt64 = width * (yi as! UInt64)
+		for xi in x ... bottomX {
+			let offset UInt64 = scanline + (xi as! UInt64)
+			destination[offset] = source[offset]
+		}
+	}
+}
+
 /// Copy the back buffer to the native framebuffer
 fun copyToScreen() {
 	// On 64-bit platform registers are 64-bit,
-	// so lets copy two pixels at a time
+	// so lets copy two or more pixels at a time
 	let height = _framebuffer.height
 	// Let's assume it is always dividable by 2
 	// TODO ^ add some stride to the Screen.fb itself to ensure this

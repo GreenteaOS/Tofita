@@ -49,9 +49,22 @@ fun guiThread() {
 			copyToScreen()
 		} else if haveToRenderMouseCursor {
 			drawCursorBackplate()
+			let dirtyX = cursorDirtyX
+			let dirtyY = cursorDirtyY
+			let dirtyBottomX = cursorDirtyBottomX
+			let dirtyBottomY = cursorDirtyBottomY
+
 			invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
 			drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
-			copyToScreen()
+
+			let startX = cursorDirtyX < dirtyX? cursorDirtyX : dirtyX
+			let startY = cursorDirtyY < dirtyY? cursorDirtyY : dirtyY
+			copyDirtyToScreen(
+				startX,
+				startY,
+				(cursorDirtyBottomX > dirtyBottomX? cursorDirtyBottomX : dirtyBottomX) as! Int16,
+				(cursorDirtyBottomY > dirtyBottomY? cursorDirtyBottomY : dirtyBottomY) as! Int16
+			)
 		}
 
 		// Lesser priority than full repaint
