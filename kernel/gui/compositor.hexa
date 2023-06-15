@@ -668,6 +668,9 @@ fun composite(startupMilliseconds UInt64) {
 
 			// Pins panel
 			{
+				// Items
+				drawPinnedItems(x, y + 24i16 + userPanelHeight, w + 0i16, pinsPanelHeight)
+
 				color.ref.color = 0x0A385999
 				let title = "Pinned apps and files"
 				drawTextBox(title, x + 16, y + 15i16 + userPanelHeight, color.ref, w, 32, true)
@@ -775,7 +778,6 @@ fun composite(startupMilliseconds UInt64) {
 			// 2. Aesthetics: looks way better than not having one
 			// 3. Familiarity: being above is good for older users
 			{
-				// TODO |__ cool outline
 				// TODO icon
 				// TODO PiP button
 				// TODO Text edit: focus, caret and kb input
@@ -784,7 +786,7 @@ fun composite(startupMilliseconds UInt64) {
 				color.ref.rgba.ref.r = 8
 				color.ref.rgba.ref.g = 8
 				color.ref.rgba.ref.b = 8
-				// TODO darken only under text field
+				// Darken only under text field
 				drawRectangleWithAlpha(
 					color.ref,
 					x + 10i16,
@@ -797,6 +799,7 @@ fun composite(startupMilliseconds UInt64) {
 				let welcome = "Type anything to start search"
 				drawTextBox(welcome, x + 16, inputY, color.ref, w, 32, true)
 
+				// Cool hairline
 				color.ref.color = 0x129999FF
 				color.ref.rgba.ref.a = 128
 				lineHorizontalWithAlpha(color.ref, x + 12i16, inputY + 16i16, w - 24)
@@ -808,6 +811,52 @@ fun composite(startupMilliseconds UInt64) {
 	quake()
 	invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
 	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
+}
+
+// TODO scrollOffsetY Int16
+/// Render the pinned apps and files
+fun drawPinnedItems(x Int16, y Int16, w Int16, h Int16) {
+	let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
+	let startX = 10 + x
+	var xu = startX
+	var yu = 12 + y
+	let color = new ByValue<Pixel32>()
+
+	// TODO draw =P when zero pinned and show built-in apps in recommendations
+	for i in pinnedFilesList.length {
+		let file = pinnedFilesList[i]
+
+		if file.utf16()[0] as! UInt16 == 13u16 {
+			drawBitmap32WithAlpha(folder48, 14i16 + xu, yu)
+		} else {
+			// TODO endsWith
+			if file.utf16()[file.length - 1] as! UInt16 == 101 {
+				// TODO read real icon
+				drawBitmap32WithAlpha(app48, 14i16 + xu, yu)
+			} else {
+				// TODO real preview for pics
+				drawBitmap32WithAlpha(unknown48, 14i16 + xu, yu)
+			}
+		}
+
+		color.ref.color = 0x00000000
+		let shadowTextWidth = 76u16 - 8u16
+		let textX = 2 + xu
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+		drawShadowText(file, textX, 62i16 + yu, shadowTextWidth, color.ref)
+
+		// Grid
+		xu += yOffset
+
+		if xu + yOffset > x + w {
+			xu = startX
+			yu += yOffset
+		}
+
+		if yu > y + h {
+			break
+		}
+	}
 }
 
 var cursorBackplate Bitmap32 = null
