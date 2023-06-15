@@ -400,12 +400,53 @@ fun composite(startupMilliseconds UInt64) {
 		(_framebuffer.height / 2i16) - (wallpaper.height / 2i16)
 	)
 
-	drawBitmap32WithAlpha(trashCan, 12i16, 10i16)
+	// Desktop icons
+	drawBitmap32WithAlpha(trashCan, 14i16, 10i16)
 	var color = new ByValue<Pixel32>()
 	color.ref.color = 0x00000000
-	drawShadowText("Recycle Bin", 8, 62i16) // TODO infer i16
+	let shadowTextWidth = 76u16 - 8u16
 	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
-	drawAsciiText("Recycle Bin", 8, 62i16, color.ref)
+	drawShadowText("Recycle Bin", 8, 62i16, shadowTextWidth, color.ref) // TODO infer i16
+
+	let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
+	var xu = 0i16
+	var yu = yOffset
+	// TODO not inferred properly?
+	// for file in desktopFilesList as! [String] {
+	for i in desktopFilesList.length {
+		let file = desktopFilesList[i] // TODO [ ] must return T? not T
+
+		// TODO `\r`
+		if file.utf16()[0] as! UInt16 == 13u16 {
+			drawBitmap32WithAlpha(folder48, 14i16 + xu, yu)
+		} else {
+			// TODO endsWith
+			if file.utf16()[file.length - 1] as! UInt16 == 101 {
+				// TODO read real icon
+				drawBitmap32WithAlpha(app48, 14i16 + xu, yu)
+			} else {
+				// TODO real preview for pics
+				drawBitmap32WithAlpha(unknown48, 14i16 + xu, yu)
+			}
+		}
+
+		color.ref.color = 0x00000000
+		let textX = 2 + xu
+
+		// TODO light theme
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+		drawShadowText(file, textX, 62i16 + yu, shadowTextWidth, color.ref) // TODO infer i16
+		// TODO Hexa: must work `yu += 32`
+		// `yu += 32i16`
+		yu += yOffset
+
+		let taskbarHeight = 30 // TODO
+		if (yu + yOffset) > (_framebuffer.height - taskbarHeight) {
+			// TODO should work yu = 10 but not -10 for unsigned
+			yu = 10i16
+			xu += yOffset
+		}
+	}
 
 	color.ref.rgba.ref.a = 64
 	// TODO move to DWM handleMouseMove etc
@@ -756,6 +797,7 @@ fun composite(startupMilliseconds UInt64) {
 				)
 
 				// TODO user pic
+				// TODO click anywhere but the pic to open home folder
 				drawBitmap32WithAlpha(startUserIcon, x + 16i16, y + userPanelHeight / 2 - 16i16)
 
 				// Shortcuts
