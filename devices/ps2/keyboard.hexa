@@ -20,6 +20,8 @@
 
 // TODO this is just array of booleans
 var keyboardPressedState ArrayByValue<UInt8, 128> = [0]
+var keyboardEvents ArrayByValue<UInt8, 256> = [0]
+var keyboardEventsLength UInt8 = 0
 let keyboardMap [String] = [
 	'', ''/*ESC*/, '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
@@ -96,19 +98,20 @@ fun handleKeyboardPacket() {
 
 	// TODO if status & 0x1 != 0
 	{
-		var keycode UInt8 = readPort(dataPort)
+		let keycode UInt8 = readPort(dataPort)
 
 		// TODO should hint that `<` useless here for `uint8`
-		if keycode < 0 {
-			// lockMouse = false
-			// TODO this is why `@defer` is required, had a bug here
-			writePort(pic1_command, pic_eoi)
-			return
-		}
+		//if keycode < 0 {
+		//	// lockMouse = false
+		//	// TODO this is why `@defer` is required, had a bug here
+		//	writePort(pic1_command, pic_eoi)
+		//	return
+		//}
 
-		if keyboardMap[keycode] == null {
-			writePort(pic1_command, pic_eoi)
-			return
+		// Last one will always be overwritten, makes sense, but any better ideas?
+		keyboardEvents[keyboardEventsLength] = keycode
+		if keyboardEventsLength < 255 {
+			keyboardEventsLength++
 		}
 
 		if keycode < 128 {
@@ -118,7 +121,7 @@ fun handleKeyboardPacket() {
 
 			if 41 == keycode {
 				haveToQuake = !haveToQuake
-				// TODO DWM
+				requestAnimationFrame()
 			}
 
 			if haveToQuake {
@@ -127,13 +130,12 @@ fun handleKeyboardPacket() {
 				// handleKeyDown(keycode)
 			}
 		} else {
-			keycode = keycode - 128u8
+			let keycode = keycode - 128u8
 			// serialPrint("[")
 			// serialPrint(buffer)
 			// serialPrintf(" up] %d\n", keycode + 128)
 			keyboardPressedState[keycode] = 0
 		}
-
 		// if (status & 0x20) {
 		//    UInt8 buffer[] = {'M', 0}
 		//    serialPrint(buffer)
@@ -141,7 +143,6 @@ fun handleKeyboardPacket() {
 	}
 
 	// Note: Quake terminal has higher priority than kernel itself
-	// TODO DWM
 	keyboardActivity = true
 
 	// keyDownHandler = null

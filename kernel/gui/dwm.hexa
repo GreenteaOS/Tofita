@@ -503,9 +503,37 @@ fun handleMouseActivity() {
 	mouseY = mouseYtemp
 }
 
+var pressedState ArrayByValue<UInt8, 256> = [0]
 fun handleKeyboardActivity() {
-	// TODO
-	haveToRender = true
+	// Copy to stack
+	// TODO Hexa: `var pressedState ArrayByValue<UInt8, 256> = keyboardEvents` wrong place of `[256]`
+	// TODO pressedState = keyboardEvents
+	for i in keyboardEventsLength {
+		pressedState[i] = keyboardEvents[i]
+	}
+
+	let events = keyboardEventsLength
+	// Reset
+	keyboardEventsLength = 0
+
+	for event in events {
+		let keycode = pressedState[event]
+		if keycode < 128 {
+			// Down
+			// TODO push into events and window messages
+		} else {
+			// Up
+			let keycode = keycode - 128u8
+			
+			if keycode == 91 {
+				// Start button
+				// TODO Hotkeys detection
+				// TODO just `.toggleStart()`
+				defaultSession.showStart = not defaultSession.showStart
+				requestAnimationFrame()
+			}
+		}
+	}
 }
 
 fun startClick(mouseX Int16, mouseY Int16) {
