@@ -621,26 +621,30 @@ fun composite(startupMilliseconds UInt64) {
 	// Start
 	if defaultSession.showStart {
 		let w = 640u16
+		// TODO should fit into 720p
 		let h = 730u16
+		// TODO centered mode
 		let x = 0i16
+		// TODO gap above taskbar in centered mode
 		let y = taskbarY - h
 		drawVibrancedRectangle(x, y as! Int16, w, h, darkTheme)
 		// TODO probably `w - 2` to avoid some overdraw?
-		color.ref.color = 0x126099FF
+		color.ref.color = 0x44444444u32
 		drawRectangleOutline(color, x, y as! Int16, w, h)
 
 		// Interior
 		{
 			// Layout
 			let userPanelHeight = 64i16
-
+			let pinsPanelHeight = 500i16
 			// TODO capture click zone inside Start so it is not auto closed on click itself
 			// TODO internal colliders and their hover/hold states
 
 			// Pins panel
 			{
+				color.ref.color = 0x0A385999
 				let title = "Pinned apps and files"
-				drawTextBox(title, x + 16, y + 24i16 + userPanelHeight, color.ref, w, 32, true)
+				drawTextBox(title, x + 16, y + 15i16 + userPanelHeight, color.ref, w, 32, true)
 
 				// Scroll "bar"
 				let currentScrollIndex = 1 // TODO
@@ -656,7 +660,7 @@ fun composite(startupMilliseconds UInt64) {
 						color.ref,
 						x + w - scrollWidth - 12i16,
 						// TODO current larger by h + 2px
-						y + userPanelHeight + 256i16 + (index * scrollWidth * 2i16),
+						y + userPanelHeight + (pinsPanelHeight / 2i16 - scrollWidth) + (index * scrollWidth * 2i16),
 						scrollWidth,
 						scrollWidth
 					)
@@ -674,10 +678,10 @@ fun composite(startupMilliseconds UInt64) {
 				color.ref.rgba.ref.b = 8
 				drawRectangleWithAlpha(
 					color.ref,
-					x,
-					y + 0i16,
-					w,
-					userPanelHeight - 1u16
+					x + 1i16,
+					y + 1i16,
+					w - 2,
+					userPanelHeight - 2u16
 				)
 
 				color.ref.color = 0xFFFFFFFFu32
@@ -691,10 +695,52 @@ fun composite(startupMilliseconds UInt64) {
 
 			// All apps panel
 			{
-				// TODO Move dark bg from search to here
-				// TODO "Apps and suggestions"
-				// TODO "Show all apps..." or "All A/apps"
-				// TODO _ _ _ blocks
+				let panelY = y + userPanelHeight + pinsPanelHeight
+				let panelHeight = h - userPanelHeight * 2 - pinsPanelHeight + 0u16
+
+				color.ref.rgba.ref.r = 8
+				color.ref.rgba.ref.g = 8
+				color.ref.rgba.ref.b = 8
+				color.ref.rgba.ref.a = 128
+				drawRectangleWithAlpha(
+					color.ref,
+					x + 1i16,
+					panelY,
+					w - 2,
+					panelHeight
+				)
+
+				color.ref.color = 0x0A385999
+				let title = "Apps and suggestions"
+				drawTextBox(title, x + 16, panelY + 15i16, color.ref, w, 32, true)
+
+				// "All apps"
+				color.ref.color = 0x99999999u32
+				let button = "Show all apps..."
+				drawTextBox(button, x + w / 2, panelY + panelHeight / 2 - 6i16, color.ref, w, 32, true)
+
+				// _ _ _ blocks
+				let blockWidth = 32i16
+				color.ref.color = 0xF0F0F0
+				color.ref.rgba.ref.a = 32
+				for index in 3 {
+					drawRectangleWithAlpha(
+						color.ref,
+						w / 2 - blockWidth - blockWidth / 2i16 - index * blockWidth - index * blockWidth / 2i16,
+						panelY + panelHeight / 2 - blockWidth / 2i16,
+						blockWidth + 0u16,
+						blockWidth + 0u16
+					)
+
+					// Small shortcut-like element
+					drawRectangleWithAlpha(
+						color.ref,
+						w / 2 - blockWidth - blockWidth / 2i16 - index * blockWidth - index * blockWidth / 2i16,
+						panelY + panelHeight / 2 - blockWidth / 2i16 + (blockWidth / 4i16) * 3i16,
+						blockWidth / 4u16,
+						blockWidth / 4u16
+					)
+				}
 			}
 
 			// Search panel
@@ -707,9 +753,7 @@ fun composite(startupMilliseconds UInt64) {
 				// TODO icon
 				// TODO PiP button
 				// TODO Text edit: focus, caret and kb input
-				color.ref.color = 0x126099FF
-				color.ref.rgba.ref.a = 128
-				lineHorizontalWithAlpha(color.ref, x, y + h - userPanelHeight, w)
+				let inputY = y + h - userPanelHeight + 29i16
 
 				color.ref.rgba.ref.r = 8
 				color.ref.rgba.ref.g = 8
@@ -717,15 +761,19 @@ fun composite(startupMilliseconds UInt64) {
 				// TODO darken only under text field
 				drawRectangleWithAlpha(
 					color.ref,
-					x,
-					y + h - userPanelHeight,
-					w,
-					userPanelHeight - 1u16
+					x + 10i16,
+					inputY - 8i16,
+					w - 22,
+					24
 				)
 
 				color.ref.color = 0xFFFFFFFFu32
 				let welcome = "Type anything to start search"
-				drawTextBox(welcome, x + 16, y + h - userPanelHeight + 29i16, color.ref, w, 32, true)
+				drawTextBox(welcome, x + 16, inputY, color.ref, w, 32, true)
+
+				color.ref.color = 0x129999FF
+				color.ref.rgba.ref.a = 128
+				lineHorizontalWithAlpha(color.ref, x + 12i16, inputY + 16i16, w - 24)
 			}
 		}
 	}
