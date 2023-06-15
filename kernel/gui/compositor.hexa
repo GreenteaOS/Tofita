@@ -28,6 +28,14 @@ var notepad16 Bitmap32 = null
 var notepad48 Bitmap32 = null
 var app16 Bitmap32 = null
 var link Bitmap32 = null
+var startUserIcon Bitmap32 = null
+var startGearIcon Bitmap32 = null
+var startDownloadsIcon Bitmap32 = null
+var startGalleryIcon Bitmap32 = null
+var startPowerIcon Bitmap32 = null
+var startFilesIcon Bitmap32 = null
+var startSearchIcon Bitmap32 = null
+var startSearchOutIcon Bitmap32 = null
 var cur Cursor = null
 var darkTheme Bool = true
 var startupAnimation UInt16 = 0
@@ -218,6 +226,40 @@ fun initializeCompositor() {
 	Screen.height = Screen.doublebuffer.height
 	Screen.widthMinusOne = Screen.doublebuffer.width - 1
 	Screen.heightMinusOne = Screen.doublebuffer.height - 1
+
+	// Start
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/user.png")
+	startUserIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/gear.png")
+	startGearIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/downloads.png")
+	startDownloadsIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/gallery.png")
+	startGalleryIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/power.png")
+	startPowerIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/files.png")
+	startFilesIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/search.png")
+	startSearchIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/pip.png")
+	startSearchOutIcon = loadPng32(a)
 
 	let a = new RamDiskAsset()
 	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves.png")
@@ -713,13 +755,19 @@ fun composite(startupMilliseconds UInt64) {
 					userPanelHeight - 2u16
 				)
 
+				// TODO user pic
+				drawBitmap32WithAlpha(startUserIcon, x + 16i16, y + userPanelHeight / 2 - 16i16)
+
+				// Shortcuts
+				drawBitmap32WithAlpha(startPowerIcon, x + w - 48 * 1i16, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startGearIcon, x + w - 48 * 2i16, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startFilesIcon, x + w - 48 * 3i16, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startGalleryIcon, x + w - 48 * 4i16, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startDownloadsIcon, x + w - 48 * 5i16, y + userPanelHeight / 2 - 18i16)
+
 				color.ref.color = 0xFFFFFFFFu32
 				let welcome = "Hello, dear User"
-				// TODO user pic
-				drawTextBox(welcome, x + 16, y + 29i16, color.ref, w, 32, true)
-				// TODO folders
-				// TODO settings gear
-				// TODO power
+				drawTextBox(welcome, x + 16 + 32 + 15, y + 29i16, color.ref, w, 32, true)
 			}
 
 			// All apps panel
@@ -778,15 +826,13 @@ fun composite(startupMilliseconds UInt64) {
 			// 2. Aesthetics: looks way better than not having one
 			// 3. Familiarity: being above is good for older users
 			{
-				// TODO icon
-				// TODO PiP button
 				// TODO Text edit: focus, caret and kb input
 				let inputY = y + h - userPanelHeight + 29i16
 
+				// Darken only under the text field
 				color.ref.rgba.ref.r = 8
 				color.ref.rgba.ref.g = 8
 				color.ref.rgba.ref.b = 8
-				// Darken only under text field
 				drawRectangleWithAlpha(
 					color.ref,
 					x + 10i16,
@@ -797,7 +843,10 @@ fun composite(startupMilliseconds UInt64) {
 
 				color.ref.color = 0xFFFFFFFFu32
 				let welcome = "Type anything to start search"
-				drawTextBox(welcome, x + 16, inputY, color.ref, w, 32, true)
+				drawTextBox(welcome, x + 16 + 22, inputY, color.ref, w, 32, true)
+
+				drawBitmap32WithAlpha(startSearchIcon, x + 12i16, inputY - 8i16)
+				drawBitmap32WithAlpha(startSearchOutIcon, x + w - 24 - 12i16, inputY - 8i16)
 
 				// Cool hairline
 				color.ref.color = 0x129999FF
