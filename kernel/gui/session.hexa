@@ -176,6 +176,8 @@ class GraphicalSession {
 		taskbarZone = new ColliderRectangle(0, taskbarHandler)
 		windowsZone = new ColliderRectangle(0, windowHandler)
 
+		// TODO Hexa: well should error obviously `desktopHandler.hint = hintOfFile`
+
 		// Taskbar
 		//taskbarZone.width = 256 TODO Hexa: infer as i16
 		taskbarZone.height = 31i16 // TODO 31 lol? related to <= in collider?
@@ -188,6 +190,7 @@ class GraphicalSession {
 			rectangle.relativeX = 0
 			rectangle.relativeY = 1i16
 			taskbarZone.children.push(rectangle)
+			rectangle.hint = hintOfTaskbar
 			taskbarStart = rectangle
 		}
 
@@ -200,6 +203,7 @@ class GraphicalSession {
 			rectangle.relativeX = 44i16 // TODO respect Start padding... actually just = start.w
 			// rectangle.relativeY = 0i16 // TODO Hexa: hint that this is same `0` value as class' default
 			taskbarZone.children.push(rectangle)
+			rectangle.hint = hintOfTaskbar
 			taskbarPin = rectangle
 			// TODO multiple pins
 			// TODO click actually opens (an associated) app
@@ -212,30 +216,35 @@ class GraphicalSession {
 			rectangle.width = 4i16
 			rectangle.height = 32i16 // TODO Always same as taskbar
 			taskbarZone.children.push(rectangle)
+			rectangle.hint = hintOfTaskbar
 			taskbarDesktopPeek = rectangle
 
 			let rectangle = new ColliderRectangle(4, taskbarHandler)
 			rectangle.width = 64i16
 			rectangle.height = 32i16 // TODO Always same as taskbar
 			taskbarZone.children.push(rectangle)
+			rectangle.hint = hintOfTaskbar
 			taskbarTime = rectangle
 
 			let rectangle = new ColliderRectangle(5, taskbarHandler)
 			rectangle.width = 16i16 + 22i16
 			rectangle.height = 32i16 // TODO Always same as taskbar
 			taskbarZone.children.push(rectangle)
+			rectangle.hint = hintOfTaskbar
 			taskbarInput = rectangle
 
 			let rectangle = new ColliderRectangle(6, taskbarHandler)
 			rectangle.width = 12i16 + 20i16
 			rectangle.height = 32i16 // TODO Always same as taskbar
 			taskbarZone.children.push(rectangle)
+			rectangle.hint = hintOfTaskbar
 			taskbarTrayOpener = rectangle
 
 			let rectangle = new ColliderRectangle(7, taskbarHandler)
 			rectangle.width = 32i16
 			rectangle.height = 32i16 // TODO Always same as taskbar
 			taskbarZone.children.push(rectangle)
+			rectangle.hint = hintOfTaskbar
 			taskbarSearch = rectangle
 		}
 
@@ -283,6 +292,8 @@ class GraphicalSession {
 	}
 
 	fun mouseUp(type MouseActionType, mouseX Int16, mouseY Int16) Bool {
+		ColliderRectangle.cancelHint()
+
 		let event = ColliderEventType.MouseUp // TODO left/ri/mi maybe just reuse MouseActionType?
 
 		// Taskbar is topmost
@@ -294,6 +305,7 @@ class GraphicalSession {
 		// Windows go under taskbar
 		let windowId = findWindowUnderCursor(mouseX, mouseY)
 		if not drag, windowId != 0 {
+			ColliderRectangle.cancelHint()
 			return false // TODO call DWM
 		}
 
@@ -306,6 +318,8 @@ class GraphicalSession {
 	}
 
 	fun mouseDown(type MouseActionType, mouseX Int16, mouseY Int16) Bool {
+		ColliderRectangle.cancelHint()
+
 		let event = ColliderEventType.MouseDown
 
 		// Taskbar is topmost
@@ -348,10 +362,40 @@ fun desktopHandler(id UInt64, event ColliderEventType) Void {
 	defaultSession.desktopHandle(id, event)
 }
 
+// TODO Hexa: try those functions as `static fun`
 fun windowHandler(id UInt64, event ColliderEventType) Void {
 	defaultSession.windowHandle(id, event)
 }
 
 fun taskbarHandler(id UInt64, event ColliderEventType) Void {
 	defaultSession.taskbarHandle(id, event)
+}
+
+fun hintOfTaskbar(id UInt64) String {
+	if defaultSession.taskbarStart.id == id {
+		return "Start"
+	}
+
+	if defaultSession.taskbarTrayOpener.id == id {
+		return "Show hidden icons"
+	}
+
+	if defaultSession.taskbarPin.id == id {
+		return "Pinned items"
+	}
+
+	// TODO taskbarDesktopPeek
+	// TODO taskbarTime
+	// TODO taskbarInput
+	// TODO taskbarSearch
+
+	return "Right click for more options"
+}
+
+fun hintOfWindow(id UInt64) String {
+	if let window = windowsList[id] {
+		return window.title
+	}
+
+	return "Right click for more options"
 }
