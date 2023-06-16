@@ -41,6 +41,8 @@ var startFilesIcon Bitmap32 = null
 var startSearchIcon Bitmap32 = null
 var startSearchOutIcon Bitmap32 = null
 var traySearchIcon Bitmap32 = null
+var trayVolume Bitmap32 = null
+var trayWifi Bitmap32 = null
 var cur Cursor = null
 var darkTheme Bool = true
 var startupAnimation UInt16 = 0
@@ -275,6 +277,14 @@ fun initializeCompositor() {
 	let a = new RamDiskAsset()
 	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/find.png")
 	traySearchIcon = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Tray/volume.png")
+	trayVolume = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Tray/wifi.png")
+	trayWifi = loadPng32(a)
 
 	// Desktop
 
@@ -775,7 +785,7 @@ fun composite(startupMilliseconds UInt64) {
 		taskbarY + 4i16
 	)
 
-	// Tray
+	// Tray popup
 	if defaultSession.showTray {
 		let w = defaultSession.taskbarTrayOpener.width * 3 as! UInt16
 		let h = defaultSession.taskbarTrayOpener.width * 3 as! UInt16
@@ -791,15 +801,25 @@ fun composite(startupMilliseconds UInt64) {
 
 		for xx in 3 {
 			for yy in 3 {
+				let atX = 1 + (defaultSession.taskbarTrayOpener.width * xx) + x
+				let atY = 1 + (defaultSession.taskbarTrayOpener.width * yy) + y as! Int16
 				drawRectangleWithAlpha(
 					color.ref,
 					// TODO instead of +1 do 2px wider outline
-					1 + (defaultSession.taskbarTrayOpener.width * xx) + x,
-					1 + (defaultSession.taskbarTrayOpener.width * yy) + y as! Int16,
+					atX,
+					atY,
 					defaultSession.taskbarTrayOpener.width as! UInt16,
 					defaultSession.taskbarTrayOpener.width as! UInt16
 				)
 				color.ref.rgba.ref.a -= 16u8
+
+				if xx == 0 and yy == 0 {
+					drawBitmap32WithAlpha(trayVolume, atX + 8i16, atY + 8i16)
+				}
+
+				if xx == 1 and yy == 0 {
+					drawBitmap32WithAlpha(trayWifi, atX + 8i16, atY + 10i16)
+				}
 			}
 		}
 	}
