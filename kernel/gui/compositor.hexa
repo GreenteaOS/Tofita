@@ -634,7 +634,7 @@ fun composite(startupMilliseconds UInt64) {
 			// TODO measure default width
 			let w = 148u16
 			let x = shortcutsEnd + windowIndex * w
-			let y = _framebuffer.height - 30i16
+			let y = taskbarY
 			if firstResponder == i {
 				color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 				color.ref.rgba.ref.a = 64
