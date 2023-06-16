@@ -26,6 +26,9 @@ var leaves Bitmap32 = null
 var trashCan Bitmap32 = null
 var notepad16 Bitmap32 = null
 var notepad48 Bitmap32 = null
+var folder48 Bitmap32 = null
+var unknown48 Bitmap32 = null
+var app48 Bitmap32 = null
 var app16 Bitmap32 = null
 var link Bitmap32 = null
 var startUserIcon Bitmap32 = null
@@ -291,6 +294,18 @@ fun initializeCompositor() {
 	link = loadPng32(e)
 
 	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/folder48.png")
+	folder48 = loadPng32(asset)
+
+	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Conservative/folder48.png")
+	unknown48 = loadPng32(asset)
+
+	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/app48.png")
+	app48 = loadPng32(asset)
+
+	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Resources/Icons/app16.png")
 	app16 = loadPng32(asset)
 
@@ -429,13 +444,17 @@ fun composite(startupMilliseconds UInt64) {
 		if file.utf16()[0] as! UInt16 == 13u16 {
 			drawBitmap32WithAlpha(folder48, 14i16 + xu, yu)
 		} else {
-			// TODO endsWith
-			if file.utf16()[file.length - 1] as! UInt16 == 101 {
+			// TODO case insensitive
+			if file.endsWith(".exe") {
 				// TODO read real icon
 				drawBitmap32WithAlpha(app48, 14i16 + xu, yu)
 			} else {
 				// TODO real preview for pics
-				drawBitmap32WithAlpha(unknown48, 14i16 + xu, yu)
+				if file.endsWith(".md") or file.endsWith(".txt") {
+					drawBitmap32WithAlpha(notepad48, 14i16 + xu, yu)
+				} else {
+					drawBitmap32WithAlpha(unknown48, 14i16 + xu, yu)
+				}
 			}
 		}
 
