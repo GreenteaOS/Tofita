@@ -344,6 +344,8 @@ fun initializeCompositor() {
 	serialPrintln("[compositor.initializeCompositor] done")
 }
 
+/// Draw windows
+// TODO partial composition
 fun compositeWindows() {
 	var i = rootWindow
 	// Avoid infinite loop
@@ -954,6 +956,12 @@ fun composite(startupMilliseconds UInt64) {
 				lineHorizontalWithAlpha(color.ref, x + 12i16, inputY + 16i16, w - 24)
 			}
 		}
+	}
+
+	// Show hint
+	if let hintText = ColliderRectangle.hintReady {
+		// TODO proper pos
+		drawHint(hintText, mouseX, mouseY)
 	}
 
 	// HUD

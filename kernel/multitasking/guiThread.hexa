@@ -36,6 +36,19 @@ fun guiThread() {
 			handleKeyboardActivity()
 		}
 
+		// TODO better timers handling
+		if
+			let hintOwner = ColliderRectangle.hintOwner,
+			ColliderRectangle.hintReady == null,
+			ColliderRectangle.showHint != null and uptimeMilliseconds >= ColliderRectangle.showHintAfter
+		{
+			ColliderRectangle.hintReady = ColliderRectangle.showHint(hintOwner.id)
+			// TODO hint advance
+			// TODO save position
+			// TODO hide hint when mouse over it
+			haveToRender = true
+		}
+
 		if haveToRenderMouseCursor == false and haveToRender == false {
 			yield()
 		}

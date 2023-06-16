@@ -56,6 +56,15 @@ class ColliderRectangle {
 	//var onLeftUp (id UInt64) => Void
 	// TODO `@capture(closure: true)`
 	var handler (id UInt64, event ColliderEventType) => Void // TODO `let`
+
+	/// Set this to `null` to indicate lack of hint, or function that lazily updates hint content
+	var hint (id UInt64) => String = null // TODO Hexa: nullable function type... `varName @nullable ()=>T`
+	// TODO hint within screen bounds and under/above mouse
+	static var showHintAfter UInt64 = 0
+	static var showHint (id UInt64) => String = null
+	static var hintReady String? = null
+	static var hintOwner ColliderRectangle? = null
+
 	// TODO Hexa: instead of `= 0` ensure init by {}
 	var relativeX Int16 = 0
 	var relativeY Int16 = 0
@@ -165,6 +174,16 @@ class ColliderRectangle {
 			// TODO set hover only on mouse move and UPPED
 			let passMouseUp = current == this
 			current = this
+
+			if not passMouseUp {
+				// Reset hint timer
+				let hintDelay = 500
+				showHintAfter = uptimeMilliseconds + hintDelay
+				showHint = hint
+				hintReady = null
+				hintOwner = this
+				// TODO CLEAR STATE when hover out / over window
+			}
 
 			// TODO `state == ColliderState.Hover` hint unused `==` here in vs hexa
 			if state != ColliderState.Drag {
