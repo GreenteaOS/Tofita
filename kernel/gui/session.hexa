@@ -31,6 +31,7 @@ class GraphicalSession {
 	var taskbarTime ColliderRectangle
 	var taskbarInput ColliderRectangle
 	var taskbarTrayOpener ColliderRectangle
+	var taskbarSearch ColliderRectangle
 	var taskbarWindowList ColliderRectangle
 	var showStart = false
 	var showTray = false
@@ -159,9 +160,12 @@ class GraphicalSession {
 
 		// Resize internal elements
 		taskbarDesktopPeek.relativeX = taskbarZone.width - taskbarDesktopPeek.width
+		// TODO taskbarSearch.relativeX = taskbarDesktopPeek.relativeX - taskbarSearch.width
+		// TODO taskbarTime.relativeX = taskbarSearch.relativeX - taskbarTime.width
 		taskbarTime.relativeX = taskbarDesktopPeek.relativeX - taskbarTime.width
 		taskbarInput.relativeX = taskbarTime.relativeX - taskbarInput.width
 		taskbarTrayOpener.relativeX = taskbarInput.relativeX - taskbarTrayOpener.width
+		taskbarSearch.relativeX = taskbarTrayOpener.relativeX - taskbarSearch.width
 	}
 
 	new (owner User) {
@@ -227,6 +231,12 @@ class GraphicalSession {
 			rectangle.height = 32i16 // TODO Always same as taskbar
 			taskbarZone.children.push(rectangle)
 			taskbarTrayOpener = rectangle
+
+			let rectangle = new ColliderRectangle(7, taskbarHandler)
+			rectangle.width = 32i16
+			rectangle.height = 32i16 // TODO Always same as taskbar
+			taskbarZone.children.push(rectangle)
+			taskbarSearch = rectangle
 		}
 
 		// List of windows (this is a separate clickable zone)

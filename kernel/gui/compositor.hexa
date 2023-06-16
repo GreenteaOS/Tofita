@@ -36,6 +36,7 @@ var startPowerIcon Bitmap32 = null
 var startFilesIcon Bitmap32 = null
 var startSearchIcon Bitmap32 = null
 var startSearchOutIcon Bitmap32 = null
+var traySearchIcon Bitmap32 = null
 var cur Cursor = null
 var darkTheme Bool = true
 var startupAnimation UInt16 = 0
@@ -264,6 +265,14 @@ fun initializeCompositor() {
 	let a = new RamDiskAsset()
 	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves.png")
 	leaves = loadPng32(a)
+
+	// Tray
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/find.png")
+	traySearchIcon = loadPng32(a)
+
+	// Desktop
 
 	let b = new RamDiskAsset()
 	getRamDiskAsset(b, "root/Windows/Resources/Icons/trash-empty48.png")
@@ -697,6 +706,24 @@ fun composite(startupMilliseconds UInt64) {
 
 	line45smooth(color, trayButtonX, taskbarY + 10 + 2i16, 6i16, 1i16)
 	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
+
+	// Search
+	if defaultSession.taskbarSearch.mouseOver {
+		drawRectangleWithAlpha(
+			defaultSession.taskbarSearch.mouseHold? holdColor.ref : hoverColor.ref,
+			defaultSession.taskbarSearch.relativeX,
+			taskbarY,
+			defaultSession.taskbarSearch.width as! UInt16,
+			30
+		)
+	}
+
+	drawBitmap32WithAlpha(
+		traySearchIcon,
+		// TODO probably compute global positions for all once in the begin of composition?
+		defaultSession.taskbarSearch.relativeX + 5i16,
+		taskbarY + 4i16
+	)
 
 	// Tray
 	if defaultSession.showTray {
