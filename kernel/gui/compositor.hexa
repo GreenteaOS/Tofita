@@ -960,8 +960,7 @@ fun composite(startupMilliseconds UInt64) {
 
 	// Show hint
 	if let hintText = ColliderRectangle.hintReady {
-		// TODO proper pos
-		drawHint(hintText, mouseX, mouseY)
+		drawHint(hintText, ColliderRectangle.hintX, ColliderRectangle.hintY)
 	}
 
 	// HUD

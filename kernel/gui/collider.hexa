@@ -64,6 +64,8 @@ class ColliderRectangle {
 	static var showHint (id UInt64) => String = null
 	static var hintReady String? = null
 	static var hintOwner ColliderRectangle? = null
+	static var hintX Int16 = 0
+	static var hintY Int16 = 0
 
 	// TODO Hexa: instead of `= 0` ensure init by {}
 	var relativeX Int16 = 0
@@ -220,5 +222,15 @@ class ColliderRectangle {
 
 		return clickable
 		// TODO ^ Hexa: ensure returning fun *always* returns something
+	}
+
+	static fun cancelHint() {
+		hintOwner = null
+
+		if hintReady != null {
+			requestAnimationFrame()
+		}
+
+		hintReady = null
 	}
 }
