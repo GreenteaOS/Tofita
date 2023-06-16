@@ -28,6 +28,7 @@ var notepad16 Bitmap32 = null
 var notepad48 Bitmap32 = null
 var folder48 Bitmap32 = null
 var unknown48 Bitmap32 = null
+var picture48 Bitmap32 = null
 var app48 Bitmap32 = null
 var app16 Bitmap32 = null
 var link Bitmap32 = null
@@ -293,6 +294,10 @@ fun initializeCompositor() {
 	getRamDiskAsset(e, "root/Windows/Resources/Icons/link.png")
 	link = loadPng32(e)
 
+	let e = new RamDiskAsset()
+	getRamDiskAsset(e, "root/Windows/Resources/Icons/256_image-x-generic.ico")
+	picture48 = loadIcon(e.data as! ConstArrayPointer<UInt8>, 48)
+
 	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/folder48.png")
 	folder48 = loadPng32(asset)
@@ -459,10 +464,14 @@ fun composite(startupMilliseconds UInt64) {
 			if file.endsWith(".exe") {
 				// TODO read real icon
 				drawBitmap32WithAlpha(app48, 14i16 + xu, yu)
+				// Name without `.exe` part TODO theme-configurable
+				displayName = displayName.substr(0, displayName.length - 4)
 			} else {
 				// TODO real preview for pics
 				if file.endsWith(".md") or file.endsWith(".txt") {
 					drawBitmap32WithAlpha(notepad48, 14i16 + xu, yu)
+				} else if file.endsWith(".ico") or file.endsWith(".png") or file.endsWith(".jpg") {
+					drawBitmap32WithAlpha(picture48, 14i16 + xu, yu)
 				} else if file.endsWith(".lnk") {
 					// Name without `.lnk` part
 					displayName = displayName.substr(0, displayName.length - 4)
