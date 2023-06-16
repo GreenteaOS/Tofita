@@ -148,8 +148,18 @@ class GraphicalSession {
 		if id == taskbarDesktopPeek.id {
 			// TODO MouseEnter
 			// TODO delay
-			desktopPeek = true
-			requestAnimationFrame()
+			if event == ColliderEventType.MouseMove {
+				desktopPeek = true
+				requestAnimationFrame()
+			} else if event == ColliderEventType.MouseUp {
+				for i in windowsLimit {
+					if let window = windowsList[i], i != 0, window.present, window.visible, not window.minimized {
+						minimize(i)
+					}
+				}
+
+				requestAnimationFrame()
+			}
 		}
 	}
 
