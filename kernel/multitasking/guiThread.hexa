@@ -42,10 +42,27 @@ fun guiThread() {
 			ColliderRectangle.hintReady == null,
 			ColliderRectangle.showHint != null and uptimeMilliseconds >= ColliderRectangle.showHintAfter
 		{
-			ColliderRectangle.hintReady = ColliderRectangle.showHint(hintOwner.id)
-			// TODO hint advance
-			ColliderRectangle.hintX = mouseX
-			ColliderRectangle.hintY = mouseY + 18i16
+			let text = ColliderRectangle.showHint(hintOwner.id)
+			ColliderRectangle.hintReady = text
+
+			// TODO reuse sizes logic
+			let measure = getTextAdvance(text)
+			let w = 6 * 2 + measure + 1
+			let h = 20u16
+
+			if mouseX + w >= Screen.width {
+				ColliderRectangle.hintX = Screen.width - w
+			} else {
+				ColliderRectangle.hintX = mouseX
+			}
+
+			if mouseY + 32 >= Screen.height {
+				// TODO exactly over the taskbar
+				ColliderRectangle.hintY = Screen.height - 32 - h
+			} else {
+				ColliderRectangle.hintY = mouseY + 18i16
+			}
+			
 			// TODO hide hint when mouse over it
 			haveToRender = true
 		}

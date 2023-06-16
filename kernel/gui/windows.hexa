@@ -15,6 +15,7 @@
 
 // Window frames and some GUI elements
 
+// TODO collider should set `.hint`, child overrides parent one, but parent sets default one to (deep) childs
 fun drawHint(text String, x Int16, y Int16) {
 	let measure = getTextAdvance(text)
 	let w = 6 * 2 + measure + 1
