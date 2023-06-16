@@ -357,8 +357,16 @@ fun compositeWindows() {
 			continue
 		}
 
+		if i != 0 && window.present && window.visible && not window.minimized, defaultSession.desktopPeek {
+			let color = new ByValue<Pixel32>()
+			color.ref.color = 0xAAAAAAAAu32
+			color.ref.rgba.ref.a = 64u8
+			drawRectangleWithAlpha(color.ref, window.x, window.y, window.width + 2, window.height + 34)
+			drawShadowBox(window.x - 1i16, window.y - 1i16, window.width + 3, window.height + 35)
+		}
+
 		// TODO better use max int or whatever instead of 0 for desktop window/others
-		if i != 0 && window.present && window.visible && not window.minimized {
+		if i != 0 && window.present && window.visible && not window.minimized, not defaultSession.desktopPeek {
 			let hover = frameHoverWindow == i ? frameHoverState : FrameHover.Noop
 
 			drawWindowFrame(

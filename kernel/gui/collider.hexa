@@ -184,7 +184,8 @@ class ColliderRectangle {
 				showHint = hint
 				hintReady = null
 				hintOwner = this
-				// TODO CLEAR STATE when hover out / over window
+				// TODO better idea
+				defaultSession.desktopPeek = false
 			}
 
 			// TODO `state == ColliderState.Hover` hint unused `==` here in vs hexa
@@ -225,6 +226,10 @@ class ColliderRectangle {
 	}
 
 	static fun cancelHint() {
+		// TODO Hexa: compiles `defaultSession.adasdass.desktopPeek = false`
+		// TODO better idea
+		defaultSession.desktopPeek = false
+
 		hintOwner = null
 
 		if hintReady != null {

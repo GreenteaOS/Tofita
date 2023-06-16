@@ -35,6 +35,7 @@ class GraphicalSession {
 	var taskbarWindowList ColliderRectangle
 	var showStart = false
 	var showTray = false
+	var desktopPeek = false
 
 	// TODO probably useless
 	var windowsZone ColliderRectangle
@@ -142,6 +143,13 @@ class GraphicalSession {
 				// TODO cover whole screen with clickable area to hide `Tray`
 			}
 			return
+		}
+
+		if id == taskbarDesktopPeek.id {
+			// TODO MouseEnter
+			// TODO delay
+			desktopPeek = true
+			requestAnimationFrame()
 		}
 	}
 
@@ -279,6 +287,7 @@ class GraphicalSession {
 		// Windows go under taskbar
 		let windowId = findWindowUnderCursor(mouseX, mouseY)
 		if not drag, windowId != 0 {
+			ColliderRectangle.cancelHint()
 			return false // TODO call DWM
 		}
 
