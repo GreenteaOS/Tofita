@@ -370,7 +370,7 @@ fun initializeCompositor() {
 		shortcut.displayName = "Files"
 		shortcut.file = "*:files"
 		shortcut.icon = files48
-		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
+		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopShortcutHandler)
 		shortcut.rectangle = rectangle
 		desktopShortcuts.push(shortcut)
 		defaultSession.desktopZone.children.push(rectangle)
@@ -397,7 +397,7 @@ fun initializeCompositor() {
 		shortcut.displayName = "Recycle Bin"
 		shortcut.file = "*:trash"
 		shortcut.icon = trashCan
-		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
+		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopShortcutHandler)
 		shortcut.rectangle = rectangle
 		desktopShortcuts.push(shortcut)
 		defaultSession.desktopZone.children.push(rectangle)
@@ -417,7 +417,7 @@ fun initializeCompositor() {
 			shortcut.displayName = file
 			shortcut.file = "desktop/" + file
 			shortcut.icon = unknown48
-			let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
+			let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopShortcutHandler)
 			shortcut.rectangle = rectangle
 
 			rectangle.relativeX = xu
@@ -482,6 +482,7 @@ fun initializeCompositor() {
 			desktopShortcuts.push(shortcut)
 			defaultSession.desktopZone.children.push(rectangle)
 
+			// Set as pin
 			let pin = new Shortcut()
 			pin.displayName = shortcut.displayName
 			pin.file = shortcut.file

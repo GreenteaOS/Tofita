@@ -64,7 +64,7 @@ class GraphicalSession {
 		}
 
 		if event == ColliderEventType.MouseUp {
-			// TODO set mouse coordinates ant event type properly
+			// TODO set mouse coordinates and event type properly
 			handleMouseUpDesktop(MouseActionType.LeftUp, mouseX, mouseY)
 			return
 		}
@@ -73,6 +73,20 @@ class GraphicalSession {
 			// TODO set mouse coordinates ant event type properly
 			handleMouseUpDesktop(MouseActionType.LeftUp, mouseX, mouseY)
 			return
+		}
+	}
+
+	fun desktopShortcutHandle(id UInt64, event ColliderEventType) Void {
+		if isDoubleClick, event == ColliderEventType.MouseDown {
+			if let shortcut = desktopShortcuts[id] as! Shortcut? {
+				if shortcut.file.endsWith(".exe") {
+					let newProcess TofitaProcess = processCreate()
+					processInit(newProcess)
+					loadExeIntoProcess(shortcut.file, newProcess)
+					newProcess.name = shortcut.displayName
+					newProcess.schedulable = true
+				}
+			}
 		}
 	}
 
@@ -381,6 +395,10 @@ fun desktopHandler(id UInt64, event ColliderEventType) Void {
 	defaultSession.desktopHandle(id, event)
 }
 
+fun desktopShortcutHandler(id UInt64, event ColliderEventType) Void {
+	defaultSession.desktopShortcutHandle(id, event)
+}
+
 // TODO Hexa: try those functions as `static fun`
 fun windowHandler(id UInt64, event ColliderEventType) Void {
 	defaultSession.windowHandle(id, event)
@@ -400,6 +418,7 @@ fun hintOfFile(id UInt64) String {
 		return "Size: " + asset.size + " bytes"
 	}
 
+	// TODO `case (computed_filesShortcutPath_let):`
 	if shortcut.file == "*:files" {
 		return "Browse your computer storage."
 	}

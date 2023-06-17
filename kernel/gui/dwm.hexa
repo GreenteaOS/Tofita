@@ -524,7 +524,7 @@ fun handleKeyboardActivity() {
 		} else {
 			// Up
 			let keycode = keycode - 128u8
-			
+
 			if keycode == 91 {
 				// Start button
 				// TODO Hotkeys detection
