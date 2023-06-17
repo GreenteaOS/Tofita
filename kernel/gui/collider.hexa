@@ -113,6 +113,18 @@ class ColliderRectangle {
 			enabled
 	}
 
+	static fun rectanglesIntersect(
+		minAx Int16, minAy Int16, maxAx Int16, maxAy Int16,
+		minBx Int16, minBy Int16, maxBx Int16, maxBy Int16
+	) Bool {
+		let aLeftOfB = maxAx < minBx
+		let aRightOfB = minAx > maxBx
+		let aAboveB = minAy > maxBy
+		let aBelowB = maxAy < minBy
+
+		return not (aLeftOfB or aRightOfB or aAboveB or aBelowB)
+	}
+
 	// TODO Hexa: it is much move robust to just use getters instead
 	fun updateVisualState() Void {
 		this.mouseOver = state != ColliderState.Default

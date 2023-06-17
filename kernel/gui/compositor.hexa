@@ -605,9 +605,22 @@ fun composite(startupMilliseconds UInt64) {
 		let xu = shortcut.rectangle.relativeX
 		let yu = shortcut.rectangle.relativeY
 
-		if shortcut.rectangle.mouseOver {
+		let outlineX = mouseX < dragX ? mouseX : dragX
+		let outlineXX = mouseX > dragX ? mouseX : dragX
+		let outlineY = mouseY < dragY ? mouseY : dragY
+		let outlineYY = mouseY > dragY ? mouseY : dragY
+		//let selected = shortcut.rectangle.collidesWithBox(outlineX, outlineY, outlineW, outlineH)
+		let selected = ColliderRectangle.rectanglesIntersect(
+			outlineX, outlineY, outlineXX, outlineYY,
+			shortcut.rectangle.relativeX,
+			shortcut.rectangle.relativeY,
+			shortcut.rectangle.relativeX + shortcut.rectangle.width,
+			shortcut.rectangle.relativeY + shortcut.rectangle.height
+		) and drag
+
+		if shortcut.rectangle.mouseOver or selected {
 			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
-			color.ref.rgba.ref.a = shortcut.rectangle.mouseHold? 76u8 : 64u8
+			color.ref.rgba.ref.a = shortcut.rectangle.mouseHold or selected? 76u8 : 64u8
 			let outlineX = 0i16 + xu
 			let outlineY = -1i16 + yu
 			let outlineW = shortcut.rectangle.width + 0u16
