@@ -169,6 +169,74 @@ enum ImageDirectoryType : UInt8 {
 	var size UInt32
 }
 
+@packed @struct
+class IMAGE_RESOURCE_DIRECTORY_ENTRY_NAME_STRING {
+	// TODO Hexa: @bits don't work with `let` `@bits(31) let nameOffset UInt32`
+	@bits(31) var nameOffset UInt32
+	@bits(1) var nameIsString UInt32
+}
+
+@packed @struct @union
+class IMAGE_RESOURCE_DIRECTORY_ENTRY_NAME {
+	let string ByValue<IMAGE_RESOURCE_DIRECTORY_ENTRY_NAME_STRING>
+	let name UInt32
+	let id UInt16
+}
+
+@packed @struct
+class IMAGE_RESOURCE_DIRECTORY_ENTRY_OFFSET_DIRECTORY {
+	@bits(31) var offsetToDirectory UInt32
+	@bits(1) var dataIsDirectory UInt32
+}
+
+@packed @struct @union
+class IMAGE_RESOURCE_DIRECTORY_ENTRY_OFFSET {
+	let offsetToData UInt32
+	let string ByValue<IMAGE_RESOURCE_DIRECTORY_ENTRY_OFFSET_DIRECTORY>
+}
+
+@packed @struct class IMAGE_RESOURCE_DIRECTORY_ENTRY {
+	let unionName ByValue<IMAGE_RESOURCE_DIRECTORY_ENTRY_NAME>
+	let unionOffset ByValue<IMAGE_RESOURCE_DIRECTORY_ENTRY_OFFSET>
+}
+
+@packed @struct class IMAGE_RESOURCE_DATA_ENTRY {
+	let offsetToData UInt32
+	let size UInt32
+	let codePage UInt32
+	let reserved UInt32
+}
+
+@packed @struct class GRPICONDIRENTRY {
+	let bWidth UInt8
+	let bHeight UInt8
+	let bColorCount UInt8
+	let bReserved UInt8
+	let wPlanes UInt16
+	let wBitCount UInt16
+	let dwBytesInRes UInt32
+	let nID UInt16
+}
+
+@packed @struct class GRPICONDIR {
+	let idReserved UInt16
+	let idType UInt16
+	let idCount UInt16
+	var idEntries ArrayByValue<ByValue<GRPICONDIRENTRY>, 1>
+}
+
+// TODO `let` here and everywhere
+@packed
+@struct class IMAGE_RESOURCE_DIRECTORY {
+	var characteristics UInt32
+	var timeDateStamp UInt32
+	var majorVersion UInt16
+	var minorVersion UInt16
+	var numberOfNamedEntries UInt16
+	var numberOfIdEntries UInt16
+	var directoryEntries ArrayByValue<ByValue<IMAGE_RESOURCE_DIRECTORY_ENTRY>, 1>
+}
+
 enum ImageRelocationType : Int32 {
 	IMAGE_REL_BASED_ABSOLUTE = 0
 	IMAGE_REL_BASED_DIR64 = 10

@@ -22,6 +22,7 @@ fun offsetPointer(data UInt64, offset UInt64) ArrayPointer<UInt8> {
 	return (data + offset) as! ArrayPointer<UInt8>
 }
 
+// TODO why not IMAGE_DATA_DIRECTORY
 @struct
 class ImageDataDirectory {
 	var virtualAddress UInt32
@@ -217,6 +218,7 @@ class ExeLoader<SIZE, HEADER> {
 		}
 
 		// TODO code gen over u8 must be `i` of u8 too
+		// TODO is it always 15?
 		for i in 15u8 {
 			if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
 				var codeBase UInt64 = (buffer as! UInt64)
@@ -353,6 +355,7 @@ class ExeLoader<SIZE, HEADER> {
 						} else {
 							// Set stub to avoid simple crash
 							// TODO `tofitaStdStub`
+							// TODO separate placeholders for std call etc
 							func = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root).ptr as! SIZE
 						}
 					}
