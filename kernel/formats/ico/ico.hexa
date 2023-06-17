@@ -109,6 +109,10 @@ fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
 		height = width
 	}
 
+	return loadIconPayload(buffer, width, height, imageSize, offset)
+}
+
+fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16, imageSize UInt32, offset UInt32) {
 	let bmp Bitmap32 = allocateBitmap(width, height)
 
 	serialPrintf("The icon is %dx%d, %d bytes at %d\n", bmp.width, bmp.height, imageSize, offset)
@@ -129,14 +133,11 @@ fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
 		return loadPng32FromBuffer(buffer as! ArrayPointer<UInt8>, imageSize)
 	}
 
-	serialPrintf("Header at: %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])
-
 	let fsize = bmp.width * bmp.height * 4
 	let start = offset + 20 + 16 + 4
 	// TODO bmp.pixels = buffer.slice(start, start + imageSize)
 	let pixels = ((buffer as! UInt64) + start) as! ArrayPointer<UInt8>
 
-	serialPrintf("Icon bits per pixel %d == %d, color planes %d\n", bits, 8 * Math.round(imageSize / (bmp.width * bmp.height)), planes)
 	serialPrintf("Icon bytes %d == %d\n", bmp.width * bmp.height * 4, imageSize)
 
 	// Mirror vertical
