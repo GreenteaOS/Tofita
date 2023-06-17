@@ -336,7 +336,6 @@ fun initializeCompositor() {
 	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "desktop")
 	{
-		serialPrintf("root/Windows/Resources/Icons: %d\n", asset.size)
 		var length = 0
 		var at = 0u64 // TODO should work with 0u32 too
 		for i in asset.size {
@@ -397,6 +396,14 @@ fun initializeCompositor() {
 					shortcut.icon = app48
 					// Name without `.exe` part TODO theme-configurable
 					// displayName = displayName.substr(0, displayName.length - 4)
+					//if let icon = getExeIconFromPath("desktop/" + file) {
+					//	// TODO Hexa: `?? app48`
+					//	shortcut.icon = icon
+					//}
+					let icon = getExeIconFromPath("desktop/" + file)
+					if icon != null {
+						shortcut.icon = icon as! Bitmap32
+					}
 				} else {
 					// TODO real preview for pics
 					if file.endsWith(".md") or file.endsWith(".txt") {
