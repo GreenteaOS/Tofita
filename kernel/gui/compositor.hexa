@@ -27,6 +27,7 @@ var trashCan Bitmap32 = null
 var notepad16 Bitmap32 = null
 var notepad48 Bitmap32 = null
 var folder48 Bitmap32 = null
+var files48 Bitmap32 = null
 var unknown48 Bitmap32 = null
 var picture48 Bitmap32 = null
 var app48 Bitmap32 = null
@@ -311,11 +312,15 @@ fun initializeCompositor() {
 	picture48 = loadIcon(e.data as! ConstArrayPointer<UInt8>, 48)
 
 	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/folder48.png")
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Conservative/folder48.png")
 	folder48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Conservative/folder48.png")
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/folder48.png")
+	files48 = loadPng32(asset)
+
+	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/unknown48.png")
 	unknown48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
@@ -351,8 +356,24 @@ fun initializeCompositor() {
 		// TODO separate list for Start
 		pinnedFilesList = desktopFilesList
 
-		// TODO Add default desktop icons
-		// ...
+		// Add default desktop icons
+		let shortcut = new Shortcut()
+		shortcut.displayName = "Files"
+		shortcut.file = "*:files"
+		shortcut.icon = files48
+		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
+		shortcut.rectangle = rectangle
+		desktopShortcuts.push(shortcut)
+		defaultSession.desktopZone.children.push(rectangle)
+
+		let shortcut = new Shortcut()
+		shortcut.displayName = "Recycle Bin"
+		shortcut.file = "*:trash"
+		shortcut.icon = trashCan
+		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
+		shortcut.rectangle = rectangle
+		desktopShortcuts.push(shortcut)
+		defaultSession.desktopZone.children.push(rectangle)
 
 		// Fill the files
 		for i in desktopFilesList.length {
@@ -361,8 +382,8 @@ fun initializeCompositor() {
 			let shortcut = new Shortcut()
 			shortcut.displayName = file
 			shortcut.file = file // TODO full file path
-			shortcut.icon = unknown48 // TODO proper icon
-			let rectangle = new ColliderRectangle(i, desktopHandler /* TODO ! */)
+			shortcut.icon = unknown48
+			let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
 			shortcut.rectangle = rectangle
 
 			// TODO `\r`
@@ -512,16 +533,13 @@ fun composite(startupMilliseconds UInt64) {
 	)
 
 	// Desktop icons
-	drawBitmap32WithAlpha(trashCan, 14i16, 10i16)
 	var color = new ByValue<Pixel32>()
-	color.ref.color = 0x00000000
 	let shadowTextWidth = 76u16 - 8u16
-	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
-	drawShadowText("Recycle Bin", 8, 62i16, shadowTextWidth, color.ref) // TODO infer i16
 
 	let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
+	let yOffsetDefault = 10i16
 	var xu = 0i16
-	var yu = yOffset
+	var yu = yOffsetDefault
 	// TODO not inferred properly?
 	// for file in desktopFilesList as! [String] {
 	for i in desktopFilesList.length {
@@ -548,7 +566,7 @@ fun composite(startupMilliseconds UInt64) {
 		let taskbarHeight = 30 // TODO
 		if (yu + yOffset) > (_framebuffer.height - taskbarHeight) {
 			// TODO should work yu = 10 but not -10 for unsigned
-			yu = 10i16
+			yu = yOffsetDefault
 			xu += yOffset
 		}
 	}
