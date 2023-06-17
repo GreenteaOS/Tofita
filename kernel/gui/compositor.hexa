@@ -359,6 +359,11 @@ fun initializeCompositor() {
 
 		// TODO separate list for Start
 		pinnedFilesList = desktopFilesList
+		let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
+		let yOffsetDefault = 10i16
+		var yu = yOffsetDefault
+		var xu = 0i16
+		let h = 76i16
 
 		// Add default desktop icons
 		let shortcut = new Shortcut()
@@ -369,6 +374,12 @@ fun initializeCompositor() {
 		shortcut.rectangle = rectangle
 		desktopShortcuts.push(shortcut)
 		defaultSession.desktopZone.children.push(rectangle)
+
+		rectangle.relativeX = xu
+		rectangle.relativeY = yu
+		yu += yOffset
+		shortcut.rectangle.width = 76i16
+		shortcut.rectangle.height = h
 
 		// Add Files to Start too
 		let shortcut = new Shortcut()
@@ -389,6 +400,12 @@ fun initializeCompositor() {
 		desktopShortcuts.push(shortcut)
 		defaultSession.desktopZone.children.push(rectangle)
 
+		rectangle.relativeX = xu
+		rectangle.relativeY = yu
+		yu += yOffset
+		shortcut.rectangle.width = 76i16
+		shortcut.rectangle.height = h
+
 		// Fill the files
 		for i in desktopFilesList.length {
 			let file = desktopFilesList[i]
@@ -399,6 +416,21 @@ fun initializeCompositor() {
 			shortcut.icon = unknown48
 			let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
 			shortcut.rectangle = rectangle
+
+			rectangle.relativeX = xu
+			rectangle.relativeY = yu
+			// TODO Hexa: must work `yu += 32`
+			// `yu += 32i16`
+			yu += yOffset
+			shortcut.rectangle.width = 76i16
+			shortcut.rectangle.height = h
+
+			let taskbarHeight = 30 // TODO
+			if (yu + yOffset) > (_framebuffer.height - taskbarHeight) {
+				// TODO should work yu = 10 but not -10 for unsigned
+				yu = yOffsetDefault
+				xu += yOffset
+			}
 
 			// TODO `\r`
 			if file.utf16()[0] as! UInt16 == 13u16 {
@@ -561,22 +593,29 @@ fun composite(startupMilliseconds UInt64) {
 	var color = new ByValue<Pixel32>()
 	let shadowTextWidth = 76u16 - 8u16
 
-	let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
-	let yOffsetDefault = 10i16
-	var xu = 0i16
-	var yu = yOffsetDefault
 	// TODO not inferred properly?
 	// for file in desktopFilesList as! [String] {
 	for i in desktopFilesList.length {
 		// TODO Hexa: `let file = desktopFilesList[i]` [ ] must return T? not T
 		let shortcut = desktopShortcuts[i]
+		let xu = shortcut.rectangle.relativeX
+		let yu = shortcut.rectangle.relativeY
+
+		if shortcut.rectangle.mouseOver {
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+			color.ref.rgba.ref.a = shortcut.rectangle.mouseHold? 76u8 : 64u8
+			let outlineX = 0i16 + xu
+			let outlineY = -1i16 + yu
+			let outlineW = shortcut.rectangle.width + 0u16
+			let outlineH = shortcut.rectangle.height + 0u16
+			drawRectangleWithAlpha(color.ref, outlineX, outlineY, outlineW, outlineH)
+			drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH)
+		}
 
 		drawBitmap32WithAlpha(shortcut.icon, 14i16 + xu, yu)
 		if shortcut.link {
 			drawBitmap32WithAlpha(link, 14i16 + xu, yu + 48 - 16i16)
 		}
-
-		// TODO sizes
 
 		color.ref.color = 0x00000000
 		let textX = 2 + xu
@@ -584,27 +623,6 @@ fun composite(startupMilliseconds UInt64) {
 		// TODO light theme
 		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 		drawShadowText(shortcut.displayName, textX, 62i16 + yu, shadowTextWidth, color.ref) // TODO infer i16
-		// TODO Hexa: must work `yu += 32`
-		// `yu += 32i16`
-		yu += yOffset
-
-		let taskbarHeight = 30 // TODO
-		if (yu + yOffset) > (_framebuffer.height - taskbarHeight) {
-			// TODO should work yu = 10 but not -10 for unsigned
-			yu = yOffsetDefault
-			xu += yOffset
-		}
-	}
-
-	color.ref.rgba.ref.a = 64
-	// TODO move to DWM handleMouseMove etc
-	if mouseX > 20 && mouseX < (20 + 32) && mouseY > 12 && mouseY < (12 + 60) {
-		let outlineX = 1i16
-		let outlineY = 10i16
-		let outlineW = 72u16
-		let outlineH = 64u16
-		drawRectangleWithAlpha(color.ref, outlineX, outlineY, outlineW, outlineH)
-		drawRectangleOutline(color, outlineX, outlineY, outlineW, outlineH)
 	}
 
 	// Desktop is below everything
