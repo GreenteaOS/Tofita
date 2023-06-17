@@ -28,6 +28,7 @@ var notepad16 Bitmap32 = null
 var notepad48 Bitmap32 = null
 var folder48 Bitmap32 = null
 var files48 Bitmap32 = null
+var dll48 Bitmap32 = null
 var unknown48 Bitmap32 = null
 var picture48 Bitmap32 = null
 var app48 Bitmap32 = null
@@ -324,6 +325,10 @@ fun initializeCompositor() {
 	unknown48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/dll48.png")
+	dll48 = loadPng32(asset)
+
+	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Resources/Icons/app48.png")
 	app48 = loadPng32(asset)
 
@@ -404,6 +409,9 @@ fun initializeCompositor() {
 					if icon != null {
 						shortcut.icon = icon as! Bitmap32
 					}
+				} else if file.endsWith(".dll") {
+					// TODO read real icon (some .dll files have them)
+					shortcut.icon = dll48
 				} else {
 					// TODO real preview for pics
 					if file.endsWith(".md") or file.endsWith(".txt") {
