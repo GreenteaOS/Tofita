@@ -58,6 +58,7 @@
 		"devices/amd64/amd64paging",
 		"devices/cpu/physical",
 		"kernel/formats/exe/exe",
+		"kernel/formats/exe/exeIcon",
 		"devices/cpu/rdtsc",
 		"devices/cpu/seh.header",
 		"devices/cpu/seh",

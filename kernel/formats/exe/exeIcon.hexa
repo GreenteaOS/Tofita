@@ -1,0 +1,152 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+class ExeResourceLoader<SIZE, HEADER> {
+	new() {}
+
+	fun getIcon(asset RamDiskAsset) Bitmap32? {
+		var ptr = asset.data as! ArrayPointer<UInt8>
+		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
+		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
+
+		// Copy sections
+		var imageSectionHeader =
+			((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader) as! ArrayPointer<ByValue<ImageSectionHeader>>
+
+		for i in peHeader.numberOfSections {
+			// Compare with `.rsrc` TODO better idea
+			let isRSRC =
+				imageSectionHeader[i].ref.name[0] == 46 and
+				imageSectionHeader[i].ref.name[1] == 114 and
+				imageSectionHeader[i].ref.name[2] == 115 and
+				imageSectionHeader[i].ref.name[3] == 114 and
+				imageSectionHeader[i].ref.name[4] == 99 // TODO and zero terminator?
+
+			let idi_application = 32512
+			let rt_group_icon = 14
+			let rt_icon = 3
+
+			if isRSRC {
+				let section = imageSectionHeader[i].ref
+				let dir = ((ptr as! UInt64) + section.pointerToRawData) as! IMAGE_RESOURCE_DIRECTORY
+         		// TODO Named
+
+				var bestIcon = 0
+				var foundIcon = false
+				var imageSize UInt32 = 0
+
+				// Find the icon in the group
+				for id in dir.numberOfIdEntries {
+					let entry = dir.directoryEntries[id].ref
+
+					if entry.unionName.ref.id == rt_group_icon {
+					} else {
+						continue
+					}
+
+					let byName =
+						((ptr as! UInt64) + (section.pointerToRawData as! UInt64) + (entry.unionOffset.ref.offsetToData & 0x7fffffffu64))
+						as! IMAGE_RESOURCE_DIRECTORY
+
+					for id in byName.numberOfIdEntries {
+						let byNameEntry = byName.directoryEntries[id].ref
+
+						let byLanguage =
+							((ptr as! UInt64) + section.pointerToRawData + (byNameEntry.unionOffset.ref.offsetToData & 0x7fffffffu64))
+							as! IMAGE_RESOURCE_DIRECTORY
+
+						for id in byLanguage.numberOfIdEntries {
+							let byLanguageEntry = byLanguage.directoryEntries[id].ref
+							let dataEntry =
+								((ptr as! UInt64) + section.pointerToRawData + (byLanguageEntry.unionOffset.ref.offsetToData & 0x7fffffffu64))
+								as! IMAGE_RESOURCE_DATA_ENTRY
+
+							let rva UInt64 = section.pointerToRawData + (dataEntry.offsetToData - section.virtualAddress)
+							let offset = (ptr as! UInt64) + rva
+							let iconDir = offset as! GRPICONDIR
+
+							for index in iconDir.idCount {
+								let iconEntry = iconDir.idEntries[index].ref
+								// TODO size selection
+								// TODO `iconEntry.bColorCount == 0,`?
+								if iconEntry.bWidth == 48, iconEntry.bHeight == iconEntry.bWidth,  iconEntry.wBitCount == 32 {
+									bestIcon = iconEntry.nID
+									foundIcon = true
+									imageSize = iconEntry.dwBytesInRes
+								}
+							}
+						}
+					}
+				}
+
+				// Find the icon payload
+				for id in dir.numberOfIdEntries {
+					let entry = dir.directoryEntries[id].ref
+
+					if entry.unionName.ref.id == rt_icon, foundIcon {
+					} else {
+						continue
+					}
+
+					let byName =
+						((ptr as! UInt64) + (section.pointerToRawData as! UInt64) + (entry.unionOffset.ref.offsetToData & 0x7fffffffu64))
+						as! IMAGE_RESOURCE_DIRECTORY
+
+					for id in byName.numberOfIdEntries {
+						let byNameEntry = byName.directoryEntries[id].ref
+
+						let byLanguage =
+							((ptr as! UInt64) + section.pointerToRawData + (byNameEntry.unionOffset.ref.offsetToData & 0x7fffffffu64))
+							as! IMAGE_RESOURCE_DIRECTORY
+
+						for id in byLanguage.numberOfIdEntries {
+							let byLanguageEntry = byLanguage.directoryEntries[id].ref
+							let dataEntry =
+								((ptr as! UInt64) + section.pointerToRawData + (byLanguageEntry.unionOffset.ref.offsetToData & 0x7fffffffu64))
+								as! IMAGE_RESOURCE_DATA_ENTRY
+
+							let rva UInt64 = section.pointerToRawData + (dataEntry.offsetToData - section.virtualAddress)
+							let offset = (ptr as! UInt64) + rva
+
+							if bestIcon == byNameEntry.unionName.ref.id {
+								let icon = offset
+								// TODO Hexa: `let bmp = return whatever`
+								return loadIconPayload(icon as! ConstArrayPointer<UInt8>, 48, 48, imageSize, 0)
+							}
+						}
+					}
+				}
+
+				return null
+			}
+		}
+		// TODO Hexa: got a bug with garbage in `return` cause *guaranteed return* wasn't checked
+		return null
+	}
+}
+
+fun getExeIconFromPath(file String /*TODO iconWidth*/) Bitmap32? {
+	let asset RamDiskAsset = new RamDiskAsset()
+	getRamDiskAsset(asset, file)
+	// TODO handle not found
+	if is64Exe(asset) {
+		let loader = new ExeResourceLoader<UInt64, Pe64OptionalHeader>()
+		return loader.getIcon(asset)
+	} else {
+		let loader = new ExeResourceLoader<UInt32, Pe32OptionalHeader>()
+		return loader.getIcon(asset)
+	}
+	return null
+}
