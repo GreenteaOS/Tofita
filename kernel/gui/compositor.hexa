@@ -380,6 +380,7 @@ fun initializeCompositor() {
 		yu += yOffset
 		shortcut.rectangle.width = 76i16
 		shortcut.rectangle.height = h
+		shortcut.rectangle.hint = hintOfFile
 
 		// Add Files to Start too
 		let shortcut = new Shortcut()
@@ -391,6 +392,7 @@ fun initializeCompositor() {
 		startShortcuts.push(shortcut)
 		defaultSession.startZone.children.push(rectangle)
 
+		// Continue adding to desktop
 		let shortcut = new Shortcut()
 		shortcut.displayName = "Recycle Bin"
 		shortcut.file = "*:trash"
@@ -405,6 +407,7 @@ fun initializeCompositor() {
 		yu += yOffset
 		shortcut.rectangle.width = 76i16
 		shortcut.rectangle.height = h
+		shortcut.rectangle.hint = hintOfFile
 
 		// Fill the files
 		for i in desktopFilesList.length {
@@ -412,7 +415,7 @@ fun initializeCompositor() {
 
 			let shortcut = new Shortcut()
 			shortcut.displayName = file
-			shortcut.file = file // TODO full file path
+			shortcut.file = "desktop/" + file
 			shortcut.icon = unknown48
 			let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopHandler /* TODO ! */)
 			shortcut.rectangle = rectangle
@@ -422,8 +425,9 @@ fun initializeCompositor() {
 			// TODO Hexa: must work `yu += 32`
 			// `yu += 32i16`
 			yu += yOffset
-			shortcut.rectangle.width = 76i16
-			shortcut.rectangle.height = h
+			rectangle.width = 76i16
+			rectangle.height = h
+			rectangle.hint = hintOfFile
 
 			let taskbarHeight = 30 // TODO
 			if (yu + yOffset) > (_framebuffer.height - taskbarHeight) {
@@ -443,11 +447,11 @@ fun initializeCompositor() {
 					shortcut.icon = app48
 					// Name without `.exe` part TODO theme-configurable
 					// displayName = displayName.substr(0, displayName.length - 4)
-					//if let icon = getExeIconFromPath("desktop/" + file) {
+					//if let icon = getExeIconFromPath(shortcut.file) {
 					//	// TODO Hexa: `?? app48`
 					//	shortcut.icon = icon
 					//}
-					let icon = getExeIconFromPath("desktop/" + file)
+					let icon = getExeIconFromPath(shortcut.file)
 					if icon != null {
 						shortcut.icon = icon as! Bitmap32
 					}
