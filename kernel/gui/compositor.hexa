@@ -48,6 +48,8 @@ var darkTheme Bool = true
 var startupAnimation UInt16 = 0
 var desktopFilesList [String] = []
 var pinnedFilesList [String] = []
+let desktopShortcuts [Shortcut] = []
+let startShortcuts [Shortcut] = []
 var versionText = ""
 
 enum WallpaperStyle : UInt8 {
@@ -346,8 +348,68 @@ fun initializeCompositor() {
 			}
 		}
 
-		// TODO
+		// TODO separate list for Start
 		pinnedFilesList = desktopFilesList
+
+		// TODO Add default desktop icons
+		// ...
+
+		// Fill the files
+		for i in desktopFilesList.length {
+			let file = desktopFilesList[i]
+
+			let shortcut = new Shortcut()
+			shortcut.displayName = file
+			shortcut.file = file // TODO full file path
+			shortcut.icon = unknown48 // TODO proper icon
+			let rectangle = new ColliderRectangle(i, desktopHandler /* TODO ! */)
+			shortcut.rectangle = rectangle
+
+			// TODO `\r`
+			if file.utf16()[0] as! UInt16 == 13u16 {
+				shortcut.icon = folder48
+			} else {
+				// TODO Hexa: write test case `if file.utf16()[file.length - 1] as! UInt16 == 101 {`
+				// TODO case insensitive
+				if file.endsWith(".exe") {
+					// TODO read real icon
+					shortcut.icon = app48
+					// Name without `.exe` part TODO theme-configurable
+					// displayName = displayName.substr(0, displayName.length - 4)
+				} else {
+					// TODO real preview for pics
+					if file.endsWith(".md") or file.endsWith(".txt") {
+						shortcut.icon = notepad48
+					} else if file.endsWith(".ico") or file.endsWith(".png") or file.endsWith(".jpg") {
+						shortcut.icon = picture48
+					} else if file.endsWith(".lnk") {
+						shortcut.link = true
+						// Name without `.lnk` part
+						shortcut.displayName = shortcut.displayName.substr(0, shortcut.displayName.length - 4)
+						// TODO get icon for pointed file
+						if shortcut.displayName.endsWith(".exe") {
+							shortcut.icon = app48
+						} else {
+							// TODO icon of pointed file
+						}
+					}
+				}
+			}
+
+			// TODO compute sizes here
+			desktopShortcuts.push(shortcut)
+			defaultSession.desktopZone.children.push(rectangle)
+
+			let pin = new Shortcut()
+			pin.displayName = shortcut.displayName
+			pin.file = shortcut.file
+			pin.icon = shortcut.icon
+			let rectangle = new ColliderRectangle(i, desktopHandler /* TODO ! */)
+			pin.rectangle = rectangle
+			startShortcuts.push(pin)
+			defaultSession.startZone.children.push(rectangle)
+			// TODO compute sizes here
+		}
 	}
 
 	let asset = new RamDiskAsset()
@@ -463,48 +525,22 @@ fun composite(startupMilliseconds UInt64) {
 	// TODO not inferred properly?
 	// for file in desktopFilesList as! [String] {
 	for i in desktopFilesList.length {
-		let file = desktopFilesList[i] // TODO [ ] must return T? not T
-		var displayName = file
+		// TODO Hexa: `let file = desktopFilesList[i]` [ ] must return T? not T
+		let shortcut = desktopShortcuts[i]
 
-		// TODO `\r`
-		if file.utf16()[0] as! UInt16 == 13u16 {
-			drawBitmap32WithAlpha(folder48, 14i16 + xu, yu)
-		} else {
-			// TODO case insensitive
-			if file.endsWith(".exe") {
-				// TODO read real icon
-				drawBitmap32WithAlpha(app48, 14i16 + xu, yu)
-				// Name without `.exe` part TODO theme-configurable
-				displayName = displayName.substr(0, displayName.length - 4)
-			} else {
-				// TODO real preview for pics
-				if file.endsWith(".md") or file.endsWith(".txt") {
-					drawBitmap32WithAlpha(notepad48, 14i16 + xu, yu)
-				} else if file.endsWith(".ico") or file.endsWith(".png") or file.endsWith(".jpg") {
-					drawBitmap32WithAlpha(picture48, 14i16 + xu, yu)
-				} else if file.endsWith(".lnk") {
-					// Name without `.lnk` part
-					displayName = displayName.substr(0, displayName.length - 4)
-					// TODO get icon for pointed file
-					if displayName.endsWith(".exe") {
-						drawBitmap32WithAlpha(app48, 14i16 + xu, yu)
-					} else {
-						drawBitmap32WithAlpha(unknown48, 14i16 + xu, yu)
-					}
-
-					drawBitmap32WithAlpha(link, 14i16 + xu, yu + 48 - 16i16)
-				} else {
-					drawBitmap32WithAlpha(unknown48, 14i16 + xu, yu)
-				}
-			}
+		drawBitmap32WithAlpha(shortcut.icon, 14i16 + xu, yu)
+		if shortcut.link {
+			drawBitmap32WithAlpha(link, 14i16 + xu, yu + 48 - 16i16)
 		}
+
+		// TODO sizes
 
 		color.ref.color = 0x00000000
 		let textX = 2 + xu
 
 		// TODO light theme
 		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
-		drawShadowText(displayName, textX, 62i16 + yu, shadowTextWidth, color.ref) // TODO infer i16
+		drawShadowText(shortcut.displayName, textX, 62i16 + yu, shadowTextWidth, color.ref) // TODO infer i16
 		// TODO Hexa: must work `yu += 32`
 		// `yu += 32i16`
 		yu += yOffset

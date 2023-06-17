@@ -26,6 +26,15 @@ class Desktop {
 	}
 }
 
+class Shortcut {
+	var displayName String
+	var file String
+	var icon Bitmap32
+	var rectangle ColliderRectangle
+	var link Bool = false
+	new () {}
+}
+
 var dragX = 255i16
 var dragY = 255i16
 // TODO Hexa: obvious typing fail `var drag = false` at `fun mouseMove`
