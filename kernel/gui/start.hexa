@@ -1,0 +1,73 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+class StartMenu {
+	// TODO scrollOffsetY Int16
+	/// Render the pinned apps and files
+	static fun drawPinnedItems(x Int16, y Int16, w Int16, h Int16) Void {
+		let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
+		let startX = 10 + x
+		var xu = startX
+		var yu = 12 + y
+		let color = new ByValue<Pixel32>()
+
+		color.ref.rgba.ref.a = 100
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
+		let hoverColor = color
+		let holdColor = color
+		holdColor.ref.rgba.ref.a = 64
+
+		// TODO draw =P when zero pinned and show built-in apps in recommendations
+		for i in startShortcuts.length {
+			let shortcut = startShortcuts[i]
+			let rectangle = shortcut.rectangle
+
+			rectangle.relativeX = xu
+			rectangle.relativeY = yu - 2 + 24 - y
+			rectangle.width = 76i16
+			rectangle.height = 78i16
+
+			if rectangle.mouseOver {
+				drawRectangleWithAlpha(
+					rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+					x + rectangle.relativeX,
+					y - 25 + rectangle.relativeY,
+					rectangle.width + 0u16,
+					rectangle.height + 0u16
+				)
+			}
+
+			drawBitmap32WithAlpha(shortcut.icon, 14i16 + xu, yu)
+
+			color.ref.color = 0x00000000
+			let shadowTextWidth = 76u16 - 8u16
+			let textX = 2 + xu
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+			drawShadowText(shortcut.displayName, textX, 62i16 + yu, shadowTextWidth, color.ref)
+
+			// Grid
+			xu += yOffset
+
+			if xu + yOffset > x + w {
+				xu = startX
+				yu += yOffset
+			}
+
+			if yu > y + h {
+				break
+			}
+		}
+	}
+}

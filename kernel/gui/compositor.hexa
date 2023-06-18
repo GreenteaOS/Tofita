@@ -1011,7 +1011,7 @@ fun composite(startupMilliseconds UInt64) {
 				defaultSession.startPins.height = 500i16
 
 				// Items
-				drawPinnedItems(x, defaultSession.startPins.relativeY + y + 24i16, w + 0i16, defaultSession.startPins.height)
+				StartMenu.drawPinnedItems(x, defaultSession.startPins.relativeY + y + 24i16, w + 0i16, defaultSession.startPins.height)
 
 				color.ref.color = 0x0A385999
 				let title = "Pinned apps and files"
@@ -1204,64 +1204,6 @@ fun composite(startupMilliseconds UInt64) {
 	quake()
 	invalidateCursorBackplate(mouseX as! UInt16, mouseY as! UInt16)
 	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
-}
-
-// TODO move to start.hexa
-// TODO scrollOffsetY Int16
-/// Render the pinned apps and files
-fun drawPinnedItems(x Int16, y Int16, w Int16, h Int16) {
-	let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
-	let startX = 10 + x
-	var xu = startX
-	var yu = 12 + y
-	let color = new ByValue<Pixel32>()
-
-	color.ref.rgba.ref.a = 100
-	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
-	let hoverColor = color
-	let holdColor = color
-	holdColor.ref.rgba.ref.a = 64
-
-	// TODO draw =P when zero pinned and show built-in apps in recommendations
-	for i in startShortcuts.length {
-		let shortcut = startShortcuts[i]
-		let rectangle = shortcut.rectangle
-
-		rectangle.relativeX = xu
-		rectangle.relativeY = yu - 2 + 24 - y
-		rectangle.width = 76i16
-		rectangle.height = 78i16
-
-		if rectangle.mouseOver {
-			drawRectangleWithAlpha(
-				rectangle.mouseHold? holdColor.ref : hoverColor.ref,
-				x + rectangle.relativeX,
-				y - 25 + rectangle.relativeY,
-				rectangle.width + 0u16,
-				rectangle.height + 0u16
-			)
-		}
-
-		drawBitmap32WithAlpha(shortcut.icon, 14i16 + xu, yu)
-
-		color.ref.color = 0x00000000
-		let shadowTextWidth = 76u16 - 8u16
-		let textX = 2 + xu
-		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
-		drawShadowText(shortcut.displayName, textX, 62i16 + yu, shadowTextWidth, color.ref)
-
-		// Grid
-		xu += yOffset
-
-		if xu + yOffset > x + w {
-			xu = startX
-			yu += yOffset
-		}
-
-		if yu > y + h {
-			break
-		}
-	}
 }
 
 var cursorBackplate Bitmap32 = null
