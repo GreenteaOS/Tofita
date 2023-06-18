@@ -1228,15 +1228,15 @@ fun drawPinnedItems(x Int16, y Int16, w Int16, h Int16) {
 		let rectangle = shortcut.rectangle
 
 		rectangle.relativeX = xu
-		rectangle.relativeY = yu - 1 + 24 - y
+		rectangle.relativeY = yu - 2 + 24 - y
 		rectangle.width = 76i16
-		rectangle.height = 77i16
+		rectangle.height = 78i16
 
 		if rectangle.mouseOver {
 			drawRectangleWithAlpha(
 				rectangle.mouseHold? holdColor.ref : hoverColor.ref,
 				x + rectangle.relativeX,
-				y - 24 + rectangle.relativeY,
+				y - 25 + rectangle.relativeY,
 				rectangle.width + 0u16,
 				rectangle.height + 0u16
 			)
