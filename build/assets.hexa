@@ -71,6 +71,8 @@ fun packAssets(config Config) {
 		let assetName [String] = []
 		/// Simply list of files, used only in the build process
 		let assetPath [String] = []
+		/// Stores list of files in the folder
+		let folders [String:Buffer] = [:] // TODO `= []`?
 
 		assetName.push('tofita.exe')
 		assetPath.push(folder + '\\tofita.exe')
@@ -93,17 +95,26 @@ fun packAssets(config Config) {
 
 		fun addFolderRecursive(path) {
 			if fs.existsSync(path) {
+				let filesList [String] = []
+
 				fs.readdirSync(path).forEach(fun(file, index) {
 					let curPath = path + "\\" + file
 					let assetFullName = curPath.substr('../Greentea/assets/'.length).split('\\').join('/')
 
 					if fs.lstatSync(curPath).isDirectory() {
 						addFolderRecursive(curPath)
+						// TODO better idea
+						// This is a `folder` flag lol
+						filesList.push('\r' + assetFullName.split('/').pop())
 					} else {
 						assetName.push(assetFullName)
 						assetPath.push(curPath)
+						filesList.push(assetFullName.split('/').pop())
 					}
 				})
+
+				let folderFullName = path.substr('../Greentea/assets/'.length).split('\\').join('/')
+				folders.set(folderFullName, Buffer.from(filesList.join('\n') + '\n', "utf16le"))
 			}
 		}
 
@@ -116,6 +127,12 @@ fun packAssets(config Config) {
 			ramDiskSize += fs.statSync(asset).size
 		}
 
+		var folderCount = 0
+		for folder in folders.keys() {
+			ramDiskSize += folders.get(folder).length
+			folderCount++
+		}
+
 		ramDiskSize += 4 // UInt32 ramDiskChecksum
 		ramDiskSize += 4 // UInt32 ramDiskSize
 		ramDiskSize += 4 // UInt32 assetsCount
@@ -125,7 +142,7 @@ fun packAssets(config Config) {
 			4 + //	    UInt32 size
 			4 //	    UInt32 offsetFromRamDiskFirstByte // NOT relative to `data`
 			//}
-		) * assetName.length
+		) * (assetName.length + folderCount)
 		//uint8_t* data
 
 		// Round upto 4 bytes
@@ -135,8 +152,8 @@ fun packAssets(config Config) {
 
 		let buffer = Buffer.alloc(ramDiskSize) // zeroed
 		buffer.writeUInt32LE(0, 0)
-		buffer.writeUInt32LE(assetName.length,   8)
 		buffer.writeUInt32LE(ramDiskSize, 4)
+		buffer.writeUInt32LE(assetName.length + folderCount, 8)
 		let assetInfoSize = 256 + 4 + 4
 		var assetInfoOffset = 4 + 4 + 4
 		var assetDataOffset = ramDiskSize
@@ -154,6 +171,19 @@ fun packAssets(config Config) {
 
 			buffer.writeUInt32LE(assetDataOffset, assetInfoOffset + 256 + 4)
 			assetInfoOffset += assetInfoSize
+		}
+
+		for folder in folders.keys() {
+			if let list = folders.get(folder) {
+				buffer.write(folder, assetInfoOffset, "utf16le")
+				buffer.writeUInt32LE(list.length, assetInfoOffset + 256)
+
+				assetDataOffset -= list.length
+				list.copy(buffer, assetDataOffset)
+
+				buffer.writeUInt32LE(assetDataOffset, assetInfoOffset + 256 + 4)
+				assetInfoOffset += assetInfoSize
+			}
 		}
 
 		fun getChecksum() {
