@@ -23,6 +23,7 @@ class GraphicalSession {
 	// Clickable zones
 	// TODO move this rect to Desktop
 	var desktopZone ColliderRectangle
+	var popupZone ColliderRectangle = new ColliderRectangle(0, startHandler)
 	var startZone ColliderRectangle = new ColliderRectangle(0, startHandler)
 
 	// Taskbar
@@ -203,6 +204,9 @@ class GraphicalSession {
 		windowsZone.width = screenWidth
 		windowsZone.height = screenHeight
 
+		popupZone.width = screenWidth
+		popupZone.height = screenHeight
+
 		// Resize internal elements
 		taskbarDesktopPeek.relativeX = taskbarZone.width - taskbarDesktopPeek.width
 		// TODO taskbarSearch.relativeX = taskbarDesktopPeek.relativeX - taskbarSearch.width
@@ -222,6 +226,8 @@ class GraphicalSession {
 		windowsZone = new ColliderRectangle(0, windowHandler)
 
 		// TODO Hexa: well should error obviously `desktopHandler.hint = hintOfFile`
+		popupZone.children.push(startZone)
+		popupZone.clickable = false
 
 		// Start menu
 		{
@@ -328,7 +334,12 @@ class GraphicalSession {
 	fun mouseMove(mouseX Int16, mouseY Int16) Bool {
 		let event = ColliderEventType.MouseMove
 
-		// Taskbar is topmost
+		// Popup is topmost
+		if popupZone.trySendEvent(mouseX, mouseY, event) {
+			return true
+		}
+
+		// Taskbar is next topmost
 		// TODO some global way to detect drag of any collider to ignore any other collider
 		let drag = drag as! Bool // TODO Hexa
 		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
@@ -356,7 +367,12 @@ class GraphicalSession {
 
 		let event = ColliderEventType.MouseUp // TODO left/ri/mi maybe just reuse MouseActionType?
 
-		// Taskbar is topmost
+		// Popup is topmost
+		if popupZone.trySendEvent(mouseX, mouseY, event) {
+			return true
+		}
+
+		// Taskbar is next topmost
 		let drag = drag as! Bool // TODO Hexa
 		if taskbarZone.trySendEvent(mouseX, mouseY, event) {
 			return true
@@ -366,6 +382,7 @@ class GraphicalSession {
 		let windowId = findWindowUnderCursor(mouseX, mouseY)
 		if not drag, windowId != 0 {
 			ColliderRectangle.cancelHint()
+			ColliderRectangle.clearState()
 			return false // TODO call DWM
 		}
 
@@ -382,7 +399,14 @@ class GraphicalSession {
 
 		let event = ColliderEventType.MouseDown
 
-		// Taskbar is topmost
+		// Popup is topmost
+		if popupZone.trySendEvent(mouseX, mouseY, event) {
+			return true
+		}
+
+		selectMouseNextResponder(mouseX, mouseY)
+
+		// Taskbar is next topmost
 		let drag = drag as! Bool // TODO Hexa
 		if not drag, taskbarZone.trySendEvent(mouseX, mouseY, event) {
 			return true

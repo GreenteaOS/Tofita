@@ -57,6 +57,7 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 
 	// Adding a mouse handler
 	let rectangle = new ColliderRectangle(window.windowId, windowHandler)
+	rectangle.hint = hintOfWindow
 	// TODO probably just use UInt16 for rect size
 	// TODO Separate method of all those things adjust
 	rectangle.height = 32i16
@@ -341,8 +342,6 @@ fun isFrontWindow(windowId UInt64) Bool {
 }
 
 fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
-	selectMouseNextResponder(mouseX, mouseY)
-
 	// TODO should reset on different responder id?
 	startClick(mouseX, mouseY)
 

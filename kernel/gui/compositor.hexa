@@ -724,6 +724,7 @@ fun composite(startupMilliseconds UInt64) {
 
 	// Version
 	{
+		// TODO draw on desktop, not foreground
 		let name = "Greentea OS Insider Preview"
 		let color = new ByValue<Pixel32>()
 		color.ref.color = 0xFFFFFFFFu32
