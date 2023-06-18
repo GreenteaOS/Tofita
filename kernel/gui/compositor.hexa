@@ -240,6 +240,8 @@ fun initializeCompositor() {
 
 	// Start
 
+	// TODO helper function that simply does `loadBitmapFromPath()` and on fail sets default 16x16 and quakes
+	// ^ autodetect format from extension (ico, png, bmp, etc)
 	let a = new RamDiskAsset()
 	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/user.png")
 	startUserIcon = loadPng32(a)
@@ -579,6 +581,7 @@ fun requestAnimationFrame() {
 }
 
 fun composite(startupMilliseconds UInt64) {
+	// TODO `let currentSession = defaultSession` cache
 	let mouseX = mouseX
 	let mouseY = mouseY
 
@@ -708,6 +711,7 @@ fun composite(startupMilliseconds UInt64) {
 	// TODO draw differentially (optimization) desktop/windows/taskbar (full overlap detection?)
 
 	// Taskbar shortcuts (pins)
+	// TODO move to taskbar.hexa
 	// TODO just use specs from collider
 	let shortcutsWidth = 36u16 // 24 is too small
 	// TODO respect leaves padding
@@ -951,6 +955,7 @@ fun composite(startupMilliseconds UInt64) {
 	defaultSession.startZone.enabled = defaultSession.showStart
 	defaultSession.popupZone.enabled = defaultSession.startZone.enabled // or
 
+	// TODO move to start.hexa
 	if defaultSession.showStart {
 		let w = 640u16
 		// TODO should fit into 720p
@@ -1201,6 +1206,7 @@ fun composite(startupMilliseconds UInt64) {
 	drawCursor(cur, mouseX as! UInt16, mouseY as! UInt16)
 }
 
+// TODO move to start.hexa
 // TODO scrollOffsetY Int16
 /// Render the pinned apps and files
 fun drawPinnedItems(x Int16, y Int16, w Int16, h Int16) {
@@ -1327,6 +1333,7 @@ fun drawCursor(cur Cursor, x UInt16, y UInt16) {
 }
 
 /// Copy the part of back buffer to the native framebuffer
+// TODO mem copy with aligned movntdq
 fun copyDirtyToScreen(x Int16, y Int16, bottomX Int16, bottomY Int16) {
 	var source = Screen.pixels as! ArrayPointer<UInt32>
 	var destination = _framebuffer.base as! ArrayPointer<UInt32>

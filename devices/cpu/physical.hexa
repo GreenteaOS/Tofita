@@ -51,6 +51,11 @@ class PhysicalAllocator {
 	static var last UInt64
 	// TODO those fields must have ` = default`
 
+	// TODO does make sense at all?
+	//static fun virtualToPhysical(virtual UInt64) UInt64 {
+	//	return 0
+	//}
+
 	static fun physicalToVirtual(physical UInt64) UInt64 {
 		return physical + wholePhysicalStart
 	}

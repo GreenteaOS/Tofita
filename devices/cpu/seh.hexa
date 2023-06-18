@@ -104,3 +104,15 @@ fun probeForWriteOkay(@volatile at UInt64, @volatile bytes UInt64) Bool /*{
 // This is a fascinating way to not allow compiler to optimize return value
 //let probeForReadOkay = _probeForReadOkay
 //let probeForWriteOkay = _probeForWriteOkay
+
+/// Use this to determine if RIP is within SEH-probing function
+/// This is thread-safe
+fun isWithinSehProbe(rip UInt64) Bool {
+	// let approximateHandlerSize = 123u64
+	// TODO ^ size easier to guess in NASM,
+	// just rewrite those functions in asm
+	// ^ combine them near together so test is just
+	// on condition min < rip < max
+	// TODO same for user space
+	return sehProbe // TODO
+}

@@ -60,6 +60,10 @@ let mouseActionsLimit UInt8 = 255
 fun pushMouseAction(type MouseActionType, mouseXdiff Int16 = 0, mouseYdiff Int16 = 0) {
 	if mouseActionsUseZeta {
 		if mouseActionsZetaAmount == mouseActionsLimit {
+			// TODO compact mouse events on overflow like that:
+			// down->move->move->move->up
+			// becomes
+			// down->move->up or just filter-out all moves
 			return
 		}
 

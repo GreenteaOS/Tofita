@@ -17,6 +17,7 @@
 class GraphicalSession {
 	// TODO probably user owns session, not the other way around? it's 1:1 after all
 	var user User // TODO `let`
+	// TODO use user name in Hello, dear NAME
 	// TODO Hexa: ensure theme is embedded (as struct by value) in allocation
 	let theme = new Theme()
 

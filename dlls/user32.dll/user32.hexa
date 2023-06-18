@@ -24,6 +24,7 @@ let classNameLimit = 256u16
 // TODO regions and separate modules
 
 fun handleToWindow(hWnd HWnd) Window {
+	// TODO `HWnd?` and `if let hWnd, compare secret etc { return ok }`
 	if hWnd == null {
 		// TODO ^ assumes `HWnd?` so must error here or something
 		return null // TODO return desktop
@@ -43,6 +44,9 @@ fun handleToWindow(hWnd HWnd) Window {
 	// and only then compare HANDLE.tag (windowIsWindow)
 	// HWnd should extend Handle/TaggedHandle probably
 	// TODO SEH-reading
+	// TODO the secret in fact can be just vTable address of Window class
+	// `Window.type.virtualMethodTableAddress`
+	// ^ makes sense cause this memory address would not be used elsewhere
 	if (hWnd as! Window).windowIsWindowSecret != windowIsWindow {
 		return null
 	}
@@ -367,6 +371,12 @@ fun fillRect(dc HDc, lprc Rect, brush HBrush) Int32 {
 			// TODO respect brush color/style
 			setPixel(fb, x, y, color)
 			// TODO ^ this can be unsafe write, cause within bounds
+
+			// TODO this is for demo purposes and to check frame buffer size
+			if (x == 0 || y == 0 || y == lprc.bottom - 1 || x == lprc.right - 1) {
+				color.ref.color = 0x00AA0000
+				setPixel(fb, x, y, color)
+			}
 		}
 	}
 

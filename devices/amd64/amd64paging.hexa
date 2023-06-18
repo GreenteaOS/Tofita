@@ -26,6 +26,7 @@ fun mapPage(entry PageEntry, address UInt64, writeAllowed Bool, accessibleByUser
 	entry.address = address >> addressBits
 	entry.present = 1
 	entry.writeAllowed = writeAllowed ? 1u8 : 0u8
+	// TODO `accessibleByUser and (v is lower half)` as a last-resort measure
 	entry.accessibleByUser = accessibleByUser ? 1u8 : 0u8
 }
 

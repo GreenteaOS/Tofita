@@ -50,6 +50,14 @@ class Idtr {
 	new ()
 }
 
+/// Levels which are allowed to access this interrupt via the INT instruction.
+/// Hardware interrupts ignore this mechanism.
+// TODO
+enum DPL : UInt8 {
+	OnlySystem = 0
+	AllowFromUser = 3
+}
+
 @struct @packed
 class IdtEntry {
 	@bits(16) var offsetLowerBits UInt16

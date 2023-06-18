@@ -126,6 +126,13 @@ fun postMessage(@volatile process TofitaProcess, payload PostMessagePayload) Boo
 	return true
 }
 
+fun hasMessages(process TofitaProcess) Bool {
+	if process.messagesUsed > 0 {
+		return true
+	}
+
+	return false
+}
 
 fun getMessage(@volatile process TofitaProcess, payload GetMessagePayload) Bool {
 	// Do not allocate until needed
@@ -171,7 +178,10 @@ fun getMessage(@volatile process TofitaProcess, payload GetMessagePayload) Bool 
 }
 
 fun processDestroy(@volatile process TofitaProcess) {
-	// TODO de-allocate stuff
+	// TODO de-allocate stuff like virtual memory table and it's physical memory
+	// ^ in essence should call VirtualFree for all virtual blocks,
+	// if user process would call them,
+	// cause memory could be reused by other processes
 	process.present = false
 	process.messages = null
 

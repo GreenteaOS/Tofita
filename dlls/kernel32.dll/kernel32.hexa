@@ -14,7 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 @dllExport('ExitProcess')
-fun exitProcess(exitCode UInt32) {
+@haltsProgram
+fun exitProcess(@hide exitCode UInt32) {
 	tofitaExitProcess(exitCode)
 	// TODO jump to NtDLL or something
 	while true {}
@@ -41,6 +42,9 @@ fun localAlloc(flags UInt32, bytes SizeOfPointer) HLocal {
 @dllExport('GlobalAlloc')
 fun globalAlloc(flags UInt32, bytes SizeOfPointer) HGlobal {
 	return localAlloc(0, bytes) as! HGlobal
+	// TODO corresponding *Free* functions should check for != null,
+	// do MemProbe and check the tag of heap block to actually be a heap
+	// and only then do rc--
 }
 
 @dllExport('HeapAlloc')
@@ -49,8 +53,9 @@ fun heapAlloc(heap Handle, flags UInt32, bytes SizeOfPointer) ArrayPointer<UInt8
 }
 
 @dllExport('free')
-fun free(pointer SizeOfPointer) Void {
+fun free(@hide pointer SizeOfPointer) Void {
 	// TODO
+	// Note: pointer may be null
 }
 
 // TODO @linkName('_DllMainCRTStartup')
