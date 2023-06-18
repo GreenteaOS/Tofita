@@ -90,15 +90,34 @@ class GraphicalSession {
 		}
 	}
 
+	fun openFile(file String, displayName String) {
+		if file.endsWith(".exe") {
+			let newProcess TofitaProcess = processCreate()
+			processInit(newProcess)
+			loadExeIntoProcess(file, newProcess)
+			newProcess.name = displayName
+			newProcess.schedulable = true
+		} else {
+			// TODO
+		}
+	}
+
+	fun startPinHandle(id UInt64, event ColliderEventType) Void {
+		if event == ColliderEventType.MouseUp {
+			showStart = false
+			showTray = false
+			if let shortcut = desktopShortcuts[id] as! Shortcut? {
+				openFile(shortcut.file, shortcut.displayName)
+			}
+			requestAnimationFrame()
+		}
+	}
+
 	fun desktopShortcutHandle(id UInt64, event ColliderEventType) Void {
 		if isDoubleClick, event == ColliderEventType.MouseDown {
 			if let shortcut = desktopShortcuts[id] as! Shortcut? {
 				if shortcut.file.endsWith(".exe") {
-					let newProcess TofitaProcess = processCreate()
-					processInit(newProcess)
-					loadExeIntoProcess(shortcut.file, newProcess)
-					newProcess.name = shortcut.displayName
-					newProcess.schedulable = true
+					openFile(shortcut.file, shortcut.displayName)
 				}
 			}
 		}
@@ -464,7 +483,7 @@ fun startHandler(id UInt64, event ColliderEventType) Void {
 }
 
 fun startPinHandler(id UInt64, event ColliderEventType) Void {
-	// TODO
+	defaultSession.startPinHandle(id, event)
 }
 
 fun hintOfFile(id UInt64) String {
@@ -488,6 +507,11 @@ fun hintOfFile(id UInt64) String {
 
 	// TODO hint for folders
 	return "Right click for more options"
+}
+
+fun hintOfPin(id UInt64) String {
+	let shortcut = startShortcuts[id]
+	return shortcut.displayName
 }
 
 fun hintOfTaskbar(id UInt64) String {

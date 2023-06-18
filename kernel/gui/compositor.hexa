@@ -387,10 +387,11 @@ fun initializeCompositor() {
 		shortcut.displayName = "Files"
 		shortcut.file = "*:files"
 		shortcut.icon = files48
-		let rectangle = new ColliderRectangle(startShortcuts.length, desktopHandler /* TODO ! */)
+		let rectangle = new ColliderRectangle(startShortcuts.length, startPinHandler)
 		shortcut.rectangle = rectangle
 		startShortcuts.push(shortcut)
-		defaultSession.startZone.children.push(rectangle)
+		defaultSession.startPins.children.push(rectangle)
+		shortcut.rectangle.hint = hintOfPin
 
 		// Continue adding to desktop
 		let shortcut = new Shortcut()
@@ -487,10 +488,11 @@ fun initializeCompositor() {
 			pin.displayName = shortcut.displayName
 			pin.file = shortcut.file
 			pin.icon = shortcut.icon
-			let rectangle = new ColliderRectangle(startShortcuts.length, desktopHandler /* TODO ! */)
+			let rectangle = new ColliderRectangle(startShortcuts.length, startPinHandler)
 			pin.rectangle = rectangle
 			startShortcuts.push(pin)
-			defaultSession.startZone.children.push(rectangle)
+			defaultSession.startPins.children.push(rectangle)
+			pin.rectangle.hint = hintOfPin
 			// TODO compute sizes here
 		}
 	}
@@ -1208,9 +1210,32 @@ fun drawPinnedItems(x Int16, y Int16, w Int16, h Int16) {
 	var yu = 12 + y
 	let color = new ByValue<Pixel32>()
 
+	color.ref.rgba.ref.a = 100
+	color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
+	let hoverColor = color
+	let holdColor = color
+	holdColor.ref.rgba.ref.a = 64
+
 	// TODO draw =P when zero pinned and show built-in apps in recommendations
 	for i in startShortcuts.length {
 		let shortcut = startShortcuts[i]
+		let rectangle = shortcut.rectangle
+
+		rectangle.relativeX = xu
+		rectangle.relativeY = yu - 1 + 24 - y
+		rectangle.width = 76i16
+		rectangle.height = 77i16
+
+		if rectangle.mouseOver {
+			drawRectangleWithAlpha(
+				rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+				x + rectangle.relativeX,
+				y - 24 + rectangle.relativeY,
+				rectangle.width + 0u16,
+				rectangle.height + 0u16
+			)
+		}
+
 		drawBitmap32WithAlpha(shortcut.icon, 14i16 + xu, yu)
 
 		color.ref.color = 0x00000000
