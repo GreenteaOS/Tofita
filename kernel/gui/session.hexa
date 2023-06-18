@@ -350,6 +350,7 @@ class GraphicalSession {
 		let windowId = findWindowUnderCursor(mouseX, mouseY)
 		if not drag, windowId != 0 {
 			ColliderRectangle.cancelHint()
+			ColliderRectangle.clearState()
 			return false // TODO call DWM
 		}
 
@@ -381,8 +382,7 @@ class GraphicalSession {
 		// Windows go under taskbar
 		let windowId = findWindowUnderCursor(mouseX, mouseY)
 		if not drag, windowId != 0 {
-			ColliderRectangle.cancelHint()
-			ColliderRectangle.clearState()
+			// TODO ColliderRectangle.clearState()
 			return false // TODO call DWM
 		}
 
