@@ -134,7 +134,10 @@ fun kernelThread() {
 						// Note ^ some code in syscall handlers may *read* this value
 						// So set it to zero just in case
 
-						if !userCallHandled(process, syscall) {
+						if
+							not userCallHandled(process, syscall),
+							not njraaCallHandled(process, syscall)
+						{
 							// Unknown syscall is no-op
 							serialPrintf("[[PID %d]] Unknown or unhandled syscall %d\n", index,
 										 frame.rcxArg0)

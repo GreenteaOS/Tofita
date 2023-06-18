@@ -16,6 +16,7 @@
 		"kernel/process",
 		"kernel/process.header",
 		"kernel/module",
+		"kernel/syscalls/njraa/njraaCall",
 		"kernel/syscalls/user32/userCall",
 		"kernel/syscalls/syscalls",
 		"kernel/gui/windows",
