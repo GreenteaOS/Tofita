@@ -148,7 +148,7 @@ fun kernelInit(params UefiPayload) {
 		quakePrintf("ACPI 2.0 is loaded and ready\n".utf16())
 	}
 
-	quakePrintf("Enter 'help' for commands\n".utf16())
+	quakePrintf("Enter 'help' for commands or press ~ to hide this window\n".utf16())
 
 	{
 		// TODO move to compositor/DWM

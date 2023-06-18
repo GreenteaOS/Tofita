@@ -127,7 +127,7 @@ fun handleKeyboardPacket() {
 			if haveToQuake {
 				quakeHandleButtonDown(keycode)
 			} else {
-				// handleKeyDown(keycode)
+				// TODO quake should block keyboard input
 			}
 		} else {
 			let keycode = keycode - 128u8

@@ -120,6 +120,8 @@ fun quakeHandleButtonDown(key UInt8) {
 		}
 		serialPrintf("quake command is %S +%S %d\n", quakeCommand.utf16(), char.utf16(), charCode)
 	}
+
+	requestAnimationFrame()
 }
 
 var qsodHappened = false
