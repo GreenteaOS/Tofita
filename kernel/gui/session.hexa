@@ -215,6 +215,7 @@ class GraphicalSession {
 		taskbarInput.relativeX = taskbarTime.relativeX - taskbarInput.width
 		taskbarTrayOpener.relativeX = taskbarInput.relativeX - taskbarTrayOpener.width
 		taskbarSearch.relativeX = taskbarTrayOpener.relativeX - taskbarSearch.width
+		taskbarWindowList.width = taskbarSearch.relativeX - (taskbarStart.width * 2i16 /*TODO*/)
 	}
 
 	new (owner User) {
@@ -317,7 +318,6 @@ class GraphicalSession {
 		{
 			// windowHandler by windowId, but this thing just taskbarHandler
 			let rectangle = new ColliderRectangle(7, taskbarHandler)
-			rectangle.width = 1620i16 // TODO
 			rectangle.height = 32i16 // TODO Always same as taskbar
 			rectangle.relativeX = taskbarPin.relativeX + taskbarPin.width
 			taskbarZone.children.push(rectangle)

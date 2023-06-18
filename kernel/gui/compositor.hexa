@@ -745,8 +745,12 @@ fun composite(startupMilliseconds UInt64) {
 			continue
 		}
 
+		let w = 148u16
+		let x = shortcutsEnd + windowIndex * w
+		let fits = (windowIndex + 1) * w <= defaultSession.taskbarWindowList.width
+
 		// TODO and visible?
-		if i != 0 && window.present {
+		if i != 0 and window.present and fits {
 			var rectangle = defaultSession.taskbarWindowList.children[0]
 			for r in defaultSession.taskbarWindowList.children.length {
 				let rect = defaultSession.taskbarWindowList.children[r]
@@ -760,8 +764,6 @@ fun composite(startupMilliseconds UInt64) {
 			// TODO ellipsis
 			// TODO more windows - less width
 			// TODO measure default width
-			let w = 148u16
-			let x = shortcutsEnd + windowIndex * w
 			let y = taskbarY
 			if firstResponder == i {
 				color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
