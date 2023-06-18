@@ -610,7 +610,9 @@ fun composite(startupMilliseconds UInt64) {
 		let outlineXX = mouseX > dragX ? mouseX : dragX
 		let outlineY = mouseY < dragY ? mouseY : dragY
 		let outlineYY = mouseY > dragY ? mouseY : dragY
-		//let selected = shortcut.rectangle.collidesWithBox(outlineX, outlineY, outlineW, outlineH)
+		// let outlineW = mouseX < dragX ? dragX - mouseX : mouseX - dragX
+		// let outlineH = mouseY < dragY ? dragY - mouseY : mouseY - dragY
+		// TODO let selected = shortcut.rectangle.collidesWithBox(outlineX, outlineY, outlineW, outlineH)
 		let selected = ColliderRectangle.rectanglesIntersect(
 			outlineX, outlineY, outlineXX, outlineYY,
 			shortcut.rectangle.relativeX,
@@ -940,6 +942,10 @@ fun composite(startupMilliseconds UInt64) {
 	}
 
 	// Start
+	// TODO move to session
+	defaultSession.startZone.enabled = defaultSession.showStart
+	defaultSession.popupZone.enabled = defaultSession.startZone.enabled // or
+
 	if defaultSession.showStart {
 		let w = 640u16
 		// TODO should fit into 720p
@@ -953,22 +959,53 @@ fun composite(startupMilliseconds UInt64) {
 		color.ref.color = 0x44444444u32
 		drawRectangleOutline(color, x, y as! Int16, w, h)
 
+		defaultSession.startZone.relativeX = x
+		defaultSession.startZone.relativeY = y + 0i16
+		defaultSession.startZone.width = w + 0i16
+		defaultSession.startZone.height = h + 0i16
+
+		fun highlight(rectangle ColliderRectangle) Void {
+			let color = new ByValue<Pixel32>()
+			color.ref.rgba.ref.a = 100
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
+			let hoverColor = color
+			let holdColor = color
+			holdColor.ref.rgba.ref.a = 64
+
+			if rectangle.mouseOver {
+				drawRectangleWithAlpha(
+					rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+					defaultSession.startZone.relativeX + rectangle.relativeX,
+					defaultSession.startZone.relativeY + rectangle.relativeY,
+					rectangle.width + 0u16,
+					rectangle.height + 0u16
+				)
+			}
+		}
+
 		// Interior
 		{
 			// Layout
 			let userPanelHeight = 64i16
-			let pinsPanelHeight = 500i16
-			// TODO capture click zone inside Start so it is not auto closed on click itself
-			// TODO internal colliders and their hover/hold states
+			defaultSession.startUser.height = userPanelHeight
+			defaultSession.startDownloads.height = userPanelHeight
+			defaultSession.startGallery.height = userPanelHeight
+			defaultSession.startHome.height = userPanelHeight
+			defaultSession.startSettings.height = userPanelHeight
+			defaultSession.startPower.height = userPanelHeight
 
 			// Pins panel
 			{
+				defaultSession.startPins.relativeY = userPanelHeight
+				defaultSession.startPins.width = defaultSession.startZone.width
+				defaultSession.startPins.height = 500i16
+
 				// Items
-				drawPinnedItems(x, y + 24i16 + userPanelHeight, w + 0i16, pinsPanelHeight)
+				drawPinnedItems(x, defaultSession.startPins.relativeY + y + 24i16, w + 0i16, defaultSession.startPins.height)
 
 				color.ref.color = 0x0A385999
 				let title = "Pinned apps and files"
-				drawTextBox(title, x + 16, y + 15i16 + userPanelHeight, color.ref, w, 32, true)
+				drawTextBox(title, x + 16, defaultSession.startPins.relativeY + y + 15i16, color.ref, w, 32, true)
 
 				// Scroll "bar"
 				let currentScrollIndex = 1 // TODO
@@ -984,7 +1021,7 @@ fun composite(startupMilliseconds UInt64) {
 						color.ref,
 						x + w - scrollWidth - 12i16,
 						// TODO current larger by h + 2px
-						y + userPanelHeight + (pinsPanelHeight / 2i16 - scrollWidth) + (index * scrollWidth * 2i16),
+						defaultSession.startPins.relativeY + y + (defaultSession.startPins.height / 2i16 - scrollWidth) + (index * scrollWidth * 2i16),
 						scrollWidth,
 						scrollWidth
 					)
@@ -1008,16 +1045,42 @@ fun composite(startupMilliseconds UInt64) {
 					userPanelHeight - 2u16
 				)
 
+				let iconOffset = 8i16
+				defaultSession.startPower.width = 48i16 + iconOffset
+				defaultSession.startSettings.width = 48i16
+				defaultSession.startHome.width = 48i16
+				defaultSession.startGallery.width = 48i16
+				defaultSession.startDownloads.width = 48i16
+
+				defaultSession.startUser.relativeX = 0
+				var i = 1i16
+				defaultSession.startPower.relativeX = x + w - 48 * i - iconOffset
+				i++
+				defaultSession.startSettings.relativeX = x + w - 48 * i - iconOffset
+				i++
+				defaultSession.startHome.relativeX = x + w - 48 * i - iconOffset
+				i++
+				defaultSession.startGallery.relativeX = x + w - 48 * i - iconOffset
+				i++
+				defaultSession.startDownloads.relativeX = x + w - 48 * i - iconOffset
+				defaultSession.startUser.width = defaultSession.startDownloads.relativeX
+
 				// TODO user pic
 				// TODO click anywhere but the pic to open home folder
+				highlight(defaultSession.startUser)
 				drawBitmap32WithAlpha(startUserIcon, x + 16i16, y + userPanelHeight / 2 - 16i16)
 
 				// Shortcuts
-				drawBitmap32WithAlpha(startPowerIcon, x + w - 48 * 1i16, y + userPanelHeight / 2 - 16i16)
-				drawBitmap32WithAlpha(startGearIcon, x + w - 48 * 2i16, y + userPanelHeight / 2 - 16i16)
-				drawBitmap32WithAlpha(startFilesIcon, x + w - 48 * 3i16, y + userPanelHeight / 2 - 16i16)
-				drawBitmap32WithAlpha(startGalleryIcon, x + w - 48 * 4i16, y + userPanelHeight / 2 - 16i16)
-				drawBitmap32WithAlpha(startDownloadsIcon, x + w - 48 * 5i16, y + userPanelHeight / 2 - 18i16)
+				highlight(defaultSession.startPower)
+				drawBitmap32WithAlpha(startPowerIcon, defaultSession.startPower.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				highlight(defaultSession.startSettings)
+				drawBitmap32WithAlpha(startGearIcon, defaultSession.startSettings.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				highlight(defaultSession.startHome)
+				drawBitmap32WithAlpha(startFilesIcon, defaultSession.startHome.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				highlight(defaultSession.startGallery)
+				drawBitmap32WithAlpha(startGalleryIcon, defaultSession.startGallery.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				highlight(defaultSession.startDownloads)
+				drawBitmap32WithAlpha(startDownloadsIcon, defaultSession.startDownloads.relativeX + iconOffset, y + userPanelHeight / 2 - 18i16)
 
 				color.ref.color = 0xFFFFFFFFu32
 				let welcome = "Hello, dear User"
@@ -1026,8 +1089,14 @@ fun composite(startupMilliseconds UInt64) {
 
 			// All apps panel
 			{
-				let panelY = y + userPanelHeight + pinsPanelHeight
-				let panelHeight = h - userPanelHeight * 2 - pinsPanelHeight + 0u16
+				let panelY = y + userPanelHeight + defaultSession.startPins.height
+				let panelHeight = h - userPanelHeight * 2 - defaultSession.startPins.height + 0u16
+
+				defaultSession.startApps.relativeY = userPanelHeight + defaultSession.startPins.height
+				defaultSession.startApps.relativeX = 1i16
+				defaultSession.startApps.width = defaultSession.startZone.width - 2i16
+				defaultSession.startApps.height = panelHeight + 0i16
+				highlight(defaultSession.startApps)
 
 				color.ref.rgba.ref.r = 8
 				color.ref.rgba.ref.g = 8
@@ -1095,6 +1164,12 @@ fun composite(startupMilliseconds UInt64) {
 					24
 				)
 
+				defaultSession.startSearch.relativeX = 10i16
+				defaultSession.startSearch.relativeY = h - userPanelHeight + 29i16 - 8i16
+				defaultSession.startSearch.width = w - 22i16
+				defaultSession.startSearch.height = 24i16
+				highlight(defaultSession.startSearch)
+
 				color.ref.color = 0xFFFFFFFFu32
 				let welcome = "Type anything to start search"
 				drawTextBox(welcome, x + 16 + 22, inputY, color.ref, w, 32, true)
@@ -1105,7 +1180,7 @@ fun composite(startupMilliseconds UInt64) {
 				// Cool hairline
 				color.ref.color = 0x129999FF
 				color.ref.rgba.ref.a = 128
-				lineHorizontalWithAlpha(color.ref, x + 12i16, inputY + 16i16, w - 24)
+				lineHorizontalWithAlpha(color.ref, x + 11i16, inputY + 16i16, w - 24)
 			}
 		}
 	}

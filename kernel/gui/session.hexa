@@ -23,7 +23,9 @@ class GraphicalSession {
 	// Clickable zones
 	// TODO move this rect to Desktop
 	var desktopZone ColliderRectangle
+	var startZone ColliderRectangle = new ColliderRectangle(0, startHandler)
 
+	// Taskbar
 	var taskbarZone ColliderRectangle
 	var taskbarStart ColliderRectangle
 	var taskbarPin ColliderRectangle
@@ -36,6 +38,17 @@ class GraphicalSession {
 	var showStart = false
 	var showTray = false
 	var desktopPeek = false
+
+	// Start menu
+	let startUser ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startDownloads ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startGallery ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startHome ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startSettings ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startPower ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startPins ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startApps ColliderRectangle = new ColliderRectangle(0, startHandler)
+	let startSearch ColliderRectangle = new ColliderRectangle(0, startHandler)
 
 	// TODO probably useless
 	var windowsZone ColliderRectangle
@@ -209,6 +222,20 @@ class GraphicalSession {
 		windowsZone = new ColliderRectangle(0, windowHandler)
 
 		// TODO Hexa: well should error obviously `desktopHandler.hint = hintOfFile`
+
+		// Start menu
+		{
+			startZone.enabled = false
+			startZone.children.push(startUser)
+			startZone.children.push(startDownloads)
+			startZone.children.push(startGallery)
+			startZone.children.push(startHome)
+			startZone.children.push(startSettings)
+			startZone.children.push(startPower)
+			startZone.children.push(startPins)
+			startZone.children.push(startApps)
+			startZone.children.push(startSearch)
+		}
 
 		// Taskbar
 		//taskbarZone.width = 256 TODO Hexa: infer as i16
@@ -406,6 +433,14 @@ fun windowHandler(id UInt64, event ColliderEventType) Void {
 
 fun taskbarHandler(id UInt64, event ColliderEventType) Void {
 	defaultSession.taskbarHandle(id, event)
+}
+
+fun startHandler(id UInt64, event ColliderEventType) Void {
+	// TODO
+}
+
+fun startPinHandler(id UInt64, event ColliderEventType) Void {
+	// TODO
 }
 
 fun hintOfFile(id UInt64) String {
