@@ -17,6 +17,7 @@
 // and threads will have parentPID and that's
 // so we don't have linked list of threads per process
 @struct
+// TODO just a class, not struct
 class TofitaProcess {
 	// Is process exists at all and fully initialized
 	@volatile var present Bool

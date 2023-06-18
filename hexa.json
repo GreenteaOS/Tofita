@@ -51,6 +51,7 @@
 		"devices/cpu/cpuid",
 		"devices/cpu/exceptions",
 		"devices/cpu/interrupts.header",
+		"kernel/multitasking/thread",
 		"kernel/multitasking/kernelThread",
 		"kernel/multitasking/guiThread",
 		"kernel/multitasking/scheduler",

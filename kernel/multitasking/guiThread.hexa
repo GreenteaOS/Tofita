@@ -62,7 +62,7 @@ fun guiThread() {
 			} else {
 				ColliderRectangle.hintY = mouseY + 18i16
 			}
-			
+
 			// TODO hide hint when mouse over it
 			haveToRender = true
 		}
