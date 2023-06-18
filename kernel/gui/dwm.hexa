@@ -297,6 +297,7 @@ fun findWindowUnderCursor(mouseX Int16, mouseY Int16) UInt64 {
 	return 0
 }
 
+var previousResponder UInt64 = 0
 fun selectMouseNextResponder(mouseX Int16, mouseY Int16) {
 	// TODO hexa unconditional recursion firstResponder = selectMouseNextResponder(mouseX, mouseY)
 	let newResponder = findWindowUnderCursor(mouseX, mouseY)
@@ -305,6 +306,7 @@ fun selectMouseNextResponder(mouseX Int16, mouseY Int16) {
 		requestAnimationFrame()
 	}
 
+	previousResponder = firstResponder
 	firstResponder = newResponder
 }
 

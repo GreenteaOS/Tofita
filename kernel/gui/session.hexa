@@ -125,6 +125,7 @@ class GraphicalSession {
 	}
 
 	var taskbarResponder UInt64 = 0
+	var taskbarPrevious UInt64 = 0
 
 	/// Selects the clicked window that is shown on the taskbar
 	fun windowHandle(id UInt64, event ColliderEventType) Void {
@@ -136,6 +137,7 @@ class GraphicalSession {
 
 		if event == ColliderEventType.MouseDown {
 			taskbarResponder = id
+			taskbarPrevious = previousResponder
 		}
 
 		else if event == ColliderEventType.MouseUp {
@@ -149,7 +151,7 @@ class GraphicalSession {
 						// TODO Hexa: must be null-safe
 						windowsList[id].minimized = false
 					} else {
-						if isFrontWindow(id) {
+						if isFrontWindow(id) and taskbarPrevious == id {
 							// TODO make it `window.minimize()` and `minimize.toggleMinimized()`?
 							minimize(id)
 						} else {
