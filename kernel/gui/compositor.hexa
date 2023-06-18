@@ -738,73 +738,8 @@ fun composite(startupMilliseconds UInt64) {
 		drawTextBox(versionText, _framebuffer.width - getTextAdvance(versionText) - 5i16, taskbarY - 16i16, color.ref, 512, 32, true)
 	}
 
-	// Opened windows
-	// Sorted in the creation order
-	var i = rootWindow
-	var windowIndex = 0
-	// Avoid infinite loop
-	for loop in windowsLimit {
-		let window = windowsList[i]
-
-		// TODO proper iteration
-		if window == null {
-			continue
-		}
-
-		let w = 148u16
-		let x = shortcutsEnd + windowIndex * w
-		let fits = (windowIndex + 1) * w <= defaultSession.taskbarWindowList.width
-
-		// TODO and visible?
-		if i != 0 and window.present and fits {
-			var rectangle = defaultSession.taskbarWindowList.children[0]
-			for r in defaultSession.taskbarWindowList.children.length {
-				let rect = defaultSession.taskbarWindowList.children[r]
-				if rect.id == i {
-					// TODO Yeah, could just use Array.find
-					rectangle = rect
-				}
-			}
-
-			// TODO if window.visible
-			// TODO ellipsis
-			// TODO more windows - less width
-			// TODO measure default width
-			let y = taskbarY
-			if firstResponder == i {
-				color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
-				color.ref.rgba.ref.a = 64
-				drawRectangleWithAlpha(color.ref, x + 2i16, y, w - 4u16, 26u16)
-				color.ref.rgba.ref.a = 100
-			} else {
-				if let rectangle = rectangle, rectangle.mouseOver {
-					drawRectangleWithAlpha(
-						rectangle.mouseHold? holdColor.ref : hoverColor.ref,
-						rectangle.relativeX + defaultSession.taskbarWindowList.relativeX,
-						taskbarY,
-						rectangle.width as! UInt16,
-						30
-					)
-				}
-			}
-			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
-			// TODO proper app icon
-			drawBitmap32WithAlpha(app16, x + 6i16, y + 5i16)
-			// TODO widthLimit Int16, wrapAround Bool, heightLimit Int16
-			let appTitleOffset = 29
-			drawTextBox(window.title, x + appTitleOffset, y + 10i16, color.ref, w - appTitleOffset, 32, true)
-			// TODO full width in active
-			// TODO animate
-			// TODO to not look like win10 by default, draw them as vertical
-			// gradients as I did want long ago!!!
-			drawRectangleWithAlpha(color.ref, x + 2i16, y + 26i16, w - 4u16, 4u16)
-			windowIndex++
-		}
-
-		i++
-	}
-
 	// TODO tray space should be computed *before* window list
+	Taskbar.compositeOpenedWindowsList(taskbarY)
 
 	// Tray | line
 	if let rectangle = defaultSession.taskbarDesktopPeek, rectangle.mouseOver {

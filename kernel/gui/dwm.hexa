@@ -147,12 +147,11 @@ fun overlappedWindow_destroy(windowId UInt64) {
 	var window = windowsList[windowId]
 	overlappedWindow_detach(windowId)
 
-	// TODO de-allocate
 	window.present = false
 	window.visible = false
+	// TODO de-allocate
 	window.fbZeta = null
 	window.fbGama = null
-	window.title = null
 
 	// TODO make a better re-paint trigger
 	haveToRender = true

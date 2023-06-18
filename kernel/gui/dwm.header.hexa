@@ -27,51 +27,6 @@ var firstResponder UInt64 = 0 // Active window to catch keyboard input
 //	Minimized = 1
 //}
 
-// TODO move this declaration somewhere else
-@struct
-class OverlappedWindow {
-	var present Bool
-	var pid UInt64 // Owner
-	// TODO tid - thread id
-
-	// TODO this id is kinda useless and may go out of sync
-	// when topmost updated
-	var windowId UInt64
-	var nextId UInt64
-	var prevId UInt64
-	var hWnd HWnd
-
-	var visible Bool
-
-	/// Aka "hidden to taskbar", unrelated to `maximized`
-	var minimized Bool = false
-
-	/// Aka "full screen", unrelated to `minimized`
-	var maximized Bool = false
-
-	// TODO var notResponding Bool = false
-	// TODO var respondingTimeoutMs UInt16 = 0
-	// ^ count milliseconds>N before setting notResponding
-
-	var title String
-
-	var x Int16
-	var y Int16
-
-	var width UInt16
-	var height UInt16
-
-	// fb.pixels == null if framebuffer not present
-	// Note: fb size may be != current window size
-	var fbZeta Bitmap32
-	var fbGama Bitmap32
-	var fbCurrentZeta Bool // Use to swap chain
-	var fbZetaUserAddress UInt64
-	var fbGamaUserAddress UInt64
-
-	new () {}
-}
-
 let windowsLimit UInt64 = 256
 
 // TODO allocate dynamically (just use Hexa Array or something)
