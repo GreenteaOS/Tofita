@@ -1,0 +1,38 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+/// Current screen
+/// Allows to avoid pointer indirection
+class Screen {
+	static var width UInt32 = 0
+	static var widthMinusOne UInt32 = 0
+	static var height UInt32 = 0
+	static var heightMinusOne UInt32 = 0
+	static var pixels ArrayPointer<ByValue<Pixel32>> = null
+	/// Actual pixel buffer to be used
+	// TODO just allocate memory instead of bitmap
+	// TODO should be per-screen
+	static var doublebuffer Bitmap32 = null
+}
+
+/// Optimize access to the common screen properties
+class CurrentScreen {
+	// TODO Hexa: readonly from outside, writeable from inside of CurrentScreen
+	static var height UInt32 = 0 // TODO proper type
+
+	static fun setCurrent(screen Screen) {
+		// TODO set fields
+	}
+}

@@ -26,20 +26,6 @@ var _framebuffer FrameBuffer = null
 // TODO make sure this in the huge/epic pages and 4k aligned
 var _pixels ArrayPointer<ByValue<Pixel32>> = null
 
-/// Current screen
-/// Allows to avoid pointer indirection
-class Screen {
-	static var width UInt32 = 0
-	static var widthMinusOne UInt32 = 0
-	static var height UInt32 = 0
-	static var heightMinusOne UInt32 = 0
-	static var pixels ArrayPointer<ByValue<Pixel32>> = null
-	/// Actual pixel buffer to be used
-	// TODO just allocate memory instead of bitmap
-	// TODO should be per-screen
-	static var doublebuffer Bitmap32 = null
-}
-
 fun allocateBitmap(width UInt32, height UInt32) Bitmap32 {
 	// TODO allocateStruct<T>
 	let result = PhysicalAllocator.allocateBytes(
