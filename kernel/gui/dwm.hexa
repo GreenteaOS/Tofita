@@ -50,7 +50,7 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	window.fbZeta = null
 	window.fbGama = null
 	window.fbCurrentZeta = true
-	window.title = null
+	window.title = "" // TODO Hexa: nullability was an issue for titles once, just a notable case
 	window.hWnd = null
 	window.prevId = 0
 	window.nextId = 0
@@ -58,15 +58,11 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	// Adding a mouse handler
 	let rectangle = new ColliderRectangle(window.windowId, windowHandler)
 	rectangle.hint = hintOfWindow
-	// TODO probably just use UInt16 for rect size
-	// TODO Separate method of all those things adjust
-	rectangle.height = 32i16
-	rectangle.width = 148i16
-	rectangle.relativeX =
-		(index - 1) * rectangle.width
-	// TODO Hexa: hint when var fields are set etc, but var itself not used
+	// TODO probably just use UInt16 or Int16 for rect size
+	// TODO Hexa: hint when var fields are set etc, but var itself *not used*
 	// ^ cause forgot to push that rect to array
 	defaultSession.taskbarWindowList.children.push(rectangle)
+	defaultSession.resizeWindowList()
 
 	return window
 }
@@ -153,8 +149,16 @@ fun overlappedWindow_destroy(windowId UInt64) {
 	window.fbZeta = null
 	window.fbGama = null
 
-	// TODO make a better re-paint trigger
-	haveToRender = true
+	for i in defaultSession.taskbarWindowList.children.length {
+		let rectangle = defaultSession.taskbarWindowList.children[i]
+		if rectangle.id == window.windowId {
+			rectangle.enabled = false
+		}
+	}
+
+	defaultSession.resizeWindowList()
+
+	requestAnimationFrame()
 }
 
 fun initDwm() {

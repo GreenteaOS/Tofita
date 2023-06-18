@@ -238,6 +238,19 @@ class GraphicalSession {
 		taskbarWindowList.width = taskbarSearch.relativeX - (taskbarStart.width * 2i16 /*TODO*/)
 	}
 
+	fun resizeWindowList() {
+		var index = 0
+		for i in taskbarWindowList.children.length {
+			let rectangle = taskbarWindowList.children[i]
+			if rectangle.enabled {
+				rectangle.height = 32i16
+				rectangle.width = 148i16
+				rectangle.relativeX = index * rectangle.width
+				index++
+			}
+		}
+	}
+
 	new (owner User) {
 		this.user = owner
 		// TODO Hexa: desktop should be pre-embed-allocated too
