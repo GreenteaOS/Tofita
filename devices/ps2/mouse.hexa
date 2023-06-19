@@ -139,14 +139,14 @@ fun handleMousePacket() {
 
 		// Ignore all state changes until message pool is ready
 		// Otherwise we will have situation like DOWN-UP-UP instead of D-U-D-U
-		if mouseActionsUseZeta && mouseActionsZetaAmount == mouseActionsLimit {
+		if mouseActionsUseZeta and mouseActionsZetaAmount == mouseActionsLimit {
 			// TODO break
 		}
-		if !mouseActionsUseZeta && mouseActionsGamaAmount == mouseActionsLimit {
+		if not mouseActionsUseZeta and mouseActionsGamaAmount == mouseActionsLimit {
 			// TODO break
 		}
 
-		if mouseXd != 0 || mouseYd != 0 {
+		if mouseXd != 0 or mouseYd != 0 {
 			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
 		}
 
@@ -154,24 +154,24 @@ fun handleMousePacket() {
 		let right Bool = getBit(mouseByte[0], 1) != 0
 		let middle Bool = getBit(mouseByte[0], 2) != 0
 
-		if left == false && leftDown == true {
+		if left == false and leftDown == true {
 			pushMouseAction(MouseActionType.LeftUp)
 		}
-		if left == true && leftDown == false {
+		if left == true and leftDown == false {
 			pushMouseAction(MouseActionType.LeftDown)
 		}
 
-		if right == false && rightDown == true {
+		if right == false and rightDown == true {
 			pushMouseAction(MouseActionType.RightUp)
 		}
-		if right == true && rightDown == false {
+		if right == true and rightDown == false {
 			pushMouseAction(MouseActionType.RightDown)
 		}
 
-		if middle == false && middleDown == true {
+		if middle == false and middleDown == true {
 			pushMouseAction(MouseActionType.MiddleUp)
 		}
-		if middle == true && middleDown == false {
+		if middle == true and middleDown == false {
 			pushMouseAction(MouseActionType.MiddleDown)
 		}
 
@@ -208,8 +208,8 @@ fun handleMouse() {
 	// polls = true
 	// handleMousePacket()
 	// UInt8 poll = readPort(0x64)
-	// while getBit(poll, 0) == 1 && getBit(poll, 5) == 1 {
-	//	// if (getBit(poll, 0) == 1 && getBit(poll, 5) == 1) {
+	// while getBit(poll, 0) == 1 and getBit(poll, 5) == 1 {
+	//	// if (getBit(poll, 0) == 1 and getBit(poll, 5) == 1) {
 	//	// handleMousePacket()
 	//	poll = readPort(0x64)
 	//}

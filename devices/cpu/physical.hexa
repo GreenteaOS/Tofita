@@ -285,7 +285,7 @@ class PhysicalAllocator {
 	static fun freeOnePage(physical UInt64) {
 		let where = down_bytes_to_pages(physical - (wholePhysicalStart as! UInt64))
 		// Bounds check
-		if physical <= wholePhysicalStart || where > count {
+		if physical <= wholePhysicalStart or where > count {
 			return
 		}
 

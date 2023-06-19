@@ -138,7 +138,7 @@ fun createWindowExW(
 
 	// TODO `not`
 	// TODO `if let`
-	if !found {
+	if not found {
 		tofitaDebugLog("CreateWindowExW not found return".utf16())
 		return null
 	}
@@ -335,10 +335,10 @@ fun beginPaint(hWnd HWnd, ps PaintStruct) HDc {
 // TODO Clang may NOT pass Pixel32 as a single uint32_t in argument and cause perf loss
 @fastcall fun setPixel(fb WindowFramebuffer, x Int32, y Int32, pixel ByValue<Pixel32>) Void {
 	// TODO merge to single comparison
-	if (x < 0) || (y < 0) {
+	if (x < 0) or (y < 0) {
 		return
 	}
-	if (x > fb.width - 1) || (y > fb.height - 1) {
+	if (x > fb.width - 1) or (y > fb.height - 1) {
 		return
 	}
 
@@ -373,7 +373,7 @@ fun fillRect(dc HDc, lprc Rect, brush HBrush) Int32 {
 			// TODO ^ this can be unsafe write, cause within bounds
 
 			// TODO this is for demo purposes and to check frame buffer size
-			if (x == 0 || y == 0 || y == lprc.bottom - 1 || x == lprc.right - 1) {
+			if (x == 0 or y == 0 or y == lprc.bottom - 1 or x == lprc.right - 1) {
 				color.ref.color = 0x00AA0000
 				setPixel(fb, x, y, color)
 			}

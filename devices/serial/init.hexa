@@ -33,7 +33,7 @@ fun initSerial() UInt8 {
 	currentDivisor |= readSerialRegister(r_uart_baud_low) as! UInt32
 	writeSerialRegister(r_uart_lcr, readSerialRegister(r_uart_lcr) & ~b_uart_lcr_dlab)
 	// Fast path
-	initialized = initialized && currentDivisor == divisor
+	initialized = initialized and currentDivisor == divisor
 	if initialized {
 		return 1u8
 	}

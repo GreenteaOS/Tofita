@@ -56,12 +56,12 @@ fun quakeHandleButtonDown(key UInt8) {
 		return
 	}
 
-	if keyboardMap[key] == '\b' && quakeCommandSize > 0 {
+	if keyboardMap[key] == '\b' and quakeCommandSize > 0 {
 		quakeCommand = quakeCommand.substr(0, quakeCommand.length - 1)
 		quakeCommandSize--
 	}
 
-	if keyboardMap[key] == '\n' && quakeCommandSize > 0 {
+	if keyboardMap[key] == '\n' and quakeCommandSize > 0 {
 		if quakeCommand == 'gdt' {
   			let gdt = gdtTemplate as! ArrayPointer<ByValue<GdtDescriptorEx>>
 			dumpGdtEntries(gdt)
@@ -104,14 +104,14 @@ fun quakeHandleButtonDown(key UInt8) {
 	// clicking right on the right most opens new terminal
 	// (show this as help in pale color)
 
-	// TODO support string comparisons `if (keyboardMap[key] >= 'a' && keyboardMap[key] <= 'z') ||`
+	// TODO support string comparisons `if (keyboardMap[key] >= 'a' and keyboardMap[key] <= 'z') or`
 	if let char = keyboardMap[key] {
 		let charCode = char.charCodeAt(0) as! UInt16 // TODO `?? 0`
-		// TODO nullables are incomparable, do some cool way to avoid this `if (charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0)) ||`
+		// TODO nullables are incomparable, do some cool way to avoid this `if (charCode >= 'a'.charCodeAt(0) and charCode <= 'z'.charCodeAt(0)) or`
 		// TODO ^ better error `you are comparing nullable values`
-		if (charCode >= 97 && charCode <= 122) ||
-			(charCode >= 48 && charCode <= 57) || (charCode == 32)
-			|| (charCode == 45) {
+		if (charCode >= 97 and charCode <= 122) or
+			(charCode >= 48 and charCode <= 57) or (charCode == 32)
+			or (charCode == 45) {
 			if quakeCommandSize < 255 {
 				// quakeCommand += keyboardMap[key]
 				quakeCommand = quakeCommand + char

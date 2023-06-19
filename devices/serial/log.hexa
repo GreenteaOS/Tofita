@@ -24,12 +24,12 @@
 #else
 	const uint8_t sehLogError[] = "<STRING IS NULL OR SEH ERROR>";
 #endif
-if (string != null && probeForReadOkay((uint64_t)string, 1)) {
+if (string != null and probeForReadOkay((uint64_t)string, 1)) {
 	puts(string);
 } else {
 	puts(sehLogError);
 }
-if (string != null && probeForReadOkay((uint64_t)string, 2)) {
+if (string != null and probeForReadOkay((uint64_t)string, 2)) {
 	while (string[i] != 0) {
 		putChar(string[i] & 0xFF);
 		i++;
@@ -177,7 +177,7 @@ fun serialPortWrite(buffer ArrayPointer<UInt8>, sizeOfBuffer UInt64) UInt64 {
 
 		// Fill then entire Tx FIFO
 		var index UInt64 = 0u64
-		while index < fifoSize && size != 0 {
+		while index < fifoSize and size != 0 {
 			// Wait for the hardware flow control signal
 			while !serialPortWritable() {}
 

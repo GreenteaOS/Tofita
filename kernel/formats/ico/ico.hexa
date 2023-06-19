@@ -122,9 +122,9 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 
 	// ?PNG
 	if
-		buffer[offset] == 0x89 &&
-		buffer[offset + 1] == 0x50 &&
-		buffer[offset + 2] == 0x4E &&
+		buffer[offset] == 0x89 and
+		buffer[offset + 1] == 0x50 and
+		buffer[offset + 2] == 0x4E and
 		buffer[offset + 3] == 0x47
 	{
 		serialPrintf('Decoding as PNG\n')

@@ -87,7 +87,7 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 
 	addr = saddr[0]
 
-	if status == EFI_STATUS.EFI_NOT_FOUND || status == EFI_STATUS.EFI_OUT_OF_RESOURCES {
+	if status == EFI_STATUS.EFI_NOT_FOUND or status == EFI_STATUS.EFI_OUT_OF_RESOURCES {
 		serialPrintf("[[[uefi.uefiAllocate]]] failed EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
 					 bytes[0])
 	}

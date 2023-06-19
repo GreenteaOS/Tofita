@@ -105,7 +105,7 @@ fun drawText(text String, y Int16, framebuffer FrameBuffer) {
 	// Get width to center text on screen
 	var width Float = 0
 
-	while (text[i] as! UInt16) != 0 && i < 255 * 255 {
+	while (text[i] as! UInt16) != 0 and i < 255 * 255 {
 		width += getCharAdvance((text[i] as! UInt16) & 0xFF as! UInt8)
 		i++
 	}
@@ -113,7 +113,7 @@ fun drawText(text String, y Int16, framebuffer FrameBuffer) {
 	var xx Float = (framebuffer.width / 2) - (width / 2)
 
 	i = 0
-	while (text[i] as! UInt16) != 0 && i < 255 * 255 {
+	while (text[i] as! UInt16) != 0 and i < 255 * 255 {
 		xx += drawChar((text[i] as! UInt16) & 0xFF as! UInt8, xx, y, framebuffer)
 		i++
 	}

@@ -75,7 +75,7 @@ fun overlappedWindow_find(pid UInt64, windowId UInt64) OverlappedWindow {
 			return null
 		}
 		var window = windowsList[index]
-		if window.present == true && window.pid == pid && window.windowId == windowId {
+		if window.present == true and window.pid == pid and window.windowId == windowId {
 			return window
 		}
 	}
@@ -90,7 +90,7 @@ fun overlappedWindow_findAnyProcessWindow(pid UInt64) OverlappedWindow {
 			return null
 		}
 		var window = windowsList[index]
-		if window.present == true && window.pid == pid {
+		if window.present == true and window.pid == pid {
 			return window
 		}
 	}
@@ -110,7 +110,7 @@ fun overlappedWindow_detach(windowId UInt64) {
 	if firstResponder == windowId {
 		firstResponder = window.prevId
 
-		while windowsList[firstResponder].visible == false && firstResponder != 0 {
+		while windowsList[firstResponder].visible == false and firstResponder != 0 {
 			firstResponder = windowsList[firstResponder].prevId
 		}
 	}
@@ -221,9 +221,8 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	// TODO could be just `mouseDragWindow Window? = current` instead of getting by id, same for others
 	let window = windowsList[mouseDragWindow]
 
-	// TODO Hexa: `and` instead of `&&` here, btw `,`
 	// TODO disallow drag past taskbar + respect taskbar position on screen
-	if mouseDragCapturedWindow && window.present && window.visible {
+	if mouseDragCapturedWindow and window.present and window.visible {
 		let diffX = mouseX - mouseDragLastX
 		let diffY = mouseY - mouseDragLastY
 
@@ -246,7 +245,7 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	// TODO `else mouseDragCapturedWindow = false`?
 
 	// TODO Hexa: `not`
-	if !frameHoverWindowDown {
+	if not frameHoverWindowDown {
 		let _frameHoverWindow = frameHoverWindow
 		let _frameHoverState = frameHoverState
 
@@ -286,7 +285,7 @@ fun findWindowUnderCursor(mouseX Int16, mouseY Int16) UInt64 {
 
 		// TODO .visible? active etc?
 		if not window.minimized {
-			if mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy {
+			if mouseX >= x and mouseX <= xx and mouseY >= y and mouseY <= yy {
 				return windowId
 			}
 		}
@@ -326,7 +325,7 @@ fun isDraggableFrame(mouseX Int16, mouseY Int16, windowId UInt64) Bool {
 	let xx = x + window.width - frameButtonsWidth
 	let yy = y + frameHeight
 
-	if mouseX >= x && mouseX <= xx && mouseY >= y && mouseY <= yy {
+	if mouseX >= x and mouseX <= xx and mouseY >= y and mouseY <= yy {
 		return true
 	}
 
@@ -354,12 +353,12 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 		return
 	}
 
-	if firstResponder != 0 && firstResponder != topmostWindow {
+	if firstResponder != 0 and firstResponder != topmostWindow {
 		bringWindowToFront(firstResponder)
 		requestAnimationFrame()
 	}
 
-	if type == MouseActionType.LeftDown && isDraggableFrame(mouseX, mouseY, firstResponder) {
+	if type == MouseActionType.LeftDown and isDraggableFrame(mouseX, mouseY, firstResponder) {
 		if isDoubleClick {
 			// TODO send message to wapi
 			minimize(firstResponder) // TODO should actually maximize and normalize
@@ -373,7 +372,7 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 		mouseDragLastY = mouseY
 	}
 
-	if type == MouseActionType.LeftDown && frameHoverState != FrameHover.Noop {
+	if type == MouseActionType.LeftDown and frameHoverState != FrameHover.Noop {
 		frameHoverWindowDown = true
 		frameHoverWindowInsideButtonArea = true
  		// TODO Hexa: fun as st useless error `requestAnimationFrame` note lack of `()`
@@ -410,7 +409,7 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 		let hover = getFrameButton(mouseX, mouseY, frameHoverWindow)
 		let window = windowsList[frameHoverWindow]
 
-		if hover == frameHoverState && window.present {
+		if hover == frameHoverState and window.present {
 			if frameHoverState == FrameHover.Min {
 				// TODO send message to wapi
 				minimize(frameHoverWindow)
@@ -480,10 +479,10 @@ fun handleMouseActivity() {
 			}
 
 			handleMouseMove(mouseXtemp, mouseYtemp)
-		} else if (type == MouseActionType.LeftUp || type == MouseActionType.RightUp ||
+		} else if (type == MouseActionType.LeftUp or type == MouseActionType.RightUp or
 				   type == MouseActionType.MiddleUp) {
 			handleMouseUp(type, mouseXtemp, mouseYtemp)
-		} else if (type == MouseActionType.LeftDown || type == MouseActionType.RightDown ||
+		} else if (type == MouseActionType.LeftDown or type == MouseActionType.RightDown or
 				   type == MouseActionType.MiddleDown) {
 			handleMouseDown(type, mouseXtemp, mouseYtemp)
 		}
@@ -491,7 +490,7 @@ fun handleMouseActivity() {
 		mouseActions[i].type = MouseActionType.Noop
 	}
 
-	if !mouseActionsUseZeta {
+	if not mouseActionsUseZeta {
 		mouseActionsZetaAmount = 0
 	}
 	if mouseActionsUseZeta {
@@ -499,7 +498,7 @@ fun handleMouseActivity() {
 	}
 
 	// Atomically update
-	if mouseX != mouseXtemp || mouseY != mouseYtemp {
+	if mouseX != mouseXtemp or mouseY != mouseYtemp {
 		haveToRenderMouseCursor = true
 	}
 

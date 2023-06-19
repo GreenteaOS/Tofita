@@ -117,7 +117,7 @@ for task in ['tasks'] {
 							if fs.lstatSync(curPath).isDirectory() {
 								formatFolderRecursive(curPath)
 							} else {
-								if curPath.indexOf('external\\') == -1, curPath.endsWith('.c') || curPath.endsWith('.hpp') {
+								if curPath.indexOf('external\\') == -1, curPath.endsWith('.c') or curPath.endsWith('.hpp') {
 									files.push(curPath)
 								}
 							}

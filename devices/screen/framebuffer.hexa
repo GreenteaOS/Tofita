@@ -74,7 +74,7 @@ fun blend255(target UInt8, color UInt8, alpha UInt8) UInt8 {
 fun blendPixel(x Int64, y Int64, pixel Pixel32) {
 	// TODO make all values like `width` global and overwrite them on FB switch
 	// TODO taken ifs are faster?
-	if (x > Screen.widthMinusOne) || (y > Screen.heightMinusOne) || (x < 0) || (y < 0) {
+	if (x > Screen.widthMinusOne) or (y > Screen.heightMinusOne) or (x < 0) or (y < 0) {
 		return
 	}
 
@@ -94,14 +94,14 @@ fun blendPixel(x Int64, y Int64, pixel Pixel32) {
 fun setPixel(x Int64, y Int64, pixel ByValue<Pixel32>) {
 	// TODO Faster access `let width = s.w`?
 	// TODO taken ifs are faster?
-	/*if (x > Screen.widthMinusOne) || (y > Screen.heightMinusOne) || (x < 0) || (y < 0) {
+	/*if (x > Screen.widthMinusOne) or (y > Screen.heightMinusOne) or (x < 0) or (y < 0) {
 		return
 	}
 
 	Screen.pixels[y * Screen.width + x] = pixel    * / not closes comment
 	*/
 
-	if (x < Screen.width) && (y < Screen.height) && (x >= 0) && (y >= 0) {
+	if (x < Screen.width) and (y < Screen.height) and (x >= 0) and (y >= 0) {
 		Screen.pixels[y * Screen.width + x] = pixel
 		// TODO lol worse perf
 	}
@@ -160,7 +160,7 @@ fun drawRectangleOutline(color ByValue<Pixel32>, x Int16, y Int16, width UInt16,
 			// Rendering left and far right points sequentally should be
 			// better for cache-locality than vertical lines
 			// At least this is true for small rectangles (like buttons)
-			if yy == 0 || xx == 0 || xx == width - 1 || yy == height - 1 {
+			if yy == 0 or xx == 0 or xx == width - 1 or yy == height - 1 {
 				setPixel(x + xx, y + yy, color)
 			}
 		}

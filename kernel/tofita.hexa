@@ -142,8 +142,8 @@ fun kernelInit(params UefiPayload) {
 	}
 
 	// disablePic() TODO may be required before activation
-	if !ACPIParser.parse(params.acpiTablePhysical) {
 		quakePrintf("ACPI is *not* loaded\n".utf16())
+	if not ACPIParser.parse(params.acpiTablePhysical) {
 	} else {
 		quakePrintf("ACPI 2.0 is loaded and ready\n".utf16())
 	}

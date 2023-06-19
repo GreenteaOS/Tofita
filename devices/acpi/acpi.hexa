@@ -238,7 +238,7 @@ class ACPIParser {
 
 		for j in 8 {
 			var buffer ArrayByValue<UInt16, 2> = [0, 0]
-			buffer[0] = (y[j] == 0 || y[j] < 32) ? '?'.charCodeAt(0) as! UInt8 : x[j]
+			buffer[0] = (y[j] == 0 or y[j] < 32) ? '?'.charCodeAt(0) as! UInt8 : x[j]
 			buffer[1] = 0 as! UInt8
 			serialPrint(String.fromUTF16z(buffer.ref as! ConstArrayPointer<UInt16>))
 		}

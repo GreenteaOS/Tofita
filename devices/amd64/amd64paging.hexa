@@ -249,7 +249,7 @@ fun findUserspaceMemory(
 	var pageFirstByte = virtualAddr == 0? 4096u64 : virtualAddr
 	let cycle = virtualAddr == 0
 
-	while cycle && pageFirstByte < upperBound {
+	while cycle and pageFirstByte < upperBound {
 		var found = 0u64
 		let result = pageFirstByte
 		// TODO create isMapped function

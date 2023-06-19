@@ -521,7 +521,7 @@ fun compositeWindows() {
 			continue
 		}
 
-		if i != 0 && window.present && window.visible && not window.minimized, defaultSession.desktopPeek {
+		if i != 0 and window.present and window.visible and not window.minimized, defaultSession.desktopPeek {
 			let color = new ByValue<Pixel32>()
 			color.ref.color = 0xAAAAAAAAu32
 			color.ref.rgba.ref.a = 64u8
@@ -530,7 +530,7 @@ fun compositeWindows() {
 		}
 
 		// TODO better use max int or whatever instead of 0 for desktop window/others
-		if i != 0 && window.present && window.visible && not window.minimized, not defaultSession.desktopPeek {
+		if i != 0 and window.present and window.visible and not window.minimized, not defaultSession.desktopPeek {
 			let hover = frameHoverWindow == i ? frameHoverState : FrameHover.Noop
 
 			drawWindowFrame(
@@ -552,7 +552,7 @@ fun compositeWindows() {
 			let frameHeight Int16 = 30 + 3i16
 			let frameWidth Int16 = 1i16
 
-			if window.fbZeta != null && window.fbGama != null {
+			if window.fbZeta != null and window.fbGama != null {
 
 				drawBitmap32(window.fbCurrentZeta ? window.fbZeta : window.fbGama, window.x + frameWidth,
 							 window.y + frameHeight)

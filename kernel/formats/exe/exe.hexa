@@ -286,7 +286,7 @@ class ExeLoader<SIZE, HEADER> {
 
 			var i UInt16 = 0
 			while true {
-				if (list.name[i] == name[i]) && (name[i] as! Int == 0) {
+				if (list.name[i] == name[i]) and (name[i] as! Int == 0) {
 					serialPrintf("[getProcAddress] import {%s} resolved to {%s}\n", name, list.name)
 					return list
 					break

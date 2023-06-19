@@ -26,7 +26,7 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 		// TODO Note: temporal page must be kernel-only for read and write to avoid
 		// other user *threads* accessing it
 		// TODO if page is zero just step over to next instruction? except of conditional mov
-		if !probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
+		if not probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
 			return false
 		}
 
@@ -36,7 +36,7 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 		// TODO not that (ptr + size) should be saturating add, to not wrap around,
 		// cause otherwise it will be again under <lower and pass checks for
 		// user memory pointer validity, but be pointing at kernel memory
-		if !probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
+		if not probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
 			return false
 		}
 
@@ -88,14 +88,14 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 	}
 
 	if syscall == TofitaSyscalls.GetOrCreateWindowFramebuffer {
-		if !probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
+		if not probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
 			return false
 		}
 
 		let payload = frame.rdxArg1 as! SwapWindowFramebufferPayload
 
 		// TODO probeForWriteOkay alias taking pointer probeForWriteAtOkay
-		if !probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
+		if not probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
 			return false
 		}
 

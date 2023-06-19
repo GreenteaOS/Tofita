@@ -17,7 +17,7 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 	@volatile var frame = process.frame
 
 	if syscall == TofitaSyscalls.CreateWindowEx {
-		if !probeForReadOkay(frame.rdxArg1, sizeOf<CreateWindowExPayload>()) {
+		if not probeForReadOkay(frame.rdxArg1, sizeOf<CreateWindowExPayload>()) {
 			return false
 		}
 
@@ -63,7 +63,7 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 
 	if syscall == TofitaSyscalls.ShowWindow {
 		// TODO merge to probeForReadAndConvert os it takes <T> and returns nullable for `if let`
-		if !probeForReadOkay(frame.rdxArg1, sizeOf<ShowWindowPayload>()) {
+		if not probeForReadOkay(frame.rdxArg1, sizeOf<ShowWindowPayload>()) {
 			return false
 		}
 
@@ -86,7 +86,7 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 	// ^ just multi-inherit multiple enums
 	if syscall == TofitaSyscalls.GetMessage {
 		// TODO pointers should be validated to be not within kernel space!
-		if !probeForWriteOkay(frame.rdxArg1, sizeOf<GetMessagePayload>()) {
+		if not probeForWriteOkay(frame.rdxArg1, sizeOf<GetMessagePayload>()) {
 			// TODO wrote here %S instead of %8 and it crashed, must think about such safety
 			// serialPrintf("<> GetMessage frame.rdxArg1 probe fail %8\n", frame.rdxArg1)
 			return false
@@ -108,7 +108,7 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 	}
 
 	if syscall == TofitaSyscalls.PostMessage {
-		if !probeForReadOkay(frame.rdxArg1, sizeOf<PostMessagePayload>()) {
+		if not probeForReadOkay(frame.rdxArg1, sizeOf<PostMessagePayload>()) {
 			return false
 		}
 

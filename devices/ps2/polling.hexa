@@ -34,12 +34,12 @@ fun pollPS2Devices() UInt8 {
 
 	while getBit(poll, 0) == 1 {
 		// Mouse has higher priority
-		while getBit(poll, 0) == 1 && getBit(poll, 5) == 1 {
+		while getBit(poll, 0) == 1 and getBit(poll, 5) == 1 {
 			handleMousePacket()
 			poll = readPS2()
 		}
 
-		if getBit(poll, 0) == 1 && getBit(poll, 5) == 0 {
+		if getBit(poll, 0) == 1 and getBit(poll, 5) == 0 {
 			handleKeyboardPacket()
 			poll = readPS2()
 		}
