@@ -605,7 +605,7 @@ fun composite(startupMilliseconds UInt64) {
 
 	// TODO not inferred properly?
 	// for file in desktopFilesList as! [String] {
-	for i in desktopFilesList.length {
+	for i in desktopShortcuts.length {
 		// TODO Hexa: `let file = desktopFilesList[i]` [ ] must return T? not T
 		let shortcut = desktopShortcuts[i]
 		let xu = shortcut.rectangle.relativeX

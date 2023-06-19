@@ -107,7 +107,7 @@ class GraphicalSession {
 		if event == ColliderEventType.MouseUp {
 			showStart = false
 			showTray = false
-			if let shortcut = desktopShortcuts[id] as! Shortcut? {
+			if let shortcut = startShortcuts[id] as! Shortcut? {
 				openFile(shortcut.file, shortcut.displayName)
 			}
 			requestAnimationFrame()

@@ -84,12 +84,36 @@ fun quakeHandleButtonDown(key UInt8) {
 			justBlur = not justBlur
 			// TODO sync to avoid race conditions
 			setWallpaper(wallpaperSource, WallpaperStyle.Center)
+		} else if quakeCommand == 'exe' {
+			var index UInt64 = 0
+			while index < processes.length {
+				let process = processes[index]
+				index++
+
+				if process == null {
+					continue
+				}
+
+				if process.present != true {
+					continue
+				}
+
+				quakePrintf("%S pid:%d threads:%d syscall:%d ~#rip:%8 is64bit:%d\n".utf16(),
+					process.name.utf16(),
+					process.pid,
+					1, // TODO
+					process.syscallToHandle,
+					process.frame.ip,
+					process.is64bit
+				)
+			}
 		} else if quakeCommand == 'help' {
 			quakePrintf("Hit `~` to show/hide this terminal at any time. At least those commands available:\n".utf16())
 			quakePrintf("dark - set the dark theme\n".utf16())
 			quakePrintf("light - set the light theme\n".utf16())
 			quakePrintf("blur - set alternative theme with slightly different aesthetics\n".utf16())
 			quakePrintf("gdt - dump Global Descriptor Table\n".utf16())
+			quakePrintf("exe - show running processes\n".utf16())
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
 		} else if quakeCommand == 'apt-get moo' or quakeCommand == "cowsay" {
