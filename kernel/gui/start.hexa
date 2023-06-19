@@ -34,7 +34,7 @@ class StartMenu {
 			let shortcut = startShortcuts[i]
 			let rectangle = shortcut.rectangle
 
-			rectangle.relativeX = xu
+			rectangle.relativeX = xu - x
 			rectangle.relativeY = yu - 2 + 24 - y
 			rectangle.width = 76i16
 			rectangle.height = 78i16

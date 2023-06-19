@@ -958,10 +958,10 @@ fun composite(startupMilliseconds UInt64) {
 		let w = 640u16
 		// TODO should fit into 720p
 		let h = 730u16
-		// TODO centered mode
-		let x = 0i16
-		// TODO gap above taskbar in centered mode
-		let y = taskbarY - h
+		let x Int16 = Theme.centeredStart?
+			(defaultSession.popupZone.width / 2i16) - (w / 2i16) : 0i16
+		// Gap above taskbar in centered mode
+		let y = taskbarY - h - (Theme.centeredStart? 12i16 : 0i16)
 		drawVibrancedRectangle(x, y as! Int16, w, h, darkTheme)
 		// TODO probably `w - 2` to avoid some overdraw?
 		color.ref.color = 0x44444444u32
@@ -1062,15 +1062,15 @@ fun composite(startupMilliseconds UInt64) {
 
 				defaultSession.startUser.relativeX = 0
 				var i = 1i16
-				defaultSession.startPower.relativeX = x + w - 48 * i - iconOffset
+				defaultSession.startPower.relativeX = w - 48 * i - iconOffset
 				i++
-				defaultSession.startSettings.relativeX = x + w - 48 * i - iconOffset
+				defaultSession.startSettings.relativeX = w - 48 * i - iconOffset
 				i++
-				defaultSession.startHome.relativeX = x + w - 48 * i - iconOffset
+				defaultSession.startHome.relativeX = w - 48 * i - iconOffset
 				i++
-				defaultSession.startGallery.relativeX = x + w - 48 * i - iconOffset
+				defaultSession.startGallery.relativeX = w - 48 * i - iconOffset
 				i++
-				defaultSession.startDownloads.relativeX = x + w - 48 * i - iconOffset
+				defaultSession.startDownloads.relativeX = w - 48 * i - iconOffset
 				defaultSession.startUser.width = defaultSession.startDownloads.relativeX
 
 				// TODO user pic
@@ -1080,15 +1080,15 @@ fun composite(startupMilliseconds UInt64) {
 
 				// Shortcuts
 				highlight(defaultSession.startPower)
-				drawBitmap32WithAlpha(startPowerIcon, defaultSession.startPower.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startPowerIcon, x + defaultSession.startPower.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
 				highlight(defaultSession.startSettings)
-				drawBitmap32WithAlpha(startGearIcon, defaultSession.startSettings.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startGearIcon, x + defaultSession.startSettings.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
 				highlight(defaultSession.startHome)
-				drawBitmap32WithAlpha(startFilesIcon, defaultSession.startHome.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startFilesIcon, x + defaultSession.startHome.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
 				highlight(defaultSession.startGallery)
-				drawBitmap32WithAlpha(startGalleryIcon, defaultSession.startGallery.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
+				drawBitmap32WithAlpha(startGalleryIcon, x + defaultSession.startGallery.relativeX + iconOffset, y + userPanelHeight / 2 - 16i16)
 				highlight(defaultSession.startDownloads)
-				drawBitmap32WithAlpha(startDownloadsIcon, defaultSession.startDownloads.relativeX + iconOffset, y + userPanelHeight / 2 - 18i16)
+				drawBitmap32WithAlpha(startDownloadsIcon, x + defaultSession.startDownloads.relativeX + iconOffset, y + userPanelHeight / 2 - 18i16)
 
 				color.ref.color = 0xFFFFFFFFu32
 				let welcome = "Hello, dear User"
