@@ -195,18 +195,6 @@ fun kernelInit(params UefiPayload) {
 	{
 		// TODO must error `sizeOf(processes)`
 		// processes[0] = new TofitaProcess()
-		for i in 256 {
-			let process = new TofitaProcess()
-			process.frame = new InterruptFrame()
-			if i == 0 {
-				appendProcess(process)
-			}
-
-			process.present = false
-			process.schedulable = false
-			process.name = "Empty"
-			process.syscallToHandle = TofitaSyscalls.Noop
-		}
 		// TODO optimizer: set Array.capacity to 256 upfront cause known value `for i in 256 { arr[i] =`
 
 		// TODO this is entirely useless
@@ -217,10 +205,12 @@ fun kernelInit(params UefiPayload) {
 			windowsList[i] = window
 		}
 
-		var idle: TofitaProcess = processes[0] // TODO new!!! not preallocated
 		// TODO make a kernel a process too with ultimate priority
 		// TODO process.name = "Tofita"
 		// TODO idle process must have NxN threads, thread per CPU core?
+		let idle TofitaProcess = new TofitaProcess()
+		appendProcess(idle)
+		idle.frame = new InterruptFrame()
 		idle.pml4 = pml4entries // Save CR3 template to idle process
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
@@ -232,15 +222,22 @@ fun kernelInit(params UefiPayload) {
 	}
 
 	// GUI
-	if false {
 	// TODO should be done at main thread
 	// TODO use some kind of autorun.ini asset
+	if true {
+		for i in 3
 		{
 			let guiProcess TofitaProcess = processCreate()
 			serialPrintf("<Tofita> GUI process ID == %u\n", guiProcess.pid)
 			processInit(guiProcess)
 			disableSerial = 1
 			// TODO `@defer disableSerial = 0` <- `@` must have the lowest priority?
+			if i == 1 {
+				loadExeIntoProcess("desktop/wndapp32.exe", guiProcess)
+			} else {
+				loadExeIntoProcess("desktop/wndapp.exe", guiProcess)
+			}
+
 			disableSerial = 0
 			// TODO loadExeIntoProcess(""root/Windows/GreenteaGUI.exe", guiProcess)
 			guiProcess.name = "Greentea OS GUI"
