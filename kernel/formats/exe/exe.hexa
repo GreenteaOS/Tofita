@@ -81,7 +81,12 @@ class ExeLoader<SIZE, HEADER> {
 		let env = is64bit? "C:\\Windows\\System32\\" : "C:\\Windows\\SysWOW64\\"
 		let fullPath = env + @hide name // TODO dedup `//` and normalize `/` to `\`
 		// TODO Note: `@hide name` should disallow erroneus usage of `name` instead of `fullPath`
+		/*if not is64bit {
+			let name = "C:\\Windows\\SysWOW64\\" + name
+			return loadPe(name, root, exec)
+		}
 		let name = "C:\\Windows\\System32\\" + name
+		return loadPe(name, root, exec)*/
 		return loadPe(fullPath, root, exec)
 	}
 
@@ -271,7 +276,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
 	// may be moved between versions.
 	// Search only selected .dll only within the user provided dlls
-	fun getProcAddress(name ConstArrayPointer<UInt8>, root PeExportLinkedList) PeExportLinkedList {
+	fun getProcAddress(name ConstArrayPointer<UInt8>, root PeExportLinkedList) PeExportLinkedList? {
 		var list PeExportLinkedList = root
 		// TODO make it intrusive list
 		// TODO compute crc for faster .dll import names lookup
@@ -348,15 +353,20 @@ class ExeLoader<SIZE, HEADER> {
 						// func = null // TODO This should error
 						func = 0
 
-						var proc PeExportLinkedList = getProcAddress(szImportName, root)
+						let proc PeExportLinkedList? = getProcAddress(szImportName, root)
 
-						if proc != null {
+						if let proc = proc {
 							func = proc.ptr as! SIZE
 						} else {
 							// Set stub to avoid simple crash
 							// TODO `tofitaStdStub`
 							// TODO separate placeholders for std call etc
-							func = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root).ptr as! SIZE
+							// TODO cache the bytes!
+							if let placeholder = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root) {
+								func = placeholder.ptr as! SIZE
+							} else {
+								serialPrintf("[resolveDllImports] placeholder for {%s} is unresolved\n", szImportName)
+							}
 						}
 					}
 
@@ -504,13 +514,16 @@ class ExeLoader<SIZE, HEADER> {
 			(startup as! UInt64) - wholePhysicalStart,
 			1,
 			accessibleByUser: true
-		)
+		) /* TODO ?? {
+			unMap()
+			return // <- here guard returns from a block, not immediately `?? return`
+		} Hexa */
 
 		process.frame.ip = ntdll.entry // Contains crt0
 		process.frame.sp = app.stackVirtual
 		process.frame.rcxArg0 = whereStartup // First argument
 		// TODO merge all to one argument (single structure)
-		// TODO unmap zero page to cause NPE
+		// TODO unMap zero page to cause NPE
 	}
 }
 
