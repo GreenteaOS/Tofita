@@ -107,6 +107,9 @@ fun quakeHandleButtonDown(key UInt8) {
 					process.is64bit
 				)
 			}
+		} else if quakeCommand == 'verbose' {
+			Theme.verbose = not Theme.verbose
+			quakePrintf("Command completed. You may now open any .exe and check the output.\n".utf16())
 		} else if quakeCommand == 'help' {
 			quakePrintf("Hit `~` to show/hide this terminal at any time. At least those commands available:\n".utf16())
 			quakePrintf("dark - set the dark theme\n".utf16())
@@ -114,6 +117,7 @@ fun quakeHandleButtonDown(key UInt8) {
 			quakePrintf("blur - set alternative theme with slightly different aesthetics\n".utf16())
 			quakePrintf("gdt - dump Global Descriptor Table\n".utf16())
 			quakePrintf("exe - show running processes\n".utf16())
+			quakePrintf("verbose - print details when .exe is loaded\n".utf16())
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
 		} else if quakeCommand == 'apt-get moo' or quakeCommand == "cowsay" {

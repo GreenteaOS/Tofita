@@ -76,6 +76,9 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO error if not found
 	// TODO more PATH support
 	fun loadDll(name String, root PeExportLinkedList, exec Executable) PeInterim {
+		if Theme.verbose {
+			quakePrintf("[loadDll] loading {%S}\n".utf16(), name.utf16())
+		}
 		// TODO simple size ofs should be evaluated at normalizer to exclude ifs
 		let is64bit = sizeOf<SIZE>() == 8
 		let env = is64bit? "C:\\Windows\\System32\\" : "C:\\Windows\\SysWOW64\\"
@@ -307,6 +310,7 @@ class ExeLoader<SIZE, HEADER> {
 	fun resolveDllImports(pei PeInterim, root PeExportLinkedList) {
 		var buffer UInt64 = pei.base
 		var imageDataDirectory = pei.imageDataDirectory
+		var unresolved = 0
 
 		// Imports
 		{
@@ -364,9 +368,23 @@ class ExeLoader<SIZE, HEADER> {
 							// TODO cache the bytes!
 							if let placeholder = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root) {
 								func = placeholder.ptr as! SIZE
+								if Theme.verbose and unresolved < 2 {
+									quakePrintf("[resolveDllImports] using placeholder for {%s}\n".utf16(), szImportName)
+								}
+								if Theme.verbose and unresolved == 2 {
+									quakePrintf("[resolveDllImports] similar messages will be hidden\n".utf16(), szImportName)
+								}
 							} else {
 								serialPrintf("[resolveDllImports] placeholder for {%s} is unresolved\n", szImportName)
+								if Theme.verbose and unresolved < 2 {
+									quakePrintf("[resolveDllImports] placeholder for {%s} is unresolved\n".utf16(), szImportName)
+								}
+								if Theme.verbose and unresolved == 2 {
+									quakePrintf("[resolveDllImports] similar messages will be hidden\n".utf16(), szImportName)
+								}
 							}
+
+							unresolved++
 						}
 					}
 
@@ -528,6 +546,9 @@ class ExeLoader<SIZE, HEADER> {
 }
 
 fun loadExeIntoProcess(file String, process TofitaProcess) {
+	if Theme.verbose {
+		quakePrintf("[loadExeIntoProcess] loading {%S}\n".utf16(), file.utf16())
+	}
 	{
 		let root =
 			PhysicalAllocator.allocateBytes(sizeOf<PeExportLinkedList>()) as! PeExportLinkedList
@@ -544,7 +565,16 @@ fun loadExeIntoProcess(file String, process TofitaProcess) {
 
 		// TODO fix in codegen `if ExeLoader.is64(asset) {` for `static fun` of generic class
 		// TODO `if ExeLoader<UInt64, Pe64OptionalHeader>.is64(asset) {`
-		if is64Exe(asset) {
+		let is64 = is64Exe(asset)
+		if Theme.verbose {
+			if is64 {
+				quakePrintf("[loadExeIntoProcess] process is 64 bit\n".utf16())
+			} else {
+				quakePrintf("[loadExeIntoProcess] process is 32 bit\n".utf16())
+			}
+		}
+
+		if is64 {
 			let loader = new ExeLoader<UInt64, Pe64OptionalHeader>()
 			let app = loader.loadExe(asset, root, exec)
 			loader.loadRelatedDLLsAndMapIntoProcess(app, root, exec, process)
