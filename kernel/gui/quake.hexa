@@ -93,6 +93,9 @@ fun quakeHandleButtonDown(key UInt8) {
 			justBlur = not justBlur
 			// TODO sync to avoid race conditions
 			setWallpaper(wallpaperSource, WallpaperStyle.Center)
+		} else if quakeCommand == 'center' {
+			Theme.centeredStart = not Theme.centeredStart
+			quakePrintf("Command completed.\n".utf16())
 		} else if quakeCommand == 'fast' {
 			Theme.fast = not Theme.fast
 			quakePrintf("Command completed.\n".utf16())
@@ -139,6 +142,7 @@ fun quakeHandleButtonDown(key UInt8) {
 			quakePrintf("gdt - dump Global Descriptor Table\n".utf16())
 			quakePrintf("exe - show running processes\n".utf16())
 			quakePrintf("verbose - print details when .exe is loaded\n".utf16())
+			quakePrintf("center - toggle centered Start menu\n".utf16())
 			quakePrintf("wallpaper - set alternative wallpaper\n".utf16())
 			quakePrintf("fast - faster screen rendering method\n".utf16())
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
