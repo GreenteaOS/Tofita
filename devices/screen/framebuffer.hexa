@@ -94,11 +94,17 @@ fun blendPixel(x Int64, y Int64, pixel Pixel32) {
 fun setPixel(x Int64, y Int64, pixel ByValue<Pixel32>) {
 	// TODO Faster access `let width = s.w`?
 	// TODO taken ifs are faster?
-	if (x > Screen.widthMinusOne) || (y > Screen.heightMinusOne) || (x < 0) || (y < 0) {
+	/*if (x > Screen.widthMinusOne) || (y > Screen.heightMinusOne) || (x < 0) || (y < 0) {
 		return
 	}
 
-	Screen.pixels[y * Screen.width + x] = pixel
+	Screen.pixels[y * Screen.width + x] = pixel    * / not closes comment
+	*/
+
+	if (x < Screen.width) && (y < Screen.height) && (x >= 0) && (y >= 0) {
+		Screen.pixels[y * Screen.width + x] = pixel
+		// TODO lol worse perf
+	}
 }
 
 fun drawBitmap32WithAlpha(bitmap Bitmap32, x Int16, y Int16) {
@@ -109,10 +115,25 @@ fun drawBitmap32WithAlpha(bitmap Bitmap32, x Int16, y Int16) {
 	}
 }
 
-	for yy in bitmap.height {
-		for xx in bitmap.width {
-			setPixel(x + xx, y + yy, bitmap.pixels[yy * bitmap.width + xx])
 fun drawBitmap32(bitmap Bitmap32, x Int16, y Int16) {
+	let yStart = y < 0? -y : 0
+	let xStart = x < 0? -x : 0
+	// TODO actually use UInt16 for bitmap dimensions for speed everywhere
+	// ^ fix int upcast first
+
+	if yStart >= bitmap.height or xStart >= bitmap.width {
+		return
+	}
+
+	for yy in (yStart as! UInt32)...bitmap.height {
+		let stride = yy * bitmap.width
+		let screenStride = (y + yy) * Screen.width
+		for xx in (xStart as! UInt32)...bitmap.width {
+			// TODO save scanline check to Bool and evaluate eagerly
+			if x + xx > Screen.widthMinusOne or y + yy > Screen.heightMinusOne {
+				continue
+			}
+			Screen.pixels[screenStride + x + xx] = bitmap.pixels[stride + xx]
 		}
 	}
 }
