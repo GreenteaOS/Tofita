@@ -18,6 +18,7 @@
 
 var quakeHeight UInt8 = 255 // TODO `256` better error message aka too large to fit
 var quakeCommand String = ""
+var quakePreviousCommand String = "help"
 // `var quakeLines [String] = [0]` // TODO `= [0]` not valid type
 var quakeLines [String] = []
 // TODO `= []` is inferred as `Array_$Any_$new_(0);`
@@ -50,9 +51,16 @@ fun quake() {
 }
 
 fun quakeHandleButtonDown(key UInt8) {
-	serialPrintf("quakeHandleButtonDown %d\n", key)
+	// Up Arrow
+	if key == 72 {
+		quakeCommand = quakePreviousCommand
+		// TODO drop `quakeCommandSize`
+		quakeCommandSize = quakeCommand.length as! UInt8
+		requestAnimationFrame()
+		return
+	}
+
 	if keyboardMap[key] == null or keyboardMap[key].length == 0 {
-		serialPrintf("quakeHandleButtonDown null\n")
 		return
 	}
 
@@ -65,6 +73,7 @@ fun quakeHandleButtonDown(key UInt8) {
 		quakePrintf("> ".utf16())
 		quakePrintf(quakeCommand.utf16())
 		quakePrintf("\n".utf16())
+		quakePreviousCommand = quakeCommand
 
 		if quakeCommand == 'gdt' {
   			let gdt = gdtTemplate as! ArrayPointer<ByValue<GdtDescriptorEx>>
@@ -130,6 +139,7 @@ fun quakeHandleButtonDown(key UInt8) {
 			quakePrintf("wallpaper - set alternative wallpaper\n".utf16())
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
+			quakePrintf("Press UP to re-enter the last command\n".utf16())//
 		} else if quakeCommand == 'apt-get moo' or quakeCommand == "cowsay" {
 			// TODO print last command as `> %S`
 			quakePrintf('                 (__)
@@ -162,11 +172,9 @@ fun quakeHandleButtonDown(key UInt8) {
 			if quakeCommandSize < 255 {
 				// quakeCommand += keyboardMap[key]
 				quakeCommand = quakeCommand + char
-				serialPrintf("quake append\n")
 				quakeCommandSize++
 			}
 		}
-		serialPrintf("quake command is %S +%S %d\n", quakeCommand.utf16(), char.utf16(), charCode)
 	}
 
 	requestAnimationFrame()

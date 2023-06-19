@@ -51,7 +51,7 @@ let keyboardMap [String] = [
 	'', // 69 - Num lock
 	'', // Scroll Lock
 	'', // Home key
-	'', // Up Arrow
+	'', // 72 - Up Arrow
 	'', // Page Up
 	'-',
 	'', // Left Arrow
