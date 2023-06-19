@@ -27,7 +27,6 @@ fun mapPage(entry PageEntry, address UInt64, writeAllowed UInt8) {
 	entry.present = 1u64
 	entry.writeAllowed = (writeAllowed == 1) ? 1u64 : 0u64
 	entry.accessibleByAll = 0u64
-	// TODO all fields must be set to zero, filled by kernel later
 }
 
 fun mapPageHuge(entry PageEntry, address UInt64) {

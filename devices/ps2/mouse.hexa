@@ -63,7 +63,8 @@ fun pushMouseAction(type MouseActionType, mouseXdiff Int16 = 0, mouseYdiff Int16
 			// TODO compact mouse events on overflow like that:
 			// down->move->move->move->up
 			// becomes
-			// down->move->up or just filter-out all moves
+			// down->move->up or just filter-out all moves (nope! we must preserver click coordinate,
+			// thus save the latest move (sum of all moves like x1diff+x2diff+...+xN-diff))
 			return
 		}
 
@@ -137,7 +138,7 @@ fun handleMousePacket() {
 		mouseCycle = 0
 
 		// Ignore all state changes until message pool is ready
-		// Otherwise we will have situaion like DOWN-UP-UP instead of D-U-D-U
+		// Otherwise we will have situation like DOWN-UP-UP instead of D-U-D-U
 		if mouseActionsUseZeta && mouseActionsZetaAmount == mouseActionsLimit {
 			// TODO break
 		}

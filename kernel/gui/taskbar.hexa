@@ -43,6 +43,14 @@ class Taskbar {
 
 			// TODO and visible?
 			if window.present and fits {
+				//var rectangle = defaultSession.taskbarWindowList.children[0]
+				//for r in defaultSession.taskbarWindowList.children.length {
+				//	let rect = defaultSession.taskbarWindowList.children[r]
+				//	if rect.id == i {
+				//		// TODO Hexa: Yeah, could just use Array.find
+				//		rectangle = rect
+				//	}
+				//}
 				// TODO ellipsis
 				// TODO more windows - less width
 				// TODO measure default width

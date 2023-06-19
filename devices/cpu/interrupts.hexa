@@ -41,9 +41,9 @@ declare fun vmemcpy(@volatile dest ArrayPointer<UInt8>, @volatile src ConstArray
 
 // TODO @byValue
 @struct @packed @sizeOf(10)
-@rename('Idtr')
-@asIs
-declare
+// TODO @rename('Idtr')
+// TODO @asIs
+// TODO declare
 class Idtr {
 	var limit UInt16
 	var offset UInt64
@@ -189,9 +189,10 @@ let irq14 = 46u16
 let irq15 = 47u16
 
 @struct @packed @sizeOf(10)
-@asIs
-@rename('TablePtr')
-declare class TablePtr {
+// TODO @asIs
+// TODO @rename('TablePtr')
+// TODO declare
+class TablePtr {
 	var limit UInt16
 	var base UInt64
 	new ()

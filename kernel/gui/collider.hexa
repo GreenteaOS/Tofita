@@ -59,6 +59,7 @@ class ColliderRectangle {
 
 	/// Set this to `null` to indicate lack of hint, or function that lazily updates hint content
 	var hint (id UInt64) => String = null // TODO Hexa: nullable function type... `varName @nullable ()=>T`
+	// ^ `Null<(id UInt64) => String>`
 	// TODO hint within screen bounds and under/above mouse
 	static var showHintAfter UInt64 = 0
 	static var showHint (id UInt64) => String = null

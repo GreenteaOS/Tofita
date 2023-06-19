@@ -40,7 +40,7 @@ fun exceptionHandler(frame InterruptFrame) {
 		switchToKernelThread(frame)
 	} else if currentThread == ThreadKind.THREAD_KERNEL or currentThread == ThreadKind.THREAD_GUI {
 		// SEH
-		if sehProbe {
+		if isWithinSehProbe(frame.ip) {
 			frame.ip = sehReturnFalse as! UInt64
 			sehProbe = false
 			return

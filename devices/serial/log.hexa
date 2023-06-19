@@ -80,7 +80,8 @@ let b_uart_msr_dcd = (1 << 8)
 
 // TODO renaming not works
 @rename('kstrlen')
-fun kstrlen(data: ConstArrayPointer<UInt8>) {
+// TODO Hexa: infer return type earlier `fun kstrlen(data ConstArrayPointer<UInt8>) {`
+fun kstrlen(data ConstArrayPointer<UInt8>) UInt64 {
 	var r UInt64 = 0u64
 
 	while data[r] != 0 {

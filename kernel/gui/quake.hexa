@@ -68,7 +68,8 @@ fun quakeHandleButtonDown(key UInt8) {
 			quakePrintf("GDT was logged into serial\n".utf16())
 		} else
 		if quakeCommand == 're' or quakeCommand == 'reboot' {
-			//var start: InitKernel = upper as! InitKernel // TODO `= (InitKernel)` compiles
+			//quakePrintf("Doing hot reload. Note: this log may be persistent between hot reloads\n".utf16())
+			//var start InitKernel = upper as! InitKernel // TODO `= (InitKernel)` compiles
 			//start(paramsCache) // TODO pml4, stack
 		} else if quakeCommand == 'da' or quakeCommand == 'dark' { // TODO startsWith
 			// Dark theme

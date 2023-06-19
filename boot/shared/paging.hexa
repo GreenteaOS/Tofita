@@ -106,6 +106,7 @@ fun conventionalAllocateLargest(memoryMap UefiMemoryMap) {
 var conventionalOffset UInt64 = 0u64
 fun conventionalAllocateNext(bytes UInt64) UInt64 {
 	let result = conventionalOffset
+	let pageSize = pageSize as! UInt64 // TODO Hexa: is it needed?
 	let pages = bytes / pageSize // Math.floor
 	conventionalOffset += pages * pageSize
 	if (bytes - (pages * pageSize)) > 0 {
@@ -114,8 +115,9 @@ fun conventionalAllocateNext(bytes UInt64) UInt64 {
 	return result
 }
 
-	// TODO map with hugepages!!!
 fun mapFrameBuffer(@readonly fb FrameBuffer) {
 	// TODO map ALL with EPIC pages?
-	mapMemory(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u64, 1u8)
+	// TODO test huge pages on more hardware
+	// mapMemory(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u64, 1u8)
+	mapMemoryHuge(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u32)
 }
