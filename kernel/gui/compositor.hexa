@@ -1297,6 +1297,11 @@ fun copyDirtyToScreen(x Int16, y Int16, bottomX Int16, bottomY Int16) {
 
 /// Copy the back buffer to the native framebuffer
 fun copyToScreen() {
+	if Theme.fast {
+		copyToScreenFaster()
+		return
+	}
+
 	// On 64-bit platform registers are 64-bit,
 	// so lets copy two or more pixels at a time
 	let height = _framebuffer.height
@@ -1315,6 +1320,28 @@ fun copyToScreen() {
 		for x in width {
 			destination[x] = source[x]
 		}
+
+		source = ((source as! UInt64) + scanline) as! ArrayPointer<UInt64>
+		destination = ((destination as! UInt64) + pixelsPerScanLine) as! ArrayPointer<UInt64>
+	}
+}
+
+/// Copy the back buffer to the native framebuffer without buffering
+fun copyToScreenFaster() {
+	let height = _framebuffer.height
+	// Let's assume it is always dividable by 2
+	// TODO ^ add some stride to the Screen.fb itself to ensure this
+	// or make loop to copy rightmost pixels separately
+	let width = _framebuffer.width / 16
+	let scanline UInt64 = _framebuffer.width * 4
+	// TODO byte offset should respect bytes-per-pixel (may be 3?)
+	let pixelsPerScanLine UInt64 = _framebuffer.pixelsPerScanLine * 4
+	var source = (Screen.pixels as! UInt64) as! ArrayPointer<UInt64>
+	var destination = (_framebuffer.base as! UInt64) as! ArrayPointer<UInt64>
+
+	// TODO copy only dirty rect (at least cursor) (must be aligned to the stride too)
+	for y in height {
+		movntdq(source, destination, width)
 
 		source = ((source as! UInt64) + scanline) as! ArrayPointer<UInt64>
 		destination = ((destination as! UInt64) + pixelsPerScanLine) as! ArrayPointer<UInt64>

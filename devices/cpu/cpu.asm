@@ -427,3 +427,22 @@ rdtscTicks:
     or rax, rdx
     mov qword [rcx], rax
     ret
+
+; 64 bytes at a time, aligned by 16 bytes
+global movntdq_; from rcx, to rdx, loops r8
+movntdq_:
+.loop:
+	movdqa xmm0, [rcx]
+	movdqa xmm1, [rcx + 16]
+	movdqa xmm2, [rcx + 32]
+	movdqa xmm3, [rcx + 48]
+	movntdq [rdx], xmm0
+	movntdq [rdx + 16], xmm1
+	movntdq [rdx + 32], xmm2
+	movntdq [rdx + 48], xmm3
+
+	add rcx, 64
+	add rdx, 64
+	dec r8
+	jnz .loop
+	ret

@@ -117,6 +117,16 @@ declare fun pat(
 	value UInt64
 ) Void
 
+@customHeader('
+	void movntdq_(char* from, char* to, uint64_t loops);// { _movntdq(from, to); };
+	#define movntdq__(from, to, loops) movntdq_(from, to, loops)
+')
+@rename('movntdq__')
+declare fun movntdq(
+	//from UInt64,
+	//to UInt64
+) Void
+
 /*
 // TODO support `enum class` in hexa cpp codegen `enum class MSR : uint32_t {`
 enum MSR {

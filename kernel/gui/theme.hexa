@@ -15,6 +15,7 @@
 
 class Theme {
 	static var verbose = false
+	static var fast = false
 
 	new () {}
 }
