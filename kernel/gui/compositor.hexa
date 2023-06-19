@@ -159,6 +159,30 @@ fun setWallpaper(bitmap Bitmap32, style WallpaperStyle, preserveAspectRatio Bool
 	let hReciprocal = 1.0f32 / (upscale.height as! Float32)
 	let wReciprocal = 1.0f32 / (upscale.width as! Float32)
 
+	if justBlur {
+		for y in upscale.height as! UInt64 {
+			for x in upscale.width as! UInt64 {
+				let rgbaSource =
+					interpolatePixel(
+						downscale,
+						(x * wReciprocal) * downscale.width as! Float32, // TODO UInt32 is precise than Float32
+						(y * hReciprocal) * (downscale.height - 8) as! Float32
+					// TODO disallowed in C `).ref as! Pixel32`
+					// TODO disallowed in C `) as! ByValue<Pixel32>`
+					)
+
+				let rgbaSource = rgbaSource as! ByValue<Pixel32>
+
+				upscaleDark.pixels[y * upscale.width + x].ref.color = rgbaSource.ref.color
+				upscaleLight.pixels[y * upscale.width + x].ref.color = rgbaSource.ref.color
+			}
+		}
+
+		vibranceDark = upscaleDark
+		vibranceLight = upscaleLight
+		return
+	}
+
 	for y in upscale.height as! UInt64 {
 		for x in upscale.width as! UInt64 {
 			let rgbaSource =
@@ -665,6 +689,13 @@ fun composite(startupMilliseconds UInt64) {
 		30,
 		darkTheme
 	)
+
+	if justBlur {
+		color.ref.color = 0x126099FF
+		color.ref.rgba.ref.a = 128
+		lineHorizontalWithAlpha(color.ref, 0, _framebuffer.height - animationTaskbarY as! Int16, _framebuffer.width as! UInt16)
+		// TODO Hexa: lineHorizontal(color, 0, _framebuffer.height - animationTaskbarY as! Int16, _framebuffer.width as! UInt16)
+	}
 
 	let taskbarY = _framebuffer.height + 30 - animationTaskbarY * 2.0
 	let taskbarY = taskbarY as! Int16
