@@ -295,15 +295,15 @@ fun initializeCompositor() {
 	// Desktop
 
 	let b = new RamDiskAsset()
-	getRamDiskAsset(b, "root/Windows/Resources/Icons/trash-empty48.png")
+	getRamDiskAsset(b, "root/Windows/Resources/Icons/trash.png")
 	trashCan = loadPng32(b)
 
 	let c = new RamDiskAsset()
-	getRamDiskAsset(c, "root/Windows/Resources/Icons/notepad.ico_48x48.png")
+	getRamDiskAsset(c, "root/Windows/Resources/Icons/Beautiful/paper_3.png")
 	notepad48 = loadPng32(c)
 
 	let d = new RamDiskAsset()
-	getRamDiskAsset(d, "root/Windows/Resources/Icons/notepad.ico_16x16.png")
+	getRamDiskAsset(d, "root/Windows/Resources/Icons/Beautiful/paper_2_16.png")
 	notepad16 = loadPng32(d)
 
 	let e = new RamDiskAsset()
@@ -319,7 +319,7 @@ fun initializeCompositor() {
 	folder48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/folder48.png")
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/folder(1).png")
 	files48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
@@ -331,7 +331,7 @@ fun initializeCompositor() {
 	dll48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/app48.png")
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/app4.png")
 	app48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
