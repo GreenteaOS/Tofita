@@ -113,7 +113,7 @@ fun kernelInit(params UefiPayload) {
 	defaultSession.resize()
 
 	serialPrintln("<Tofita> quakePrintf(versionText.utf16())")
-	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " loaded and operational\n"
+	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " is loaded and operational\n"
 	quakePrintf(versionText.utf16())
 
 	// TODO enableLocalApic()
@@ -142,12 +142,13 @@ fun kernelInit(params UefiPayload) {
 	}
 
 	// disablePic() TODO may be required before activation
-		quakePrintf("ACPI is *not* loaded\n".utf16())
 	if not ACPIParser.parse(params.acpiTablePhysical) {
+		quakePrintf("ACPI is *not* loaded, probably incompatible motherboard or outdated BIOS\n".utf16())
 	} else {
 		quakePrintf("ACPI 2.0 is loaded and ready\n".utf16())
 	}
 
+	quakePrintf("\nHere you may toggle experimental features and see some internal information (for developers)\n".utf16())
 	quakePrintf("Enter 'help' for commands or press ~ to hide this window\n".utf16())
 
 	{
@@ -227,20 +228,22 @@ fun kernelInit(params UefiPayload) {
 	if true {
 		for i in 3
 		{
-			let guiProcess TofitaProcess = processCreate()
+			let guiProcess TofitaProcess = processCreate() // TODO just `new` and no `@struct`
 			serialPrintf("<Tofita> GUI process ID == %u\n", guiProcess.pid)
 			processInit(guiProcess)
 			disableSerial = 1
 			// TODO `@defer disableSerial = 0` <- `@` must have the lowest priority?
 			if i == 1 {
 				loadExeIntoProcess("desktop/wndapp32.exe", guiProcess)
+				guiProcess.name = "wndapp32.exe"
 			} else {
 				loadExeIntoProcess("desktop/wndapp.exe", guiProcess)
+				guiProcess.name = "wndapp.exe"
 			}
 
 			disableSerial = 0
 			// TODO loadExeIntoProcess(""root/Windows/GreenteaGUI.exe", guiProcess)
-			guiProcess.name = "Greentea OS GUI"
+			// TODO guiProcess.name = "Greentea OS GUI"
 			guiProcess.schedulable = true
 		}
 	}

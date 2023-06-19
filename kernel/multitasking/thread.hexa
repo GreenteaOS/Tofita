@@ -18,6 +18,26 @@ class TofitaThread {
 	/// Owner of the thread
 	var pid UInt64
 
+	/// Is it allowed to make this thread current
+	var schedulable Bool
+	// TODO combine booleans into bit/flag mask?
+
+	/// Should be false after creation
+	var scheduleOnNextTick Bool
+
+	/// CR3, should be page aligned
+	var pml4 ArrayPointer<ByValue<PageEntry>>
+
+	/// State
+	var frame InterruptFrame
+
+	/// Filled on #PF
+	var cr2PageFaultAddress UInt64
+
+	/// When syscall happens, thread halted and handled retroactively
+	/// in the kernel's event loop
+	var syscallToHandle TofitaSyscalls // = Noop if no actions required
+
 	new (owner UInt64) {
 		pid = owner
 	}

@@ -107,7 +107,7 @@ fun kernelThread() {
 						// TODO ^ rename to CpuException or something
 						process.present = false
 						serialPrintf("[[Cpu:PID %d]] rdx=%d\n", index, frame.rdxArg1)
-						quakePrintf("Process #%d force quit due to a CPU exception #%u\n".utf16(), index, frame.index)
+						quakePrintf("Process '%S' #%d force quit due to a CPU exception #%u\n".utf16(), process.name.utf16(), index, frame.index)
 
 						// Page fault
 						// TODO `switch`

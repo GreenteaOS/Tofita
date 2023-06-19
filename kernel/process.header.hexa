@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// TODO probably use Thread instead of TofitaProcess for easier scheduling & syscalls
+// TODO use Thread instead of TofitaProcess for easier scheduling & syscalls
 // and threads will have parentPID and that's
 // so we don't have linked list of threads per process
 @struct
@@ -35,8 +35,6 @@ class TofitaProcess {
 
 	// CR3, should be page aligned
 	@volatile var pml4 ArrayPointer<ByValue<PageEntry>>
-
-	// TODO 32-bit
 
 	// State
 	var frame InterruptFrame
