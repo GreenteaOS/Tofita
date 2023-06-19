@@ -30,14 +30,23 @@ function libc_free(void *addr) {
 
 void *libc_malloc(uint64_t size) {
 	// serialPrintf(L"[libc] libc_malloc of size %u\n", size);
-	return (void *)(kernelParams? PhysicalAllocator_$allocateBytes_(size) : /*PhysicalAllocator::allocateBytes(size)*/0);
+	return (void *)(PhysicalAllocator_$allocateBytes_(size));
+}
+
+function libc_memcpy(void *dest, const void *src, uint64_t n) {
+	const uint8_t *csrc = (uint8_t *)src;
+	uint8_t *cdest = (uint8_t *)dest;
+	for (int32_t i = 0; i < n; i++)
+		cdest[i] = csrc[i];
 }
 
 void *libc_realloc(void *addr, uint64_t size) {
-	// serialPrintf(L"[libc] libc_realloc %u of size %u\n", addr, size);
-
 	{
-		uint64_t result = kernelParams? PhysicalAllocator_$allocateBytes_(size) : /*PhysicalAllocator::allocateBytes(size)*/0;
+		uint64_t result = PhysicalAllocator_$allocateBytes_(size);
+		if (addr) {
+			libc_memcpy((void *)result, addr, size);
+		}
+		// TODO free
 		return (void *)result;
 	}
 }
@@ -67,13 +76,6 @@ int32_t libc_pow(int32_t a, int32_t n) {
 		n >>= 1;
 	}
 	return r;
-}
-
-function libc_memcpy(void *dest, const void *src, uint64_t n) {
-	const uint8_t *csrc = (uint8_t *)src;
-	uint8_t *cdest = (uint8_t *)dest;
-	for (int32_t i = 0; i < n; i++)
-		cdest[i] = csrc[i];
 }
 
 function memcpy(void *dest, const void *src, uint64_t n) {
