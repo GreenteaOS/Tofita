@@ -75,31 +75,41 @@ fun getTextAdvance(text String) UInt16 {
 	return xx as! UInt16
 }
 
-	var textChar: TextFontList = textFontList[c as! Int].ref
 fun drawChar(c UInt8, x Float, y Int16, color Pixel32) Float {
+	let textChar = textFontList[c as! Int].ref
 	// TODO parses `let textChar textChar.ref`
 
-	let xx: Int16 = (x + 0.5) as! Int32 as! Int16
+	let xx Int16 = (x + 0.5) as! Int32 as! Int16
 	let w UInt8 = (textChar.width + 0.5) as! Int32 as! UInt8
 	let screenWidth = Screen.width
 	let screenHeight = Screen.height
+	let textFontBitmapPixels = textFontBitmap.pixels
+	let color = color.rgba.ref
+	let r = color.r
+	let g = color.r
+	let b = color.r
 
 	for yi in 12 {
+		let scanline = (textChar.y + yi) * textFontBitmap.width
 		for xi in w {
 			let atx Int32 = xx + xi
 			let aty Int32 = y + yi
 
+			let offset = aty * screenWidth + atx
 
 			if atx >= screenWidth or atx < 0 or aty >= screenHeight or aty < 0 {
 				continue
 			}
-			let font: Pixel32 =
-				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
+			let font =
+				textFontBitmapPixels[scanline + (textChar.x + xi)].ref.rgba.ref
 
-			var p: Pixel32 = _pixels[aty * _framebuffer.width + atx].ref
-			p.rgba.ref.r = blend255(p.rgba.ref.r, color.rgba.ref.r, font.rgba.ref.r)
-			p.rgba.ref.g = blend255(p.rgba.ref.g, color.rgba.ref.g, font.rgba.ref.g)
-			p.rgba.ref.b = blend255(p.rgba.ref.b, color.rgba.ref.b, font.rgba.ref.b)
+			let pValue = Screen.pixels[offset]
+			let p = pValue.ref.rgba
+			// TODO p.r is actually p.b so maybe blend r<->b?
+			p.ref.r = blend255(p.ref.r, r, font.r)
+			p.ref.g = blend255(p.ref.g, g, font.g)
+			p.ref.b = blend255(p.ref.b, b, font.b)
+			Screen.pixels[offset].ref.rgba = p
 			// TODO `no known conversion from 'Pixel32_ *' to 'const Pixel32_'`
 			// `_pixels[aty * _framebuffer.width + atx] = p`
 		}
@@ -136,7 +146,8 @@ fun drawAlphaChar(c UInt8, x Float, y Int16, color Pixel32) Float {
 			let font Pixel32 =
 				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
 
-			let p = _pixels[aty * _framebuffer.width + atx]
+			// Note: pixelsPerScanLine not width
+			let p = _pixels[aty * _framebuffer.pixelsPerScanLine + atx]
 			let p Pixel32 = p.ref
 			p.rgba.ref.r = blend255(p.rgba.ref.r, color.rgba.ref.r, font.rgba.ref.r)
 			p.rgba.ref.g = blend255(p.rgba.ref.g, color.rgba.ref.g, font.rgba.ref.g)
@@ -209,8 +220,12 @@ fun drawTextBox(text String, x Float, y Int16, color Pixel32, w UInt16, h UInt16
 
 	var end = xx + w - ellipsisWidth
 
+	// TODO compare for `length` not `255 * 255`
+	// TODO take pointer to `.utf16`
 	var previousCode = 0u16
 
+	// TODO bad code gen cause optional->u16 `while (text.charCodeAt(i) as! UInt16) != 0 && i < 255 * 255 {`
+	// TODO same `while text.charCodeAt(i) != 0 && i < 255 * 255 {`
 	while text.utf16()[i] as! UInt16 != 0 and i < 255 * 255 {
 		let code = (text.charCodeAt(i) as! UInt16) & 0xFF as! UInt8
 		if xx + getCharAdvance(code) > end {
@@ -282,4 +297,17 @@ fun drawShadowText(text String, x Float, y Int16, w UInt16, primaryColor Pixel32
 
 	// Primary text
 	drawTextBox(text, x + offset, y, primaryColor, w, 32u16, true, alpha: false)
+//	// TODO `while let char = .charCodeAt(i)`
+//	while text[i] as! UInt16 != 0 && i < 255 * 255 {
+//		var ch UInt8 = text[i] as! UInt8
+//		// TODO charCodeAt return zero? oh wait, `while let` checks for null!
+//
+//		drawAlphaChar(ch, xx + 1, y + 1i16, color)
+//		drawAlphaChar(ch, xx + 1, y + 2i16, color)
+//
+//		drawAlphaChar(ch, xx - 1, y + 1i16, color)
+//		xx += drawAlphaChar(ch, xx - 1, y + 2i16, color)
+//
+//		i++
+//	}
 }
