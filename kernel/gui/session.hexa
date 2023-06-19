@@ -98,6 +98,8 @@ class GraphicalSession {
 			loadExeIntoProcess(file, newProcess)
 			newProcess.name = displayName
 			newProcess.schedulable = true
+		} if file == "*:quake" {
+			haveToQuake = true
 		} else {
 			// TODO
 		}
@@ -117,10 +119,9 @@ class GraphicalSession {
 	fun desktopShortcutHandle(id UInt64, event ColliderEventType) Void {
 		if isDoubleClick, event == ColliderEventType.MouseDown {
 			if let shortcut = desktopShortcuts[id] as! Shortcut? {
-				if shortcut.file.endsWith(".exe") {
-					openFile(shortcut.file, shortcut.displayName)
-				}
+				openFile(shortcut.file, shortcut.displayName)
 			}
+			requestAnimationFrame()
 		}
 	}
 
@@ -519,6 +520,10 @@ fun hintOfFile(id UInt64) String {
 
 	if shortcut.file == "*:trash" {
 		return "Contains deleted files and folders."
+	}
+
+	if shortcut.file == "*:quake" {
+		return "Terminal"
 	}
 
 	// TODO hint for folders

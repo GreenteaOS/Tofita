@@ -30,6 +30,7 @@ var folder48 Bitmap32 = null
 var files48 Bitmap32 = null
 var dll48 Bitmap32 = null
 var unknown48 Bitmap32 = null
+var prompt48 Bitmap32 = null
 var picture48 Bitmap32 = null
 var app48 Bitmap32 = null
 var app16 Bitmap32 = null
@@ -347,6 +348,10 @@ fun initializeCompositor() {
 	files48 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/app.png")
+	prompt48 = loadPng32(asset)
+
+	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Resources/Icons/unknown48.png")
 	unknown48 = loadPng32(asset)
 
@@ -408,11 +413,21 @@ fun initializeCompositor() {
 		shortcut.rectangle.height = h
 		shortcut.rectangle.hint = hintOfFile
 
-		// Add Files to Start too
+		// Add to Start too
 		let shortcut = new Shortcut()
 		shortcut.displayName = "Files"
 		shortcut.file = "*:files"
 		shortcut.icon = files48
+		let rectangle = new ColliderRectangle(startShortcuts.length, startPinHandler)
+		shortcut.rectangle = rectangle
+		startShortcuts.push(shortcut)
+		defaultSession.startPins.children.push(rectangle)
+		shortcut.rectangle.hint = hintOfPin
+
+		let shortcut = new Shortcut()
+		shortcut.displayName = "Command Prompt"
+		shortcut.file = "*:quake"
+		shortcut.icon = prompt48
 		let rectangle = new ColliderRectangle(startShortcuts.length, startPinHandler)
 		shortcut.rectangle = rectangle
 		startShortcuts.push(shortcut)
@@ -424,6 +439,23 @@ fun initializeCompositor() {
 		shortcut.displayName = "Recycle Bin"
 		shortcut.file = "*:trash"
 		shortcut.icon = trashCan
+		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopShortcutHandler)
+		shortcut.rectangle = rectangle
+		desktopShortcuts.push(shortcut)
+		defaultSession.desktopZone.children.push(rectangle)
+
+		rectangle.relativeX = xu
+		rectangle.relativeY = yu
+		yu += yOffset
+		shortcut.rectangle.width = 76i16
+		shortcut.rectangle.height = h
+		shortcut.rectangle.hint = hintOfFile
+
+		let shortcut = new Shortcut()
+		shortcut.displayName = "Command Prompt"
+		shortcut.file = "*:quake"
+		shortcut.icon = prompt48
+		shortcut.link = true
 		let rectangle = new ColliderRectangle(desktopShortcuts.length, desktopShortcutHandler)
 		shortcut.rectangle = rectangle
 		desktopShortcuts.push(shortcut)
