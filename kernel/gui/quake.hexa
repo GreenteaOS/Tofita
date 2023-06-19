@@ -80,10 +80,15 @@ fun quakeHandleButtonDown(key UInt8) {
 		} else if quakeCommand == 'light' {
 			// Light theme
 			darkTheme = false
+		} else if quakeCommand == 'blur' {
+			justBlur = not justBlur
+			// TODO sync to avoid race conditions
+			setWallpaper(wallpaperSource, WallpaperStyle.Center)
 		} else if quakeCommand == 'help' {
 			quakePrintf("Hit `~` to show/hide this terminal at any time. At least those commands available:\n".utf16())
 			quakePrintf("dark - set the dark theme\n".utf16())
 			quakePrintf("light - set the light theme\n".utf16())
+			quakePrintf("blur - set alternative theme with slightly different aesthetics\n".utf16())
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
 		} else if quakeCommand == 'apt-get moo' or quakeCommand == "cowsay" {

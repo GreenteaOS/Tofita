@@ -155,10 +155,10 @@ fun kernelInit(params UefiPayload) {
 		// TODO move to compositor/DWM
 		var a RamDiskAsset = new RamDiskAsset()
 		getRamDiskAsset(a, "root/Windows/Web/Wallpaper/Tofita/default.bmp")
-		var bmp Bitmap32 = loadBitMap24(a)
+		wallpaperSource = loadBitMap24(a)
 		// TODO var bmp Bitmap32 = loadBitMap24(Buffer.fromBytes(a.data))
 		// ^ Buffer should not create a copy of data
-		setWallpaper(bmp, WallpaperStyle.Center)
+		setWallpaper(wallpaperSource, WallpaperStyle.Center)
 	}
 
 	// TODO var sandbox = sandbox.createSandbox()

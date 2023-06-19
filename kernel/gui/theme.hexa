@@ -16,3 +16,6 @@
 class Theme {
 	new () {}
 }
+
+var justBlur = false
+var wallpaperSource Bitmap32 = null
