@@ -109,9 +109,13 @@ fun gdtSetEntry(i UInt8, base UInt32, limit UInt64, is64 Bool, typed GdtType) {
 
 fun dumpTSS(desc TssDescriptor) {
     serialPrintf("limit=%8 ", (desc.limitLow) as! UInt64)
-    serialPrintf("base=%8", (
+	let base = (
         (desc.base_00 as! UInt64) | ((desc.base_16 as! UInt64) << 16) | ((desc.base_24 as! UInt64) << 24) | ((desc.base_32 as! UInt64) << 32)
-    ) as! UInt64)
+    ) as! UInt64
+    serialPrintf("base=%8", base)
+
+	quakePrintf("limit=%8 ".utf16(), (desc.limitLow) as! UInt64)
+	quakePrintf("base=%8".utf16(), base)
 
     let type = desc.type as! UInt64
 
@@ -132,11 +136,15 @@ fun dumpTSS(desc TssDescriptor) {
     }
 
 	serialPrintf("\n")
+	quakePrintf("\n".utf16())
 }
 
 fun dumpGDT(desc GdtDescriptorEx) {
     serialPrintf("limit=%8 ", (desc.limitLow | (desc.limit << 16)) as! UInt32)
     serialPrintf("base=%8", (desc.baseLow | (desc.baseMid << 16) | (desc.baseHigh << 24)) as! UInt32)
+
+	quakePrintf("limit=%8 ".utf16(), (desc.limitLow | (desc.limit << 16)) as! UInt32)
+	quakePrintf("base=%8".utf16(), (desc.baseLow | (desc.baseMid << 16) | (desc.baseHigh << 24)) as! UInt32)
 
     /*serialPrintf("limit==%8 ", desc.limit)
     serialPrintf("limitLow==%8 ", desc.limitLow)
@@ -184,29 +192,35 @@ fun dumpGDT(desc GdtDescriptorEx) {
 	}
 
 	serialPrintf("\n")
+	quakePrintf("\n".utf16())
 }
 
 fun dumpGdtEntries(gdt ArrayPointer<ByValue<GdtDescriptorEx>>) {
     for i in 16 {
         if i == 0 {
             serialPrintf("[GDT] #%u Empty\n", i)
+			quakePrintf("[GDT] #%u Empty\n".utf16(), i)
             continue // Empty
         }
         if i == 8 {
             serialPrintf("[GDT] #%u TSS ", i)
+			quakePrintf("[GDT] #%u TSS ".utf16(), i)
             dumpTSS(gdt[i].ref as! TssDescriptor)
             continue // TSS
         }
         if i == 9 {
             serialPrintf("[GDT] #%u TSS (part two)\n", i)
+			quakePrintf("[GDT] #%u TSS (part two)\n".utf16(), i)
             continue // TSS
         }
         if gdt[i].ref.present == 0 {
             serialPrintf("[GDT] #%u Not present\n", i)
+			quakePrintf("[GDT] #%u Not present\n".utf16(), i)
             continue
         }
 
         serialPrintf("[GDT] #%u ", i)
+		quakePrintf("[GDT] #%u ".utf16(), i)
         dumpGDT(gdt[i].ref)
     }
 }
