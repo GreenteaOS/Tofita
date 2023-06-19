@@ -338,8 +338,8 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	}
 
 	params.ramBytes = ram
-	params.physicalRamBitMaskVirtual = conventionalAllocateNext(ram >> 12)
-	// TODO rename to ramBitMaskVirtual
+	params.physicalRamBitMaskVirtual = conventionalAllocateNext(ram >> 12u64)
+	// TODO rename to ramBitMaskVirtual ^ Hexa: 12u64 to just 12
 
 	// TODO move this constant to paging
 	let pageTableEntriesCount = 512u64
@@ -365,7 +365,8 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	mapFrameBuffer(params.framebuffer.ref)
 	drawLoading(framebuffer, 2)
 	mapEfiRuntime(params.efiMemoryMap.ref)
-	mapMemoryHuge(wholePhysicalStart, 0, ram / pageSize)
+	// TODO is +1 needed? better make helper function
+	mapMemoryHuge(wholePhysicalStart, 0, (ram / pageSize) + 1)
 
 	drawVerbose("Setup kernel mode...", framebuffer)
 	let startFunction = (conventionalOffset + pageSize) as! InitKernelTrampoline
