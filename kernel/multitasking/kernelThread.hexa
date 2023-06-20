@@ -108,6 +108,7 @@ fun kernelThread() {
 						process.present = false
 						serialPrintf("[[Cpu:PID %d]] rdx=%d\n", index, frame.rdxArg1)
 						quakePrintf("Process '%S' #%d force quit due to a CPU exception #%u\n".utf16(), process.name.utf16(), index, frame.index)
+						let name = process.name
 
 						// Page fault
 						// TODO `switch`
@@ -128,6 +129,12 @@ fun kernelThread() {
 
 						// De-allocate process
 						processDestroy(process)
+
+						// Notify the user
+						alert(
+							"App " + name + " has compatibility issues, press ~ for more info."
+							// TODO "press ~ to see information than may be valuable for the developers"
+						)
 					} else if syscall == TofitaSyscalls.Message {
 						for i in process.messagesUsed {
 							if let message = process.messages[i] {
