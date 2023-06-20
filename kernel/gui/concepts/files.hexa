@@ -1,0 +1,91 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+class Files {
+	var dir String
+	var window OverlappedWindow
+
+	new (path String) {
+		this.dir = path
+
+		// TODO `\r`
+		// Check if it's a folder
+		if path.utf16()[path.length - 1] as! UInt16 == 13u16 {
+			window = createWindow()
+			loadFiles()
+			repaint()
+		} else {
+			// TODO Hexa: `defaultSession_->openFile_(path_, path_);`
+			// defaultSession.openFile(path, path)
+			// When `fun openFile(file String, displayName String) {` return type is note set
+			(defaultSession as! GraphicalSession).openFile(path, path)
+		}
+	}
+
+	fun createWindow() OverlappedWindow {
+		let window OverlappedWindow = overlappedWindow_create(0)
+		window.title = "Files"
+		// TODO handle very long text
+		window.width = 640
+		window.height = 480
+		window.x = (Screen.width / 2) - (window.width / 2i16)
+		window.y = (Screen.height / 2) - (window.height / 2i16)
+		window.visible = true
+		window.icon = leaves16
+		window.hWnd = window.windowId as! Handle
+
+		// Setup buffer
+		let bytes = window.width * window.height * sizeOf<Pixel32>()
+		window.fbZeta = allocatePageAlignedBitmap(window.width, window.height)
+		memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
+		window.fbCurrentZeta = true
+		window.fbGama = window.fbZeta // TODO
+
+		// Go
+		overlappedWindow_attach(window.windowId)
+
+		return window
+	}
+
+	fun loadFiles() {
+		let asset = new RamDiskAsset()
+		getRamDiskAsset(asset, dir)
+		let filesList = getRamDiskFolder(asset)
+		// TODO for file in filesList {
+		for file in filesList.length {
+			let file = filesList[file]
+		}
+	}
+
+	fun repaint() {
+		// Paint
+		let screenWidth = Screen.width
+		let screenHeight = Screen.height
+		let screenPixels = Screen.pixels
+
+		// TODO function like `setBitmapAsCurrentScreen()`
+		Screen.width = window.width
+		Screen.height = window.height
+		Screen.pixels = window.fbZeta.pixels
+
+		var color = new ByValue<Pixel32>()
+		// TODO light theme
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+
+		Screen.width = screenWidth
+		Screen.height = screenHeight
+		Screen.pixels = screenPixels
+	}
+}
