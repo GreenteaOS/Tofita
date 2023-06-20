@@ -216,7 +216,8 @@ fun kernelInit(params UefiPayload) {
 		idle.schedulable = true // At idle schedule to idle process
 		idle.present = true
 		idle.syscallToHandle = TofitaSyscalls.Noop
-		idle.name = "System Idle Process"
+		idle.name = "System"
+		// TODO idle.name = "System Idle Process"
 		// TODO idle.name = "Tofita"? is idle process really required?
 		currentProcess = 0
 		pml4kernelThread = processes[0].pml4

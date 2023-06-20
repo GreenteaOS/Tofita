@@ -102,7 +102,7 @@ class GraphicalSession {
 		} else if file == "*:quake" {
 			haveToQuake = true
 		} else {
-			// TODO
+			alert("TODO")
 		}
 	}
 

@@ -123,6 +123,11 @@ fun postMessage(@volatile process TofitaProcess, payload PostMessagePayload) Boo
 		process.syscallToHandle = TofitaSyscalls.GetMessage
 	}
 
+	// TODO better idea
+	if process.pid == 0 {
+		process.syscallToHandle = TofitaSyscalls.Message
+	}
+
 	return true
 }
 
@@ -183,6 +188,7 @@ fun processDestroy(@volatile process TofitaProcess) {
 	// if user process would call them,
 	// cause memory could be reused by other processes
 	process.present = false
+	process.messagesUsed = 0
 	process.messages = null
 
 	var window = overlappedWindow_findAnyProcessWindow(process.pid)

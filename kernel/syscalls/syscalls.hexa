@@ -24,8 +24,10 @@ let userSyscalls = 123000
 //@castTo('TofitaSyscalls')
 enum TofitaSyscalls : UInt32 {
 	// System
+	// TODO Disallow user to call them by index
 	Noop = 0
 	Cpu = 1
+	Message = 2
 
 	// User
 	// TODO DebugLog = userSyscalls

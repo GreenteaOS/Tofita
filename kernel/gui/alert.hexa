@@ -1,0 +1,45 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+class MessageBox {
+	var message String
+
+	new (text String) {
+		this.message = text
+		let window OverlappedWindow = overlappedWindow_create(0)
+		window.title = "Greentea OS"
+		window.width = 420
+		window.height = 100
+		window.x = (Screen.width / 2) - (window.width / 2i16)
+		window.y = (Screen.height / 2) - (window.height / 2i16)
+		window.visible = true
+		window.icon = leaves16
+		window.hWnd = window.windowId as! Handle
+		overlappedWindow_attach(window.windowId)
+	}
+}
+
+fun alert(text String) Void {
+	let box = new MessageBox(text)
+}
+
+// TODO move this to a better place like `eventLoop.hexa`
+fun dispatchInternalMessage(message Msg) Void {
+	if let window = overlappedWindow_find(0, message.hwnd as! UInt64) {
+		if message.message == Message.WM_CLOSE {
+			overlappedWindow_destroy(window.windowId)
+		}
+	}
+}

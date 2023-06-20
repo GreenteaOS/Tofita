@@ -40,7 +40,7 @@ fun kernelThread() {
 	while true {
 		// TODO optimize cast to 1u64
 		// TODO no need for `@volatile` here and there
-		@volatile var index UInt64 = 1 // Idle process ignored
+		@volatile var index UInt64 = 0 // Zero process accepts `TofitaSyscalls.Message`
 		while index < processes.length {
 			let process = processes[index]
 			// TODO `for process in processes { if process.pid == 0 { continue } }`
@@ -128,6 +128,14 @@ fun kernelThread() {
 
 						// De-allocate process
 						processDestroy(process)
+					} else if syscall == TofitaSyscalls.Message {
+						for i in process.messagesUsed {
+							if let message = process.messages[i] {
+								dispatchInternalMessage(message)
+							}
+						}
+
+						process.messagesUsed = 0
 					} else {
 						// TODO TofitaSyscalls.type.tagNameFromValue(syscall)
 						frame.raxReturn = 0 // Must return at least something

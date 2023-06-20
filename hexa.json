@@ -32,6 +32,7 @@
 		"kernel/gui/taskbar",
 		"kernel/gui/desktop",
 		"kernel/gui/compositor",
+		"kernel/gui/alert",
 		"kernel/gui/start",
 		"kernel/gui/blur",
 		"kernel/formats/stb_image/unlibc",
