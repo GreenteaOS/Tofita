@@ -42,15 +42,16 @@ class GraphicalSession {
 	var desktopPeek = false
 
 	// Start menu
-	let startUser ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startDownloads ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startGallery ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startHome ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startSettings ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startPower ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startPins ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startApps ColliderRectangle = new ColliderRectangle(0, startHandler)
-	let startSearch ColliderRectangle = new ColliderRectangle(0, startHandler)
+	// TODO id could be set automatically by increment, and compared just by `r.id==id`
+	let startUser ColliderRectangle = new ColliderRectangle(1, startHandler)
+	let startDownloads ColliderRectangle = new ColliderRectangle(2, startHandler)
+	let startGallery ColliderRectangle = new ColliderRectangle(3, startHandler)
+	let startHome ColliderRectangle = new ColliderRectangle(4, startHandler)
+	let startSettings ColliderRectangle = new ColliderRectangle(5, startHandler)
+	let startPower ColliderRectangle = new ColliderRectangle(6, startHandler)
+	let startPins ColliderRectangle = new ColliderRectangle(7, startHandler)
+	let startApps ColliderRectangle = new ColliderRectangle(8, startHandler)
+	let startSearch ColliderRectangle = new ColliderRectangle(9, startHandler)
 
 	// TODO probably useless
 	var windowsZone ColliderRectangle
@@ -222,6 +223,28 @@ class GraphicalSession {
 				requestAnimationFrame()
 			}
 		}
+	}
+
+	/// Handle Start menu buttons
+	fun startHandle(id UInt64, event ColliderEventType) Void {
+		if event != ColliderEventType.MouseUp or id == 0 {
+			return
+		}
+
+		if id == startUser.id { openFile("*:startUser", "*:startUser") }
+		if id == startDownloads.id { openFile("*:startDownloads", "*:startDownloads") }
+		if id == startGallery.id { openFile("*:startGallery", "*:startGallery") }
+		if id == startHome.id { openFile("*:startHome", "*:startHome") }
+		if id == startSettings.id { openFile("*:startSettings", "*:startSettings") }
+		if id == startPower.id { openFile("*:startPower", "*:startPower") }
+		if id == startPins.id { return /* TODO scroll */ }
+		if id == startApps.id { openFile("*:startApps", "*:startApps") }
+		if id == startSearch.id { openFile("*:startSearch", "*:startSearch") }
+
+		showStart = false
+		showTray = false
+
+		requestAnimationFrame()
 	}
 
 	/// Set actual screen size dynamically
@@ -506,7 +529,7 @@ fun taskbarHandler(id UInt64, event ColliderEventType) Void {
 }
 
 fun startHandler(id UInt64, event ColliderEventType) Void {
-	// TODO
+	defaultSession.startHandle(id, event)
 }
 
 fun startPinHandler(id UInt64, event ColliderEventType) Void {
