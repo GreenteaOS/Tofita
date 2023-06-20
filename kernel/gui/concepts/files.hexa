@@ -16,6 +16,8 @@
 class Files {
 	var dir String
 	var window OverlappedWindow
+	let shortcuts [Shortcut] = []
+	let zone ColliderRectangle = new ColliderRectangle(0, startPinHandler) // TODO handler for selection
 
 	new (path String) {
 		this.dir = path
@@ -38,8 +40,8 @@ class Files {
 		let window OverlappedWindow = overlappedWindow_create(0)
 		window.title = "Files"
 		// TODO handle very long text
-		window.width = 640
-		window.height = 480
+		window.width = 740
+		window.height = 520
 		window.x = (Screen.width / 2) - (window.width / 2i16)
 		window.y = (Screen.height / 2) - (window.height / 2i16)
 		window.visible = true
@@ -52,6 +54,11 @@ class Files {
 		memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
 		window.fbCurrentZeta = true
 		window.fbGama = window.fbZeta // TODO
+
+		// Setup interaction
+		zone.width = window.width + 0i16
+		zone.height = window.height - 32i16
+		zone.relativeY = 32i16
 
 		// Go
 		overlappedWindow_attach(window.windowId)
@@ -66,6 +73,69 @@ class Files {
 		// TODO for file in filesList {
 		for file in filesList.length {
 			let file = filesList[file]
+			let shortcut = new Shortcut()
+			shortcut.displayName = file
+			shortcut.file = file
+			shortcut.icon = unknown48
+			let rectangle = new ColliderRectangle(0, startPinHandler) // TODO
+			shortcut.rectangle = rectangle
+			shortcuts.push(shortcut)
+			zone.children.push(rectangle)
+			// TODO shortcut.rectangle.hint = hintOfPin
+		}
+	}
+
+	fun drawItems(x Int16, y Int16, w Int16, h Int16) Void {
+		let yOffset = 12i16 + 48i16 + 10i16 + 4i16 + 16i16
+		let startX = 10 + x
+		var xu = startX
+		var yu = 12 + y
+		let color = new ByValue<Pixel32>()
+
+		color.ref.rgba.ref.a = 100
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
+		let hoverColor = color
+		let holdColor = color
+		holdColor.ref.rgba.ref.a = 64
+
+		for i in shortcuts.length {
+			let shortcut = shortcuts[i]
+			let rectangle = shortcut.rectangle
+
+			rectangle.relativeX = xu - x
+			rectangle.relativeY = yu - 2 + 24 - y
+			rectangle.width = 76i16
+			rectangle.height = 78i16
+
+			if rectangle.mouseOver {
+				drawRectangleWithAlpha(
+					rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+					x + rectangle.relativeX,
+					y - 25 + rectangle.relativeY,
+					rectangle.width + 0u16,
+					rectangle.height + 0u16
+				)
+			}
+
+			drawBitmap32WithAlpha(shortcut.icon, 14i16 + xu, yu)
+
+			color.ref.color = 0x00000000
+			let shadowTextWidth = 76u16 - 8u16
+			let textX = 2 + xu
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+			drawShadowText(shortcut.displayName, textX, 62i16 + yu, shadowTextWidth, color.ref)
+
+			// Grid
+			xu += yOffset
+
+			if xu + yOffset > x + w {
+				xu = startX
+				yu += yOffset
+			}
+
+			if yu > y + h {
+				break
+			}
 		}
 	}
 
@@ -83,6 +153,15 @@ class Files {
 		var color = new ByValue<Pixel32>()
 		// TODO light theme
 		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+		drawShadowText(
+			"This is not a final design",
+			8,
+			4i16,
+			window.width - 6,
+			color.ref
+		)
+
+		drawItems(zone.relativeX, zone.relativeY, zone.width, zone.height)
 
 		Screen.width = screenWidth
 		Screen.height = screenHeight
