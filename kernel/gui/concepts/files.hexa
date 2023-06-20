@@ -56,8 +56,9 @@ class Files {
 		window.fbGama = window.fbZeta // TODO
 
 		// Setup interaction
-		zone.width = window.width + 0i16
-		zone.height = window.height - 32i16
+		zone.relativeX = 190i16
+		zone.width = window.width - zone.relativeX
+		zone.height = window.height - 64i16
 		zone.relativeY = 32i16
 
 		// Go
@@ -141,6 +142,7 @@ class Files {
 		}
 	}
 
+	// TODO take theme parameters from the system, repaint on theme change
 	fun repaint() {
 		// Paint
 		let screenWidth = Screen.width
@@ -158,12 +160,43 @@ class Files {
 		drawShadowText(
 			"This is not a final design",
 			4,
-			8i16,
+			9i16,
 			window.width - 6,
 			color.ref
 		)
+		drawShadowText(
+			dir,
+			4,
+			window.height + 2 - 24i16,
+			window.width / 2,
+			color.ref
+		)
+
+		drawText("Desktop", 34, zone.relativeY + 9i16 + 6i16, color.ref)
+		drawBitmap32WithAlpha(startSearchOutIcon, 6i16, zone.relativeY + 8i16)
+
+		let offset = 25i16
+		drawText("Documents", 34, zone.relativeY + offset + 9i16 + 6i16, color.ref)
+		drawBitmap32WithAlpha(startSearchOutIcon, 6i16, zone.relativeY + offset + 8i16)
+
+		drawText("Downloads", 34, zone.relativeY + offset * 2 + 9i16 + 6i16, color.ref)
+		drawBitmap32WithAlpha(startSearchOutIcon, 6i16, zone.relativeY + offset * 2 + 8i16)
+
+		drawBitmap32WithAlpha(startSearchOutIcon, window.width + 2 - 32i16, window.height - 28i16)
+		drawBitmap32WithAlpha(startSearchOutIcon, window.width + 2 - 58i16, window.height - 28i16)
 
 		drawItems(zone.relativeX, zone.relativeY, zone.width, zone.height)
+		color.ref.color = 0x126099FF
+		drawRectangleOutline(color, zone.relativeX, zone.relativeY, zone.width + 1u16, zone.height + 0u16)
+		color.ref.rgba.ref.a = 100
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
+		drawRectangleWithAlpha(
+			color.ref,
+			0,
+			32i16,
+			zone.relativeX + 0u16,
+			zone.height + 0u16
+		)
 
 		Screen.width = screenWidth
 		Screen.height = screenHeight
