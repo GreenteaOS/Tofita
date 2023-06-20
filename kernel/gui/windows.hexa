@@ -78,7 +78,7 @@ fun drawShadowBox(x Int16, y Int16, w UInt16, h UInt16) {
 }
 
 fun drawWindowFrame(title String, x Int16, y Int16, w UInt16, h UInt16, active Bool,
-						 hover FrameHover, down Bool) {
+						 hover FrameHover, down Bool, icon Bitmap32) {
 	var shorterFrame Bool = false // OSX style TODO
 
 	var color = new ByValue<Pixel32>()
@@ -102,8 +102,8 @@ fun drawWindowFrame(title String, x Int16, y Int16, w UInt16, h UInt16, active B
 	}
 
 	// Icon
-	// TODO proper app icon
-	drawBitmap32WithAlpha(app16, x + 9i16, y + 8i16)
+	// TODO proper app icon from wapi
+	drawBitmap32WithAlpha(icon, x + 9i16, y + 8i16)
 
 	// Title
 	// TODO ellipsis

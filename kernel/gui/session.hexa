@@ -98,7 +98,8 @@ class GraphicalSession {
 			loadExeIntoProcess(file, newProcess)
 			newProcess.name = displayName
 			newProcess.schedulable = true
-		} if file == "*:quake" {
+		// TODO Hexa: damn written liek `} if file == "*:quake" {` instead of `} else if`
+		} else if file == "*:quake" {
 			haveToQuake = true
 		} else {
 			// TODO

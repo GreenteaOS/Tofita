@@ -23,6 +23,7 @@ var wallpaper Bitmap32 = null // Size of framebuffer
 var vibranceLight Bitmap32 = null // Size of framebuffer
 var vibranceDark Bitmap32 = null // Size of framebuffer
 var leaves Bitmap32 = null
+var leaves16 Bitmap32 = null
 var trashCan Bitmap32 = null
 var notepad16 Bitmap32 = null
 var notepad48 Bitmap32 = null
@@ -302,6 +303,10 @@ fun initializeCompositor() {
 	let a = new RamDiskAsset()
 	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves.png")
 	leaves = loadPng32(a)
+
+	let a = new RamDiskAsset()
+	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves16.png")
+	leaves16 = loadPng32(a)
 
 	// Tray
 
@@ -600,7 +605,9 @@ fun compositeWindows() {
 				hover,
 				// Note this is kinda different than original
 				// but I like it more this way
-				frameHoverWindowDown and frameHoverWindowInsideButtonArea
+				frameHoverWindowDown and frameHoverWindowInsideButtonArea,
+				// ^ TODO Hexa: here had to add `,` trailing to ruin a diff
+				window.icon
 			)
 
 			// TODO just untyped `let frameHeight = 30 + 3`, see below

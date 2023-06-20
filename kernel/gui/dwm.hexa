@@ -54,6 +54,7 @@ fun overlappedWindow_create(pid UInt64) OverlappedWindow {
 	window.hWnd = null
 	window.prevId = 0
 	window.nextId = 0
+	window.icon = app16
 
 	// Adding a mouse handler
 	let rectangle = new ColliderRectangle(window.windowId, windowHandler)

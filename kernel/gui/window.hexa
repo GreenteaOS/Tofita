@@ -26,7 +26,6 @@ class OverlappedWindow {
 	var nextId UInt64
 	var prevId UInt64
 	var hWnd HWnd
-
 	var visible Bool
 
 	/// Aka "hidden to taskbar", unrelated to `maximized`
@@ -39,7 +38,9 @@ class OverlappedWindow {
 	// TODO var respondingTimeoutMs UInt16 = 0
 	// ^ count milliseconds>N before setting notResponding
 
+	// Visuals
 	var title String
+	var icon Bitmap32
 
 	var x Int16
 	var y Int16
