@@ -616,7 +616,7 @@ fun compositeWindows() {
 			let frameWidth Int16 = 1i16
 
 			if window.fbZeta != null and window.fbGama != null {
-
+				// TODO support transparent mode
 				drawBitmap32(window.fbCurrentZeta ? window.fbZeta : window.fbGama, window.x + frameWidth,
 							 window.y + frameHeight)
 			} else {

@@ -20,6 +20,7 @@ class MessageBox {
 		this.message = text
 		let window OverlappedWindow = overlappedWindow_create(0)
 		window.title = "Greentea OS"
+		// TODO handle very long text
 		window.width = 420
 		window.height = 100
 		window.x = (Screen.width / 2) - (window.width / 2i16)
@@ -27,6 +28,40 @@ class MessageBox {
 		window.visible = true
 		window.icon = leaves16
 		window.hWnd = window.windowId as! Handle
+
+		// Setup buffer
+		let bytes = window.width * window.height * sizeOf<Pixel32>()
+		window.fbZeta = allocatePageAlignedBitmap(window.width, window.height)
+		memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
+		window.fbCurrentZeta = true
+		window.fbGama = window.fbZeta // TODO
+
+		// Paint
+		let screenWidth = Screen.width
+		let screenHeight = Screen.height
+		let screenPixels = Screen.pixels
+
+		// TODO function like `setBitmapAsCurrentScreen()`
+		Screen.width = window.width
+		Screen.height = window.height
+		Screen.pixels = window.fbZeta.pixels
+
+		var color = new ByValue<Pixel32>()
+		// TODO light theme
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+		drawShadowText(
+			text,
+			1,
+			(window.height / 2i16) - 6i16,
+			window.width - 6,
+			color.ref
+		)
+
+		Screen.width = screenWidth
+		Screen.height = screenHeight
+		Screen.pixels = screenPixels
+
+		// Go
 		overlappedWindow_attach(window.windowId)
 	}
 }

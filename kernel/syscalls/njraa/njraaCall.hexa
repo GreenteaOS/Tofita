@@ -54,7 +54,7 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 		let bytes = width * height * sizeOf<Pixel32>()
 
 		if window.fbZeta != null {
-			window.fbCurrentZeta = !window.fbCurrentZeta
+			window.fbCurrentZeta = not window.fbCurrentZeta
 			if window.fbCurrentZeta {
 				// TODO triple buffer: screen<-fb<-zeta and no gama
 				tmemcpy(window.fbZeta.pixels as! ArrayPointer<UInt8>, window.fbGama.pixels as! ConstArrayPointer<UInt8>, bytes)

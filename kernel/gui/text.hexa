@@ -129,14 +129,14 @@ fun drawAlphaChar(c UInt8, x Float, y Int16, color Pixel32) Float {
 			let atx Int16 = (xx as! Int16) + (xi as! Int16)
 			let aty Int16 = (y as! Int16) + (yi as! Int16)
 
-			if atx >= _framebuffer.width {
+			if atx >= Screen.width {
 				continue
 			}
 			if atx < 0 {
 				continue
 			}
 
-			if aty >= _framebuffer.height {
+			if aty >= Screen.height {
 				continue
 			}
 			if aty < 0 {
@@ -146,8 +146,7 @@ fun drawAlphaChar(c UInt8, x Float, y Int16, color Pixel32) Float {
 			let font Pixel32 =
 				textFontBitmap.pixels[(textChar.y + yi) * textFontBitmap.width + (textChar.x + xi)].ref
 
-			// Note: pixelsPerScanLine not width
-			let p = _pixels[aty * _framebuffer.pixelsPerScanLine + atx]
+			let p = Screen.pixels[aty * Screen.width + atx]
 			let p Pixel32 = p.ref
 			p.rgba.ref.r = blend255(p.rgba.ref.r, color.rgba.ref.r, font.rgba.ref.r)
 			p.rgba.ref.g = blend255(p.rgba.ref.g, color.rgba.ref.g, font.rgba.ref.g)

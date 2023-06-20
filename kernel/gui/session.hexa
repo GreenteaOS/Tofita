@@ -102,7 +102,9 @@ class GraphicalSession {
 		} else if file == "*:quake" {
 			haveToQuake = true
 		} else {
-			alert("TODO")
+			alert(
+				"Associated app is not defined for " + displayName + ". Feature may be incomplete."
+			)
 		}
 	}
 
