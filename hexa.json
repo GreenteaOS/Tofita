@@ -33,6 +33,7 @@
 		"kernel/gui/desktop",
 		"kernel/gui/compositor",
 		"kernel/gui/alert",
+		"kernel/gui/concepts/viewer",
 		"kernel/gui/start",
 		"kernel/gui/blur",
 		"kernel/formats/stb_image/unlibc",

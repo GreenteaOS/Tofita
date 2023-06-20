@@ -1,0 +1,93 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+class Viewer {
+	new (file String, displayName String) {
+		let window OverlappedWindow = overlappedWindow_create(0)
+		window.title = displayName
+		// TODO handle very large pic
+		window.width = 420
+		window.height = 420
+		window.x = (Screen.width / 2) - (window.width / 2i16)
+		window.y = (Screen.height / 2) - (window.height / 2i16)
+		window.visible = true
+		window.icon = leaves16
+		window.hWnd = window.windowId as! Handle
+		// TODO load picture in separate thread
+
+		// Setup buffer
+		let bytes = window.width * window.height * sizeOf<Pixel32>()
+		window.fbZeta = allocatePageAlignedBitmap(window.width, window.height)
+		memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
+		window.fbCurrentZeta = true
+		window.fbGama = window.fbZeta // TODO
+
+		// Paint
+		let screenWidth = Screen.width
+		let screenHeight = Screen.height
+		let screenPixels = Screen.pixels
+
+		// TODO function like `setBitmapAsCurrentScreen()`
+		Screen.width = window.width
+		Screen.height = window.height
+		Screen.pixels = window.fbZeta.pixels
+
+		let asset = new RamDiskAsset()
+		getRamDiskAsset(asset, file)
+
+		// TODO or file.endsWith(".png") or file.endsWith(".bmp")
+		var picture Bitmap32 = null
+
+		if asset.data != null or asset.size != 0 {
+			if file.endsWith(".ico") {
+				picture = loadIcon(asset.data as! ConstArrayPointer<UInt8>, 48)
+			}
+
+			if file.endsWith(".png") {
+				picture = loadPng32(asset)
+			}
+
+			if file.endsWith(".bmp") {
+				picture = loadBitMap24(asset)
+			}
+		}
+
+		if picture == null {
+			var color = new ByValue<Pixel32>()
+			// TODO light theme
+			color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+			drawShadowText(
+				"Cannot open this file",
+				1,
+				(window.height / 2i16) - 6i16,
+				window.width - 6,
+				color.ref
+			)
+		} else {
+			drawBitmap32WithAlpha(
+				picture,
+				window.width / 2 - picture.width / 2i16,
+				window.height / 2 - picture.height / 2i16
+			)
+		}
+
+		Screen.width = screenWidth
+		Screen.height = screenHeight
+		Screen.pixels = screenPixels
+
+		// Go
+		overlappedWindow_attach(window.windowId)
+	}
+}
