@@ -83,3 +83,25 @@ fun getRamDiskAsset(asset RamDiskAsset, pathToAsset String) {
 				 ramDiskInfo.assetsCount)
 	return
 }
+
+fun getRamDiskFolder(asset RamDiskAsset) [String] {
+	var filesList [String] = []
+	var length = 0
+	var at = 0u64 // TODO should work with 0u32 too
+	for i in asset.size {
+		// TODO `'\n'.charCodeAt(0)`
+		// if i % 2 == 1 and asset.data[i] == 10 {
+		if (i % 2 == 0) and (asset.data[i] == 10) {
+			let offset = (asset.data as! UInt64) + at + 0u64
+			let file = String.fromUTF16zUpTo(offset as! ConstArrayPointer<UInt16>, length / 2)
+			at = i + 2u64
+			length = 0
+			filesList.push(file)
+		} else {
+			// UTF 16
+			length++
+		}
+	}
+
+	return filesList
+}

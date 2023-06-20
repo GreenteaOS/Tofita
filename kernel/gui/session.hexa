@@ -91,14 +91,19 @@ class GraphicalSession {
 		}
 	}
 
-	fun openFile(file String, displayName String) {
+	fun openFile(file String, displayName String) Void {
+		if file.utf16()[file.length - 1] as! UInt16 == 13u16 {
+			// Open the folder
+			return
+		}
+
 		if file.endsWith(".exe") {
 			let newProcess TofitaProcess = processCreate()
 			processInit(newProcess)
 			loadExeIntoProcess(file, newProcess)
 			newProcess.name = displayName
 			newProcess.schedulable = true
-		// TODO Hexa: damn written liek `} if file == "*:quake" {` instead of `} else if`
+		// TODO Hexa: damn written like `} if file == "*:quake" {` instead of `} else if`
 		} else if file == "*:quake" {
 			haveToQuake = true
 		} else if file.endsWith(".ico") or file.endsWith(".png") or file.endsWith(".bmp") {

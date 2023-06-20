@@ -51,7 +51,7 @@ class MessageBox {
 		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 		drawShadowText(
 			text,
-			1,
+			2,
 			(window.height / 2i16) - 6i16,
 			window.width - 6,
 			color.ref
