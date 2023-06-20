@@ -67,6 +67,7 @@ class Files {
 	}
 
 	fun loadFiles() {
+		let dirBase = dir.substr(0, dir.length - 1) + "/"
 		let asset = new RamDiskAsset()
 		getRamDiskAsset(asset, dir)
 		let filesList = getRamDiskFolder(asset)
@@ -75,13 +76,14 @@ class Files {
 			let file = filesList[file]
 			let shortcut = new Shortcut()
 			shortcut.displayName = file
-			shortcut.file = file
+			shortcut.file = dirBase + file
 			shortcut.icon = unknown48
 			let rectangle = new ColliderRectangle(0, startPinHandler) // TODO
 			shortcut.rectangle = rectangle
 			shortcuts.push(shortcut)
 			zone.children.push(rectangle)
 			// TODO shortcut.rectangle.hint = hintOfPin
+			guessIcon(shortcut)
 		}
 	}
 
@@ -155,8 +157,8 @@ class Files {
 		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 		drawShadowText(
 			"This is not a final design",
-			8,
-			4i16,
+			4,
+			8i16,
 			window.width - 6,
 			color.ref
 		)
@@ -166,5 +168,51 @@ class Files {
 		Screen.width = screenWidth
 		Screen.height = screenHeight
 		Screen.pixels = screenPixels
+	}
+
+	static fun guessIcon(shortcut Shortcut) Void {
+		let file String = shortcut.file
+
+		if file.utf16()[file.length - 1] as! UInt16 == 13u16 {
+			// TODO substr folder flag
+			shortcut.icon = folder48
+		} else {
+			// TODO Hexa: write test case `if file.utf16()[file.length - 1] as! UInt16 == 101 {`
+			// TODO case insensitive
+			if file.endsWith(".exe") {
+				// TODO read real icon
+				shortcut.icon = app48
+				// Name without `.exe` part TODO theme-configurable
+				// displayName = displayName.substr(0, displayName.length - 4)
+				//if let icon = getExeIconFromPath(shortcut.file) {
+				//	// TODO Hexa: `?? app48`
+				//	shortcut.icon = icon
+				//}
+				let icon = getExeIconFromPath(shortcut.file)
+				if icon != null {
+					shortcut.icon = icon as! Bitmap32
+				}
+			} else if file.endsWith(".dll") {
+				// TODO read real icon (some .dll files have them)
+				shortcut.icon = dll48
+			} else {
+				// TODO real preview for pics
+				if file.endsWith(".md") or file.endsWith(".txt") {
+					shortcut.icon = notepad48
+				} else if file.endsWith(".ico") or file.endsWith(".png") or file.endsWith(".jpg") {
+					shortcut.icon = picture48
+				} else if file.endsWith(".lnk") {
+					shortcut.link = true
+					// Name without `.lnk` part
+					shortcut.displayName = shortcut.displayName.substr(0, shortcut.displayName.length - 4)
+					// TODO get icon for pointed file
+					if shortcut.displayName.endsWith(".exe") {
+						shortcut.icon = app48
+					} else {
+						// TODO icon of pointed file
+					}
+				}
+			}
+		}
 	}
 }
