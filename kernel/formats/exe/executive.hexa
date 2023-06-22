@@ -1,0 +1,42 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+let tibDestination UInt64 = 0x00000000FFFAE000u64 // From GDT
+
+// 64-bit https://en.wikipedia.org/wiki/Win32_Thread_Information_Block
+@struct
+class TIB64 {
+	var exceptionList UInt64
+	var stackBase UInt64
+	var stackLimit UInt64
+	var subSystemTib UInt64
+	var fiberDataOrVersion UInt64 // union
+	var arbitraryUserPointer UInt64
+	var self UInt64 // *TIB64
+}
+// TODO Hexa: assert(sizeof(TIB64) == 56)
+
+// 32-bit https://en.wikipedia.org/wiki/Win32_Thread_Information_Block
+@struct
+class TIB32 {
+	var exceptionList UInt32
+	var stackBase UInt32
+	var stackLimit UInt32
+	var subSystemTib UInt32
+	var fiberDataOrVersion UInt32 // union
+	var arbitraryuserpointer UInt32
+	var self UInt32 // *TIB32
+}
+// TODO Hexa: assert(sizeof(TIB32) == 28)

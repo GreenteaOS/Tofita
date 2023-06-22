@@ -66,6 +66,7 @@
 		"devices/amd64/amd64page",
 		"devices/amd64/amd64paging",
 		"devices/cpu/physical",
+		"kernel/formats/exe/executive",
 		"kernel/formats/exe/exe",
 		"kernel/formats/exe/exeIcon",
 		"devices/cpu/rdtsc",
