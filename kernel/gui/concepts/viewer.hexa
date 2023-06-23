@@ -13,8 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// TODO this is a prototype, make it a user space app
+let viewers [Viewer] = []
 class Viewer {
 	new (file String, displayName String) {
+		(viewers as! [Viewer]).push(this)
+
 		let window OverlappedWindow = overlappedWindow_create(0)
 		window.title = displayName
 		// TODO handle very large pic
@@ -89,5 +93,8 @@ class Viewer {
 
 		// Go
 		overlappedWindow_attach(window.windowId)
+	}
+
+	fun handleEvent(message Msg) {
 	}
 }
