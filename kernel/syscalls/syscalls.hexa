@@ -80,6 +80,22 @@ class ShowWindowPayload {
 
 @struct
 class LParam {
+	static fun makeULong(low UInt16, high UInt16) UInt32 {
+		return ((low & 0xFFFFu32) | ((high & 0xFFFFu32) << 16u32))
+	}
+
+	static fun makeLong(low Int16, high Int16) Int32 {
+		return ((low & 0xFFFFi32) | ((high & 0xFFFFi32) << 16i32))
+	}
+
+	static fun loWord(lParam UInt32) UInt16 {
+		return lParam & 0xFFFFu16
+	}
+
+	static fun hiWord(lParam UInt32) UInt16 {
+		return lParam >> 16u16
+	}
+
 	new () {}
 }
 
