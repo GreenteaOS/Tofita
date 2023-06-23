@@ -260,6 +260,21 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 		frameHoverWindowInsideButtonArea = getFrameButton(mouseX, mouseY, frameHoverWindow) == frameHoverState
 		haveToRender = haveToRender or (frameHoverWindowInsideButtonArea != _frameHoverWindowInsideButtonArea)
 	}
+
+	// TODO check for first responder
+	let current = findWindowUnderCursor(mouseX, mouseY)
+	if current != 0 {
+		let window = windowsList[current]
+		let payload = new ByValue<PostMessagePayload>()
+		let payload = payload.ref
+		payload.hWnd = window.hWnd as! UInt64
+		// TODO RMB, MMB etc
+		payload.msg = Message.WM_MOUSEMOVE
+		payload.wParam = null
+		payload.lParam = LParam.makeLong(mouseX - window.x, mouseY - window.y) as! UInt64
+		let process TofitaProcess = processes[window.pid]
+		postMessage(process, payload)
+	}
 }
 
 /// Returns zero by default, otherwise index in windows list
@@ -422,14 +437,14 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 			}
 
 			if frameHoverState == FrameHover.Close {
-				var payload PostMessagePayload = new PostMessagePayload()
+				let payload PostMessagePayload = new PostMessagePayload()
 
 				payload.hWnd = window.hWnd as! UInt64
 				payload.msg = Message.WM_CLOSE
 				payload.wParam = null
 				payload.lParam = null
 
-				@volatile let process TofitaProcess = processes[window.pid]
+				let process TofitaProcess = processes[window.pid]
 				postMessage(process, payload)
 			}
 		}
