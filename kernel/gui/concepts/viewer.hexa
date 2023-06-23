@@ -116,6 +116,12 @@ class Viewer {
 
 	var down Bool = false
 	fun handleEvent(message Msg) {
+		if message.message == Message.WM_CLOSE {
+			overlappedWindow_destroy(window.windowId)
+			window = null
+			return
+		}
+
 		// Paint
 		let screenWidth = Screen.width
 		let screenHeight = Screen.height

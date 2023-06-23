@@ -73,26 +73,25 @@ fun alert(text String) Void {
 // TODO move this to a better place like `eventLoop.hexa`
 fun dispatchInternalMessage(message Msg) Void {
 	if let window = overlappedWindow_find(0, message.hwnd as! UInt64) {
-		if message.message == Message.WM_CLOSE {
-			overlappedWindow_destroy(window.windowId)
-			return
-		}
-
-		if message.message == Message.WM_LBUTTONDOWN or message.message == Message.WM_LBUTTONUP or message.message == Message.WM_MOUSEMOVE {
+		if true {
 			for i in viewers.length {
-				if viewers[i].window.windowId == window.windowId {
+				if viewers[i].window != null, viewers[i].window.windowId == window.windowId {
 					viewers[i].handleEvent(message)
 					return
 				}
 			}
 
 			for i in files.length {
-				if files[i].window.windowId == window.windowId {
+				if files[i].window != null, files[i].window.windowId == window.windowId {
 					files[i].handleEvent(message)
 					return
 				}
 			}
+		}
 
+		// Just alert box
+		if message.message == Message.WM_CLOSE {
+			overlappedWindow_destroy(window.windowId)
 			return
 		}
 	}

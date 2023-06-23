@@ -145,6 +145,7 @@ fun overlappedWindow_destroy(windowId UInt64) {
 	overlappedWindow_detach(windowId)
 
 	window.present = false
+	window.hWnd = null
 	window.visible = false
 	// TODO de-allocate
 	window.fbZeta = null
