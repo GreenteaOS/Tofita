@@ -62,7 +62,7 @@ fun processCreate() TofitaProcess {
 // Note: supposedly 10.000 system-wise
 let messagesBufferSize UInt64 = 256 // TODO better idea
 
-fun getOrCreateMessagesBuffer(@volatile process TofitaProcess) /*TODO wapi.*/[Msg]? {
+fun getOrCreateMessagesBuffer(process TofitaProcess) /*TODO wapi.*/[Msg]? {
 	if process.messages == null {
 		process.messages = []
 		process.messagesUsed = 0
@@ -84,7 +84,7 @@ fun getOrCreateMessagesBuffer(@volatile process TofitaProcess) /*TODO wapi.*/[Ms
 }
 
 // TODO make all this TofitaProcess class methods + @final
-fun postMessage(@volatile process TofitaProcess, payload PostMessagePayload) Bool {
+fun postMessage(process TofitaProcess, payload PostMessagePayload) Bool {
 	// TODO do not allocate messages queue if no windows and not awaits for them
 	let messages = getOrCreateMessagesBuffer(process)
 	if messages == null {

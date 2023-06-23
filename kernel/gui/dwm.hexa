@@ -263,6 +263,8 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 
 	// TODO check for first responder
 	let current = findWindowUnderCursor(mouseX, mouseY)
+	let combineMouseMoves = true
+
 	if current != 0 {
 		let window = windowsList[current]
 		let payload = new ByValue<PostMessagePayload>()
@@ -273,7 +275,19 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 		payload.wParam = null
 		payload.lParam = LParam.makeLong(mouseX - window.x, mouseY - window.y) as! UInt64
 		let process TofitaProcess = processes[window.pid]
-		postMessage(process, payload)
+
+		if combineMouseMoves,
+			let messages = getOrCreateMessagesBuffer(process),
+			process.messagesUsed > 0,
+			let last = messages[process.messagesUsed - 1],
+			last.hwnd == (payload.hWnd as! Handle),
+			last.message == payload.msg
+		{
+			last.lParam = payload.lParam as! LParam
+			// TODO more fields?
+		} else {
+			postMessage(process, payload)
+		}
 	}
 }
 
