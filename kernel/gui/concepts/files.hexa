@@ -157,7 +157,12 @@ class Files {
 		Screen.height = window.height
 		Screen.pixels = window.fbZeta.pixels
 
-		var color = new ByValue<Pixel32>()
+		let color = new ByValue<Pixel32>()
+
+		// Cleanup
+		color.ref.color = 0x33333333u32
+		drawRectangle(color, 0, 0,window.width, window.height)
+
 		// TODO light theme
 		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
 		drawShadowText(
@@ -253,6 +258,15 @@ class Files {
 	}
 
 	fun handleEvent(message Msg) {
-		// TODO
+		if message.message == Message.WM_MOUSEMOVE {
+			// Paint
+			let x = LParam.loWord(message.lParam as! UInt32)
+			let y = LParam.hiWord(message.lParam as! UInt32)
+			// Popup is topmost
+			if zone.trySendEvent(x as! Int16, y as! Int16, ColliderEventType.MouseMove) {
+				repaint()
+				requestAnimationFrame()
+			}
+		}
 	}
 }

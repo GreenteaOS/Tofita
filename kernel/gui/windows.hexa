@@ -21,7 +21,7 @@ fun drawHint(text String, x Int16, y Int16) {
 	let w = 6 * 2 + measure + 1
 	let h = 20u16
 
-	var color = new ByValue<Pixel32>()
+	let color = new ByValue<Pixel32>()
 	color.ref.color = 0x57575757
 	drawRectangleOutline(color, x, y, w, h)
 	color.ref.color = 0xFFFFFFFFu32
