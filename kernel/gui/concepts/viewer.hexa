@@ -25,32 +25,10 @@ class Viewer {
 		let window OverlappedWindow = overlappedWindow_create(0)
 		this.window = window
 		window.title = displayName
-		// TODO handle very large pic
-		window.width = 420
-		window.height = 420
-		window.x = (Screen.width / 2) - (window.width / 2i16)
-		window.y = (Screen.height / 2) - (window.height / 2i16)
 		window.visible = true
 		window.icon = leaves16
 		window.hWnd = window.windowId as! Handle
 		// TODO load picture in separate thread
-
-		// Setup buffer
-		let bytes = window.width * window.height * sizeOf<Pixel32>()
-		window.fbZeta = allocatePageAlignedBitmap(window.width, window.height)
-		memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
-		window.fbCurrentZeta = true
-		window.fbGama = window.fbZeta // TODO
-
-		// Paint
-		let screenWidth = Screen.width
-		let screenHeight = Screen.height
-		let screenPixels = Screen.pixels
-
-		// TODO function like `setBitmapAsCurrentScreen()`
-		Screen.width = window.width
-		Screen.height = window.height
-		Screen.pixels = window.fbZeta.pixels
 
 		let asset = new RamDiskAsset()
 		getRamDiskAsset(asset, file)
@@ -73,6 +51,41 @@ class Viewer {
 		}
 
 		this.picture = picture
+		if this.picture == null {
+			this.picture = leaves16 // TODO
+			picture = this.picture
+		}
+
+		// Set sizes
+		window.width = 420
+		if picture.width > window.width {
+			window.width = picture.width + 16u16
+		}
+
+		window.height = 420
+		if picture.height > window.height {
+			window.height = picture.height + 16u16
+		}
+
+		window.x = (Screen.width / 2) - (window.width / 2i16)
+		window.y = (Screen.height / 2) - (window.height / 2i16)
+
+		// Setup buffer
+		let bytes = window.width * window.height * sizeOf<Pixel32>()
+		window.fbZeta = allocatePageAlignedBitmap(window.width, window.height)
+		memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
+		window.fbCurrentZeta = true
+		window.fbGama = window.fbZeta // TODO
+
+		// Paint
+		let screenWidth = Screen.width
+		let screenHeight = Screen.height
+		let screenPixels = Screen.pixels
+
+		// TODO function like `setBitmapAsCurrentScreen()`
+		Screen.width = window.width
+		Screen.height = window.height
+		Screen.pixels = window.fbZeta.pixels
 
 		if picture == null {
 			var color = new ByValue<Pixel32>()
@@ -119,7 +132,7 @@ class Viewer {
 			color.ref.color = 0x33333333u32
 			drawRectangle(color, 0, 0,window.width, window.height)
 			drawBitmap32WithAlpha(
-				picture,
+				picture, // TODO `??`
 				window.width / 2 - picture.width / 2i16,
 				window.height / 2 - picture.height / 2i16
 			)
