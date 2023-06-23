@@ -393,6 +393,23 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 		frameHoverWindowInsideButtonArea = true
  		// TODO Hexa: fun as st useless error `requestAnimationFrame` note lack of `()`
 		requestAnimationFrame()
+
+		return
+	}
+
+	// TODO check for first responder
+	let current = findWindowUnderCursor(mouseX, mouseY)
+	if current != 0 {
+		let window = windowsList[current]
+		let payload = new ByValue<PostMessagePayload>()
+		let payload = payload.ref
+		payload.hWnd = window.hWnd as! UInt64
+		// TODO RMB, MMB etc
+		payload.msg = Message.WM_LBUTTONDOWN
+		payload.wParam = null
+		payload.lParam = LParam.makeLong(mouseX - window.x, mouseY - window.y) as! UInt64
+		let process TofitaProcess = processes[window.pid]
+		postMessage(process, payload)
 	}
 }
 
