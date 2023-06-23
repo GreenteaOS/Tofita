@@ -16,10 +16,14 @@
 // TODO this is a prototype, make it a user space app
 let viewers [Viewer] = []
 class Viewer {
+	var window OverlappedWindow
+	var picture Bitmap32
+
 	new (file String, displayName String) {
 		(viewers as! [Viewer]).push(this)
 
 		let window OverlappedWindow = overlappedWindow_create(0)
+		this.window = window
 		window.title = displayName
 		// TODO handle very large pic
 		window.width = 420
@@ -68,6 +72,8 @@ class Viewer {
 			}
 		}
 
+		this.picture = picture
+
 		if picture == null {
 			var color = new ByValue<Pixel32>()
 			// TODO light theme
@@ -95,6 +101,53 @@ class Viewer {
 		overlappedWindow_attach(window.windowId)
 	}
 
+	var down Bool = false
 	fun handleEvent(message Msg) {
+		// Paint
+		let screenWidth = Screen.width
+		let screenHeight = Screen.height
+		let screenPixels = Screen.pixels
+
+		// TODO function like `setBitmapAsCurrentScreen()`
+		Screen.width = window.width
+		Screen.height = window.height
+		Screen.pixels = window.fbZeta.pixels
+
+		if message.message == Message.WM_LBUTTONDOWN {
+			// Clear
+			let color = new ByValue<Pixel32>()
+			color.ref.color = 0x33333333u32
+			drawRectangle(color, 0, 0,window.width, window.height)
+			drawBitmap32WithAlpha(
+				picture,
+				window.width / 2 - picture.width / 2i16,
+				window.height / 2 - picture.height / 2i16
+			)
+
+			down = true
+			requestAnimationFrame()
+		}
+
+		if message.message == Message.WM_MOUSEMOVE and down {
+			// Paint
+			let x = LParam.loWord(message.lParam as! UInt32)
+			let y = LParam.hiWord(message.lParam as! UInt32) - 32 // TODO window frame height
+			drawBitmap32WithAlpha(
+				leaves16,
+				x - leaves16.width / 2i16,
+				y - leaves16.height / 2i16
+			)
+
+			requestAnimationFrame()
+		}
+
+		if message.message == Message.WM_LBUTTONUP {
+			// Nothing
+			down = false
+		}
+
+		Screen.width = screenWidth
+		Screen.height = screenHeight
+		Screen.pixels = screenPixels
 	}
 }
