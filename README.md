@@ -50,7 +50,6 @@ Get automatic build or make yours with Teapot (if you want to edit the code)
 ### Automatic builds
 
 If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts).
-Note that it also builds third-party pull requests.
 
 
 ### Build using Teapot
@@ -84,20 +83,10 @@ Otherwise `C:` is used to store builds by default.
 
 #### Install Hexa
 
-You also need to install [Hexa compiler](https://github.com/hexalang/hexa#unstable).
+You also need to install [Hexa compiler](https://hexalang.github.io/book/installation).
+Simply use the latest graphical installer from the automated builds.
 
-Currently you will build Hexa manually too. Download [this](https://github.com/hexalang/hexa/archive/kawaii.zip) and extract contents of `hexa-kawaii` into `C:\Hexa`, so you have `C:\Hexa\hexa.cmd`.
-
-Install [node.js LTS](https://nodejs.org/en/download/).
-
-```sh
-cd C:\hexa
-node bootstrap.js hexa.json
-node hexa-node.js hexa.json
-node hexa-node.js hexa.json
-```
-
-Add `C:\Hexa` into your PATH.
+You may build Hexa manually too. [Follow instructions.](https://github.com/hexalang/hexa#build) Remember to add Hexa into your PATH.
 
 #### Compile and generate disk image
 
