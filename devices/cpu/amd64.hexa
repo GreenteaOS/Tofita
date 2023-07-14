@@ -123,8 +123,9 @@ declare fun pat(
 ')
 @rename('movntdq__')
 declare fun movntdq(
-	//from UInt64,
-	//to UInt64
+	source ArrayPointer<UInt64>,
+	destination ArrayPointer<UInt64>,
+	loops UInt64
 ) Void
 
 /*

@@ -31,7 +31,7 @@ var useCpp = false
 // TODO ^ update readme if it calls build script
 
 // Removes folder recursively
-fun deleteFolderRecursive(path, noRemoveSelf) {
+fun deleteFolderRecursive(path, noRemoveSelf Bool = false) {
 	if fs.existsSync(path) {
 		fs.readdirSync(path).forEach(fun(file, index) {
 			let curPath = path + "\\" + file

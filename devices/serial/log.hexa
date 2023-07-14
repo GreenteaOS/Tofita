@@ -305,7 +305,7 @@ fun comItoA(i Int64, b ArrayPointer<UInt8>) {
 @nativeVariadic
 // TODO `(...rest)` here, require it when `@nativeVariadic` specified
 // ^ (as last argument)
-declare fun va_start() Void
+declare fun va_start(first Any) Void
 @rename('va_arg_int32') @customHeader('
 	#define va_arg_int32() va_arg(va_list__, int32_t)
 ')
