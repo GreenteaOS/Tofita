@@ -343,12 +343,15 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	// TODO move this constant to paging
 	let pageTableEntriesCount = 512u64
+	let pageTableEntriesSize = sizeOf<PageEntry>() * pageTableEntriesCount
 	pml4entries =
-		conventionalAllocateNext(sizeOf<PageEntry>() * pageTableEntriesCount) as! ArrayPointer<ByValue<PageEntry>>
+		conventionalAllocateNext(pageTableEntriesSize) as! ArrayPointer<ByValue<PageEntry>>
+		// TODO Hexa: `as! _`
 
+	// Zero-fill PML4
 	{
 		var b = pml4entries as! ArrayPointer<UInt8>
-		for i in conventionalOffset {
+		for i in pageTableEntriesSize {
 			// TODO faster with uint64_t
 			b[i] = buffa[0]
 		}
