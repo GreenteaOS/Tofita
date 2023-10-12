@@ -142,14 +142,17 @@ fun drawCleanup(y Int16, framebuffer FrameBuffer) {
 	}
 }
 
+// Calculated from screen size
 var errorY Int16 = 0
+
 fun drawError(text String, framebuffer FrameBuffer) {
 	drawCleanup(errorY, framebuffer)
 	drawText(text, errorY, framebuffer)
 }
 
-// TODO outline infer `true` (for let) or `Bool` (for var)
+// TODO Hexa: outline infer `true` (for let) or `Bool` (for var)
 let verbose = true
+
 fun drawVerbose(text String, framebuffer FrameBuffer) {
 	drawCleanup(errorY + 32i16, framebuffer)
 	drawText(text, errorY + 32i16, framebuffer)

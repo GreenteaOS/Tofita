@@ -129,6 +129,8 @@ class UefiPayload {
 	// UInt8 isLiveBootWithInstaller; == 1 == 0, don't show logon screen (and
 	// don't allow to login! in the sense that it looks like a security hole
 	// like "let it in without entering a login-password")
+
+	// TODO many reserved fields, ensure whole thing is 4k size
 }
 
 declare InitKernel = @convention(fastcall) (params UefiPayload) => Void

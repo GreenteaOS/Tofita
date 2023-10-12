@@ -20,11 +20,13 @@ class ExeResourceLoader<SIZE, HEADER> {
 		var ptr = asset.data as! ArrayPointer<UInt8>
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
+		// TODO require all .dlls ARCH be the same or show loader error
 
 		// Copy sections
 		var imageSectionHeader =
 			((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader) as! ArrayPointer<ByValue<ImageSectionHeader>>
 
+		// TODO copy PE headers?
 		for i in peHeader.numberOfSections {
 			// Compare with `.rsrc` TODO better idea
 			let isRSRC =

@@ -49,6 +49,7 @@ fun loadRamDiskFromVolume(
 	// TODO `uint8_t info[sizeOf(efi::EFI_FILE_INFO) + 100];`
 	// TODO `uint64_t infoSize = sizeOf(info);`
 	let info = new EFI_FILE_INFO()
+	// TODO Hexa: use not array here but ByValue<UInt64> or some other
 	var infoSize ArrayByValue<UInt64, 1> = [4096]
 
 	var genericFileInfo EFI_GUID = new EFI_FILE_INFO_ID()

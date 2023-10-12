@@ -49,7 +49,7 @@ Get automatic build or make yours with Teapot (if you want to edit the code)
 
 ### Automatic builds
 
-If you don't want to build Tofita, you may [download latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts).
+If you don't want to build Tofita, you may [download the latest automatic GitHub build](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts).
 
 
 ### Build using Teapot

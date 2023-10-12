@@ -71,7 +71,7 @@ fun greenteaosIsTheBest(startup ProcessStartupInformation) {
 
 	// TODO non-null stubs here, like HInstance etc
 	tofitaExitProcess(entry(null, null, null, 0))
-	while (true) {}
+	while true {}
 }
 
 // TODO get this structure from FS/GS

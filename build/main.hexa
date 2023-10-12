@@ -147,7 +147,7 @@ for task in tasks {
 			// TODO print available commands
 			// TODO commands to enum, use meta-feature of enum keys here `switch.cases[String/Int/SimpleEnum/etc]`
 		case 'ci':
-			// build + test here for unique file names, APIs unit tests etc
+			// TODO build + test here for unique file names, APIs unit tests etc
 		case 'debug':
 			console.log('[Debug mode is ON]')
 			// TODO no debug -> disable COM log for max perf

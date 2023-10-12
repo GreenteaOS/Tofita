@@ -215,6 +215,8 @@ registerStorageSize equ (0x78 + 128)
 	add rsp, registerStorageSize
 %endmacro
 
+; TODO disabling this may disallow syscals from the kernel mode
+; but better perf? (except for yield)
 %macro swapGsIfRequired 0
 	mov rax, [rsp + InterruptFrame.cs]
 	and rax, 0x03
