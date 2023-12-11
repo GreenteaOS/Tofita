@@ -132,7 +132,7 @@ class Viewer {
 		Screen.height = window.height
 		Screen.pixels = window.fbZeta.pixels
 
-		if message.message == Message.WM_LBUTTONDOWN {
+		if message.message == Message.WM_L_BUTTON_DOWN {
 			// Clear
 			let color = new ByValue<Pixel32>()
 			color.ref.color = 0x33333333u32
@@ -147,7 +147,7 @@ class Viewer {
 			requestAnimationFrame()
 		}
 
-		if message.message == Message.WM_MOUSEMOVE and down {
+		if message.message == Message.WM_MOUSE_MOVE and down {
 			// Paint
 			let x = LParam.loWord(message.lParam as! UInt32)
 			let y = LParam.hiWord(message.lParam as! UInt32) - 32 // TODO window frame height
@@ -160,7 +160,7 @@ class Viewer {
 			requestAnimationFrame()
 		}
 
-		if message.message == Message.WM_LBUTTONUP {
+		if message.message == Message.WM_L_BUTTON_UP {
 			// Nothing
 			down = false
 		}

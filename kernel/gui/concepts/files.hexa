@@ -264,7 +264,7 @@ class Files {
 			return
 		}
 
-		if message.message == Message.WM_MOUSEMOVE {
+		if message.message == Message.WM_MOUSE_MOVE {
 			// Paint
 			let x = LParam.loWord(message.lParam as! UInt32)
 			let y = LParam.hiWord(message.lParam as! UInt32)

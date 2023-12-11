@@ -414,7 +414,7 @@ fun defWindowProcW(hWnd HWnd, uMsg Message, wParam WParam, lParam LParam) LResul
 		// TODO probably should be async post?
 		// TODO call proc with an asm wrapper which sets red-zone and extra stack/reg safety
 		window.proc(hWnd, Message.WM_DESTROY, null, null)
-		window.proc(hWnd, Message.WM_NCDESTROY, null, null)
+		window.proc(hWnd, Message.WM_NC_DESTROY, null, null)
 		return null
 	}
 	tofitaDebugLog("DefWindowProcW done".utf16())
@@ -434,7 +434,7 @@ fun destroyWindow(hWnd HWnd) Bool32 {
 
 	// TODO probably should be async post?
 	window.proc(hWnd, Message.WM_DESTROY, null, null)
-	window.proc(hWnd, Message.WM_NCDESTROY, null, null)
+	window.proc(hWnd, Message.WM_NC_DESTROY, null, null)
 	tofitaDebugLog("DestroyWindow done".utf16())
 	return Bool32.False // TODO false?
 }
