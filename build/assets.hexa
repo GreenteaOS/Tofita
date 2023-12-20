@@ -43,7 +43,7 @@ let deps [[String]] = [
 fun packFonts(config Config) {
 		let fs = require('fs')
 		let chars [{code:Int, x:Int, y:Int, width:Float}] =
-			JSON.parse(fs.readFileSync('..\\Greentea\\assets\\root\\Windows\\Fonts\\default.json').toString().trim())
+			JSON.parse(fs.readFileSync('..\\Tongue\\fonts\\bitmap\\ascii.json').toString().trim())
 
 		let charSize = 2 + 2 + 8
 		let size = 256 * charSize // Just ASCII for now
@@ -72,16 +72,20 @@ fun packAssets(config Config) {
 		/// Simply list of files, used only in the build process
 		let assetPath [String] = []
 		/// Stores list of files in the folder
+		// TODO Hexa: hl [:ThisPart]
 		let folders [String:Buffer] = [:] // TODO `= []`?
 
+		// Bootloader reads this kernel file
 		assetName.push('tofita.exe')
 		assetPath.push(folder + '\\tofita.exe')
 
+		// SMP
 		assetName.push('trapeze.tofita')
 		assetPath.push(folder + '\\trapeze.bin')
 
+		// User mode libraries
 		for dll in dlls {
-			// TODO \ not werks in js assetName.push(`C:\Windows\System32\` + dll + '.dll')
+			// TODO \ not works in js assetName.push(`C:\Windows\System32\` + dll + '.dll')
 			assetName.push(`C:\\Windows\\System32\\` + dll + '.dll')
 			assetPath.push(folder + '\\\(dll).64.dll')
 
@@ -89,14 +93,19 @@ fun packAssets(config Config) {
 			assetPath.push(folder + '\\\(dll).32.dll')
 		}
 
+		// Fonts
 		packFonts(config)
 		assetName.push('ascii.tofita')
 		assetPath.push(folder + '\\ascii.tofita')
+		assetName.push('root/Windows/Fonts/ascii.png')
+		assetPath.push('..\\Tongue\\fonts\\bitmap\\ascii.png')
 
+		// TODO Hexa: hl function name cause readability is bad here
 		fun addFolderRecursive(path) {
 			if fs.existsSync(path) {
 				let filesList [String] = []
 
+				// Hexa: hl fun() too
 				fs.readdirSync(path).forEach(fun(file, index) {
 					let curPath = path + "\\" + file
 					let assetFullName = curPath.substr('../Greentea/assets/'.length).split('\\').join('/')

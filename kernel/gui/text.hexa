@@ -34,7 +34,7 @@ fun initText() {
 	textFontList = textFont.data as! ArrayPointer<ByValue<TextFontList>>
 
 	var font = new RamDiskAsset()
-	getRamDiskAsset(font, "root/Windows/Fonts/default.png")
+	getRamDiskAsset(font, "root/Windows/Fonts/ascii.png")
 	textFontBitmap = loadPng32(font)
 }
 
