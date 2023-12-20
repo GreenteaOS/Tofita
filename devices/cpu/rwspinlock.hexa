@@ -1,0 +1,103 @@
+// The Tofita Kernel
+// Copyright (C) 2023 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+/// Recursive read-write lock
+// Based on https://jfdube.wordpress.com/2014/01/03/implementing-a-recursive-read-write-spinlock/
+@final // TODO Hexa: disable `virtual`
+// TODO `@struct` make whole instance a `declare RWSpinLock = ByValue<ReadWriteSpinLock>`
+class ReadWriteSpinLock {
+	// TODO Hexa: generate `volatile` in C
+	@volatile var lock UInt32 = 0
+    var threadId UInt32 = 0xFFFFFFFFu32
+    var recursionDepth UInt32 = 0
+
+    @inline new() {}
+
+	@inline fun yieldProcessor() Void {
+		// TODO
+		pause()
+	}
+
+	@inline fun interlockedCompareExchange(lock UInt32, newLock UInt32, oldLock UInt32) UInt32 {
+		// TODO
+		pause()
+		return oldLock
+	}
+
+	@inline fun lockReader() Void {
+		while true {
+			// Wait until there's no active writer
+			while (lock & 0x80000000u32) != 0 {
+				yieldProcessor()
+			}
+
+			let oldLock UInt32 = (lock & 0x7fffffff)
+			let newLock UInt32 = oldLock + 1
+
+			if interlockedCompareExchange(/*TODO &*/lock, newLock, oldLock) == oldLock {
+				return
+			}
+		}
+	}
+
+	@inline fun lockWriter() Void {
+		while true {
+			// Wait until there's no active writer
+			while (lock & 0x80000000u32) != 0 {
+				yieldProcessor()
+			}
+
+			let oldLock UInt32 = (lock & 0x7fffffff)
+			let newLock UInt32 = (oldLock | 0x80000000u32)
+
+			if interlockedCompareExchange(/*TODO &*/lock, newLock, oldLock) == oldLock {
+				// Wait for active readers to release their locks
+				while (lock & 0x7fffffff) != 0 {
+					yieldProcessor()
+				}
+
+				return
+			}
+		}
+	}
+
+	@inline fun interlockedDecrement(lock UInt32) Void {
+		// TODO
+		pause()
+	}
+
+	@inline fun unlockReader() Void {
+		interlockedDecrement(/*TODO &*/lock)
+	}
+
+	@inline fun getCurrentThreadId() UInt32 {
+		// TODO
+		return 0
+	}
+
+	@inline fun unlockWriter() Void {
+		let curThreadID UInt32 = getCurrentThreadId()
+		// assert(threadId == curThreadID)
+
+		// assert(recursionDepth > 0)
+		recursionDepth--
+
+		if recursionDepth == 0 {
+			threadId = 0xFFFFFFFFu32
+			// assert(lock == 0x80000000u32)
+    		lock = 0
+		}
+	}
+}

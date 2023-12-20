@@ -73,6 +73,7 @@
 		"devices/cpu/seh.header",
 		"devices/cpu/seh",
 		"devices/cpu/spinlock",
+		"devices/cpu/rwspinlock",
 		"devices/serial/init",
 		"devices/serial/log"
 	],
