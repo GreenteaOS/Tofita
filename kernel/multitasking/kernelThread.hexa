@@ -24,6 +24,7 @@ let stackSizeForKernelThread UInt64 = 1024 * 1024u64
 // TODO use `stackSizeForKernelThread` in <>
 var kernelStack ArrayByValue<UInt8, 1048576> = [0]
 
+/// Entry point of the main kernel thread
 fun kernelThread() {
 	serialPrintln("<Tofita> [kernelThread] thread started")
 
@@ -37,6 +38,10 @@ fun kernelThread() {
 	//serialPrintf("<seh> 1 == %u\n", probeForReadOkay(switchToNextProcess as! UInt64, 1))
 	//serialPrintf("<seh> done\n")
 
+	// The concept here is to delay syscall handling in an event-loop manner
+	// Has good multi-tasking capability due to round-robin iteration
+	// but should be improved in future for better latency
+	// or simply do kernel-thread-per-user-thread model
 	while true {
 		// TODO optimize cast to 1u64
 		// TODO no need for `@volatile` here and there
@@ -168,6 +173,7 @@ fun kernelThread() {
 			index++
 		}
 
+		// Nothing to do
 		switchToUserProcess()
 	}
 }

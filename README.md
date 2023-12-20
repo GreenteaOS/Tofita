@@ -30,7 +30,7 @@ Give some attention for Greentea OS be noticed and attract more contributors, th
 [![Become a sponsor](docs/sponsors.png?raw=true)](https://github.com/sponsors/PeyTy)
 [![Become a patron](docs/patreon.png?raw=true)](https://www.patreon.com/PeyTy)
 
-Become a sponsor to help hire developers and test more hardware
+Become a sponsor to help us hire developers and test more hardware
 
 ## Tools
 
@@ -41,7 +41,7 @@ Become a sponsor to help hire developers and test more hardware
 - [`gos-devlist.bat`](tools/gos-devlist.bat) - show useful device names and PCI IDs to gather user hardware stats
 - [`OVMF.fd`](https://t.me/s/greenteaos_official/6) - speed of light UEFI bootloader for QEMU
 - [`Greentea OS Compat`](https://t.me/s/greenteaos_official/7) - Greentea OS compatibility assistant
-- [`build.bat`](build.bat) - check comments for examples of hot to re-inject .iso file in VirtualBox and avoid full VM reboot for faster testing iterations
+- [`build.bat`](build.bat) - check comments for examples of how to re-inject .iso file in VirtualBox and avoid full VM reboot for faster testing iterations
 
 ## Build
 

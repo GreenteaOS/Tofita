@@ -20,6 +20,8 @@ var guiThreadFrame InterruptFrame = new InterruptFrame()
 @aligned(64)
 var guiStack ArrayByValue<UInt8, 1048576> = [0]
 
+/// Thread that handles user input and display
+/// Has enhanced low-latency scheduling
 fun guiThread() {
 	serialPrintln("<Tofita> [guiThread] thread started")
 
