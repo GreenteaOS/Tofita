@@ -63,6 +63,7 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/GreenteaOS/Greentea.git ../Greentea
           git clone --depth 1 https://github.com/GreenteaOS/Tongue.git ../Tongue
+          git clone --depth 1 https://github.com/GreenteaOS/NjRAA.git ../NjRAA
 
       - name: Prepare Hexa
         run: |

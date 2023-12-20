@@ -61,6 +61,7 @@ Download or clone [Teapot repo](https://github.com/GreenteaOS/Teapot#download-la
 .\Tofita
 .\Greentea
 .\Tongue
+.\NjRAA
 ```
 
 You should have extracted `Teapot-kawaii` and have folders like this `.\Teapot\LLVM-*.*.*`.
@@ -72,6 +73,7 @@ git clone --recursive --depth 1 https://github.com/GreenteaOS/Tofita.git
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Teapot.git
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Greentea.git
 git clone --recursive --depth 1 https://github.com/GreenteaOS/Tongue.git
+git clone --recursive --depth 1 https://github.com/GreenteaOS/NjRAA.git
 ```
 
 #### Configure
