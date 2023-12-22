@@ -106,8 +106,14 @@ fun drawWindowFrame(title String, x Int16, y Int16, w UInt16, h UInt16, active B
 	drawBitmap32WithAlpha(icon, x + 9i16, y + 8i16)
 
 	// Title
-	// TODO ellipsis
-	drawText(title, x + 31, y + 9i16 + 3i16, color.ref)
+	if justBlur {
+		// TODO correct `w - buttons`
+		color.ref.color = 0x126099FF
+		drawShadowText(title, x + 31, y + 9i16 + 3i16, w - 44 * 3, color.ref)
+	} else {
+		// TODO ellipsis
+		drawText(title, x + 31, y + 9i16 + 3i16, color.ref)
+	}
 
 	// Frame hairline
 	if active {
