@@ -765,7 +765,7 @@ fun composite(startupMilliseconds UInt64) {
 	// TODO create Theme class with static fields
 	// TODO ^ move other elements to the right
 	// TODO finally unify, use Int16 ot UInt16 everywhere lol!
-	drawBitmap32WithAlpha(leaves, leavesPad + 2i16, taskbarY + 2i16)
+	drawBitmap32WithAlpha(leaves, leavesPad + 2i16, taskbarY + (Theme.hugeTaskbar? 7i16 : 2i16))
 	// TODO ^ white leaves or dynamically recolored depending on wallpaper or something
 	// ^ change color on hover
 
@@ -856,14 +856,15 @@ fun composite(startupMilliseconds UInt64) {
 	}
 
 	let trayTimeStartX = trayButtonX + 20
+	let trayTimeY = taskbarY + (Theme.hugeTaskbar? 15i16 : 10i16)
 	var trayTimeX = trayTimeStartX + 4
-	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, taskbarY + 10i16, color.ref)
-	trayTimeX += drawAsciiText(":", trayTimeX, taskbarY + 10i16, color.ref)
+	trayTimeX += drawIntegerText(uptimeHours, trayTimeX, trayTimeY, color.ref)
+	trayTimeX += drawAsciiText(":", trayTimeX, trayTimeY, color.ref)
 	if uptimeMinutes < 10 {
-		trayTimeX += drawAsciiText("0", trayTimeX, taskbarY + 10i16, color.ref)
+		trayTimeX += drawAsciiText("0", trayTimeX, trayTimeY, color.ref)
 	}
-	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, taskbarY + 10i16, color.ref)
-	trayTimeX += drawAsciiText(pm ? " PM" : " AM", trayTimeX, taskbarY + 10i16, color.ref)
+	trayTimeX += drawIntegerText(uptimeMinutes, trayTimeX, trayTimeY, color.ref)
+	trayTimeX += drawAsciiText(pm ? " PM" : " AM", trayTimeX, trayTimeY, color.ref)
 
 	// Input language
 	if let rectangle = defaultSession.taskbarInput, rectangle.mouseOver {
@@ -878,7 +879,7 @@ fun composite(startupMilliseconds UInt64) {
 	let languageId = 'ENG'
 	let languagePad = 8
 	var trayLanguageX = trayTimeStartX - getTextAdvance(languageId) - languagePad * 2
-	drawAsciiText(languageId, trayLanguageX, taskbarY + 10i16, color.ref)
+	drawAsciiText(languageId, trayLanguageX, trayTimeY, color.ref)
 
 	// Tray ^ button
 	// TODO Hexa: try `if let item = defaultSession.taskbarTrayOpener, item.mouseOver { item.xxx }` pattern
@@ -894,8 +895,8 @@ fun composite(startupMilliseconds UInt64) {
 
 	trayButtonX = trayLanguageX - languagePad - 16i16
 
-	line45smooth(color, trayButtonX, taskbarY + 10 + 2i16, 6i16, 1i16)
-	line45smooth(color, trayButtonX + 1i16, taskbarY + 10 + 2i16, 6i16, -1i16)
+	line45smooth(color, trayButtonX, trayTimeY + 2i16, 6i16, 1i16)
+	line45smooth(color, trayButtonX + 1i16, trayTimeY + 2i16, 6i16, -1i16)
 
 	// Search
 	if defaultSession.taskbarSearch.mouseOver {
@@ -912,7 +913,7 @@ fun composite(startupMilliseconds UInt64) {
 		traySearchIcon,
 		// TODO probably compute global positions for all once in the begin of composition?
 		defaultSession.taskbarSearch.relativeX + 5i16,
-		taskbarY + 4i16
+		taskbarY + (Theme.hugeTaskbar? 9i16 : 4i16)
 	)
 
 	// Tray popup
