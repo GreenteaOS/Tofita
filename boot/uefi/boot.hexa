@@ -368,8 +368,11 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	mapMemory(upper, largeBuffer, conventionalPages + 1u64, 1, global: true)
 
 	// Note: framebuffer is *not* within physical memory
+	drawVerbose("Setup display memory...", framebuffer)
 	mapFrameBuffer(params.framebuffer.ref)
 	drawLoading(framebuffer, 2)
+
+	drawVerbose("Setup runtime memory...", framebuffer)
 	mapEfiRuntime(params.efiMemoryMap.ref)
 	// TODO is +1 needed? better make helper function
 	mapMemoryHuge(wholePhysicalStart, 0, (ram / pageSize) + 1u64, global: true)
