@@ -75,6 +75,7 @@ fun quakeHandleButtonDown(key UInt8) {
 		quakePrintf("\n".utf16())
 		quakePreviousCommand = quakeCommand
 
+		// TODO `switch` lol + .meta for help
 		if quakeCommand == 'gdt' {
   			let gdt = gdtTemplate as! ArrayPointer<ByValue<GdtDescriptorEx>>
 			dumpGdtEntries(gdt)
@@ -98,6 +99,10 @@ fun quakeHandleButtonDown(key UInt8) {
 			quakePrintf("Command completed.\n".utf16())
 		} else if quakeCommand == 'fast' {
 			Theme.fast = not Theme.fast
+			quakePrintf("Command completed.\n".utf16())
+		} else if quakeCommand == 'huge' {
+			Theme.hugeTaskbar = not Theme.hugeTaskbar
+			defaultSession.resizeWindowList()
 			quakePrintf("Command completed.\n".utf16())
 		} else if quakeCommand == 'exe' {
 			var index UInt64 = 0
@@ -145,6 +150,7 @@ fun quakeHandleButtonDown(key UInt8) {
 			quakePrintf("center - toggle centered Start menu\n".utf16())
 			quakePrintf("wallpaper - set alternative wallpaper\n".utf16())
 			quakePrintf("fast - faster screen rendering method\n".utf16())
+			quakePrintf("huge - large taskbar without labels\n".utf16())
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
 			quakePrintf("Press UP to re-enter the last command\n".utf16())//

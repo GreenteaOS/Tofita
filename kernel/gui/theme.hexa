@@ -17,6 +17,7 @@ class Theme {
 	static var centeredStart = false
 	static var verbose = false
 	static var fast = false
+	static var hugeTaskbar = false
 
 	new () {}
 }
