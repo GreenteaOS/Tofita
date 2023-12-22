@@ -13,20 +13,27 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/// Recursive read-write lock
 // Based on https://jfdube.wordpress.com/2014/01/03/implementing-a-recursive-read-write-spinlock/
+
+/// Recursive read-write lock
 @final // TODO Hexa: disable `virtual`
+@reflect(false) // TODO Hexa: disable `Any` or just use `@struct`
 // TODO `@struct` make whole instance a `declare RWSpinLock = ByValue<ReadWriteSpinLock>`
 class ReadWriteSpinLock {
 	// TODO Hexa: generate `volatile` in C
+	/// The most significant bit is the writer bit, other bits a readers count
 	@volatile var lock UInt32 = 0
+
+	/// Writer thread
     var threadId UInt32 = 0xFFFFFFFFu32
+
+	/// Writers depth
     var recursionDepth UInt32 = 0
 
     @inline new() {}
 
-	@inline fun yieldProcessor() Void {
-		// TODO
+	@inline static fun yieldProcessor() Void {
+		// TODO __mm_pause()
 		pause()
 	}
 
@@ -43,7 +50,7 @@ class ReadWriteSpinLock {
 				yieldProcessor()
 			}
 
-			let oldLock UInt32 = (lock & 0x7fffffff)
+			let oldLock UInt32 = lock & 0x7fffffff
 			let newLock UInt32 = oldLock + 1
 
 			if interlockedCompareExchange(/*TODO &*/lock, newLock, oldLock) == oldLock {
@@ -52,6 +59,7 @@ class ReadWriteSpinLock {
 		}
 	}
 
+	// TODO rename to lock()
 	@inline fun lockWriter() Void {
 		while true {
 			// Wait until there's no active writer
@@ -59,8 +67,8 @@ class ReadWriteSpinLock {
 				yieldProcessor()
 			}
 
-			let oldLock UInt32 = (lock & 0x7fffffff)
-			let newLock UInt32 = (oldLock | 0x80000000u32)
+			let oldLock UInt32 = lock & 0x7fffffff
+			let newLock UInt32 = oldLock | 0x80000000u32
 
 			if interlockedCompareExchange(/*TODO &*/lock, newLock, oldLock) == oldLock {
 				// Wait for active readers to release their locks
@@ -82,11 +90,12 @@ class ReadWriteSpinLock {
 		interlockedDecrement(/*TODO &*/lock)
 	}
 
-	@inline fun getCurrentThreadId() UInt32 {
+	@inline static fun getCurrentThreadId() UInt32 {
 		// TODO
 		return 0
 	}
 
+	// TODO rename to unlock()
 	@inline fun unlockWriter() Void {
 		let curThreadID UInt32 = getCurrentThreadId()
 		// assert(threadId == curThreadID)
