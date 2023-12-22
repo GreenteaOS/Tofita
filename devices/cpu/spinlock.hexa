@@ -39,7 +39,9 @@ class SpinLock {
 		// TODO yield to another process
 		while !__sync_bool_compare_and_swap(counter.ref, 0, 1) {
 			while counter[0] != 0 {
+				// Please note, that the loop also requires __mm_pause() to enable hyperthreads
 				pause()
+				// TODO just use __mm_pause
 			}
 		}
 	}

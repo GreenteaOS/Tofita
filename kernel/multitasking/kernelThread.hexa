@@ -95,6 +95,7 @@ fun kernelThread() {
 						}
 
 						serialPrintf("\n")
+						// TODO rename to canBeScheduled
 						process.schedulable = true
 					} else if syscall == TofitaSyscalls.ExitProcess {
 						serialPrintf("[[ExitProcess:PID %d]] %d\n", index, frame.rdxArg1)

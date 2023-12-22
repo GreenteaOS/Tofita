@@ -219,7 +219,7 @@ class TssEntry {
 
 	var reserved1 UInt64
 	var reserved2 UInt16
-	var iomap_offset UInt16
+	var ioMapOffset UInt16
 
 	new () {}
 }
@@ -345,10 +345,11 @@ fun tssSetEntry(i UInt8, base UInt64, limit UInt64) {
 @aligned(64) var cacheIdtr Idtr = new Idtr()
 
 fun setupInterruptsAndExceptions() {
-	var sizeof_TssEntry UInt16 = sizeOf<TssEntry>() as! UInt16
+	let sizeOfTssEntry UInt16 = sizeOf<TssEntry>() as! UInt16
 
-	memset(globalTss as! ArrayPointer<UInt8>, 0, sizeof_TssEntry)
-	globalTss.iomap_offset = sizeof_TssEntry
+	// TODO zeroMemory
+	memset(globalTss as! ArrayPointer<UInt8>, 0, sizeOfTssEntry)
+	globalTss.ioMapOffset = sizeOfTssEntry
 	// TODO per-CPU core stacks required?
 	globalTss.rsp[0] = rsp0stack.ref as! UInt64 + rspStackSize
 	globalTss.rsp[1] = rsp1stack.ref as! UInt64 + rspStackSize
@@ -364,13 +365,13 @@ fun setupInterruptsAndExceptions() {
 	globalTss.ist[6] = ist6stack.ref as! UInt64 + rspStackSize
 	globalTss.ist[7] = ist7stack.ref as! UInt64 + rspStackSize
 
-	var tssBase UInt64 = globalTss as! UInt64
+	let tssBase UInt64 = globalTss as! UInt64
 
 	// upload
 	{
 		serialPrintf("[cpu] TSS base is %8\n", tssBase)
-		tssSetEntry(8, tssBase, sizeof_TssEntry)
-		// tssSetEntry(8, tssBase, sizeof_TssEntry - 1) TODO correct size?
+		tssSetEntry(8, tssBase, sizeOfTssEntry)
+		// tssSetEntry(8, tssBase, sizeOfTssEntry - 1) TODO correct size?
 	}
 
 	// globalGdtr.limit = sizeOf(gdtTemplate) - 1 TODO
@@ -379,7 +380,7 @@ fun setupInterruptsAndExceptions() {
 	lgdt(globalGdtr)
 	{
 		setTsr(64)
-		// TODO setTsr(64 + 3) TODO
+		// TODO setTsr(64 + 3)
 	}
 
 	serialPrintln("[cpu] Initializing interrupts")

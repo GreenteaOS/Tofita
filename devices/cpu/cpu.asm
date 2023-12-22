@@ -357,6 +357,7 @@ enableAllInterruptsAndHalt:
 
 global writeCr3
 writeCr3:
+	; TODO ensure fence is needed here
 	mfence
 	mov	cr3, rcx
 	ret
