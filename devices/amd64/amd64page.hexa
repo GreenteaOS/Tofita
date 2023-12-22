@@ -62,6 +62,7 @@ class PageEntry {
 
 	// TODO
 	/// G: Do not invalidate the TLB entry upon a MOV to CR3 instruction
+	/// Useful for pinning interrupt handlers and kernel memory
 	@bits(1) var global UInt8
 
 	/*

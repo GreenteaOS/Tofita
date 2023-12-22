@@ -93,7 +93,7 @@ fun mapPML4(pml4 ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalA
 	// TODO inv pg asm to invalidate page cache
 }
 
-// Returns actual physical address from virtual address
+/// Returns actual physical address from virtual address
 fun resolveAddr(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64) UInt64 {
 	// TODO unsupported by C `let linear = getPageAddressView(virtualAddr).ref`
 	let linear = getPageAddressView(virtualAddr)
@@ -199,6 +199,7 @@ fun copyKernelMemoryMap(pml4source ArrayPointer<ByValue<PageEntry>>, pml4destina
 	}
 }
 
+// TODO rename pml4 to virtualMemoryTable/Map newVirtualMemoryTable
 // Creates new PML4 for new process
 fun newCR3(pml4source ArrayPointer<ByValue<PageEntry>>) ArrayPointer<ByValue<PageEntry>> {
 	var pml4result = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>
@@ -209,14 +210,16 @@ fun newCR3(pml4source ArrayPointer<ByValue<PageEntry>>) ArrayPointer<ByValue<Pag
 }
 
 fun freeCR3(pml4 PageEntry) Void {
-	// TODO deallocate full lower half
+	// TODO deallocate full lower half (page.dest.arc--)
 }
 
 // Lower half
 // TODO protection ring
 // TODO lower half limit bounds check (it is less than upper starting range)
 fun mapUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, physicalAddr UInt64,
-							pageCount UInt32) {}
+							pageCount UInt32) {
+	// TODO
+}
 
 // Same as VirtualAlloc
 // TODO protection ring
@@ -225,7 +228,9 @@ fun mapUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, physicalAddr U
 // Decides automatically where to allocate
 // if virtualAddr == 0
 // Note: also allocates physical pages, i.e consumes extra memory
-fun allocUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, pageCount UInt32) {}
+fun allocUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, pageCount UInt32) {
+	// TODO
+}
 
 // TODO protection ring
 // TODO respect WoW limits
