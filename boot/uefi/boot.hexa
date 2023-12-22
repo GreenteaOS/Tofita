@@ -363,6 +363,8 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	serialPrintln("[[[uefi]]] mapping pages for kernel loader")
 
+	let pageSize = 4096u64
+
 	mapMemory(upper, largeBuffer, conventionalPages + 1u64, 1, global: true)
 
 	// Note: framebuffer is *not* within physical memory
