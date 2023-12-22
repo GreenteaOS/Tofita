@@ -27,7 +27,7 @@
 		"kernel/gui/theme",
 		"kernel/gui/quake",
 		"kernel/gui/dwm",
-		"kernel/gui/dwm.header",
+		"kernel/gui/dwmState",
 		"kernel/gui/session",
 		"kernel/gui/taskbar",
 		"kernel/gui/desktop",
