@@ -101,6 +101,14 @@ if tasks.length == 0 {
 
 console.log("[Tasks: \(tasks.join(', '))]")
 
+for folder in ['NjRAA', 'Tongue', 'Greentea', 'Teapot'] {
+	if not fs.existsSync('..\\' + folder) {
+		console.error('Folder ..\\\(folder) is not present. You should download this repo from GitHub.')
+		process.exit(123)
+		break
+	}
+}
+
 for task in ['tasks'] {
 	let folder = config.tempFolder + tea
 
@@ -485,7 +493,7 @@ fun runTasks() {
 						console.log(stderr)
 					}
 					process.exitCode = 123
-					process.stdout.once('drain', fun () { Process.exit(123) })
+					process.stdout.once('drain', fun () { process.exit(123) })
 					return
 				}
 
@@ -573,7 +581,7 @@ fun runTasks() {
 			}
 
 			console.log("[All tasks finished in \(Date.now() - begin) ms, upto \(maxBusy) parallel tasks performed]")
-			process.stdout.once('drain', fun () { Process.exit(0) })
+			process.stdout.once('drain', fun () { process.exit(0) })
 		}
 	}
 
