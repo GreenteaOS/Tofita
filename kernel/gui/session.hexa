@@ -282,8 +282,8 @@ class GraphicalSession {
 		for i in taskbarWindowList.children.length {
 			let rectangle = taskbarWindowList.children[i]
 			if rectangle.enabled {
-				rectangle.height = 32i16
-				rectangle.width = 148i16
+				rectangle.height = Theme.hugeTaskbar? 40i16 : 32i16
+				rectangle.width = Theme.hugeTaskbar? 60i16 : 148i16
 				rectangle.relativeX = index * rectangle.width
 				index++
 			}
