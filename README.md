@@ -11,7 +11,7 @@ All-new kernel to-fit-a [Greentea OS](https://github.com/GreenteaOS) (hence "Tof
 [![Automatic Builds](https://img.shields.io/badge/Get-Builds-ff69b4.svg?style=flat)](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 [![Made with Hexa](https://img.shields.io/badge/Code-Hexa-FF7F50.svg?style=flat)](https://github.com/hexalang/hexa)
 
-Greentea OS is aimed to provide complete operating system compatible with existing apps
+Greentea OS is aimed to provide complete operating system [compatible with existing apps](https://github.com/GreenteaOS/Greentea#compatibility-goals)
 
 ![Screenshot](https://raw.githubusercontent.com/GreenteaOS/Greentea/kawaii/Images/screenshot.jpg)
 
@@ -43,9 +43,22 @@ Become a sponsor to help us hire developers and test more hardware
 - [`Greentea OS Compat`](https://t.me/s/greenteaos_official/7) - Greentea OS compatibility assistant
 - [`build.bat`](build.bat) - check comments for examples of how to re-inject .iso file in VirtualBox and avoid full VM reboot for faster testing iterations
 
+## Edit Online
+
+You may edit and commit directly from the browser:
+
+https://github.dev/GreenteaOS/Tofita/blob/kawaii/README.md
+
+Remember to open `Extensions` and install **Hexa**!
+Reload the tab if you don't see file icons.
+
+Making a commit in the `Source Control` panel will create a *Fork* automatically for you.
+
 ## Build
 
 Get automatic build or make yours with Teapot (if you want to edit the code)
+
+Teapot is a bundle containing all of the build tools you need like LLVM and NASM.
 
 ### Automatic builds
 
@@ -97,6 +110,8 @@ cmd /c build
 ```
 
 Or just open `build.bat` file with Explorer.
+
+You'll find `Tea` subfolder with binaries and disk image.
 
 ## License
 
