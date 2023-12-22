@@ -104,13 +104,17 @@ fun conventionalAllocateLargest(memoryMap UefiMemoryMap) {
 }
 
 var conventionalOffset UInt64 = 0u64
+var conventionalPages UInt64 = 0u64
 fun conventionalAllocateNext(bytes UInt64) UInt64 {
 	let result = conventionalOffset
 	let pageSize = pageSize as! UInt64 // TODO Hexa: is it needed?
-	let pages = bytes / pageSize // Math.floor
+	let pages = bytes / pageSize // Math.floor TODO Hexa: `\`
 	conventionalOffset += pages * pageSize
+	conventionalPages += pages
+	// TODO meaning
 	if (bytes - (pages * pageSize)) > 0 {
 		conventionalOffset += pageSize
+		conventionalPages++
 	}
 	return result
 }
