@@ -96,6 +96,13 @@ portInb:
     in al, dx
     ret
 
+; CPU pause
+global pause
+pause:
+	mfence
+	pause
+	ret
+
 global binFont
 binFont:
 incbin "boot/loader/ascii.tofita"

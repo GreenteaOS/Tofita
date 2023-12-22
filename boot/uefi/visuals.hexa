@@ -157,4 +157,8 @@ fun drawVerbose(text String, framebuffer FrameBuffer) {
 	drawCleanup(errorY + 32i16, framebuffer)
 	drawText(text, errorY + 32i16, framebuffer)
 	// TODO also to COM
+
+	// Ensure it goes into framebuffer before hang
+	__sync_synchronize()
+	pause()
 }

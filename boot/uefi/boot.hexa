@@ -30,12 +30,22 @@ fun memset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void {
 
 // CR3 trampoline
 @extern
-@rename("trampolineCR3") // TODO
+@rename("trampolineCR3") // TODO Hexa: @asIs
 @convention(fastcall) @fastcall // TODO
 declare fun
 trampolineCR3(@volatile kernelParams UInt64, @volatile pml4 UInt64, @volatile stack UInt64,
 			  @volatile entry UInt64) Void
 
+// CPU manipulation
+@extern
+@rename("__sync_synchronize")
+declare fun __sync_synchronize() Void
+
+@extern
+@rename("pause")
+declare fun pause() Void
+
+// Hexa compiler definitions
 @extern @rename('versionMajor') declare let versionMajor Int
 @extern @rename('versionMinor') declare let versionMinor Int
 @extern @rename('versionTag') declare let versionTag Int
