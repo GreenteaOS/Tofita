@@ -235,6 +235,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	let largeBuffer UInt64 = conventionalAllocateLargest(efiMemoryMap)
 	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", largeBuffer)
 	conventionalOffset = largeBuffer
+
 	var addressOfEntryPoint UInt64 = 0
 
 	drawVerbose("Load kernel file...", framebuffer)
@@ -254,7 +255,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 		let imageSectionHeader =
 			((peOptionalHeader as! UInt64) + peHeader.mSizeOfOptionalHeader) as! ArrayPointer<ByValue<ImageSectionHeader>>
 
-		// TODO seems like normalizer cannot iterate over `UInt16`
+		// TODO Hexa: seems like normalizer cannot iterate over `UInt16`
 		// `for i in peHeader.mNumberOfSections {`
 		let mNumberOfSections Int = peHeader.mNumberOfSections
 		for i in mNumberOfSections {
@@ -362,20 +363,20 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	serialPrintln("[[[uefi]]] mapping pages for kernel loader")
 
-	mapMemory(upper, largeBuffer, (conventionalOffset - largeBuffer) / pageSize + 1, 1)
+	mapMemory(upper, largeBuffer, conventionalPages + 1u64, 1, global: true)
 
 	// Note: framebuffer is *not* within physical memory
 	mapFrameBuffer(params.framebuffer.ref)
 	drawLoading(framebuffer, 2)
 	mapEfiRuntime(params.efiMemoryMap.ref)
 	// TODO is +1 needed? better make helper function
-	mapMemoryHuge(wholePhysicalStart, 0, (ram / pageSize) + 1)
+	mapMemoryHuge(wholePhysicalStart, 0, (ram / pageSize) + 1u64, global: true)
 
 	drawVerbose("Setup kernel mode...", framebuffer)
 	let startFunction = (conventionalOffset + pageSize) as! InitKernelTrampoline
-	// TODO somehow ensure size is enough to copy whole trampoline (-D arg same as verison)
-	tmemcpy(startFunction as! ArrayPointer<UInt8>, trampolineCR3 as! ConstArrayPointer<UInt8>, 32)
-	mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0)
+	// TODO somehow ensure size is enough to copy whole trampoline (-D arg same as version)
+	tmemcpy(startFunction as! ArrayPointer<UInt8>, trampolineCR3 as! ConstArrayPointer<UInt8>, 64)
+	mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0, global: false)
 
 	// Fix virtual addresses
 

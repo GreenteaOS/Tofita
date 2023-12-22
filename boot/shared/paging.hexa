@@ -56,7 +56,7 @@ fun mapEfiRuntime(memoryMap UefiMemoryMap) {
 			// TODO should be RW or RO? NX? Ring0?
 			// Note: in VirtualBox, physicalStart seems way beyond RAM bounds
 			// Seems like fixup should be applied only if PhysicalStart < ramBytes?
-			mapMemory(descriptor.physicalStart, descriptor.physicalStart, descriptor.numberOfPages, 1u8)
+			mapMemory(descriptor.physicalStart, descriptor.physicalStart, descriptor.numberOfPages, 1u8, global: false)
 			sum += descriptor.numberOfPages
 		}
 
@@ -119,5 +119,10 @@ fun mapFrameBuffer(@readonly fb FrameBuffer) {
 	// TODO map ALL with EPIC pages?
 	// TODO test huge pages on more hardware
 	// mapMemory(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u64, 1u8)
-	mapMemoryHuge(frameBufferVirtualBase, fb.base as! UInt64, fb.size / pageSize + 1u32)
+	mapMemoryHuge(
+		frameBufferVirtualBase,
+		fb.base as! UInt64,
+		fb.size / pageSize + 1u32,
+		global: true
+	)
 }
