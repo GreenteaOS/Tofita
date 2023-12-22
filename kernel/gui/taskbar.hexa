@@ -16,8 +16,9 @@
 class Taskbar {
 	static fun compositeOpenedWindowsList(taskbarY Int16) {
 		// TODO just use specs from collider
-		let shortcutsWidth = 36u16 // 24 is too small
-		let shortcutsEnd = shortcutsWidth + 44
+		let shortcutsWidth = Theme.hugeTaskbar? 0 : 36u16 // 24 is too small
+		let startWidth = 44u16
+		let shortcutsEnd = shortcutsWidth + startWidth
 		var color = new ByValue<Pixel32>()
 		// TODO use colors from Theme
 		color.ref.rgba.ref.a = 100
@@ -58,7 +59,7 @@ class Taskbar {
 				if firstResponder == window.windowId {
 					color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 					color.ref.rgba.ref.a = 64
-					drawRectangleWithAlpha(color.ref, x + 2i16, y, w - 4u16, 26u16)
+					drawRectangleWithAlpha(color.ref, x + 2i16, y, w - 4u16, rectangle.height - 6u16)
 					color.ref.rgba.ref.a = 100
 				} else {
 					if rectangle.mouseOver {
@@ -74,7 +75,11 @@ class Taskbar {
 
 				color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xAAu8
 				// TODO proper app icon
-				drawBitmap32WithAlpha(Theme.hugeTaskbar? app32 : window.icon, x + 6i16, y + 5i16)
+				drawBitmap32WithAlpha(
+					Theme.hugeTaskbar? app32 : window.icon,
+					x + (Theme.hugeTaskbar? 14i16 : 6i16),
+					y + (Theme.hugeTaskbar? 3i16 : 5i16)
+				)
 				// TODO widthLimit Int16, wrapAround Bool, heightLimit Int16
 				let appTitleOffset = 29u16
 				if not Theme.hugeTaskbar {
@@ -84,7 +89,7 @@ class Taskbar {
 				// TODO animate
 				// TODO to not look like win10 by default, draw them as vertical
 				// gradients as I did want long ago!!!
-				drawRectangleWithAlpha(color.ref, x + 2i16, y + 26i16, w - 4u16, 4u16)
+				drawRectangleWithAlpha(color.ref, x + 2i16, y + rectangle.height - 6i16, w - 4u16, Theme.hugeTaskbar? 2u16 : 4u16)
 			}
 		}
 	}

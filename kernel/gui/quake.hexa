@@ -102,6 +102,9 @@ fun quakeHandleButtonDown(key UInt8) {
 			quakePrintf("Command completed.\n".utf16())
 		} else if quakeCommand == 'huge' {
 			Theme.hugeTaskbar = not Theme.hugeTaskbar
+			defaultSession.taskbarPin.enabled = not Theme.hugeTaskbar
+			defaultSession.taskbarPin.width = Theme.hugeTaskbar? 0i16 : 36i16
+			defaultSession.resize()
 			defaultSession.resizeWindowList()
 			quakePrintf("Command completed.\n".utf16())
 		} else if quakeCommand == 'exe' {

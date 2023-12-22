@@ -275,6 +275,7 @@ class GraphicalSession {
 		taskbarTrayOpener.relativeX = taskbarInput.relativeX - taskbarTrayOpener.width
 		taskbarSearch.relativeX = taskbarTrayOpener.relativeX - taskbarSearch.width
 		taskbarWindowList.width = taskbarSearch.relativeX - (taskbarStart.width * 2i16 /*TODO*/)
+		taskbarWindowList.relativeX = taskbarPin.relativeX + taskbarPin.width
 	}
 
 	fun resizeWindowList() {

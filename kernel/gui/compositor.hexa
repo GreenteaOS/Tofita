@@ -346,8 +346,8 @@ fun initializeCompositor() {
 	picture48 = loadIcon(e.data as! ConstArrayPointer<UInt8>, 48)
 
 	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/256_utilities-terminal.ico")
-	app32 = loadIcon(asset.data as! ConstArrayPointer<UInt8>, 32)
+	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/app32.png")
+	app32 = loadPng32(asset)
 
 	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Conservative/folder48.png")
@@ -776,21 +776,25 @@ fun composite(startupMilliseconds UInt64) {
 
 	// Taskbar shortcuts (pins)
 	// TODO move to taskbar.hexa
-	// TODO just use specs from collider
-	let shortcutsWidth = 36u16 // 24 is too small
-	// TODO respect leaves padding
-	let shortcutsIconX = 44i16 + (shortcutsWidth / 2i16) - (16 / 2i16)
-	let shortcutsEnd = shortcutsWidth + 44
-	if let rectangle = defaultSession.taskbarPin, rectangle.mouseOver {
-		drawRectangleWithAlpha(
-			rectangle.mouseHold? holdColor.ref : hoverColor.ref,
-			44i16,
-			taskbarY,
-			shortcutsWidth,
-			taskbarHeight
-		)
+	// Disable in huge mode cause looks not in style
+	if not Theme.hugeTaskbar {
+		// TODO just use specs from collider
+		let shortcutsWidth = 36u16 // 24 is too small
+		// TODO respect leaves padding
+		let shortcutsIconX = 44i16 + (shortcutsWidth / 2i16) - (16 / 2i16)
+		let shortcutsEnd = shortcutsWidth + 44
+		if let rectangle = defaultSession.taskbarPin, rectangle.mouseOver {
+			drawRectangleWithAlpha(
+				rectangle.mouseHold? holdColor.ref : hoverColor.ref,
+				44i16,
+				taskbarY,
+				shortcutsWidth,
+				taskbarHeight
+			)
+		}
+
+		drawBitmap32WithAlpha(notepad16, shortcutsIconX, taskbarY + 7i16)
 	}
-	drawBitmap32WithAlpha(notepad16, shortcutsIconX, taskbarY + 7i16)
 
 	// Version
 	{
