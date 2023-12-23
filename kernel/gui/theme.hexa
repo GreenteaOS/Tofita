@@ -16,7 +16,10 @@
 class Theme {
 	static var centeredStart = false
 	static var verbose = false
-	static var fast = false
+
+	/// Fast composition with special CPU instructions
+	static var fast = true
+
 	static var hugeTaskbar = false
 
 	new () {}

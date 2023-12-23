@@ -94,12 +94,17 @@ fun quakeHandleButtonDown(key UInt8) {
 			justBlur = not justBlur
 			// TODO sync to avoid race conditions
 			setWallpaper(wallpaperSource, WallpaperStyle.Center)
+			quakePrintf("Command completed.\n".utf16())
 		} else if quakeCommand == 'center' {
 			Theme.centeredStart = not Theme.centeredStart
 			quakePrintf("Command completed.\n".utf16())
 		} else if quakeCommand == 'fast' {
 			Theme.fast = not Theme.fast
-			quakePrintf("Command completed.\n".utf16())
+			if Theme.fast {
+				quakePrintf("Fast composition mode enabled.\n".utf16())
+			} else {
+				quakePrintf("Fast composition mode disabled.\n".utf16())
+			}
 		} else if quakeCommand == 'huge' {
 			Theme.hugeTaskbar = not Theme.hugeTaskbar
 			defaultSession.taskbarPin.enabled = not Theme.hugeTaskbar
