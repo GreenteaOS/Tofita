@@ -113,8 +113,9 @@ declare fun wrmsr(
 ')
 @rename('pat')
 declare fun pat(
-	msr UInt64,
-	value UInt64
+	// TODO
+	// msr UInt64,
+	// value UInt64
 ) Void
 
 @customHeader('

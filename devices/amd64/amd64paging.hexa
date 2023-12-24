@@ -83,6 +83,7 @@ fun mapPDPT(pdpt ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalA
 	mapPD(pd, virtualAddr, physicalAddr, writeAllowed, accessibleByUser)
 }
 
+// TODO `private` all those functions
 fun mapPML4(pml4 ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64,
 							writeAllowed Bool, accessibleByUser Bool) Void {
 	let view = getPageAddressView(virtualAddr)

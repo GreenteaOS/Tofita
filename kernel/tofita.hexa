@@ -13,18 +13,22 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// CRT
 fun memzero(dest ArrayPointer<UInt8>, len UInt64) {
 	memset(dest, 0, len)
 }
 
+// Clang workaround
 @keep
 @rename('___chkstk_ms')
 fun chkstkStub() Void {}
 
+// Hexa definitions
 @extern @rename('versionMajor') declare let versionMajor Int
 @extern @rename('versionMinor') declare let versionMinor Int
 @extern @rename('versionTag') declare let versionTag Int
 
+/// Entry point from trampoline.asm
 fun kernelInit(params UefiPayload) {
 	serialPrintln("<Tofita> Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " kernel loaded and operational")
 	serialPrintf("<Tofita> CR3 points to: %8\n", params.pml4 as! UInt64)
@@ -34,14 +38,21 @@ fun kernelInit(params UefiPayload) {
 	// Ensure to allocate within 1 MB
 	PhysicalAllocator.resetCounter()
 	let trapezePadding = PhysicalAllocator.allocateOnePage()
-	// TODO ^ rename to "first reserved 4k"? Does it even works like that? Clearify in comments
+	// TODO ^ rename to "first reserved 4k"? Does it even works like that? Clarify in comments
 	let trapeze = PhysicalAllocator.allocatePages(8) // Bootloader
 	let trapezePhysical = trapeze - (wholePhysicalStart as! UInt64)
 
 	pml4entries = ((wholePhysicalStart as! UInt64) + (params.pml4 as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 
-	// TODO
-	if false {
+	// CPU features
+	{
+		// Page Attribute Table (PAT)
+		// TODO SMP enable PAT for each AP
+		pat()
+	}
+
+	// TODO move to kernel\health\sanityChecks.hexa
+	if false /*not SanityChecks.isVirtualMemoryOkay() { error }*/ {
 		mapMemory(pml4entries, 4096, 4096, 256, accessibleByUser: false)
 		mapMemory(pml4entries, 4096, 4096, 256, accessibleByUser: false)
 		mapMemory(pml4entries, 4096 * 20u64, 4096 * 10u64, 256, accessibleByUser: false)
