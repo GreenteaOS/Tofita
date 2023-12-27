@@ -43,7 +43,8 @@ fun deleteFolderRecursive(path, noRemoveSelf Bool = false) {
 		})
 		// Fixes some random errors
 		if noRemoveSelf != true {
-			fs.rmdirSync(path)
+			// fs.rmdirSync(path)
+			fs.rmSync(path, { recursive: true, force: true })
 		}
 	}
 }
