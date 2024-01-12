@@ -242,9 +242,9 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	serialPrintf("[[[uefi]]] loaded asset 'tofita.exe' %d bytes at %8\n", asset.size, asset.data)
 
 	drawVerbose("Allocate memory...", framebuffer)
-	let largeBuffer UInt64 = conventionalAllocateLargest(efiMemoryMap)
-	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", largeBuffer)
-	conventionalOffset = largeBuffer
+	conventionalBuffer = conventionalAllocateLargest(efiMemoryMap)
+	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", conventionalBuffer)
+	conventionalOffset = conventionalBuffer
 
 	var addressOfEntryPoint UInt64 = 0
 
@@ -375,7 +375,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	let pageSize = 4096u64
 
-	mapMemory(upper, largeBuffer, conventionalPages + 1u64, 1, global: true)
+	mapMemory(upper, conventionalBuffer, conventionalPages + 1u64, 1, global: true)
 
 	// Note: framebuffer is *not* within physical memory
 	drawVerbose("Setup display memory...", framebuffer)
@@ -405,8 +405,8 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	params.pml4 = (pml4entries as! UInt64)
 	// Physical address TODO elaborate purpose (used for stack overflow detection? trampoline?)
 	params.stack = stack
-	params.physicalBuffer = largeBuffer
-	params.physicalBytes = conventionalOffset - largeBuffer
+	params.physicalBuffer = conventionalBuffer
+	params.physicalBytes = conventionalOffset - conventionalBuffer
 	params.efiRuntimeServices = systemTable.runtimeServices
 	params.acpiTablePhysical = acpiTable as! UInt64
 	params.efiMemoryMap.ref.memoryMap =
