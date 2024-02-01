@@ -446,7 +446,7 @@ class ExeLoader<SIZE, HEADER> {
 		//let amount = count[0] as! SIZE
 		//if amount >= (511 as! SIZE) {
 		if startup.dllCount >= 511 {
-			// TODO error
+			// TODO error > GUI alert DLL entry not found
 			return
 		}
 

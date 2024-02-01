@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -437,6 +437,324 @@ fun destroyWindow(hWnd HWnd) Bool32 {
 	window.proc(hWnd, Message.WM_NON_CLIENT_DESTROY, null, null)
 	tofitaDebugLog("DestroyWindow done".utf16())
 	return Bool32.False // TODO false?
+}
+
+@dllExport('AppendMenuW')
+fun appendMenuW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('CallWindowProcW')
+fun callWindowProcW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('CheckDlgButton')
+fun checkDlgButton(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('CheckMenuItem')
+fun checkMenuItem(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('CheckRadioButton')
+fun checkRadioButton(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('CloseClipboard')
+fun closeClipboard(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('CreateDialogParamW')
+fun createDialogParamW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('CreatePopupMenu')
+fun createPopupMenu(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('DestroyIcon')
+fun destroyIcon(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('DestroyMenu')
+fun destroyMenu(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('DrawFrameControl')
+fun drawFrameControl(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('DrawStateW')
+fun drawStateW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('EmptyClipboard')
+fun emptyClipboard(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('EnableMenuItem')
+fun enableMenuItem(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('EnableWindow')
+fun enableWindow(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('EnumChildWindows')
+fun enumChildWindows(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetAsyncKeyState')
+fun getAsyncKeyState(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetClassNameW')
+fun getClassNameW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetClipboardData')
+fun getClipboardData(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetDlgItem')
+fun getDlgItem(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetDlgItemTextW')
+fun getDlgItemTextW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetFocus')
+fun getFocus(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetKeyboardLayout')
+fun getKeyboardLayout(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetKeyboardState')
+fun getKeyboardState(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetMenu')
+fun getMenu(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetParent')
+fun getParent(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetSubMenu')
+fun getSubMenu(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetSystemMetrics')
+fun getSystemMetrics(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetWindowLongW')
+fun getWindowLongW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetWindowRect')
+fun getWindowRect(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('GetWindowTextW')
+fun getWindowTextW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('InvalidateRect')
+fun invalidateRect(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('IsClipboardFormatAvailable')
+fun isClipboardFormatAvailable(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('IsDlgButtonChecked')
+fun isDlgButtonChecked(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('IsWindow')
+fun isWindow(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('IsWindowEnabled')
+fun isWindowEnabled(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('LoadImageW')
+fun loadImageW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('LoadMenuW')
+fun loadMenuW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('LoadStringW')
+fun loadStringW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('MapVirtualKeyExW')
+fun mapVirtualKeyExW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('MoveWindow')
+fun moveWindow(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('OpenClipboard')
+fun openClipboard(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('PostMessageW')
+fun postMessageW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('SendDlgItemMessageW')
+fun sendDlgItemMessageW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('SendMessageW')
+fun sendMessageW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('SetClipboardData')
+fun setClipboardData(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('SetDlgItemTextW')
+fun setDlgItemTextW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('SetFocus')
+fun setFocus(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('SetMenu')
+fun setMenu(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('SetWindowLongW')
+fun setWindowLongW(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('ToAsciiEx')
+fun toAsciiEx(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('TrackMouseEvent')
+fun trackMouseEvent(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
+
+@dllExport('TrackPopupMenu')
+fun trackPopupMenu(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
 }
 
 @linkName('NO_DllMainCRTStartup')

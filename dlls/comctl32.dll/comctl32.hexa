@@ -13,8 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-@dllExport('comctl32stub')
-fun stub() {}
+@dllExport('InitCommonControls')
+fun initCommonControls(stub SizeOfPointer) SizeOfPointer {
+    // TODO
+    return 0
+}
 
 @linkName('_DllMainCRTStartup_TODO')
 #if bit32

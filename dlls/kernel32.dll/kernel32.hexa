@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -36,6 +36,7 @@ fun localAlloc(flags UInt32, bytes SizeOfPointer) HLocal {
 		bufferOffset++
 		// TODO non-loop align
 	}
+
 	return result as! HLocal
 }
 
@@ -52,6 +53,7 @@ fun heapAlloc(heap Handle, flags UInt32, bytes SizeOfPointer) ArrayPointer<UInt8
 	return localAlloc(0, bytes) as! ArrayPointer<UInt8>
 }
 
+// TODO move to crt
 @dllExport('free')
 fun free(@hide pointer SizeOfPointer) Void {
 	// TODO
