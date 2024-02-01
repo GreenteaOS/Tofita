@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -467,7 +467,13 @@ class ExeLoader<SIZE, HEADER> {
 		let kernel32 = loadDll("kernel32.dll", root, exec)
 		let gdi32 = loadDll("gdi32.dll", root, exec)
 		let user32 = loadDll("user32.dll", root, exec)
+		let advapi32 = loadDll("advapi32.dll", root, exec)
+		let comctl32 = loadDll("comctl32.dll", root, exec)
+		let shell32 = loadDll("shell32.dll", root, exec)
+		let msvcrt = loadDll("msvcrt.dll", root, exec)
 		// TODO read dll files from the list of imports of .exe and .dlls, hardcode only ntdll
+		// ^ ensure paths have no / and \
+		// ^ case insensitive
 		// TODO reuse loaded dlls in memory
 		// TODO load every DLL in separate thread
 
@@ -476,14 +482,21 @@ class ExeLoader<SIZE, HEADER> {
 		// TODO resolve in multiple threads (this is readonly operation over list of imports, but not for sections)
 		resolveDllImports(ntdll, root)
 		resolveDllImports(kernel32, root)
+		resolveDllImports(msvcrt, root)
 		resolveDllImports(gdi32, root)
 		resolveDllImports(user32, root)
+		resolveDllImports(advapi32, root)
+		resolveDllImports(comctl32, root)
+		resolveDllImports(shell32, root)
 		resolveExeImports(app, root)
 
 		addDllEntry(dllEntries, kernel32.entry, startup)
+		addDllEntry(dllEntries, msvcrt.entry, startup)
 		addDllEntry(dllEntries, gdi32.entry, startup)
 		addDllEntry(dllEntries, user32.entry, startup)
-		// TODO addDllEntry(dllEntries, advapi32.entry)
+		addDllEntry(dllEntries, advapi32.entry, startup)
+		addDllEntry(dllEntries, comctl32.entry, startup)
+		addDllEntry(dllEntries, shell32.entry, startup)
 
 		process.is64bit = is64bit
 

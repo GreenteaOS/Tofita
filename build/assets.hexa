@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -29,6 +29,9 @@ let dlls = [
 	'kernel32',
 	'gdi32',
 	'user32',
+	'comctl32',
+	'shell32',
+	'msvcrt',
 	'advapi32'
 ]
 
@@ -37,6 +40,9 @@ let deps [[String]] = [
 	['ntdll'],
 	['ntdll', 'kernel32'],
 	['ntdll', 'kernel32', 'gdi32'],
+	['ntdll', 'kernel32'],
+	['ntdll', 'kernel32'],
+	['ntdll', 'kernel32'],
 	['ntdll', 'kernel32']
 ]
 
