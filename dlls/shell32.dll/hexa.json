@@ -1,0 +1,31 @@
+{
+    "name": "Shell",
+    "version": "1.0.0",
+    "description": "Greentea OS",
+    "author": "PeyTy",
+    "license": "LGPL-3.0-only",
+    "global": [
+        "../types",
+        "../../kernel/syscalls/syscalls",
+        "../kernel32.dll/kernel32.header",
+        "../ntdll.dll/ntdll.header",
+        "shell32.header",
+        "shellMain",
+        "shell32Vars"
+    ],
+    "targets": [
+        {
+            "name": "default",
+            "generator": "c",
+            "output": "shell32.64.c",
+            "options": []
+        },
+        {
+            "name": "i386",
+            "generator": "c",
+            "output": "shell32.32.c",
+            "options": []
+        }
+    ],
+    "entry": "shell32"
+}
