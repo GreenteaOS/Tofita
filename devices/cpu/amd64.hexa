@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -100,7 +100,7 @@ declare fun rdmsr(
 ')
 @rename('wrmsr')
 declare fun wrmsr(
-	msr UInt64,
+	msr UInt64, // TODO enum
 	value UInt64
 ) Void
 

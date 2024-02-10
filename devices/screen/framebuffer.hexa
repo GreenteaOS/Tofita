@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -131,6 +131,7 @@ fun drawBitmap32(bitmap Bitmap32, x Int16, y Int16) {
 		for xx in (xStart as! UInt32)...bitmap.width {
 			// TODO save scanline check to Bool and evaluate eagerly
 			if x + xx > Screen.widthMinusOne or y + yy > Screen.heightMinusOne {
+				// TODO use same concept as yStart but for yEnd
 				continue
 			}
 			Screen.pixels[screenStride + x + xx] = bitmap.pixels[stride + xx]

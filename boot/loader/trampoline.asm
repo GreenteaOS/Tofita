@@ -1,5 +1,5 @@
 ; The Tofita Kernel
-; Copyright (C) 2020 Oleh Petrenko
+; Copyright (C) 2020-2024 Oleh Petrenko
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU Lesser General Public License as published by
@@ -66,7 +66,7 @@ trampolineCR3:
 	mov rbp, rsp ; Frame
 
 	; TODO Reset state
-	;cld ; Clear direction flag
+	;cld ; Clear direction flag TODO actually do it
 	;; Clear registers
 	;xor rax, rax
 	;xor rdx, rdx
@@ -80,6 +80,8 @@ trampolineCR3:
 
 	; Enter main [with rcx]
 	o64 call r9
+	; TODO times 64 - ($-$$) db 0 ; Padding
+	; TODO size: dw $-$$ to store a size in the bootloader that you could look at in an asm listing or hexdump. But that takes up 2 bytes.
 
 ; COM write
 global portOutb

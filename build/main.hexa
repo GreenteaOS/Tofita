@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -110,6 +110,7 @@ for folder in ['NjRAA', 'Tongue', 'Greentea', 'Teapot'] {
 	}
 }
 
+// TODO remove this
 for task in ['tasks'] {
 	let folder = config.tempFolder + tea
 
@@ -170,6 +171,8 @@ for task in tasks {
 		case 'experimental':
 			// TODO
 		case 'init-or-clean':
+			// TODO check the presence of other repos like Tongue etc at ../
+			// if they are at ./ than show recommendation
 			cleanupTask = true
 		case 'asm':
 			asmTask = true
@@ -180,11 +183,13 @@ for task in tasks {
 		case 'kernel':
 			kernelTask = true
 		case 'ramdisk':
+		//TODO ram-disk or assets
 			ramDiskTask = true
 		case 'iso':
 			isoTask = true
-		case 'riscv64': // TODO
-		case 'arm64': // TODO
+		case 'risc64': // TODO
+		case 'arm64':
+		// TODO
 			// TODO disallow doc comment on non expr
 			{
 				/// TODO like this one
@@ -340,6 +345,7 @@ fun runTasks() {
 
 				let outobj = folder + '\\' + dlls[i] + '.' + bit + '_dll.obj'
 
+				// TODO output warnings! cause -x is unused
 				phase2.push(
 					[
 						clang + ' ',
@@ -469,6 +475,9 @@ fun runTasks() {
 						(
 							' bit named ' + config.tempFolder + '/' + teaFolder + '/!named.bit.lib '
 						)
+					// TODO Hexa: }catch e: Any {} `:`
+					//try {fs.unlinkSync(config.tempFolder + '/' + teaFolder + '/!\(named).64.lib')}catch e: Any {}
+
 					phase2.push(libgen + (gen + items64).replaceAll('named', named).replaceAll('bit', '64'))
 					phase2.push(libgen + (gen + items32).replaceAll('named', named).replaceAll('bit', '32'))
 				}

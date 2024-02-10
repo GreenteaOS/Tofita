@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -20,6 +20,7 @@ let addressBits = 12
 
 // TODO remove this
 @aligned(4096) var pml4entries ArrayPointer<ByValue<PageEntry>> = null as! ArrayPointer<ByValue<PageEntry>>
+// TODO Hexa must error <Int>: @aligned(4096) var pml4entries VirtualMemoryMap = null as! ArrayPointer<ByValue<Int>>
 
 // TODO combine flags into bit mask
 fun mapPage(entry PageEntry, address UInt64, writeAllowed Bool, accessibleByUser Bool) {
@@ -134,6 +135,7 @@ fun resolveAddr(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64
 // TODO ^ same clang warning
 // TODO should accept usermode flag so shared memory and GDI buffers can be mapped out of user scope
 // ^ probably should be other way for WoW processes
+// TODO mapUserMemory and separate mapKernelMemory
 fun mapMemory(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, physicalAddr UInt64, pageCount UInt32, accessibleByUser Bool) {
 	serialPrintln("[paging] mapping memory range")
 
@@ -241,6 +243,7 @@ fun allocUserspaceMemory(pml4entries PageEntry, virtualAddr UInt64, pageCount UI
 // Does NOT allocate physical memory for the requested range
 // Returns 0 if requested pointer is occupied
 // TODO rename to findUserMemory or findLowerMemory or findProcessMemory
+// TODO fun findUserspaceMemoryAt( isAvailableUserMemoryAt
 fun findUserspaceMemory(
 	pml4entries ArrayPointer<ByValue<PageEntry>>,
 	virtualAddr UInt64,

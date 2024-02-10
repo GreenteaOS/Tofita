@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -236,7 +236,7 @@ fun kernelInit(params UefiPayload) {
 
 	// GUI
 	// TODO should be done at main thread
-	// TODO use some kind of autorun.ini asset
+	// TODO use some kind of autorun.ini/.bat asset
 	if true {
 		for i in 3
 		{

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -145,20 +145,25 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	serialPrintln("[[[uefi]]] begin: uefiGetMemoryMap")
 	drawVerbose("Getting memory map...", framebuffer)
 	var sizeAlloc UInt64 = (ramdisk.size / pageSize + 1) * pageSize
-	var efiMemoryMap UefiMemoryMap = new UefiMemoryMap()
+	var efiMemoryMap UefiMemoryMap = new UefiMemoryMap() // TODO can be just by value on stack
+	// TODO is 512 x sizeof or just 512
 	efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64
 	// TODO bug efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512
 	// TODO sizeOf<EFI_MEMORY_DESCRIPTOR>() ?
 	// TODO is 512 enough?
 	// TODO is this storage destination ok?
+	// TODO use conventional alloc with alignment at 4k
 	efiMemoryMap.memoryMap = (ramdisk.base + sizeAlloc) as! EFI_MEMORY_DESCRIPTOR
 	{
 		var b = efiMemoryMap.memoryMap as! ArrayPointer<UInt8>
 		for i in efiMemoryMap.memoryMapSize {
 			// TODO faster with uint64_t
 			b[i] = buffa[0]
+			// TODO zero-fill buffer for EFI memory map -< unify to zeroFill()
 		}
 	}
+
+	// TODO check for error STATUS_EFI_BUFFER_TOO_SMALL
 	uefiGetMemoryMap(efiMemoryMap, systemTable)
 	serialPrintln("[[[uefi]]] done: uefiGetMemoryMap")
 
@@ -242,6 +247,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	serialPrintf("[[[uefi]]] loaded asset 'tofita.exe' %d bytes at %8\n", asset.size, asset.data)
 
 	drawVerbose("Allocate memory...", framebuffer)
+	// TODO how to ensure the memory is preserved by UEFI and memory map is unchanged when Exit B S called?
 	conventionalBuffer = conventionalAllocateLargest(efiMemoryMap)
 	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", conventionalBuffer)
 	conventionalOffset = conventionalBuffer

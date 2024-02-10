@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -94,5 +94,7 @@ class PageEntry {
 	@bits(4) var protectionKey UInt8
 
 	/// XD/NX-bit: Instructions are not allowed to be executed at addresses within the page
+	// TODO make it impossible to map executable memory in higher half after boot AT ALL!
+	// ^ map with EXEC in boot for kernel code and that's it
 	@bits(1) var disableExecution UInt8
 }

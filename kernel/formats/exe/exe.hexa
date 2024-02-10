@@ -366,13 +366,15 @@ class ExeLoader<SIZE, HEADER> {
 							// TODO `tofitaStdStub`
 							// TODO separate placeholders for std call etc
 							// TODO cache the bytes!
+							// TODO resolve upfront and cache !!! for faster exe load
 							if let placeholder = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root) {
 								func = placeholder.ptr as! SIZE
 								if Theme.verbose and unresolved < 2 {
-									quakePrintf("[resolveDllImports] using placeholder for {%s}\n".utf16(), szImportName)
+									// TODO Hexa: meta.funName instead of "resolveDllImports" text
+									quakePrintf("[resolveDllImports] using placeholder for %s of %s\n".utf16(), szImportName, szName)
 								}
 								if Theme.verbose and unresolved == 2 {
-									quakePrintf("[resolveDllImports] similar messages will be hidden\n".utf16(), szImportName)
+									quakePrintf("[resolveDllImports] similar messages will be hidden\n".utf16())
 								}
 							} else {
 								serialPrintf("[resolveDllImports] placeholder for {%s} is unresolved\n", szImportName)
@@ -380,7 +382,7 @@ class ExeLoader<SIZE, HEADER> {
 									quakePrintf("[resolveDllImports] placeholder for {%s} is unresolved\n".utf16(), szImportName)
 								}
 								if Theme.verbose and unresolved == 2 {
-									quakePrintf("[resolveDllImports] similar messages will be hidden\n".utf16(), szImportName)
+									quakePrintf("[resolveDllImports] similar messages will be hidden\n".utf16())
 								}
 							}
 

@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -247,6 +247,9 @@ class PhysicalAllocator {
 
 				i++
 			}
+
+			// TODO Hexa: `meta.moduleName` instead of `"physical"`
+			// ^ `fun log(text, moduleName = meta.callerModuleName)` `log(x, _)` <- assume default arg value
 			serialPrintf("[physical] allocatePages current %u\n", current)
 			serialPrintf("[physical] allocatePages currentAt %u\n", currentAt)
 		}

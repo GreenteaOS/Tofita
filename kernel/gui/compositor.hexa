@@ -1,5 +1,5 @@
 // The Tofita Kernel
-// Copyright (C) 2022-2023 Oleh Petrenko
+// Copyright (C) 2022-2024 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -345,6 +345,7 @@ fun initializeCompositor() {
 	getRamDiskAsset(e, "root/Windows/Resources/Icons/256_image-x-generic.ico")
 	picture48 = loadIcon(e.data as! ConstArrayPointer<UInt8>, 48)
 
+	// TODO `getRamDiskAsset` should be null-safe!!! cause forgot to add asset sometimes
 	let asset = new RamDiskAsset()
 	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/app32.png")
 	app32 = loadPng32(asset)
