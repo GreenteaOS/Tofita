@@ -229,7 +229,7 @@ class ACPIParser {
 	}
 
 	static /*TODO private*/ fun physicalToVirtual(physical UInt64) UInt64 {
-		var result UInt64 = (wholePhysicalStart as! UInt64) + (physical as! UInt64)
+		var result UInt64 = wholePhysicalStart + (physical as! UInt64)
 		return result
 	}
 

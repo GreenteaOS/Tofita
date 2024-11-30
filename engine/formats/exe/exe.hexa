@@ -135,7 +135,7 @@ class ExeLoader<SIZE, HEADER> {
 		mapMemory(
 			exec.pml4,
 			exec.nextBase,
-			physical - (wholePhysicalStart as! UInt64),
+			physical - wholePhysicalStart,
 			pages,
 			accessibleByUser: true
 		)
@@ -431,7 +431,7 @@ class ExeLoader<SIZE, HEADER> {
 			mapMemory(
 				exec.pml4,
 				exec.nextBase,
-				physical - (wholePhysicalStart as! UInt64),
+				physical - wholePhysicalStart,
 				pages,
 				accessibleByUser: true
 			)

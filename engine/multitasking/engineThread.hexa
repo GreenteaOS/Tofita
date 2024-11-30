@@ -62,7 +62,7 @@ fun engineThread() {
 					// Remember pml4 for proper restore from scheduling
 					pml4engineThread = process.pml4
 					// Select pml4 to work within current process memory
-					writeCr3((pml4engineThread as! UInt64) - (wholePhysicalStart as! UInt64))
+					writeCr3((pml4engineThread as! UInt64) - wholePhysicalStart)
 
 					// TODO refactor to separate syscall handler per-DLL and handlers table by syscall id
 
@@ -105,7 +105,7 @@ fun engineThread() {
 						// Select pml4 of idle process for safety
 						// TODO idle as `idle TofitaProcess` var, not `[0]`
 						pml4engineThread = processes[0].pml4
-						writeCr3((pml4engineThread as! UInt64) - (wholePhysicalStart as! UInt64))
+						writeCr3((pml4engineThread as! UInt64) - wholePhysicalStart)
 
 						// De-allocate process
 						// TODO as TofitaProcess class method
@@ -132,7 +132,7 @@ fun engineThread() {
 						// Select pml4 of idle process for safety
 						pml4engineThread = processes[0].pml4
 						// TODO `TofitaProcess.this.writeOwnCr3`
-						writeCr3((pml4engineThread as! UInt64) - (wholePhysicalStart as! UInt64))
+						writeCr3((pml4engineThread as! UInt64) - wholePhysicalStart)
 
 						// De-allocate process
 						processDestroy(process)

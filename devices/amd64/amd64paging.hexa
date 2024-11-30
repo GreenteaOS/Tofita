@@ -37,11 +37,11 @@ fun referOrCreatePage(table ArrayPointer<ByValue<PageEntry>>, entryId UInt64, wr
 
 	if entry.present == 1 {
 		// TODO `.present` is not always means allocated
-		return ((entry.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
+		return ((entry.address << addressBits) + wholePhysicalStart) as! ArrayPointer<ByValue<PageEntry>>
 	} else {
 		var newPage = PhysicalAllocator.allocateOnePagePreZeroed() as! ArrayPointer<ByValue<PageEntry>>
 		if newPage != null {
-			mapPage(entry, (newPage as! UInt64) - (wholePhysicalStart as! UInt64), writeAllowed, accessibleByUser)
+			mapPage(entry, (newPage as! UInt64) - wholePhysicalStart, writeAllowed, accessibleByUser)
 			// TODO else error
 		}
 		return newPage
@@ -106,7 +106,7 @@ fun resolveAddr(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64
 	if entry[0].ref.present == 0 {
 		return physical_not_found
 	}
-	entry = ((entry[0].ref.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
+	entry = ((entry [0].ref.address << addressBits) + wholePhysicalStart) as! ArrayPointer<ByValue<PageEntry>>
 	// pdpt
 	entry = entry[linear.pdpt] as! ArrayPointer<ByValue<PageEntry>>
 	if entry[0].ref.present == 0 {
@@ -170,7 +170,7 @@ fun mapMemory(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, 
 	}
 
 	// TODO rethink where to call this
-	writeCr3((pml4entries as! UInt64) - (wholePhysicalStart as! UInt64))
+	writeCr3((pml4entries as! UInt64) - wholePhysicalStart)
 }
 
 // Unmaps pages without actually deallocating them, still deallocates unused page tables

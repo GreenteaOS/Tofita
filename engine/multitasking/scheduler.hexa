@@ -97,7 +97,7 @@ fun switchToEngineThread(@volatile frame InterruptFrame) {
 
 	// Restore
 	currentThread = ThreadKind.THREAD_ENGINE
-	writeCr3((pml4engineThread as! UInt64) - (wholePhysicalStart as! UInt64))
+	writeCr3((pml4engineThread as! UInt64) - wholePhysicalStart)
 	tmemcpy(frame as! ArrayPointer<UInt8>, engineThreadFrame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 }
 
@@ -114,7 +114,7 @@ fun switchToNextProcess(@volatile frame InterruptFrame) {
 	currentProcess = process.pid
 	// TODO in .exe loader, disallow changing of CR3 until not fully loaded
 	// another option is to save/restore CR3 used by engine thread
-	writeCr3((process.pml4 as! UInt64) - (wholePhysicalStart as! UInt64))
+	writeCr3((process.pml4 as! UInt64) - wholePhysicalStart)
 	process.scheduleOnNextTick = false
 
 	// Note: pid 0 is not real process, so keep things in engine
@@ -135,7 +135,7 @@ fun switchToNextProcess(@volatile frame InterruptFrame) {
 		currentThread = ThreadKind.THREAD_USER
 		tmemcpy(frame as! ArrayPointer<UInt8>, process.frame as! ConstArrayPointer<UInt8>, sizeOf<InterruptFrame>())
 	} else {
-		writeCr3((pml4engineThread as! UInt64) - (wholePhysicalStart as! UInt64))
+		writeCr3((pml4engineThread as! UInt64) - wholePhysicalStart)
 		switchToEngineThread(frame)
 	}
 }

@@ -52,13 +52,13 @@ class Physical<T> {
 
 	fun toVirtual() Virtual<T> {
 		var physical UInt64 = this as! UInt64
-		var result UInt64 = (wholePhysicalStart as! UInt64) + physical
+		var result UInt64 = wholePhysicalStart + physical
 		return result as! Virtual<T>
 	}
 
 	fun toVirtualOffset(offset UInt64) Virtual<T> {
 		var physical UInt64 = this as! UInt64
-		var result UInt64 = (wholePhysicalStart as! UInt64) + physical + offset
+		var result UInt64 = wholePhysicalStart + physical + offset
 		return result as! Virtual<T>
 	}
 }*/

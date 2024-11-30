@@ -421,9 +421,9 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	// Convert addresses to upper half
 
-	let stack = (wholePhysicalStart as! UInt64) + stack
-	params.physicalRamBitMaskVirtual = (wholePhysicalStart as! UInt64) + params.physicalRamBitMaskVirtual
-	let params = ((wholePhysicalStart as! UInt64) + (params as! UInt64)) as! UefiPayload
+	let stack = wholePhysicalStart + stack
+	params.physicalRamBitMaskVirtual = wholePhysicalStart + params.physicalRamBitMaskVirtual
+	let params = (wholePhysicalStart + (params as! UInt64)) as! UefiPayload
 
 	serialPrintln("[[[uefi]]] done: all done, entering engine loader")
 
