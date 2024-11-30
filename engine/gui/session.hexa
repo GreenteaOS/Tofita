@@ -550,8 +550,7 @@ fun startPinHandler(id UInt64, event ColliderEventType) Void {
 
 fun hintOfFile(id UInt64) String {
 	let shortcut = desktopShortcuts[id]
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, shortcut.file)
+	let asset = getRamDiskAsset(shortcut.file)
 
 	if asset.data != null /* TODO , asset.data.length > 0 */ {
 		// TODO more + comma separators

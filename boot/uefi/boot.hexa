@@ -241,9 +241,8 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	serialPrintln("[[[uefi]]] begin: preparing engine loader")
 
 	// TODO forward constructor arguments `var asset ByValue<RamDiskAsset> = new ByValue<RamDiskAsset>()`
-	var asset RamDiskAsset = new RamDiskAsset()
 	drawVerbose("Load engine file...", framebuffer)
-	getRamDiskAsset(asset, "tofita.exe")
+	let asset RamDiskAsset = getRamDiskAsset("tofita.exe")
 	serialPrintf("[[[uefi]]] loaded asset 'tofita.exe' %d bytes at %8\n", asset.size, asset.data)
 
 	drawVerbose("Allocate memory...", framebuffer)

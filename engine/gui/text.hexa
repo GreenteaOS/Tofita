@@ -29,12 +29,10 @@ class TextFontList {
 var textFontList ArrayPointer<ByValue<TextFontList>> = null as! ArrayPointer<ByValue<TextFontList>>
 
 fun initText() {
-	var textFont = new RamDiskAsset()
-	getRamDiskAsset(textFont, "ascii.tofita")
+	var textFont = getRamDiskAsset("ascii.tofita")
 	textFontList = textFont.data as! ArrayPointer<ByValue<TextFontList>>
 
-	var font = new RamDiskAsset()
-	getRamDiskAsset(font, "root/Windows/Fonts/ascii.png")
+	var font = getRamDiskAsset("root/Windows/Fonts/ascii.png")
 	textFontBitmap = loadPng32(font)
 }
 

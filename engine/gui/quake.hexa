@@ -139,8 +139,7 @@ fun quakeHandleButtonDown(key UInt8) {
 			Theme.verbose = not Theme.verbose
 			quakePrintf("Command completed. You may now open any .exe and check the output.\n".utf16())
 		} else if quakeCommand == 'wallpaper' {
-			let a = new RamDiskAsset()
-			getRamDiskAsset(a, "root/Windows/Web/Wallpaper/Tofita/alternative.png")
+			let a = getRamDiskAsset("root/Windows/Web/Wallpaper/Tofita/alternative.png")
 			wallpaperSource = loadPng32(a)
 			if wallpaperSource.width == 0 or wallpaperSource.height == 0 {
 				quakePrintf("Color palette format unsupported for the provided image file.\n".utf16())

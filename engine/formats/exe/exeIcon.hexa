@@ -184,8 +184,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 }
 
 fun getExeIconFromPath(file String /*TODO iconWidth*/) Bitmap32? {
-	let asset RamDiskAsset = new RamDiskAsset()
-	getRamDiskAsset(asset, file)
+	let asset = getRamDiskAsset(file)
 	// TODO handle not found
 	if is64Exe(asset) {
 		let loader = new ExeResourceLoader<UInt64, Pe64OptionalHeader>()

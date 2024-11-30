@@ -164,8 +164,7 @@ fun engineInit(params UefiPayload) {
 
 	// SMP trapeze
 	{
-		var asset RamDiskAsset = new RamDiskAsset()
-		getRamDiskAsset(asset, "trapeze.tofita")
+		let asset RamDiskAsset = getRamDiskAsset("trapeze.tofita")
 		serialPrintf("Copy trapeze %d bytes\n", asset.size)
 		let trapeze = 0x8000u64 + wholePhysicalStart
 		// TODO why fixed address here? Wasn't it updated at BSP code?

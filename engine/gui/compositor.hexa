@@ -283,123 +283,95 @@ fun initializeCompositor() {
 
 	// TODO helper function that simply does `loadBitmapFromPath()` and on fail sets default 16x16 and quakes
 	// ^ autodetect format from extension (ico, png, bmp, etc)
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/user.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/user.png")
 	startUserIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/gear.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/gear.png")
 	startGearIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/downloads.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/downloads.png")
 	startDownloadsIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/gallery.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/gallery.png")
 	startGalleryIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/power.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/power.png")
 	startPowerIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/files.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/files.png")
 	startFilesIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/search.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/search.png")
 	startSearchIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/pip.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/pip.png")
 	startSearchOutIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/leavesWhite.png")
 	leaves = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves16.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/leaves16.png")
 	leaves16 = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/leaves16white.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/leaves16white.png")
 	leaves16white = loadPng32(a)
 
 	// Tray
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Start/find.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Start/find.png")
 	traySearchIcon = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Tray/volume.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Tray/volume.png")
 	trayVolume = loadPng32(a)
 
-	let a = new RamDiskAsset()
-	getRamDiskAsset(a, "root/Windows/Resources/Icons/Tray/wifi.png")
+	let a = getRamDiskAsset("root/Windows/Resources/Icons/Tray/wifi.png")
 	trayWifi = loadPng32(a)
 
 	// Desktop
 
-	let b = new RamDiskAsset()
-	getRamDiskAsset(b, "root/Windows/Resources/Icons/trash.png")
+	let b = getRamDiskAsset("root/Windows/Resources/Icons/trash.png")
 	trashCan = loadPng32(b)
 
-	let c = new RamDiskAsset()
-	getRamDiskAsset(c, "root/Windows/Resources/Icons/Beautiful/paper_3.png")
+	let c = getRamDiskAsset("root/Windows/Resources/Icons/Beautiful/paper_3.png")
 	notepad48 = loadPng32(c)
 
-	let d = new RamDiskAsset()
-	getRamDiskAsset(d, "root/Windows/Resources/Icons/Beautiful/paper_2_16.png")
+	let d = getRamDiskAsset("root/Windows/Resources/Icons/Beautiful/paper_2_16.png")
 	notepad16 = loadPng32(d)
 
-	let e = new RamDiskAsset()
-	getRamDiskAsset(e, "root/Windows/Resources/Icons/link.png")
+	let e = getRamDiskAsset("root/Windows/Resources/Icons/link.png")
 	link = loadPng32(e)
 
-	let e = new RamDiskAsset()
-	getRamDiskAsset(e, "root/Windows/Resources/Icons/256_image-x-generic.ico")
+	let e = getRamDiskAsset("root/Windows/Resources/Icons/256_image-x-generic.ico")
 	picture48 = loadIcon(e.data as! ConstArrayPointer<UInt8>, 48)
 
 	// TODO `getRamDiskAsset` should be null-safe!!! cause forgot to add asset sometimes
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/app32.png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/Beautiful/app32.png")
 	app32 = loadPng32(asset)
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Conservative/folder48.png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/Conservative/folder48.png")
 	folder48 = loadPng32(asset)
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/folder(1).png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/Beautiful/folder(1).png")
 	files48 = loadPng32(asset)
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/app.png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/Beautiful/app.png")
 	prompt48 = loadPng32(asset)
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/unknown48.png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/unknown48.png")
 	unknown48 = loadPng32(asset)
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/dll48.png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/dll48.png")
 	dll48 = loadPng32(asset)
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/Beautiful/app4.png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/Beautiful/app4.png")
 	app48 = loadPng32(asset)
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Resources/Icons/app16.png")
+	let asset = getRamDiskAsset("root/Windows/Resources/Icons/app16.png")
 	app16 = loadPng32(asset)
 
 	// TODO move all those assets to desktop.hexa ^ taskbar.hexa
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "desktop" + '\r')
+	let asset = getRamDiskAsset("desktop" + '\r')
 	{
 		// var length = 0
 		// var at = 0u64 // TODO should work with 0u32 too
@@ -586,8 +558,7 @@ fun initializeCompositor() {
 		}
 	}
 
-	let asset = new RamDiskAsset()
-	getRamDiskAsset(asset, "root/Windows/Cursors/aero_arrow.cur")
+	let asset = getRamDiskAsset("root/Windows/Cursors/aero_arrow.cur")
 	// TODO cur = loadCursor(Buffer.fromBytes(asset.data))
 	cur = loadCursor(asset)
 	initCursorBackplate()

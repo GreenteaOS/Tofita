@@ -72,8 +72,7 @@ class Files {
 
 	fun loadFiles() {
 		let dirBase = dir.substr(0, dir.length - 1) + "/"
-		let asset = new RamDiskAsset()
-		getRamDiskAsset(asset, dir)
+		let asset = getRamDiskAsset(dir)
 		let filesList = getRamDiskFolder(asset)
 		// TODO for file in filesList {
 		for file in filesList.length {

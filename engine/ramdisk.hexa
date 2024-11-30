@@ -40,7 +40,9 @@ class RamDiskAsset {
 	new () { }
 }
 
-fun getRamDiskAsset(asset RamDiskAsset, pathToAsset String) {
+// TODO Hexa: optional type here
+fun getRamDiskAsset(pathToAsset String) RamDiskAsset {
+	let asset RamDiskAsset = RamDiskAsset()
 	asset.size = 0u32
 	asset.data = null // TODO should error cause non-nullable
 	let path = pathToAsset.utf16() as! ConstArrayPointer<UInt16>
@@ -73,15 +75,15 @@ fun getRamDiskAsset(asset RamDiskAsset, pathToAsset String) {
 			asset.size = ramDiskAssetInfo.size
 			asset.data = ((_ramdisk.base as! UInt64) + ramDiskAssetInfo.offsetFromRamDiskFirstByte) as! ArrayPointer<UInt8>
 			// TODO `as! _` short syntax
-			return
+			return asset
 		}
 
 		id++
 	}
 
 	serialPrintf("[ramdisk.getRamDiskAsset] asset '%S' not found in %d assets\n", path,
-				 ramDiskInfo.assetsCount)
-	return
+		ramDiskInfo.assetsCount)
+	return null
 }
 
 fun getRamDiskFolder(asset RamDiskAsset) [String] {

@@ -108,8 +108,7 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	fun loadPe(name String, root PeExportLinkedList, exec Executable) {
-		let asset RamDiskAsset = new RamDiskAsset()
-		getRamDiskAsset(asset, name)
+		let asset RamDiskAsset = getRamDiskAsset(name)
 		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name.utf16(), asset.size, asset.data)
 		return loadPeAsset(asset, root, exec)
 	}
@@ -637,8 +636,7 @@ fun loadExeIntoProcess(file String, process TofitaProcess) {
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
 
-		let asset RamDiskAsset = new RamDiskAsset()
-		getRamDiskAsset(asset, file)
+		let asset = getRamDiskAsset(file)
 
 		// TODO fix in codegen `if ExeLoader.is64(asset) {` for `static fun` of generic class
 		// TODO `if ExeLoader<UInt64, Pe64OptionalHeader>.is64(asset) {`
