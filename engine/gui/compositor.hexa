@@ -698,6 +698,38 @@ fun composite(startupMilliseconds UInt64) {
 		(_framebuffer.height / 2i16) - (wallpaper.height / 2i16)
 	)
 
+	// Caution
+	let privateBuild = false
+	if privateBuild {
+		var color = new ByValue<Pixel32>()
+		color.ref.rgba.ref.r = 0xFFu8
+		// TODO Hexa: deprecated syntax `value = value = value` or just compile into three lines
+		// TODO Hexa: 0 inferred as Int
+		// `color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0`
+		let offset = 384i16
+		for i in 32 {
+			// TODO Hexa: useless value in `()`
+			(_framebuffer.width / 2i16)
+			color.ref.rgba.ref.g = color.ref.rgba.ref.b = color.ref.rgba.ref.r
+
+			drawAsciiText(
+				"PRIVATE DEVELOPER BUILD / FOR TESTERS ONLY",
+				_framebuffer.width / 2i16 - 160i16 - offset + (i * 24i16),
+				_framebuffer.height / 2i16 - offset + (i * 24i16),
+				color.ref
+			)
+
+			drawAsciiText(
+				"PRIVATE DEVELOPER BUILD / FOR TESTERS ONLY",
+				_framebuffer.width / 2i16 - 160i16 + offset - (i * 24i16),
+				_framebuffer.height / 2i16 - offset + (i * 24i16),
+				color.ref
+			)
+
+			color.ref.rgba.ref.r -= 0x8u8
+		}
+	}
+
 	// Desktop icons
 	var color = new ByValue<Pixel32>()
 	let shadowTextWidth = 76u16 - 8u16
