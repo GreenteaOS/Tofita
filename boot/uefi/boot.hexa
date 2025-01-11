@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -343,7 +343,10 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	drawVerbose("Setup device memory...", framebuffer)
 
 	var ram UInt64 = getRAMSize(params.efiMemoryMap.ref)
-	var megs UInt32 = (ram / (1024u64 * 1024u64)) as! UInt32
+	// Keep as UInt64 to support systems with more than 4096GB RAM (4TB)
+	// 4096GB in MB = 4194304, which exceeds UInt32.MAX (4294967295)
+	// TODO Hexa: add UInt32.MAX or something
+	var megs UInt64 = ram / (1024u64 * 1024u64)
 	serialPrintf("[paging] available RAM is ~%8 bytes\n", ram)
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
