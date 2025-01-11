@@ -80,6 +80,7 @@ trampolineCR3:
 
 	; Enter main [with rcx]
 	o64 call r9
+	times 64 - ($-$$) db 0 ; Padding
 	; TODO times 64 - ($-$$) db 0 ; Padding
 	; TODO size: dw $-$$ to store a size in the bootloader that you could look at in an asm listing or hexdump. But that takes up 2 bytes.
 

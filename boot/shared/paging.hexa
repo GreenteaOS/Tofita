@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -67,15 +67,15 @@ fun mapEfiRuntime(memoryMap UefiMemoryMap) {
 	serialPrintf("[paging] efi runtime mapped %8 pages\n", sum)
 }
 
-@struct class Buffa {
+@struct class ZeroBuffer {
 	let value UInt64 = 0
 	new () { }
 }
-let buffaStorage = new Buffa()
-let buffa = buffaStorage as! ArrayPointer<UInt8>
+let zeroBufferStorage = new ZeroBuffer()
+let zeroBuffer = zeroBufferStorage as! ArrayPointer<UInt8>
 // TODO ^ simple array by value
 
-fun conventionalAllocateLargest(memoryMap UefiMemoryMap) {
+fun conventionalAllocateLargest(memoryMap UefiMemoryMap) Void {
 	var descriptor = memoryMap.memoryMap
 	let descriptorSize UInt64 = memoryMap.descriptorSize
 	var result UInt64 = 0u64
@@ -100,25 +100,44 @@ fun conventionalAllocateLargest(memoryMap UefiMemoryMap) {
 	serialPrintf("[paging] conventionalAllocateLargest is %8 bytes, %8 pages\n",
 		pageSize * largestPages, largestPages)
 
-	return result
+	conventionalBuffer = result
+	conventionalOffset = conventionalBuffer
+	conventionalPagesAvailable = largestPages
 }
 
 var conventionalBuffer UInt64 = 0u64
 var conventionalOffset UInt64 = 0u64
 var conventionalPages UInt64 = 0u64
+var conventionalPagesAvailable UInt64 = 0u64
+var conventionalFramebufferForErrors FrameBuffer? = null
 
 /// Simplistic memory allocator
 fun conventionalAllocateNext(bytes UInt64) UInt64 {
 	let result = conventionalOffset
-	let pageSize = pageSize as! UInt64 // TODO Hexa: is it needed?
-	let pages = bytes / pageSize // Math.floor TODO Hexa: `\`
+	let pages = bytes / pageSize + 1u64 // Math.floor TODO Hexa: `\`
 	conventionalOffset += pages * pageSize
 	conventionalPages += pages
-	// TODO meaning
-	if (bytes - (pages * pageSize)) > 0 {
-		conventionalOffset += pageSize
-		conventionalPages++
+
+	// Overflow check
+	if conventionalPages > conventionalPagesAvailable {
+		serialPrintf("[paging] conventionalAllocateNext %u bytes == exhausted\n", bytes)
+		while true {
+			if let fb = conventionalFramebufferForErrors {
+				drawError("[ERROR] Conventional buffer exhausted [ERROR]", fb)
+			}
+			__sync_synchronize()
+		}
 	}
+
+	// Zero-fill allocated memory
+	{
+		var b = result as! ArrayPointer<UInt8>
+		for i in bytes {
+			b[i] = zeroBuffer[0]
+		}
+	}
+	__sync_synchronize() // Ensure zero-fill is complete before returning
+
 	return result
 }
 

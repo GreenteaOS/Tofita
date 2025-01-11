@@ -55,7 +55,7 @@ declare fun pause() Void
 // Entry point
 fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STATUS {
 	// Workaround for Clang `memset`, but it may be not needed anymore
-	buffa[0] = 0
+	zeroBuffer[0] = 0
 
 	initSerial()
 
@@ -158,7 +158,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 		var b = efiMemoryMap.memoryMap as! ArrayPointer<UInt8>
 		for i in efiMemoryMap.memoryMapSize {
 			// TODO faster with uint64_t
-			b[i] = buffa[0]
+			b[i] = zeroBuffer[0]
 			// TODO zero-fill buffer for EFI memory map -< unify to zeroFill()
 		}
 	}
@@ -247,9 +247,9 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	drawVerbose("Allocate memory...", framebuffer)
 	// TODO how to ensure the memory is preserved by UEFI and memory map is unchanged when Exit B S called?
-	conventionalBuffer = conventionalAllocateLargest(efiMemoryMap)
+	conventionalAllocateLargest(efiMemoryMap)
+	conventionalFramebufferForErrors = framebuffer
 	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", conventionalBuffer)
-	conventionalOffset = conventionalBuffer
 
 	var addressOfEntryPoint UInt64 = 0
 
@@ -257,7 +257,14 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	{
 		let ptr = asset.data as! ArrayPointer<UInt8>
 		// TODO `@readonly PeHeader` just make all fields `let` also decided to disallow `@` on types
-		let peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! @readonly PeHeader
+		let peHeaderOffset UInt64 =
+			(ptr[0x3C] as! UInt64) +
+			(ptr[0x3C + 1] as! UInt64) * 256u64 +
+			(ptr[0x3C + 2] as! UInt64) * 65536u64 +
+			(ptr[0x3C + 3] as! UInt64) * 16777216u64
+		let peHeader = (
+			(ptr as! UInt64) + peHeaderOffset
+		) as! @readonly PeHeader
 		serialPrintf("PE header signature 'PE' == '%s'\n", peHeader)
 		let peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! @readonly Pe32OptionalHeader
 		serialPrintf("PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.mMagic,
@@ -295,7 +302,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	{
 		var b = params as! ArrayPointer<UInt8>
 		for i in sizeOf<UefiPayload>() {
-			b[i] = buffa[0]
+			b[i] = zeroBuffer[0]
 		}
 	}
 
@@ -312,11 +319,11 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	// Note: stack grows from X to X-N, not X+N
 	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
-	let stack = conventionalAllocateNext(1024u64 * 1024) + 1024 * 1024
+	let stack = conventionalAllocateNext(1024u64 * 1024u64) + 1024u64 * 1024u64
 	{
-		var b = (stack - 1024 * 1024) as! ArrayPointer<UInt8>
-		for i in 1024 * 1024 {
-			b[i] = buffa[0]
+		var b = (stack - 1024u64 * 1024u64) as! ArrayPointer<UInt8>
+		for i in 1024u64 * 1024u64 {
+			b[i] = zeroBuffer[0]
 		}
 	}
 
@@ -350,10 +357,14 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	serialPrintf("[paging] available RAM is ~%8 bytes\n", ram)
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
-	while megs < 1234 {
 		// TODO check only physical memory in this case (but map whole range reported by UEFI)
-		drawError("[ERROR] Tofita requires at least 2 GB of memory [ERROR]", framebuffer)
+	if megs < 1234u64 {
+		// This code intentionally hangs forever and keeps printing text to VGA screen
+		// to ensure that it is sent to GPU (cause halting may stop firmware copy mem process)
 		serialPrintf("Tofita requires at least 2 GB of memory\n")
+		while true {
+			drawError("[ERROR] Tofita requires at least 2 GB of memory [ERROR]", framebuffer)
+		}
 	}
 
 	params.ramBytes = ram
@@ -372,9 +383,11 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 		var b = pml4entries as! ArrayPointer<UInt8>
 		for i in pageTableEntriesSize {
 			// TODO faster with uint64_t
-			b[i] = buffa[0]
+			b[i] = zeroBuffer[0]
 		}
 	}
+
+	__sync_synchronize() // Ensure PML4 zeroing is complete before mapping
 
 	// Map memory
 	drawVerbose("Setup virtual memory...", framebuffer)
@@ -383,12 +396,14 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	let pageSize = 4096u64
 
-	mapMemory(upper, conventionalBuffer, conventionalPages + 1u64, 1, global: true)
+	mapMemory(upper, conventionalBuffer, conventionalPages + 1u64, 1u8, global: true)
 
 	// Note: framebuffer is *not* within physical memory
 	drawVerbose("Setup display memory...", framebuffer)
 	mapFrameBuffer(params.framebuffer.ref)
 	drawLoading(framebuffer, 2)
+
+	__sync_synchronize() // Ensure all memory mappings are complete
 
 	drawVerbose("Setup runtime memory...", framebuffer)
 	mapEfiRuntime(params.efiMemoryMap.ref)
@@ -396,9 +411,9 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	mapMemoryHuge(wholePhysicalStart, 0, (ram / pageSize) + 1u64, global: true)
 
 	drawVerbose("Setup engine modes...", framebuffer)
-	// TODO somehow ensure size is enough to copy whole trampoline (-D arg same as version)
 	let startFunction = (conventionalOffset + pageSize) as! InitEngineTrampoline
 
+	// Size is defined with padding within .asm file
 	tmemcpy(startFunction as! ArrayPointer<UInt8>, trampolineCR3 as! ConstArrayPointer<UInt8>, 64)
 	mapMemory((startFunction as! UInt64), (startFunction as! UInt64), 1, 0, global: false)
 

@@ -25,7 +25,9 @@ let frameBufferVirtualBase UInt64 = (upper + 768u64 * 1024u64 * 1024u64)
 // Mapping of 1:1 of physical memory as virtual = physical + wholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
 let wholePhysicalStart UInt64 = (frameBufferVirtualBase + 128 * 1024 * 1024)
-let pageSize UInt16 = 4096u16 // 4 KiB
+let pageSize UInt64 = 4096u64 // 4 KiB
+// TODO Hexa: could be inlining in normalizer of u16 value instead of u64
+// let pageSize UInt64 = 4096u16 // 4 KiB
 
 // Helpers
 @struct

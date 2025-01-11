@@ -18,6 +18,16 @@
 @rename('imageHandle') declare let imageHandle ByValue<EFI_HANDLE>
 @rename('systemTable') declare let systemTable EFI_SYSTEM_TABLE
 
+fun heapOverflow() Void {
+	if let fb = conventionalFramebufferForErrors {
+		drawError("[ERROR] Heap overflow [ERROR]", fb)
+	}
+
+	while true {
+		__sync_synchronize()
+	}
+}
+
 @customHeader('
     extern const uint8_t binFont[];
     extern const uint8_t binFontBitmap[];
@@ -56,9 +66,8 @@
         heapOffset += 8;
         heapOffset += size;
         if (heapOffset >= HEAP_C) {
-            //serialPrint_(L"Heap overflow\n");
-            //serialPrint_(L"Heap overflow\n");
-            //serialPrint_(L"Heap overflow\n");
+            serialPrint_(L"Heap overflow (HeapAlloc). Halt.\n");
+            heapOverflow_();
             while (1) {};
         }
         return &heap[heapOffset - size];
