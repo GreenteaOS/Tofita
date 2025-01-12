@@ -59,6 +59,7 @@ arguments:
 ; Actual AP entry point body
 use16
 realModeApStart:
+	; TODO cld? Clear direction flag just in case
     ; Segment selectors
     xor ax, ax
     mov ds, ax
@@ -143,7 +144,7 @@ gdtr:
     .size uint16_t 127
     .offset uint64_t gdtTemplate
 
-; TODO copy actual template in realtime
+; TODO copy actual template in realtime and set segment selectors
 gdtTemplate:
     uint32_t 0x00000000
     uint32_t 0x00000000
