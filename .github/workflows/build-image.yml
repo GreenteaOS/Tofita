@@ -41,7 +41,7 @@ jobs:
     strategy:
       matrix:
         system:
-          - windows-2022
+          - windows-latest
 
     runs-on: ${{ matrix.system }}
 
