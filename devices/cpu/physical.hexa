@@ -47,7 +47,7 @@ class PhysicalAllocator {
 	static var buffer ArrayPointer<UInt8> // TODO use bits, not bytes
 	static var count UInt64
 	static var countUser UInt64 // count - engine_reserved_pages
-	static var available UInt64
+	static var available UInt64 = 0u64
 	static var last UInt64
 	// TODO those fields must have ` = default`
 
