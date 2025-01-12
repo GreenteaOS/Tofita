@@ -37,7 +37,10 @@ fun mapPageHuge(entry PageEntry, address UInt64, global Bool) {
 	entry.writeAllowed = 1u64
 	entry.largePage = 1u64
 	entry.accessibleByAll = 0u64
-	// TODO ^ should NX be explicitly enabled on AMD64?
+	// TODO entry.disableExecution = address >= physicalStart ? 1 : 0
+	// TODO will setting disableExecution to 1 when NX unsupported cause crash?
+	// TODO enforce NX cpuid test in the bootloader "CPU NX bit feature is not enabled in BIOS"
+	// TODO required in compatibility assistant
 	entry.global = global? 1u64 : 0
 }
 

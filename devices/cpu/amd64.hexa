@@ -35,6 +35,7 @@ declare fun cpuid(
 	ecx ArrayPointer<UInt32>,
 	edx ArrayPointer<UInt32>
 ) Void
+
 /* {
 	var a UInt32 = 0
 	var b UInt32 = 0
@@ -47,7 +48,6 @@ declare fun cpuid(
 	ecx[0] = c
 	edx[0] = d
 }*/
-
 /// Note: this also a way to clear TLB cache even if cr3 not switched to another
 @rename('writeCr3') // TODO rename didn't work
 @emitHeader @linkAsIs
@@ -83,6 +83,7 @@ declare fun pause() Void
 @emitHeader @linkAsIs
 declare fun yield() Void
 
+// TODO MSR to enum
 @customHeader('
 	uint64_t rdmsr(uint64_t addr) {
 		uint32_t low, high;

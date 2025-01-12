@@ -37,7 +37,7 @@ class SpinLock {
 		// TODO simply loop 4096 times before doing version with `pause()`
 		// TODO UInt8 tries = 255
 		// TODO yield to another process
-		while !__sync_bool_compare_and_swap(counter.ref, 0, 1) {
+		while not __sync_bool_compare_and_swap(counter.ref, 0, 1) {
 			while counter[0] != 0 {
 				// Please note, that the loop also requires __mm_pause() to enable hyperthreads
 				pause()

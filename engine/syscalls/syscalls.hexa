@@ -21,7 +21,7 @@ let userSyscalls = 123000
 
 // TODO store all syscalls as huge complex enum and generate all wrappers with macro
 // and serializer to-from enum tags / wow64
-//@castTo('TofitaSyscalls')
+// @castTo('TofitaSyscalls')
 enum TofitaSyscalls : UInt32 {
 	// System
 	// TODO Disallow user to call them by index
@@ -61,7 +61,7 @@ class DebugLogPayload {
 	// TODO count chars at user space, and transfer as length for SEH probing
 	var extra UInt64 = 0
 	var more UInt64 = 0
-	new () {}
+	new () { }
 }
 
 @struct @sizeOf(8 * 2)
@@ -101,7 +101,7 @@ class LParam {
 
 @struct
 class WParam {
-	new () {}
+	new () { }
 }
 
 // TODO use pointer wrappers instead of raw pointers

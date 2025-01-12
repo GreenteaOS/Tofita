@@ -184,7 +184,10 @@ class ACPIParser {
 
 		serialPrintf("[ACPI] revision is %d\n", acpi10.ref.revision)
 
-		// TODO ensure \0 at end of array
+		// TODO Hexa: communicate presence \0 at end of array
+		// ^ may assume \0 for `ArrayByValue<Clang[Wide]Char, 9>` also `9 + 0` idea
+		// or always assume \0 as in C thus <N+1>, but may do `= @nullTerminated(false) "RSD PTR "`
+		// ^ in the code gen it will produce `char s2[3] = {'a','a','a'};`
 		var signature ArrayByValue<UInt8, 9> = "RSD PTR "
 
 		// TODO sizeOf accepts 0 args! `for i in sizeOf(acpi10.ref.signature) {`
@@ -275,16 +278,16 @@ class ACPIParser {
 			serialPrintf("[ACPI] acpiValidate(header) %d\n", header.validate(header.type))
 
 			switch header.type {
-			case APIC:
-				loadApic(header as! AcpiApic)
-				break
+				case APIC:
+					loadApic(header as! AcpiApic)
+					break // TODO breaks `for` not `switch`
 
-			case MCFG:
-				loadMcfg(header as! AcpiMcfg)
-				break
+				case MCFG:
+					loadMcfg(header as! AcpiMcfg)
+					break
 
-			case _:
-				break
+				case _:
+					break
 			}
 		}
 

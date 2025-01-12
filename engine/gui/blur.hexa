@@ -198,8 +198,8 @@ fun boxesForGauss(sigma Float, n UInt8) ArrayPointer<UInt8> {
 	var wu UInt8 = wl + 2u8
 
 	var mIdeal Float = (12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4)
- 	fun round(x Float) {
-		return ((x) >= 0 ? (((x) + 0.5) as! Int64) : (((x)-0.5) as! Int64))
+	fun round(x Float) {
+		return ((x) >= 0 ? (((x) + 0.5) as! Int64) : (((x) - 0.5) as! Int64))
 	}
 	var m Int8 = round(mIdeal) as! Int8
 

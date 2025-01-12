@@ -27,6 +27,7 @@ fun loadRamDiskFromVolume(
 	let status EFI_STATUS = root.open(
 		root,
 		sfile.ref,
+		// TODO Hexa: auto-cast String to Const-pointers (all utf16, utf8 pre-validate literals)
 		name.utf16() as! ArrayPointer<UInt16>,
 		EFI_OpenMode.EFI_FILE_MODE_READ,
 		(

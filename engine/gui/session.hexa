@@ -131,6 +131,7 @@ class GraphicalSession {
 		if event == ColliderEventType.MouseUp {
 			showStart = false
 			showTray = false
+			// TODO Hexa: half-infer `startShortcuts` in just scopes, fill fields as `Infer({null})`
 			if let shortcut = startShortcuts[id] as! Shortcut? {
 				openFile(shortcut.file, shortcut.displayName)
 			}

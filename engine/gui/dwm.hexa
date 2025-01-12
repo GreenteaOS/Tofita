@@ -512,10 +512,10 @@ fun handleMouseActivity() {
 	// Swap buffers
 	mouseActionsUseZeta = not mouseActionsUseZeta
 
-	@volatile let mouseActions [MouseAction] = (!mouseActionsUseZeta) ? mouseActionsZeta : mouseActionsGama
+	@volatile let mouseActions [MouseAction] = (not mouseActionsUseZeta) ? mouseActionsZeta : mouseActionsGama
 
 	let mouseActionsAmount UInt8 =
-		(!mouseActionsUseZeta) ? mouseActionsZetaAmount : mouseActionsGamaAmount
+		(not mouseActionsUseZeta) ? mouseActionsZetaAmount : mouseActionsGamaAmount
 
 	var mouseXtemp = mouseX
 	var mouseYtemp = mouseY
@@ -545,10 +545,10 @@ fun handleMouseActivity() {
 
 			handleMouseMove(mouseXtemp, mouseYtemp)
 		} else if (type == MouseActionType.LeftUp or type == MouseActionType.RightUp or
-				   type == MouseActionType.MiddleUp) {
+					type == MouseActionType.MiddleUp) {
 			handleMouseUp(type, mouseXtemp, mouseYtemp)
 		} else if (type == MouseActionType.LeftDown or type == MouseActionType.RightDown or
-				   type == MouseActionType.MiddleDown) {
+					type == MouseActionType.MiddleDown) {
 			handleMouseDown(type, mouseXtemp, mouseYtemp)
 		}
 

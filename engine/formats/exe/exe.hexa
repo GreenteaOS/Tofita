@@ -98,6 +98,7 @@ class ExeLoader<SIZE, HEADER> {
 		let env = is64bit? "C:\\Windows\\System32\\" : "C:\\Windows\\SysWOW64\\"
 		let fullPath = env + @hide name // TODO dedup `//` and normalize `/` to `\`
 		// TODO Note: `@hide name` should disallow erroneus usage of `name` instead of `fullPath`
+
 		/*if not is64bit {
 			let name = "C:\\Windows\\SysWOW64\\" + name
 			return loadPe(name, root, exec)
@@ -127,7 +128,7 @@ class ExeLoader<SIZE, HEADER> {
 		let physical = PhysicalAllocator.allocatePages(pages)
 
 		if exec.nextBase == 0 {
-			// TODO round to pages? or 64k?
+			// TODO round to pages? or 64kb? same for sections
 			exec.nextBase = peOptionalHeader.imageBase
 		}
 
@@ -158,8 +159,8 @@ class ExeLoader<SIZE, HEADER> {
 			var where UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
 
 			tmemcpy(where as! ArrayPointer<UInt8>,
-					((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
-					imageSectionHeader[i].ref.sizeOfRawData)
+				((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
+				imageSectionHeader[i].ref.sizeOfRawData)
 		}
 
 		// TODO `const ImageDataDirectory*` just `let` all the fields in class declaration?
@@ -610,7 +611,6 @@ class ExeLoader<SIZE, HEADER> {
 			unMap()
 			return // <- here guard returns from a block, not immediately `?? return`
 		} Hexa */
-
 		process.frame.ip = ntdll.entry // Contains crt0
 		process.frame.sp = app.stackVirtual
 		process.frame.rcxArg0 = whereStartup // First argument

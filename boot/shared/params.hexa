@@ -64,7 +64,6 @@ class Physical<T> {
 		return result as! Virtual<T>
 	}
 }*/
-
 // Data transferred from UEFI application into engine loader
 
 @struct
@@ -138,4 +137,4 @@ class UefiPayload {
 declare InitEngine = @convention(fastcall) (params UefiPayload) => Void
 // TODO ^ fix that in quake
 declare InitEngineTrampoline = @convention(fastcall) (engineParams UInt64, pml4 UInt64, stack UInt64,
-												entry UInt64) => Void
+	entry UInt64) => Void

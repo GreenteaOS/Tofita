@@ -33,14 +33,13 @@ class ExeResourceLoader<SIZE, HEADER> {
 		}
 		return blobSectionStart
 	}*/
-
 	fun getIcon(asset RamDiskAsset) Bitmap32? {
 		var ptr = asset.data as! ArrayPointer<UInt8>
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 		// serialPrintf("[ExeResourceLoader] PE header signature 'PE' == '%s'\n", peHeader)
 		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
-		//serialPrintf("[ExeResourceLoader] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
-		//			0x020B)
+		// serialPrintf("[ExeResourceLoader] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
+		// 0x020B)
 		// TODO require all .dlls ARCH be the same or show loader error
 		// serialPrintf("[ExeResourceLoader] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
 
@@ -53,15 +52,15 @@ class ExeResourceLoader<SIZE, HEADER> {
 
 		// TODO copy PE headers?
 		for i in peHeader.numberOfSections {
-			//serialPrintf("[ExeResourceLoader] Found section [%d] named '%s' of size %d at %u\n", i,
-			//			imageSectionHeader[i].ref.name.ref,
-			//			imageSectionHeader[i].ref.sizeOfRawData,
-			//			imageSectionHeader[i].ref.virtualAddress)
-			//var where UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
+			// serialPrintf("[ExeResourceLoader] Found section [%d] named '%s' of size %d at %u\n", i,
+			// imageSectionHeader[i].ref.name.ref,
+			// imageSectionHeader[i].ref.sizeOfRawData,
+			// imageSectionHeader[i].ref.virtualAddress)
+			// var where UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
 
-			//tmemcpy(where as! ArrayPointer<UInt8>,
-			//		((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
-			//		imageSectionHeader[i].ref.sizeOfRawData)
+			// tmemcpy(where as! ArrayPointer<UInt8>,
+			// ((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
+			// imageSectionHeader[i].ref.sizeOfRawData)
 			// Compare with `.rsrc` TODO better idea
 			let isRSRC =
 				imageSectionHeader[i].ref.name[0] == 46 and

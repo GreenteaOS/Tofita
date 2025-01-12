@@ -160,7 +160,7 @@ fun packAssets(config Config) {
 		4 + // UInt32 size
 		4 // UInt32 offsetFromRamDiskFirstByte // NOT relative to `data`
 		// }
-	) *(assetName.length + folderCount)
+	) * (assetName.length + folderCount)
 	// uint8_t* data
 
 	// Round upto 4 bytes

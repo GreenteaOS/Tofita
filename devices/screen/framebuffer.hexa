@@ -94,13 +94,13 @@ fun blendPixel(x Int64, y Int64, pixel Pixel32) {
 fun setPixel(x Int64, y Int64, pixel ByValue<Pixel32>) {
 	// TODO Faster access `let width = s.w`?
 	// TODO taken ifs are faster?
+
 	/*if (x > Screen.widthMinusOne) or (y > Screen.heightMinusOne) or (x < 0) or (y < 0) {
 		return
 	}
 
 	Screen.pixels[y * Screen.width + x] = pixel    * / not closes comment
 	*/
-
 	if (x < Screen.width) and (y < Screen.height) and (x >= 0) and (y >= 0) {
 		Screen.pixels[y * Screen.width + x] = pixel
 		// TODO lol worse perf
@@ -125,10 +125,10 @@ fun drawBitmap32(bitmap Bitmap32, x Int16, y Int16) {
 		return
 	}
 
-	for yy in (yStart as! UInt32)...bitmap.height {
+	for yy in (yStart as! UInt32) ... bitmap.height {
 		let stride = yy * bitmap.width
 		let screenStride = (y + yy) * Screen.width
-		for xx in (xStart as! UInt32)...bitmap.width {
+		for xx in (xStart as! UInt32) ... bitmap.width {
 			// TODO save scanline check to Bool and evaluate eagerly
 			if x + xx > Screen.widthMinusOne or y + yy > Screen.heightMinusOne {
 				// TODO use same concept as yStart but for yEnd

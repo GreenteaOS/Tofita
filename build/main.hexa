@@ -569,12 +569,14 @@ fun runTasks() {
 					folder + '\\spin-off\\DISK.IMG')
 
 				let path = '/cygdrive/' + folder.split(':').join('')
+				/// EFI partition type
+				let efi = '0xef'
 				child_process.execSync(
 					[
 						xorriso,
 						'-as mkisofs -o \(path)/greenteaos-uefi64.iso -iso-level 3',
 						// TODO try to use .img not in spin-off folder to avoid duplication
-						'-V GreenteaOS \(path)/spin-off -append_partition 2 0xef \(path)/DISK.IMG',
+						'-V GreenteaOS \(path)/spin-off -append_partition 2 \(efi) \(path)/DISK.IMG',
 						'-e --interval:appended_partition_2:all:: -no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
 				)

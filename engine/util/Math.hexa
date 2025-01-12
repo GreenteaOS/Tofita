@@ -15,7 +15,7 @@
 
 class Math {
 	static fun round(value Float) Int32 {
-		return ((value) >= 0 ? (int32_t)((value) + 0.5) : (int32_t)((value)-0.5))
+		return ((value) >= 0 ? (int32_t) ((value) + 0.5) : (int32_t) ((value) - 0.5))
 	}
 
 	fun sqrt(number Float32) Float32 {

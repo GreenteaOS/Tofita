@@ -124,13 +124,14 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 		framebuffer
 	)
 
-	// Check ACPI here, after framebuffer initialization
+	// Check ACPI here, after framebuffer initialization, loop infinitely on fail
 	while acpiTable == null {
 		drawError("[ERROR] Tofita requires ACPI 2.0 [ERROR]", framebuffer)
+		serialPrintln("[[[uefi]]] <ERROR> ACPI 2.0 not found")
+		__sync_synchronize()
 	}
 
 	// TODO: render something to show that loader is ok, because initial start form USB may take a while
-	// TODO: show error message if ram < 512 or < 1024 mb and cancel boot (loop forever)
 	serialPrintln("[[[uefi]]] done: uefiSetFrameBufferMode")
 
 	// Initial RAM disk
@@ -191,10 +192,10 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 				capabilities.accuracy,
 				capabilities.setsToZero)
 
-			// Set 2023 as least valid, so security/HTTPS certificates at least partially work
+			// Set 2025 as least valid, so security/HTTPS certificates at least partially work
 			// and file system is not messed
-			if time.year < 2023 {
-				time.year = 2023
+			if time.year < 2025 {
+				time.year = 2025
 			}
 			// TODO use constants from version numbers
 		}
@@ -287,11 +288,13 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 				imageSectionHeader[i].ref.mName.ref,
 				imageSectionHeader[i].ref.mSizeOfRawData
 			)
+
+			// TODO mem protect as read only and executable for specific sections
 			let where UInt64 = (engineBase as! UInt64) + imageSectionHeader[i].ref.mVirtualAddress
 
 			tmemcpy(where as! ArrayPointer<UInt8>,
-					((asset.data as! UInt64) + (imageSectionHeader[i].ref.mPointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
-					imageSectionHeader[i].ref.mSizeOfRawData)
+				((asset.data as! UInt64) + (imageSectionHeader[i].ref.mPointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
+				imageSectionHeader[i].ref.mSizeOfRawData)
 		}
 
 		addressOfEntryPoint = peOptionalHeader.mAddressOfEntryPoint
@@ -372,16 +375,17 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	// TODO rename to ramBitMaskVirtual ^ Hexa: 12u64 to just 12
 
 	// TODO move this constant to paging
+	// This is correct value and equals to 4096 bytes of the PML4 table itself
 	let pageTableEntriesCount = 512u64
-	let pageTableEntriesSize = sizeOf<PageEntry>() * pageTableEntriesCount
+	let pageTableEntriesSizeBytes = sizeOf<PageEntry>() * pageTableEntriesCount
 	pml4entries =
-		conventionalAllocateNext(pageTableEntriesSize) as! ArrayPointer<ByValue<PageEntry>>
+		conventionalAllocateNext(pageTableEntriesSizeBytes) as! ArrayPointer<ByValue<PageEntry>>
 	// TODO Hexa: `as! _`
 
 	// Zero-fill PML4
 	{
 		var b = pml4entries as! ArrayPointer<UInt8>
-		for i in pageTableEntriesSize {
+		for i in pageTableEntriesSizeBytes {
 			// TODO faster with uint64_t
 			b[i] = zeroBuffer[0]
 		}

@@ -37,7 +37,7 @@ fun uefiGetMemoryMap(efiMemoryMap UefiMemoryMap, systemTable EFI_SYSTEM_TABLE) {
 	}
 
 	serialPrintf("[[[uefi.uefiGetMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
-				 efiMemoryMap.memoryMapSize, efiMemoryMap.descriptorSize)
+		efiMemoryMap.memoryMapSize, efiMemoryMap.descriptorSize)
 }
 
 fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
@@ -61,7 +61,7 @@ fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
 	fb.pixelsPerScanLine = gop.mode.info.pixelsPerScanLine
 
 	serialPrintf("[[[uefi.uefiSetFrameBufferMode]]] width=%d height=%d pixelsPerScanLine=%d size=%d\n",
-				 fb.width, fb.height, fb.pixelsPerScanLine, fb.size)
+		fb.width, fb.height, fb.pixelsPerScanLine, fb.size)
 
 	// TODO https://forum.osdev.org/viewtopic.php?f=1&t=37201
 	gop.setMode(gop, gop.mode.mode)
@@ -89,14 +89,14 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 
 	if status == EFI_STATUS.EFI_NOT_FOUND or status == EFI_STATUS.EFI_OUT_OF_RESOURCES {
 		serialPrintf("[[[uefi.uefiAllocate]]] failed EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
-					 bytes[0])
+			bytes[0])
 	}
 
 	if status != EFI_STATUS.EFI_SUCCESS {
 		serialPrintf("[[[uefi.uefiAllocate]]] failed AllocateAnyPages %d bytes, %d pages, of type %d, "
-					 +
-					 "status %d\n",
-					 bytes[0], pages, allocationType, status)
+			+
+			"status %d\n",
+			bytes[0], pages, allocationType, status)
 	}
 
 	bytes[0] = pages * (pageSize as! UInt64)

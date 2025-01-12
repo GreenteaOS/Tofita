@@ -25,20 +25,20 @@ let pic_eoi_0x20 = 0x20u8 // end-of-interrupt command code
 
 @rename('vmemcpy')
 declare fun tmemcpy(dest ArrayPointer<UInt8>, src ConstArrayPointer<UInt8>, count UInt64) Void
+
 /* {
 	for i in count {
 		dest[0] = src[0]
 	}
 }*/
-
 @rename('vmemcpy')
 declare fun vmemcpy(@volatile dest ArrayPointer<UInt8>, @volatile src ConstArrayPointer<UInt8>, @volatile count UInt64) Void
+
 /* {
 	for i in count {
 		dest[0] = src[0]
 	}
 }*/
-
 // TODO @byValue
 @struct @packed @sizeOf(10)
 // TODO @rename('Idtr')
@@ -251,11 +251,11 @@ let rspStackSize = 131072u64
 // https://github.com/phil-opp/blog_os/issues/450#issuecomment-582535783
 
 // TODO: errcode is `extra` here:
-//@aligned(64) @interrupt Void unknownInterrupt(struct frame: <InterruptFrame>,
+// @aligned(64) @interrupt Void unknownInterrupt(struct frame: <InterruptFrame>,
 // uint64_t
 // extra) {
 // https://github.com/llvm-mirror/clang/blob/master/test/SemaCXX/attr-x86-interrupt.cpp#L30
-//declare fun anyInterruptHandler(frame: <InterruptFrame>) Void
+// declare fun anyInterruptHandler(frame: <InterruptFrame>) Void
 
 // TODO remove
 @aligned(64) @interrupt fun unknownInterrupt(frame InterruptFrame) Void {

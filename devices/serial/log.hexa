@@ -17,6 +17,7 @@
 // Check `serialPrintf` to see supported features
 
 // TODO
+
 /*
 #ifdef UEFI_BOOT_LOADER
 	#define probeForReadOkay(ptr, bytes) 1
@@ -38,7 +39,6 @@ if (string != null and probeForReadOkay((uint64_t)string, 2)) {
 	puts(sehLogError);
 }
 */
-
 // TODO `NativeBool`
 // @rename('disableSerial') // TODO `@as`
 // TODO @rename not work on no-declare
@@ -155,7 +155,7 @@ fun serialPortWrite(buffer ArrayPointer<UInt8>, sizeOfBuffer UInt64) UInt64 {
 		//
 		// Wait for both the transmit FIFO and shift register empty.
 		while (readSerialRegister(r_uart_lsr) & (b_uart_lsr_temt | b_uart_lsr_txrdy)) !=
-			   (b_uart_lsr_temt | b_uart_lsr_txrdy) {}
+		(b_uart_lsr_temt | b_uart_lsr_txrdy) { }
 
 		while not serialPortWritable() { }
 
@@ -280,9 +280,10 @@ fun comItoA(i Int64, b ArrayPointer<UInt8>) {
 	}
 	var shifter = i
 	do { // Move to where representation ends
-		++p
+		// TODO Hexa: `++i` deprecated
+		++ p
 		shifter = shifter / 10
-	// TODO should type check as `while Bool`
+		// TODO should type check as `while Bool`
 	} while (shifter)
 	b[p] = 0 // TODO '\0'.charCodeAt(0)
 	do { // Move back, inserting digits as u go
@@ -326,7 +327,6 @@ declare fun va_arg_uint64() UInt64
 @rename('macro_serialPrintf')
 declare fun serialPrintf(c String, ...rest) Void
 */
-
 @nativeVariadic
 // TODO `rest.getNext<UInt>()` + auto gen va_start
 // TODO would be cooler to trace the file:line:function here
@@ -361,65 +361,65 @@ fun serialPrintf(c String, ...rest) {
 						puts(string)
 					} else {
 						serialPrintf("<STRING IS NULL>")
+					}
 				}
-			}
 				// TODO `break` here converts switch to chain of `if`s, ensure this is correct and document
 				// ^ probably UInt16 is not recognized as switch-able
 			case 83: { // ASCII of UTF-16 `S`
-				var string = va_arg_uint64() as! ArrayPointer<UInt16> // TODO va_arg<ArrayPointer<UInt16> >(lst)
-				var i UInt32 = 0u32
-				if string != null {
-					// TODO probeForReadOkay((uint64_t)string, 2) of pointer itself?
-					// TODO disallow reading of higher half! thus sehUserReadUInt16
-					// TODO actually should sehReadUInt16(, defaultValue: 0) for every char
-					// TODO same ^ for the `c String` template string itself
-					while string[i] != 0 {
-						// TODO limit to 4096 iterations
-						putChar(string[i] & 0xFFu8)
-						i++
+					var string = va_arg_uint64() as! ArrayPointer<UInt16> // TODO va_arg<ArrayPointer<UInt16> >(lst)
+					var i UInt32 = 0u32
+					if string != null {
+						// TODO probeForReadOkay((uint64_t)string, 2) of pointer itself?
+						// TODO disallow reading of higher half! thus sehUserReadUInt16
+						// TODO actually should sehReadUInt16(, defaultValue: 0) for every char
+						// TODO same ^ for the `c String` template string itself
+						while string[i] != 0 {
+							// TODO limit to 4096 iterations
+							putChar(string[i] & 0xFFu8)
+							i++
+						}
+					} else {
+						serialPrintf("<STRING IS NULL>")
 					}
-				} else {
-					serialPrintf("<STRING IS NULL>")
 				}
-			}
 			case 99: // `c`
 				putChar(va_arg_int32() as! UInt8) // TODO lst, int32_t
 			case 100: { // `d`
-				var value = va_arg_int32() // TODO lst, int32_t
-				var buffer ArrayByValue<UInt8, 16> = [0]
-				for i in 16 {
-					buffer[i] = 0
+					var value = va_arg_int32() // TODO lst, int32_t
+					var buffer ArrayByValue<UInt8, 16> = [0]
+					for i in 16 {
+						buffer[i] = 0
+					}
+					comItoA(value, buffer.ref)
+					var c ArrayPointer<UInt8> = buffer.ref
+					var i = 0
+					while c[i] != 0 {
+						putChar(c[i])
+						i++
+					}
 				}
-				comItoA(value, buffer.ref)
-				var c ArrayPointer<UInt8> = buffer.ref
-				var i = 0
-				while c[i] != 0 {
-					putChar(c[i])
-					i++
-				}
-			}
 			case 117: { // `u`
-				var value UInt32 = va_arg_uint32() // TODO lst, int32_t
-				var buffer ArrayByValue<UInt8, 16> = [0]
-				for i in 16 {
-					buffer[i] = 0
+					var value UInt32 = va_arg_uint32() // TODO lst, int32_t
+					var buffer ArrayByValue<UInt8, 16> = [0]
+					for i in 16 {
+						buffer[i] = 0
+					}
+					comItoA(value, buffer.ref)
+					var c ArrayPointer<UInt8> = buffer.ref
+					var i = 0
+					while c[i] != 0 {
+						putChar(c[i])
+						i++
+					}
 				}
-				comItoA(value, buffer.ref)
-				var c ArrayPointer<UInt8> = buffer.ref
-				var i = 0
-				while c[i] != 0 {
-					putChar(c[i])
-					i++
-				}
-			}
 			case 56: { // `8`
-				var value UInt64 = va_arg_uint64() // TODO lst, uint64_t
-				serialPrintHex(value)
-			}
+					var value UInt64 = va_arg_uint64() // TODO lst, uint64_t
+					serialPrintHex(value)
+				}
 			case 98: { // `b`
-				var value UInt64 = va_arg_uint64() // TODO lst, uint64_t
-				serialPrintBits(value)
-			}
+					var value UInt64 = va_arg_uint64() // TODO lst, uint64_t
+					serialPrintBits(value)
+				}
 		}
 		i++
 	}

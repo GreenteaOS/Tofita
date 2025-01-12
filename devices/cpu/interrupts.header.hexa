@@ -18,6 +18,7 @@ class InterruptFrame {
 	// SSE
 	@volatile var xmm ArrayByValue<UInt64, 16>
 
+	// TODO volatility may be not required anymore
 	@volatile var r15 UInt64
 	@volatile var r14 UInt64
 	@volatile var r13 UInt64

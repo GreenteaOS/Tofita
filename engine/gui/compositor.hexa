@@ -19,6 +19,7 @@
 
 // Differential composition is not yet supported, performance with large amount of apps may be low
 
+// TODO Hexa: `null!`
 var wallpaper Bitmap32 = null // Size of framebuffer
 var vibranceLight Bitmap32 = null // Size of framebuffer
 var vibranceDark Bitmap32 = null // Size of framebuffer
@@ -177,15 +178,16 @@ fun setWallpaper(bitmap Bitmap32, style WallpaperStyle, preserveAspectRatio Bool
 			for x in upscale.width as! UInt64 {
 				let rgbaSource =
 					interpolatePixel(
-						downscale,
-						(x * wReciprocal) * downscale.width as! Float32, // TODO UInt32 is precise than Float32
-						(y * hReciprocal) * (downscale.height - 8) as! Float32
+					downscale,
+					(x * wReciprocal) * downscale.width as! Float32, // TODO UInt32 is precise than Float32
+					(y * hReciprocal) * (downscale.height - 8) as! Float32
 					// TODO disallowed in C `).ref as! Pixel32`
 					// TODO disallowed in C `) as! ByValue<Pixel32>`
-					)
+				)
 
 				let rgbaSource = rgbaSource as! ByValue<Pixel32>
 
+				// TODO Hexa: [x, y]
 				upscaleDark.pixels[y * upscale.width + x].ref.color = rgbaSource.ref.color
 				upscaleLight.pixels[y * upscale.width + x].ref.color = rgbaSource.ref.color
 			}
@@ -204,10 +206,10 @@ fun setWallpaper(bitmap Bitmap32, style WallpaperStyle, preserveAspectRatio Bool
 		for x in upscale.width as! UInt64 {
 			let rgbaSource =
 				interpolatePixel(
-					downscale,
-					(x * wReciprocal) * downscale.width as! Float32, // TODO UInt32 is precise than Float32
-					preMultipliedY * (downscale.height - 8) as! Float32
-				)
+				downscale,
+				(x * wReciprocal) * downscale.width as! Float32, // TODO UInt32 is precise than Float32
+				preMultipliedY * (downscale.height - 8) as! Float32
+			)
 
 			// Apply vibrance (frosted glass)
 			// 0.66*255 = 168.3
@@ -615,7 +617,7 @@ fun compositeWindows() {
 			if window.fbZeta != null and window.fbGama != null {
 				// TODO support transparent mode
 				drawBitmap32(window.fbCurrentZeta ? window.fbZeta : window.fbGama, window.x + frameWidth,
-							 window.y + frameHeight)
+					window.y + frameHeight)
 			} else {
 				drawVibrancedRectangle(
 					window.x + frameWidth, // TODO late-infer-fix int type
@@ -697,7 +699,11 @@ fun composite(startupMilliseconds UInt64) {
 				color.ref
 			)
 
-			color.ref.rgba.ref.r -= 0x8u8
+			if i < 16 {
+				color.ref.rgba.ref.r -= 0x8u8
+			} else {
+				color.ref.rgba.ref.r += 0x8u8
+			}
 		}
 	}
 
@@ -1032,7 +1038,7 @@ fun composite(startupMilliseconds UInt64) {
 		// Should fit into 720p like `h + 32 + 12 <= 720`
 		let h = 676u16
 		let x Int16 = Theme.centeredStart?
-			(defaultSession.popupZone.width / 2i16) - (w / 2i16) : 0i16
+		(defaultSession.popupZone.width / 2i16) - (w / 2i16) : 0i16
 		// Gap above taskbar in centered mode
 		let y = taskbarY - h - (Theme.centeredStart? 12i16 : 0i16)
 
@@ -1385,6 +1391,7 @@ fun copyDirtyToScreen(x Int16, y Int16, bottomX Int16, bottomY Int16) {
 			destination[offset] = source[offset]
 		}
 	}
+
 	/*
 	// Pixels to bytes
 	let width = _framebuffer.width// * 4u64

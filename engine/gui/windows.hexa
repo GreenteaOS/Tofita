@@ -58,8 +58,8 @@ fun drawShadowBox(x Int16, y Int16, w UInt16, h UInt16) {
 			shadow(x + ix + w, y + iy, 192u8 + ix * 4u8)
 		}
 	}
-	for iy in 1...15 {
-		for ix in 1...15 {
+	for iy in 1 ... 15 {
+		for ix in 1 ... 15 {
 			let ix = ix as! Int16 // TODO `...i16`
 			let iy = iy as! Int16
 

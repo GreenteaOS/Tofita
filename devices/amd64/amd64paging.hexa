@@ -106,14 +106,14 @@ fun resolveAddr(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64
 	if entry[0].ref.present == 0 {
 		return physical_not_found
 	}
-	entry = ((entry [0].ref.address << addressBits) + wholePhysicalStart) as! ArrayPointer<ByValue<PageEntry>>
+	entry = ((entry[0].ref.address << addressBits) + wholePhysicalStart) as! ArrayPointer<ByValue<PageEntry>>
 	// pdpt
 	entry = entry[linear.pdpt] as! ArrayPointer<ByValue<PageEntry>>
 	if entry[0].ref.present == 0 {
 		return physical_not_found
 	}
 	// TODO handle mega pages
-	entry = ((entry[0].ref.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
+	entry = ((entry[0].ref.address << addressBits) + wholePhysicalStart) as! ArrayPointer<ByValue<PageEntry>>
 	// pd
 	entry = entry[linear.pd] as! ArrayPointer<ByValue<PageEntry>>
 	if entry[0].ref.present == 0 {
@@ -122,7 +122,7 @@ fun resolveAddr(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64
 	if entry[0].ref.largePage == 1 {
 		return (entry[0].ref.address << addressBits) + linear.pt * 4096 + linear.offset
 	}
-	entry = ((entry[0].ref.address << addressBits) + (wholePhysicalStart as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
+	entry = ((entry[0].ref.address << addressBits) + wholePhysicalStart) as! ArrayPointer<ByValue<PageEntry>>
 	// pt
 	entry = entry[linear.pt] as! ArrayPointer<ByValue<PageEntry>>
 	if entry[0].ref.present == 0 {

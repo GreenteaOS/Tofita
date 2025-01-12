@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -66,22 +66,22 @@ fun engineInit(params UefiPayload) {
 		mapMemory(pml4entries, 4096 * 20u64, 4096 * 10u64, 256, accessibleByUser: false)
 
 		serialPrintf("<> %8 == %8\n", (4096u64 * 10),
-					 resolveAddr(pml4entries, 4096u64 * 20))
+			resolveAddr(pml4entries, 4096u64 * 20))
 		serialPrintf("<> %8 == %8\n", (4096 * 10 + 123),
-					 resolveAddr(pml4entries, 4096u64 * 20 + 123))
+			resolveAddr(pml4entries, 4096u64 * 20 + 123))
 		serialPrintf("<> %8 == %8\n", (0),
-					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64)))
+			resolveAddr(pml4entries, wholePhysicalStart))
 		serialPrintf("<> %8 == %8\n", (0 + 123),
-					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 123))
+			resolveAddr(pml4entries, wholePhysicalStart + 123))
 		serialPrintf("<> %8 == %8\n", (0 + 4096),
 					 resolveAddr(pml4entries, (wholePhysicalStart as! UInt64) + 4096))
 		serialPrintf( // TODO hint that (wholePhysicalStart as! UInt64) useless cause it is same T already
 			"<> %8 == %8\n", (0 + 4096 * 1000 + 123),
 			resolveAddr(pml4entries, wholePhysicalStart + 4096 * 1000 + 123))
 		serialPrintf("<> %8 == %8\n", (1048576),
-					 resolveAddr(pml4entries, 0xffff800000000000u64))
+			resolveAddr(pml4entries, 0xffff800000000000u64))
 		serialPrintf("<> %8 == %8\n", (1048576 + 123),
-					 resolveAddr(pml4entries, 0xffff800000000000u64 + 123))
+			resolveAddr(pml4entries, 0xffff800000000000u64 + 123))
 
 		// TODO move all these to SanityCheck module
 		// serialPrint("resolves from, to, wh, wh+8888: ")
@@ -197,6 +197,7 @@ fun engineInit(params UefiPayload) {
 	currentThread = ThreadKind.THREAD_INIT
 	// FSBase is MSR 0xC0000100, GSBase is 0xC0000101, and EngineGSBase is 0xC0000102
 	// TODO same in trapeze
+	// TODO describe the purpose and save into global constant
 	wrmsr(0xC0000100u64, tibDestination)
 	wrmsr(0xC0000101u64, tibDestination)
 	wrmsr(0xC0000102u64, tibDestination)
@@ -305,8 +306,10 @@ fun engineInit(params UefiPayload) {
 		}
 	}
 
-	startupMilliseconds = paramsCache.time.ref.hour * 60 * 60 * 1000 + paramsCache.time.ref.minute * 60 * 1000 +
-						  paramsCache.time.ref.second * 1000u64
+	startupMilliseconds =
+		paramsCache.time.ref.hour * 60 * 60 * 1000 +
+		paramsCache.time.ref.minute * 60 * 1000 +
+		paramsCache.time.ref.second * 1000u64
 
 	// Show something before scheduling delay
 	composite(startupMilliseconds)

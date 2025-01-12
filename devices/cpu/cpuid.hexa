@@ -20,8 +20,8 @@ class CPUID {
 	var brandName ArrayByValue<UInt8, 48> = [0]
 	var data ArrayByValue<UInt32, 1> = [0]
 	var extras ArrayByValue<UInt32, 1> = [0]
-	var extendedECX ArrayByValue<UInt32, 1 > = [0]
-	var extendedEDX ArrayByValue<UInt32, 1 > = [0]
+	var extendedECX ArrayByValue<UInt32, 1> = [0]
+	var extendedEDX ArrayByValue<UInt32, 1> = [0]
 	var nxBitSupported = false
 	new () { }
 }
@@ -61,6 +61,7 @@ fun getCPUID() CPUID {
 	// TODO Hexa: disallow mixing bit ops and logical (!=) ops!
 	// Like Infix(bit, Infix(logical, ...))
 	// result.nxBitSupported = 0 != result.extendedEDX[0] & 0b00000000000100000000000000000000u32
+	// TODO ^ also precedence bug or Infix bug: the result of this is Bool, not integer, must not be assignable
 	result.nxBitSupported = 0 != (result.extendedEDX[0] & 0b00000000000100000000000000000000u32)
 
 	if result.extras[0] >= cpuidExtendedLevels + 4 {

@@ -86,7 +86,7 @@ fun conventionalAllocateLargest(memoryMap UefiMemoryMap) Void {
 	var offset UInt64 = startOfMemoryMap
 
 	while offset < endOfMemoryMap {
-		// Note: > not >= cause we should have some extra space next to this
+		// Note: > not >= cause we should have some extra space next to this buffer
 		if descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory, descriptor.numberOfPages > largestPages {
 			largestPages = descriptor.numberOfPages
 			result = descriptor.physicalStart

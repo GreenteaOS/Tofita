@@ -65,13 +65,14 @@ fun processCreate() TofitaProcess {
 // Note: supposedly 10.000 system-wise
 let messagesBufferSize UInt64 = 256 // TODO better idea
 
-fun getOrCreateMessagesBuffer(process TofitaProcess) /*TODO wapi.*/[Msg]? {
+fun getOrCreateMessagesBuffer(process TofitaProcess) /*TODO wapi.*/ [Msg]? {
 	if process.messages == null {
 		process.messages = []
 		process.messagesUsed = 0
 
 		// TODO this check is useless
 		// TODO must error `if process.messages != physical_not_found {` comparison between pointer and integer
+
 		/*
 		if process.messages as! UInt64 != physical_not_found {
 			//memset(process.messages as! ArrayPointer<UInt8>, 0, bytes)

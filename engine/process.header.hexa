@@ -63,7 +63,7 @@ class TofitaProcess {
 	var limits AddressAwareness
 	var name String
 
-	new () {}
+	new () { }
 }
 
 /// List of all processes

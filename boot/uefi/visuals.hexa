@@ -125,9 +125,9 @@ fun drawLoading(framebuffer FrameBuffer, progress UInt8) {
 		for x in leavesWidth {
 			let pixel = getBitmapPixel(binLeavesBitmap, x, y, leavesWidth, leavesHeight)
 			drawPixel(framebuffer,
-					  x + framebuffer.width / 2 - (leavesWidth / 2) + progress * leavesWidth * 2 -
-						  leavesWidth * 2,
-					  y + (framebuffer.height / 4) * 3, pixel)
+				x + framebuffer.width / 2 - (leavesWidth / 2) + progress * leavesWidth * 2 -
+				leavesWidth * 2,
+				y + (framebuffer.height / 4) * 3, pixel)
 		}
 	}
 }

@@ -340,51 +340,51 @@ fun quakePrintf(c ConstArrayPointer<ClangWideChar>, ...args) {
 						quakePutString(string)
 					} else {
 						quakePrintf("<STRING IS NULL>".utf16())
-				}
-			}
-			case 83: { // ASCII of UTF-16 `S`
-				var string = va_arg_uint64() as! ArrayPointer<UInt16>
-				var i UInt32 = 0u32
-				if string != null {
-					// TODO probeForReadOkay((uint64_t)string, 2)
-					while string[i] != 0 {
-						quakePutChar(string[i] & 0xFFu8)
-						i++
 					}
-				} else {
-					quakePrintf("<STRING IS NULL>".utf16())
 				}
-			}
+			case 83: { // ASCII of UTF-16 `S`
+					var string = va_arg_uint64() as! ArrayPointer<UInt16>
+					var i UInt32 = 0u32
+					if string != null {
+						// TODO probeForReadOkay((uint64_t)string, 2)
+						while string[i] != 0 {
+							quakePutChar(string[i] & 0xFFu8)
+							i++
+						}
+					} else {
+						quakePrintf("<STRING IS NULL>".utf16())
+					}
+				}
 			case 99: // `c`
 				quakePutChar(va_arg_int32() as! UInt8)
 			case 100: { // `d`
-				var value = va_arg_int32()
-				var buffer ArrayByValue<UInt8, 16> = [0]
-				for i in 16 {
-					buffer[i] = 0
+					var value = va_arg_int32()
+					var buffer ArrayByValue<UInt8, 16> = [0]
+					for i in 16 {
+						buffer[i] = 0
+					}
+					comItoA(value, buffer.ref)
+					var c ArrayPointer<UInt8> = buffer.ref
+					var i = 0
+					while c[i] != 0 {
+						quakePutChar(c[i])
+						i++
+					}
 				}
-				comItoA(value, buffer.ref)
-				var c ArrayPointer<UInt8> = buffer.ref
-				var i = 0
-				while c[i] != 0 {
-					quakePutChar(c[i])
-					i++
-				}
-			}
 			case 117: { // `u`
-				var value UInt32 = va_arg_uint32()
-				var buffer ArrayByValue<UInt8, 16> = [0]
-				for i in 16 {
-					buffer[i] = 0
+					var value UInt32 = va_arg_uint32()
+					var buffer ArrayByValue<UInt8, 16> = [0]
+					for i in 16 {
+						buffer[i] = 0
+					}
+					comItoA(value, buffer.ref)
+					var c ArrayPointer<UInt8> = buffer.ref
+					var i = 0
+					while c[i] != 0 {
+						quakePutChar(c[i])
+						i++
+					}
 				}
-				comItoA(value, buffer.ref)
-				var c ArrayPointer<UInt8> = buffer.ref
-				var i = 0
-				while c[i] != 0 {
-					quakePutChar(c[i])
-					i++
-				}
-			}
 			case 56: { // `8`
 					var value UInt64 = va_arg_uint64()
 					quakePrintHex(value)

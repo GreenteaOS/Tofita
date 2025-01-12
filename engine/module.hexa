@@ -44,12 +44,11 @@ fun loadModule(params ModuleInterim) Module {
 
 	// Copy sections
 	for i in peHeader.numberOfSections {
-		let imageSectionHeader =
-			(
-				(peOptionalHeader as! UInt64)
-				+ (sizeOf<ImageSectionHeader>() * i)
-				+ peHeader.sizeOfOptionalHeader
-			) as! ImageSectionHeader
+		let imageSectionHeader = (
+			(peOptionalHeader as! UInt64)
+			+ (sizeOf<ImageSectionHeader>() * i)
+			+ peHeader.sizeOfOptionalHeader
+		) as! ImageSectionHeader
 
 		serialPrintf("Copy section [%d] named '%s' of size %d\n",
 			i,
@@ -59,8 +58,8 @@ fun loadModule(params ModuleInterim) Module {
 		var where UInt64 = (base as! UInt64) + imageSectionHeader.virtualAddress
 
 		tmemcpy(where as! ArrayPointer<UInt8>,
-				((params.dll.data as! UInt64) + (imageSectionHeader.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
-				imageSectionHeader.sizeOfRawData)
+			((params.dll.data as! UInt64) + (imageSectionHeader.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
+			imageSectionHeader.sizeOfRawData)
 	}
 
 	return module

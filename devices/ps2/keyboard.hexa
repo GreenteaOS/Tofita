@@ -23,30 +23,30 @@ var keyboardPressedState ArrayByValue<UInt8, 128> = [0]
 var keyboardEvents ArrayByValue<UInt8, 256> = [0]
 var keyboardEventsLength UInt8 = 0
 let keyboardMap [String] = [
-	'', ''/*ESC*/, '1', '2', '3', '4', '5', '6', '7',
+	'', '' /*ESC*/, '1', '2', '3', '4', '5', '6', '7',
 	'8', // 9
-	'9',  '0', '-', '=',
+	'9', '0', '-', '=',
 	'\b', // Backspace
 	'\t', // Tab
-	'q',  'w', 'e',
+	'q', 'w', 'e',
 	'r', // 19
-	't',  'y', 'u', 'i', 'o', 'p', '[', ']',
+	't', 'y', 'u', 'i', 'o', 'p', '[', ']',
 	'\n', // Enter key
-	'',	  // 29 - Control
-	'a',  's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+	'', // 29 - Control
+	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
 	';', // 39
 	'\'', '`',
 	'', // Left shift
 	'\\', 'z', 'x', 'c', 'v', 'b',
 	'n', // 49
-	'm',  ',', '.', '/',
+	'm', ',', '.', '/',
 	'', // Right shift
 	'*',
-	'',	 // Alt
+	'', // Alt
 	' ', // Space bar
-	'',	 // Caps lock
-	'',	 // 59 - F1 key ... >
-	'',	  '',   '',	'',	 '',	  '',   '',	'',
+	'', // Caps lock
+	'', // 59 - F1 key ... >
+	'', '', '', '', '', '', '', '',
 	'', // < ... F10
 	'', // 69 - Num lock
 	'', // Scroll Lock
@@ -63,7 +63,7 @@ let keyboardMap [String] = [
 	'', // Page Down
 	'', // Insert Key
 	'', // Delete Key
-	'',	  '',   '',
+	'', '', '',
 	'', // F11 Key
 	'', // F12 Key
 	'' // All other keys are undefined
@@ -73,10 +73,10 @@ let dataPort = 0x60u8
 
 fun handleKeyboardPacket() {
 	// if (polls)
-	//	return
+	// return
 
 	// if (lockMouse)
-	//	return
+	// return
 	// while lockMouse {}
 	// lockMouse = true
 
@@ -84,29 +84,29 @@ fun handleKeyboardPacket() {
 
 	/// PS2 Mouse
 	// if (status & 0x20) {
-	//	//    UInt8 keycode = readPort(DATA_PORT)
-	//	//    //if keycode < 0 {
-	//	lockMouse = false
-	//	handleMousePacket()
-	//	return
-	//	//    //}
-	//	//    //UInt8 buffer[] = {keyboardMap[keycode], 0}
-	//	//    UInt8 buffer[] = {'M','o','u','s','e',':', 0}
-	//	//    serialPrint(buffer)
-	//	//    serialPrint(buffer)
-	//}
+	// //    UInt8 keycode = readPort(DATA_PORT)
+	// //    //if keycode < 0 {
+	// lockMouse = false
+	// handleMousePacket()
+	// return
+	// //    //}
+	// //    //UInt8 buffer[] = {keyboardMap[keycode], 0}
+	// //    UInt8 buffer[] = {'M','o','u','s','e',':', 0}
+	// //    serialPrint(buffer)
+	// //    serialPrint(buffer)
+	// }
 
 	// TODO if status & 0x1 != 0
 	{
 		let keycode UInt8 = readPort(dataPort)
 
 		// TODO should hint that `<` useless here for `uint8`
-		//if keycode < 0 {
-		//	// lockMouse = false
-		//	// TODO this is why `@defer` is required, had a bug here
-		//	writePort(pic1_command, pic_eoi)
-		//	return
-		//}
+		// if keycode < 0 {
+		// // lockMouse = false
+		// // TODO this is why `@defer` is required, had a bug here
+		// writePort(pic1_command, pic_eoi)
+		// return
+		// }
 
 		// Last one will always be overwritten, makes sense, but any better ideas?
 		keyboardEvents[keyboardEventsLength] = keycode
@@ -120,7 +120,7 @@ fun handleKeyboardPacket() {
 			keyboardPressedState[keycode] = 1
 
 			if 41 == keycode {
-				haveToQuake = !haveToQuake
+				haveToQuake = not haveToQuake
 				requestAnimationFrame()
 			}
 
@@ -137,9 +137,9 @@ fun handleKeyboardPacket() {
 			keyboardPressedState[keycode] = 0
 		}
 		// if (status & 0x20) {
-		//    UInt8 buffer[] = {'M', 0}
-		//    serialPrint(buffer)
-		//}
+		// UInt8 buffer[] = {'M', 0}
+		// serialPrint(buffer)
+		// }
 	}
 
 	// Note: Quake terminal has higher priority than the engine itself
@@ -147,7 +147,7 @@ fun handleKeyboardPacket() {
 
 	// keyDownHandler = null
 	// if (haveToQuake)
-	//	keyDownHandler = quakeHandleButtonDown
+	// keyDownHandler = quakeHandleButtonDown
 
 	// EOI
 	// Disable this line if polling is used

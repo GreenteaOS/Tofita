@@ -231,13 +231,13 @@ fun timerInterruptHandler(@volatile frame InterruptFrame) {
 					} else {
 						switchToNextProcess(frame)
 					}
-					nextIsUserProcess = !nextIsUserProcess
+					nextIsUserProcess = not nextIsUserProcess
 				}
 			}
 		}
 	}
-	//		if currentThread == THREAD_INIT {
-	//			// TODO hexa error == statement: currentThread == THREAD_INIT
+	// if currentThread == THREAD_INIT {
+	// // TODO hexa error == statement: currentThread == THREAD_INIT
 
 	// Enable interrupts
 	writePort(pic1_command_0x20, pic_eoi_0x20)
