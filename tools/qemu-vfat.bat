@@ -1,4 +1,5 @@
 @echo off
+cd /d %~dp0
 color 0A
 setlocal enableDelayedExpansion
 cls
@@ -17,7 +18,7 @@ if not exist "%ISO%" (
 )
 
 set QEMU="C:\Program Files\qemu\qemu-system-x86_64.exe"
-set OVMF="..\Teapot\OVMF.fd"
+set OVMF="..\..\Teapot\OVMF.fd"
 
 %QEMU% -accel tcg -bios %OVMF% -m 2048 ^
     -vga std -machine pc-q35-2.10 ^
