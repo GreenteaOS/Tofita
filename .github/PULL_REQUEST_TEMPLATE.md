@@ -22,11 +22,10 @@ If this pull request is related to any issue, then put its number here please. F
 
 Checklist:
 
-- [ ] My code is commented, has adequate variable/methods names, autoformatted or manually formatted
+- [ ] My code is commented, has adequate variable/methods names and autoformatted
 - [ ] Code is __not copy-pasted__ from __leaked source codes__ of commercial projects, nor from projects protected with GPL-incompatible licenses
-- [ ] My pull request is complete and does not require any additional steps
-- [ ] `(optional)` I added my real name to the [authors list](https://github.com/GreenteaOS/Tofita/blob/kawaii/AUTHORS.md) to improve protective power of the [GPL license](https://en.wikipedia.org/wiki/GNU_General_Public_License)
-- [ ] I have checked [automatic builds](https://ci.appveyor.com/project/PeyTy/tofita) for this project and downloaded [artifacts](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
+- [ ] `(optional)` I added my real name to the authors list to improve protective power of the [GPL license](https://en.wikipedia.org/wiki/GNU_General_Public_License)
+- [ ] I will check [automatic builds](https://ci.appveyor.com/project/PeyTy/tofita) for this project and downloaded [artifacts](https://ci.appveyor.com/project/PeyTy/tofita/build/artifacts)
 
 Agreements
 
