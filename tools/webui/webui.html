@@ -38,8 +38,8 @@
 				})
 				.then((data) => {
 					// Dev Tools don't filter on single .log
-					const lines = ('' + data).split('\n')
-					for (const line of lines) console.log(line);
+					const lines = data? ('' + data).split('\n') : []
+					for (const line of lines) if (line) console.log(line);
 					busy = false
 				})
 				.catch((error) => {
