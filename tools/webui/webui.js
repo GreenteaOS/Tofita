@@ -18,7 +18,7 @@
 // Configuration
 const vmname = 'Tofita'
 const command = '"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage" --nologo startvm ' + vmname
-const host = 'localhost'
+const host = '127.0.0.1' // 'localhost'
 const port = 1234
 
 // Web UI
