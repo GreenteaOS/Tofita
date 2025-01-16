@@ -51,6 +51,7 @@ void free(void *ptr) {
 };
 typedef void FILE;
 #define HEXA_MAIN mainHexa
+int HEXA_MAIN(int argc, char **argv);
 #define HEXA_NEW(z) malloc(z)
 
 void *memset(void *dest, int32_t e, uint64_t len) {
