@@ -51,6 +51,9 @@ declare
 fun probeForReadOkay(@volatile at UInt64, @volatile bytes UInt64) Bool
 
 /*{
+	// TODO just check RIP, not sehProbe flag: rewrite in NASM + pad `times 510 - ($-$$) db 0 ; Pad the remaining of the first 510 bytes with 0`
+	// ^ RIP approach is better cause its thread-safe and does not require thread sync mechanism (like FS:)
+
 	sehProbe = true
 	// TODO do not probe upper half to not touch mmio from user process while probing
 	// TODO per-page not per-byte
