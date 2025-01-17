@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -76,7 +76,7 @@ fun engineThread() {
 						// TODO serialPrintf("[[rcx=%u rdx=%8 r8=%8]] ", frame.rcxArg0, frame.rdxArg1, frame.r8)
 
 						if probeForReadOkay(frame.rdxArg1, sizeOf<DebugLogPayload>()) {
-							var payload = frame.rdxArg1 as! DebugLogPayload
+							let payload = frame.rdxArg1 as! DebugLogPayload
 							// Note this is still very unsafe
 							// TODO safer one, with SEH + check to addresses be at user space
 							if probeForReadOkay(payload.message, 1) {
