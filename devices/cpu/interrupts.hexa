@@ -295,25 +295,6 @@ fun syscallInterruptHandler(frame InterruptFrame) {
 	switchToEngineThread(frame)
 	// TODO weird frame+8 offset if called switchToNextProcess
 	// switchToNextProcess(frame)
-	{
-		return // TODO
-	}
-
-	if index == TofitaSyscalls.DebugLog {
-		serialPrintf("[[DebugLog:PID %d]] %s\n", currentProcess, frame.rdxArg1)
-		return
-	}
-
-	if index == TofitaSyscalls.ExitProcess {
-		serialPrintf("[[ExitProcess:PID %d]] %d\n", currentProcess, frame.rdxArg1)
-		// TODO engine wake up
-		// TODO destroy process
-		var process TofitaProcess = processes[currentProcess]
-		process.schedulable = false
-		switchToNextProcess(frame)
-		process.present = false
-		return
-	}
 }
 
 @emitHeader @linkAsIs
