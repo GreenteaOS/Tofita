@@ -18,7 +18,7 @@
 // Engine memory upper half starts from here
 let upper UInt64 = 0xffff800000000000u64
 // TODO map pixels right here to avoid pointer indirection?
-let frameBufferVirtualBase UInt64 = (upper + 768u64 * 1024u64 * 1024u64)
+let frameBufferVirtualBase UInt64 = upper + 768u64 * 1024u64 * 1024u64
 // TODO: no need for mapping frameBufferVirtualBase if wholePhysicalStart used
 // TODO proper dynamically computed numbers
 
