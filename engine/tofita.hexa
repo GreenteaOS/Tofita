@@ -266,8 +266,7 @@ fun engineInit(params UefiPayload) {
 	// TODO should be done at main thread
 	// TODO use some kind of autorun.ini/.bat asset
 	if false {
-		for i in 4
-		{
+		for i in 4 {
 			if i == 0 {
 				continue
 			}
