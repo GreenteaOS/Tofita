@@ -58,7 +58,7 @@ let tasks [String] = process.argv.slice()
 let llvm = 'LLVM-14.0.6-2'
 tasks.shift()
 tasks.shift()
-let teapot = config.teapot
+let teapot = "..\\TEAPOT"
 let nasm = '\(teapot)\\nasm-2.14.02\\nasm'
 let clang = '\(teapot)\\\(llvm)\\bin\\clang.exe'
 let link = '\(teapot)\\\(llvm)\\bin\\lld-link.exe'
@@ -470,16 +470,23 @@ fun runTasks() {
 				// LIB GEN
 				for i in dlls.length {
 					let named = dlls[i]
-					let items64 = fs.readFileSync(config.tempFolder + '\\' + teaFolder + '\\\(named).64.c.dllExport.txt').toString()
-					let items32 = fs.readFileSync(config.tempFolder + '\\' + teaFolder + '\\\(named).32.c.dllExport.txt').toString()
-					let gen =
-						(
-							' bit named ' + config.tempFolder + '/' + teaFolder + '/!named.bit.lib '
-						)
+					// let items64 = fs.readFileSync(config.tempFolder + '\\' + teaFolder + '\\\(named).64.c.dllExport.txt').toString()
+					// let items32 = fs.readFileSync(config.tempFolder + '\\' + teaFolder + '\\\(named).32.c.dllExport.txt').toString()
+					let gen = (
+						' file %bit %named ' + config.tempFolder + '/' + teaFolder + '/!%named.%bit.lib '
+					)
 					// TODO Hexa: }catch e: Any {} `:`
+					// try {fs.unlinkSync(config.tempFolder + '/' + teaFolder + '/!\(named).64.lib')}catch e: Any {}
+					// try {fs.unlinkSync(config.tempFolder + '/' + teaFolder + '/!\(named).32.lib')}catch e: Any {}
 
-					phase2.push(libgen + (gen + items64).replaceAll('named', named).replaceAll('bit', '64'))
-					phase2.push(libgen + (gen + items32).replaceAll('named', named).replaceAll('bit', '32'))
+					// phase2.push(libgen + (gen + items64).replaceAll('%named', named).replaceAll('%bit', '64'))
+					// phase2.push(libgen + (gen + items32).replaceAll('%named', named).replaceAll('%bit', '32'))
+
+					// Use files directly with newer libgen
+					let names64 = config.tempFolder + '\\' + teaFolder + '\\\(named).64.c.dllExport.txt'
+					let names32 = config.tempFolder + '\\' + teaFolder + '\\\(named).32.c.dllExport.txt'
+					phase2.push(libgen + (gen + names64).replaceAll('%named', named).replaceAll('%bit', '64'))
+					phase2.push(libgen + (gen + names32).replaceAll('%named', named).replaceAll('%bit', '32'))
 				}
 
 				currentWave = phase2

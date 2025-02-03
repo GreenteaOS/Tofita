@@ -1,6 +1,5 @@
 {
 	"warnings": false,
-	"teapot": "..\\Teapot",
 	"features": [
 		"example-like-mail-client-or-something"
 	],
