@@ -28,6 +28,11 @@ fun memset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void {
 	}
 }
 
+// Clang workaround
+@keep
+@rename('__chkstk')
+fun chkstkStub() Void { }
+
 // CR3 trampoline
 @extern
 @rename("trampolineCR3") // TODO Hexa: @asIs
@@ -140,6 +145,10 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk)
 	while status != EFI_STATUS.EFI_SUCCESS {
 		drawError("[ERROR] Tofita cannot load RAM disk [ERROR]", framebuffer)
+		while status != EFI_STATUS.EFI_SUCCESS {
+			pause()
+			__sync_synchronize()
+		}
 	}
 	drawLoading(framebuffer, 1)
 
