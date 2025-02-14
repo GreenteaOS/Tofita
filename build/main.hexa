@@ -583,8 +583,10 @@ fun runTasks() {
 						xorriso,
 						'-as mkisofs -o \(path)/greenteaos-uefi64.iso -iso-level 3',
 						// TODO try to use .img not in spin-off folder to avoid duplication
-						'-V GreenteaOS \(path)/spin-off -append_partition 2 \(efi) \(path)/DISK.IMG',
-						'-e --interval:appended_partition_2:all:: -no-emul-boot'
+						'-V GTOS \(path)/spin-off',
+						'-append_partition 2 \(efi) \(path)/DISK.IMG',
+						'-e --interval:appended_partition_2:all::',
+						'-no-emul-boot'
 					].join(' '), { stdio: 'inherit' }
 				)
 			}
