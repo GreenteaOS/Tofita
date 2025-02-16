@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -545,10 +545,10 @@ fun handleMouseActivity() {
 
 			handleMouseMove(mouseXtemp, mouseYtemp)
 		} else if (type == MouseActionType.LeftUp or type == MouseActionType.RightUp or
-					type == MouseActionType.MiddleUp) {
+				type == MouseActionType.MiddleUp) {
 			handleMouseUp(type, mouseXtemp, mouseYtemp)
 		} else if (type == MouseActionType.LeftDown or type == MouseActionType.RightDown or
-					type == MouseActionType.MiddleDown) {
+				type == MouseActionType.MiddleDown) {
 			handleMouseDown(type, mouseXtemp, mouseYtemp)
 		}
 

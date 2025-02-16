@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -21,7 +21,7 @@ class Cursor {
 	var bmp ArrayPointer<UInt8>
 	// TODO just use Bitmap32
 	var bmpStart UInt64
-	new () {}
+	new () { }
 }
 
 fun loadCursor(asset RamDiskAsset) Cursor {
@@ -66,8 +66,8 @@ fun loadCursor(asset RamDiskAsset) Cursor {
 		// In CUR format: Specifies the vertical coordinates of the hotspot in number of pixels from the top.
 
 		// Specifies the size of the image's data in bytes
-		//let size = toInt32(buffer[offset + 8], buffer[offset + 9], buffer[offset + 10], buffer[offset + 11])
-		//console.log("%d size\n", size)
+		// let size = toInt32(buffer[offset + 8], buffer[offset + 9], buffer[offset + 10], buffer[offset + 11])
+		// console.log("%d size\n", size)
 		// Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
 	}
 

@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -47,7 +47,7 @@ class MouseAction {
 	var mouseYdiff Int16
 	var type MouseActionType
 	// TODO time stamp
-	new () {}
+	new () { }
 }
 
 let mouseActionsLimit UInt8 = 255
@@ -100,85 +100,85 @@ fun getBit(byte UInt8, bit UInt8) UInt8 {
 }
 
 fun handleMousePacket() {
-	while lockMouse {}
+	while lockMouse { }
 	lockMouse = true
 
 	switch mouseCycle {
-	case 0: {
-		mouseByte[0] = mouseRead()
-		if (mouseByte[0] & 0x08) != 0 {
-			mouseCycle++ // Only accept this as the first byte if the "must be 1" bit is set
-		}
-		// mouseCycle++
-	}
-	case 1: {
-		mouseByte[1] = mouseRead()
-		mouseCycle++
-	}
-	case 2: {
-		mouseByte[2] = mouseRead()
+		case 0: {
+				mouseByte[0] = mouseRead()
+				if (mouseByte[0] & 0x08) != 0 {
+					mouseCycle++ // Only accept this as the first byte if the "must be 1" bit is set
+				}
+				// mouseCycle++
+			}
+		case 1: {
+				mouseByte[1] = mouseRead()
+				mouseCycle++
+			}
+		case 2: {
+				mouseByte[2] = mouseRead()
 
-		var mouseXd Int16 = mouseByte[1]
-		var mouseYd Int16 = mouseByte[2]
-		mouseYd = -mouseYd
+				var mouseXd Int16 = mouseByte[1]
+				var mouseYd Int16 = mouseByte[2]
+				mouseYd = -mouseYd
 
-		// Overflow
-		if getBit(mouseByte[0], 6) != 0 {
-			mouseXd = 0
-		} else if getBit(mouseByte[0], 4) != 0 {
-			mouseXd -= 0x100i16
-		}
+				// Overflow
+				if getBit(mouseByte[0], 6) != 0 {
+					mouseXd = 0
+				} else if getBit(mouseByte[0], 4) != 0 {
+					mouseXd -= 0x100i16
+				}
 
-		if getBit(mouseByte[0], 7) != 0 {
-			mouseYd = 0
-		} else if getBit(mouseByte[0], 5) != 0 {
-			mouseYd += 0x100i16
-		}
+				if getBit(mouseByte[0], 7) != 0 {
+					mouseYd = 0
+				} else if getBit(mouseByte[0], 5) != 0 {
+					mouseYd += 0x100i16
+				}
 
-		mouseCycle = 0
+				mouseCycle = 0
 
-		// Ignore all state changes until message pool is ready
-		// Otherwise we will have situation like DOWN-UP-UP instead of D-U-D-U
-		if mouseActionsUseZeta and mouseActionsZetaAmount == mouseActionsLimit {
-			// TODO break
-		}
-		if not mouseActionsUseZeta and mouseActionsGamaAmount == mouseActionsLimit {
-			// TODO break
-		}
+				// Ignore all state changes until message pool is ready
+				// Otherwise we will have situation like DOWN-UP-UP instead of D-U-D-U
+				if mouseActionsUseZeta and mouseActionsZetaAmount == mouseActionsLimit {
+					// TODO break
+				}
+				if not mouseActionsUseZeta and mouseActionsGamaAmount == mouseActionsLimit {
+					// TODO break
+				}
 
-		if mouseXd != 0 or mouseYd != 0 {
-			pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
-		}
+				if mouseXd != 0 or mouseYd != 0 {
+					pushMouseAction(MouseActionType.Moved, mouseXd, mouseYd)
+				}
 
-		let left Bool = getBit(mouseByte[0], 0) != 0
-		let right Bool = getBit(mouseByte[0], 1) != 0
-		let middle Bool = getBit(mouseByte[0], 2) != 0
+				let left Bool = getBit(mouseByte[0], 0) != 0
+				let right Bool = getBit(mouseByte[0], 1) != 0
+				let middle Bool = getBit(mouseByte[0], 2) != 0
 
-		if left == false and leftDown == true {
-			pushMouseAction(MouseActionType.LeftUp)
-		}
-		if left == true and leftDown == false {
-			pushMouseAction(MouseActionType.LeftDown)
-		}
+				if left == false and leftDown == true {
+					pushMouseAction(MouseActionType.LeftUp)
+				}
+				if left == true and leftDown == false {
+					pushMouseAction(MouseActionType.LeftDown)
+				}
 
-		if right == false and rightDown == true {
-			pushMouseAction(MouseActionType.RightUp)
-		}
-		if right == true and rightDown == false {
-			pushMouseAction(MouseActionType.RightDown)
-		}
+				if right == false and rightDown == true {
+					pushMouseAction(MouseActionType.RightUp)
+				}
+				if right == true and rightDown == false {
+					pushMouseAction(MouseActionType.RightDown)
+				}
 
-		if middle == false and middleDown == true {
-			pushMouseAction(MouseActionType.MiddleUp)
-		}
-		if middle == true and middleDown == false {
-			pushMouseAction(MouseActionType.MiddleDown)
-		}
+				if middle == false and middleDown == true {
+					pushMouseAction(MouseActionType.MiddleUp)
+				}
+				if middle == true and middleDown == false {
+					pushMouseAction(MouseActionType.MiddleDown)
+				}
 
-		leftDown = left
-		rightDown = right
-		middleDown = middle
-	}
+				leftDown = left
+				rightDown = right
+				middleDown = middle
+			}
 	}
 
 	// Trigger DWM to handle mouse packets
@@ -198,21 +198,21 @@ fun handleMouse() {
 	// This is hack to avoid race condition in poller
 	// this way we handle mouse *only* in poller
 	// if true {
-	//	pollForce = true
-	//	writePort(0xA0, 0x20)
-	//	writePort(0x20, 0x20)
-	//	return
-	//}
+	// pollForce = true
+	// writePort(0xA0, 0x20)
+	// writePort(0x20, 0x20)
+	// return
+	// }
 
 	// Avoid race condition
 	// polls = true
 	// handleMousePacket()
 	// UInt8 poll = readPort(0x64)
 	// while getBit(poll, 0) == 1 and getBit(poll, 5) == 1 {
-	//	// if (getBit(poll, 0) == 1 and getBit(poll, 5) == 1) {
-	//	// handleMousePacket()
-	//	poll = readPort(0x64)
-	//}
+	// // if (getBit(poll, 0) == 1 and getBit(poll, 5) == 1) {
+	// // handleMousePacket()
+	// poll = readPort(0x64)
+	// }
 	// writePort(0xA0, 0x20)
 	// writePort(0x20, 0x20)
 	// haveToRender = 1

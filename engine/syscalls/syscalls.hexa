@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -32,7 +32,7 @@ enum TofitaSyscalls : UInt32 {
 	// User
 	// TODO DebugLog = userSyscalls
 	DebugLog = 123000
-	CreateWindowEx = 123001 // TODO auto compute
+	CreateWindowEx = 123001 // TODO auto compute while ensure unique
 	ShowWindow = 123002 // TODO auto compute
 	GetMessage = 123003 // TODO auto compute
 	PostMessage = 123004 // TODO auto compute

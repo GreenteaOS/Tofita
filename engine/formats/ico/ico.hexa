@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -48,7 +48,7 @@ fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
 		// Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
 		// Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
 		serialPrintf("%d image is %dx%d, palette = %d\n", i, buffer[offset], buffer[offset + 1], buffer[offset + 2])
-		//if buffer[offset] + buffer[offset + 1] >= buffer[best] + buffer[best + 1] {
+		// if buffer[offset] + buffer[offset + 1] >= buffer[best] + buffer[best + 1] {
 		if buffer[offset] == width {
 			best = offset
 			bestId = i
@@ -63,8 +63,8 @@ fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
 		// In CUR format: Specifies the vertical coordinates of the hotspot in number of pixels from the top.
 
 		// Specifies the size of the image's data in bytes
-		//let size = toInt32(buffer[offset + 8], buffer[offset + 9], buffer[offset + 10], buffer[offset + 11])
-		//console.log("%d size\n", size)
+		// let size = toInt32(buffer[offset + 8], buffer[offset + 9], buffer[offset + 10], buffer[offset + 11])
+		// console.log("%d size\n", size)
 		// Specifies the offset of BMP or PNG data from the beginning of the ICO/CUR file
 	}
 
@@ -86,7 +86,8 @@ fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
 		bits: buffer[best + 6] + buffer[best + 7] * 0xFF,
 		pixels: null
 	}
-	*/ // TODO Hexa: sublime comment
+	*/
+	// TODO Hexa: sublime comment
 
 	let planes = buffer[best + 4] + buffer[best + 5] * 0xFF
 	let bits = buffer[best + 6] + buffer[best + 7] * 0xFF
@@ -118,7 +119,7 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 	serialPrintf("The icon is %dx%d, %d bytes at %d\n", bmp.width, bmp.height, imageSize, offset)
 	// A PNG file starts with an 8-byte signature (refer to hex editor image on the right):
 	serialPrintf("Header at %d: %d %d %d %d\n", offset, buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3])
-	//serialPrintf("Header text is:\n", String.fromCharCode(buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3]))
+	// serialPrintf("Header text is:\n", String.fromCharCode(buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3]))
 
 	// ?PNG
 	if
@@ -133,13 +134,13 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 		return loadStbi32FromBuffer(buffer as! ArrayPointer<UInt8>, imageSize)
 	}
 
-	//serialPrintf("Header at: %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])
+	// serialPrintf("Header at: %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])
 	let fsize = bmp.width * bmp.height * 4
 	let start = offset + 20 + 16 + 4
 	// TODO bmp.pixels = buffer.slice(start, start + imageSize)
 	let pixels = ((buffer as! UInt64) + start) as! ArrayPointer<UInt8>
 
-	//serialPrintf("Icon bits per pixel %d == %d, color planes %d\n", bits, 8 * Math.round(imageSize / (bmp.width * bmp.height)), planes)
+	// serialPrintf("Icon bits per pixel %d == %d, color planes %d\n", bits, 8 * Math.round(imageSize / (bmp.width * bmp.height)), planes)
 	serialPrintf("Icon bytes %d == %d\n", bmp.width * bmp.height * 4, imageSize)
 
 	// Mirror vertical

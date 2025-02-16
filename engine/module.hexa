@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -30,15 +30,15 @@ class ModuleInterim {
 }
 
 fun loadModule(params ModuleInterim) Module {
-	var module = PhysicalAllocator.allocateBytes(sizeOf<Module>()) as! Module // TODO new Module
+	let module = PhysicalAllocator.allocateBytes(sizeOf<Module>()) as! Module // TODO new Module
 	module.name = params.name // TODO copy string
 	module.dll = params.dll
 
 	// TODO relocation? or overwrite?
-	var ptr = params.dll.data as! ArrayPointer<UInt8>
-	var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
-	var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe32OptionalHeader
-	var base = peOptionalHeader.imageBase as! ArrayPointer<UInt8>
+	let ptr = params.dll.data as! ArrayPointer<UInt8>
+	let peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
+	let peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe32OptionalHeader
+	let base = peOptionalHeader.imageBase as! ArrayPointer<UInt8>
 	memset(base, 0, peOptionalHeader.sizeOfImage) // Zeroing
 	module.base = peOptionalHeader.imageBase
 
@@ -55,7 +55,7 @@ fun loadModule(params ModuleInterim) Module {
 			imageSectionHeader.name,
 			imageSectionHeader.sizeOfRawData
 		)
-		var where UInt64 = (base as! UInt64) + imageSectionHeader.virtualAddress
+		let where UInt64 = (base as! UInt64) + imageSectionHeader.virtualAddress
 
 		tmemcpy(where as! ArrayPointer<UInt8>,
 			((params.dll.data as! UInt64) + (imageSectionHeader.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,

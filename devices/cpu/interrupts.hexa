@@ -425,11 +425,13 @@ fun setupInterruptsAndExceptions() {
 	enterEngineMode()
 
 	// Set PIT frequency
+	// Valid values: 57 Hz, 121 Hz, 173 Hz, 209 Hz, 363 Hz, ..., 627 Hz, 1903 Hz
 	// Next valid: `i = 174; while (Math.round(1193181 / i) != (1193181 / i)) {i++;}; console.log(i)`
 	writePort(0x43, 0x36)
 	// 627 Hz is the sweet spot between 250 and 1000 Hz `(1000 + 250) / 2 == 625`
 	// Well of course 1000 Hz may make sense too cause people expect 1 ms precision
 	// but this timer does not support such precision
+	let frequency = 1193181 / 627
 	writePort(0x40, frequency & 0xFFu8)
 	writePort(0x40, (frequency >> 8) & 0xFFu8)
 

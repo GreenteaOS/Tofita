@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -72,6 +72,7 @@ fun packFonts(config Config) {
 	fs.writeFileSync(config.tempFolder + tea + '\\ascii.tofita', buffer, "binary")
 }
 
+// TODO split ram disk into multiple files cause conventional memory may be fragmented
 fun packAssets(config Config) {
 	let folder = config.tempFolder + tea
 	let fs = require('fs') // TODO import normally
@@ -163,12 +164,13 @@ fun packAssets(config Config) {
 	) * (assetName.length + folderCount)
 	// uint8_t* data
 
-	// Round upto 4 bytes
+	// Round up to 4 bytes
 	ramDiskSize = Math.ceil(ramDiskSize / 4) * 4
 	// console.log('ramDiskSize is', ramDiskSize, 'bytes')
 	// console.log('Assets count is', assetName.length)
 
 	let buffer = Buffer.alloc(ramDiskSize) // zeroed
+	// TODO write a header GTOS (+4 bytes of disk size)
 	buffer.writeUInt32LE(0, 0)
 	buffer.writeUInt32LE(ramDiskSize, 4)
 	buffer.writeUInt32LE(assetName.length + folderCount, 8)

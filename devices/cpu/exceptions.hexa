@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -19,6 +19,7 @@
 fun engineThreadLoop() {
 	serialPrintln("<Tofita> [looping forever]")
 	while true {
+		__sync_synchronize()
 		pause()
 		disableAllInterrupts()
 		halt()
@@ -84,4 +85,9 @@ fun exceptionHandler(frame InterruptFrame) {
 
 		qsod("Engine-mode unhandled CPU exception: index = %u, code = %8, cr2 = %8\n".utf16(), frame.index, frame.code, cr2)
 	}
+
+	serialPrintf("\n[Exception before main thread]\n")
+	// engineThreadLoop()
+
+	// TODO div by zero produce zero? or exception? exception seems better
 }

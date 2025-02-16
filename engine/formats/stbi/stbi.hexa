@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -8132,9 +8132,11 @@ fun loadStbi32FromBuffer(data ArrayPointer<UInt8>, size UInt32) Bitmap32 {
 }
 
 fun loadPng32(asset RamDiskAsset) Bitmap32 {
+	// TODO don't load >8k huge images
 	return loadStbi32FromBuffer(asset.data, asset.size)
 }
 
 fun loadJpeg32(asset RamDiskAsset) Bitmap32 {
+	// TODO don't load >8k huge images
 	return loadStbi32FromBuffer(asset.data, asset.size)
 }

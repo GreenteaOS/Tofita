@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -118,18 +118,23 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 	// serialPrintf_(L"HeapAlloc [%s:%d] %d", /*filename,*/ functionName, lineNumber, size);
 	// size = ((size - 1) | 7) + 1; // Align by 8
 	size = ((size - 1) | 15) + 1; // Align by 16
+
 	if (size < 16) size = 16;
+
 	heapOffset += 16;
 	heapOffset += size;
+
 	if (heapOffset >= HEAP_C) {
 		//serialPrint_(L"Heap overflow\n");
 		// TODO heap zero fill?
 		heap = (uint8_t*)PhysicalAllocator_$allocateBytes_(HEAP_C);
 		heapOffset = 16 + size;
+
 		while (heap == nullptr) {
 			//serialPrint_(L"Heap total overflow\n");
 		};
 	}
+
 	// TODO FILL WITH ZEROS RIGHT HERE!
 	return &heap[heapOffset - size];
 }
