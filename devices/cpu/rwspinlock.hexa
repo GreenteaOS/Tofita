@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -25,12 +25,12 @@ class ReadWriteSpinLock {
 	@volatile var lock UInt32 = 0
 
 	/// Writer thread
-    var threadId UInt32 = 0xFFFFFFFFu32
+	var threadId UInt32 = 0xFFFFFFFFu32
 
 	/// Writers depth
-    var recursionDepth UInt32 = 0
+	var recursionDepth UInt32 = 0
 
-    @inline new() {}
+	@inline new () { }
 
 	@inline static fun yieldProcessor() Void {
 		// TODO __mm_pause()
@@ -53,7 +53,7 @@ class ReadWriteSpinLock {
 			let oldLock UInt32 = lock & 0x7fffffff
 			let newLock UInt32 = oldLock + 1
 
-			if interlockedCompareExchange(/*TODO &*/lock, newLock, oldLock) == oldLock {
+			if interlockedCompareExchange(/*TODO &*/ lock, newLock, oldLock) == oldLock {
 				return
 			}
 		}
@@ -70,7 +70,7 @@ class ReadWriteSpinLock {
 			let oldLock UInt32 = lock & 0x7fffffff
 			let newLock UInt32 = oldLock | 0x80000000u32
 
-			if interlockedCompareExchange(/*TODO &*/lock, newLock, oldLock) == oldLock {
+			if interlockedCompareExchange(/*TODO &*/ lock, newLock, oldLock) == oldLock {
 				// Wait for active readers to release their locks
 				while (lock & 0x7fffffff) != 0 {
 					yieldProcessor()
@@ -87,7 +87,7 @@ class ReadWriteSpinLock {
 	}
 
 	@inline fun unlockReader() Void {
-		interlockedDecrement(/*TODO &*/lock)
+		interlockedDecrement(/*TODO &*/ lock)
 	}
 
 	@inline static fun getCurrentThreadId() UInt32 {
@@ -106,7 +106,7 @@ class ReadWriteSpinLock {
 		if recursionDepth == 0 {
 			threadId = 0xFFFFFFFFu32
 			// assert(lock == 0x80000000u32)
-    		lock = 0
+			lock = 0
 		}
 	}
 }
