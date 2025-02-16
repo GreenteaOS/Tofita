@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -175,8 +175,7 @@ fun timerInterruptHandler(@volatile frame InterruptFrame) {
 
 	// Happens once per second
 	// TODO divider to constant
-	// if timerCalled % 121 == 0 {
-	if timerCalled % 173 == 0 {
+	if timerCalled % 627 == 0 {
 		// Performance tracking
 		framesLast = framesDone
 		framesDone = 0
@@ -191,16 +190,24 @@ fun timerInterruptHandler(@volatile frame InterruptFrame) {
 	}
 
 	// TODO ensure this value is in sync with PIT
-	// uptimeMilliseconds += 8
-	uptimeMilliseconds += 5
-	// if extraMillisecond % 4 == 0 {
-	if extraMillisecond % 9 == 0 {
-		// uptimeMilliseconds += 1 // PIT is somewhat imprecise
-		uptimeMilliseconds += 7 // PIT is somewhat imprecise
-	}
-	/*if extraMillisecond % 64 == 0 {
+	// `= 1000 / divider`
+	// Computed as:
+	// `i=0; ms=0; while (i < 627) { ms += 1; if (i%2 == 0) ms++; if (i%11 == 0) ms++; i++; }; console.log(ms, i);`
+	// `998 627` first value must be as close to 1000 as possible (but not larger)
+	uptimeMilliseconds += 1
+
+	if extraMillisecond % 2 == 0 {
 		uptimeMilliseconds += 1 // PIT is somewhat imprecise
-	}*/
+	}
+
+	if extraMillisecond % 11 == 0 {
+		uptimeMilliseconds += 1 // PIT is somewhat imprecise
+	}
+
+	if extraMillisecond % 627 == 0 {
+		uptimeMilliseconds += 1 // PIT is somewhat imprecise
+	}
+
 	extraMillisecond++
 	timerCalled++
 
