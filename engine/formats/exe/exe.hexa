@@ -182,12 +182,28 @@ class ExeLoader<SIZE, HEADER> {
 		exec.nextBase = exec.nextBase + pages * pageSize
 		// TODO Hexa: better safe cast to signed (.toSignedTrimmed/Clamped/Truncated() and toSignedBitExact())
 		// ^ support in C-to-Hexa too
+		let delta Int64 = (buffer as! Int64) - (peOptionalHeader.imageBase as! Int64)
 
 		// Copy sections
 		var imageSectionHeader =
 			((peOptionalHeader as! UInt64) + peHeader.sizeOfOptionalHeader) as! ArrayPointer<ByValue<ImageSectionHeader>>
 
-		// TODO copy PE headers?
+		// Copy PE headers
+		{
+			let amount UInt64 = peOptionalHeader.sizeOfHeaders
+			let destination = buffer as! ArrayPointer<UInt8>
+			serialPrintf("[loadDLL] PE sizeOfHeaders is %d\n", amount)
+			// TODO .dlls too
+			// if delta == 0
+			{
+				// TODO all mem copy usages must be SEH ones
+				tmemcpy(destination, ptr, amount)
+			}
+			// TODO fail if too much
+			serialPrintf("[loadDLL] PE done copying sizeOfHeaders\n")
+		}
+
+		// Copy sections
 		for i in peHeader.numberOfSections {
 			serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
 				imageSectionHeader[i].ref.name.ref,
