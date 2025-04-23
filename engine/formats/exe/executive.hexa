@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2024-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,12 +15,20 @@
 
 let tibDestination UInt64 = 0x00000000FFFAE000u64 // From GDT
 
-/// 64-bit https://en.wikipedia.org/wiki/Win32_Thread_Information_Block
+// All pointers here are plain integer addresses for safety
+// They can be real pointers at the user space
+// NOTE Remember to sync it with Caramel module!
+
+/// 64-bit Thread Information Block (TIB)
 @struct
 class TIB64 {
+	/// Pointer to the exception handler chain aka `_EXCEPTION_REGISTRATION_RECORD`
 	var exceptionList UInt64
+	/// Top of thread stack
 	var stackBase UInt64
+	/// Bottom of thread stack
 	var stackLimit UInt64
+	/// Pointer to subsystem TIB
 	var subSystemTib UInt64
 	var fiberDataOrVersion UInt64 // TODO union
 	var arbitraryUserPointer UInt64
@@ -28,12 +36,16 @@ class TIB64 {
 }
 // TODO Hexa: assert(sizeof(TIB64) == 56)
 
-/// 32-bit https://en.wikipedia.org/wiki/Win32_Thread_Information_Block
+/// 32-bit Thread Information Block (TIB)
 @struct
 class TIB32 {
+	/// Pointer to the exception handler chain
 	var exceptionList UInt32
+	/// Top of thread stack
 	var stackBase UInt32
+	/// Bottom of thread stack
 	var stackLimit UInt32
+	/// Pointer to subsystem TIB
 	var subSystemTib UInt32
 	var fiberDataOrVersion UInt32 // TODO union
 	var arbitraryUserPointer UInt32

@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,6 +18,7 @@
 // TODO ntdll should have tofitaStub(){} for unresolved dll imports -> log them
 // TODO ^ should actually show a message box and abort in future
 
+// TODO use std offset
 fun offsetPointer(data UInt64, offset UInt64) ArrayPointer<UInt8> {
 	return (data + offset) as! ArrayPointer<UInt8>
 }
@@ -61,10 +62,36 @@ class Executable {
 	new () { }
 }
 
+// TODO
+/// Optimal use as by-value to avoid allocation
+/// Works only with a user space memory
+// TODO document this ALL UPPER CASE convention for generics (no scalable?)
+@struct
+class SehReaderConcept<STRUCT> {
+	let ref ByValue<STRUCT>
+	new (address UInt64) {
+		// Always zero-fill cause its stack allocated
+		// TODO Hexa: always zero-fill `= {0}` stack allocated in code gen until `@noZeroing`
+		memset(ref.ref as! ArrayPointer<UInt8>, 0, sizeOf<STRUCT>()) // Zeroing
+
+		// TODO ensure this does not overflow and bounds are correct
+		if (address + sizeOf<STRUCT>()) >= upper or not probeForReadOkay(address, sizeOf<STRUCT>()) {
+			// Cancel reading when its clearly tries to read engine memory
+			serialPrintf("[sehReader] trying to read engine or bad memory %8\n", address)
+		} else {
+			// TODO use SEH-version of memory copy function
+			tmemcpy(ref.ref as! ArrayPointer<UInt8>, address as! ConstArrayPointer<UInt8>, sizeOf<STRUCT>())
+		}
+	}
+}
+
+// TODO 16-bit ones should go via emulator instead of entry point
+// like `if x16 { emu16(entry) } else entry()`
 fun is64Exe(asset RamDiskAsset) {
-	var ptr = asset.data as! ArrayPointer<UInt8>
-	var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
-	var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
+	let ptr = asset.data as! ArrayPointer<UInt8>
+	// TODO 32-bit 0x3C and must be within asset bounds
+	let peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
+	let peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
 	return peOptionalHeader.magic == 0x020B
 }
 
@@ -82,6 +109,13 @@ fun is64Exe(asset RamDiskAsset) {
 // @optionalValidate(SIZE is UInt64, flag: 'is64'); @enableIf('is64') fun
 class ExeLoader<SIZE, HEADER> {
 	new () { }
+
+	// TODO security ideas
+	fun setWorkingRange(base UInt64, lengthInBytes UInt64) Void {
+		// now all operations go bounds checked *and* via SEH
+		// (after header and sections copy)
+		// ! most of wok like relocation *must* happen at user space
+	}
 
 	// TODO probe for read/write
 	// TODO error if not found
@@ -115,8 +149,9 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	fun loadPeAsset(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
-		var ptr = asset.data as! ArrayPointer<UInt8>
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
+		let ptr = asset.data as! ArrayPointer<UInt8>
+		// TODO 0x3C is 32-bit
 		serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
 		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
 		serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
@@ -145,6 +180,8 @@ class ExeLoader<SIZE, HEADER> {
 		memset(buffer as! ArrayPointer<UInt8>, 0, peOptionalHeader.sizeOfImage) // Zeroing
 
 		exec.nextBase = exec.nextBase + pages * pageSize
+		// TODO Hexa: better safe cast to signed (.toSignedTrimmed/Clamped/Truncated() and toSignedBitExact())
+		// ^ support in C-to-Hexa too
 
 		// Copy sections
 		var imageSectionHeader =
@@ -164,7 +201,7 @@ class ExeLoader<SIZE, HEADER> {
 		}
 
 		// TODO `const ImageDataDirectory*` just `let` all the fields in class declaration?
-		var imageDataDirectory =
+		let imageDataDirectory =
 			((peOptionalHeader as! UInt64) + sizeOf<HEADER>()) as! ArrayPointer<ByValue<ImageDataDirectory>>
 
 		// Relocate EXE or DLL to a new base
@@ -189,19 +226,20 @@ class ExeLoader<SIZE, HEADER> {
 
 				for i in (relocation.sizeOfBlock - image_sizeof_base_relocation) / 2 {
 					// The upper 4 bits define the type of relocation
-					var type Int32 = relInfo[0] >> 12
+					let type Int32 = relInfo[0] >> 12
 					// The lower 12 bits define the offset
-					var offset UInt64 = relInfo[0] & 0xfff
+					let offset UInt64 = relInfo[0] & 0xfff
 
 					switch type as! ImageRelocationType {
 						case IMAGE_REL_BASED_ABSOLUTE:
 							// Skip relocation
 							// TODO `break` will not work here?
 
+							// TODO rename to HIGH_LOW
 						case IMAGE_REL_BASED_HIGHLOW:
 							// Change complete 32 bit address
 							{
-								var patchAddrHL ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
+								let patchAddrHL ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
 								patchAddrHL[0] += delta as! UInt32
 							}
 							// break
@@ -209,7 +247,7 @@ class ExeLoader<SIZE, HEADER> {
 							// TODO `#ifdef _WIN64`
 						case IMAGE_REL_BASED_DIR64: {
 								// TODO should be no-op on 32 bit
-								var patchAddr64 = (dest + offset) as! ArrayPointer<Int64>
+								let patchAddr64 = (dest + offset) as! ArrayPointer<Int64>
 								patchAddr64[0] += delta as! Int64
 							}
 							// break
@@ -241,7 +279,7 @@ class ExeLoader<SIZE, HEADER> {
 		}
 
 		// TODO code gen over u8 must be `i` of u8 too
-		// TODO is it always 15?
+		// TODO is it always 15? or its specified in the header?
 		for i in 15u8 {
 			if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
 				var codeBase UInt64 = (buffer as! UInt64)
@@ -279,7 +317,7 @@ class ExeLoader<SIZE, HEADER> {
 			}
 		}
 
-		var pei = new PeInterim()
+		let pei = new PeInterim()
 
 		pei.base = buffer
 		pei.entry = (buffer as! UInt64) + (peOptionalHeader.addressOfEntryPoint as! UInt64)
@@ -308,6 +346,7 @@ class ExeLoader<SIZE, HEADER> {
 					return list
 					break
 				}
+
 				if list.name[i] == name[i] {
 					i++
 					continue
@@ -417,15 +456,18 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	fun loadExe(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
-		var ei ExeInterim = new ExeInterim()
+		let ei ExeInterim = new ExeInterim()
 
 		ei.pei = loadPeAsset(asset, root, exec)
 
 		// Allocate stack
 		{
 			let pages = down_bytes_to_pages(ei.pei.sizeOfStackReserve) + 1u32
+			// TODO rename to `stackPhysical`
+			// TODO rename to `PhysicalAllocator.allocateDirtyPages` for clarity
 			let physical = PhysicalAllocator.allocatePages(pages)
 
+			// TODO guard page? also stack overcommit
 			let buffer UInt64 = exec.nextBase
 
 			mapMemory(
@@ -436,6 +478,7 @@ class ExeLoader<SIZE, HEADER> {
 				accessibleByUser: true
 			)
 
+			// TODO yeah use PreZeroed-functions of `PhysicalAllocator`
 			memset(buffer as! ArrayPointer<UInt8>, 0, ei.pei.sizeOfStackReserve) // Zeroing
 
 			exec.nextBase = exec.nextBase + pages * pageSize
@@ -447,8 +490,9 @@ class ExeLoader<SIZE, HEADER> {
 		{
 			let pages = 1u32
 			let physical = PhysicalAllocator.allocateOnePagePreZeroed()
-			let where = 0x00000000FFFAE000u64 // From GDT TODO tibDestination
-			// TODO TEB 000007FF'FFFAE000 on 64-bit?
+			// From GDT aka GS:[0x00] TODO to tibDestination variable
+			let where = 0x00000000FFFAE000u64
+			// TODO TEB always 000007FF'FFFAE000 on 64-bit?
 
 			// TODO map upfront, to make this page occupied for proper relocation
 			mapMemory(exec.pml4, where, physical - wholePhysicalStart, pages, accessibleByUser: true)
@@ -457,7 +501,7 @@ class ExeLoader<SIZE, HEADER> {
 			if is64bit {
 				let tib = physical as! TIB64
 
-				// TODO
+				// TODO other fields
 				tib.self = where
 				tib.exceptionList = where
 				tib.stackBase = where
@@ -477,7 +521,10 @@ class ExeLoader<SIZE, HEADER> {
 			} else {
 				let tib = physical as! TIB32
 
-				// TODO
+				// TODO remove PEB32 from Tofita entirely and fill it all from user space
+				// ^ it must be within 2 GB range
+				// On 32-bit systems, the PEB is accessible via the Thread Environment Block (TEB) at FS:[0x30].
+				// Alternatively, APIs like `NtQueryInformationThread` can retrieve the PEB address.
 				tib.self = where as! UInt32
 				tib.exceptionList = where as! UInt32
 				tib.stackBase = where as! UInt32
@@ -485,6 +532,11 @@ class ExeLoader<SIZE, HEADER> {
 				tib.subSystemTib = where as! UInt32
 				tib.arbitraryUserPointer = where as! UInt32
 			}
+		}
+
+		// Map fonts
+		{
+			// TODO map with tail/head aligned at 4k (or even 64k)
 		}
 
 		return ei
@@ -638,7 +690,7 @@ fun loadExeIntoProcess(file String, process TofitaProcess) {
 
 		let asset = getRamDiskAsset(file)
 
-		// TODO fix in codegen `if ExeLoader.is64(asset) {` for `static fun` of generic class
+		// TODO fix in code gen `if ExeLoader.is64(asset) {` for `static fun` of generic class
 		// TODO `if ExeLoader<UInt64, Pe64OptionalHeader>.is64(asset) {`
 		let is64 = is64Exe(asset)
 		if Theme.verbose {
