@@ -32,8 +32,10 @@ class ImageDataDirectory {
 
 @struct
 class PeInterim {
+	/// Base address after relocation
 	var base UInt64 // TODO UserPointer?
-	var entry UInt64 // _DllMainCRTStartup
+	/// `_DllMainCRTStartup`
+	var entry UInt64
 	var imageDataDirectory ArrayPointer<ByValue<ImageDataDirectory>>
 	var sizeOfStackReserve UInt64
 	var is64bit Bool
@@ -89,7 +91,7 @@ class SehReaderConcept<STRUCT> {
 // like `if x16 { emu16(entry) } else entry()`
 fun is64Exe(asset RamDiskAsset) {
 	let ptr = asset.data as! ArrayPointer<UInt8>
-	// TODO 32-bit 0x3C and must be within asset bounds
+	// TODO 32-bit 0x3C and must be within asset bounds -> read as pointer to a number
 	let peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 	let peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! Pe64OptionalHeader
 	return peOptionalHeader.magic == 0x020B
@@ -517,13 +519,14 @@ class ExeLoader<SIZE, HEADER> {
 			if is64bit {
 				let tib = physical as! TIB64
 
-				// TODO other fields
+				// TODO other fields + proper offsets
 				tib.self = where
 				tib.exceptionList = where
 				tib.stackBase = where
 				tib.stackLimit = where
 				tib.subSystemTib = where
 				tib.arbitraryUserPointer = where
+				tib.environmentPointer = where
 
 				// PEB - Process Environment Block
 				let physicalPEB = PhysicalAllocator.allocateOnePagePreZeroed()
@@ -640,6 +643,7 @@ class ExeLoader<SIZE, HEADER> {
 		}
 
 		// TODO this may fail/except, handle errors
+		// TODO refactor to pml4.findUserspaceMemory method
 		let whereEntries = findUserspaceMemory(
 			process.pml4,
 			0,
