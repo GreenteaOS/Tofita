@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023-2024 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 	}*/
 	fun getIcon(asset RamDiskAsset) Bitmap32? {
 		var ptr = asset.data as! ArrayPointer<UInt8>
+		// TODO 0x3C is 32-bit, 0x3C can be 64-bit?
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 		// serialPrintf("[ExeResourceLoader] PE header signature 'PE' == '%s'\n", peHeader)
 		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
@@ -85,10 +86,10 @@ class ExeResourceLoader<SIZE, HEADER> {
 				var imageSize UInt32 = 0
 
 				// Find the icon in the group
-				for id in dir.numberOfIdEntries {
+				for id in dir.numberOfIdEntries + dir.numberOfNamedEntries {
 					let entry = dir.directoryEntries[id].ref
 
-					if entry.unionName.ref.id == rt_group_icon {
+					if entry.unionName.ref.id == rt_group_icon and entry.unionName.ref.string.ref.nameIsString == 0 {
 						// serialPrintf("[ExeResourceLoader] Found RT_GROUP_ICON at %d offset %8\n", id as! Int, entry.unionOffset.ref.offsetToData as! UInt64)
 					} else {
 						continue
@@ -98,7 +99,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 						((ptr as! UInt64) + (section.pointerToRawData as! UInt64) + (entry.unionOffset.ref.offsetToData & 0x7fffffffu64))
 						as! IMAGE_RESOURCE_DIRECTORY
 
-					for id in byName.numberOfIdEntries {
+					for id in byName.numberOfIdEntries + byName.numberOfNamedEntries {
 						let byNameEntry = byName.directoryEntries[id].ref
 
 						let byLanguage =
@@ -127,10 +128,18 @@ class ExeResourceLoader<SIZE, HEADER> {
 									foundIcon = true
 									imageSize = iconEntry.dwBytesInRes
 									// serialPrintf("[ExeResourceLoader] Best icon is %d\n", bestIcon)
+
+									break
 								}
 							}
+
+							if foundIcon { break } // Exit language loop
 						}
+
+						if foundIcon { break } // Exit name loop
 					}
+
+					if foundIcon { break } // Exit group loop
 				}
 
 				// Find the icon payload
@@ -147,6 +156,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 						((ptr as! UInt64) + (section.pointerToRawData as! UInt64) + (entry.unionOffset.ref.offsetToData & 0x7fffffffu64))
 						as! IMAGE_RESOURCE_DIRECTORY
 
+					// TODO ` + byName.numberOfNamedEntries`?
 					for id in byName.numberOfIdEntries {
 						let byNameEntry = byName.directoryEntries[id].ref
 
@@ -177,14 +187,17 @@ class ExeResourceLoader<SIZE, HEADER> {
 				return null
 			}
 		}
+
 		// TODO Hexa: got a bug with garbage in `return` cause *guaranteed return* wasn't checked
 		return null
 	}
 }
 
+// TODO `isolatedCall` separately for res find and .png decode
+// TODO Generalize resource loading, not just icons
 fun getExeIconFromPath(file String /*TODO iconWidth*/) Bitmap32? {
 	let asset = getRamDiskAsset(file)
-	// TODO handle not found
+	// TODO handle the case when not found
 	if is64Exe(asset) {
 		let loader = new ExeResourceLoader<UInt64, Pe64OptionalHeader>()
 		return loader.getIcon(asset)

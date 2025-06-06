@@ -131,6 +131,7 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 		serialPrintf('Decoding as PNG\n')
 		// TODO let buffer = (buffer.address)
 		let buffer = (buffer as! UInt64) + offset
+		// TODO This thing crashes for 48x48 PNG icons (icon resources)
 		return loadStbi32FromBuffer(buffer as! ArrayPointer<UInt8>, imageSize)
 	}
 

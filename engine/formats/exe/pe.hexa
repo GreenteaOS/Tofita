@@ -177,6 +177,7 @@ enum ImageDirectoryType : UInt8 {
 class IMAGE_RESOURCE_DIRECTORY_ENTRY_NAME_STRING {
 	// TODO Hexa: @bits don't work with `let` `@bits(31) let nameOffset UInt32`
 	@bits(31) var nameOffset UInt32
+	// TODO Hexa: allow @bits on Bool, and disallow for other types if needed
 	@bits(1) var nameIsString UInt32
 }
 
