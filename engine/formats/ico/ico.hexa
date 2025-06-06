@@ -14,8 +14,12 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 // TODO rename to `toUInt32`
-fun toInt32(a UInt8, b UInt8, c UInt8, d UInt8) UInt32 {
+
+/*fun toInt32(a UInt8, b UInt8, c UInt8, d UInt8) UInt32 {
 	return a + b * 256 + c * 0xFFFF + d * 0xFFFFFFu32
+}*/
+fun toInt32(a UInt8, b UInt8, c UInt8, d UInt8) UInt32 {
+	return a + b * 0x100u32 + c * 0x10000u32 + d * 0x1000000u32
 }
 
 fun loadIcon(buffer ConstArrayPointer<UInt8>, width Int) Bitmap32 {
@@ -130,10 +134,133 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 	{
 		serialPrintf('Decoding as PNG\n')
 		// TODO let buffer = (buffer.address)
-		let buffer = (buffer as! UInt64) + offset
+		let buffer = (buffer as! UInt64) + (offset as! UInt64)
 		// TODO This thing crashes for 48x48 PNG icons (icon resources)
 		return loadStbi32FromBuffer(buffer as! ArrayPointer<UInt8>, imageSize)
 	}
+
+	// Read `BITMAPINFOHEADER` (40 bytes)
+	// TODO use structure
+	let headerOffset = offset
+	let biSize = toInt32(buffer[headerOffset], buffer[headerOffset + 1], buffer[headerOffset + 2], buffer[headerOffset + 3])
+	let biWidth = toInt32(buffer[headerOffset + 4], buffer[headerOffset + 5], buffer[headerOffset + 6], buffer[headerOffset + 7])
+	let biHeight = toInt32(buffer[headerOffset + 8], buffer[headerOffset + 9], buffer[headerOffset + 10], buffer[headerOffset + 11])
+	let biPlanes = buffer[headerOffset + 12] + buffer[headerOffset + 13] * 0xFF
+	let biBitCount = buffer[headerOffset + 14] + buffer[headerOffset + 15] * 0xFF
+	let biClrUsed = toInt32(buffer[headerOffset + 32], buffer[headerOffset + 33], buffer[headerOffset + 34], buffer[headerOffset + 35])
+
+	if biSize != 40 or biWidth != width or biHeight != height * 2 { // Height includes XOR + AND mask
+		serialPrintf("[loadIconPayload] Invalid BITMAPINFOHEADER: size=%d, width=%d, height=%d\n", biSize, biWidth, biHeight)
+		return null
+	}
+
+	serialPrintf("[loadIconPayload] Bit count: %d, planes: %d, colors used: %d\n", biBitCount, biPlanes, biClrUsed)
+
+	// Calculate palette size
+	var paletteSize UInt32 = 0
+	// `var paletteEntries = 0`
+	var paletteEntries UInt32 = 0u32
+	if biBitCount <= 8 {
+		// TODO Hexa: Incompatible types `Int` and value of `UInt32` but at `unknown.hexa` meaning `if {}`-ternary lack pos info
+		// `paletteEntries = if biClrUsed == 0 { 1 << biBitCount } else { biClrUsed }``
+		// TODO Hexa: 'Incompatible types `Int` and value of `UInt32`' here must be `UInt32` and value of `Int`
+		// `{ 1 << biBitCount }`
+		paletteEntries = if biClrUsed == 0 { 1u32 << biBitCount } else { biClrUsed }
+		paletteSize = paletteEntries * 4 // 4 bytes per RGBQUAD
+	}
+
+	// Validate palette offset
+	let paletteOffset = headerOffset + 40
+	if paletteOffset + paletteSize > offset + imageSize {
+		serialPrintf("[loadIconPayload] Invalid palette offset %d or size %d\n", paletteOffset, paletteSize)
+		return null
+	}
+
+	// Pixel data offset (after header + palette)
+	let pixelOffset = paletteOffset + paletteSize
+	let rowBytes = ((width * biBitCount + 31) / 32) * 4 // DIB rows are 32-bit aligned
+	let xorSize = rowBytes * height
+	let andOffset = pixelOffset + xorSize
+	let andRowBytes = ((width + 31) / 32) * 4 // 1-bit AND mask, 32-bit aligned
+	let andSize = andRowBytes * height
+
+	if andOffset + andSize > offset + imageSize {
+		serialPrintf("[loadIconPayload] Invalid pixel offset %d or AND mask offset %d\n", pixelOffset, andOffset)
+		return null
+	}
+
+	// Read palette if needed
+	// TODO `var palette = new Array<UInt32>(paletteEntries)` pass `paletteEntries` for VLA?
+	// Oh wait its VLA, as value is known at runtime only, better just allocate as much as possible to not break he stack
+	var palette ArrayByValue<UInt32, 256> = [0]
+	if biBitCount <= 8 {
+		for i in paletteEntries {
+			let p = paletteOffset + i * 4
+			palette[i] = toInt32(buffer[p + 2], buffer[p + 1], buffer[p], 0xFF) // BGR to RGBA (alpha = 255)
+		}
+	}
+
+	// Process pixels based on bit count
+	for y in height {
+		let srcY = height - y - 1 // Flip vertically
+		let dstY = y
+		for x in width {
+			var color UInt32 = 0xFF000000u32 // Default: opaque black
+
+			if biBitCount == 32 {
+				let srcIdx = pixelOffset + srcY * rowBytes + x * 4
+				color = toInt32(buffer[srcIdx + 2], buffer[srcIdx + 1], buffer[srcIdx], buffer[srcIdx + 3]) // BGRA
+			} else if biBitCount == 8 {
+				let srcIdx = pixelOffset + srcY * rowBytes + x
+				let index = buffer[srcIdx]
+				if index < paletteEntries {
+					color = palette[index]
+				}
+			} else if biBitCount == 4 {
+				let srcIdx = pixelOffset + srcY * rowBytes + x / 2
+				let byte = buffer[srcIdx]
+				let index = if x % 2 == 0 { byte >> 4 } else { byte & 0x0F }
+				if index < paletteEntries {
+					color = palette[index]
+				}
+			} else if biBitCount == 1 {
+				let srcIdx = pixelOffset + srcY * rowBytes + x / 8
+				let byte = buffer[srcIdx]
+				let bit = 7 - (x % 8)
+				let index = (byte >> bit) & 0x01
+				if index < paletteEntries {
+					color = palette[index]
+				}
+			} else {
+				serialPrintf("[loadIconPayload] Unsupported bit count: %d\n", biBitCount)
+				return null
+			}
+
+			// Apply AND mask for transparency
+			let andIdx = andOffset + srcY * andRowBytes + x / 8
+			let andByte = buffer[andIdx]
+			let andBit = 7 - (x % 8)
+			if (andByte >> andBit) & 0x01 == 1 {
+				color = color & 0x00FFFFFF // Set alpha to 0
+			}
+
+			// Write to bitmap
+			let dstIdx = dstY * width + x
+			bmp.pixels[dstIdx].ref.rgba.ref.b = (color & 0xFF) as! UInt8
+			bmp.pixels[dstIdx].ref.rgba.ref.g = ((color >> 8) & 0xFF) as! UInt8
+			bmp.pixels[dstIdx].ref.rgba.ref.r = ((color >> 16) & 0xFF) as! UInt8
+			bmp.pixels[dstIdx].ref.rgba.ref.a = ((color >> 24) & 0xFF) as! UInt8
+
+			// TODO Hexa: `bmp.pixels[dstY * width + x].ref.rgba = {r: color & 0xFF, g: (color >> 8) & 0xFF, b: (color >> 16) & 0xFF, a: (color >> 24) & 0xFF}`
+			// ^ i.e. writing as a struct by value
+		}
+	}
+
+	if biBitCount <= 8 {
+		// TODO `delete palette`
+	}
+
+	return bmp
 
 	// serialPrintf("Header at: %d %d %d %d\n", buffer[best + 12], buffer[best + 13], buffer[best + 14], buffer[best + 15])
 	let fsize = bmp.width * bmp.height * 4

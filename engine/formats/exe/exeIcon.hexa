@@ -81,6 +81,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 				// TODO Named
 				// serialPrintf("[ExeResourceLoader] ID Entries: %d\n", dir.numberOfIdEntries)
 
+				var bestBitCount UInt16 = 0
 				var bestIcon = 0
 				var foundIcon = false
 				var imageSize UInt32 = 0
@@ -127,9 +128,18 @@ class ExeResourceLoader<SIZE, HEADER> {
 									bestIcon = iconEntry.nID
 									foundIcon = true
 									imageSize = iconEntry.dwBytesInRes
+									bestBitCount = iconEntry.wBitCount
 									// serialPrintf("[ExeResourceLoader] Best icon is %d\n", bestIcon)
 
 									break
+								}
+
+								// Fallback to a low-quality icon
+								if iconEntry.bWidth == 48, iconEntry.bHeight == iconEntry.bWidth, iconEntry.wBitCount <= 8, iconEntry.wBitCount > bestBitCount {
+									bestIcon = iconEntry.nID
+									foundIcon = true
+									bestBitCount = iconEntry.wBitCount
+									imageSize = iconEntry.dwBytesInRes
 								}
 							}
 
@@ -194,6 +204,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 }
 
 // TODO `isolatedCall` separately for res find and .png decode
+// ^ i.e. find icon in isolation, then allocate w x h bitmap, then isolate parse into it
 // TODO Generalize resource loading, not just icons
 fun getExeIconFromPath(file String /*TODO iconWidth*/) Bitmap32? {
 	let asset = getRamDiskAsset(file)
