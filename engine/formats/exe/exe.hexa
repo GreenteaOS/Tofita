@@ -39,6 +39,10 @@ class PeInterim {
 	var imageDataDirectory ArrayPointer<ByValue<ImageDataDirectory>>
 	var sizeOfStackReserve UInt64
 	var is64bit Bool
+	/// Like `kernel32.dll`
+	var baseName String
+	/// Like `C:\Windows\System32\kernel32.dll`
+	var fullName String
 	new () { }
 }
 
@@ -61,6 +65,10 @@ class PeExportLinkedList {
 class Executable {
 	var nextBase UInt64
 	var pml4 ArrayPointer<ByValue<PageEntry>>
+	var startup ProcessStartupInformation
+	var teb TIB64
+	var peb PEB64
+	var ldr PEB_LDR_DATA
 	new () { }
 }
 
@@ -141,23 +149,26 @@ class ExeLoader<SIZE, HEADER> {
 		}
 		let name = "C:\\Windows\\System32\\" + name
 		return loadPe(name, root, exec)*/
-		return loadPe(fullPath, root, exec)
+		let result PeInterim = loadPe(fullPath, root, exec)
+		result.baseName = name
+		result.fullName = fullPath
+		return result
 	}
 
-	fun loadPe(name String, root PeExportLinkedList, exec Executable) {
-		let asset RamDiskAsset = getRamDiskAsset(name)
-		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %d\n", name.utf16(), asset.size, asset.data)
+	// TODO get rid of all `as!` casts in this file and exeIcon.hexa
+	fun loadPe(fullPath String, root PeExportLinkedList, exec Executable) {
+		let asset RamDiskAsset = getRamDiskAsset(fullPath)
+		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %8\n", fullPath.utf16(), asset.size, asset.data)
 		return loadPeAsset(asset, root, exec)
 	}
 
 	fun loadPeAsset(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
-		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
 		let ptr = asset.data as! ArrayPointer<UInt8>
 		// TODO 0x3C is 32-bit
+		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256u64) as! PeHeader
 		serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
 		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
-		serialPrintf("[loadDLL] PE32(+) optional header signature 0x020B == %d == %d\n", peOptionalHeader.magic,
-			0x020B)
+		serialPrintf("[loadDLL] PE32(+) optional header signature %8\n", peOptionalHeader.magic)
 		// TODO require all .dlls ARCH be the same or show loader error
 		serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
 
@@ -181,6 +192,7 @@ class ExeLoader<SIZE, HEADER> {
 		serialPrintf("[loadDLL] PE mapped at %8\n", buffer)
 		memset(buffer as! ArrayPointer<UInt8>, 0, peOptionalHeader.sizeOfImage) // Zeroing
 
+		// TODO align by max of OS-specific and PE-specified (+align it by OS-specific or 4k for EEE)
 		exec.nextBase = exec.nextBase + pages * pageSize
 		// TODO Hexa: better safe cast to signed (.toSignedTrimmed/Clamped/Truncated() and toSignedBitExact())
 		// ^ support in C-to-Hexa too
@@ -207,11 +219,14 @@ class ExeLoader<SIZE, HEADER> {
 
 		// Copy sections
 		for i in peHeader.numberOfSections {
-			serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u\n", i,
+			// TODO Hexa: report `as! UInt64` here as useless
+			let where UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
+			serialPrintf("[loadDLL] Copy section [%d] named '%s' of size %d at %u aka %8 virtual\n", i,
 				imageSectionHeader[i].ref.name.ref,
 				imageSectionHeader[i].ref.sizeOfRawData,
-				imageSectionHeader[i].ref.virtualAddress)
-			var where UInt64 = (buffer as! UInt64) + imageSectionHeader[i].ref.virtualAddress
+				imageSectionHeader[i].ref.virtualAddress,
+				where
+			)
 
 			tmemcpy(where as! ArrayPointer<UInt8>,
 				((asset.data as! UInt64) + (imageSectionHeader[i].ref.pointerToRawData as! UInt64)) as! ConstArrayPointer<UInt8>,
@@ -227,7 +242,6 @@ class ExeLoader<SIZE, HEADER> {
 		// NOTE this is a user-mode address, so pointer delta is ok (TODO really?)
 		let delta Int64 = (buffer as! Int64) - (peOptionalHeader.imageBase as! Int64)
 		if delta != 0 {
-			var codeBase ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
 
 			var directory =
 				// TODO indexing by enum like `IMAGE_DIRECTORY_ENTRY_BASERELOC`
@@ -236,6 +250,8 @@ class ExeLoader<SIZE, HEADER> {
 			if directory.size == 0 {
 				// return (delta == 0)
 			}
+		// TODO there may be a situation when no relocation table present but PE is moved (malformed .dll)
+			let codeBase ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
 
 			var relocation = (codeBase + directory.virtualAddress) as! IMAGE_BASE_RELOCATION
 			while relocation.virtualAddress > 0 {
@@ -300,7 +316,7 @@ class ExeLoader<SIZE, HEADER> {
 		// TODO is it always 15? or its specified in the header?
 		for i in 15u8 {
 			if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
-				var codeBase UInt64 = (buffer as! UInt64)
+				let codeBase UInt64 = (buffer as! UInt64)
 				let directory = imageDataDirectory[i].ref as! ImageDataDirectory
 
 				var exports = ((buffer as! UInt64) + (directory.virtualAddress as! UInt64)) as! IMAGE_EXPORT_DIRECTORY
@@ -349,6 +365,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO for system dlls (ntdll, user32, etc) search EVERY dll for the name, cause they
 	// may be moved between versions.
 	// Search only selected .dll only within the user provided dlls
+	// TODO Accept dll (or its name) as argument
 	fun getProcAddress(name ConstArrayPointer<UInt8>, root PeExportLinkedList) PeExportLinkedList? {
 		var list PeExportLinkedList = root
 		// TODO make it intrusive list
@@ -379,6 +396,8 @@ class ExeLoader<SIZE, HEADER> {
 
 	// TODO `template<typename SIZE>`
 	fun resolveDllImports(pei PeInterim, root PeExportLinkedList) {
+		serialPrintf("[resolveDllImports] begin\n")
+
 		var buffer UInt64 = pei.base
 		var imageDataDirectory = pei.imageDataDirectory
 		var unresolved = 0
@@ -392,6 +411,8 @@ class ExeLoader<SIZE, HEADER> {
 			// DLL
 			// TODO must error `while iid.originalFirstThunk != null {` compares Int and null
 			while iid.originalFirstThunk != 0 {
+				// TODO rename to dllName
+				// TODO ensure same dll is not loaded twice (case-insensitive, resolve full file path (relative to importer?) and compare i-nodes)
 				var szName = ((buffer as! UInt64) + (iid.name as! UInt64)) as! ArrayPointer<UInt8>
 				var pThunkOrg = ((buffer as! UInt64) + (iid.originalFirstThunk as! UInt64)) as! IMAGE_THUNK_DATA<SIZE>
 				// TODO `(SIZE *)`
@@ -399,11 +420,10 @@ class ExeLoader<SIZE, HEADER> {
 
 				// TODO bad code gen for uint32_t$null `while pThunkOrg.addressOfData != null {`
 				while pThunkOrg.addressOfData != 0 {
-					var ord UInt32 = 666
 					var func SIZE = 0
 
 					if (pThunkOrg.ordinal & 0x80000000u32) != 0 {
-						ord = pThunkOrg.ordinal & 0xffff
+						let ord = pThunkOrg.ordinal & 0xffffu32
 						serialPrintf("[resolveDllImports] import {%s}.@%d - at address: {%d} <------------ NOT "
 							+
 							"IMPLEMENTED YET!\n",
@@ -418,7 +438,7 @@ class ExeLoader<SIZE, HEADER> {
 							) as! UInt64
 						) as! IMAGE_IMPORT_BY_NAME
 
-						ord = pIBN.hint
+						let ord = pIBN.hint
 						var szImportName ConstArrayPointer<UInt8> = pIBN.name as! ConstArrayPointer<UInt8>
 						serialPrintf("[resolveDllImports] import {%s}.{%s}@%d - at address: {%d}\n",
 							szName,
@@ -471,6 +491,8 @@ class ExeLoader<SIZE, HEADER> {
 				iid++
 			}
 		}
+
+		serialPrintf("[resolveDllImports] end\n")
 	}
 
 	fun loadExe(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
@@ -518,6 +540,8 @@ class ExeLoader<SIZE, HEADER> {
 			let is64bit = ei.pei.is64bit
 			if is64bit {
 				let tib = physical as! TIB64
+				let tibSize = 4096u64 // TODO validate actual, should be 8192u64 -> update `pages = 1u32`
+				exec.teb = tib
 
 				// TODO other fields + proper offsets
 				tib.self = where
@@ -529,14 +553,38 @@ class ExeLoader<SIZE, HEADER> {
 				tib.environmentPointer = where
 
 				// PEB - Process Environment Block
-				let physicalPEB = PhysicalAllocator.allocateOnePagePreZeroed()
-				mapMemory(exec.pml4, where + 4096u64, physicalPEB - wholePhysicalStart, 1, accessibleByUser: true)
-				let wherePEB = physical + 0x60u64
-				let wherePEBaddr = wherePEB as! ArrayPointer<UInt64>
-				wherePEBaddr[0] = where + 4096u64
+				let physicalPeb = PhysicalAllocator.allocateOnePagePreZeroed()
+				// TODO find memory dynamically
+				let virtualPeb = where + tibSize
+				mapMemory(exec.pml4, virtualPeb, physicalPeb - wholePhysicalStart, 1, accessibleByUser: true)
+				tib.peb = virtualPeb
 
-				let processParameters = (physicalPEB + 0x20u64) as! ArrayPointer<UInt64>
-				processParameters[0] = where + 4096u64 + 256u64
+				// TODO Hexa: `PEB64.meta.fromAddress()`
+				let peb = physicalPeb as! PEB64
+				// TODO `processParameters` This points to an RTL_USER_PROCESS_PARAMETERS structure containing command-line arguments, environment variables, etc.
+				peb.processParameters = virtualPeb + 256u64
+				peb.imageBaseAddress = ei.pei.base
+				peb.numberOfProcessors = 2 // TODO
+
+				let physicalPebLdr = PhysicalAllocator.allocateOnePagePreZeroed()
+				let virtualPebLdr = virtualPeb + 4096u64
+				mapMemory(exec.pml4, virtualPebLdr, physicalPebLdr - wholePhysicalStart, 1, accessibleByUser: true)
+
+				peb.ldrData = virtualPebLdr
+				exec.ldr = /*physicalPebLdr*/ virtualPebLdr as! PEB_LDR_DATA
+
+				// Initialize the three linked lists as empty
+				// TODO `ldr.inLoadOrderModuleList.forwardLink = & ldr.inLoadOrderModuleList`
+				// TODO `ldr.inLoadOrderModuleList.backLink = & ldr.inLoadOrderModuleList`
+				// if false
+				{
+					// NOTE those are user space addresses in the lists
+					let virtual = exec.ldr.inMemoryOrderModuleList.ref as! UInt64
+					exec.ldr.inMemoryOrderModuleList.ref.forwardLink = virtual as! LIST_ENTRY
+					exec.ldr.inMemoryOrderModuleList.ref.backLink = virtual as! LIST_ENTRY
+				}
+				// TODO `ldr.inInitializationOrderModuleList.forwardLink = & ldr.inInitializationOrderModuleList`
+				// TODO `ldr.inInitializationOrderModuleList.backLink = & ldr.inInitializationOrderModuleList`
 			} else {
 				let tib = physical as! TIB32
 
@@ -567,7 +615,9 @@ class ExeLoader<SIZE, HEADER> {
 
 	// TODO `template<typename SIZE>` per function
 	// TODO make `entry` a generic too
-	fun addDllEntry(physical UInt64, entry UInt64, startup ProcessStartupInformation) {
+	fun addDllEntry(physical UInt64, dll PeInterim, exec Executable) {
+		let startup = exec.startup
+
 		let max SIZE = 511 // TODO any other limits?
 		// TODO ^ 32-bit limit is x2
 		// TODO in NT DLL count[0] is expected to be u32
@@ -581,16 +631,51 @@ class ExeLoader<SIZE, HEADER> {
 			return
 		}
 
-		dllEntries[startup.dllCount] = entry
+		dllEntries[startup.dllCount] = dll.entry
+		// TODO base dllInstances
 		startup.dllCount++
+
+		// Use PEB instead
+		let ldr = exec.ldr
+
+		// Allocate a new LDR_DATA_TABLE_ENTRY
+		let physicalEntry = PhysicalAllocator.allocateOnePagePreZeroed()
+		let virtualEntry UInt64 = exec.nextBase
+		let pages = 1u32
+
+		mapMemory(
+			exec.pml4,
+			virtualEntry,
+			physicalEntry - wholePhysicalStart,
+			pages,
+			accessibleByUser: true
+		)
+
+		exec.nextBase = exec.nextBase + pages * pageSize
+
+		// Initialize fields
+		let entry = virtualEntry as! LDR_DATA_TABLE_ENTRY
+		entry.dllBase = dll.base
+		// TODO entry.timeDateStamp = dll.timeDateStamp
+
+		entry.baseDllName.ref.buffer = virtualEntry + sizeOf<LDR_DATA_TABLE_ENTRY>()
+		entry.baseDllName.ref.length = dll.baseName.length * 2u16
+		tmemcpy(entry.baseDllName.ref.buffer as! ArrayPointer<UInt8>, dll.baseName.utf16(), dll.baseName.length * 2u32)
+
+		// Set basic flags and load count (simplified)
+		entry.reserved5[1] = 0 // Flags (e.g., 0 for no special flags)
+		entry.reserved5[2] = 1 // LoadCount (set to 1 for simplicity)
+
+		// Insert into `inMemoryOrderModuleList`
+		entry.inMemoryOrderLinks.ref.forwardLink = ldr.inMemoryOrderModuleList.ref.forwardLink
+		entry.inMemoryOrderLinks.ref.backLink = ldr.inMemoryOrderModuleList.ref
+		ldr.inMemoryOrderModuleList.ref.forwardLink.backLink = entry.inMemoryOrderLinks.ref
+		ldr.inMemoryOrderModuleList.ref.forwardLink = entry.inMemoryOrderLinks.ref
 	}
 
 	// DLL entry points aka `DllMain`
 	// TODO make it linked list, if it's not enough?
 	let dllEntries = PhysicalAllocator.allocateOnePagePreZeroed()
-
-	// Size is ensured by `@sizeOfLessOrEqual(4096)`
-	let startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
 
 	fun loadRelatedDLLsAndMapIntoProcess(app ExeInterim, root PeExportLinkedList, exec Executable, process TofitaProcess) {
 		// TODO parse DLLs in multiple threads
@@ -609,6 +694,15 @@ class ExeLoader<SIZE, HEADER> {
 		// TODO load every DLL in separate thread
 
 		let is64bit = app.pei.is64bit
+		// TODO tofita32.dll build as separate complete .dll but load only ntdll when not needed (and redirect all tofita-- calls there)
+
+		// TODO
+		var demo = PeInterim()
+		if is64bit {
+			demo = loadPe(fullPath: "desktop/cardsnew.dll", root, exec)
+			demo.baseName = "cards.dll"
+			demo.fullName = "C:\\Windows\\System32\\cards.dll"
+		}
 
 		// TODO resolve in multiple threads (this is readonly operation over list of imports, but not for sections)
 		resolveDllImports(ntdll, root)
@@ -619,15 +713,25 @@ class ExeLoader<SIZE, HEADER> {
 		resolveDllImports(advapi32, root)
 		resolveDllImports(comctl32, root)
 		resolveDllImports(shell32, root)
+
+		if is64bit {
+			resolveDllImports(demo, root)
+		}
+
 		resolveExeImports(app, root)
 
-		addDllEntry(dllEntries, kernel32.entry, startup)
-		addDllEntry(dllEntries, msvcrt.entry, startup)
-		addDllEntry(dllEntries, gdi32.entry, startup)
-		addDllEntry(dllEntries, user32.entry, startup)
-		addDllEntry(dllEntries, advapi32.entry, startup)
-		addDllEntry(dllEntries, comctl32.entry, startup)
-		addDllEntry(dllEntries, shell32.entry, startup)
+		addDllEntry(dllEntries, kernel32, exec)
+		addDllEntry(dllEntries, msvcrt, exec)
+		addDllEntry(dllEntries, gdi32, exec)
+		addDllEntry(dllEntries, user32, exec)
+
+		if is64bit {
+			addDllEntry(dllEntries, demo, exec)
+		}
+
+		addDllEntry(dllEntries, advapi32, exec)
+		addDllEntry(dllEntries, comctl32, exec)
+		addDllEntry(dllEntries, shell32, exec)
 
 		process.is64bit = is64bit
 
@@ -660,9 +764,10 @@ class ExeLoader<SIZE, HEADER> {
 			accessibleByUser: true
 		)
 
-		startup.dllEntries = whereEntries
-		startup.entry = app.pei.entry
-		startup.pid = process.pid
+		exec.startup.dllEntries = whereEntries
+		exec.startup.entry = app.pei.entry
+		exec.startup.pid = process.pid
+		exec.startup.base = app.pei.base
 
 		let whereStartup = findUserspaceMemory(
 			process.pml4,
@@ -674,7 +779,7 @@ class ExeLoader<SIZE, HEADER> {
 		mapMemory(
 			process.pml4,
 			whereStartup,
-			(startup as! UInt64) - wholePhysicalStart,
+			(exec.startup as! UInt64) - wholePhysicalStart,
 			1,
 			accessibleByUser: true
 		)
@@ -707,6 +812,7 @@ fun loadExeIntoProcess(file String, process TofitaProcess) {
 		let exec Executable = new Executable()
 		exec.nextBase = 0
 		exec.pml4 = process.pml4
+		exec.startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
 
 		let asset = getRamDiskAsset(file)
 
