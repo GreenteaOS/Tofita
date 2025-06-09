@@ -30,11 +30,36 @@ class TIB64 {
 	var stackLimit UInt64
 	/// Pointer to subsystem TIB
 	var subSystemTib UInt64
-	var fiberDataOrVersion UInt64 // TODO union
+	/// Fiber local storage or version number // TODO union
+	var fiberDataOrVersion UInt64
+	/// Reserved for application use (set via `NtSetInformationThread`)
 	var arbitraryUserPointer UInt64
-	var self UInt64 // TODO `var self TIB64`
+	/// Linear address of this TIB (at `GS:[0x00]`) // TODO `var self TIB64`
+	var self UInt64
+	/// Pointer to process environment block
+	// TODO Hexa: use `private` for unused fields
+	var environmentPointer UInt64
+	/// Current process ID (same as returned by `GetCurrentProcessId()`)
+	var processId UInt64
+	/// Current thread ID (same as returned by `GetCurrentThreadId()`)
+	var threadId UInt64
+	/// Active RPC handle
+	var activeRpcHandle UInt64
+	/// Thread local storage array pointer (used for `__declspec(thread)` variables)
+	var threadLocalStoragePointer UInt64
+	/// Direct pointer to process environment block (the `PEB64` via `GS:[0x60]`)
+	var peb UInt64
+	/// Last error code from `GetLastError()` and `SetLastError()`
+	var lastErrorValue UInt32
+	/// Number of critical sections owned by thread
+	var countOfOwnedCriticalSections UInt32
+	/// Client/Server Runtime Subsystem thread specific data
+	var csrClientThreadData UInt64
+	/// Thread information
+	var threadInfo UInt64
 }
-// TODO Hexa: assert(sizeof(TIB64) == 56)
+// TODO Hexa: assert(sizeof(TIB64) == 120)
+// The actual TEB is much larger (e.g., ~0x2000 bytes and contains additional fields like e.g. `GdiTebBatch`, `Wx86Thread`, `ThreadLocalStorageBitmap`)
 
 /// 32-bit Thread Information Block (TIB)
 @struct
@@ -47,8 +72,214 @@ class TIB32 {
 	var stackLimit UInt32
 	/// Pointer to subsystem TIB
 	var subSystemTib UInt32
-	var fiberDataOrVersion UInt32 // TODO union
+	/// Fiber local storage or version number // TODO union
+	var fiberDataOrVersion UInt32
+	/// Reserved for application use
 	var arbitraryUserPointer UInt32
-	var self UInt32 // TODO `var self TIB32`
+	/// Linear address of this TIB // TODO `var self TIB32`
+	var self UInt32
+	/// Pointer to process environment block
+	var environmentPointer UInt32
+	/// Current process ID
+	var processId UInt32
+	/// Current thread ID
+	var threadId UInt32
+	/// Active RPC handle
+	var activeRpcHandle UInt32
+	/// Thread local storage array pointer
+	var threadLocalStoragePointer UInt32
+	/// Direct pointer to process environment block
+	var peb UInt32
+	/// Last error code from GetLastError()
+	var lastErrorValue UInt32
+	/// Number of critical sections owned by thread
+	var countOfOwnedCriticalSections UInt32
+	/// CSRSS thread specific data
+	var csrssThreadData UInt32
 }
-// TODO Hexa: assert(sizeof(TIB32) == 28)
+// TODO Hexa: assert(sizeof(TIB32) == 64)
+
+/// 64-bit Process Environment Block (PEB)
+@struct
+class PEB64 {
+	/// True if address space was inherited from parent
+	var inheritedAddressSpace UInt8
+	/// True if debugger is attached
+	var beingDebugged UInt8
+	/// Various PEB flags like `SpareBits` or `ImageUsesLargePages`
+	var bitField UInt8
+	/// Alignment padding
+	var padding UInt8
+	/// Handle to the mutant object
+	var mutant UInt64
+	/// Base address of loaded executable
+	var imageBaseAddress UInt64
+	/// Pointer to loaded module list
+	var ldrData UInt64
+	/// Process startup parameters
+	var processParameters UInt64
+	/// Subsystem-specific data pointer
+	var subSystemData UInt64
+	/// Process heap handle
+	var processHeap UInt64
+	/// Fast PEB lock object
+	var fastPebLock UInt64
+	/// Fast PEB lock acquire routine
+	var fastPebLockRoutine UInt64
+	/// Fast PEB lock release routine
+	var fastPebUnlockRoutine UInt64
+	/// Counter for environment updates
+	var environmentUpdateCount UInt64
+	/// Kernel callback table address
+	var kernelCallbackTable UInt64
+	/// Reserved for system use
+	var systemReserved UInt64
+	/// ATL thunk emulation table pointer
+	var atlThunkSListPtr UInt64
+	/// List of free memory blocks
+	var freeList UInt64
+	/// TLS slots expansion counter
+	var tlsExpansionCounter UInt64
+	/// TLS bitmap address
+	var tlsBitmap UInt64
+	/// TLS bitmap bits array TODO `UInt32`?
+	var tlsBitmapBits ArrayByValue<UInt64, 2>
+	/// Read-only shared memory base
+	var readOnlySharedMemoryBase UInt64
+	/// Hotsplit barrier flag
+	var hotsplitBarrierEnabled UInt64
+	/// Read-only static server data
+	var readOnlyStaticServerData UInt64
+	/// ANSI code page data pointer
+	var ansiCodePageData UInt64
+	/// OEM code page data pointer
+	var oemCodePageData UInt64
+	/// Unicode code page data pointer
+	var unicodeCodePageData UInt64
+	/// Number of processors in system
+	var numberOfProcessors UInt32
+	/// NtGlobalFlag value
+	var ntGlobalFlag UInt32
+}
+// TODO Hexa: assert(sizeof(PEB64) == 184)
+// PEB is typically around 0x7D0 bytes (missing `CrossProcessFlags`, `TracingFlags`, or `ApiSetMap`).
+
+/// 32-bit Process Environment Block (PEB)
+@struct
+class PEB32 {
+	/// True if address space was inherited from parent
+	var inheritedAddressSpace UInt8
+	/// True if debugger is attached
+	var beingDebugged UInt8
+	/// Various PEB flags
+	var bitField UInt8
+	/// Alignment padding
+	var padding UInt8
+	/// Handle to the mutant object
+	var mutant UInt32
+	/// Base address of loaded executable
+	var imageBaseAddress UInt32
+	/// Pointer to loaded module list
+	var ldrData UInt32
+	/// Process startup parameters
+	var processParameters UInt32
+	/// Subsystem-specific data pointer
+	var subSystemData UInt32
+	/// Process heap handle
+	var processHeap UInt32
+	/// Fast PEB lock object
+	var fastPebLock UInt32
+	/// Fast PEB lock acquire routine
+	var fastPebLockRoutine UInt32
+	/// Fast PEB lock release routine
+	var fastPebUnlockRoutine UInt32
+	/// Counter for environment updates
+	var environmentUpdateCount UInt32
+	/// Kernel callback table address
+	var kernelCallbackTable UInt32
+	/// Reserved for system use
+	var systemReserved UInt32
+	/// ATL thunk emulation table pointer
+	var atlThunkSListPtr UInt32
+	/// List of free memory blocks
+	var freeList UInt32
+	/// TLS slots expansion counter
+	var tlsExpansionCounter UInt32
+	/// TLS bitmap address
+	var tlsBitmap UInt32
+	/// TLS bitmap bits array
+	var tlsBitmapBits ArrayByValue<UInt64, 2>
+	/// Read-only shared memory base
+	var readOnlySharedMemoryBase UInt32
+	/// Hot split barrier flag
+	var hotSplitBarrierEnabled UInt32
+	/// Read-only static server data
+	var readOnlyStaticServerData UInt32
+	/// ANSI code page data pointer
+	var ansiCodePageData UInt32
+	/// OEM code page data pointer
+	var oemCodePageData UInt32
+	/// Unicode code page data pointer
+	var unicodeCodePageData UInt32
+	/// Number of processors in system
+	var numberOfProcessors UInt32
+	/// NtGlobalFlag value
+	var ntGlobalFlag UInt32
+}
+// TODO Hexa: assert(sizeof(PEB32) == 100)
+
+@struct
+class PEB_LDR_DATA {
+	// TODO `Length` `Initialized` `SsHandle` etc
+	var reserved1 ArrayByValue<UInt8, 8>
+	var reserved2 ArrayByValue<UInt64, 3>
+	var inMemoryOrderModuleList ByValue<LIST_ENTRY>
+}
+
+@struct
+class LDR_DATA_TABLE_ENTRY {
+	// TODO Typically contains ForwarderLinks (a LIST_ENTRY for forwarded modules) and StaticLinks (a LIST_ENTRY for statically linked modules).
+	// These are used to track module dependencies and linking.
+	var reserved1 ArrayByValue<UInt64, 2>
+	var inMemoryOrderLinks ByValue<LIST_ENTRY>
+	// TODO Usually contains `InInitializationOrderLinks` (a LIST_ENTRY for the order in which modules are initialized) and InProgressLinks (a LIST_ENTRY for modules being processed).
+	// These track the initialization state of modules.
+	var reserved2 ArrayByValue<UInt64, 2>
+	var dllBase UInt64
+	// TODO Commonly holds the module's `EntryPoint` (a pointer to the DLL's entry point function) and SizeOfImage (the size of the module in memory, as specified in the PE header).
+	var reserved3 ArrayByValue<UInt64, 2>
+	// TODO UNICODE_STRING not pointer to it
+	var fullDllName UInt64
+	// TODO Typically unused or serves as padding for alignment. Often zeroed out in practice.
+	var reserved4 ArrayByValue<UInt8, 8>
+	// TODO Usually contains:
+	// `BaseDllName` (a UNICODE_STRING for the module's base name, e.g., "kernel32.dll").
+	// `Flags` (a bit field indicating module properties, like whether it was loaded dynamically).
+	// `LoadCount` (a reference count for how many times the module is loaded) or ObsoleteLoadCount (in older Windows versions).
+	/// `UNICODE_STRING` for the module's base name, e.g. "kernel32.dll\0" (in UTF-16)
+	// `Length` would be 24 bytes, excluding the null terminator (12 characters × 2 bytes)
+	// `MaximumLength` might be 26 bytes, including the null terminator (13 characters × 2 bytes)
+	var baseDllName ByValue<UNICODE_STRING>
+	// TODO UNICODE_STRING takes two 64-bit slots
+	var reserved5 ArrayByValue<UInt64, 2>
+	// var reserved5 ArrayByValue<UInt64, 3>
+	var checkSum32 UInt64
+	/// Timestamp from PE header
+	var timeDateStamp UInt32
+}
+
+@struct
+class UNICODE_STRING {
+	/// Length in bytes excluding the null terminator
+	var length UInt16
+	/// Length in bytes including the null terminator
+	var maximumLength UInt16
+	// TODO on 32-bit PEB this better be `UInt32` not a pointer
+	var buffer UInt64
+}
+
+@struct
+class LIST_ENTRY {
+	var forwardLink LIST_ENTRY
+	var backLink LIST_ENTRY
+}
