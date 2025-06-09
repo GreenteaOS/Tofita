@@ -68,6 +68,7 @@
 		"devices/amd64/amd64paging",
 		"devices/cpu/physical",
 		"engine/formats/exe/executive",
+		"engine/formats/exe/exeInterim",
 		"engine/formats/exe/exe",
 		"engine/formats/exe/exeIcon",
 		"devices/cpu/rdtsc",

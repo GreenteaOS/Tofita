@@ -15,6 +15,7 @@
 
 let tibDestination UInt64 = 0x00000000FFFAE000u64 // From GDT
 
+// TODO Hexa: mark structures as `declare` or implement placement new `s = S(this: addr, args) { fields }`
 // All pointers here are plain integer addresses for safety
 // They can be real pointers at the user space
 // NOTE Remember to sync it with Caramel module!
@@ -229,19 +230,19 @@ class PEB32 {
 // TODO Hexa: assert(sizeof(PEB32) == 100)
 
 @struct
-class PEB_LDR_DATA {
+class PEB_LDR_DATA<SIZE> {
 	// TODO `Length` `Initialized` `SsHandle` etc
 	var reserved1 ArrayByValue<UInt8, 8>
 	var reserved2 ArrayByValue<UInt64, 3>
-	var inMemoryOrderModuleList ByValue<LIST_ENTRY>
+	var inMemoryOrderModuleList ByValue<LIST_ENTRY<SIZE>>
 }
 
 @struct
-class LDR_DATA_TABLE_ENTRY {
+class LDR_DATA_TABLE_ENTRY<SIZE> {
 	// TODO Typically contains ForwarderLinks (a LIST_ENTRY for forwarded modules) and StaticLinks (a LIST_ENTRY for statically linked modules).
 	// These are used to track module dependencies and linking.
 	var reserved1 ArrayByValue<UInt64, 2>
-	var inMemoryOrderLinks ByValue<LIST_ENTRY>
+	var inMemoryOrderLinks ByValue<LIST_ENTRY<SIZE>>
 	// TODO Usually contains `InInitializationOrderLinks` (a LIST_ENTRY for the order in which modules are initialized) and InProgressLinks (a LIST_ENTRY for modules being processed).
 	// These track the initialization state of modules.
 	var reserved2 ArrayByValue<UInt64, 2>
@@ -259,7 +260,7 @@ class LDR_DATA_TABLE_ENTRY {
 	/// `UNICODE_STRING` for the module's base name, e.g. "kernel32.dll\0" (in UTF-16)
 	// `Length` would be 24 bytes, excluding the null terminator (12 characters × 2 bytes)
 	// `MaximumLength` might be 26 bytes, including the null terminator (13 characters × 2 bytes)
-	var baseDllName ByValue<UNICODE_STRING>
+	var baseDllName ByValue<UNICODE_STRING<SIZE>>
 	// TODO UNICODE_STRING takes two 64-bit slots
 	var reserved5 ArrayByValue<UInt64, 2>
 	// var reserved5 ArrayByValue<UInt64, 3>
@@ -269,17 +270,34 @@ class LDR_DATA_TABLE_ENTRY {
 }
 
 @struct
-class UNICODE_STRING {
+class UNICODE_STRING<SIZE> {
 	/// Length in bytes excluding the null terminator
 	var length UInt16
 	/// Length in bytes including the null terminator
 	var maximumLength UInt16
 	// TODO on 32-bit PEB this better be `UInt32` not a pointer
-	var buffer UInt64
+	var buffer SIZE
 }
 
 @struct
-class LIST_ENTRY {
-	var forwardLink LIST_ENTRY
-	var backLink LIST_ENTRY
+class LIST_ENTRY<SIZE> {
+	var forwardLink SIZE // LIST_ENTRY
+	var backLink SIZE // LIST_ENTRY
+
+	fun getForwardLink() LIST_ENTRY<SIZE> {
+		// TODO Hexa: typer accepted `return forwardLink // without as! LIST_ENTRY<SIZE>` at LSP time
+		return forwardLink as! LIST_ENTRY<SIZE>
+	}
+
+	fun getBackLink() LIST_ENTRY<SIZE> {
+		return backLink as! LIST_ENTRY<SIZE>
+	}
+
+	fun setForwardLink(value LIST_ENTRY<SIZE>) Void {
+		forwardLink = value as! SIZE
+	}
+
+	fun setBackLink(value LIST_ENTRY<SIZE>) Void {
+		backLink = value as! SIZE
+	}
 }

@@ -1,0 +1,26 @@
+// The Tofita Engine
+// Copyright (C) 2022-2025 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+// TODO Hexa: if this is not within a separate module, then only one `<T>` instance is generated,
+// seemingly it either does it once or just thinks that `<UInt64> == <UInt32>` same instances and deduplicates
+class Executable<SIZE, TIB, PEB> {
+	var nextBase UInt64
+	var pml4 ArrayPointer<ByValue<PageEntry>>
+	var startup ProcessStartupInformation
+	var teb TIB
+	var peb PEB
+	var ldr PEB_LDR_DATA<SIZE>
+	new () { }
+}

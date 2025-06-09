@@ -61,17 +61,6 @@ class PeExportLinkedList {
 	var hash UInt8
 }
 
-@struct
-class Executable {
-	var nextBase UInt64
-	var pml4 ArrayPointer<ByValue<PageEntry>>
-	var startup ProcessStartupInformation
-	var teb TIB64
-	var peb PEB64
-	var ldr PEB_LDR_DATA
-	new () { }
-}
-
 // TODO
 /// Optimal use as by-value to avoid allocation
 /// Works only with a user space memory
@@ -117,7 +106,8 @@ fun is64Exe(asset RamDiskAsset) {
 // class PeOptionalHeader<LIMIT UInt64 or UInt32> {}
 // @require(SIZE is UInt64 or UInt32) <- same for optional fields
 // @optionalValidate(SIZE is UInt64, flag: 'is64'); @enableIf('is64') fun
-class ExeLoader<SIZE, HEADER> {
+class ExeLoader<SIZE, HEADER, TIB, PEB> {
+	// TODO Hexa: `type Exe = Executable<SIZE>` to cache types withing classes would be handy
 	new () { }
 
 	// TODO security ideas
@@ -130,7 +120,7 @@ class ExeLoader<SIZE, HEADER> {
 	// TODO probe for read/write
 	// TODO error if not found
 	// TODO more PATH support
-	fun loadDll(name String, root PeExportLinkedList, exec Executable) PeInterim {
+	fun loadDll(name String, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) PeInterim {
 		if Theme.verbose {
 			quakePrintf("[loadDll] loading {%S}\n".utf16(), name.utf16())
 		}
@@ -156,13 +146,13 @@ class ExeLoader<SIZE, HEADER> {
 	}
 
 	// TODO get rid of all `as!` casts in this file and exeIcon.hexa
-	fun loadPe(fullPath String, root PeExportLinkedList, exec Executable) {
+	fun loadPe(fullPath String, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) {
 		let asset RamDiskAsset = getRamDiskAsset(fullPath)
 		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %8\n", fullPath.utf16(), asset.size, asset.data)
 		return loadPeAsset(asset, root, exec)
 	}
 
-	fun loadPeAsset(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
+	fun loadPeAsset(asset RamDiskAsset, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) {
 		let ptr = asset.data as! ArrayPointer<UInt8>
 		// TODO 0x3C is 32-bit
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256u64) as! PeHeader
@@ -500,7 +490,7 @@ class ExeLoader<SIZE, HEADER> {
 		serialPrintf("[resolveDllImports] end\n")
 	}
 
-	fun loadExe(asset RamDiskAsset, root PeExportLinkedList, exec Executable) {
+	fun loadExe(asset RamDiskAsset, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) {
 		let ei ExeInterim = new ExeInterim()
 
 		ei.pei = loadPeAsset(asset, root, exec)
@@ -536,15 +526,19 @@ class ExeLoader<SIZE, HEADER> {
 			let pages = 1u32
 			let physical = PhysicalAllocator.allocateOnePagePreZeroed()
 			// From GDT aka GS:[0x00] TODO to tibDestination variable
-			let where = 0x00000000FFFAE000u64
+			let where = 0x00000000FFFAE000u64 as! SIZE
 			// TODO TEB always 000007FF'FFFAE000 on 64-bit?
 
 			// TODO map upfront, to make this page occupied for proper relocation
 			mapMemory(exec.pml4, where, physical - wholePhysicalStart, pages, accessibleByUser: true)
 
 			let is64bit = ei.pei.is64bit
-			if is64bit {
-				let tib = physical as! TIB64
+			// if is64bit {
+			if true {
+				// TODO Hexa: some alias-selection like `type TIB = if SIZE is UInt64 { TIB64 } else { TIB32 }`
+				// ^ note `if` here easier to parse (no conflict with `T?`), maybe even allow to remove `{}`
+				// ^ damn will be hard to read then: `if SIZE is UInt64 TIB64`
+				let tib = physical as! TIB
 				let tibSize = 4096u64 // TODO validate actual, should be 8192u64 -> update `pages = 1u32`
 				exec.teb = tib
 
@@ -562,21 +556,21 @@ class ExeLoader<SIZE, HEADER> {
 				// TODO find memory dynamically
 				let virtualPeb = where + tibSize
 				mapMemory(exec.pml4, virtualPeb, physicalPeb - wholePhysicalStart, 1, accessibleByUser: true)
-				tib.peb = virtualPeb
+				tib.peb = virtualPeb as! SIZE
 
 				// TODO Hexa: `PEB64.meta.fromAddress()`
-				let peb = physicalPeb as! PEB64
+				let peb = physicalPeb as! PEB
 				// TODO `processParameters` This points to an RTL_USER_PROCESS_PARAMETERS structure containing command-line arguments, environment variables, etc.
-				peb.processParameters = virtualPeb + 256u64
-				peb.imageBaseAddress = ei.pei.base
+				peb.processParameters = (virtualPeb + 256u64) as! SIZE
+				peb.imageBaseAddress = ei.pei.base as! SIZE
 				peb.numberOfProcessors = 2 // TODO
 
 				let physicalPebLdr = PhysicalAllocator.allocateOnePagePreZeroed()
 				let virtualPebLdr = virtualPeb + 4096u64
 				mapMemory(exec.pml4, virtualPebLdr, physicalPebLdr - wholePhysicalStart, 1, accessibleByUser: true)
 
-				peb.ldrData = virtualPebLdr
-				exec.ldr = /*physicalPebLdr*/ virtualPebLdr as! PEB_LDR_DATA
+				peb.ldrData = virtualPebLdr as! SIZE
+				exec.ldr = /*physicalPebLdr*/ virtualPebLdr as! PEB_LDR_DATA<SIZE>
 
 				// Initialize the three linked lists as empty
 				// TODO `ldr.inLoadOrderModuleList.forwardLink = & ldr.inLoadOrderModuleList`
@@ -585,8 +579,8 @@ class ExeLoader<SIZE, HEADER> {
 				{
 					// NOTE those are user space addresses in the lists
 					let virtual = exec.ldr.inMemoryOrderModuleList.ref as! UInt64
-					exec.ldr.inMemoryOrderModuleList.ref.forwardLink = virtual as! LIST_ENTRY
-					exec.ldr.inMemoryOrderModuleList.ref.backLink = virtual as! LIST_ENTRY
+					exec.ldr.inMemoryOrderModuleList.ref.setForwardLink(virtual as! LIST_ENTRY<SIZE>)
+					exec.ldr.inMemoryOrderModuleList.ref.setBackLink(virtual as! LIST_ENTRY<SIZE>)
 				}
 				// TODO `ldr.inInitializationOrderModuleList.forwardLink = & ldr.inInitializationOrderModuleList`
 				// TODO `ldr.inInitializationOrderModuleList.backLink = & ldr.inInitializationOrderModuleList`
@@ -620,7 +614,7 @@ class ExeLoader<SIZE, HEADER> {
 
 	// TODO `template<typename SIZE>` per function
 	// TODO make `entry` a generic too
-	fun addDllEntry(physical UInt64, dll PeInterim, exec Executable) {
+	fun addDllEntry(physical UInt64, dll PeInterim, exec Executable<SIZE, TIB, PEB>) {
 		let startup = exec.startup
 
 		let max SIZE = 511 // TODO any other limits?
@@ -644,6 +638,7 @@ class ExeLoader<SIZE, HEADER> {
 		let ldr = exec.ldr
 
 		// Allocate a new LDR_DATA_TABLE_ENTRY
+		// TODO Would be great to not waste 1 page of memory every time (guess just allocate them at user space in heap)
 		let physicalEntry = PhysicalAllocator.allocateOnePagePreZeroed()
 		let virtualEntry UInt64 = exec.nextBase
 		let pages = 1u32
@@ -659,11 +654,12 @@ class ExeLoader<SIZE, HEADER> {
 		exec.nextBase = exec.nextBase + pages * pageSize
 
 		// Initialize fields
-		let entry = virtualEntry as! LDR_DATA_TABLE_ENTRY
+		let entry = virtualEntry as! LDR_DATA_TABLE_ENTRY<SIZE>
 		entry.dllBase = dll.base
 		// TODO entry.timeDateStamp = dll.timeDateStamp
 
-		entry.baseDllName.ref.buffer = virtualEntry + sizeOf<LDR_DATA_TABLE_ENTRY>()
+		// TODO Hexa: Expected `>` before `>>` bad parsing
+		entry.baseDllName.ref.buffer = (virtualEntry + sizeOf< LDR_DATA_TABLE_ENTRY<SIZE> >()) as! SIZE
 		entry.baseDllName.ref.length = dll.baseName.length * 2u16
 		tmemcpy(entry.baseDllName.ref.buffer as! ArrayPointer<UInt8>, dll.baseName.utf16(), dll.baseName.length * 2u32)
 
@@ -672,17 +668,17 @@ class ExeLoader<SIZE, HEADER> {
 		entry.reserved5[2] = 1 // LoadCount (set to 1 for simplicity)
 
 		// Insert into `inMemoryOrderModuleList`
-		entry.inMemoryOrderLinks.ref.forwardLink = ldr.inMemoryOrderModuleList.ref.forwardLink
-		entry.inMemoryOrderLinks.ref.backLink = ldr.inMemoryOrderModuleList.ref
-		ldr.inMemoryOrderModuleList.ref.forwardLink.backLink = entry.inMemoryOrderLinks.ref
-		ldr.inMemoryOrderModuleList.ref.forwardLink = entry.inMemoryOrderLinks.ref
+		entry.inMemoryOrderLinks.ref.setForwardLink(ldr.inMemoryOrderModuleList.ref.getForwardLink())
+		entry.inMemoryOrderLinks.ref.setBackLink(ldr.inMemoryOrderModuleList.ref)
+		ldr.inMemoryOrderModuleList.ref.getForwardLink().setBackLink(entry.inMemoryOrderLinks.ref)
+		ldr.inMemoryOrderModuleList.ref.setForwardLink(entry.inMemoryOrderLinks.ref)
 	}
 
 	// DLL entry points aka `DllMain`
 	// TODO make it linked list, if it's not enough?
 	let dllEntries = PhysicalAllocator.allocateOnePagePreZeroed()
 
-	fun loadRelatedDLLsAndMapIntoProcess(app ExeInterim, root PeExportLinkedList, exec Executable, process TofitaProcess) {
+	fun loadRelatedDLLsAndMapIntoProcess(app ExeInterim, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>, process TofitaProcess) {
 		// TODO parse DLLs in multiple threads
 		let ntdll = loadDll("ntdll.dll", root, exec) // TODO proper path!!!
 		let kernel32 = loadDll("kernel32.dll", root, exec)
@@ -814,11 +810,6 @@ fun loadExeIntoProcess(file String, process TofitaProcess) {
 		root.name = null
 		root.ptr = 0
 
-		let exec Executable = new Executable()
-		exec.nextBase = 0
-		exec.pml4 = process.pml4
-		exec.startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
-
 		let asset = getRamDiskAsset(file)
 
 		// TODO fix in code gen `if ExeLoader.is64(asset) {` for `static fun` of generic class
@@ -833,13 +824,23 @@ fun loadExeIntoProcess(file String, process TofitaProcess) {
 		}
 
 		if is64 {
-			let loader = new ExeLoader<UInt64, Pe64OptionalHeader>()
+			let exec = new Executable<UInt64, TIB64, PEB64>()
+			exec.nextBase = 0
+			exec.pml4 = process.pml4
+			exec.startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
+
+			let loader = new ExeLoader<UInt64, Pe64OptionalHeader, TIB64, PEB64>()
 			// TODO Hexa: use interface (non-runtime?) here to avoid code dup
 			// or just move this code into function
 			let app = loader.loadExe(asset, root, exec)
 			loader.loadRelatedDLLsAndMapIntoProcess(app, root, exec, process)
 		} else {
-			let loader = new ExeLoader<UInt32, Pe32OptionalHeader>()
+			let exec = new Executable<UInt32, TIB32, PEB32>()
+			exec.nextBase = 0
+			exec.pml4 = process.pml4
+			exec.startup = PhysicalAllocator.allocateOnePagePreZeroed() as! ProcessStartupInformation
+
+			let loader = new ExeLoader<UInt32, Pe32OptionalHeader, TIB32, PEB32>()
 			let app = loader.loadExe(asset, root, exec)
 			loader.loadRelatedDLLsAndMapIntoProcess(app, root, exec, process)
 		}
