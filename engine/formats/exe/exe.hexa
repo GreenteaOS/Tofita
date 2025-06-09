@@ -239,18 +239,13 @@ class ExeLoader<SIZE, HEADER> {
 
 		// Relocate EXE or DLL to a new base
 		// TODO should return signed or something? used ptr_diff_t
-		// NOTE this is a user-mode address, so pointer delta is ok (TODO really?)
-		let delta Int64 = (buffer as! Int64) - (peOptionalHeader.imageBase as! Int64)
-		if delta != 0 {
+		// NOTE this is a user-mode address, so pointer `delta` is ok (TODO really?)
+		let directory =
+			// TODO indexing by enum like `IMAGE_DIRECTORY_ENTRY_BASERELOC`
+			imageDataDirectory[image_directory_entry_basereloc].ref as! IMAGE_DATA_DIRECTORY
 
-			var directory =
-				// TODO indexing by enum like `IMAGE_DIRECTORY_ENTRY_BASERELOC`
-				imageDataDirectory[image_directory_entry_basereloc].ref as! IMAGE_DATA_DIRECTORY
-
-			if directory.size == 0 {
-				// return (delta == 0)
-			}
 		// TODO there may be a situation when no relocation table present but PE is moved (malformed .dll)
+		if delta != 0, directory.size != 0 {
 			let codeBase ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
 
 			var relocation = (codeBase + directory.virtualAddress) as! IMAGE_BASE_RELOCATION
@@ -318,6 +313,10 @@ class ExeLoader<SIZE, HEADER> {
 			if i as! ImageDirectoryType == ImageDirectoryType.IMAGE_DIRECTORY_ENTRY_EXPORT {
 				let codeBase UInt64 = (buffer as! UInt64)
 				let directory = imageDataDirectory[i].ref as! ImageDataDirectory
+
+				if directory.size == 0 {
+					continue
+				}
 
 				var exports = ((buffer as! UInt64) + (directory.virtualAddress as! UInt64)) as! IMAGE_EXPORT_DIRECTORY
 
@@ -404,9 +403,15 @@ class ExeLoader<SIZE, HEADER> {
 
 		// Imports
 		{
+			let directory =
+				imageDataDirectory[image_directory_entry_import].ref
 			let at =
-				((buffer as! UInt64) + (imageDataDirectory[image_directory_entry_import].ref.virtualAddress as! UInt64)) as! ArrayPointer<UInt8>
+				((buffer as! UInt64) + (directory.virtualAddress as! UInt64)) as! ArrayPointer<UInt8>
 			var iid = at as! IMAGE_IMPORT_DESCRIPTOR
+
+			if directory.size == 0 {
+				return
+			}
 
 			// DLL
 			// TODO must error `while iid.originalFirstThunk != null {` compares Int and null
