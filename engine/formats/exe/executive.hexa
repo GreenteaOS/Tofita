@@ -237,15 +237,16 @@ class PEB_LDR_DATA<SIZE> {
 	var inMemoryOrderModuleList ByValue<LIST_ENTRY<SIZE>>
 }
 
+@packed
 @struct
 class LDR_DATA_TABLE_ENTRY<SIZE> {
 	// TODO Typically contains ForwarderLinks (a LIST_ENTRY for forwarded modules) and StaticLinks (a LIST_ENTRY for statically linked modules).
 	// These are used to track module dependencies and linking.
-	var reserved1 ArrayByValue<UInt64, 2>
+	var inLoadOrderLinks ByValue<LIST_ENTRY<SIZE>>
 	var inMemoryOrderLinks ByValue<LIST_ENTRY<SIZE>>
 	// TODO Usually contains `InInitializationOrderLinks` (a LIST_ENTRY for the order in which modules are initialized) and InProgressLinks (a LIST_ENTRY for modules being processed).
 	// These track the initialization state of modules.
-	var reserved2 ArrayByValue<UInt64, 2>
+	var inInitializationOrderLinks ByValue<LIST_ENTRY<SIZE>>
 	var dllBase UInt64
 	// TODO Commonly holds the module's `EntryPoint` (a pointer to the DLL's entry point function) and SizeOfImage (the size of the module in memory, as specified in the PE header).
 	var reserved3 ArrayByValue<UInt64, 2>
@@ -269,6 +270,7 @@ class LDR_DATA_TABLE_ENTRY<SIZE> {
 	var timeDateStamp UInt32
 }
 
+@packed
 @struct
 class UNICODE_STRING<SIZE> {
 	/// Length in bytes excluding the null terminator
