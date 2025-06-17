@@ -453,7 +453,10 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 							// TODO separate placeholders for std call etc
 							// TODO cache the bytes!
 							// TODO resolve upfront and cache !!! for faster exe load
-							if let placeholder = getProcAddress("tofitaFastStub".utf8copy().bytes as! ConstArrayPointer<UInt8>, root) {
+							// TODO Hexa: `let stub = is64Exe ? "tofitaFastStub" : "tofitaStdStub"` function(!) is64Exe accepted in `?`
+							let is64bit = pei.is64bit
+							let stub = is64bit ? "tofitaFastStub" : "tofitaStdStub"
+							if let placeholder = getProcAddress(stub.utf8copy().bytes as! ConstArrayPointer<UInt8>, root) {
 								func = placeholder.ptr as! SIZE
 								if Theme.verbose and unresolved < 2 {
 									// TODO Hexa: meta.funName instead of "resolveDllImports" text
