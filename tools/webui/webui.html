@@ -42,6 +42,7 @@
             font-size: 1rem;
             transition: background-color 0.3s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex-shrink: 0; /* Prevent buttons from shrinking */
         }
 
         button:hover {
@@ -50,6 +51,13 @@
 
         button.active {
             background-color: #3a3d41;
+        }
+
+        #clearButton {
+            background-color: #6c757d;
+        }
+        #clearButton:hover {
+            background-color: #5a6268;
         }
 
         /* --- Filter Input Styling --- */
@@ -61,6 +69,7 @@
             padding: 0.75rem;
             border-radius: 8px;
             font-size: 1rem;
+            min-width: 150px; /* Ensure it doesn't get too small */
         }
 
         #filterInput:focus {
@@ -87,12 +96,44 @@
         .log-line {
             padding: 0.1rem 0.5rem;
             border-radius: 4px;
+            transition: background-color 0.2s ease;
         }
 
         /* Zebra striping for log lines */
         .log-line:nth-child(even) {
             background-color: #2d2d2d;
         }
+
+        /* 1. Highlight on hover */
+        .log-line:hover {
+            background-color: #3e3e42;
+        }
+
+        /* 2. Style for highlighted numbers */
+        .number {
+            color: #6369fc; /* A color for numbers */
+        }
+
+        /* 4. Dark scrollbar for Chrome/WebKit browsers */
+        #logContainer::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        #logContainer::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 8px;
+        }
+
+        #logContainer::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 10px;
+            border: 3px solid #2d2d2d;
+        }
+
+        #logContainer::-webkit-scrollbar-thumb:hover {
+            background-color: #777;
+        }
+
     </style>
 </head>
 <body>
@@ -101,6 +142,8 @@
     <div class="controls">
         <button id="modeToggle">Use HTML Instead</button>
         <input type="text" id="filterInput" placeholder="Filter logs..." disabled>
+        <!-- 3. Button to clear the log -->
+        <button id="clearButton" disabled>Clear Log</button>
     </div>
 
     <!-- Container where logs will be displayed -->
@@ -114,11 +157,27 @@
         const modeToggleButton = document.getElementById('modeToggle');
         const filterInput = document.getElementById('filterInput');
         const logContainer = document.getElementById('logContainer');
+        const clearButton = document.getElementById('clearButton'); // 3. Get clear button
 
         // --- State Variables ---
         let useHTML = false;
         let busy = false;
         let logLinesCache = []; // Cache to hold all fetched log lines
+
+        /**
+         * 2. Takes a string and returns an HTML string with numbers highlighted.
+         * This regex finds hex numbers (0x...), integers, and decimals.
+         * @param {string} text - The raw log line text.
+         * @returns {string} - HTML string with numbers wrapped in spans.
+         */
+        function highlightNumbers(text) {
+            // Regex to match hex numbers OR standalone numbers (integers/floats)
+            const numberRegex = /(0x[a-fA-F0-9]+|\b\d+(\.\d+)?\b)/g;
+            // Sanitize text to prevent HTML injection before processing
+            const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return sanitizedText.replace(numberRegex, '<span class="number">$&</span>');
+        }
+
 
         /**
          * Renders the log lines to the HTML container based on the current filter.
@@ -133,7 +192,8 @@
                 if (line.toLowerCase().includes(filterText)) {
                     const lineDiv = document.createElement('div');
                     lineDiv.className = 'log-line';
-                    lineDiv.textContent = line;
+                    // Use the number highlighting function
+                    lineDiv.innerHTML = highlightNumbers(line);
                     fragment.appendChild(lineDiv);
                 }
             });
@@ -153,6 +213,7 @@
             modeToggleButton.textContent = useHTML ? 'Use Console Instead' : 'Use HTML Instead';
             modeToggleButton.classList.toggle('active', useHTML);
             filterInput.disabled = !useHTML;
+            clearButton.disabled = !useHTML; // 3. Enable/disable clear button
 
             if (useHTML) {
                 logContainer.innerHTML = ''; // Clear initial message
@@ -164,6 +225,15 @@
 
         // Filter logs as the user types
         filterInput.addEventListener('input', renderLog);
+
+        // 3. Clear the log cache and the view
+        clearButton.addEventListener('click', () => {
+            if (useHTML) {
+                logLinesCache = []; // Empty the cache
+                renderLog(); // Re-render, which will now be empty
+            }
+        });
+
 
         // --- Main Data Fetching Logic ---
         console.log('[Welcome to the Tofita Web UI!]');
