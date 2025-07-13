@@ -15,7 +15,7 @@
             --border-color: #3c3c3c;
             --highlight-bg: #3e3e42;
             --selected-bg: #684500; /* Dark Orange */
-            --number-color: #b5cea8; /* Light Green */
+            --number-color: #6369fc; /* Light Green */
             --string-color: #ce9178; /* Yellowish-Orange */
             --operator-color: #d4d4d4; /* Default text color */
         }
@@ -228,10 +228,12 @@
          * @param {string} text - The raw log line text.
          * @returns {string} - HTML string with syntax highlighted.
          */
-            const numberRegex = /(0x[a-fA-F0-9]+|\b\d+(\.\d+)?\b)/g;
         function highlightSyntax(text) {
             const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            return sanitizedText.replace(numberRegex, '<span class="number">$&</span>');
+            return sanitizedText
+                .replace(/(['"])(.*?)\1/g, '<span class="string">$&</span>')
+                .replace(/&gt;/g, '<span class="op-gt">&gt;</span>') // Must run after sanitization
+                .replace(/(0x[a-fA-F0-9]+|\b\d+(\.\d+)?\b)/g, '<span class="number">$&</span>')
         }
 
         /**
@@ -375,7 +377,7 @@
                 .catch(error => {
                     busy = false;
                 });
-        }, 222); // Increased interval for better performance
+        }, 222);
 
     })();
     </script>
