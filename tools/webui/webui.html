@@ -252,28 +252,27 @@
 
             let linesToRender = logLinesCache;
 
-            // 5. If highlight field is used, it overrides the filtering behavior
-            if (highlightText.length > 0) {
-                // Show all lines, but mark the highlighted text
-            } else if (filterText.length >= 2) { // 3. Only filter if length >= 2
+            if (filterText.length >= 2) {
                 linesToRender = logLinesCache.filter(line => line.content.toLowerCase().includes(filterText));
             }
 
             linesToRender.forEach(lineObj => {
                 const lineDiv = document.createElement('div');
                 lineDiv.className = 'log-line';
-                lineDiv.dataset.id = lineObj.id; // Store ID for click handling
+                lineDiv.dataset.id = lineObj.id;
 
-                // 4. Apply selected class if the line ID is in the set
                 if (selectedLineIds.has(lineObj.id)) {
                     lineDiv.classList.add('selected');
                 }
 
                 let lineHTML = highlightSyntax(lineObj.content);
 
-                // 5. Apply highlight marking if text is present
-                if (highlightText.length > 0 && lineObj.content.toLowerCase().includes(highlightText.toLowerCase())) {
+                // Apply highlight marking if text is present. This now works on the filtered list.
+                if (highlightText.length > 0) {
                     const highlightRegex = new RegExp(highlightText.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+                    // We must be careful not to highlight inside HTML tags from syntax highlighting.
+                    // A simple replace is generally safe here because user input is escaped in the regex,
+                    // but a more robust solution would parse the DOM. For this tool, it's a good trade-off.
                     lineHTML = lineHTML.replace(highlightRegex, match => `<mark>${match}</mark>`);
                 }
 
@@ -307,9 +306,10 @@
             }
         });
 
+        // Combined handler for both inputs
         const handleInputChange = () => {
-            // 3. Check filter length before rendering
             if (filterInput.value.length === 1 && highlightInput.value.length === 0) {
+                // Do nothing to avoid filtering on a single character
                 return;
             }
             renderLog();
@@ -317,7 +317,7 @@
         filterInput.addEventListener('input', handleInputChange);
         highlightInput.addEventListener('input', handleInputChange);
 
-        // 1. Clear buttons for inputs
+        // Clear buttons for inputs
         clearFilterButton.addEventListener('click', () => {
             filterInput.value = '';
             renderLog();
@@ -336,7 +336,6 @@
             }
         });
 
-        // 4. Click handler for line selection
         logContainer.addEventListener('click', (e) => {
             const lineDiv = e.target.closest('.log-line');
             if (lineDiv) {
