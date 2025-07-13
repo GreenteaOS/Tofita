@@ -45,7 +45,7 @@ http.createServer(function (req, res) {
 
 	if (url == '/favicon.ico') {
 		res.writeHead(200, { 'Content-Type': 'image/x-icon' });
-		res.write(fs.readFileSync('..\\..\\assets\\autorun.ico'));
+		res.write(fs.readFileSync('favicon.ico'));
 		res.end();
 		return
 	}
