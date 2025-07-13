@@ -232,6 +232,7 @@
             const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             return sanitizedText
                 .replace(/(['"])(.*?)\1/g, '<span class="string">$&</span>')
+                .replace(/(~~mark~~)(.*?)\1/g, '<mark>$2</mark>')
                 .replace(/&gt;/g, '<span class="op-gt">&gt;</span>') // Must run after sanitization
                 .replace(/(0x[a-fA-F0-9]+|\b\d+(\.\d+)?\b)/g, '<span class="number">$&</span>')
         }
@@ -265,7 +266,7 @@
                     lineDiv.classList.add('selected');
                 }
 
-                let lineHTML = highlightSyntax(lineObj.content);
+                let line = lineObj.content + '';
 
                 // Apply highlight marking if text is present. This now works on the filtered list.
                 if (highlightText.length > 0) {
@@ -273,8 +274,10 @@
                     // We must be careful not to highlight inside HTML tags from syntax highlighting.
                     // A simple replace is generally safe here because user input is escaped in the regex,
                     // but a more robust solution would parse the DOM. For this tool, it's a good trade-off.
-                    lineHTML = lineHTML.replace(highlightRegex, match => `<mark>${match}</mark>`);
+                    line = line.replace(highlightRegex, match => `~~mark~~${match}~~mark~~`);
                 }
+
+                let lineHTML = highlightSyntax(line);
 
                 lineDiv.innerHTML = lineHTML;
                 fragment.appendChild(lineDiv);
