@@ -1,57 +1,208 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-	<meta charset="utf-8" />
-	<title>Tofita Web UI</title>
+    <meta charset="utf-8" />
+    <title>Tofita Web UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        /* Basic reset and font setup */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 1rem;
+        }
+
+        /* --- Controls Area --- */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        /* --- Button Styling --- */
+        button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #005a9e;
+        }
+
+        button.active {
+            background-color: #3a3d41;
+        }
+
+        /* --- Filter Input Styling --- */
+        #filterInput {
+            flex-grow: 1;
+            background-color: #2d2d2d;
+            color: #d4d4d4;
+            border: 1px solid #3c3c3c;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        #filterInput:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        /* --- Log Container Styling --- */
+        #logContainer {
+            flex-grow: 1;
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            overflow-y: auto;
+            padding: 1rem;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap; /* Wrap long lines */
+            word-break: break-all; /* Break long words */
+            height: calc(100vh - 100px); /* Adjust based on controls height */
+        }
+
+        /* Individual log line styling */
+        .log-line {
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Zebra striping for log lines */
+        .log-line:nth-child(even) {
+            background-color: #2d2d2d;
+        }
+    </style>
 </head>
-
 <body>
-	<style type="text/css">
-	* {
-		font-family: sans-serif;
-	}
 
-	body {
-		background-color: darkgray;
-	}
+    <!-- Controls for the log view -->
+    <div class="controls">
+        <button id="modeToggle">Use HTML Instead</button>
+        <input type="text" id="filterInput" placeholder="Filter logs..." disabled>
+    </div>
 
-	</style>
-	<div id="log">Check Chrome Developer Tools Console</div>
-	<script type="text/javascript">
-	;
-	(function() {
-		console.log('[Welcome to the Tofita Web UI!]')
+    <!-- Container where logs will be displayed -->
+    <div id="logContainer">
+        Check Chrome Developer Tools Console, or press "Use HTML Instead".
+    </div>
 
-		var busy = false
-		setInterval(function() {
-			if (busy) return
-			busy = true
+    <script type="text/javascript">
+    (function() {
+        // --- DOM Element References ---
+        const modeToggleButton = document.getElementById('modeToggle');
+        const filterInput = document.getElementById('filterInput');
+        const logContainer = document.getElementById('logContainer');
 
-			fetch('/buffer.json')
-				.then((response) => {
-					return response.json();
-				})
-				.catch((error) => {
-					//console.error('Error:', error);
-					busy = false
-				})
-				.then((data) => {
-					// Dev Tools don't filter on single .log
-					const lines = data? ('' + data).split('\n') : []
-					for (const line of lines) if (line) console.log(line);
-					busy = false
-				})
-				.catch((error) => {
-					//console.error('Error:', error);
-					busy = false
-				})
+        // --- State Variables ---
+        let useHTML = false;
+        let busy = false;
+        let logLinesCache = []; // Cache to hold all fetched log lines
 
-		}, 111);
+        /**
+         * Renders the log lines to the HTML container based on the current filter.
+         */
+        function renderLog() {
+            if (!useHTML) return; // Only render if in HTML mode
 
-	})();
+            const filterText = filterInput.value.toLowerCase();
+            const fragment = document.createDocumentFragment(); // Use a fragment for performance
 
-	</script>
+            logLinesCache.forEach(line => {
+                if (line.toLowerCase().includes(filterText)) {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'log-line';
+                    lineDiv.textContent = line;
+                    fragment.appendChild(lineDiv);
+                }
+            });
+
+            // Clear the container and append the new filtered lines
+            logContainer.innerHTML = '';
+            logContainer.appendChild(fragment);
+            // Auto-scroll to the bottom
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // --- Event Listeners ---
+
+        // Toggle between console and HTML mode
+        modeToggleButton.addEventListener('click', () => {
+            useHTML = !useHTML;
+            modeToggleButton.textContent = useHTML ? 'Use Console Instead' : 'Use HTML Instead';
+            modeToggleButton.classList.toggle('active', useHTML);
+            filterInput.disabled = !useHTML;
+
+            if (useHTML) {
+                logContainer.innerHTML = ''; // Clear initial message
+                renderLog(); // Render existing cache immediately
+            } else {
+                logContainer.innerHTML = 'Logs are now being sent to the Developer Tools Console.';
+            }
+        });
+
+        // Filter logs as the user types
+        filterInput.addEventListener('input', renderLog);
+
+        // --- Main Data Fetching Logic ---
+        console.log('[Welcome to the Tofita Web UI!]');
+
+        setInterval(function() {
+            if (busy) return;
+            busy = true;
+
+            fetch('/buffer.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const lines = data ? ('' + data).split('\n').filter(line => line) : [];
+                    if (lines.length > 0) {
+                        logLinesCache.push(...lines); // Add new lines to the cache
+
+                        if (useHTML) {
+                            renderLog(); // Re-render the HTML view
+                        } else {
+                            // Dev Tools don't filter on single .log call, so we loop
+                            for (const line of lines) {
+                                console.log(line);
+                            }
+                        }
+                    }
+                    busy = false;
+                })
+                .catch(error => {
+                    // Don't spam the console with fetch errors (e.g., server down)
+                    // console.error('Fetch Error:', error);
+                    busy = false;
+                });
+        }, 222); // Increased interval for better performance
+
+    })();
+    </script>
 </body>
-
 </html>
