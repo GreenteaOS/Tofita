@@ -247,18 +247,18 @@
             const highlightText = highlightInput.value;
 
             // 6. Update placeholder with log count
-            filterInput.placeholder = logLinesCache.length > 1? `Filter ${logLinesCache.length} logs...` : `Filter logs...`;
+            filterInput.placeholder = logLinesCache.length > 1? `Filter ${logLinesCache.length} lines...` : `Filter logs...`;
 
             const fragment = document.createDocumentFragment();
 
             let linesToRender = logLinesCache;
 
             if (filterText.length >= 2) {
-                linesToRender = logLinesCache.filter(line => line.content.toLowerCase().includes(filterText));
+                linesToRender = logLinesCache.filter(line => line.contentLowerCase.includes(filterText));
             }
 
             linesToRender.forEach(lineObj => {
-                const lineDiv = document.createElement('div');
+                const lineDiv = lineObj.div;
                 lineDiv.className = 'log-line';
                 lineDiv.dataset.id = lineObj.id;
 
@@ -266,7 +266,7 @@
                     lineDiv.classList.add('selected');
                 }
 
-                let line = lineObj.content + '';
+                let line = lineObj.content;
 
                 // Apply highlight marking if text is present. This now works on the filtered list.
                 if (highlightText.length > 0) {
@@ -353,6 +353,16 @@
             }
         });
 
+        // Having a class optimizes js runtime
+        class LineObj {
+        	constructor (id, content) {
+        		this.id = id;
+        		this.content = content;
+        		this.contentLowerCase = content.toLowerCase();
+        		this.div = document.createElement('div');
+        	}
+        }
+
         // --- Main Data Fetching Logic ---
         console.log('[Welcome to the Tofita Web UI!]');
         setInterval(function() {
@@ -365,7 +375,7 @@
                     const lines = data ? ('' + data).split('\n').filter(line => line) : [];
                     if (lines.length > 0) {
                         lines.forEach(line => {
-                            logLinesCache.push({ id: nextLogId++, content: line });
+                            logLinesCache.push(new LineObj(nextLogId++, line));
                         });
 
                         if (useHTML) {
