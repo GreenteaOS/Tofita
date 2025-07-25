@@ -178,8 +178,8 @@ fun engineInit(params UefiPayload) {
 		quakePrintf("ACPI 2.0 is loaded and ready\n".utf16())
 	}
 
-	quakePrintf("\nHere you may toggle experimental features and see some internal information (for developers)\n".utf16())
-	quakePrintf("Enter 'help' for commands or press ~ to hide this window\n".utf16())
+	// Quake-style console
+	quakeWelcome()
 
 	{
 		// TODO move to compositor/DWM

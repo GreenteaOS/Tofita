@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -147,7 +147,7 @@ fun quakeHandleButtonDown(key UInt8) {
 				setWallpaper(wallpaperSource, WallpaperStyle.Center)
 			}
 		} else if quakeCommand == 'help' {
-			quakePrintf("Hit `~` to show/hide this terminal at any time. At least those commands available:\n".utf16())
+			quakePrintf("Hit `~` to show/hide this console at any time. At least those commands available:\n".utf16())
 			quakePrintf("dark - set the dark theme\n".utf16())
 			quakePrintf("light - set the light theme\n".utf16())
 			quakePrintf("blur - set alternative theme with slightly different aesthetics\n".utf16())
@@ -179,8 +179,8 @@ fun quakeHandleButtonDown(key UInt8) {
 		quakeCommandSize = 0
 	}
 
-	// TODO when no command entered, left/right buttons swap between different terminals,
-	// clicking right on the right most opens new terminal
+	// TODO when no command entered, left/right buttons swap between different consoles,
+	// clicking right on the right most opens new console
 	// (show this as help in pale color)
 
 	// TODO support string comparisons `if (keyboardMap[key] >= 'a' and keyboardMap[key] <= 'z') or`
@@ -200,6 +200,13 @@ fun quakeHandleButtonDown(key UInt8) {
 	}
 
 	requestAnimationFrame()
+}
+
+/// Show welcome message
+fun quakeWelcome() {
+	quakePrintf("\nWelcome to the Quake-style console!\n".utf16())
+	quakePrintf("Here you may toggle experimental features and see some internal information (for developers)\n".utf16())
+	quakePrintf("Enter 'help' for commands or press ~ to hide this window\n".utf16())
 }
 
 var qsodHappened = false

@@ -569,7 +569,7 @@ fun hintOfFile(id UInt64) String {
 	}
 
 	if shortcut.file == "*:quake" {
-		return "Terminal"
+		return "Console"
 	}
 
 	// TODO hint for folders
