@@ -211,6 +211,30 @@ fun timerInterruptHandler(@volatile frame InterruptFrame) {
 	extraMillisecond++
 	timerCalled++
 
+	// Handle timers
+	for i in timerListUsed {
+		let timer = timerList[i]
+		if timer != null, uptimeMilliseconds >= timer.nextFireTime {
+			// Post WM_TIMER message
+			var payload = ByValue<PostMessagePayload>()
+			var payload = payload.ref
+			// TODO `var payload PostMessagePayload = new PostMessagePayload()`
+			payload.hWnd = timer.hwnd as! UInt64
+			payload.msg = Message.WM_TIMER
+			payload.wParam = timer.nIDEvent
+			payload.lParam = timer.timerProc
+			let process TofitaProcess = processes[timer.processId]
+			postMessage(process, payload)
+			quakePrintf("T!%8!".utf16(), timer.interval)
+
+			// Update next fire time
+			// TODO in future when using list, ensure that when `interval == 0` it does not get inf. looped
+			timer.nextFireTime = uptimeMilliseconds + timer.interval
+
+			// TODO !!! WM_TIMER messages that belong to the same timer-id are coalesced inside the window-message queue (not just latest message)
+		}
+	}
+
 	// Schedule
 	// TODO is `if true` `if false else` optimized to a block?
 	if true {

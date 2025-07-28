@@ -1,0 +1,28 @@
+// The Tofita Engine
+// Copyright (C) 2025 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+@struct @sizeOf(8 * 4 + 4)
+class Timer {
+	var hwnd UInt64 // Window handle
+	var nIDEvent UInt64 // Timer ID
+	var interval UInt64 // Interval in milliseconds
+	var nextFireTime UInt64 // Next firing time (uptimeMilliseconds)
+	var timerProc UInt64 // TIMERPROC function pointer (0 if NULL)
+	var processId UInt64 // Process ID TODO use reference not ID index
+	new () { }
+}
+
+var timerList [Timer] = [] // Array to store up to 256 timers
+var timerListUsed UInt64 = 0 // Number of timers in use

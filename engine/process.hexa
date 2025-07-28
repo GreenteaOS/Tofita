@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -194,6 +194,22 @@ fun processDestroy(@volatile process TofitaProcess) {
 	process.present = false
 	process.messagesUsed = 0
 	process.messages = null
+
+	// Remove timers for this process
+	var i UInt64 = 0
+	while i < timerListUsed {
+		let timer = timerList[i]
+		if timer != null, timer.processId == process.pid {
+			// Shift remaining timers
+			for j in i ... (timerListUsed - 1) {
+				timerList[j] = timerList[j + 1]
+			}
+			timerList[timerListUsed - 1] = null
+			timerListUsed--
+		} else {
+			i++
+		}
+	}
 
 	var window = overlappedWindow_findAnyProcessWindow(process.pid)
 

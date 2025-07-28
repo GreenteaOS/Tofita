@@ -22,6 +22,7 @@ let userSyscalls = 123000
 // TODO store all syscalls as huge complex enum and generate all wrappers with macro
 // and serializer to-from enum tags / wow64
 // @castTo('TofitaSyscalls')
+// TODO LMAO rename to just TofitaSyscall
 enum TofitaSyscalls : UInt32 {
 	// System
 	// TODO Disallow user to call them by index
@@ -31,14 +32,17 @@ enum TofitaSyscalls : UInt32 {
 
 	// User
 	// TODO DebugLog = userSyscalls
+	// TODO Hexa: randomize via `#int define` and add `#string define` too
 	DebugLog = 123000
 	CreateWindowEx = 123001 // TODO auto compute while ensure unique
 	ShowWindow = 123002 // TODO auto compute
 	GetMessage = 123003 // TODO auto compute
 	PostMessage = 123004 // TODO auto compute
-	GetOrCreateWindowFramebuffer = 123005 // TODO auto compute
-	SwapWindowFramebuffer = 123006 // TODO auto compute
-	ExitProcess = 123007 // TODO auto compute
+	GetOrCreateWindowFramebuffer = 123006 // TODO auto compute
+	SwapWindowFramebuffer = 123007 // TODO auto compute
+	ExitProcess = 123008 // TODO auto compute
+	SetTimer = 123009
+	KillTimer = 123010
 }
 
 // Note: all pointers should be 64-bit even for 32-bit processes
@@ -146,8 +150,25 @@ class GetMessagePayload {
 	var pt ByValue<Point>
 	var lPrivate UInt32
 
+	// TODO why twice?
 	var hWnd UInt64 // HWnd
 	var wMsgFilterMin UInt32
 	var wMsgFilterMax UInt32
+	new () { }
+}
+
+@struct @sizeOf(8 * 3 + 4)
+class SetTimerPayload {
+	var hwnd UInt64 // HWnd
+	var nIDEvent UInt64 // Timer ID
+	var uElapse UInt32 // Interval in milliseconds
+	var timerProc UInt64 // TIMERPROC function pointer (0 if NULL)
+	new () { }
+}
+
+@struct @sizeOf(8 * 2)
+class KillTimerPayload {
+	var hwnd UInt64 // HWnd
+	var nIDEvent UInt64 // Timer ID
 	new () { }
 }

@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -118,6 +118,68 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 
 		frame.raxReturn = postMessage(process, payload).toZeroOrOne
 
+		process.schedulable = true
+		return true
+	}
+
+	if syscall == TofitaSyscalls.SetTimer {
+		if not probeForReadOkay(frame.rdxArg1, sizeOf<SetTimerPayload>()) {
+			serialPrintf("<> TofitaSyscalls.SetTimer == not probeForReadOkay\n")
+			return false
+		}
+
+		let payload = frame.rdxArg1 as! SetTimerPayload
+
+		// Create new timer
+		var timer = new Timer()
+		timer.hwnd = payload.hwnd
+		timer.nIDEvent = payload.nIDEvent
+		timer.interval = payload.uElapse
+		// TODO Hexa: ensure `UInt64 + UInt32` does `a + (uint64_t)b`
+		timer.nextFireTime = uptimeMilliseconds + payload.uElapse
+		timer.timerProc = payload.timerProc
+		timer.processId = process.pid
+
+		// Add to timerList
+		// TODO update existing ones
+		timerList[timerListUsed] = timer
+		timerListUsed++
+
+		frame.raxReturn = payload.nIDEvent // Return timer ID
+		process.schedulable = true
+		return true
+	}
+
+	if syscall == TofitaSyscalls.KillTimer {
+		if not probeForReadOkay(frame.rdxArg1, sizeOf<KillTimerPayload>()) {
+			serialPrintf("<> TofitaSyscalls.KillTimer == not probeForReadOkay\n")
+			return false
+		}
+
+		let payload = frame.rdxArg1 as! KillTimerPayload
+
+		// Find and remove timer
+		for i in timerListUsed {
+			let timer = timerList[i]
+			if
+				timer != null,
+				timer.processId == process.pid,
+				timer.hwnd == payload.hwnd,
+				timer.nIDEvent == payload.nIDEvent
+			{
+				// Shift remaining timers
+				for j in i ... (timerListUsed - 1) {
+					timerList[j] = timerList[j + 1]
+				}
+				timerList[timerListUsed - 1] = null
+				timerListUsed--
+				frame.raxReturn = 1
+				process.schedulable = true
+				break
+			}
+		}
+
+		frame.raxReturn = 0
 		process.schedulable = true
 		return true
 	}
