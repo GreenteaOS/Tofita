@@ -33,7 +33,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 		}
 		return blobSectionStart
 	}*/
-	fun getIcon(asset RamDiskAsset) Bitmap32? {
+	fun getIcon(asset RamDiskAsset, requestedWidth UInt8) Bitmap32? {
 		var ptr = asset.data as! ArrayPointer<UInt8>
 		// TODO 0x3C is 32-bit, 0x3C can be 64-bit?
 		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256) as! PeHeader
@@ -122,9 +122,9 @@ class ExeResourceLoader<SIZE, HEADER> {
 								let iconEntry = iconDir.idEntries[index].ref
 								// serialPrintf("[ExeResourceLoader] GRPICONDIR width %d id %d color %d bit %d\n", iconEntry.bWidth, iconEntry.nID, iconEntry.bColorCount, iconEntry.wBitCount)
 								// TODO size selection
-								// let goal = 48
+								// let goal = requestedWidth
 								// TODO `iconEntry.bColorCount == 0,`?
-								if iconEntry.bWidth == 48, iconEntry.bHeight == iconEntry.bWidth, iconEntry.wBitCount == 32 {
+								if iconEntry.bWidth == requestedWidth, iconEntry.bHeight == iconEntry.bWidth, iconEntry.wBitCount == 32 {
 									bestIcon = iconEntry.nID
 									foundIcon = true
 									imageSize = iconEntry.dwBytesInRes
@@ -135,7 +135,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 								}
 
 								// Fallback to a low-quality icon
-								if iconEntry.bWidth == 48, iconEntry.bHeight == iconEntry.bWidth, iconEntry.wBitCount <= 8, iconEntry.wBitCount > bestBitCount {
+								if iconEntry.bWidth == requestedWidth, iconEntry.bHeight == iconEntry.bWidth, iconEntry.wBitCount <= 8, iconEntry.wBitCount > bestBitCount {
 									bestIcon = iconEntry.nID
 									foundIcon = true
 									bestBitCount = iconEntry.wBitCount
@@ -143,6 +143,9 @@ class ExeResourceLoader<SIZE, HEADER> {
 								}
 							}
 
+							// TODO stop after very first `GRPICONDIR` cause we don't need to scan other icons
+							// break
+							//
 							if foundIcon { break } // Exit language loop
 						}
 
@@ -188,7 +191,7 @@ class ExeResourceLoader<SIZE, HEADER> {
 								// serialPrintf("[ExeResourceLoader] Found icon %d\n", bestIcon)
 								let icon = offset
 								// TODO Hexa: `let bmp = return whatever`
-								return loadIconPayload(icon as! ConstArrayPointer<UInt8>, 48, 48, imageSize, 0)
+								return loadIconPayload(icon as! ConstArrayPointer<UInt8>, requestedWidth, requestedWidth, imageSize, 0)
 							}
 						}
 					}
@@ -206,15 +209,15 @@ class ExeResourceLoader<SIZE, HEADER> {
 // TODO `isolatedCall` separately for res find and .png decode
 // ^ i.e. find icon in isolation, then allocate w x h bitmap, then isolate parse into it
 // TODO Generalize resource loading, not just icons
-fun getExeIconFromPath(file String /*TODO iconWidth*/) Bitmap32? {
+fun getExeIconFromPath(file String, iconWidth UInt8 = 48) Bitmap32? {
 	let asset = getRamDiskAsset(file)
 	// TODO handle the case when not found
 	if is64Exe(asset) {
 		let loader = new ExeResourceLoader<UInt64, Pe64OptionalHeader>()
-		return loader.getIcon(asset)
+		return loader.getIcon(asset, iconWidth)
 	} else {
 		let loader = new ExeResourceLoader<UInt32, Pe32OptionalHeader>()
-		return loader.getIcon(asset)
+		return loader.getIcon(asset, iconWidth)
 	}
 	return null
 }
