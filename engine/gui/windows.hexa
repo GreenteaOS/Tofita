@@ -203,5 +203,7 @@ fun drawWindowFrame(title String, x Int16, y Int16, w UInt16, h UInt16, active B
 	drawShadowBox(x - 1i16, y - 1i16, w + 1, h + 1)
 
 	// :3
-	drawBitmap32WithAlpha(gura, w > 228 ? x : x - 36i16, y - 139i16)
+	if Theme.showGura {
+		drawBitmap32WithAlpha(gura, w > 228 ? x : x - 36i16, y - 139i16)
+	}
 }
