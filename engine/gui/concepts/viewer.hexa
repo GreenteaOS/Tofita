@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -78,7 +78,7 @@ class Viewer {
 		window.fbZeta = allocatePageAlignedBitmap(window.width, window.height)
 		memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
 		window.fbCurrentZeta = true
-		window.fbGama = window.fbZeta // TODO
+		window.fbGama = window.fbZeta // TODO double buffering
 
 		// Paint
 		let screenWidth = Screen.width
