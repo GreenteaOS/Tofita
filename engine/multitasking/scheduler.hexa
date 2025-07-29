@@ -16,9 +16,10 @@
 // Scheduling
 enum ThreadKind : UInt8 {
 	THREAD_INIT = 0 // engineMain, it will be destroyed
-	THREAD_GUI = 1
+	/// Realtime threads cannot be switched, they request context switch with `yield()` explicitly
+	THREAD_GUI = 1 // TODO rename to Realtime
 	THREAD_ENGINE = 2
-	THREAD_USER = 3
+	THREAD_USER = 3 // TODO rename to User/Application
 }
 
 @volatile var currentThread ThreadKind = ThreadKind.THREAD_INIT
