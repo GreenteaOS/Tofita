@@ -21,8 +21,9 @@ fun tmemcpy(dest ArrayPointer<UInt8>, src ConstArrayPointer<UInt8>, count UInt64
 	}
 }
 
-fun memset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void {
-	var d = dest as! ArrayPointer<UInt8>
+// TODO actually uses one from Main
+fun tmemset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void {
+	let d = dest as! ArrayPointer<UInt8>
 	for i in len {
 		d[i] = e
 	}
@@ -33,12 +34,14 @@ fun memset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void {
 @rename('__chkstk')
 fun chkstkStub() Void { }
 
+// Stubs for the `log.hexa`
+fun probeForReadOkay(at UInt64, bytes UInt64) Bool { return true }
+
 // CR3 trampoline
 @extern
 @rename("trampolineCR3") // TODO Hexa: @asIs
 @convention(fastcall) @fastcall // TODO
-declare fun
-trampolineCR3(@volatile engineParams UInt64, @volatile pml4 UInt64, @volatile stack UInt64,
+declare fun trampolineCR3(@volatile engineParams UInt64, @volatile pml4 UInt64, @volatile stack UInt64,
 	@volatile entry UInt64) Void
 
 // CPU manipulation
@@ -113,6 +116,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	// TODO should create fake fb on fail to work in headless mode
 	uefiSetFrameBufferMode(framebuffer, systemTable)
 	drawLoading(framebuffer, 0)
+	// NOTE Hexa: meta.getStringDefine('versionMajor')
 	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag
 	let versionY = (framebuffer.height / 4) * 3 + 64 as! Int16
 	drawText(
@@ -136,7 +140,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 		__sync_synchronize()
 	}
 
-	// TODO: render something to show that loader is ok, because initial start form USB may take a while
+	// TODO render something to show that loader is ok, because initial start form USB may take a while
 	serialPrintln("[[[uefi]]] done: uefiSetFrameBufferMode")
 
 	// Initial RAM disk
@@ -179,7 +183,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	drawVerbose("Reading the time...", framebuffer)
 	var time EFI_TIME = new EFI_TIME()
-	time.year = 2023
+	time.year = 2023 // TODO use one from version number
 	var capabilities EFI_TIME_CAPABILITIES = new EFI_TIME_CAPABILITIES()
 	{
 		serialPrintln("[[[uefi]]] begin GetTime")
@@ -201,7 +205,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 				capabilities.accuracy,
 				capabilities.setsToZero)
 
-			// Set 2025 as least valid, so security/HTTPS certificates at least partially work
+			// Set latest known as least valid, so security/HTTPS certificates at least partially work
 			// and file system is not messed
 			if time.year < 2025 {
 				time.year = 2025
@@ -330,7 +334,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	params.capabilities.ref.setsToZero = capabilities.setsToZero
 
 	// Note: stack grows from X to X-N, not X+N
-	// TODO: map empty page for stack overflow protection + map larger stack (~4 MB)
+	// TODO map empty page for stack overflow protection + map larger stack (~4 MB)
 	let stack = conventionalAllocateNext(1024u64 * 1024u64) + 1024u64 * 1024u64
 	{
 		var b = (stack - 1024u64 * 1024u64) as! ArrayPointer<UInt8>
@@ -369,7 +373,6 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	serialPrintf("[paging] available RAM is ~%8 bytes\n", ram)
 	serialPrintf("[paging] available RAM is ~%u megabytes\n", megs)
 
-		// TODO check only physical memory in this case (but map whole range reported by UEFI)
 	if megs < 1234u64 {
 		// This code intentionally hangs forever and keeps printing text to VGA screen
 		// to ensure that it is sent to GPU (cause halting may stop firmware copy mem process)
