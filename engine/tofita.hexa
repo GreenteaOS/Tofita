@@ -21,7 +21,10 @@ fun memzero(dest ArrayPointer<UInt8>, len UInt64) {
 // Clang workaround
 @keep
 @rename('___chkstk_ms')
-fun chkstkStub() Void { }
+fun chkstkStub() Void {
+	// This function must be empty to avoid LLVM bugs TODO
+	// serialPrintln("<Tofita> chkstkStub called")
+}
 
 // Hexa definitions
 @extern @rename('versionMajor') declare let versionMajor Int
@@ -292,18 +295,17 @@ fun engineInit(params UefiPayload) {
 			}
 
 			if i == 4 {
-				loadExeIntoProcess("desktop/calc64.exe", guiProcess)
 				// loadExeIntoProcess("desktop/calc32.exe", guiProcess)
-				guiProcess.name = "calc32.exe"
-				guiProcess.name = "calc64.exe"
 			}
 
-			disableSerial = 0
 			// TODO loadExeIntoProcess(""root/Windows/GreenteaGUI.exe", guiProcess)
 			// TODO guiProcess.name = "Greentea OS GUI"
 			guiProcess.schedulable = true
 		}
 	}
+
+	// Auto run
+	autoRun()
 
 	startupMilliseconds =
 		paramsCache.time.ref.hour * 60 * 60 * 1000 +
