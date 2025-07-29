@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,15 +13,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+// TODO move this all to Caramel
 // TODO better idea
+// Being struct allows it to be nullable `Handle?`
 @struct
 class Handle {
-	// Ok
+	// No fields should be accessed without casting to a proper type
+	// TODO let value SizeOfPointer NONONO makes no sense cause not `int*` just `int`
+	// TODO `private`
+	let padding SizeOfPointer
 }
 
 // TODO ifdef 64-bit
 // (HandleSize)handle & ~(HandleSize)0b11
-declare HandleSize = UInt64
+declare HandleSize = SizeOfPointer
+// TODO use separate types for stricter typing and helper methods like `HWnd.toWindow()`
 declare HInstance = Handle
 declare HIcon = Handle
 declare HBrush = Handle
@@ -35,6 +41,12 @@ declare HFont = Handle
 declare HRsrc = Handle
 declare HMonitor = Handle
 declare HModule = Handle
+declare HBitmap = Handle
+declare HPen = Handle
+declare HRgn = Handle
+declare HPalette = Handle
+declare HKey = Handle
+declare HAccel = Handle
 
 // TODO @byValue + @sizeOf(8/4)/@sizeOfPointer + value: size_t = safe converters
 @struct
@@ -53,8 +65,21 @@ enum Bool32: Int32 {
 	// TODO ^ types check infer 0i32 etc same as int
 	True = 1
 	// TODO ^ `true` is any non-0 value `True = 1 or _` or just `v != Bool32.False`
+
+	// TODO make a feature of automatic conversion
+	// ^ should work with `if bool32value {}`
+	@converter
 	static fun fromBool(value Bool) Bool32 {
 		if value {
+			return Bool32.True
+		}
+
+		return Bool32.False
+	}
+
+	// TODO make it generic
+	static fun fromNonZero(value Int) Bool32 {
+		if value != 0 {
 			return Bool32.True
 		}
 
@@ -74,6 +99,14 @@ class Rect {
 	var right Int32
 	var bottom Int32
 	// TODO const all fields or `Rect extends ConstRect`
+	new () { }
+
+	/*new (left Int32, top Int32, right Int32, bottom Int32) {
+		this.left = left
+		this.top = top
+		this.right = right
+		this.bottom = bottom
+	}*/
 }
 
 @struct
@@ -91,6 +124,8 @@ class PaintStruct {
 }
 
 enum Message: UInt32 {
+	// Remove prefixes WM_ they look stupid and outdated (also doc this)
+	// ^ use TitleCase
 	WM_NULL = 0x0000
 	WM_CREATE = 0x0001
 	WM_DESTROY = 0x0002
@@ -129,20 +164,24 @@ enum Message: UInt32 {
 	WM_NON_CLIENT_DESTROY = 0x0082
 	WM_NON_CLIENT_CALC_SIZE = 0x0083
 	WM_NON_CLIENT_HIT_TEST = 0x0084
+	// TODO A window DC is associated with a particular window, and allows the developer to draw on any part of the target window, including the borders and the caption. This is the type of DC that is sent with WM_NCPAINT message.
 	WM_NON_CLIENT_PAINT = 0x0085
+	// WM_PAINT and WM_NCPAINT messages are only generated when the update region is not empty
 	WM_NON_CLIENT_ACTIVATE = 0x0086
 	WM_GET_DLG_CODE = 0x0087
 	WM_SYNC_PAINT = 0x0088
+	// TODO NC is NESTED_CHILD? _CLIENT
+	// non-client region should be updated then the painting should occur in WM_NCPAINT
 	WM_NON_CLIENT_MOUSE_MOVE = 0x00A0
 	WM_NON_CLIENT_LEFT_BUTTON_DOWN = 0x00A1
 	WM_NON_CLIENT_LEFT_BUTTON_UP = 0x00A2
-	WM_NON_CLIENT_LEFT_BUTTON_DBL_CLK = 0x00A3
+	WM_NON_CLIENT_LEFT_BUTTON_DOUBLE_CLICK = 0x00A3
 	WM_NON_CLIENT_RIGHT_BUTTON_DOWN = 0x00A4
 	WM_NON_CLIENT_RIGHT_BUTTON_UP = 0x00A5
-	WM_NON_CLIENT_RIGHT_BUTTON_DBL_CLK = 0x00A6
+	WM_NON_CLIENT_RIGHT_BUTTON_DOUBLE_CLICK = 0x00A6
 	WM_NON_CLIENT_MIDDLE_BUTTON_DOWN = 0x00A7
 	WM_NON_CLIENT_MIDDLE_BUTTON_UP = 0x00A8
-	WM_NON_CLIENT_MIDDLE_BUTTON_DBL_CLK = 0x00A9
+	WM_NON_CLIENT_MIDDLE_BUTTON_DOUBLE_CLICK = 0x00A9
 	BM_GET_CHECK = 0x00F0
 	BM_SET_CHECK = 0x00F1
 	BM_GET_STATE = 0x00F2
@@ -168,10 +207,15 @@ enum Message: UInt32 {
 	WM_MOUSE_MOVE = 0x0200
 	WM_LEFT_BUTTON_DOWN = 0x0201
 	WM_LEFT_BUTTON_UP = 0x0202
+	WM_LEFT_BUTTON_DOUBLE_CLICK = 0x0203
 	WM_RIGHT_BUTTON_DOWN = 0x0204
 	WM_RIGHT_BUTTON_UP = 0x0205
+	WM_RIGHT_BUTTON_DOUBLE_CLICK = 0x0206
 	WM_MIDDLE_BUTTON_DOWN = 0x0207
 	WM_MIDDLE_BUTTON_UP = 0x0208
+	WM_MIDDLE_BUTTON_DOUBLE_CLICK = 0x0209
+	WM_MOUSE_WHEEL = 0x020A
+	WM_MOUSE_HORIZONTAL_WHEEL = 0x020E
 	WM_SIZING = 0x0214
 }
 
@@ -203,6 +247,10 @@ class Msg {
 // TODO convention (actually may be any so must build universal call frame)
 declare WindowProcedure = (hWnd HWnd, uMsg Message, wParam WParam, lParam LParam) => LResult
 
+// AKA `TIMERPROC`
+declare TimerProcedure = (hWnd HWnd, uMsg Message, idEvent UInt64, dwTime UInt32) => Void
+
+// TODO actually use only WNDCLASSEXA instead { let cbSize = Self.meta.sizeOf }
 @struct @sizeOf(72)
 class WindowClass {
 	var style UInt32
@@ -218,7 +266,9 @@ class WindowClass {
 	new () { }
 }
 
+// TODO underscores
 enum CmdShow: Int32 {
+	SW_UNCHANGED = 100 // TODO -1
 	SW_HIDE = 0
 	SW_SHOWNORMAL = 1
 	SW_NORMAL = SW_SHOWNORMAL
@@ -229,7 +279,7 @@ enum CmdShow: Int32 {
 	SW_SHOW = 5
 	SW_MINIMIZE = 6
 	SW_SHOWMINNOACTIVE = 7
-	SW_SHOWNA = 8
+	SW_SHOWNA = 8 // TODO rename
 	SW_SHOWRESTORE = 9
 	SW_SHOWDEFAULT = 10
 	SW_FORCEMINIMIZE = 11
@@ -256,15 +306,28 @@ class Pixel32 {
 	new () { }
 }
 
+// TODO `declare COLORREF = ByValue<Pixel32>`
+// TODO rename to `Color` and `IndirectColor` (for `DWORD* LPCOLORREF`)
+// Red is `0x000000FF`
+// TODO comments like AKA `COLORREF` and esp. for types like DWORD
+declare COLORREF = UInt32
+
 @struct
 class WindowFramebuffer {
 	// TODO map them again onto process memory space (<2Gb on 32 bit)
 	var pixels UInt64 // ArrayPointer<ByValue<Pixel32>>
 	var width UInt32
 	var height UInt32
+	// TODO rethink
+	var ownerWindowId UInt64
+	var renderSequence UInt32
+
+	// CLIP?
 }
 
+// TODO @packed
 @struct
+@sizeOf(48) // TODO
 class DIALOGINFO {
 	var hwndFocus HWnd
 	var hUserFont HFont
@@ -273,4 +336,224 @@ class DIALOGINFO {
 	var yBaseUnit UInt32
 	var idResult Int32
 	var flags UInt32
+}
+
+@packed
+@struct
+@sizeOf(48) // TODO
+class CREATESTRUCT {
+	var lpCreateParams LParam
+	var hInstance HInstance
+	var hMenu HMenu
+	var hwndParent HWnd
+	var cy Int32
+	var cx Int32
+	var y Int32
+	var x Int32
+	var dwStyle UInt32
+	// TODO wide chars
+	// TODO Hexa idea: `OneOfSizeOfPointer<ConstArrayPointer<ClangWideChar>, ConstArrayPointer<ClangChar>>`
+	var lpszName SizeOfPointer // ConstArrayPointer<ClangWideChar>
+	var lpszClass SizeOfPointer // ConstArrayPointer<ClangWideChar>
+	var dwExStyle UInt32
+
+	// TODO fun asLParam() return this as! LParam
+	new () { }
+}
+
+@struct class LogPalette {
+	var palVersion UInt16
+	var palNumEntries UInt16
+	var palPalEntry ArrayPointer<PalEntry>
+	new () { }
+}
+
+// TODO rename to `PaletteEntry`
+@struct class PalEntry {
+	var peRed UInt8
+	var peGreen UInt8
+	var peBlue UInt8
+	var peFlags UInt8
+	new () { }
+}
+
+enum HandleType : UInt16 {
+	HInstance = 0xCFA8
+	HIcon = 0xCFA9
+	HBrush = 0xCFAA
+	HCursor = 0xCFAB
+	HLocal = 0xCFAC
+	HGlobal = 0xCFAD
+	HWnd = 0xCFAE
+	HMenu = 0xCFAF
+	HDc = 0xCFB0
+	HFont = 0xCFB1
+	HRsrc = 0xCFB2
+	HMonitor = 0xCFB3
+	HModule = 0xCFB4
+	HBitmap = 0xCFB5
+	HPen = 0xCFB6
+	HRgn = 0xCFB7
+	HPalette = 0xCFB8
+}
+
+@struct class HandleTypeHolder {
+	let handleType HandleType
+}
+
+// TODO inherit from HandleTypeHolder
+@struct class Pen {
+	let handleType HandleType = HandleType.HPen
+	var style Int32
+	var width Int32
+	var color COLORREF
+	new () { }
+}
+
+@struct class LogPen {
+	var lopnStyle UInt32
+	var lopnWidth ByValue<Point> // Only x is used for width
+	var lopnColor COLORREF
+	new () { }
+}
+
+@struct class Brush {
+	let handleType HandleType = HandleType.HBrush
+	var pattern HBitmap? = null
+	var color COLORREF = 0u32
+	new () { }
+}
+
+// TODO rename BITMAP to Bitmap and add to namespace `Gdi`
+@struct class BITMAP {
+	var bmType Int32
+	var bmWidth Int32
+	var bmHeight Int32
+	var bmWidthBytes Int32
+	var bmPlanes Int16
+	var bmBitsPixel Int16
+	var bmBits SizeOfPointer
+	new () { }
+}
+
+@packed
+@struct class BITMAPINFOHEADER {
+	var biSize UInt32
+	var biWidth Int32
+	var biHeight Int32
+	var biPlanes UInt16
+	var biBitCount UInt16
+	var biCompression UInt32
+	var biSizeImage UInt32
+	var biXPelsPerMeter Int32
+	var biYPelsPerMeter Int32
+	var biClrUsed UInt32
+	var biClrImportant UInt32
+	new () { }
+}
+
+@packed
+@struct class RGBQUAD {
+	var rgbBlue UInt8
+	var rgbGreen UInt8
+	var rgbRed UInt8
+	var rgbReserved UInt8
+	new () { }
+}
+
+@struct class BITMAPINFO {
+	var bmiHeader ByValue<BITMAPINFOHEADER>
+	var bmiColors ArrayByValue<RGBQUAD, 1>
+	new () { }
+}
+
+// TODO move to `typesUser.hexa`, `typesGdi.hexa` etc
+@struct class MINMAXINFO {
+	var ptReserved ByValue<Point>
+	var ptMaxSize ByValue<Point>
+	var ptMaxPosition ByValue<Point>
+	var ptMinTrackSize ByValue<Point>
+	var ptMaxTrackSize ByValue<Point>
+	new () { }
+}
+
+enum ROP2 : Int32 {
+	R2_BLACK = 1
+	R2_COPY_PEN = 13
+	R2_MASK_NOT_PEN = 3
+	R2_MASK_PEN = 9
+	R2_MASK_PEN_NOT = 5
+	R2_MERGE_NOT_PEN = 12
+	R2_MERGE_PEN = 15
+	R2_MERGE_PEN_NOT = 14
+	R2_NOP = 11
+	R2_NOT = 6
+	R2_NOT_COPY_PEN = 4
+	R2_NOT_MASK_PEN = 8
+	R2_NOT_MERGE_PEN = 2
+	R2_NOT_XOR_PEN = 10
+	R2_WHITE = 16
+	R2_XOR_PEN = 7
+}
+
+// TODO rename to `DrawingContext` and add to namespace `Gdi`
+@struct class DC {
+	let handleType HandleType = HandleType.HDc
+
+	// Selectable objects
+	var hPalette HPalette = null
+	var hBitmap HBitmap = null
+	var hBrush HBrush = null
+	var hFont HFont = null
+	var hPen HPen = null
+	var hRgn HRgn = null
+
+	var penPosX Int32 = 0
+	var penPosY Int32 = 0
+
+	// Framebuffer
+	// var fb WindowFramebuffer?
+	var fb ByValue<WindowFramebuffer>
+
+	// Client area
+	let width UInt16
+	let height UInt16
+
+	var textColor COLORREF = 0x000000 as! COLORREF // Black
+	var bkColor COLORREF = 0xFFFFFF as! COLORREF // White
+	/// This brush is created on-demand to be used by the functions that cannot work directly with COLORREF
+	var bkBrush HBrush = null
+	var brushOrgX Int32 = 0
+	var brushOrgY Int32 = 0
+	var rop2 ROP2 = ROP2.R2_COPY_PEN
+
+	new () { }
+}
+
+// Define the Bitmap structure to hold DIB data
+@struct
+class Bitmap {
+	let handleType HandleType = HandleType.HBitmap
+	var width Int32
+	var height Int32
+	var bitsPerPixel Int16
+	var bytesPerRow Int32
+	var bits ArrayPointer<UInt8>
+	var colorTable ArrayPointer<ByValue<RGBQUAD>>
+	var colorTableSize UInt32
+	var isTopDown Bool
+	new () { }
+}
+
+@struct
+class FILETIME {
+	var dwLowDateTime UInt32
+	var dwHighDateTime UInt32
+	new () { }
+}
+
+@struct
+class LARGE_INTEGER {
+	var quadPart Int64
+	new () { }
 }
