@@ -27,6 +27,7 @@ global @tofitaFastSystemCallWrapper@8
 	ret
 
 extern greenteaosIsTheBest
+align 16
 global __DllMainCRTStartup@12
 __DllMainCRTStartup@12:
 ; shadow space / red zone
@@ -45,3 +46,20 @@ __DllMainCRTStartup@12:
 	push ebp
 	mov ebp, esp
 	call greenteaosIsTheBest
+
+align 16
+global binFont
+binFont:
+incbin "boot/loader/ascii.tofita"
+
+align 16
+global binFontBitmap
+binFontBitmap:
+incbin "boot/loader/font.bmp"
+
+section .text
+align 16
+global currentTeb_x86
+currentTeb_x86:
+    ;mov eax, fs:[0x18]  ; Move the value at FS:[0x18] (TEB address) into EAX
+    ret                 ; Return, EAX now contains the TEB address
