@@ -217,6 +217,9 @@ fun engineInit(params UefiPayload) {
 		guiThreadFrame.sp = guiStack.ref as! UInt64 + stackSizeForEngineThread
 		guiThreadFrame.ss = Selector.SYS_DATA32_SEL
 
+		guiThreadFrame.es = Selector.SYS_DATA32_SEL
+		guiThreadFrame.ds = Selector.SYS_DATA32_SEL
+
 		// TODO gs/fs
 	}
 
@@ -230,6 +233,9 @@ fun engineInit(params UefiPayload) {
 		engineThreadFrame.cs = Selector.SYS_CODE64_SEL
 		engineThreadFrame.sp = engineStack as! UInt64 + stackSizeForEngineThread
 		engineThreadFrame.ss = Selector.SYS_DATA32_SEL
+
+		engineThreadFrame.es = Selector.SYS_DATA32_SEL
+		engineThreadFrame.ds = Selector.SYS_DATA32_SEL
 
 		// TODO gs/fs
 	}
