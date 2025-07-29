@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -385,6 +385,8 @@ class ACPIParser {
 		localApicOut(lapic_ldr, 0x01000000) // All CPUs use logical id 1
 		localApicOut(lapic_svr, 0x100u32 | 0xff) // Configure Spurious Interrupt Vector Register
 
+		// TODO FORMAT
+		// let virtualIoApic = wholePhysicalStart + ((uint64_t) 33 *(uint64_t) 1024 *(uint64_t) 1024 *(uint64_t) 1024)
 		let virtualIoApic = wholePhysicalStart + (33u64 * 1024u64 * 1024u64 * 1024u64)
 		var physicalIoApic = 0u64
 
@@ -504,7 +506,9 @@ class ACPIParser {
 					let flags = readFromUInt8(position + 4)
 
 					if bsp == cpuid {
-						// TODO break // TODO Hexa
+						// TODO break // TODO Hexa doc how to break early (to func) haxe break for?
+						// TODO idea: break does break from `case` when in `switch`, not outer loops
+						// ^ error when `break` is not within `if`
 					}
 
 					if (flags & 0x1) == 0 {
