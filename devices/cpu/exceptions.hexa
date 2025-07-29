@@ -26,6 +26,7 @@ fun engineThreadLoop() {
 	}
 }
 
+// This function should not depend on automatic memory management because it yields explicitly
 fun exceptionHandler(frame InterruptFrame) {
 	// Page fault
 	@volatile var cr2 UInt64 = 0
@@ -37,7 +38,7 @@ fun exceptionHandler(frame InterruptFrame) {
 		@volatile let process TofitaProcess = processes[currentProcess]
 		process.schedulable = false
 		process.syscallToHandle = TofitaSyscalls.Cpu
-		process.cr2PageFaultAddress = cr2
+		process.cr2PageFaultAddress = cr2 // TODO only when page fault
 		switchToEngineThread(frame)
 	} else if currentThread == ThreadKind.THREAD_ENGINE or currentThread == ThreadKind.THREAD_GUI {
 		// SEH
@@ -52,7 +53,7 @@ fun exceptionHandler(frame InterruptFrame) {
 
 		// TODO re-enable serial here
 		// disableSerial = no
-		serialPrintf("\n\n<Tofita> Non-SEH exception\n")
+		serialPrintf("\n\n<Tofita> Non-SEH exception with IP at %8\n", frame.ip)
 
 		if currentThread == ThreadKind.THREAD_GUI {
 			serialPrintf("Current context: THREAD_GUI\n")
@@ -75,7 +76,6 @@ fun exceptionHandler(frame InterruptFrame) {
 		if frame.index == 13 {
 			serialPrintf("Event: #GPF [General Protection Fault]\n")
 			serialPrintf("Seems like trying to execute non-executable or write into write-protected memory\n")
-			serialPrintf("IP at %8\n", frame.ip)
 		}
 
 		// TODO `@noCapture` on `fun engineThreadLoop`
