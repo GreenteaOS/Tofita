@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+// TODO rename to context.hexa
 @struct @sizeOf(0xb0 + 128)
 class InterruptFrame {
 	// SSE
@@ -37,10 +38,18 @@ class InterruptFrame {
 	@volatile var rcxArg0 UInt64
 	@volatile var raxReturn UInt64
 
-	// IRQ index
+	@volatile var fs Selector // 32-bit PEB
+	@volatile var gs Selector // 64-bit PEB
+	@volatile var es Selector // 64-bit PEB
+	@volatile var ds Selector // 64-bit PEB
+
+	// NOTE: DO NOT ADD NEW FIELDS HERE
+	// Memory beyond this line is managed by the CPU
+
+	/// IRQ index (for example 0x0E is page fault)
 	@volatile var index UInt64
 
-	// IRQ error code
+	/// IRQ error code
 	@volatile var code UInt64
 
 	@volatile var ip UInt64 // Instruction pointer
@@ -48,8 +57,11 @@ class InterruptFrame {
 	@volatile var flags UInt64 // RFLAGS\EFLAGS (same on AMD64 and x86)
 	@volatile var sp UInt64 // Stack pointer
 	@volatile var ss Selector // Stack segment
-	@volatile var fs Selector // 32-bit PEB
-	@volatile var gs Selector // 64-bit PEB
+
+	// NOTE: DO NOT ADD NEW FIELDS HERE
+	// There's no memory anymore, this is the very beginning of the stack itself
+	// TODO just sync it with asm
+	// var padding ArrayByValue<UInt8, 128>
 
 	new ()
 }

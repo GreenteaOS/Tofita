@@ -25,6 +25,7 @@
 %define CODE (USER_CODE64_SEL + 3)
 %define CODEWoW (USER_CODE32_SEL + 3)
 
+; TODO remove this or repurpose into from-engine-to-user callbacks
 global enterUserMode; 64-bit mode
 enterUserMode:
 	cli
@@ -78,6 +79,7 @@ enterEngineMode:
 .ret:
 	ret
 
+; TODO this is unused now
 global selectSegment
 ; TODO set COMPAT_SEL as func agrument
 ; TODO set also SS
@@ -129,7 +131,7 @@ struc InterruptFrame
 .r12     resq 1
 .r11     resq 1
 .r10     resq 1
-.r9      resq 1
+.r9      resq 1; TODO rename to r09 for good look (at hexa side too) and all docs
 .r8      resq 1
 
 .rdi     resq 1
@@ -140,18 +142,26 @@ struc InterruptFrame
 .rcx     resq 1
 .rax     resq 1
 
+.fs      resq 1
+.gs      resq 1
+.es      resq 1
+.ds      resq 1
+
+; Pushed by the interrupt handler
 .index   resq 1
+; Pushed by CPU when available, otherwise 0 pushed by the interrupt handler
 .code    resq 1
+; Pushed by CPU
 .ip      resq 1
 .cs      resq 1
 .flags   resq 1
 .sp      resq 1
 .ss      resq 1
-.fs      resq 1
-.gs      resq 1
+; NOTE: DO NOT ADD NEW FIELDS HERE
 endstruc
+; InterruptFrame_size
 
-registerStorageSize equ (0x78 + 128)
+registerStorageSize equ (InterruptFrame_size - (8 * 7)); Subtract CPU-managed registers and .index
 
 %macro pushAllRegisters 0
 	sub rsp, registerStorageSize
@@ -182,6 +192,20 @@ registerStorageSize equ (0x78 + 128)
 	movaps [rsp + InterruptFrame.xmm5], xmm5
 	movaps [rsp + InterruptFrame.xmm6], xmm6
 	movaps [rsp + InterruptFrame.xmm7], xmm7
+	; TODO up to xmm15
+
+	; Segment selectors
+	xor rax, rax; Zero-extend aka fill unused bits by `ax` with 0-s
+	mov ax, ds
+	mov [rsp + InterruptFrame.ds], ax
+	mov ax, es
+	mov [rsp + InterruptFrame.es], ax
+	mov ax, fs
+	mov [rsp + InterruptFrame.fs], ax
+	mov ax, gs
+	mov [rsp + InterruptFrame.gs], ax
+
+	; TODO AVX when supported by the CPU
 %endmacro
 
 %macro popAllRegisters 0
@@ -211,24 +235,32 @@ registerStorageSize equ (0x78 + 128)
 	movaps xmm5, [rsp + InterruptFrame.xmm5]
 	movaps xmm6, [rsp + InterruptFrame.xmm6]
 	movaps xmm7, [rsp + InterruptFrame.xmm7]
+	; TODO up to xmm15
+
+	; Segment selectors
+	mov fs, [rsp + InterruptFrame.fs]
+	mov gs, [rsp + InterruptFrame.gs]
+	mov es, [rsp + InterruptFrame.es]
+	mov ds, [rsp + InterruptFrame.ds]; TODO probably useless, just use ss?
 
 	add rsp, registerStorageSize
 %endmacro
 
-; TODO disabling this may disallow syscals from the engine mode
+; TODO disabling this may disallow syscalls from the engine mode
 ; but better perf? (except for yield)
 %macro swapGsIfRequired 0
+	; check the privilege level of the code that was running before the interrupt
 	mov rax, [rsp + InterruptFrame.cs]
 	and rax, 0x03
 	cmp rax, 0x03
+	;test al, 3
+	;test byte [rsp + InterruptFrame.cs], 3
 	jne .noSwapGs
+	; we are came from the user mode and need to set engine registers
 	swapgs
 
-	; TODO save/restore DS and ES, etc?
-	mov ds, [rsp + InterruptFrame.ss]
-	mov fs, [rsp + InterruptFrame.fs]
-	mov gs, [rsp + InterruptFrame.gs]
 .noSwapGs:
+	; means we are called from engine mode
 %endmacro
 
 %macro defineIRQHandler 2
@@ -238,6 +270,8 @@ global %2
 	pushAllRegisters
 	swapGsIfRequired
 
+	; rcx - first argument - (uint64_t)InterruptFrame
+	; Basically use the stack as a register file
 	mov rcx, rsp
 	push 0
 	push 0
@@ -249,6 +283,7 @@ global %2
 	pop rcx
 	pop rcx
 	pop rcx
+	; TODO maybe just inline it or make a macro
 	jmp irqHandlerReturn
 %endmacro
 
@@ -260,6 +295,9 @@ irqHandlerReturn:
 	add rsp, 16
 	iretq
 
+; %1 - IRQ code
+; %2 - name of IRQ
+; %3 - jmp to handler
 %macro defineIRQ 3
 	global %2
 	%2:
@@ -271,7 +309,8 @@ irqHandlerReturn:
 %macro defineIRQwithErrCode 3
 	global %2
 	%2:
-		; Error is pushed onto the stack
+		; Error is already pushed onto the stack by the CPU
+		; Assumed `push error` is done by the CPU
 		push %1; TODO single global handler?
 		jmp %3
 %endmacro
