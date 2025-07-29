@@ -148,6 +148,10 @@
             border-radius: 4px;
             transition: background-color 0.2s ease;
             cursor: pointer;
+
+            /* Performance */
+            overflow: hidden;
+            height: 21px;
         }
 
         .log-line:nth-child(even) {
@@ -161,6 +165,10 @@
         /* 4. Style for selected lines */
         .log-line.selected {
             background-color: var(--selected-bg) !important;
+        }
+
+        .log-line.hidden {
+            display: none;
         }
 
         /* 7. Syntax Highlighting Styles */
@@ -181,6 +189,8 @@
         #logContainer::-webkit-scrollbar-track { background: var(--panel-bg-alt); border-radius: 8px; }
         #logContainer::-webkit-scrollbar-thumb { background-color: #555; border-radius: 10px; border: 3px solid var(--panel-bg-alt); }
         #logContainer::-webkit-scrollbar-thumb:hover { background-color: #777; }
+
+        #logLines { overflow: hidden; width: 100%; }
     </style>
 </head>
 <body>
@@ -202,7 +212,7 @@
         <button id="clearLogButton" disabled>Clear Log</button>
     </div>
 
-    <div id="logContainer">Check Chrome Developer Tools Console, or press "Use HTML Instead".</div>
+    <div id="logContainer"><div id="logLines">Check Chrome Developer Tools Console, or press "Use HTML Instead".</div></div>
 
     <script type="text/javascript">
     (function() {
@@ -210,7 +220,7 @@
         const modeToggleButton = document.getElementById('modeToggle');
         const filterInput = document.getElementById('filterInput');
         const highlightInput = document.getElementById('highlightInput');
-        const logContainer = document.getElementById('logContainer');
+        const logContainer = document.getElementById('logLines');
         const clearLogButton = document.getElementById('clearLogButton');
         const clearFilterButton = document.getElementById('clearFilterButton');
         const clearHighlightButton = document.getElementById('clearHighlightButton');
@@ -249,13 +259,7 @@
             // 6. Update placeholder with log count
             filterInput.placeholder = logLinesCache.length > 1? `Filter ${logLinesCache.length} lines...` : `Filter logs...`;
 
-            const fragment = document.createDocumentFragment();
-
             let linesToRender = logLinesCache;
-
-            if (filterText.length >= 2) {
-                linesToRender = logLinesCache.filter(line => line.contentLowerCase.includes(filterText));
-            }
 
             linesToRender.forEach(lineObj => {
                 const lineDiv = lineObj.div;
@@ -264,6 +268,10 @@
 
                 if (selectedLineIds.has(lineObj.id)) {
                     lineDiv.classList.add('selected');
+                }
+
+                if (filterText.length >= 2 && !lineObj.contentLowerCase.includes(filterText)) {
+                    lineDiv.classList.add('hidden');
                 }
 
                 let line = lineObj.content;
@@ -279,15 +287,24 @@
 
                 let lineHTML = highlightSyntax(line);
 
-                lineDiv.innerHTML = lineHTML;
-                fragment.appendChild(lineDiv);
+                if (lineObj.html != lineHTML) lineDiv.innerHTML = lineHTML;
+                if (lineObj.html == null) logContainer.appendChild(lineDiv);
+                lineObj.html = lineHTML;
             });
 
+
+            // Optimization
+            let height = 0
+            linesToRender.forEach(lineObj => {
+                const lineDiv = lineObj.div;
+            	if (!lineDiv.classList.contains('hidden')) height += 21
+            })
+            logContainer.style.height = height + 'px'
+
+            // TODO force recompute (use fragment/div?)
             const scrollAtBottom = logContainer.scrollHeight - logContainer.clientHeight <= logContainer.scrollTop + 1;
 
-            logContainer.innerHTML = '';
-            logContainer.appendChild(fragment);
-
+            // TODO fix auto scrolling (when on the bottom)
             if (scrollAtBottom) {
                 logContainer.scrollTop = logContainer.scrollHeight;
             }
@@ -332,6 +349,10 @@
 
         clearLogButton.addEventListener('click', () => {
             if (useHTML) {
+            	logLinesCache.forEach(lineObj => {
+	                const lineDiv = lineObj.div;
+	                lineDiv.parentNode.removeChild(lineDiv);
+	            });
                 logLinesCache = [];
                 selectedLineIds.clear();
                 nextLogId = 0;
@@ -360,6 +381,7 @@
         		this.content = content;
         		this.contentLowerCase = content.toLowerCase();
         		this.div = document.createElement('div');
+        		this.html = null;
         	}
         }
 
