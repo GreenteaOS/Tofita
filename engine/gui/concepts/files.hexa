@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -152,7 +152,8 @@ class Files {
 		let screenHeight = Screen.height
 		let screenPixels = Screen.pixels
 
-		// TODO function like `setBitmapAsCurrentScreen()`
+		// TODO function like `setBitmapAsCurrentScreen()` + ensure its thread safe and multi-task safe
+		// ^ yeah better just pass fb to functions or turn it into a class
 		Screen.width = window.width
 		Screen.height = window.height
 		Screen.pixels = window.fbZeta.pixels
@@ -180,6 +181,33 @@ class Files {
 			color.ref
 		)
 
+		// Left panel with shortcuts
+		color.ref.rgba.ref.a = 100
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
+		if Theme.reduceTransparency {
+			drawRectangleWithAlpha(
+				color.ref,
+				0,
+				32i16,
+				zone.relativeX + 0u16,
+				zone.height + 0u16
+			)
+		} else {
+			// TODO due to usage of local framebuffer target, this effect here does not respect window
+			// coordinates, this must be implemented
+			drawVibrancedRectangle(
+				0,
+				32i16,
+				zone.relativeX + 0u16,
+				zone.height + 0u16,
+				darkTheme
+			)
+		}
+
+		// The shortcuts
+		// TODO dimmed tone for `reduceTransparency` case
+		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0xFFu8
+
 		drawText("Desktop", 34, zone.relativeY + 9i16 + 6i16, color.ref)
 		drawBitmap32WithAlpha(startSearchOutIcon, 6i16, zone.relativeY + 8i16)
 
@@ -190,21 +218,13 @@ class Files {
 		drawText("Downloads", 34, zone.relativeY + offset * 2 + 9i16 + 6i16, color.ref)
 		drawBitmap32WithAlpha(startSearchOutIcon, 6i16, zone.relativeY + offset * 2 + 8i16)
 
+		// Bottom right corner
 		drawBitmap32WithAlpha(startSearchOutIcon, window.width + 2 - 32i16, window.height - 28i16)
 		drawBitmap32WithAlpha(startSearchOutIcon, window.width + 2 - 58i16, window.height - 28i16)
 
 		drawItems(zone.relativeX, zone.relativeY, zone.width, zone.height)
 		color.ref.color = 0x126099FF
 		drawRectangleOutline(color, zone.relativeX, zone.relativeY, zone.width + 1u16, zone.height + 0u16)
-		color.ref.rgba.ref.a = 100
-		color.ref.rgba.ref.r = color.ref.rgba.ref.g = color.ref.rgba.ref.b = 0x61u8
-		drawRectangleWithAlpha(
-			color.ref,
-			0,
-			32i16,
-			zone.relativeX + 0u16,
-			zone.height + 0u16
-		)
 
 		Screen.width = screenWidth
 		Screen.height = screenHeight
