@@ -15,23 +15,43 @@
 
 bits 64
 default rel
-section .head
+section .text
 
 ; LLVM generates jmp instead of call
 ; so we have to use this function in NASM
 
+align 16
 global tofitaFastSystemCallWrapper
 tofitaFastSystemCallWrapper:
 	int 0x80
 	ret
 
 extern greenteaosIsTheBest
+align 16
 global _DllMainCRTStartup
 _DllMainCRTStartup:
 ; shadow space / red zone
-	push 0
-	push 0
-	push 0
-	push 0
+	mov rbp, 0
+	push rbp
+	push rbp
+	push rbp
+	push rbp
 	mov rbp, rsp
 	call greenteaosIsTheBest
+
+align 16
+global binFont
+binFont:
+incbin "boot/loader/ascii.tofita"
+
+align 16
+global binFontBitmap
+binFontBitmap:
+incbin "boot/loader/font.bmp"
+
+; TODO
+align 16
+global currentTeb_x64
+currentTeb_x64:
+    ;mov rax, gs:[0x60]  ; Move the value at GS:[0x60] (TEB address) into RAX
+    ret                 ; Return, RAX now contains the TEB address
