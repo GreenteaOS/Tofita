@@ -109,6 +109,26 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 		return true
 	}
 
+	if syscall == TofitaSyscalls.PeekMessage {
+		/* Validate payload to ensure it’s writable, as peekMessage may write to the MSG struct */
+		if not probeForWriteOkay(frame.rdxArg1, sizeOf<PeekMessagePayload>()) {
+			serialPrintf("<> TofitaSyscalls.PeekMessage == not probeForWriteOkay\n")
+			return false
+		}
+
+		let payload = frame.rdxArg1 as! PeekMessagePayload
+
+		/* Log window ID for debugging, consistent with other handlers */
+		// serialPrintf("<> PeekMessage.windowId == %8\n", payload.hwnd)
+
+		/* Call peekMessage to check the message queue; convert result to 0 or 1 */
+		frame.raxReturn = peekMessage(process, payload).toZeroOrOne
+
+		/* PeekMessage is non-blocking, so always keep process schedulable */
+		process.schedulable = true
+		return true
+	}
+
 	if syscall == TofitaSyscalls.PostMessage {
 		if not probeForReadOkay(frame.rdxArg1, sizeOf<PostMessagePayload>()) {
 			return false

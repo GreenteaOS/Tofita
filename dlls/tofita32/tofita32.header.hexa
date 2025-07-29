@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -47,6 +47,8 @@ declare fun tofitaShowWindow(windowId UInt64, nCmdShow CmdShow) Void
 declare fun tofitaGetMessage(payload GetMessagePayload) Bool32
 @dllImport @linkAsIs
 declare fun tofitaPostMessage(payload PostMessagePayload) Bool32
+@dllImport @linkAsIs
+declare fun tofitaPeekMessage(payload PeekMessagePayload) Bool32
 
 // NjRAA
 @dllImport @linkAsIs

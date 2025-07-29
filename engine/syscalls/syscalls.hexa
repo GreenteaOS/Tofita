@@ -38,6 +38,7 @@ enum TofitaSyscalls : UInt32 {
 	ShowWindow = 123002 // TODO auto compute
 	GetMessage = 123003 // TODO auto compute
 	PostMessage = 123004 // TODO auto compute
+	PeekMessage = 123005 // TODO auto compute
 	GetOrCreateWindowFramebuffer = 123006 // TODO auto compute
 	SwapWindowFramebuffer = 123007 // TODO auto compute
 	ExitProcess = 123008 // TODO auto compute
@@ -154,6 +155,22 @@ class GetMessagePayload {
 	var hWnd UInt64 // HWnd
 	var wMsgFilterMin UInt32
 	var wMsgFilterMax UInt32
+	new () { }
+}
+
+@struct @sizeOf(8 * 2 + 4 * 2) // TODO `@packed`
+class PeekMessagePayload {
+	var hwnd UInt64 // HWnd
+	var message Message
+	var wParam UInt64 // WParam
+	var lParam UInt64 // LParam
+	var time UInt32
+	var pt ByValue<Point>
+	var lPrivate UInt32
+
+	var wMsgFilterMin UInt32
+	var wMsgFilterMax UInt32
+	var remove UInt32
 	new () { }
 }
 
