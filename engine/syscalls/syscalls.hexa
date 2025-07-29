@@ -44,6 +44,7 @@ enum TofitaSyscalls : UInt32 {
 	ExitProcess = 123008 // TODO auto compute
 	SetTimer = 123009
 	KillTimer = 123010
+	LazySwap = 123011
 }
 
 // Note: all pointers should be 64-bit even for 32-bit processes
@@ -56,35 +57,63 @@ enum TofitaSyscalls : UInt32 {
 	var entry UInt64 = 0
 	var dllEntries UInt64 = 0
 	var dllCount UInt64 = 0
+	var base UInt64 = 0
 	new () { }
 }
 
+@struct
+// @byValue // TODO Hexa: inherited by others and cancelable by `@byValue(false)`
+// bad idea cause would make also "pointers" being ByValue passing
+class SyscallPayload { }
+
+@struct
+class SyscallResult { }
+
 @struct @sizeOf(8 * 3)
+// TODO Hexa: `class DebugLogPayload SyscallPayload {}` and eliminate all `as! SyscallPayload`
 class DebugLogPayload {
 	// ConstArrayPointer<UInt16>
 	var message UInt64
 	// TODO count chars at user space, and transfer as length for SEH probing
 	var extra UInt64 = 0
 	var more UInt64 = 0
+	/// Address of the caller (i.e. instruction pointer)
+	var caller UInt64 = 0
 	new () { }
 }
 
 @struct @sizeOf(8 * 2)
 class SwapWindowFramebufferPayload {
-	var windowId UInt64
 	var fb UInt64 // WindowFramebuffer
 	new () { }
 }
 
+/// Updates window visual state like position and visibility
+// TODO rename to `SetWindowState`
 @struct @sizeOf(8 * 2)
 class ShowWindowPayload {
-	var nCmdShow CmdShow
+	// TODO `let`
 	var windowId UInt64
+
+	// TODO do not use W32 types in syscalls
+	var nCmdShow CmdShow
+	// TODO `Int?` for unchanged, current is `-1`
+	var x Int32
+	var y Int32
+	var width Int32
+	var height Int32
+	new () { }
+}
+
+@struct @sizeOf(4)
+class ExitProcessPayload {
+	var exitCode Int32
 	new () { }
 }
 
 @struct
 class LParam {
+	// NOTE making function that returns `LParam` to avoid cast makes sense `makeULongParam`
 	static fun makeULong(low UInt16, high UInt16) UInt32 {
 		return ((low & 0xFFFFu32) | ((high & 0xFFFFu32) << 16u32))
 	}
@@ -101,6 +130,8 @@ class LParam {
 		return lParam >> 16u16
 	}
 
+	// NOTE `static fun fromMINMAXINFO` or other way-around
+
 	new () { }
 }
 
@@ -111,23 +142,25 @@ class WParam {
 
 // TODO use pointer wrappers instead of raw pointers
 @struct @sizeOf(8 * 8 + 5 * 4 + 4)
+// TODO Hexa: `class CreateWindowExPayload SyscallPayload {}`
+// TODO rename to CreateWindowPayload
 class CreateWindowExPayload {
 	var wc UInt64 // WindowClass
 	var hWnd UInt64 // HWnd
 
 	// CreateWindowEx
-	var lpClassName UInt64 // ConstArrayPointer<ClangWideChar>
-	// TODO count chars at userspace, and transfer as length for SEH probing
+	// var lpClassName UInt64 // ConstArrayPointer<ClangWideChar>
+	// TODO count chars at user space, and transfer as length for SEH probing
 	var lpWindowName UInt64 // ConstArrayPointer<ClangWideChar>
 	var dwStyle UInt32
 	var x Int32
 	var y Int32
 	var nWidth Int32
 	var nHeight Int32
-	var hWndParent UInt64 // HWnd
-	var hMenu UInt64 // HMenu
-	var hInstance UInt64 // HInstance
-	var lpParam UInt64 // LParam
+	// var hWndParent UInt64 // HWnd
+	// var hMenu UInt64 // HMenu
+	// var hInstance UInt64 // HInstance
+	// var lpParam UInt64 // LParam
 	new () { }
 }
 
