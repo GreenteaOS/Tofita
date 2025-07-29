@@ -119,6 +119,7 @@ fun packAssets(config Config) {
 			fs.readdirSync(path).forEach(fun (file, index) {
 					let curPath = path + "\\" + file
 					let assetFullName = curPath.substr('../Greentea/assets/'.length).split('\\').join('/')
+					// .replace('root/', 'C:/') // TODO format `.` -> `\t.`
 
 					if fs.lstatSync(curPath).isDirectory() {
 						addFolderRecursive(curPath)
@@ -156,12 +157,14 @@ fun packAssets(config Config) {
 	ramDiskSize += 4 // UInt32 ramDiskSize
 	ramDiskSize += 4 // UInt32 assetsCount
 	ramDiskSize += (// struct assetDefinition
+		// TODO FORMAT `(//`
 		// {
 		256 + // var path[256] UInt8
 		4 + // UInt32 size
 		4 // UInt32 offsetFromRamDiskFirstByte // NOT relative to `data`
 		// }
 	) * (assetName.length + folderCount)
+	// TODO FORMAT `) *(`
 	// uint8_t* data
 
 	// Round up to 4 bytes
