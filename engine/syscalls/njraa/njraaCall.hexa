@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bool {
-	@volatile var frame = process.frame
+	@volatile let frame = process.frame
 
 	if syscall == TofitaSyscalls.SwapWindowFramebuffer {
 		// TODO should actually be probe for copy to stack
@@ -22,6 +22,9 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 		// ^ well actually to know proper sizeof code gen would be better
 		// Also: could be locking virtual memory altering syscalls while handling them
 		// Anyway must guard the logic itself in probing, like returning optional null from probeForRead on fail
+
+		// TODO better idea
+		// requestAnimationFrame()
 
 		// TODO Note: temporal page must be engine-only for read and write to avoid
 		// other user *threads* accessing it
@@ -40,10 +43,9 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 			return false
 		}
 
-		var windowId UInt64 = payload.windowId
-
-		var fb = payload.fb as! WindowFramebuffer
-		var window = overlappedWindow_find(process.pid, windowId)
+		let fb = payload.fb as! WindowFramebuffer
+		let windowId UInt64 = fb.ownerWindowId
+		let window = overlappedWindow_find(process.pid, windowId)
 
 		if window == null {
 			return false
@@ -63,6 +65,7 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 				fb.width = window.fbZeta.width
 				fb.height = window.fbZeta.height
 			} else {
+				// Preserve contents cause WAPI is immediate mode over "screen" buffer
 				tmemcpy(window.fbGama.pixels as! ArrayPointer<UInt8>, window.fbZeta.pixels as! ConstArrayPointer<UInt8>, bytes)
 				fb.pixels = window.fbGamaUserAddress
 				fb.width = window.fbGama.width
@@ -73,8 +76,8 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 		}
 
 		// if window != null {
-		// var pixelsEngine = window.fbEngine.pixels
-		// var pixelsUser = window.fbUser.pixels
+		// let pixelsEngine = window.fbEngine.pixels
+		// let pixelsUser = window.fbUser.pixels
 		// let count = window.fbEngine.width * window.fbEngine.height
 		// for i in count
 		// {
@@ -89,6 +92,7 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 
 	if syscall == TofitaSyscalls.GetOrCreateWindowFramebuffer {
 		if not probeForReadOkay(frame.rdxArg1, sizeOf<SwapWindowFramebufferPayload>()) {
+			serialPrintln("TofitaSyscalls.GetOrCreateWindowFramebuffer frame.rdxArg1 probe fail")
 			return false
 		}
 
@@ -96,19 +100,40 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 
 		// TODO probeForWriteOkay alias taking pointer probeForWriteAtOkay
 		if not probeForWriteOkay((payload.fb as! UInt64), sizeOf<WindowFramebuffer>()) {
+			serialPrintln("TofitaSyscalls.GetOrCreateWindowFramebuffer payload.fb probe fail")
 			return false
 		}
 
-		var windowId UInt64 = payload.windowId
+		let fb = payload.fb as! WindowFramebuffer
+		let windowId UInt64 = fb.ownerWindowId
+		let window = overlappedWindow_find(process.pid, windowId)
 
-		var fb = payload.fb as! WindowFramebuffer
-		var window = overlappedWindow_find(process.pid, windowId)
-
+		/*
+			NOTE Hexa:
+			let window = overlappedWindow_find(process.pid, windowId) ?? return {
+				serialPrintf("TofitaSyscalls.GetOrCreateWindowFramebuffer overlappedWindow_find fail windowId=%8\n", windowId)
+				false
+			}
+		*/
 		if window == null {
+			serialPrintf("TofitaSyscalls.GetOrCreateWindowFramebuffer overlappedWindow_find fail windowId=%8\n", windowId)
 			return false
 		}
 
-		// TODO resize fb *here* on window size change
+		// Force resize (aka re-allocation) fb *here* on window size change
+		if let fbZeta = window.fbZeta, let fbGama = window.fbGama, window.width != fbZeta.width or window.height != fbZeta.height {
+			serialPrintln("TofitaSyscalls.GetOrCreateWindowFramebuffer window.fbZeta != null, window.width != fbZeta.width or window.height != fbZeta.height")
+
+			// Free
+			freeBitmap(fbZeta)
+			freeBitmap(fbGama)
+
+			// Nullify
+			window.fbZeta = null
+			window.fbGama = null
+		}
+
+		// Allocate
 		if window.fbZeta == null {
 			let width = window.width
 			let height = window.height
@@ -125,8 +150,8 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 			window.fbGama = allocatePageAlignedBitmap(width, height)
 
 			// TODO 0x0? or use vibrance? describe decision
-			memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
-			memset(window.fbGama.pixels as! ArrayPointer<UInt8>, 0x33, bytes)
+			memset(window.fbZeta.pixels as! ArrayPointer<UInt8>, 0xC0, bytes)
+			memset(window.fbGama.pixels as! ArrayPointer<UInt8>, 0xC0, bytes)
 
 			// window.fbZeta.width = width // TODO client width
 			// window.fbZeta.height = height
@@ -188,6 +213,14 @@ fun njraaCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Bo
 		}
 
 		// frame.raxReturn = 0
+		process.schedulable = true
+		return true
+	}
+
+	if syscall == TofitaSyscalls.LazySwap {
+		// TODO this seemingly works because app renders into current fb: same that is used by compositor!
+		// ^ ensure that app is drawing into BACK-buffer and swap accordingly
+		requestAnimationFrame()
 		process.schedulable = true
 		return true
 	}
