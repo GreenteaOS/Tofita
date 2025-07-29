@@ -500,7 +500,8 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 
 		// Allocate stack
 		{
-			let pages = down_bytes_to_pages(ei.pei.sizeOfStackReserve) + 1u32
+			// TODO Now we add extra pages to the stack, but it must grow dynamically
+			let pages = down_bytes_to_pages(ei.pei.sizeOfStackReserve) + 1u32 + 8u32
 			// TODO rename to `stackPhysical`
 			// TODO rename to `PhysicalAllocator.allocateDirtyPages` for clarity
 			let physical = PhysicalAllocator.allocatePages(pages)
@@ -517,11 +518,13 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 			)
 
 			// TODO yeah use PreZeroed-functions of `PhysicalAllocator`
+			// TODO `pages * pageSize`
 			memset(buffer as! ArrayPointer<UInt8>, 0, ei.pei.sizeOfStackReserve) // Zeroing
 
 			exec.nextBase = exec.nextBase + pages * pageSize
 
-			ei.stackVirtual = buffer
+			// NOTE The stack pointer should point to the end (high address) of the stack
+			ei.stackVirtual = exec.nextBase - 16u64 // TODO is this align actually useful?
 		}
 
 		// Allocate PEB
@@ -706,6 +709,10 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 			demo = loadPe(fullPath: "desktop/cardsnew.dll", root, exec)
 			demo.baseName = "cards.dll"
 			demo.fullName = "C:\\Windows\\System32\\cards.dll"
+		} else {
+			demo = loadPe(fullPath: "desktop/Cards 32-bit/cards.dll", root, exec)
+			demo.baseName = "cards.dll"
+			demo.fullName = "C:\\Windows\\System32\\cards.dll"
 		}
 
 		// TODO resolve in multiple threads (this is readonly operation over list of imports, but not for sections)
@@ -718,7 +725,7 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 		resolveDllImports(comctl32, root)
 		resolveDllImports(shell32, root)
 
-		if is64bit {
+		if true {
 			resolveDllImports(demo, root)
 		}
 
@@ -729,7 +736,7 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 		addDllEntry(dllEntries, gdi32, exec)
 		addDllEntry(dllEntries, user32, exec)
 
-		if is64bit {
+		if true {
 			addDllEntry(dllEntries, demo, exec)
 		}
 
@@ -826,6 +833,7 @@ fun loadExeIntoProcess(file String, process TofitaProcess) {
 			}
 		}
 
+		// TODO Any one looking at this, propose a more unified solution :)
 		if is64 {
 			let exec = new Executable<UInt64, TIB64, PEB64>()
 			exec.nextBase = 0
