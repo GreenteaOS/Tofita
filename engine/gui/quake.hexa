@@ -142,8 +142,8 @@ fun quakeHandleButtonDown(key UInt8) {
 			disableSerial = (disableSerial == 0) ? 1u8 : 0
 			quakePrintf("Command completed. Serial log disabled: %u\n".utf16(), disableSerial)
 		} else if quakeCommand == 'wallpaper' {
-			let a = getRamDiskAsset("root/Windows/Web/Wallpaper/Tofita/alternative.png")
-			wallpaperSource = loadPng32(a)
+			let a = getRamDiskAsset("root/Windows/Web/Wallpaper/Tofita/nostalgia.jpg")
+			wallpaperSource = loadJpeg32(a)
 			if wallpaperSource.width == 0 or wallpaperSource.height == 0 {
 				quakePrintf("Color palette format unsupported for the provided image file.\n".utf16())
 			} else {
