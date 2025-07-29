@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -98,18 +98,21 @@ class GraphicalSession {
 			new Files(file)
 			return
 		}
-
+		// TODO .dll This is a system file used by the apps.
 		if file.endsWith(".exe") {
 			let newProcess TofitaProcess = processCreate()
 			processInit(newProcess)
 			loadExeIntoProcess(file, newProcess)
 			newProcess.name = displayName
+			newProcess.icon16 = app16
+
+			let icon = getExeIconFromPath(file, 16)
+			if icon != null {
+				newProcess.icon16 = icon as! Bitmap32
+			}
 
 			if not file.endsWith('demo32.exe') and not file.endsWith('demo64.exe') {
-				newProcess.schedulable = false
-				alert(
-					"App requires features that are not yet fully supported. Try another."
-				)
+				newProcess.schedulable = true
 			} else {
 				newProcess.schedulable = true
 			}
@@ -551,12 +554,9 @@ fun startPinHandler(id UInt64, event ColliderEventType) Void {
 
 fun hintOfFile(id UInt64) String {
 	let shortcut = desktopShortcuts[id]
-	let asset = getRamDiskAsset(shortcut.file)
 
-	if asset.data != null /* TODO , asset.data.length > 0 */ {
-		// TODO more + comma separators
-		// TODO folder size 1 depth + `or more` / `and 5 nested folders`
-		return "Size: " + asset.size + " bytes"
+	if shortcut == null {
+		return "Right click for more"
 	}
 
 	// TODO `case (computed_filesShortcutPath_let):`
@@ -570,6 +570,14 @@ fun hintOfFile(id UInt64) String {
 
 	if shortcut.file == "*:quake" {
 		return "Console"
+	}
+
+	let asset = getRamDiskAsset(shortcut.file)
+
+	if asset.data != null /* TODO , asset.data.length > 0 */ {
+		// TODO more + comma separators
+		// TODO folder size 1 depth + `or more` / `and 5 nested folders`
+		return "Size: " + asset.size + " bytes"
 	}
 
 	// TODO hint for folders
