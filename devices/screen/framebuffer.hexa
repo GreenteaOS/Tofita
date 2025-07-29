@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -55,6 +55,11 @@ fun allocatePageAlignedBitmap(width UInt32, height UInt32) Bitmap32 {
 	return result as! Bitmap32
 }
 
+fun freeBitmap(bitmap Bitmap32) Void {
+	PhysicalAllocator.freeBytes(bitmap.pixels as! UInt64, sizeOf<Pixel32>() * bitmap.width * bitmap.height)
+	PhysicalAllocator.freeBytes(bitmap as! UInt64, sizeOf<Bitmap32Interim>())
+}
+
 fun setFramebuffer(framebuffer FrameBuffer) {
 	_framebuffer = framebuffer
 	// TODO make clearer that this will be overwritten
@@ -107,6 +112,20 @@ fun setPixel(x Int64, y Int64, pixel ByValue<Pixel32>) {
 	}
 }
 
+fun getPixel(x Int64, y Int64) ByValue<Pixel32> {
+	let vibrance = vibranceLight
+	if (x < Screen.width) and (y < Screen.height) and (x >= 0) and (y >= 0) {
+		return vibrance.pixels[y * Screen.width + x]
+		return wallpaper.pixels[y * Screen.width + x]
+		return Screen.pixels[y * Screen.width + x]
+	}
+
+	// TODO Hexa: ensure its zero-initialized
+	// `return ByValue<Pixel32>()`
+	var fallback = ByValue<Pixel32>()
+	return fallback
+}
+
 fun drawBitmap32WithAlpha(bitmap Bitmap32, x Int16, y Int16) {
 	for yy in bitmap.height {
 		for xx in bitmap.width {
@@ -128,6 +147,19 @@ fun drawBitmap32(bitmap Bitmap32, x Int16, y Int16) {
 	for yy in (yStart as! UInt32) ... bitmap.height {
 		let stride = yy * bitmap.width
 		let screenStride = (y + yy) * Screen.width
+
+		// Copy entire scanline using `memcpy` if possible
+		if x >= 0 and x + bitmap.width <= Screen.width and y + yy < Screen.height { // ???
+			memcpy(
+				// TODO Hexa: lmao `+ 0` casts to an expected int type
+				Screen.pixels.offsetItems(screenStride + x + 0) as! ArrayPointer<UInt8>,
+				bitmap.pixels.offsetItems(stride) as! ConstArrayPointer<UInt8>,
+				(bitmap.width * sizeOf<UInt32>()) as! Int
+			)
+
+			continue
+		}
+
 		for xx in (xStart as! UInt32) ... bitmap.width {
 			// TODO save scanline check to Bool and evaluate eagerly
 			if x + xx > Screen.widthMinusOne or y + yy > Screen.heightMinusOne {
@@ -135,6 +167,56 @@ fun drawBitmap32(bitmap Bitmap32, x Int16, y Int16) {
 				continue
 			}
 			Screen.pixels[screenStride + x + xx] = bitmap.pixels[stride + xx]
+			// setPixel(x + xx, y + yy, bitmap.pixels[stride + xx])
+		}
+	}
+}
+
+fun max(a Int16, b Int16) Int16 {
+	return a > b? a : b
+}
+
+fun min(a Int16, b Int16) Int16 {
+	return a < b? a : b
+}
+
+fun drawBitmap32_(bitmap Bitmap32, x Int16, y Int16) {
+	// Precompute clipping boundaries
+	let xStart = max(0, -x) as! UInt16
+	let yStart = max(0, -y) as! UInt16
+	let xEnd = min(bitmap.width as! Int16, Screen.width - x) as! UInt16
+	let yEnd = min(bitmap.height as! Int16, Screen.height - y) as! UInt16
+	let xEnd = min(bitmap.width as! Int16, max(0, Screen.width - x)) as! UInt16
+	let yEnd = min(bitmap.height as! Int16, max(0, Screen.height - y)) as! UInt16
+
+	// Early exit if bitmap is completely off-screen
+	if xStart >= bitmap.width or yStart >= bitmap.height or x + xEnd <= 0 or y + yEnd <= 0 {
+		return
+	}
+
+	// Precompute initial offsets
+	let screenBase = (y + yStart) * Screen.width + x
+	let bitmapBase = yStart * bitmap.width
+	let screenBase = y * Screen.width + x
+	let bitmapBase = yStart * bitmap.width
+
+	// Process each row
+	for yy in yStart ... yEnd {
+		let bitmapOffset = bitmapBase + yy * bitmap.width
+		let screenOffset = screenBase + yy * Screen.width
+
+		// Copy entire scanline using `memcpy` if possible
+		if xStart == 0 and xEnd == bitmap.width {
+			memcpy(
+				Screen.pixels.offsetItems(screenOffset) as! ArrayPointer<UInt8>,
+				bitmap.pixels.offsetItems(bitmapOffset) as! ConstArrayPointer<UInt8>,
+				(bitmap.width * sizeOf<UInt32>()) as! Int
+			)
+		} else {
+			// Fallback to per-pixel copy for clipped regions
+			for xx in xStart ... xEnd {
+				// Screen.pixels[screenOffset + xx] = bitmap.pixels[bitmapOffset + xx]
+			}
 		}
 	}
 }
@@ -155,14 +237,39 @@ fun drawRectangle(color ByValue<Pixel32>, x Int16, y Int16, width UInt16, height
 	}
 }
 
-fun drawRectangleOutline(color ByValue<Pixel32>, x Int16, y Int16, width UInt16, height UInt16) {
+fun drawRectangleOutlinex(color ByValue<Pixel32>, x Int16, y Int16, width UInt16, height UInt16) {
+	// TODO Ha-ha wait, why I made it this slow lmao
 	for yy in height {
 		for xx in width {
-			// Rendering left and far right points sequentally should be
+			// Rendering left and far right points sequentially should be
 			// better for cache-locality than vertical lines
 			// At least this is true for small rectangles (like buttons)
 			if yy == 0 or xx == 0 or xx == width - 1 or yy == height - 1 {
 				setPixel(x + xx, y + yy, color)
+			}
+		}
+	}
+}
+
+fun drawRectangleOutline(color ByValue<Pixel32>, x Int16, y Int16, width UInt16, height UInt16) {
+	for yy in height {
+		for xx in width {
+			if yy == 0 or xx == 0 or xx == width - 1 or yy == height - 1 {
+				// TODO `cannot take the address of an rvalue`
+				// `color.ref.rgba.ref.r = getPixel(x + xx - 1, y + yy).ref.rgba.ref.r`
+				// `color.ref.rgba.ref.g = getPixel(x + xx, y + yy).ref.rgba.ref.g`
+				// `color.ref.rgba.ref.b = getPixel(x + xx + 1, y + yy).ref.rgba.ref.b`
+
+				let pixel = getPixel(x + xx - 1, y + yy)
+				color.ref.rgba.ref.r = pixel.ref.rgba.ref.r
+				let pixel = getPixel(x + xx, y + yy)
+				color.ref.rgba.ref.g = pixel.ref.rgba.ref.g
+				let pixel = getPixel(x + xx + 1, y + yy)
+				color.ref.rgba.ref.b = pixel.ref.rgba.ref.b
+
+				//setPixel(x + xx, y + yy, color)
+				color.ref.rgba.ref.a = 128
+				blendPixel(x + xx, y + yy, color.ref)
 			}
 		}
 	}
