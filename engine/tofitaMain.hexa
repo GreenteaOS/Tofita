@@ -39,7 +39,7 @@ void *malloc(uint64_t bytes) {
 	return (void *)HeapAllocAt(1, "unsafe", "unsafe", 1, 1, bytes);
 	// TODO return (void *)PhysicalAllocator_$allocateBytes_(((bytes - 1) | 15) + 1);
 };
-function memcpy(void *dest, const void *src, uint64_t n);
+#define tmemcpy memcpy
 int32_t wcslen(const wchar_t *string_) { // TODO needed?
 	int32_t i = 0;
 	while (string_[i] != '\0')
@@ -66,6 +66,7 @@ function memzero(void *dest, uint64_t len) {
 	memset(dest, 0, len);
 }
 
+// TODO rename to "volatileCopy"
 void vmemcpy(volatile void *dest, const volatile void *src, volatile uint64_t count) {
 	uint8_t *dst8 = (uint8_t *)dest;
 	uint8_t *src8 = (uint8_t *)src;
@@ -73,6 +74,47 @@ void vmemcpy(volatile void *dest, const volatile void *src, volatile uint64_t co
 	while (count--) {
 		*dst8++ = *src8++;
 	}
+}
+
+void *tmemcpy(void *dest, const void *src, uint64_t count) {
+	// Handle edge cases
+	if (count == 0 || dest == src) {
+		return dest;
+	}
+    uint8_t *dst = (uint8_t *)dest;
+    const uint8_t *src8 = (const uint8_t *)src;
+	// Align destination to 16-byte boundary for SIMD
+	while (((uintptr_t)dst & 15) && count) {
+		*dst++ = *src8++;
+		count--;
+	}
+	// Use 64-bit copies for unaligned or non-SIMD cases
+	if (count >= 8 && !((uintptr_t)src8 & 7)) {
+		uint64_t* dst64 = (uint64_t*)dst;
+		const uint64_t* src64 = (const uint64_t*)src8;
+		while (count >= 8) {
+			*dst64++ = *src64++;
+			count -= 8;
+		}
+		dst = (uint8_t*)dst64;
+		src8 = (const uint8_t*)src64;
+	}
+	// Use SSE2 for large, aligned blocks
+	/*if (count >= 16) {
+		__m128i* dst128 = (__m128i*)dst;
+		const __m128i* src128 = (const __m128i*)src8;
+		while (count >= 16) {
+			_mm_store_si128(dst128++, _mm_loadu_si128(src128++));
+			count -= 16;
+		}
+		dst = (uint8_t*)dst128;
+		src8 = (const uint8_t*)src128;
+	}*/
+	// Copy remaining bytes
+    while (count--) {
+        *dst++ = *src8++;
+    }
+    return dest;
 }
 
 function mouseHandler();
@@ -125,13 +167,17 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 	heapOffset += size;
 
 	if (heapOffset >= HEAP_C) {
-		//serialPrint_(L"Heap overflow\n");
+		// puts_("<Tofita> Heap overflow -> allocating new heap\n");
 		// TODO heap zero fill?
 		heap = (uint8_t*)PhysicalAllocator_$allocateBytes_(HEAP_C);
 		heapOffset = 16 + size;
 
+		if (heap == nullptr) {
+			puts_("<Tofita> Heap total overflow\n");
+		};
+
 		while (heap == nullptr) {
-			//serialPrint_(L"Heap total overflow\n");
+			__sync_synchronize();
 		};
 	}
 
