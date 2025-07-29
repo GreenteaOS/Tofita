@@ -78,9 +78,6 @@ int32_t libc_pow(int32_t a, int32_t n) {
 	return r;
 }
 
-function memcpy(void *dest, const void *src, uint64_t n) {
-	libc_memcpy(dest, src, n);
-}
 
 // STB library
 //
@@ -1200,8 +1197,6 @@ static uint8_t *stbi__load_and_postprocess_8bit(stbi__context *s, int32_t *x, in
 		ri.bits_per_channel = 8;
 	}
 
-	// @TODO: move stbi__convert_format to here
-
 	if (stbi__vertically_flip_on_load) {
 		int32_t channels = req_comp ? req_comp : *comp;
 		stbi__vertical_flip(result, *x, *y, channels * sizeof(stbi_uc));
@@ -1223,10 +1218,6 @@ static stbi__uint16 *stbi__load_and_postprocess_16bit(stbi__context *s, int32_t 
 		result = stbi__convert_8_to_16((stbi_uc *)result, *x, *y, req_comp == 0 ? *comp : req_comp);
 		ri.bits_per_channel = 16;
 	}
-
-	// @TODO: move stbi__convert_format16 to here
-	// @TODO: special case RGB-to-Y (and RGBA-to-YA) for 8-bit-to-16-bit case to
-	// keep more precision
 
 	if (stbi__vertically_flip_on_load) {
 		int32_t channels = req_comp ? req_comp : *comp;
@@ -8132,11 +8123,21 @@ fun loadStbi32FromBuffer(data ArrayPointer<UInt8>, size UInt32) Bitmap32 {
 }
 
 fun loadPng32(asset RamDiskAsset) Bitmap32 {
+	if asset.size < 8 {
+		// TODO in the future just use `Bitmap32?`
+		return allocateBitmap(8, 8)
+	}
+
 	// TODO don't load >8k huge images
 	return loadStbi32FromBuffer(asset.data, asset.size)
 }
 
 fun loadJpeg32(asset RamDiskAsset) Bitmap32 {
+	if asset.size < 8 {
+		// TODO in the future just use `Bitmap32?`
+		return allocateBitmap(8, 8)
+	}
+
 	// TODO don't load >8k huge images
 	return loadStbi32FromBuffer(asset.data, asset.size)
 }
