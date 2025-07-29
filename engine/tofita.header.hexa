@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -36,7 +36,7 @@ var uptimeMilliseconds UInt64 = 0
 var startupMilliseconds UInt64 = 0
 
 @rename('libc_memset')
-declare fun memset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void
+declare fun _memset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void
 
 /*{
 	var d = dest
