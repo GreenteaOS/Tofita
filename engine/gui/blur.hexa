@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -117,8 +117,7 @@ fun boxBlurT(source Bitmap32, target Bitmap32, width UInt16, height UInt16, radi
 	}
 }
 
-@fastcall fun
-boxBlurH(source Bitmap32, target Bitmap32, width UInt16, height UInt16, radius UInt8) {
+@fastcall fun boxBlurH(source Bitmap32, target Bitmap32, width UInt16, height UInt16, radius UInt8) {
 	var iarr Float = 1.0 / (radius + radius + 1)
 	for i in height {
 		var ti UInt32 = i * width
@@ -222,9 +221,85 @@ fun gaussBlur(bitmap Bitmap32, radius Float) Bitmap32 {
 	return target
 }
 
+fun ditheredPixel(source Bitmap32, x UInt64, y UInt64) /*ByValue<Pixel32>*/ UInt32 {
+	// deterministic 32-pixel radius jitter using a cheap hash
+	let random = (x as! UInt32 * 73856093u32) ^(y as! UInt32 * 19349663u32)
+	let dx = (random % 65u32) as! Int16 - 32i16 // -32 .. +32
+	let dy = ((random >> 8u32) % 65u32) as! Int16 - 32i16
+
+	let sx = x as! Int16 + dx
+	let sy = y as! Int16 + dy
+
+	// clamp to bitmap bounds
+	// TODO Hexa: `Unknown expression kind: null` for `as` without `!`
+	let sx = if sx < 0i16 { 0i16 } else { if sx >= source.width as! Int16 { source.width as! Int16 - 1i16 } else { sx } }
+	let sy = if sy < 0i16 { 0i16 } else { if sy >= source.height as! Int16 { source.height as! Int16 - 1i16 } else { sy } }
+
+	return source.pixels[sy as! UInt32 * source.width + sx as! UInt32].ref.color
+}
+
+fun ditheredPixel16(source Bitmap32, x UInt64, y UInt64) ByValue<Pixel32> {
+	// deterministic 32-pixel radius jitter using a cheap hash
+	let random = (x as! UInt32 * 19349663u32) ^(y as! UInt32 * 73856093u32)
+	let dx = (random % 5u32) as! Int16 - 2i16 // -2 .. +2
+	let dy = ((random >> 8u32) % 5u32) as! Int16 - 2i16
+
+	let sx = x as! Int16 + dx
+	let sy = y as! Int16 + dy
+
+	// clamp to bitmap bounds
+	// TODO Hexa: `Unknown expression kind: null` for `as` without `!`
+	let sx = if sx < 0i16 { 0i16 } else { if sx >= source.width as! Int16 { source.width as! Int16 - 1i16 } else { sx } }
+	let sy = if sy < 0i16 { 0i16 } else { if sy >= source.height as! Int16 { source.height as! Int16 - 1i16 } else { sy } }
+
+	return source.pixels[sy as! UInt32 * source.width + sx as! UInt32]
+}
+
+fun compressHDR(pixel ByValue<Pixel32>) ByValue<Pixel32> {
+	// Reinhard-like with a knee tuned for 0…255 input
+	let knee = 256.0f32 - 32.0f32 // raise or lower to taste
+
+	let out = new ByValue<Pixel32>()
+	
+	var r = pixel.ref.rgba.ref.r as! Float32
+	r = (r / (r + knee)) * 255.0f32
+	out.ref.rgba.ref.r = Math.min(r, 255.0f32) as! UInt8
+
+	var g = pixel.ref.rgba.ref.g as! Float32
+	g = (g / (g + knee)) * 255.0f32
+	out.ref.rgba.ref.g = Math.min(g, 255.0f32) as! UInt8
+
+	var b = pixel.ref.rgba.ref.b as! Float32
+	b = (b / (b + knee)) * 255.0f32
+	out.ref.rgba.ref.b = Math.min(b, 255.0f32) as! UInt8
+
+	out.ref.rgba.ref.a = 255u8 // pixel.ref.rgba.ref.a
+	return out
+}
+
+fun chromaticAberration(source Bitmap32, x UInt16, y UInt16) ByValue<Pixel32> {
+	// tiny fixed offsets (±1–2 px) for RGB channels
+	let r = source.pixels[clampIndex(source, x - 1i16, y as! Int16)] // red   shifted left
+	let g = source.pixels[clampIndex(source, x + 0i16, y as! Int16)] // green centered
+	let b = source.pixels[clampIndex(source, x + 1i16, y as! Int16)] // blue  shifted right
+
+	let out = new ByValue<Pixel32>()
+	out.ref.rgba.ref.r = r.ref.rgba.ref.r
+	out.ref.rgba.ref.g = g.ref.rgba.ref.g
+	out.ref.rgba.ref.b = b.ref.rgba.ref.b
+	out.ref.rgba.ref.a = g.ref.rgba.ref.a // alpha from green
+	return out
+}
+
+// helper: safe 1D index with border clamp
+fun clampIndex(bmp Bitmap32, x Int16, y Int16) UInt32 {
+	let x = if x < 0 { 0 } else { if x >= bmp.width as! Int16 { bmp.width - 1i16 } else { x } }
+	let y = if y < 0 { 0 } else { if y >= bmp.height as! Int16 { bmp.height - 1i16 } else { y } }
+	return y as! UInt32 * bmp.width + x as! UInt32
+}
+
 // Algorithm from https://fastcpp.blogspot.com/2011/06/bilinear-pixel-interpolation-using-sse.html
-@fastcall fun
-interpolatePixel(bitmap Bitmap32, x Float32, y Float32) ByValue<PixelRGBAData> {
+@fastcall fun interpolatePixel(bitmap Bitmap32, x Float32, y Float32) ByValue<PixelRGBAData> {
 	let px UInt16 = x as! UInt16 // Same as floor(x)
 	let py UInt16 = y as! UInt16 // Same as floor(y)
 	let stride UInt16 = bitmap.width as! UInt16
