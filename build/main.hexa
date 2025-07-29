@@ -87,6 +87,11 @@ let disabledFeatures = '-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4 
 
 // Security and safety
 let optimizationFeatures = '-O2 -fwrapv -fno-strict-aliasing -fno-strict-overflow -mtune=nocona '
+// NOTE Integer wrap around is applied to DLLs too cause some casting to unsigned integers
+// may be lost in the process of code porting
+let definedBehavior = '-fwrapv '
+// ^ omit frame pointer
+// TODO ffast-math
 
 let today = new Date()
 let month = today.getMonth() + 1
@@ -305,6 +310,8 @@ fun runTasks() {
 				'-mno-ms-bitfields -fno-threadsafe-statics',
 				'-Wno-address-of-temporary',
 				'-fshort-wchar -mno-red-zone -O2 -ferror-limit=10',
+				// Ensure CPU features never used
+				'-mno-sse -mno-avx',
 				' -c ',
 				config.tempFolder + '/' + teaFolder + '/uefi.c',
 				' -o ',
@@ -354,6 +361,7 @@ fun runTasks() {
 					[
 						clang + ' ',
 						'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles',
+						// TODO actually enable usage of builtins like `memset`
 						'-fms-compatibility -fms-extensions',
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w',
 						'-Wimplicit-function-declaration -O2 -c',
@@ -370,8 +378,10 @@ fun runTasks() {
 						'-msse -msse2 -msse3 -mpopcnt -mcx16 -msahf -mprfchw',
 						'-mno-ssse3 -mno-sse4a -mno-sse4.1 -mno-sse4.2 -mno-sse4', // Unsupported by some targeted CPUs
 						// TODO useCpp, fix C build
+						definedBehavior,
 						useCpp ? '-x c++ -std=c++2a': '-x c -std=gnu17',
 						'-fomit-frame-pointer',
+						// TODO check if must preserve frame pointer in the system DLLs
 						folder + '\\' + dlls[i] + '.' + bit + '.c',
 						'-o',
 						outobj
