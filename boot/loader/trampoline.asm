@@ -1,5 +1,5 @@
 ; The Tofita Engine
-; Copyright (C) 2020-2024 Oleh Petrenko
+; Copyright (C) 2020-2025 Oleh Petrenko
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU Lesser General Public License as published by
@@ -13,6 +13,8 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+
+; TODO MOVE ME TO amd64 folder
 bits 64
 default rel
 section .head
@@ -59,10 +61,11 @@ trampolineCR3:
 	mov cr3, rdx ; Tofita upper-half paging
 
 	mov rsp, r8
-	push 0 ; Signal end of stack with 0 return address
-	push 0 ; and a few extra entries in case of stack
-	push 0 ; problems
-	push 0
+	mov rbp, 0
+	push rbp ; Signal end of stack with 0 return address
+	push rbp ; and a few extra entries in case of stack
+	push rbp ; problems
+	push rbp
 	mov rbp, rsp ; Frame
 
 	; TODO Reset state
@@ -84,7 +87,7 @@ trampolineCR3:
 	; TODO times 64 - ($-$$) db 0 ; Padding
 	; TODO size: dw $-$$ to store a size in the bootloader that you could look at in an asm listing or hexdump. But that takes up 2 bytes.
 
-; COM write
+; COM write TODO rename to portOutByte
 global portOutb
 portOutb:
     mov rax, rdx
