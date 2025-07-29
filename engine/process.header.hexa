@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -58,10 +58,15 @@ class TofitaProcess {
 	var awaitsGetMessage Bool
 	// TODO Bool wmQuit/wmPaint for lowest-priority must-never-lost messages
 
-	// 32-bit
+	/// 64/32-bit
 	var is64bit Bool
 	var limits AddressAwareness
+
+	/// Display name
 	var name String
+
+	/// Icon displayed on the taskbar (and windows by default)
+	var icon16 Bitmap32 = null
 
 	new () { }
 }
