@@ -138,6 +138,9 @@ fun quakeHandleButtonDown(key UInt8) {
 		} else if quakeCommand == 'verbose' {
 			Theme.verbose = not Theme.verbose
 			quakePrintf("Command completed. You may now open any .exe and check the output.\n".utf16())
+		} else if quakeCommand == 'serial' {
+			disableSerial = (disableSerial == 0) ? 1u8 : 0
+			quakePrintf("Command completed. Serial log disabled: %u\n".utf16(), disableSerial)
 		} else if quakeCommand == 'wallpaper' {
 			let a = getRamDiskAsset("root/Windows/Web/Wallpaper/Tofita/alternative.png")
 			wallpaperSource = loadPng32(a)
@@ -161,15 +164,9 @@ fun quakeHandleButtonDown(key UInt8) {
 			// TODO quakePrintf("wallpaper - cycle wallpapers\n".utf16())//note this may crash compositor, in composite() check last!=new and load on demand
 			// TODO ACPI reboot quakePrintf("Enter 're' or 'reboot' to reboot the system\n".utf16())
 			// TODO ACPI power off quakePrintf("Enter 'po' or 'power' to shut down the system\n".utf16())
-			quakePrintf("Press UP to re-enter the last command\n".utf16())//
-		} else if quakeCommand == 'apt-get moo' or quakeCommand == "cowsay" {
-			// TODO print last command as `> %S`
-			quakePrintf('                 (__)
-                 (oo)
-           /------\\/
-          / |    ||
-         *  /\\---/\\
-            ~~   ~~\n'.utf16())
+			quakePrintf("Press UP to re-enter the last command\n".utf16()) //
+		} else if quakeCommand == "gura" {
+			quakePrintf(':3\n'.utf16())
 		} else {
 			// TODO fix %S
 			quakePrintf("Command '%S' not supported\n".utf16(), quakeCommand.utf16())
@@ -210,13 +207,18 @@ fun quakeWelcome() {
 }
 
 var qsodHappened = false
+/// Show QSOD (NOTE we NEVER scare kids with creepy blue fullscreen messages!)
 fun qsod(format ConstArrayPointer<ClangWideChar>, extra UInt64, more UInt64, other UInt64 = 0) {
+	// TODO add command `qsod` to trigger/test this thingy
 	qsodHappened = true
 	haveToQuake = true
+	// TODO must re-paint only quake part and copy this rect on the framebuffer
+	haveToRender = true
+	// haveToRender = false
 	quakePrintf("Engine stopped working. Please, reboot.\n".utf16())
 	quakePrintf(format, extra, more, other)
 	engineThreadLoop()
-	// TODO reboot (to not having to print error message to screen)
+	// TODO reboot (to not having to print error message to screen) or do it after a delay
 }
 
 // TODO `private`
