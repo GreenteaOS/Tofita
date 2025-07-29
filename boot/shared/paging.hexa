@@ -39,6 +39,10 @@ fun getRAMSize(memoryMap UefiMemoryMap) UInt64 {
 }
 
 // TODO this should be reconsidered (i.e. pointer fixups)
+// zero-fill memory map and save its received size into a var
+// rename to getEfiMemoryMap
+// passing whole map into engine instead of bitmap may make sense
+// map memory (like fb) in the engine, not in bootloader: i.e. bootloader does only 1:1 and this PML4 discarded later
 fun mapEfiRuntime(memoryMap UefiMemoryMap) {
 	serialPrintln("[paging] mapping efi runtime")
 
@@ -46,8 +50,8 @@ fun mapEfiRuntime(memoryMap UefiMemoryMap) {
 	let descriptorSize UInt64 = memoryMap.descriptorSize
 	var sum UInt64 = 0u64
 
-	var startOfMemoryMap UInt64 = (memoryMap.memoryMap as! UInt64)
-	var endOfMemoryMap UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
+	let startOfMemoryMap UInt64 = (memoryMap.memoryMap as! UInt64)
+	let endOfMemoryMap UInt64 = startOfMemoryMap + memoryMap.memoryMapSize
 	var offset UInt64 = startOfMemoryMap
 
 	while offset < endOfMemoryMap {
@@ -75,6 +79,7 @@ let zeroBufferStorage = new ZeroBuffer()
 let zeroBuffer = zeroBufferStorage as! ArrayPointer<UInt8>
 // TODO ^ simple array by value
 
+// is unused memory is available to the engine after bootloader? is it enough for engine purposes?
 fun conventionalAllocateLargest(memoryMap UefiMemoryMap) Void {
 	var descriptor = memoryMap.memoryMap
 	let descriptorSize UInt64 = memoryMap.descriptorSize
@@ -87,6 +92,7 @@ fun conventionalAllocateLargest(memoryMap UefiMemoryMap) Void {
 
 	while offset < endOfMemoryMap {
 		// Note: > not >= cause we should have some extra space next to this buffer
+		// TODO check more flags
 		if descriptor.type == EFI_MEMORY_TYPE.EfiConventionalMemory, descriptor.numberOfPages > largestPages {
 			largestPages = descriptor.numberOfPages
 			result = descriptor.physicalStart
@@ -112,8 +118,11 @@ var conventionalPagesAvailable UInt64 = 0u64
 var conventionalFramebufferForErrors FrameBuffer? = null
 
 /// Simplistic memory allocator
+// TODO use `uefiAllocate` or other UEFI mechanism, so can freely update the memory map in `exitBootServices` loop
+// ^ and have dynamic size for map itself etc
 fun conventionalAllocateNext(bytes UInt64) UInt64 {
 	let result = conventionalOffset
+	// let pageSize = pageSize as! UInt64 // TODO Hexa: is it needed?
 	let pages = bytes / pageSize + 1u64 // Math.floor TODO Hexa: `\`
 	conventionalOffset += pages * pageSize
 	conventionalPages += pages
