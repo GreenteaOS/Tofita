@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -68,13 +68,15 @@ fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
 }
 
 fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, destination ArrayPointer<UInt64>) {
-	serialPrintf("[[[uefi.uefiAllocate]]] start allocating %d bytes\n", bytes[0])
-	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting bootservices and always available
+	// Round to page size
+	// let pages UInt64 = ((bytes[0] - 1u64) / pageSize) + 1u64
+	let pages UInt64 = (bytes[0] + pageSize - 1u64) / pageSize
+
+	serialPrintf("[[[uefi.uefiAllocate]]] start allocating %d bytes, %8 pages\n", bytes[0], pages)
+	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting boot services and always available
 	let allocationType =
 		EFI_MEMORY_TYPE.EfiLoaderCode // Use `*Code` not `*Data` to avoid NX-bit crash if data executed
 
-	// Round to page size
-	var pages UInt64 = ((bytes[0] - 1u64) / pageSize) + 1u64
 	var addr EFI_PHYSICAL_ADDRESS = destination[0] as! EFI_PHYSICAL_ADDRESS
 	var saddr ArrayByValue<EFI_PHYSICAL_ADDRESS, 1> = [addr]
 
@@ -93,7 +95,7 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 	}
 
 	if status != EFI_STATUS.EFI_SUCCESS {
-		serialPrintf("[[[uefi.uefiAllocate]]] failed AllocateAnyPages %d bytes, %d pages, of type %d, "
+		serialPrintf("[[[uefi.uefiAllocate]]] failed AllocateAnyPages %d bytes, %8 pages, of type %d, "
 			+
 			"status %d\n",
 			bytes[0], pages, allocationType, status)
