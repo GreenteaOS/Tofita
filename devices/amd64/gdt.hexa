@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +15,7 @@
 
 // Segment selectors are used to set user mode and 32-bit mode
 enum Selector : UInt64 {
+	// TODO ENGINE_
 	SYS_CODE64_SEL = 0x10 // Execute/Read
 	SYS_DATA32_SEL = 0x18 // Read/Write
 	NULL_SEL = 0x00
@@ -22,6 +23,7 @@ enum Selector : UInt64 {
 	USER_DATA32_SEL = 0x28 // Read/Write
 	USER_CODE64_SEL = 0x30 // Execute/Read
 	SYS_CODE32_SEL = 0x60 // Execute/Read
+	USER_PEB32_SEL = 0x50 // Read/Write
 
 	// Just `+ 3` to above selectors
 	// TODO allow `0x30 + 3` in enum tags
@@ -34,10 +36,10 @@ enum Selector : UInt64 {
 // Global Descriptor Table aka GDT 16 records
 // TODO let
 @aligned(64) var gdtTemplate ArrayByValue<UInt32, 32> = [
-	0x00000000u32, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00209B00, 0x0000FFFF, 0x00CF9300,
-	0x0000FFFF, 0x00CFFA00, 0x0000FFFF, 0x00CFF300, 0x00000000, 0x0020FB00, 0x00000000, 0x00000000,
-	0x60800067, 0x00008BB9, 0xFFFFF800u32, 0x00000000, 0xE0003C00u32, 0xFF40F3FAu32, 0x00000000, 0x00000000,
-	0x0000FFFF, 0x00CF9A00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+	0x00000000u32, 0x00000000u32, 0x00000000u32, 0x00000000u32, 0x00000000u32, 0x00209B00u32, 0x0000FFFFu32, 0x00CF9300u32,
+	0x0000FFFFu32, 0x00CFFA00u32, 0x0000FFFFu32, 0x00CFF300u32, 0x00000000u32, 0x0020FB00u32, 0x00000000u32, 0x00000000u32,
+	0x60800067u32, 0x00008BB9u32, 0xFFFFF800u32, 0x00000000u32, 0xE0003C00u32, 0xFF40F3FAu32, 0x00000000u32, 0x00000000u32,
+	0x0000FFFFu32, 0x00CF9A00u32, 0x00000000u32, 0x00000000u32, 0x00000000u32, 0x00000000u32, 0x00000000u32, 0x00000000u32
 ]
 
 @emitHeader @linkAsIs
