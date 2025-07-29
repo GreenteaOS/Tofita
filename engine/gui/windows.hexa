@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -139,12 +139,23 @@ fun drawWindowFrame(title String, x Int16, y Int16, w UInt16, h UInt16, active B
 		color.ref.color = 0xFF000000u32
 	}
 
+	// TODO better idea
+	// ^ The problem here is that tiny windows cannot fit those buttons and that looks weird
+	let hideMinimizeAndMaximize = w < 200
+
 	// TODO option to draw it at center by default
 	let centeredMinimize = true
-	if centeredMinimize {
-		drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 15i16, 8, 1)
+	let minimizeY = if centeredMinimize {
+		// drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 15i16, 8, 1)
+		15i16
 	} else {
-		drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 19i16, 8, 1)
+		// drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + 19i16, 8, 1)
+		19i16
+	}
+
+	// We (yes me and you) currently hide the inactive button visuals, they still can be hovered - yes its needs to be rethink-ed
+	if hover == FrameHover.Min or not hideMinimizeAndMaximize {
+		drawRectangle(color, x + w - (45 + 1) * 3 + 23 - 4i16, y + minimizeY, 8, 1)
 	}
 
 	// Maximize
@@ -161,10 +172,13 @@ fun drawWindowFrame(title String, x Int16, y Int16, w UInt16, h UInt16, active B
 		color.ref.color = 0xFF000000u32
 	}
 
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 - 4i16, 9, 1)
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 + 5i16, 10, 1)
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 - 4i16, 1, 9)
-	drawRectangle(color, x + w - (45 + 1) * 2 + 23 + 5i16, y + 14 - 4i16, 1, 9)
+	if hover == FrameHover.Max or not hideMinimizeAndMaximize {
+		// TODO yeah use lines drawing instead of 1px wide rectangles
+		drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 - 4i16, 9, 1)
+		drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 + 5i16, 10, 1)
+		drawRectangle(color, x + w - (45 + 1) * 2 + 23 - 4i16, y + 14 - 4i16, 1, 9)
+		drawRectangle(color, x + w - (45 + 1) * 2 + 23 + 5i16, y + 14 - 4i16, 1, 9)
+	}
 
 	// Close
 	// color.rgba.b = 232
@@ -187,4 +201,7 @@ fun drawWindowFrame(title String, x Int16, y Int16, w UInt16, h UInt16, active B
 
 	// Shadow
 	drawShadowBox(x - 1i16, y - 1i16, w + 1, h + 1)
+
+	// :3
+	drawBitmap32WithAlpha(gura, w > 228 ? x : x - 36i16, y - 139i16)
 }
