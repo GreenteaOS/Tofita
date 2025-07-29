@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -65,7 +65,8 @@ class StartMenu {
 				yu += yOffset
 			}
 
-			if yu > y + h {
+			let padding = 16i16
+			if (yu + padding) > y + h {
 				break
 			}
 		}
