@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,8 +18,12 @@
 /// Align to 4096
 let addressBits = 12
 
+/// Virtual-to-physical address map
+declare VirtualMemoryMap = ArrayPointer<ByValue<PageEntry>>
+
+// TODO should be on per-CPU core/per-process
 // TODO remove this
-@aligned(4096) var pml4entries ArrayPointer<ByValue<PageEntry>> = null as! ArrayPointer<ByValue<PageEntry>>
+@aligned(4096) var pml4entries VirtualMemoryMap = null as! ArrayPointer<ByValue<PageEntry>>
 // TODO Hexa must error <Int>: @aligned(4096) var pml4entries VirtualMemoryMap = null as! ArrayPointer<ByValue<Int>>
 
 // TODO combine flags into bit mask
@@ -161,6 +165,7 @@ fun mapMemory(pml4entries ArrayPointer<ByValue<PageEntry>>, virtualAddr UInt64, 
 	serialPrintHex(virtualAddrEnd as! UInt64)
 	serialPrint("\n")
 
+	// TODO try to map contiguous physical memory first
 	while vAddress < virtualAddrEnd {
 		let writeAllowed = true // TODO
 		mapPML4(pml4entries, vAddress, pAddress, writeAllowed, accessibleByUser)
