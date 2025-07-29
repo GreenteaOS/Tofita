@@ -178,12 +178,12 @@ for task in tasks {
 			asmTask = true
 		case 'efi':
 			efiTask = true
-		case 'dll':
+		case 'dll': // TODO rename to `dlls`
 			dllTask = true
 		case 'engine':
 			engineTask = true
 		case 'ramdisk':
-			// TODO ram-disk or assets
+			// TODO rename to `assets`
 			ramDiskTask = true
 		case 'iso':
 			isoTask = true
@@ -289,12 +289,14 @@ fun runTasks() {
 				useCpp ? '-x c++ -std=c++2a': '-x c -std=gnu17',
 				'-fshort-wchar -mno-red-zone -w',
 				'-fomit-frame-pointer',
+				'-fno-stack-check',
 				'-D versionRolling=' + versionRolling, // TODO used?
 				'-D versionName=\\"' + versionName + '\\"', // TODO used?
 				// TODO ^ do we need name anymore? iOS has no names
 				'-D versionMajor=' + versionMajor,
 				'-D versionMinor=' + versionMinor,
 				'-D versionTag=' + versionTag,
+				// TODO still useful? document it
 				'-D HEXA_NO_PLATFORM_INCLUDES=1',
 
 				// TODO mno-sse avx etc DISABLE ALL FEATURES BUT SSE2
@@ -314,6 +316,7 @@ fun runTasks() {
 		phase3.push(
 			[
 				link + ' ',
+				// TODO document every flag, same for Clang invocations
 				'-subsystem:efi_application -nodefaultlib -dll -entry:efi_main ',
 				config.tempFolder + '/' + teaFolder + '/trampoline.o ',
 				config.tempFolder + '/' + teaFolder + '/miniefi.o ',
@@ -351,6 +354,7 @@ fun runTasks() {
 					[
 						clang + ' ',
 						'-m\(bit) -Xclang -flto-visibility-public-std -target \(arch)-pc-windows-msvc -nostdlib -nodefaultlibs -nostartfiles',
+						'-fms-compatibility -fms-extensions',
 						'-ffast-math -Wno-incompatible-library-redeclaration -Wno-absolute-value -s -w',
 						'-Wimplicit-function-declaration -O2 -c',
 						'-mtune=nocona -fno-stack-protector -mno-red-zone',
@@ -408,6 +412,7 @@ fun runTasks() {
 		// ENGINE
 		phase2.push(
 			[
+				// TODO emit llvm
 				clang,
 				'-D versionRolling=' + versionRolling,
 				'-D versionName=\\"' + versionName + '\\"', // TODO too
@@ -416,6 +421,7 @@ fun runTasks() {
 				'-D versionTag=' + versionTag,
 
 				'-mtune=nocona -fno-stack-protector -fshort-wchar -mno-red-zone ',
+				// Disable stack checks for tofita cause huge guard page anyway
 				'-fno-stack-check ',
 				debuggie ? '-fvisibility=default': '-fvisibility=hidden',
 				'-Dbit64',
@@ -445,8 +451,10 @@ fun runTasks() {
 			[
 				link + ' ',
 				debuggie ? '/debug:dwarf ': '',
+				// TODO add support for relocatable executable in the bootloader for security
 				'/FIXED ', // Disable relocations
 				// Uncomment for some info '/verbose ',
+				// /LTCG /LTO
 				'/WX /MACHINE:X64 /entry:engineMain /SUBSYSTEM:CONSOLE ',
 				'/BASE:0xffff800000000000 ',
 				config.tempFolder + '/' + teaFolder + '/tofita.asm.obj ',
