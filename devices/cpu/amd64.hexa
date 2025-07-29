@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -14,7 +14,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 // AMD64 assembly instructions wrapper
+// TODO move into amd64 folder
 
+// TODO move to cpuid.hexa thus to use in bootloader
 @customHeader('
 	inline void amd64cpuid(uint32_t leaf, uint32_t subLeaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx,
 						uint32_t *edx) {
