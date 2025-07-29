@@ -18,6 +18,12 @@ let _fltused Int64 = 0
 
 // Only ecx/edx available in x86-32 fastcall, so use rcx/rdx pair only
 @convention('fastcall')
+#if bit64
+	@dllImport('tofitaFastSystemCall')
+	@fastcall // TODO same for 32bit?
+#else
+	@dllImport('@tofitaFastSystemCall@8')
+#end
 // TODO ^ template substitution for var names in decorators by default
 declare fun tofitaFastSystemCall(rcx TofitaSyscalls,
 	#if bit64
@@ -30,19 +36,54 @@ declare fun tofitaFastSystemCall(rcx TofitaSyscalls,
 @fastcall declare fun tofitaFastStub(rcx UInt64, rdx UInt64) UInt32
 @stdcall declare fun tofitaStdStub(arg ConstArrayPointer<UInt8>) UInt32
 
-// TODO @convention('fastcall')
-@dllImport @linkAsIs
+// TODO yeah some ...variadic version needed + update logging everywhere (also zero-cost when not used)
+#if bit64
+	@convention('fastcall')
+#else
+	@convention('cdecl')
+#end
+// @dllImport @linkAsIs
+@dllImport('tofitaDebugLog')
+declare fun tofitaDebugLogREAL(message ConstArrayPointer<ClangWideChar>, extra SizeOfPointer = 0, more SizeOfPointer = 0) Void
+
+@customHeader('
+	#define tofitaDebugLog_(m, e, mo) tofitaDebugLogREAL_(m, (size_t)(e), (size_t)(mo))
+')
 declare fun tofitaDebugLog(message ConstArrayPointer<ClangWideChar>, extra UInt64 = 0, more UInt64 = 0) Void
+
+@rename('(uint64_t)__builtin_extract_return_addr(__builtin_return_address (0))')
+declare let callerAddress: UInt64
+
+@rename('(uint64_t)__builtin_extract_return_addr(__builtin_return_address (1))')
+declare let callerCallerAddress: UInt64
+
+@rename('(uint64_t)__builtin_frame_address(0)')
+declare let callerFrame: UInt64
+
+fun tofitaDebugLogxx(message ConstArrayPointer<ClangWideChar>, extra UInt64 = 0, more UInt64 = 0) Void {
+	// { return }
+	let payload = new ByValue<DebugLogPayload>()
+	// TODO @stack
+	// TODO ^ optimize to allocate on stack, some lifetime flag on creation and usage?
+	payload.ref.message = message as! UInt64 // TODO ConstArrayPointer.address UInt64/32
+	// TODO ConstArrayPointer.unsafeFromAddress(PointerAddress.unsafeFrom(123u64))
+	// TODO on the engine side ValidateUserPointer<DebugLogPayload>.clone() <= does SEH copy of sizeOf
+	// TODO hint `as! PointerAddress` use instead `fromAddress`
+	payload.ref.extra = extra
+	payload.ref.more = more
+	// payload.ref.caller = callerAddress
+	tofitaFastSystemCall(TofitaSyscalls.DebugLog, payload.ref as! #if bit64 UInt64 #else UInt32 #end)
+}
 
 // General
 @dllImport @linkAsIs
-declare fun tofitaExitProcess(exitCode UInt32) Void
+declare fun tofitaExitProcess(exitCode Int32) Void
 
 // User Interface
 @dllImport @linkAsIs
 declare fun tofitaCreateWindowEx(payload CreateWindowExPayload) UInt64
 @dllImport @linkAsIs
-declare fun tofitaShowWindow(windowId UInt64, nCmdShow CmdShow) Void
+declare fun tofitaShowWindow(payload ShowWindowPayload) Void
 @dllImport @linkAsIs
 declare fun tofitaGetMessage(payload GetMessagePayload) Bool32
 @dllImport @linkAsIs
@@ -50,8 +91,25 @@ declare fun tofitaPostMessage(payload PostMessagePayload) Bool32
 @dllImport @linkAsIs
 declare fun tofitaPeekMessage(payload PeekMessagePayload) Bool32
 
+// Timers
+@dllImport @linkAsIs
+declare fun tofitaSetTimer(payload SetTimerPayload) UInt64
+@dllImport @linkAsIs
+declare fun tofitaKillTimer(payload KillTimerPayload) Bool32
+
 // NjRAA
 @dllImport @linkAsIs
-declare fun njraaGetOrCreateWindowFramebuffer(windowId UInt64, fb WindowFramebuffer) Void
+declare fun njraaGetOrCreateWindowFramebuffer(fb WindowFramebuffer) Void
 @dllImport @linkAsIs
-declare fun njraaSwapWindowFramebuffer(windowId UInt64, fb WindowFramebuffer) Void
+declare fun njraaSwapWindowFramebuffer(fb WindowFramebuffer) Void
+
+// Fonts
+// TODO this is just a temporary solution
+let fontWidth UInt32 = 512
+let fontHeight UInt32 = 32
+
+@dllImport @linkAsIs
+declare fun tofitaFont() ConstArrayPointer<UInt8>
+
+@dllImport @linkAsIs
+declare fun tofitaFontBitmap() ConstArrayPointer<UInt8>
