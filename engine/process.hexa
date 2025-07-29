@@ -28,6 +28,12 @@ fun processInit(process TofitaProcess) {
 	process.frame.fs = Selector.USER_PEB32_SEL_USER_MODE
 	process.frame.gs = Selector.USER_PEB32_SEL_USER_MODE
 
+	// TODO If there's no point to have `es`/`ds` separately, just remove them and use `ss`
+	// or better just use constants in `.asm` instead of saving those values into frames
+	// Most 32-bit programs don’t modify `es` or `ds` at runtime, but can they?
+	process.frame.es = Selector.USER_DATA32_SEL_USER_MODE
+	process.frame.ds = Selector.USER_DATA32_SEL_USER_MODE
+
 	// process.frame.flags = 0x002 // No interrupts
 	process.frame.flags = 0x202
 	process.syscallToHandle = TofitaSyscalls.Noop
@@ -105,6 +111,7 @@ fun postMessage(process TofitaProcess, payload PostMessagePayload) Bool {
 	var message Msg = messages[process.messagesUsed]
 
 	if message == null {
+		// TODO avoid allocations by making array of by-values instead
 		message = new Msg()
 		messages[process.messagesUsed] = message
 	}
@@ -184,6 +191,57 @@ fun getMessage(@volatile process TofitaProcess, payload GetMessagePayload) Bool 
 	}
 
 	return true
+}
+
+fun peekMessage(@volatile process TofitaProcess, payload PeekMessagePayload) Bool {
+	/* Check if message buffer exists and has messages */
+	var messages = getOrCreateMessagesBuffer(process)
+	if messages == null or process.messagesUsed == 0 {
+		return false
+	}
+
+	/* Guard cast to message array */
+	let messages = messages as! [Msg]
+
+	/* Iterate through messages to find one matching hwnd and message filter */
+	for i in process.messagesUsed {
+		let message = messages[i]
+		if
+			message != null,
+			(payload.hwnd == 0 or message.hwnd == payload.hwnd as! Handle),
+			(payload.wMsgFilterMin == 0 and payload.wMsgFilterMax == 0) or
+			((message.message as! UInt32) >= payload.wMsgFilterMin and (message.message as! UInt32) <= payload.wMsgFilterMax)
+		{
+			/* Copy message fields to payload */
+			payload.hwnd = message.hwnd as! UInt64
+			payload.message = message.message
+			payload.wParam = message.wParam as! UInt64
+			payload.lParam = message.lParam as! UInt64
+			payload.time = message.time
+			payload.pt.ref.x = message.pt.ref.x
+			payload.pt.ref.y = message.pt.ref.y
+			payload.lPrivate = message.lPrivate
+
+			serialPrintf("<> peekMessage found message == %8\n", message.message)
+
+			/* If PM_REMOVE, shift messages to remove the processed one */
+			let pm_remove = 1
+			if payload.remove == pm_remove {
+				serialPrintf("<> peekMessage removing message == %8\n", message.message)
+				process.messagesUsed--
+				for j in i ... process.messagesUsed {
+					messages[j] = messages[j + 1]
+				}
+				messages[process.messagesUsed] = null
+			}
+
+			// Effectively ends the loop too
+			return true
+		}
+	}
+
+	/* No matching message found */
+	return false
 }
 
 fun processDestroy(@volatile process TofitaProcess) {
