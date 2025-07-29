@@ -151,6 +151,7 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 
 	if biSize != 40 or biWidth != width or biHeight != height * 2 { // Height includes XOR + AND mask
 		serialPrintf("[loadIconPayload] Invalid BITMAPINFOHEADER: size=%d, width=%d, height=%d\n", biSize, biWidth, biHeight)
+		return bmp // Return placeholder
 		return null
 	}
 
@@ -173,6 +174,7 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 	let paletteOffset = headerOffset + 40
 	if paletteOffset + paletteSize > offset + imageSize {
 		serialPrintf("[loadIconPayload] Invalid palette offset %d or size %d\n", paletteOffset, paletteSize)
+		return bmp
 		return null
 	}
 
@@ -186,6 +188,7 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 
 	if andOffset + andSize > offset + imageSize {
 		serialPrintf("[loadIconPayload] Invalid pixel offset %d or AND mask offset %d\n", pixelOffset, andOffset)
+		return bmp
 		return null
 	}
 
@@ -233,6 +236,7 @@ fun loadIconPayload(buffer ConstArrayPointer<UInt8>, width UInt16, height UInt16
 				}
 			} else {
 				serialPrintf("[loadIconPayload] Unsupported bit count: %d\n", biBitCount)
+				return bmp
 				return null
 			}
 
