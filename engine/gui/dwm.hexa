@@ -124,6 +124,8 @@ fun overlappedWindow_detach(windowId UInt64) {
 	window.nextId = 0
 }
 
+/// Attaches a window as the topmost window
+/// Basically puts it on top of the window stack to front
 fun overlappedWindow_attach(windowId UInt64) {
 	windowsList[topmostWindow].nextId = windowId
 
@@ -199,6 +201,28 @@ fun getFrameButton(mouseX Int16, mouseY Int16, windowId UInt64) FrameHover {
 	return FrameHover.Noop
 }
 
+/// Checks if the mouse is within the client area of a window (excludes frame)
+fun isMouseInClientArea(mouseX Int16, mouseY Int16, windowId UInt64) Bool {
+	if windowId == 0 {
+		return false
+	}
+
+	let window = windowsList[windowId]
+	let frameHeight Int16 = 30 + 3i16 // Title bar height
+	let frameWidth Int16 = 1i16 // Border width
+
+	let clientX = window.x + frameWidth
+	let clientY = window.y + frameHeight
+	let clientXX = clientX + window.width
+	let clientYY = clientY + window.height
+
+	if mouseX >= clientX and mouseX <= clientXX and mouseY >= clientY and mouseY <= clientYY {
+		return true
+	}
+
+	return false
+}
+
 fun isShouldIgnoreOutsideWindow() {
 	// TODO ignore everything when is down-in-window-and-moved outside of window
 	return mouseDragCapturedWindow or frameHoverWindowDown
@@ -216,6 +240,7 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 		}
 	}
 
+	// Handle client area mouse move
 	// TODO Hexa: this was actually error as if (as!) was calling expr(as!)
 	// (defaultSession as! GraphicalSession).desktopHandle(0, ColliderEventType.MouseUp)
 
@@ -265,16 +290,26 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 	// TODO check for first responder
 	let current = findWindowUnderCursor(mouseX, mouseY)
 	let combineMouseMoves = true
+	let inClientArea = isMouseInClientArea(mouseX, mouseY, current)
 
-	if current != 0 {
+	if current != 0 /*and inClientArea*/ {
 		let window = windowsList[current]
 		let payload = new ByValue<PostMessagePayload>()
 		let payload = payload.ref
 		payload.hWnd = window.hWnd as! UInt64
 		// TODO RMB, MMB etc
+		// if frameHoverWindowDown and frameHoverState != FrameHover.Noop {
+		// if inClientArea {
+		// payload.msg = Message.WM_NON_CLIENT_MOUSE_MOVE
+		// } else {
 		payload.msg = Message.WM_MOUSE_MOVE
+		// }
+
 		payload.wParam = null
 		payload.lParam = LParam.makeLong(mouseX - window.x, mouseY - window.y) as! UInt64
+		// TODO set `pt` field too, with ghost window adjusting!
+		// payload.pt.ref.x = mouseX
+		// payload.pt.ref.y = mouseY
 		let process TofitaProcess = processes[window.pid]
 
 		if combineMouseMoves,
@@ -288,6 +323,7 @@ fun handleMouseMove(mouseX Int16, mouseY Int16) {
 			// TODO more fields?
 		} else {
 			postMessage(process, payload)
+			requestAnimationFrame()
 		}
 	}
 }
@@ -412,6 +448,7 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 		return
 	}
 
+	// Handle client area mouse down
 	// TODO check for first responder
 	let current = findWindowUnderCursor(mouseX, mouseY)
 	if current != 0 {
@@ -419,8 +456,22 @@ fun handleMouseDown(type MouseActionType, mouseX Int16, mouseY Int16) {
 		let payload = new ByValue<PostMessagePayload>()
 		let payload = payload.ref
 		payload.hWnd = window.hWnd as! UInt64
-		// TODO RMB, MMB etc
-		payload.msg = Message.WM_LEFT_BUTTON_DOWN
+		// TODO un-vibe code this into a `switch`
+		// if isMouseInClientArea(mouseX, mouseY, current) {
+		if type == MouseActionType.LeftDown {
+			payload.msg = Message.WM_LEFT_BUTTON_DOWN
+		} else if type == MouseActionType.RightDown {
+			payload.msg = Message.WM_RIGHT_BUTTON_DOWN
+		} else if type == MouseActionType.MiddleDown {
+			payload.msg = Message.WM_MIDDLE_BUTTON_DOWN
+		} else {
+			// TODO
+			payload.msg = Message.WM_LEFT_BUTTON_DOWN
+		}
+		// } else {
+		// payload.msg = Message.WM_NON_CLIENT_LEFT_BUTTON_DOWN
+		// }
+
 		payload.wParam = null
 		payload.lParam = LParam.makeLong(mouseX - window.x, mouseY - window.y) as! UInt64
 		let process TofitaProcess = processes[window.pid]
@@ -488,6 +539,7 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 		return
 	}
 
+	// Handle client area mouse up
 	// TODO check for first responder
 	let current = findWindowUnderCursor(mouseX, mouseY)
 	if current != 0 {
@@ -496,7 +548,21 @@ fun handleMouseUp(type MouseActionType, mouseX Int16, mouseY Int16) {
 		let payload = payload.ref
 		payload.hWnd = window.hWnd as! UInt64
 		// TODO RMB, MMB etc
-		payload.msg = Message.WM_LEFT_BUTTON_UP
+		// if isMouseInClientArea(mouseX, mouseY, current) {
+		if type == MouseActionType.LeftUp {
+			payload.msg = Message.WM_LEFT_BUTTON_UP
+		} else if type == MouseActionType.RightUp {
+			payload.msg = Message.WM_RIGHT_BUTTON_UP
+		} else if type == MouseActionType.MiddleUp {
+			payload.msg = Message.WM_MIDDLE_BUTTON_UP
+		} else {
+			// TODO
+			payload.msg = Message.WM_LEFT_BUTTON_UP
+		}
+		// } else {
+		// payload.msg = Message.WM_NON_CLIENT_LEFT_BUTTON_UP
+		// }
+
 		payload.wParam = null
 		payload.lParam = LParam.makeLong(mouseX - window.x, mouseY - window.y) as! UInt64
 		let process TofitaProcess = processes[window.pid]
