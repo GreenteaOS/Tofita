@@ -27,6 +27,8 @@ var engineStack ArrayByValue<UInt8, 1048576> = [0]
 /// Entry point of the main engine thread
 fun engineThread() {
 	serialPrintln("<Tofita> [engineThread] thread started")
+	// TODO deallocate stack of `engineMain`
+	// autoRun()
 
 	// TODO move to preTest with infinite loop on fail
 	// serialPrintf("<seh> before\n")
@@ -67,12 +69,6 @@ fun engineThread() {
 					// TODO refactor to separate syscall handler per-DLL and handlers table by syscall id
 
 					if syscall == TofitaSyscalls.DebugLog {
-						if process.is64bit {
-							serialPrintf("[[DebugLog:PID %d '%S']] ", index, process.name.utf16())
-						} else {
-							serialPrintf("[[DebugLog:PID %d '%S' (32-bit)]] ", index, process.name.utf16())
-						}
-
 						// TODO serialPrintf("[[rcx=%u rdx=%8 r8=%8]] ", frame.rcxArg0, frame.rdxArg1, frame.r8)
 
 						if probeForReadOkay(frame.rdxArg1, sizeOf<DebugLogPayload>()) {
@@ -82,6 +78,12 @@ fun engineThread() {
 							if probeForReadOkay(payload.message, 1) {
 								// TODO Probably SEH in %s of serialPrintf itself
 								// (at page boundary)
+								if process.is64bit {
+									serialPrintf("[[PID %d '%S']] ", index, process.name.utf16())
+								} else {
+									serialPrintf("[[PID %d '%S' (32-bit)]] ", index, process.name.utf16())
+								}
+
 								serialPrintf(
 									// TODO just %S utf16 instead of allocation
 									String.fromUTF16z(payload.message as! ConstArrayPointer<UInt16>),
@@ -99,7 +101,13 @@ fun engineThread() {
 						// TODO rename to canBeScheduled
 						process.schedulable = true
 					} else if syscall == TofitaSyscalls.ExitProcess {
-						serialPrintf("[[ExitProcess:PID %d '%S']] with code %d\n", index, process.name.utf16(), frame.rdxArg1)
+						if probeForReadOkay(frame.rdxArg1, sizeOf<ExitProcessPayload>()) {
+							let payload = frame.rdxArg1 as! ExitProcessPayload
+							serialPrintf("[[ExitProcess:PID %d '%S']] with code %d\n", index, process.name.utf16(), payload.exitCode)
+						} else {
+							serialPrintf("[[ExitProcess:PID %d '%S']] with unknown code\n", index, process.name.utf16())
+						}
+
 						process.present = false
 
 						// Select pml4 of idle process for safety
