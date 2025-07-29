@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -19,12 +19,12 @@
 let upper UInt64 = 0xffff800000000000u64
 // TODO map pixels right here to avoid pointer indirection?
 let frameBufferVirtualBase UInt64 = upper + 768u64 * 1024u64 * 1024u64
-// TODO: no need for mapping frameBufferVirtualBase if wholePhysicalStart used
+// TODO no need for mapping frameBufferVirtualBase if wholePhysicalStart used
 // TODO proper dynamically computed numbers
 
 // Mapping of 1:1 of physical memory as virtual = physical + wholePhysicalStart
 // Note: Mapping is done on-demand per-page for faster loading
-let wholePhysicalStart UInt64 = (frameBufferVirtualBase + 128 * 1024 * 1024)
+let wholePhysicalStart UInt64 = frameBufferVirtualBase + 128u64 * 1024u64 * 1024u64
 let pageSize UInt64 = 4096u64 // 4 KiB
 // TODO Hexa: could be inlining in normalizer of u16 value instead of u64
 // let pageSize UInt64 = 4096u16 // 4 KiB
