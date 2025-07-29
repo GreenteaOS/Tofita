@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -142,7 +142,7 @@ fun handleKeyboardPacket() {
 		// }
 	}
 
-	// Note: Quake terminal has higher priority than the engine itself
+	// Note: Quake console has higher priority than the engine itself
 	keyboardActivity = true
 
 	// keyDownHandler = null
