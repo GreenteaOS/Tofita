@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -23,6 +23,7 @@
 var wallpaper Bitmap32 = null // Size of framebuffer
 var vibranceLight Bitmap32 = null // Size of framebuffer
 var vibranceDark Bitmap32 = null // Size of framebuffer
+var gura Bitmap32 = null
 var leaves Bitmap32 = null
 var leaves16 Bitmap32 = null
 var leaves16white Bitmap32 = null
@@ -247,6 +248,8 @@ fun setWallpaper(bitmap Bitmap32, style WallpaperStyle, preserveAspectRatio Bool
 	vibranceLight = upscaleLight
 }
 
+// TODO rename to `drawVibranceRectangle`
+// NOTE this is NOT a frosted glass effect (as it lack noise)
 fun drawVibrancedRectangle(x Int16, y Int16, width UInt16, height UInt16, dark Bool = true) {
 	let vibrance = dark ? vibranceDark : vibranceLight // Avoid non-register global access
 	for yy in height {
@@ -311,6 +314,9 @@ fun initializeCompositor() {
 
 	let a = getRamDiskAsset("root/Windows/Resources/Icons/leavesWhite.png")
 	leaves = loadPng32(a)
+
+	let a = getRamDiskAsset("desktop/gura.png")
+	gura = loadPng32(a)
 
 	let a = getRamDiskAsset("root/Windows/Resources/Icons/leaves16.png")
 	leaves16 = loadPng32(a)
@@ -1273,8 +1279,8 @@ fun composite(startupMilliseconds UInt64) {
 				highlight(defaultSession.startSearch)
 
 				color.ref.color = 0xFFFFFFFFu32
-				let welcome = "Type anything to start search"
-				drawTextBox(welcome, x + 16 + 22, inputY, color.ref, w, 32, true)
+				let welcome = "Type anything to search"
+				drawTextBox(welcome, x + 16 + 22, inputY - 1i16, color.ref, w, 32, true)
 
 				drawBitmap32WithAlpha(startSearchIcon, x + 12i16, inputY - 8i16)
 				drawBitmap32WithAlpha(startSearchOutIcon, x + w - 24 - 12i16, inputY - 8i16)
@@ -1463,6 +1469,7 @@ fun copyToScreen() {
 }
 
 /// Copy the back buffer to the native framebuffer without buffering
+// TODO try and compare to a *fast* `memcpy/memmove` + same for bootloader
 fun copyToScreenFaster() {
 	let height = _framebuffer.height
 	// Let's assume it is always dividable by 2
@@ -1477,6 +1484,7 @@ fun copyToScreenFaster() {
 
 	// TODO copy only dirty rect (at least cursor) (must be aligned to the stride too)
 	for y in height {
+		// Copy 64 bytes at a time, thus `sizeof(pixel) / 16`
 		movntdq(source, destination, width)
 
 		source = ((source as! UInt64) + scanline) as! ArrayPointer<UInt64>
