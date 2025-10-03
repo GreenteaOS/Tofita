@@ -13,20 +13,10 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-
 ; TODO MOVE ME TO amd64 folder
 bits 64
 default rel
 section .head
-
-; UNIX
-; rdi - first argument
-; rsi - second argument
-; rdx - third argument
-; rcx - fourth argument
-; r8 - fifth argument
-; r9 - sixth
-; rax - returned value
 
 ; Tofita
 ; rcx - first argument - (uint64_t)params
@@ -35,11 +25,6 @@ section .head
 ; r9 - fourth argument - upper (engine)
 ; xmm0, xmm1, xmm2, xmm3 for floating point arguments
 ; rax - returned value
-
-; Tofita 32-bit fastcall
-; ecx - first argument
-; edx - second argument
-; eax - returned value
 
 global trampolineCR3
 trampolineCR3:

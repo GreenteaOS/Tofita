@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -132,6 +132,7 @@ fun mapMemory(
 	virtualAddr UInt64,
 	physicalAddr UInt64,
 	pageCount UInt64,
+	// TODO bro could use damn Bool here
 	writeAllowed UInt8,
 	global Bool
 ) {

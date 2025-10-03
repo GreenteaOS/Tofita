@@ -14,30 +14,102 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 fun uefiGetMemoryMap(efiMemoryMap UefiMemoryMap, systemTable EFI_SYSTEM_TABLE) {
-	var memoryMapSize ArrayByValue<UINTN, 1> = [efiMemoryMap.memoryMapSize]
-	var mapKey ArrayByValue<UINTN, 1> = [efiMemoryMap.mapKey]
-	var descriptorSize ArrayByValue<UINTN, 1> = [efiMemoryMap.descriptorSize]
-	var descriptorVersion ArrayByValue<UInt32, 1> = [efiMemoryMap.descriptorVersion]
+	var memoryMapSize ArrayByValue<UINTN, 1> = [0]
+	var mapKey ArrayByValue<UINTN, 1> = [0]
+	var descriptorSize ArrayByValue<UINTN, 1> = [0]
+	var descriptorVersion ArrayByValue<UInt32, 1> = [0]
 
-	var status EFI_STATUS = systemTable.bootServices.getMemoryMap(
-		memoryMapSize.ref,
-		efiMemoryMap.memoryMap,
+	// Free previous allocation if it exists (when `uefiGetMemoryMap` called from *exiting boot services*)
+	if efiMemoryMap.memoryMap != null {
+		let pages = (efiMemoryMap.memoryMapSize + pageSize - 1u64) / pageSize
+		systemTable.bootServices.freePages(
+			efiMemoryMap.memoryMap as! EFI_PHYSICAL_ADDRESS,
+			pages
+		)
+
+		efiMemoryMap.memoryMap = null // Clear the pointer after freeing
+	}
+
+	// First call to get required size
+	let status EFI_STATUS = systemTable.bootServices.getMemoryMap(
+		memoryMapSize.ref, // Intentionally set to 0
+		null,
 		mapKey.ref,
 		descriptorSize.ref,
 		descriptorVersion.ref
 	)
 
-	efiMemoryMap.memoryMapSize = memoryMapSize[0]
-	efiMemoryMap.mapKey = mapKey[0]
-	efiMemoryMap.descriptorSize = descriptorSize[0]
-	efiMemoryMap.descriptorVersion = descriptorVersion[0]
+	if status != EFI_STATUS.EFI_SUCCESS and status != EFI_STATUS.EFI_BUFFER_TOO_SMALL {
+		serialPrint("[[[uefi.uefiGetMemoryMap]]] <ERROR> GetMemoryMap: failed to get map size\n")
+		// TODO handle this failure (i.e. `return status`)
+		// NOTE this appears in the log anyway, so seems like returning something else than `EFI_BUFFER_TOO_SMALL`
+	}
 
-	if status != EFI_STATUS.EFI_SUCCESS {
-		serialPrint("[[[uefi.uefiGetMemoryMap]]] <ERROR> GetMemoryMap: failed\n")
+	for attempt in 256u64 {
+		// Add extra space for potential map changes
+		memoryMapSize[0] += 4u64 * descriptorSize[0] // +N descriptors per try
+
+		// Save the current size to later call with `freePages`
+		efiMemoryMap.memoryMapSize = memoryMapSize[0]
+
+		// Allocate memory map buffer
+		var address ArrayByValue<UInt64, 1> = [0]
+		let status = uefiAllocate(systemTable.bootServices, memoryMapSize.ref, address.ref)
+
+		// Initialize the result
+		efiMemoryMap.memoryMap = address[0] as! EFI_MEMORY_DESCRIPTOR
+
+		if status != EFI_STATUS.EFI_SUCCESS {
+			serialPrint("[[[uefi.uefiGetMemoryMap]]] <ERROR> failed to allocate memory map\n")
+			// TODO handle this failure (i.e. `return status`) + good user-facing message
+			// ^ maybe just hang right here
+		}
+
+		// Second call to get actual memory map
+		let status EFI_STATUS = systemTable.bootServices.getMemoryMap(
+			memoryMapSize.ref,
+			efiMemoryMap.memoryMap,
+			mapKey.ref,
+			descriptorSize.ref,
+			descriptorVersion.ref
+		)
+
+		if status == EFI_STATUS.EFI_SUCCESS {
+			// Use non-stale map key
+			efiMemoryMap.mapKey = mapKey[0]
+			efiMemoryMap.memoryMapSize = memoryMapSize[0]
+			// TODO store also actual allocated size (i.e. +N descriptors)
+			efiMemoryMap.descriptorSize = descriptorSize[0]
+			efiMemoryMap.descriptorVersion = descriptorVersion[0]
+
+			// Effectively exits the function
+			break
+		}
+
+		// Assuming failure
+
+		// Free previous allocation
+		let pages = (efiMemoryMap.memoryMapSize + pageSize - 1u64) / pageSize
+		systemTable.bootServices.freePages(
+			efiMemoryMap.memoryMap as! EFI_PHYSICAL_ADDRESS,
+			pages
+		)
+
+		// TODO Hexa: `meta.isLastIteration`
+		if attempt == 255 {
+			serialPrint("[[[uefi.uefiGetMemoryMap]]] <ERROR> failed to get memory map\n")
+			// TODO handle this failure (i.e. `return status`) + good user-facing message
+			// ^ maybe just hang right here
+
+			efiMemoryMap.memoryMap = null
+			return EFI_STATUS.EFI_LOAD_ERROR
+		}
 	}
 
 	serialPrintf("[[[uefi.uefiGetMemoryMap]]] memoryMapSize %d, descriptorSize %d\n",
 		efiMemoryMap.memoryMapSize, efiMemoryMap.descriptorSize)
+
+	return EFI_STATUS.EFI_SUCCESS
 }
 
 fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
@@ -47,7 +119,7 @@ fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
 	// TODO `ByValue.ref`
 
 	// TODO handle EFI_STATUS of locateProtocol
-	// TODO `@checkReturn let locateProtocol () => EFI_STATUS` to force result check
+	// TODO Hexa: `@checkReturn let locateProtocol () => EFI_STATUS` to force result check
 	systemTable.bootServices.locateProtocol(gopGuid, 0, igop.ref)
 
 	let gop EFI_GRAPHICS_OUTPUT_PROTOCOL = igop[0] as! EFI_GRAPHICS_OUTPUT_PROTOCOL
@@ -55,6 +127,7 @@ fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
 	fb.base = gop.mode.frameBufferBase
 	// TODO take largest of `frameBufferSize` and `pixelsPerScanLine * h * 4`
 	fb.size = gop.mode.frameBufferSize as! UInt32
+	// TODO Hexa: `as! _`
 
 	fb.width = gop.mode.info.horizontalResolution
 	fb.height = gop.mode.info.verticalResolution
@@ -67,13 +140,14 @@ fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
 	gop.setMode(gop, gop.mode.mode)
 }
 
-fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, destination ArrayPointer<UInt64>) {
+/// `destination` can be zero for allocation at any address chosen by UEFI
+fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, destination ArrayPointer<UInt64>) EFI_STATUS {
 	// Round to page size
 	// let pages UInt64 = ((bytes[0] - 1u64) / pageSize) + 1u64
 	let pages UInt64 = (bytes[0] + pageSize - 1u64) / pageSize
 
 	serialPrintf("[[[uefi.uefiAllocate]]] start allocating %d bytes, %8 pages\n", bytes[0], pages)
-	// HINT: Data in EfiRuntimeServicesData will be preserved when exiting boot services and always available
+	// NOTE Data will be preserved when *exiting boot services* and always available
 	let allocationType =
 		EFI_MEMORY_TYPE.EfiLoaderCode // Use `*Code` not `*Data` to avoid NX-bit crash if data executed
 
@@ -92,6 +166,7 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 	if status == EFI_STATUS.EFI_NOT_FOUND or status == EFI_STATUS.EFI_OUT_OF_RESOURCES {
 		serialPrintf("[[[uefi.uefiAllocate]]] failed EFI_NOT_FOUND/EFI_OUT_OF_RESOURCES for %d bytes\n",
 			bytes[0])
+		return status
 	}
 
 	if status != EFI_STATUS.EFI_SUCCESS {
@@ -99,11 +174,72 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 			+
 			"status %d\n",
 			bytes[0], pages, allocationType, status)
+		return status
 	}
 
+	// Report back page-aligned size
 	bytes[0] = pages * (pageSize as! UInt64)
 	destination[0] = addr as! UInt64
 	// TODO typecheck `destination[0] = addr as! ArrayPointer<UInt8>`
 
+	// Zero-fill allocated memory for safety
+	var b = (addr as! UInt64) as! ArrayPointer<UInt8>
+	for i in bytes[0] {
+		b[i] = 0
+	}
+	__sync_synchronize()
+
 	return status
+}
+
+fun uefiExitBootServicesGracefully(systemTable EFI_SYSTEM_TABLE, efiMemoryMap UefiMemoryMap, imageHandle ByValue<EFI_HANDLE>, framebuffer FrameBuffer) {
+	serialPrintln("[[[uefi]]] begin exitBootServices")
+	drawVerbose("Exiting boot services...", framebuffer)
+	var oops UInt8 = 0
+	let triesBeforeReport UInt8 = 100
+	var status = EFI_STATUS.EFI_NOT_READY
+	// status = EFI_STATUS.EFI_SUCCESS // TODO remove
+	while status != EFI_STATUS.EFI_SUCCESS {
+		if oops < 10 {
+			serialPrintln("[[[uefi]]] trying exitBootServices")
+		}
+
+		// Do this once
+		if oops == triesBeforeReport {
+			// Keep user aware of the loading process
+			drawVerbose("Exiting boot services loop...", framebuffer)
+			serialPrintln("[[[uefi]]] <ERROR?> probably infinite loop on exitBootServices")
+			serialPrintln("[[[uefi]]] <ERROR?> system may or may not start")
+		}
+
+		if oops <= triesBeforeReport {
+			oops++
+		}
+
+		// TODO must do 1:1 mapping + whole ram, right here, and fix memory map before exit bs?
+		// Get fresh memory map before each attempt
+		// This is crucial because the map key changes with every allocation/deallocation within `exitBootServices`
+		status = uefiGetMemoryMap(efiMemoryMap, systemTable)
+		while status != EFI_STATUS.EFI_SUCCESS {
+			serialPrintln("[[[uefi]]] <ERROR> GetMemoryMap")
+			drawError("[ERROR] Cannot get memory map from UEFI [ERROR]", framebuffer)
+		}
+
+		status = systemTable.bootServices.exitBootServices(imageHandle, efiMemoryMap.mapKey)
+		if status != EFI_STATUS.EFI_SUCCESS {
+			// Brief pause between attempts
+			for i in 10000u64 {
+				pause()
+			}
+		}
+	}
+
+	// TODO this condition never happens (static analyze this case)
+	if status != EFI_STATUS.EFI_SUCCESS {
+		// TODO `status` to string
+		serialPrintln("[[[uefi]]] <ERROR> exitBootServices EFI_LOAD_ERROR")
+		return EFI_STATUS.EFI_LOAD_ERROR
+	}
+
+	serialPrintln("[[[uefi]]] done exitBootServices")
 }

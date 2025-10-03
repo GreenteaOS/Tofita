@@ -116,11 +116,38 @@ var conventionalOffset UInt64 = 0u64
 var conventionalPages UInt64 = 0u64
 var conventionalPagesAvailable UInt64 = 0u64
 var conventionalFramebufferForErrors FrameBuffer? = null
+var conventionalServices UInt64 = null // TODO Hexa: use `EFI_BOOT_SERVICES`
 
 /// Simplistic memory allocator
 // TODO use `uefiAllocate` or other UEFI mechanism, so can freely update the memory map in `exitBootServices` loop
 // ^ and have dynamic size for map itself etc
+// TODO rename to *Zeroed
 fun conventionalAllocateNext(bytes UInt64) UInt64 {
+	// New method
+	var address ArrayByValue<UInt64, 1> = [0]
+	var size ArrayByValue<UINTN, 1> = [bytes]
+	let status = uefiAllocate(conventionalServices as! EFI_BOOT_SERVICES, size.ref, address.ref)
+
+	if status != EFI_STATUS.EFI_SUCCESS {
+		serialPrintln("[paging] conventionalAllocateNext -> uefiAllocate fail")
+		return 0u64
+	}
+
+	let result = address[0]
+	serialPrintf("[paging] conventionalAllocateNext %u bytes == %8\n", bytes, result)
+
+	// Zero-fill allocated memory
+	{
+		var b = result as! ArrayPointer<UInt8>
+		for i in bytes {
+			b[i] = zeroBuffer[0]
+		}
+	}
+	__sync_synchronize() // Ensure zero-fill is complete before returning
+
+	return result
+
+	// Old method
 	let result = conventionalOffset
 	// let pageSize = pageSize as! UInt64 // TODO Hexa: is it needed?
 	let pages = bytes / pageSize + 1u64 // Math.floor TODO Hexa: `\`

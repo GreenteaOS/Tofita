@@ -142,6 +142,7 @@ fun loadRamDiskFromDiscDrive(
 	lbaLength UInt64,
 	ramdisk RamDisk
 ) EFI_STATUS {
+	// TODO Ensure proper alignment for DMA transfers (use `AllocateAlignedPages`)
 	let address = allocateRamDisk(bootsvc, lbaLength)
 	if address == 0 {
 		return EFI_STATUS.EFI_NOT_FOUND
