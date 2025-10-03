@@ -16,9 +16,10 @@
 // UEFI bindings
 // Based on public EFI header files aka GNU-EFI
 
-declare INTN = Int64 // TODO
-declare UINTN = UInt64 // TODO
-declare BOOLEAN = UInt8 // TODO
+// NOTE all types here are following UEFI spec and are not arbitrary
+declare INTN = Int64
+declare UINTN = UInt64
+declare BOOLEAN = UInt8 // TODO make it enum
 declare EFI_PHYSICAL_ADDRESS = UInt64
 
 @stack
@@ -503,7 +504,6 @@ class EFI_TIME {
 }
 
 // Stubs can be filled later on demand
-// @struct class ConstArrayPointer<UInt8> {}
 declare EFI_RAISE_TPL = ConstArrayPointer<UInt8>
 declare EFI_RESTORE_TPL = ConstArrayPointer<UInt8>
 declare EFI_FREE_PAGES = ConstArrayPointer<UInt8>
@@ -582,7 +582,11 @@ class EFI_BOOT_SERVICES {
 		memory ArrayPointer<EFI_PHYSICAL_ADDRESS>
 	) => EFI_STATUS
 
-	let freePages EFI_FREE_PAGES
+	// @rename('FreePages')
+	@noCapture let freePages (
+		address EFI_PHYSICAL_ADDRESS,
+		pages UINTN
+	) => EFI_STATUS
 
 	// @rename('GetMemoryMap')
 	@noCapture let getMemoryMap (
