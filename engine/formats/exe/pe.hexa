@@ -242,10 +242,46 @@ class IMAGE_RESOURCE_DIRECTORY_ENTRY_OFFSET {
 	var directoryEntries ArrayByValue<ByValue<IMAGE_RESOURCE_DIRECTORY_ENTRY>, 1>
 }
 
+/// Values for the relocation type in the base relocation table.
 enum ImageRelocationType : Int32 {
+	/// No relocation — this entry is skipped (used for padding)
 	IMAGE_REL_BASED_ABSOLUTE = 0
+
+	/// Add the high 16 bits of the delta to the 16-bit field at the offset (for 32-bit adjustments)
+	IMAGE_REL_BASED_HIGH = 1
+
+	/// Add the low 16 bits of the delta to the 16-bit field at the offset
+	IMAGE_REL_BASED_LOW = 2
+
+	/// Apply full 32-bit relocation: add the 32-bit delta to the 32-bit field at offset
+	IMAGE_REL_BASED_HIGH_LOW = 3
+
+	/// Like `HIGH`, but uses an additional “adjustment” word that follows this relocation entry to capture low bits. (Consumes two slots)
+	IMAGE_REL_BASED_HIGH_ADJ = 4
+
+	/// For MIPS machine types: relocates a MIPS jump instruction (format depends on machine)
+	IMAGE_REL_BASED_MIPS_JMP_ADDR = 5
+
+	/// Reserved (often unused)
+	IMAGE_REL_BASED_SECTION = 6
+
+	/// Reserved / special use (for relative 32-bit addresses)
+	IMAGE_REL_BASED_REL32 = 7
+
+	/// When architecture is Thumb, this is used for MOVW/MOVT pair relocations
+	IMAGE_REL_BASED_THUMB_MOV32 = IMAGE_REL_BASED_REL32
+
+	/// MIPS16 jump relocation (for 16-bit MIPS variant)
+	IMAGE_REL_BASED_MIPS_JMP_ADDR16 = 9
+
+	/// For IA-64 architecture: relocates a 64-bit immediate field in an instruction bundle
+	IMAGE_REL_BASED_IA64_IMM64 = IMAGE_REL_BASED_MIPS_JMP_ADDR16
+
+	/// For 64-bit addressing: apply the difference (delta) to a 64-bit field at offset
 	IMAGE_REL_BASED_DIR64 = 10
-	IMAGE_REL_BASED_HIGHLOW = 3
+
+	/// Rare / “high 3 adjustment” variant (less documented)
+	IMAGE_REL_BASED_HIGH3ADJ = 11
 }
 
 let image_sizeof_base_relocation = 8u64
