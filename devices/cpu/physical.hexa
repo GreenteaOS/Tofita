@@ -41,7 +41,7 @@ let engine_reserved_pages UInt64 = 4096u64
 // ^ this amount of memory cannot be allocated by user process
 // to avoid system crash on our of memory
 
-// TODO rename to just Physical
+// TODO rename to just Physical?
 class PhysicalAllocator {
 	// Approx. 1 megabyte per each 4 gigabyte of RAM
 	static var buffer ArrayPointer<UInt8> // TODO use bits, not bytes
@@ -52,10 +52,12 @@ class PhysicalAllocator {
 	// TODO those fields must have ` = default`
 
 	// TODO does make sense at all?
+	// ^ could traverse PML4 as a "fallback"?
 	// static fun virtualToPhysical(virtual UInt64) UInt64 {
 	// return 0
 	// }
 
+	/// Turns physical addresses (not accessible as pointers) into proper virtual ones (can be used as pointers)
 	static fun physicalToVirtual(physical UInt64) UInt64 {
 		return physical + wholePhysicalStart
 	}
@@ -104,18 +106,6 @@ class PhysicalAllocator {
 		}
 
 		reserveOnePage(physical_not_found) // Ensure special case
-
-		// Reserve bootloader buffer
-		{
-			var physical UInt64 = params.physicalBuffer
-			serialPrintf("[physical] Reserve %u bytes at %u of bootloader buffer\n", params.physicalBytes,
-				physical)
-			var i UInt64 = down_bytes_to_pages(params.physicalBytes) + 1u64
-			while i > 0 {
-				i--
-				reserveOnePage(physical + i * (pageSize as! UInt64))
-			}
-		}
 
 		{
 			available = 0

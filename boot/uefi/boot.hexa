@@ -173,31 +173,6 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	}
 	drawLoading(framebuffer, 1)
 
-	serialPrintln("[[[uefi]]] begin: uefiGetMemoryMap")
-	drawVerbose("Getting memory map...", framebuffer)
-	var sizeAlloc UInt64 = (ramdisk.size / pageSize + 1) * pageSize
-	var efiMemoryMap UefiMemoryMap = new UefiMemoryMap() // TODO can be just by value on stack
-	// TODO is 512 x sizeof or just 512
-	efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512u64
-	// TODO bug efiMemoryMap.memoryMapSize = sizeOf<EFI_MEMORY_DESCRIPTOR>() * 512
-	// TODO sizeOf<EFI_MEMORY_DESCRIPTOR>() ?
-	// TODO is 512 enough?
-	// TODO is this storage destination ok?
-	// TODO use conventional alloc with alignment at 4k
-	efiMemoryMap.memoryMap = (ramdisk.base + sizeAlloc) as! EFI_MEMORY_DESCRIPTOR
-	efiMemoryMap.memoryMap = null as! EFI_MEMORY_DESCRIPTOR
-	if false {
-		var b = efiMemoryMap.memoryMap as! ArrayPointer<UInt8>
-		for i in efiMemoryMap.memoryMapSize {
-			// TODO faster with uint64_t
-			b[i] = zeroBuffer[0]
-			// TODO zero-fill buffer for EFI memory map -< unify to zeroFill()
-		}
-	}
-
-	// TODO check for error STATUS_EFI_BUFFER_TOO_SMALL
-	uefiGetMemoryMap(efiMemoryMap, systemTable)
-	serialPrintln("[[[uefi]]] done: uefiGetMemoryMap")
 
 	drawVerbose("Reading the time...", framebuffer)
 	var time EFI_TIME = new EFI_TIME()
@@ -233,56 +208,6 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 		serialPrintln("[[[uefi]]] done GetTime")
 	}
 
-	serialPrintln("[[[uefi]]] begin ExitBootServices")
-	drawVerbose("Exiting boot services...", framebuffer)
-	var oops UInt8 = 0
-	status = EFI_STATUS.EFI_NOT_READY
-	status = EFI_STATUS.EFI_SUCCESS // TODO remove
-	while status != EFI_STATUS.EFI_SUCCESS {
-		if oops < 10 {
-			serialPrintln("[[[uefi]]] trying exitBootServices")
-		}
-
-		if oops == 199 {
-			// Keep user aware of the loading process
-			drawVerbose("Exiting boot services loop...", framebuffer)
-			serialPrintln("[[[uefi]]] <ERROR?> probably infinite loop on exitBootServices")
-			serialPrintln("[[[uefi]]] <ERROR?> system may or may not start")
-			// Do this once
-			oops = 200
-		}
-
-		if oops < 199 {
-			oops++
-		}
-
-		// TODO must do 1:1 mapping + whole ram, right here, and fix memory map before exit bs?
-		// Get fresh memory map before each attempt
-		// This is crucial because the map key changes with every allocation/deallocation within `exitBootServices`
-		status = uefiGetMemoryMap(efiMemoryMap, systemTable)
-		while status != EFI_STATUS.EFI_SUCCESS {
-			serialPrintln("[[[uefi]]] <ERROR> GetMemoryMap")
-			drawError("[ERROR] Cannot get memory map from UEFI [ERROR]", framebuffer)
-		}
-
-		status = systemTable.bootServices.exitBootServices(imageHandle, efiMemoryMap.mapKey)
-		if status != EFI_STATUS.EFI_SUCCESS {
-			// Brief pause between attempts
-			for i in 1000u64 {
-				pause()
-			}
-		}
-	}
-
-	// TODO this condition never happens (static analyze this case)
-	if status != EFI_STATUS.EFI_SUCCESS {
-		// TODO `status` to string
-		serialPrintln("[[[uefi]]] <ERROR> exitBootServices EFI_LOAD_ERROR")
-		return EFI_STATUS.EFI_LOAD_ERROR
-	}
-
-	serialPrintln("[[[uefi]]] done exitBootServices")
-
 	drawVerbose("Setting RAM disk...", framebuffer)
 	setRamDisk(ramdisk)
 
@@ -295,7 +220,6 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	drawVerbose("Allocate memory...", framebuffer)
 	// TODO how to ensure the memory is preserved by UEFI and memory map is unchanged when Exit B S called?
-	conventionalAllocateLargest(efiMemoryMap)
 	conventionalServices = systemTable.bootServices as! UInt64
 	conventionalFramebufferForErrors = framebuffer
 	serialPrintf("[[[uefi]]] large buffer allocated at %u\n", conventionalBuffer)
@@ -372,6 +296,8 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	}
 
 	drawVerbose("Prepare engine parameters...", framebuffer)
+	// TODO Hexa: init params fields all-at-once safely at construction
+	// ^ need placement new here due to custom allocator
 	let params = conventionalAllocateNext(sizeOf<UefiPayload>()) as! UefiPayload
 	{
 		var b = params as! ArrayPointer<UInt8>
@@ -391,7 +317,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	params.capabilities.ref.accuracy = capabilities.accuracy
 	params.capabilities.ref.setsToZero = capabilities.setsToZero
 
-	// Note: stack grows from X to X-N, not X+N
+	// Note: stack grows from X to X-N, not X+N, so we add stack size
 	// TODO map empty page for stack overflow protection + map larger stack (~4 MB)
 	let stack = conventionalAllocateNext(1024u64 * 1024u64) + 1024u64 * 1024u64
 	{
@@ -401,13 +327,13 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 		}
 	}
 
-	// TODO better idea how to automate those field assignments
-	// ^ `ByValue<T> { fun copyFrom(source T) }`
-	params.efiMemoryMap.ref.memoryMap = efiMemoryMap.memoryMap
-	params.efiMemoryMap.ref.memoryMapSize = efiMemoryMap.memoryMapSize
-	params.efiMemoryMap.ref.mapKey = efiMemoryMap.mapKey
-	params.efiMemoryMap.ref.descriptorSize = efiMemoryMap.descriptorSize
-	params.efiMemoryMap.ref.descriptorVersion = efiMemoryMap.descriptorVersion
+	serialPrintln("[[[uefi]]] begin: uefiGetMemoryMap")
+	drawVerbose("Getting memory map...", framebuffer)
+	var efiMemoryMap UefiMemoryMap = new UefiMemoryMap() // TODO can be just by value on stack
+	// Will be filled later
+	efiMemoryMap.memoryMap = null as! EFI_MEMORY_DESCRIPTOR
+	uefiGetMemoryMap(efiMemoryMap, systemTable)
+	serialPrintln("[[[uefi]]] done: uefiGetMemoryMap")
 
 	params.ramdisk.ref.base = ramdisk.base
 	params.ramdisk.ref.physical = ramdisk.physical
@@ -423,7 +349,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	// RAM usage bit-map
 	drawVerbose("Setup device memory...", framebuffer)
 
-	var ram UInt64 = getRAMSize(params.efiMemoryMap.ref)
+	var ram UInt64 = getRAMSize(efiMemoryMap)
 	// Keep as UInt64 to support systems with more than 4096GB RAM (4TB)
 	// 4096GB in MB = 4194304, which exceeds UInt32.MAX (4294967295)
 	// TODO Hexa: add UInt32.MAX or something
@@ -482,7 +408,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 
 	drawVerbose("Setup runtime memory...", framebuffer)
 	// TODO likely useless
-	mapEfiRuntime(params.efiMemoryMap.ref)
+	mapEfiRuntime(efiMemoryMap)
 	// TODO is +1 needed? better make helper function
 	mapMemoryHuge(wholePhysicalStart, 0, (ram / pageSize) + 1u64, global: true)
 
@@ -505,12 +431,8 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	params.pml4 = (pml4entries as! UInt64)
 	// Physical address TODO elaborate purpose (used for stack overflow detection? trampoline?)
 	params.stack = stack
-	params.physicalBuffer = conventionalBuffer
-	params.physicalBytes = conventionalOffset - conventionalBuffer
 	params.efiRuntimeServices = systemTable.runtimeServices
 	params.acpiTablePhysical = acpiTable as! UInt64
-	params.efiMemoryMap.ref.memoryMap =
-		(wholePhysicalStart + (params.efiMemoryMap.ref.memoryMap as! UInt64)) as! EFI_MEMORY_DESCRIPTOR
 
 	// Convert addresses to upper half
 
@@ -520,12 +442,25 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	serialPrint("\n")
 
 	params.physicalRamBitMaskVirtual = wholePhysicalStart + params.physicalRamBitMaskVirtual
-	let params = (wholePhysicalStart + (params as! UInt64)) as! UefiPayload
-
 	serialPrintln("[[[uefi]]] done: all done, entering engine loader")
 
 	// No memory operations allowed after this call
 	uefiExitBootServicesGracefully(systemTable, efiMemoryMap, imageHandle, framebuffer)
+
+	// TODO better idea how to automate those field assignments
+	// ^ `ByValue<T> { fun copyFrom(source T) }`
+	params.efiMemoryMap.ref.memoryMapSize = efiMemoryMap.memoryMapSize
+	params.efiMemoryMap.ref.mapKey = efiMemoryMap.mapKey
+	params.efiMemoryMap.ref.descriptorSize = efiMemoryMap.descriptorSize
+	params.efiMemoryMap.ref.descriptorVersion = efiMemoryMap.descriptorVersion
+	// TODO will probably we safer to make a copy of it -> otherwise leave a comment
+	params.efiMemoryMap.ref.memoryMap = efiMemoryMap.memoryMap
+
+	// Adjust to upper address space
+	params.efiMemoryMap.ref.memoryMap =
+		(wholePhysicalStart + (params.efiMemoryMap.ref.memoryMap as! UInt64)) as! EFI_MEMORY_DESCRIPTOR
+	// TODO Hexa: use some distinct types for uppers (including structures)
+	let params = (wholePhysicalStart + (params as! UInt64)) as! UefiPayload
 
 	serialPrint("[[[uefi]]] CR3 points to: ")
 	serialPrintHex((pml4entries as! UInt64))

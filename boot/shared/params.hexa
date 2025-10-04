@@ -112,9 +112,6 @@ class RamDisk {
 class UefiPayload {
 	var pml4 UInt64
 	var stack UInt64
-	/// Physical address of where engine loader placed
-	var physicalBuffer UInt64
-	var physicalBytes UInt64
 	/// Virtual address of where RAM usage bit-map stored
 	var physicalRamBitMaskVirtual UInt64
 	var imageHandle EFI_HANDLE
