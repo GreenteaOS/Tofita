@@ -6,7 +6,7 @@ cls
 
 :: Try R: first and then C:
 
-set DRIVE=R
+set DRIVE=C
 set WAY=\Tea\greenteaos-uefi64.iso
 set ISO=%DRIVE%:%WAY%
 
