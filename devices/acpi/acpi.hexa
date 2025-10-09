@@ -50,10 +50,23 @@ class AcpiMcfgEntry {
 	var reserved UInt32
 }
 
+// TODO Buffer.from('MCFG') macro
+/// little-endian 32-bit values (what the ACPI tables in memory actually contain)
 enum AcpiTypeId : UInt32 {
-	MCFG = 0x4d434647 // TODO Buffer.from('MCFG')
-	APIC = 0x41504943
-	XSDT = 0x58534454
+	APIC = 0x43495041u32 // 'APIC' -> 1128878145
+	HPET = 0x54455048u32 // 'HPET' -> 1413828680
+	TPM2 = 0x324d5054u32 // 'TPM2' ->  843927636
+	SSDT = 0x54445353u32 // 'SSDT' -> 1413763923
+	MCFG = 0x4746434du32 // 'MCFG' -> 1195787085
+	BGRT = 0x54524742u32 // 'BGRT' -> 1414678338
+
+	// Common
+	FACP = 0x50434146u32 // 'FACP' (often called FADT) -> 1346584902
+	FADT = 0x54444146u32 // 'FADT' -> 1413759302
+	XSDT = 0x54445358u32 // 'XSDT' -> 1413763928
+	RSDT = 0x54445352u32 // 'RSDT' -> 1413763922
+	DSDT = 0x54445344u32 // 'DSDT' -> 1413763908
+	FACS = 0x53434146u32 // 'FACS' -> 1398038976
 }
 
 @struct @packed
@@ -189,6 +202,11 @@ class ACPIParser {
 
 		serialPrintf("[ACPI] revision is %d\n", acpi10.ref.revision)
 
+		if acpi10.ref.revision < 2 {
+			serialPrintln("[ACPI] revision is not 2.0, aborting")
+			return false
+		}
+
 		// TODO Hexa: communicate presence \0 at end of array
 		// ^ may assume \0 for `ArrayByValue<Clang[Wide]Char, 9>` also `9 + 0` idea
 		// or always assume \0 as in C thus <N+1>, but may do `= @nullTerminated(false) "RSD PTR "`
@@ -258,10 +276,17 @@ class ACPIParser {
 
 	static fun loadXsdt(xsdt XSDT) {
 		if xsdt == null {
+			serialPrintln("[ACPI] XSDT is null")
 			return
 		}
 
-		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", acpiValidateXSDT(xsdt))
+		let valid = acpiValidateXSDT(xsdt)
+		serialPrintf("[ACPI] acpiValidate(xsdt) %d\n", valid)
+
+		if not valid {
+			serialPrintln("[ACPI] XSDT validation failed")
+			return
+		}
 
 		var sig ArrayByValue<UInt8, 5> = [0, 0, 0, 0, 0]
 		serialPrintf("[ACPI] ACPI 2.0+ tables loading\n")
@@ -269,30 +294,52 @@ class ACPIParser {
 		serialPrintf("[ACPI] Found table %s\n", sig.ref)
 		quakePrintf("[ACPI] Found table %s, ".utf16(), sig.ref)
 
-		var numTables UInt64 = acpiTableEntriesXSDT(xsdt, 8)
+		let numTables UInt64 = acpiTableEntriesXSDT(xsdt, 8)
 		serialPrintf("[ACPI] Entries XSDT %d\n", numTables)
 
 		for i in numTables {
-			var header = physicalToVirtual((xsdt.headers[i] as! UInt64)) as! AcpiTableHeader
+			let header = physicalToVirtual((xsdt.headers[i] as! UInt64)) as! AcpiTableHeader
 
 			putSig(sig.ref, header.type)
-			serialPrintf("[ACPI] Found table %s\n", sig)
-			quakePrintf("found table %s, ".utf16(), sig)
+			serialPrintf("[ACPI] Found sub-table %s\n", sig.ref)
+			quakePrintf("found table %s, ".utf16(), sig.ref)
 
 			// TODO this validation is nonsense
-			serialPrintf("[ACPI] acpiValidate(header) %d\n", header.validate(header.type))
+			let valid Bool = header.validate(header.type)
+			if not valid {
+				serialPrintln("[ACPI] header validation failed")
+				continue
+			}
 
 			switch header.type {
 				case APIC:
-					loadApic(header as! AcpiApic)
-					break // TODO breaks `for` not `switch`
+					serialPrintf("[ACPI] header.type == APIC\n")
+					// TODO loadApic(header as! AcpiApic)
+					// break // TODO breaks `for` not `switch`
 
 				case MCFG:
-					loadMcfg(header as! AcpiMcfg)
-					break
+					serialPrintf("[ACPI] header.type == MCFG\n")
+					// TODO crashes loadMcfg(header as! AcpiMcfg)
+					// break
+
+				case FADT:
+					serialPrintf("[ACPI] header.type == FADT\n")
+					// TODO loadFadt(header as! AcpiFadt)
+					// break
+
+				case HPET: serialPrintf("[ACPI] header is HPET -> skipping for now\n") // TODO
+				case TPM2: serialPrintf("[ACPI] header is TPM2 -> skipping for now\n") // TODO
+				case SSDT: serialPrintf("[ACPI] header is SSDT -> skipping for now\n") // TODO
+				case BGRT: serialPrintf("[ACPI] header is BGRT -> skipping for now\n") // TODO
+				case FACP: serialPrintf("[ACPI] header is FACP -> skipping for now\n") // TODO
+				case XSDT: serialPrintf("[ACPI] header is XSDT -> skipping for now\n") // TODO
+				case RSDT: serialPrintf("[ACPI] header is RSDT -> skipping for now\n") // TODO
+				case DSDT: serialPrintf("[ACPI] header is DSDT -> skipping for now\n") // TODO
+				case FACS: serialPrintf("[ACPI] header is FACS -> skipping for now\n") // TODO
 
 				case _:
-					break
+					serialPrintf("[ACPI] (warning) header.type == UNKNOWN (%d)\n", header.type)
+					// break
 			}
 		}
 
@@ -373,7 +420,9 @@ class ACPIParser {
 		serialPrintf("[ACPI] loadApic begin SMP\n")
 		// TODO Delay between IPI-SIPI + disable PIC
 		// TODO Hexa: ensure `if not boolean` generates `!= true_` instead of `c-style != 0` cause null-bool is `2`
+		// ^ Normalizer.ToPlainBoolean (non-nullable Bool)
 		if not smpEnabled {
+			// TODO extract SMP init to smp.hexa
 			serialPrintf("[ACPI] skipping: SMP is not enabled for this release\n")
 			return
 		}
@@ -627,7 +676,7 @@ class ACPIParser {
 			data = data.offsetItems(length)
 		}
 
-		serialPrintf("loadApic done\n")
+		serialPrintf("[ACPI] loadApic done\n")
 	}
 
 	static fun loadMcfg(mcfg AcpiMcfg) {
