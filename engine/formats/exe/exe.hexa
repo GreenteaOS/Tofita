@@ -146,18 +146,18 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 	}
 
 	// TODO get rid of all `as!` casts in this file and exeIcon.hexa
-	fun loadPe(fullPath String, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) {
+	fun loadPe(fullPath String, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) PeInterim {
 		let asset RamDiskAsset = getRamDiskAsset(fullPath)
 		serialPrintf("[loadDLL] loaded dll asset '%S' %d bytes at %8\n", fullPath.utf16(), asset.size, asset.data)
 		return loadPeAsset(asset, root, exec)
 	}
 
-	fun loadPeAsset(asset RamDiskAsset, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) {
+	fun loadPeAsset(asset RamDiskAsset, root PeExportLinkedList, exec Executable<SIZE, TIB, PEB>) PeInterim {
 		let ptr = asset.data as! ArrayPointer<UInt8>
 		// TODO 0x3C is 32-bit
-		var peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256u64) as! PeHeader
+		let peHeader = ((ptr as! UInt64) + ptr[0x3C] + ptr[0x3C + 1] * 256u64) as! PeHeader
 		serialPrintf("[loadDLL] PE header signature 'PE' == '%s'\n", peHeader)
-		var peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
+		let peOptionalHeader = ((peHeader as! UInt64) + sizeOf<PeHeader>()) as! HEADER
 		serialPrintf("[loadDLL] PE32(+) optional header signature %8\n", peOptionalHeader.magic)
 		// TODO require all .dlls ARCH be the same or show loader error
 		serialPrintf("[loadDLL] PE32(+) size of image == %d\n", peOptionalHeader.sizeOfImage)
@@ -165,6 +165,7 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 		let pages = down_bytes_to_pages(peOptionalHeader.sizeOfImage) + 1u32
 		let physical = PhysicalAllocator.allocatePages(pages)
 
+		// Where to map current PE image
 		if exec.nextBase == 0 {
 			// TODO round to pages? or 64kb? same for sections
 			exec.nextBase = peOptionalHeader.imageBase

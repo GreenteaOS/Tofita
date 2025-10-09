@@ -39,7 +39,7 @@ class GraphicalSession {
 	var taskbarWindowList ColliderRectangle
 	var showStart = false
 	var showTray = false
-	var desktopPeek = false
+	var desktopPeek Bool = false
 
 	// Start menu
 	// TODO id could be set automatically by increment, and compared just by `r.id==id`
@@ -135,6 +135,7 @@ class GraphicalSession {
 			showStart = false
 			showTray = false
 			// TODO Hexa: half-infer `startShortcuts` in just scopes, fill fields as `Infer({null})`
+			let startShortcuts = startShortcuts as! [Shortcut]
 			if let shortcut = startShortcuts[id] as! Shortcut? {
 				openFile(shortcut.file, shortcut.displayName)
 			}
@@ -144,6 +145,7 @@ class GraphicalSession {
 
 	fun desktopShortcutHandle(id UInt64, event ColliderEventType) Void {
 		if isDoubleClick, event == ColliderEventType.MouseDown {
+			let desktopShortcuts = desktopShortcuts as! [Shortcut]
 			if let shortcut = desktopShortcuts[id] as! Shortcut? {
 				openFile(shortcut.file, shortcut.displayName)
 			}
@@ -515,6 +517,11 @@ class GraphicalSession {
 
 		return false
 	}
+}
+
+// TODO this is workaround
+fun cancelPeek(session Any) Void {
+	(session as! GraphicalSession).desktopPeek = false
 }
 
 // TODO Hexa: ensure `defaultUser` is initialized

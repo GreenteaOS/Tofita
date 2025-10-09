@@ -24,7 +24,7 @@ enum ThreadKind : UInt8 {
 
 @volatile var currentThread ThreadKind = ThreadKind.THREAD_INIT
 
-var engineThreadFrame = new InterruptFrame()
+var engineThreadFrame InterruptFrame = new InterruptFrame()
 
 // ~121 times per second
 var timerCalled UInt64 = 0

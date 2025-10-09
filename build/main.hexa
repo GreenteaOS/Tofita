@@ -198,7 +198,7 @@ for task in tasks {
 			{
 				/// TODO like this one
 			}
-		case 'cpp':
+		case 'cxx':
 			useCpp = true
 		case _: // TODO capture as `case task:`
 			console.log('[Unknown task \(task)]')

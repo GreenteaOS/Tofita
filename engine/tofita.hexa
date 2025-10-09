@@ -117,6 +117,7 @@ fun engineInit(params UefiPayload) {
 	} else {
 		// Ok
 	}
+
 	if sizeOf<ArrayPointer<UInt8> >() == 8 {
 		serialPrintln("<Tofita> void*: 8 bytes")
 		// Ok

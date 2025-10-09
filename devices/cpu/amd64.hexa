@@ -126,7 +126,7 @@ declare fun pat(
 ) Void
 
 @customHeader('
-	void movntdq_(char* from, char* to, uint64_t loops);// { _movntdq(from, to); };
+	void movntdq_(void* from, void* to, uint64_t loops);// { _movntdq(from, to); };
 	#define movntdq__(from, to, loops) movntdq_(from, to, loops)
 ')
 @rename('movntdq__')

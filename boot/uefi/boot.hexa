@@ -29,6 +29,14 @@ fun tmemset(dest ArrayPointer<UInt8>, e Int32, len UInt64) Void {
 	}
 }
 
+// TODO improve
+@rename("HeapAlloc")
+declare fun heapAllocEfi(x Int8, u Int8, size UInt64) SizeOfPointer
+@rename("malloc")
+fun mallocEfi(bytes UInt64) SizeOfPointer {
+	return heapAllocEfi(0, 0, bytes)
+}
+
 // Clang workaround
 @keep
 @rename('__chkstk')

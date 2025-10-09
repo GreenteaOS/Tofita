@@ -84,7 +84,7 @@
 	"targets": [
 		{
 			"name": "default",
-			"generator": "c",
+			"generator": "cpp",
 			"output": "tofita.c",
 			"options": []
 		}

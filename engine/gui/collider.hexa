@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2023-2024 Oleh Petrenko
+// Copyright (C) 2023-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -238,7 +238,8 @@ class ColliderRectangle {
 				hintReady = null
 				hintOwner = this
 				// TODO better idea
-				defaultSession.desktopPeek = false
+				//defaultSession.desktopPeek = false
+				cancelPeek(defaultSession as! Any)
 			}
 
 			// TODO `state == ColliderState.Hover` hint unused `==` here in vs hexa
@@ -281,7 +282,9 @@ class ColliderRectangle {
 	static fun cancelHint() {
 		// TODO Hexa: compiles `defaultSession.adasdass.desktopPeek = false`
 		// TODO better idea
-		defaultSession.desktopPeek = false
+		//(defaultSession as! GraphicalSession)
+		//defaultSession.desktopPeek = false
+		cancelPeek(defaultSession as! Any)
 
 		hintOwner = null
 

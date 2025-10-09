@@ -19,7 +19,6 @@
 typedef void *EFI_HANDLE;
 typedef void VOID;
 typedef void function;
-#define nullptr ((void*)0)
 #define null nullptr
 
 struct UefiPayload_;
@@ -133,7 +132,9 @@ function keyboardHandler();
 //	uint64_t base;
 //} __attribute__((packed));
 //typedef struct TablePtr TablePtr;
-#define char8_t uint8_t
+#ifndef __cplusplus
+	#define char8_t uint8_t
+#endif
 //#pragma pack()
 //_Static_assert(sizeof(TablePtr) == 10, "sizeof is incorrect");
 
@@ -156,6 +157,7 @@ static void wprintf(const wchar_t* x, const void* y, ...) {
 static uint8_t heapInitial[HEAP_C] = {0};
 static uint8_t* heap = nullptr;
 static uint64_t heapOffset = 0;
+int32_t puts_(uint8_t* string_);
 static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* functionName, int8_t x,int8_t u, uint64_t size) {
 	// serialPrintf_(L"HeapAlloc [%s:%d] %d", /*filename,*/ functionName, lineNumber, size);
 	// size = ((size - 1) | 7) + 1; // Align by 8
@@ -166,6 +168,7 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 	heapOffset += 16;
 	heapOffset += size;
 
+	// TODO instead of HEAP_C, pre-init physical allocator in engineMain
 	if (heapOffset >= HEAP_C) {
 		// puts_("<Tofita> Heap overflow -> allocating new heap\n");
 		// TODO heap zero fill?
@@ -173,7 +176,7 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 		heapOffset = 16 + size;
 
 		if (heap == nullptr) {
-			puts_("<Tofita> Heap total overflow\n");
+			puts_((uint8_t*)"<Tofita> Heap total overflow\n");
 		};
 
 		while (heap == nullptr) {
@@ -181,7 +184,7 @@ static void* HeapAllocAt(size_t lineNumber, char const* filename, char const* fu
 		};
 	}
 
-	// TODO FILL WITH ZEROS RIGHT HERE!
+	// TODO FILL WITH ZEROS RIGHT HERE! if needed
 	return &heap[heapOffset - size];
 }
 #define HeapAlloc(a, b, c) HeapAllocAt(__LINE__, __FILE__, __func__, a, b, c)
