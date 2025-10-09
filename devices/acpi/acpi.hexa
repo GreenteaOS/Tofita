@@ -105,9 +105,14 @@ class ACPI {
 	var acpi20 ByValue<Acpi20>
 }
 
-// TODO
+// TODO Hexa template
 fun acpiTableEntries<T>(t T, size UInt64) UInt64 {
 	return 0 // (t.header.length - sizeOf<T>()) / size
+}
+
+// Compute APIC controller data bytes count (header.length - sizeof(AcpiApic))
+fun acpiTableEntriesApic(t AcpiApic, size UInt64) UInt64 {
+	return (t.header.length - sizeOf<AcpiApic>()) / size
 }
 
 fun acpiTableEntriesXSDT(t XSDT, size UInt64) UInt64 {
@@ -265,7 +270,7 @@ class ACPIParser {
 		quakePrintf("[ACPI] Found table %s, ".utf16(), sig.ref)
 
 		var numTables UInt64 = acpiTableEntriesXSDT(xsdt, 8)
-		serialPrintf("[ACPI] acpiTableEntries %d\n", numTables)
+		serialPrintf("[ACPI] Entries XSDT %d\n", numTables)
 
 		for i in numTables {
 			var header = physicalToVirtual((xsdt.headers[i] as! UInt64)) as! AcpiTableHeader
@@ -310,6 +315,8 @@ class ACPIParser {
 		coresAp++
 		// apLock.unlock()
 
+		// TODO start another AP in chain (if applicable) to speed-up the SMP initialization
+
 		while true {
 			halt()
 			pause()
@@ -317,6 +324,7 @@ class ACPIParser {
 	}
 
 	static let smpEnabled Bool = false
+	// TODO this should be removed in the future as SMP always required
 
 	// TODO Hexa: `<T>` note: not @volatile by default
 	static fun writeToUInt64(address UInt64, value UInt64) Void {
@@ -340,10 +348,36 @@ class ACPIParser {
 		return at[0] // TODO as! UInt32
 	}
 
+	// TODO Hexa: field-vars are taken as static in static functions
+	// let ioregsel = 0x00
+	static let ioregsel = 0x00
+	static let iowin = 0x10
+	static let ioredtbl = 0x10u8
+
+	static fun ioApicOut(base UInt64, reg UInt8, val UInt32) Void {
+		writeToUInt32(base + ioregsel, reg)
+		writeToUInt32(base + iowin, val)
+	}
+
+	static fun ioApicIn(base UInt64, reg UInt8) UInt32 {
+		writeToUInt32(base + ioregsel, reg)
+		return readFromUInt32(base + iowin)
+	}
+
+	static fun ioApicSetEntry(base UInt64, index UInt8, data UInt64) Void {
+		ioApicOut(base, ioredtbl + index * 2u8, data as! UInt32)
+		ioApicOut(base, ioredtbl + index * 2 + 1u8, (data >> 32) as! UInt32)
+	}
+
 	static fun loadApic(apic AcpiApic) {
-		serialPrintf("loadApic begin\n")
+		serialPrintf("[ACPI] loadApic begin SMP\n")
 		// TODO Delay between IPI-SIPI + disable PIC
-		if not smpEnabled { return }
+		// TODO Hexa: ensure `if not boolean` generates `!= true_` instead of `c-style != 0` cause null-bool is `2`
+		if not smpEnabled {
+			serialPrintf("[ACPI] skipping: SMP is not enabled for this release\n")
+			return
+		}
+
 		disableAllInterrupts()
 
 		let apic_base_flag = 0xFFFFF000u32
@@ -356,7 +390,7 @@ class ACPIParser {
 		let virtualLocalApic = wholePhysicalStart + (32u64 * 1024u64 * 1024u64 * 1024u64)
 		let physicalLocalApic = apic.localAddress
 
-		fun localApicOut(reg UInt64, data UInt32) Void {
+		fun localApicOut(reg UInt64, data UInt32, virtualLocalApic UInt64) Void {
 			// TODO Hexa: volatile types cannot be assigned
 			// TODO Hexa: code gen
 			// let at = (virtualLocalApic + reg) as! ArrayPointer<@volatile UInt32>
@@ -366,7 +400,7 @@ class ACPIParser {
 
 		// TODO Hexa: optimize to `fun`: `let localApicIn = (reg UInt64) => {`
 		// TODO Hexa: disable (arg TYPE_THIS_THING) for arrow fun-s, let use `fun` when non-inferrable
-		fun localApicIn(reg UInt64) UInt32 {
+		fun localApicIn(reg UInt64, virtualLocalApic UInt64) UInt32 {
 			// TODO return readFrom<ArrayPointer<@volatile UInt32>>(virtualLocalApic + reg)
 			// let at = (virtualLocalApic + reg) as! ArrayPointer<@volatile UInt32>
 			// return at[0]
@@ -380,17 +414,17 @@ class ACPIParser {
 
 		mapMemory(pml4entries, virtualLocalApic, physicalLocalApic, 1)
 
-		localApicOut(lapic_tpr, 0) // Clear task priority to enable all interrupts
-		localApicOut(lapic_dfr, 0xffffffffu32) // Flat mode
-		localApicOut(lapic_ldr, 0x01000000) // All CPUs use logical id 1
-		localApicOut(lapic_svr, 0x100u32 | 0xff) // Configure Spurious Interrupt Vector Register
+		localApicOut(lapic_tpr, 0, virtualLocalApic) // Clear task priority to enable all interrupts
+		localApicOut(lapic_dfr, 0xffffffffu32, virtualLocalApic) // Flat mode
+		localApicOut(lapic_ldr, 0x01000000, virtualLocalApic) // All CPUs use logical id 1
+		localApicOut(lapic_svr, 0x100u32 | 0xff, virtualLocalApic) // Configure Spurious Interrupt Vector Register
 
 		// TODO FORMAT
 		// let virtualIoApic = wholePhysicalStart + ((uint64_t) 33 *(uint64_t) 1024 *(uint64_t) 1024 *(uint64_t) 1024)
 		let virtualIoApic = wholePhysicalStart + (33u64 * 1024u64 * 1024u64 * 1024u64)
 		var physicalIoApic = 0u64
 
-		let count = acpiTableEntries(apic, 1)
+		let count = acpiTableEntriesApic(apic, 1)
 		var data ArrayPointer<UInt8> = apic.controllerData.ref
 		let end = data.offsetItems(count)
 
@@ -416,22 +450,23 @@ class ACPIParser {
 		let ioapicarb = 0x02
 		let ioredtbl = 0x10u8
 
-		fun ioApicOut(base UInt64, reg UInt8, val UInt32) Void {
+		// TODO Hexa
+		fun ioApicOut_TODO(base UInt64, reg UInt8, val UInt32) Void {
 			writeToUInt32(base + ioregsel, reg)
 			writeToUInt32(base + iowin, val)
 		}
 
-		fun ioApicIn(base UInt64, reg UInt8) UInt32 {
+		fun ioApicIn_TODO(base UInt64, reg UInt8) UInt32 {
 			writeToUInt32(base + ioregsel, reg)
 			return readFromUInt32(base + iowin)
 		}
 
-		fun ioApicSetEntry(base UInt64, index UInt8, data UInt64) Void {
+		fun ioApicSetEntry_TODO(base UInt64, index UInt8, data UInt64) Void {
 			ioApicOut(base, ioredtbl + index * 2u8, data as! UInt32)
 			ioApicOut(base, ioredtbl + index * 2 + 1u8, (data >> 32) as! UInt32)
 		}
 
-		fun ioApicInit() Void {
+		fun ioApicInit(virtualIoApic UInt64) Void {
 			let x = ioApicIn(virtualIoApic, ioapicver)
 			let count = ((x >> 16) & 0xff) + 1u8 // Maximum redirection entry
 
@@ -440,10 +475,10 @@ class ACPIParser {
 			}
 		}
 
-		ioApicInit()
+		ioApicInit(virtualIoApic)
 
-		fun acpiRemapIrq(irq UInt32) UInt32 {
-			let count = acpiTableEntries(apic, 1)
+		fun acpiRemapIrq(irq UInt32, apic AcpiApic) UInt32 {
+			let count = acpiTableEntriesApic(apic, 1)
 			var data ArrayPointer<UInt8> = apic.controllerData.ref
 			// TODO Hexa: produces UInt64 `let end = data + count`
 			let end = data.offsetItems(count)
@@ -468,10 +503,10 @@ class ACPIParser {
 
 		let int_timer = 0x20u64
 		let irq_timer = 0x00u32
-		ioApicSetEntry(virtualIoApic, acpiRemapIrq(irq_timer) as! UInt8, int_timer)
+		ioApicSetEntry(virtualIoApic, acpiRemapIrq(irq_timer, apic) as! UInt8, int_timer)
 
 		let lapic_eoi = 0x00b0u64 // End of Interrupt
-		localApicOut(lapic_eoi, 0)
+		localApicOut(lapic_eoi, 0, virtualLocalApic)
 
 		let trapeze = 0x8000 + wholePhysicalStart
 		let trapezePhysical = trapeze - wholePhysicalStart
@@ -489,7 +524,7 @@ class ACPIParser {
 		let pml4 = code + 8
 
 		var data = apic.controllerData.ref
-		let count = acpiTableEntries(apic, 1)
+		let count = acpiTableEntriesApic(apic, 1)
 		let end = data.offsetItems(count)
 		let bsp = 0 // TODO Get from LAPIC MSR?
 		let x2 = false // TODO
@@ -548,10 +583,10 @@ class ACPIParser {
 						let icr_send_pending = 0x00001000u32
 
 						let apic_id = lapicid
-						localApicOut(lapic_icrhi, apic_id << icr_destination_shift)
-						localApicOut(lapic_icrlo, icr_init | icr_physical | icr_assert | icr_edge | icr_no_shorthand)
+						localApicOut(lapic_icrhi, apic_id << icr_destination_shift, virtualLocalApic)
+						localApicOut(lapic_icrlo, icr_init | icr_physical | icr_assert | icr_edge | icr_no_shorthand, virtualLocalApic)
 
-						while (localApicIn(lapic_icrlo) & icr_send_pending) != 0 {
+						while (localApicIn(lapic_icrlo, virtualLocalApic) & icr_send_pending) != 0 {
 							pause()
 						}
 					}
@@ -567,14 +602,14 @@ class ACPIParser {
 					} else {
 						icr |= (cpuid << 56u64)
 
-						while localApicIn(0x300u64) & 1u32 << 12u32 == 1u32 << 12u32 {
+						while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
 							pause()
 						}
 
-						localApicOut(0x310, (icr >> 32u64) as! UInt32)
-						localApicOut(0x300, icr as! UInt32)
+						localApicOut(0x310, (icr >> 32u64) as! UInt32, virtualLocalApic)
+						localApicOut(0x300, icr as! UInt32, virtualLocalApic)
 
-						while localApicIn(0x300u64) & 1u32 << 12u32 == 1u32 << 12u32 {
+						while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
 							pause()
 						}
 
@@ -586,6 +621,7 @@ class ACPIParser {
 					while currentCoresAp == coresAp {
 						pause()
 					}
+				case _: // TODO
 			}
 
 			data = data.offsetItems(length)
