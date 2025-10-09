@@ -81,7 +81,7 @@ class AcpiMcfg {
 @struct @packed
 class AcpiApic {
 	// TODO static let sign = @acpiHeaderSignature 'APIC'
-	var header AcpiTableHeader
+	var header ByValue<AcpiTableHeader>
 	var localAddress UInt32
 	var flags UInt32
 	var controllerData ArrayByValue<UInt8, 0>
@@ -125,7 +125,14 @@ fun acpiTableEntries<T>(t T, size UInt64) UInt64 {
 
 // Compute APIC controller data bytes count (header.length - sizeof(AcpiApic))
 fun acpiTableEntriesApic(t AcpiApic, size UInt64) UInt64 {
-	return (t.header.length - sizeOf<AcpiApic>()) / size
+	// TODO Hexa: `if (t_2889_->header_ == nullptr) {}` is wrong for `ByValue`
+
+	/*if t.header == null {
+		serialPrintf("[ERROR] acpiTableEntriesApic: t.header is null!\n")
+		return 0
+	}*/
+	let result = (t.header.ref.length - sizeofAcpiApic) / size
+	return result
 }
 
 fun acpiTableEntriesXSDT(t XSDT, size UInt64) UInt64 {
@@ -350,13 +357,14 @@ class ACPIParser {
 	@volatile static var coresAp UInt64 = 1
 
 	static fun apStart() {
+		let core = coresAp + 1
+		serialPrintf("[ACPI] apStart(%d)\n", core)
 		// TODO seems useless, cause main CPU waits for SIPIs anyway
 		// apLock.lock()
 
 		// TODO IDT
 		// TODO GDT
 		// TODO NX
-		let core = coresAp + 1
 		quakePrintf("CPU #%u initialized, ".utf16(), core)
 		disableAllInterrupts()
 		coresAp++
@@ -582,12 +590,33 @@ class ACPIParser {
 			let type = data[0]
 			let length = data[1]
 
+			// Skip BSP
+			let position = data as! UInt64
+			let cpuid = readFromUInt8(position + 2)
+
+			if bsp == cpuid {
+				serialPrintf("[ACPI] BSP skip\n")
+				// TODO turn into `@defer/defer` because it just loops forever lmao
+				data = data.offsetItems(length)
+				continue
+			}
+
+			let flags = readFromUInt8(position + 4)
+
+			// TODO applicable to x2 or wrap into condition?
+			// The core is disabled (absent, failed, or turned off in firmware)
+			if (flags & 0x1) == 0 {
+				// TODO break // TODO Hexa
+				serialPrintf("[ACPI] Inactive AP skip\n")
+				// TODO turn into `@defer/defer` because it just loops forever lmao
+				data = data.offsetItems(length)
+				continue
+			}
+
 			switch type {
+				// TODO enum
 				case 0:
-					let position = data as! UInt64
-					let cpuid = readFromUInt8(position + 2)
 					let lapicid = readFromUInt8(position + 3)
-					let flags = readFromUInt8(position + 4)
 
 					if bsp == cpuid {
 						// TODO break // TODO Hexa doc how to break early (to func) haxe break for?
@@ -651,14 +680,19 @@ class ACPIParser {
 					} else {
 						icr |= (cpuid << 56u64)
 
-						while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
+						// TODO Hexa: precedence
+						// while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
+						let done = 1u32 << 12u32
+						while (localApicIn(0x300u64, virtualLocalApic) & done) == done {
 							pause()
 						}
 
 						localApicOut(0x310, (icr >> 32u64) as! UInt32, virtualLocalApic)
 						localApicOut(0x300, icr as! UInt32, virtualLocalApic)
 
-						while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
+						// TODO Hexa: precedence
+						// while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
+						while (localApicIn(0x300u64, virtualLocalApic) & done) == done {
 							pause()
 						}
 
@@ -671,6 +705,7 @@ class ACPIParser {
 						pause()
 					}
 				case _: // TODO
+					serialPrintf("[ACPI] Unrecognized APIC type %d\n", type)
 			}
 
 			data = data.offsetItems(length)
@@ -680,7 +715,7 @@ class ACPIParser {
 	}
 
 	static fun loadMcfg(mcfg AcpiMcfg) {
-		serialPrintf("loadMcfg\n")
+		serialPrintf("[ACPI] loadMcfg\n")
 		var count UInt64 = acpiTableEntriesAcpiMcfg(mcfg, sizeOf<AcpiMcfgEntry>()) // TODO sizeOf must error
 		var mPci [PciGroup] = []
 
