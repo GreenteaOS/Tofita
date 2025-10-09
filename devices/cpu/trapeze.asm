@@ -44,7 +44,7 @@ arguments:
     ; (this way position of .cpuIndex is easy to calculate by fixed offset)
     times PADDING - ($ - arguments) nop
 
-    ; This memory overwitten directly as a way to pass parameters
+    ; This memory overwritten directly as a way to pass parameters
     .padding: uint64_t 0 ; TODO Unused
     .cpuIndex: uint64_t 0 ; Current CPU core number
     .pageTable: uint32_t 0 ; PML4
