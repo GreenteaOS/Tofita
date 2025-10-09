@@ -56,10 +56,15 @@ fun engineInit(params UefiPayload) {
 	pml4entries = (wholePhysicalStart + (params.pml4 as! UInt64)) as! ArrayPointer<ByValue<PageEntry>>
 
 	// CPU features
+	let cpuid CPUID = getCPUID()
+
 	{
 		// Page Attribute Table (PAT)
 		// TODO SMP enable PAT for each AP
-		pat()
+		// TODO would make sense to put it into `AMD64.initializePAT(cpuid)` namespace ig
+		initializePAT(cpuid)
+
+		// TODO SMEP
 	}
 
 	// TODO move to engine\health\sanityChecks.hexa
@@ -140,8 +145,6 @@ fun engineInit(params UefiPayload) {
 	quakePrintf(versionText.utf16())
 
 	// TODO enableLocalApic()
-
-	var cpuid CPUID = getCPUID()
 
 	var megs Int32 = Math.round(params.ramBytes / (1024.0 * 1024.0))
 	quakePrintf("[CPU] %s %s %d MB RAM\n".utf16(), cpuid.vendorID, cpuid.brandName, megs)

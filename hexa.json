@@ -58,6 +58,7 @@
 		"devices/cpu/cpu",
 		"devices/cpu/cpuid",
 		"devices/cpu/exceptions",
+		"devices/amd64/pat",
 		"devices/cpu/interrupts.header",
 		"engine/autorun",
 		"engine/multitasking/thread",

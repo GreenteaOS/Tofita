@@ -112,20 +112,6 @@ declare fun wrmsr(
 ) Void
 
 @customHeader('
-	void pat() {
-		uint64_t pat = rdmsr(0x277) & ~(0x7ull << 32);
-        pat |= 0x1ull << 32; // set WC mode for PA4
-        wrmsr(0x277, pat);
-	}
-')
-@rename('pat')
-declare fun pat(
-	// TODO
-	// msr UInt64,
-	// value UInt64
-) Void
-
-@customHeader('
 	void movntdq_(void* from, void* to, uint64_t loops);// { _movntdq(from, to); };
 	#define movntdq__(from, to, loops) movntdq_(from, to, loops)
 ')
