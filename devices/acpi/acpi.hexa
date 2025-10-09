@@ -321,7 +321,7 @@ class ACPIParser {
 			switch header.type {
 				case APIC:
 					serialPrintf("[ACPI] header.type == APIC\n")
-					// TODO loadApic(header as! AcpiApic)
+					loadApic(header as! AcpiApic)
 					// break // TODO breaks `for` not `switch`
 
 				case MCFG:
@@ -383,21 +383,25 @@ class ACPIParser {
 
 	// TODO Hexa: `<T>` note: not @volatile by default
 	static fun writeToUInt64(address UInt64, value UInt64) Void {
+		// TODO Hexa: this does not produce volatile types yet, so using __sync_synchronize here
+		__sync_synchronize()
 		let at = address as! ArrayPointer<@volatile UInt64>
 		at[0] = value
 	}
 
 	static fun writeToUInt32(address UInt64, value UInt32) Void {
+		__sync_synchronize()
 		let at = address as! ArrayPointer<@volatile UInt32>
 		at[0] = value
 	}
 
 	static fun readFromUInt32(address UInt64) UInt32 {
+		__sync_synchronize()
 		let at = address as! ArrayPointer<@volatile UInt32>
 		return at[0] // TODO as! UInt32
 	}
 
-	// Note: non volatile
+	/// Note: non volatile
 	static fun readFromUInt8(address UInt64) UInt8 {
 		let at = address as! ArrayPointer<UInt8>
 		return at[0] // TODO as! UInt32
@@ -422,6 +426,19 @@ class ACPIParser {
 	static fun ioApicSetEntry(base UInt64, index UInt8, data UInt64) Void {
 		ioApicOut(base, ioredtbl + index * 2u8, data as! UInt32)
 		ioApicOut(base, ioredtbl + index * 2 + 1u8, (data >> 32) as! UInt32)
+	}
+
+	static fun delayMicroseconds(mcs Int) Void {
+		// One `pause` is 10+ cycles, assuming 4 Ghz CPU
+		// TODO better idea (rdtscTicks)
+		let dosensOfCycles = mcs * 400
+		for i in dosensOfCycles {
+			pause()
+		}
+	}
+
+	static fun delayMilliseconds(ms Int) Void {
+		delayMicroseconds(ms * 1000)
 	}
 
 	static fun loadApic(apic AcpiApic) {
@@ -646,6 +663,7 @@ class ACPIParser {
 
 					__sync_synchronize()
 
+					// Send INIT IPI
 					let icr = 0x4500
 					if x2 {
 						// TODO
@@ -667,6 +685,9 @@ class ACPIParser {
 						while (localApicIn(lapic_icrlo, virtualLocalApic) & icr_send_pending) != 0 {
 							pause()
 						}
+
+						// Recommended 10ms delay TODO
+						delayMilliseconds(10)
 					}
 
 					let currentCoresAp = coresAp
@@ -675,10 +696,13 @@ class ACPIParser {
 					let ap_segment = (trampoline >> 12u64) & 0xFFu64
 					var icr = 0x4600u64 | ap_segment
 
+					// Send START IPI (SIPI)
 					if x2 {
 						// TODO
 					} else {
-						icr |= (cpuid << 56u64)
+						// icr |= (cpuid << 56u64)
+						// NOTE not cpu id
+						icr |= ((lapicid as! UInt64) << 56u64)
 
 						// TODO Hexa: precedence
 						// while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
@@ -687,18 +711,36 @@ class ACPIParser {
 							pause()
 						}
 
+						// Send first STARTUP IPI (SIPI)
+						// ICR High: Destination
 						localApicOut(0x310, (icr >> 32u64) as! UInt32, virtualLocalApic)
+						// ICR Low: SIPI command
 						localApicOut(0x300, icr as! UInt32, virtualLocalApic)
 
 						// TODO Hexa: precedence
 						// while localApicIn(0x300u64, virtualLocalApic) & 1u32 << 12u32 == 1u32 << 12u32 {
 						while (localApicIn(0x300u64, virtualLocalApic) & done) == done {
+							// Wait for send to complete
 							pause()
 						}
 
+						// Recommended 200us delay TODO proper value if needed
+						// + check if delay needed for this CPU model
+						delayMicroseconds(200)
+
+						// Send second STARTUP IPI (SIPI)
 						let apic_id = lapicid
 						let vector = icr
 						let icr_startup = 0x00000600 // TODO
+
+						// ICR High: Destination (same as before)
+						localApicOut(0x310, (vector >> 32u64) as! UInt32, virtualLocalApic)
+						// ICR Low: SIPI again
+						localApicOut(0x300, vector as! UInt32, virtualLocalApic)
+
+						while (localApicIn(0x300u64, virtualLocalApic) & done) == done {
+							pause()
+						}
 					}
 
 					while currentCoresAp == coresAp {
