@@ -185,7 +185,7 @@ class PciGroup {
 
 // TODO move acpiParser.hexa
 class ACPIParser {
-	static fun parse(acpiVendorTable UInt64) Bool {
+	static fun parse(acpiVendorTable UInt64, cpuid CPUID) Bool {
 		serialPrint("[ACPI] parsing started at physical ")
 		serialPrintHex(acpiVendorTable as! UInt64)
 		serialPrint("\n")
@@ -321,7 +321,7 @@ class ACPIParser {
 			switch header.type {
 				case APIC:
 					serialPrintf("[ACPI] header.type == APIC\n")
-					loadApic(header as! AcpiApic)
+					loadApic(header as! AcpiApic, cpuid)
 					// break // TODO breaks `for` not `switch`
 
 				case MCFG:
@@ -441,7 +441,7 @@ class ACPIParser {
 		delayMicroseconds(ms * 1000)
 	}
 
-	static fun loadApic(apic AcpiApic) {
+	static fun loadApic(apic AcpiApic, cpuid CPUID) {
 		serialPrintf("[ACPI] loadApic begin SMP\n")
 		// TODO Delay between IPI-SIPI + disable PIC
 		// TODO Hexa: ensure `if not boolean` generates `!= true_` instead of `c-style != 0` cause null-bool is `2`
@@ -453,6 +453,9 @@ class ACPIParser {
 		}
 
 		disableAllInterrupts()
+
+		// x2APIC is supported
+		let x2 Bool = cpuid.x2apicSupported
 
 		let apic_base_flag = 0xFFFFF000u32
 		let apic_enable_flag = 0x800u32
@@ -601,7 +604,6 @@ class ACPIParser {
 		let count = acpiTableEntriesApic(apic, 1)
 		let end = data.offsetItems(count)
 		let bsp = 0 // TODO Get from LAPIC MSR?
-		let x2 = false // TODO
 
 		while data.address < end.address {
 			let type = data[0]

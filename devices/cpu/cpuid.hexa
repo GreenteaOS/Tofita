@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,6 +16,7 @@
 @struct
 class CPUID {
 	// TODO implement value arrays init in constructor
+	// CPU specs
 	var vendorID ArrayByValue<UInt8, 13> = [0]
 	var brandName ArrayByValue<UInt8, 48> = [0]
 	var data ArrayByValue<UInt32, 1> = [0]

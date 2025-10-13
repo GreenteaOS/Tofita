@@ -50,6 +50,7 @@ fun engineInit(params UefiPayload) {
 	PhysicalAllocator.resetCounter()
 	let trapezePadding = PhysicalAllocator.allocateOnePage()
 	// TODO ^ rename to "first reserved 4k"? Does it even works like that? Clarify in comments
+	// TODO `8` as a variable
 	let trapeze = PhysicalAllocator.allocatePages(8) // Bootloader
 	let trapezePhysical = trapeze - wholePhysicalStart
 
@@ -152,8 +153,11 @@ fun engineInit(params UefiPayload) {
 	if trapezePhysical > 1068032 {
 		// TODO exact address should be 0x8000u64?
 		serialPrintln("<Tofita> cannot allocate trapeze under 1 MB")
+		// TODO qsod may not work here yet, use verbose draw
 		qsod("Cannot allocate trapeze under 1 MB, got at %8\n".utf16(), trapezePhysical, 0)
-		while true { }
+		while true {
+			pause()
+		}
 		// TODO test by >1 if it even renders this message
 	}
 
@@ -179,7 +183,7 @@ fun engineInit(params UefiPayload) {
 	}
 
 	// disablePic() TODO may be required before activation
-	if not ACPIParser.parse(params.acpiTablePhysical) {
+	if not ACPIParser.parse(params.acpiTablePhysical, cpuid) {
 		quakePrintf("ACPI is *not* loaded, probably incompatible motherboard or outdated BIOS\n".utf16())
 	} else {
 		quakePrintf("ACPI 2.0 is loaded and ready\n".utf16())
