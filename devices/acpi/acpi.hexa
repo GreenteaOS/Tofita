@@ -489,6 +489,7 @@ class ACPIParser {
 		let lapic_ldr = 0x00d0u64 // Logical Destination
 		let lapic_svr = 0x00f0u64 // Spurious Interrupt Vector
 
+		// TODO is 1 page enough?
 		mapMemory(pml4entries, virtualLocalApic, physicalLocalApic, 1)
 
 		localApicOut(lapic_tpr, 0, virtualLocalApic) // Clear task priority to enable all interrupts
@@ -510,18 +511,31 @@ class ACPIParser {
 			let length = data[1]
 			switch type {
 				case APIC_TYPE_IO_APIC:
-					let s = data as! ApicIoApic
-					physicalIoApic = s.ioApicAddress
+					let apicData = data as! ApicIoApic
+					let ioApicAddress = apicData.ioApicAddress
+
+					if physicalIoApic != 0 and physicalIoApic != ioApicAddress {
+						serialPrintf("[ACPI] multiple IO APICs found, overriding\n")
+						// TODO NUMA/dual-socket only?
+					}
+
+					physicalIoApic = ioApicAddress
 			}
 
 			data = data.offsetItems(length)
 		}
 
-		mapMemory(pml4entries, virtualIoApic, physicalIoApic, 1) // Map memory, 1 page
+		// Map memory, 1 page
+		// TODO supposedly may be not enoungh for some HW?
+		mapMemory(pml4entries, virtualIoApic, physicalIoApic, 1)
 
+		// MMIO register select register that is used to access all the other I/O APIC registers
 		let ioregsel = 0x00
+		// MMIO register window
 		let iowin = 0x10
 
+		// TODO move elsewhere or turn into enum + give descriptions
+		// IO APIC registers
 		let ioapicid = 0x00
 		let ioapicver = 0x01u8
 		let ioapicarb = 0x02
@@ -533,6 +547,7 @@ class ACPIParser {
 			writeToUInt32(base + iowin, val)
 		}
 
+		// TODO use `enum` for `reg` instead of just number
 		fun ioApicIn_TODO(base UInt64, reg UInt8) UInt32 {
 			writeToUInt32(base + ioregsel, reg)
 			return readFromUInt32(base + iowin)
@@ -547,7 +562,7 @@ class ACPIParser {
 			let x = ioApicIn(virtualIoApic, ioapicver)
 			let count = ((x >> 16) & 0xff) + 1u8 // Maximum redirection entry
 
-			for i in count { // Disable all entries
+			for i in count { // Disable all entries TODO purpose
 				ioApicSetEntry(virtualIoApic, i, 1u64 << 16)
 			}
 		}
@@ -566,9 +581,9 @@ class ACPIParser {
 
 				switch type {
 					case APIC_TYPE_INTERRUPT_OVERRIDE:
-						let s = data as! ApicInterruptOverride
-						if s.source == irq {
-							return s.interrupt
+						let interruptData = data as! ApicInterruptOverride
+						if interruptData.source == irq {
+							return interruptData.interrupt
 						}
 				}
 
@@ -578,6 +593,8 @@ class ACPIParser {
 			return irq
 		}
 
+		// Set IO APIC entries
+		// TODO
 		let int_timer = 0x20u64
 		let irq_timer = 0x00u32
 		ioApicSetEntry(virtualIoApic, acpiRemapIrq(irq_timer, apic) as! UInt8, int_timer)
@@ -586,10 +603,17 @@ class ACPIParser {
 		localApicOut(lapic_eoi, 0, virtualLocalApic)
 
 		let trapeze = 0x8000 + wholePhysicalStart
+
+		// SMP goes here //
+		// TODO extract to separate function
 		let trapezePhysical = trapeze - wholePhysicalStart
 		mapMemory(pml4entries, trapeze, trapezePhysical, 1)
 		mapMemory(pml4entries, 0x8000u64 - 4096, 0x8000u64 - 4096, 16)
+		// TODO make it clear what is happening
+		// TODO make it clear why `- 4096u64`
+		// TODO unmap later
 
+		// TODO Unused `ready`
 		let ready = trapeze + 8
 		let cpu_id = ready + 8
 		let page_table = cpu_id + 8
@@ -605,6 +629,7 @@ class ACPIParser {
 		let end = data.offsetItems(count)
 		let bsp = 0 // TODO Get from LAPIC MSR?
 
+		// Iterate over "CPUs"
 		while data.address < end.address {
 			let type = data[0]
 			let length = data[1]
@@ -630,6 +655,8 @@ class ACPIParser {
 				// TODO turn into `@defer/defer` because it just loops forever lmao
 				data = data.offsetItems(length)
 				continue
+				// TODO there's known extra condition, that still allows to activate the core
+				// ^ when flags bit 0 == 0 then check bit 1, if its 1 then activate
 			}
 
 			switch type {
@@ -647,10 +674,15 @@ class ACPIParser {
 						// TODO break // TODO Hexa
 					}
 
+					// Allocate per-core stack
+					// TODO decide on stack size (global var) + space for grow
 					let _stack_start = PhysicalAllocator.allocatePages(64)
 					let _stack_end = stack_start + 64 * 4096
 
+					// TODO ensure PML4 & GDT within 4G or even 2G (Int32)
 					let pml4 = (pml4entries as! UInt64) - wholePhysicalStart
+
+					// Fill trapeze arguments via in-memory patch
 					writeToUInt64(ready, pml4)
 					writeToUInt64(cpu_id, cpuid)
 					writeToUInt32(page_table, ((pml4entries as! UInt64) - wholePhysicalStart) as! UInt32)
@@ -664,6 +696,7 @@ class ACPIParser {
 					writeToUInt64(code, apStart as! UInt64)
 
 					__sync_synchronize()
+					// TODO disableAllInterrupts()?
 
 					// Send INIT IPI
 					let icr = 0x4500
@@ -688,7 +721,7 @@ class ACPIParser {
 							pause()
 						}
 
-						// Recommended 10ms delay TODO
+						// Recommended 10ms delay TODO mega slow on QEMU
 						delayMilliseconds(10)
 					}
 
@@ -745,9 +778,13 @@ class ACPIParser {
 						}
 					}
 
+					// TODO `[ERROR] SMP hardware failure [ERROR]`
 					while currentCoresAp == coresAp {
+						__sync_synchronize()
 						pause()
 					}
+				case 2: // TODO Interrupt source override
+				case 4: // TODO LAPIC NMI
 				case _: // TODO
 					serialPrintf("[ACPI] Unrecognized APIC type %d\n", type)
 			}
