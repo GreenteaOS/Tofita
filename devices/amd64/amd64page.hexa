@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -58,6 +58,7 @@ class PageEntry {
 	@bits(1) var dirty UInt8
 
 	/// PS: Huge page or epic page
+	/// PAT: Page Attribute Table along with PCD and PWT shall indicate the memory caching type.
 	@bits(1) var largePage UInt8
 
 	// TODO
