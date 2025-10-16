@@ -15,12 +15,20 @@
 
 @struct @sizeOf(8 * 4 + 4)
 class Timer {
-	var hwnd UInt64 // Window handle
-	var nIDEvent UInt64 // Timer ID
-	var interval UInt64 // Interval in milliseconds
-	var nextFireTime UInt64 // Next firing time (uptimeMilliseconds)
-	var timerProc UInt64 // TIMERPROC function pointer (0 if NULL)
-	var processId UInt64 // Process ID TODO use reference not ID index
+	/// Window handle
+	var hwnd UInt64
+	/// Timer ID
+	var nIDEvent UInt64
+	/// Interval in milliseconds
+	var interval UInt64
+	/// Next firing time (uptimeMilliseconds)
+	var nextFireTime UInt64
+	/// TIMERPROC function pointer (0 if NULL)
+	var timerProc UInt64
+	/// Process ID TODO use reference not ID index
+	var processId UInt64
+	/// True if timer event has been processed by the user process
+	var processed Bool = false
 	new () { }
 }
 
