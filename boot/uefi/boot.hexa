@@ -144,12 +144,15 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	// NOTE Hexa: meta.getStringDefine('versionMajor')
 	let versionText = "Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag
 	let versionY = (framebuffer.height / 4) * 3 + 64 as! Int16
+	// Aggressive re-paint to force firmware to update this tile
+	drawCleanup(versionY, framebuffer)
 	drawText(
 		versionText,
 		versionY,
 		framebuffer
 	)
 	errorY = versionY + 32i16 // TODO simply `+ 32`
+	drawCleanup(errorY, framebuffer)
 	drawText(
 		"Copyright (C) " + versionMajor + " GNU LGPL v3.0",
 		// "Copyright (C) " + versionMajor + " GNU Lesser General Public License v3.0",
@@ -171,7 +174,7 @@ fun uefi(imageHandle ByValue<EFI_HANDLE>, systemTable EFI_SYSTEM_TABLE) EFI_STAT
 	// Initial RAM disk
 	var ramdisk RamDisk = new RamDisk()
 	drawVerbose("Searching for the RAM disk...", framebuffer)
-	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk)
+	status = findAndLoadRamDisk(systemTable.bootServices, ramdisk, framebuffer)
 	while status != EFI_STATUS.EFI_SUCCESS {
 		drawError("[ERROR] Tofita cannot load RAM disk [ERROR]", framebuffer)
 		while status != EFI_STATUS.EFI_SUCCESS {

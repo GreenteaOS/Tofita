@@ -17,7 +17,8 @@ let assetsStorageFileName = "TOFITA.DAT"
 
 fun allocateRamDisk(
 	bootsvc EFI_BOOT_SERVICES,
-	sizeOfFile UInt64
+	sizeOfFile UInt64,
+	framebuffer FrameBuffer
 ) UInt64 {
 	// TODO must error `size /` at `var sizeAlloc ArrayByValue<UInt64, 1> = [(size / pageSize + 1) * pageSize]`
 	var sizeAlloc ArrayByValue<UInt64, 2> = [(sizeOfFile / pageSize + 1) * pageSize]
@@ -36,6 +37,7 @@ fun allocateRamDisk(
 
 	if status != EFI_STATUS.EFI_SUCCESS {
 		serialPrintf("[[[uefi.allocateRamDisk]]] uefiAllocate failed %d\n", status)
+		drawError("[ERROR] UEFI firmware allocation failed [ERROR]", framebuffer)
 		return 0
 	}
 
@@ -66,7 +68,8 @@ fun checksumRamDisk(
 fun loadRamDiskFromVolume(
 	bootsvc EFI_BOOT_SERVICES,
 	root EFI_FILE_PROTOCOL,
-	ramdisk RamDisk
+	ramdisk RamDisk,
+	framebuffer FrameBuffer
 ) EFI_STATUS {
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] begin\n")
 
@@ -111,7 +114,7 @@ fun loadRamDiskFromVolume(
 	serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status getInfo %d\n", status)
 
 	var size ArrayByValue<UInt64, 1> = [(info as! EFI_FILE_INFO).fileSize]
-	let address = allocateRamDisk(bootsvc, size[0])
+	let address = allocateRamDisk(bootsvc, size[0], framebuffer)
 	if address == 0 {
 		return EFI_STATUS.EFI_NOT_FOUND
 	}
@@ -140,10 +143,11 @@ fun loadRamDiskFromDiscDrive(
 	fileSystem EFI_BLOCK_IO_PROTOCOL,
 	lba UInt64,
 	lbaLength UInt64,
-	ramdisk RamDisk
+	ramdisk RamDisk,
+	framebuffer FrameBuffer
 ) EFI_STATUS {
 	// TODO Ensure proper alignment for DMA transfers (use `AllocateAlignedPages`)
-	let address = allocateRamDisk(bootsvc, lbaLength)
+	let address = allocateRamDisk(bootsvc, lbaLength, framebuffer)
 	if address == 0 {
 		return EFI_STATUS.EFI_NOT_FOUND
 	}
@@ -189,7 +193,7 @@ fun loadRamDiskFromDiscDrive(
 }
 
 // Find and parse good ol' disc drive
-fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk) EFI_STATUS {
+fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk, framebuffer FrameBuffer) EFI_STATUS {
 	var status EFI_STATUS = EFI_STATUS.EFI_NOT_READY
 	var blockDeviceProtocol EFI_GUID = new EFI_BLOCK_IO_PROTOCOL_GUID()
 	var handleCountStorage ArrayByValue<UINTN, 1> = [0]
@@ -339,7 +343,7 @@ fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk) EFI_STATUS {
 
 // returns EFI_SUCCESS or EFI_NOT_FOUND
 // ^ TODO encode this in the type itself or return `RamDisk?`
-fun findAndLoadRamDisk(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk) EFI_STATUS {
+fun findAndLoadRamDisk(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk, framebuffer FrameBuffer) EFI_STATUS {
 	var status EFI_STATUS = EFI_STATUS.EFI_NOT_READY
 	var handleBuffer ArrayPointer<ByValue<EFI_HANDLE>> = null // TODO `= nullPtr`
 	var handleCount UInt64 = 0
@@ -406,7 +410,7 @@ fun findAndLoadRamDisk(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk) EFI_STATUS {
 
 		// TODO ignore volume that is unrelated to the current boot medium
 
-		status = loadRamDiskFromVolume(bootsvc, root, ramdisk)
+		status = loadRamDiskFromVolume(bootsvc, root, ramdisk, framebuffer)
 		if status != EFI_STATUS.EFI_SUCCESS {
 			serialPrintf(
 				"[[[uefi.findAndLoadRamDisk]]] failed: loadRamDiskFromVolume with status %d, continue "
@@ -421,7 +425,7 @@ fun findAndLoadRamDisk(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk) EFI_STATUS {
 
 	// Well time to parse some discs
 	serialPrintf("[[[uefi.findAndLoadRamDisk]]] <ERROR> failed to find RAM disk from ESP, trying disc drives\n")
-	status = scanDiscDrives(bootsvc, ramdisk)
+	status = scanDiscDrives(bootsvc, ramdisk, framebuffer)
 	if status != EFI_STATUS.EFI_SUCCESS {
 		serialPrintf(
 			"[[[uefi.findAndLoadRamDisk]]] failed: scanDiscDrives with status %d, continue "
