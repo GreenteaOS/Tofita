@@ -132,6 +132,16 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 		// Should sorts of loop forever
 		if frame.raxReturn != 0 {
 			process.schedulable = true
+
+			// Mark timer event as processed to prevent repeated firing of the same timer message
+			// This acknowledges that the timer event has been handled and clears it from the active timer queue
+			if payload.message == Message.WM_TIMER {
+				let timerId = payload.wParam
+				let timer = timerList[timerId]
+				if timer != null {
+					timer.processed = true
+				}
+			}
 		} else {
 			// process.syscallToHandle = TofitaSyscalls.GetMessage
 			process.awaitsGetMessage = true
@@ -154,6 +164,18 @@ fun userCallHandled(@volatile process TofitaProcess, syscall TofitaSyscalls) Boo
 
 		/* Call peekMessage to check the message queue; convert result to 0 or 1 */
 		frame.raxReturn = peekMessage(process, payload).toZeroOrOne
+
+		if frame.raxReturn != 0 {
+			// Mark timer event as processed to prevent repeated firing of the same timer message
+			// This acknowledges that the timer event has been handled and clears it from the active timer queue
+			if payload.message == Message.WM_TIMER {
+				let timerId = payload.wParam
+				let timer = timerList[timerId]
+				if timer != null {
+					timer.processed = true
+				}
+			}
+		}
 
 		/* PeekMessage is non-blocking, so always keep process schedulable */
 		process.schedulable = true
