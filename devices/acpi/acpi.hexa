@@ -131,6 +131,7 @@ fun acpiTableEntriesApic(t AcpiApic, size UInt64) UInt64 {
 		serialPrintf("[ERROR] acpiTableEntriesApic: t.header is null!\n")
 		return 0
 	}*/
+	let sizeofAcpiApic = sizeOf<AcpiApic>()
 	let result = (t.header.ref.length - sizeofAcpiApic) / size
 	return result
 }
@@ -486,12 +487,21 @@ class ACPIParser {
 
 		let apic_base_flag = 0xFFFFF000u32
 		let apic_enable_flag = 0x800u32
+		let apic_x2apic_enable_flag = 0x400u32
 
-		let ia32_apic_base = 27u64
-		wrmsr(ia32_apic_base, (apic.localAddress & apic_base_flag) | apic_enable_flag)
+		let ia32_apic_base = 27u64 // aka 0x1B
+		// Turns the Local APIC on
+		if x2 {
+			// Enable x2APIC mode (bit 10 and 11)
+			wrmsr(ia32_apic_base, (apic.localAddress & apic_base_flag) | apic_enable_flag | apic_x2apic_enable_flag)
+		} else {
+			// Enable xAPIC mode
+			wrmsr(ia32_apic_base, (apic.localAddress & apic_base_flag) | apic_enable_flag)
+		}
 
-		// TODO define this in globals
-		let virtualLocalApic = wholePhysicalStart + (32u64 * 1024u64 * 1024u64 * 1024u64)
+		// TODO define this in globals + rethink
+		let offsetGigabytes = 32u64
+		let virtualLocalApic = wholePhysicalStart + (offsetGigabytes * 1024u64 * 1024u64 * 1024u64)
 		let physicalLocalApic = apic.localAddress
 
 		fun localApicOut(reg UInt64, data UInt32, virtualLocalApic UInt64) Void {
@@ -539,6 +549,7 @@ class ACPIParser {
 			switch type {
 				case APIC_TYPE_IO_APIC:
 					let apicData = data as! ApicIoApic
+					serialPrintf("[ACPI] Found I/O APIC: id=%d addr=%8 base=%d\n", apicData.ioApicId, apicData.ioApicAddress, apicData.globalSystemInterruptBase)
 					let ioApicAddress = apicData.ioApicAddress
 
 					if physicalIoApic != 0 and physicalIoApic != ioApicAddress {
@@ -586,8 +597,11 @@ class ACPIParser {
 		}
 
 		fun ioApicInit(virtualIoApic UInt64) Void {
-			let x = ioApicIn(virtualIoApic, ioapicver)
-			let count = ((x >> 16) & 0xff) + 1u8 // Maximum redirection entry
+			// How many entries supports the I/O APIC
+			let ver = ioApicIn(virtualIoApic, ioapicver)
+			let count = ((ver >> 16u32) & 0xffu8) + 1u8
+
+			serialPrintf("[ACPI] I/O APIC pin count = %d\n", count)
 
 			for i in count { // Disable all entries TODO purpose
 				ioApicSetEntry(virtualIoApic, i, 1u64 << 16)
@@ -628,16 +642,20 @@ class ACPIParser {
 
 		let lapic_eoi = 0x00b0u64 // End of Interrupt
 		localApicOut(lapic_eoi, 0, virtualLocalApic)
+		serialPrintf("[ACPI] I/O APIC initialized\n")
 
-		let trapeze = 0x8000 + wholePhysicalStart
 
 		// SMP goes here //
 		// TODO extract to separate function
+		// We will fill trapeze arguments dynamically by updating it's binary directly
+		let trapezeIdenityAddress = 0x8000u64
+		let trapeze = trapezeIdenityAddress + wholePhysicalStart
+		// TODO trapeze is copied in tofita.hexa but this is better do here?
 		let trapezePhysical = trapeze - wholePhysicalStart
-		mapMemory(pml4entries, trapeze, trapezePhysical, 1)
-		mapMemory(pml4entries, 0x8000u64 - 4096, 0x8000u64 - 4096, 16)
 		// TODO make it clear what is happening
+		mapMemory(pml4entries, virtualAddr: trapeze, physicalAddr: trapezePhysical, pageCount: 1)
 		// TODO make it clear why `- 4096u64`
+		mapMemory(pml4entries, virtualAddr: trapezeIdenityAddress - 4096u64, physicalAddr: trapezeIdenityAddress - 4096u64, pageCount: 16)
 		// TODO unmap later
 
 		// TODO Unused `ready`
