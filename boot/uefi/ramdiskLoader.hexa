@@ -14,6 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 let assetsStorageFileName = "TOFITA.DAT"
+let assetsStorageFileNameLowerCase = "tofita.dat"
 
 fun allocateRamDisk(
 	bootsvc EFI_BOOT_SERVICES,
@@ -76,7 +77,7 @@ fun loadRamDiskFromVolume(
 	var file EFI_FILE_PROTOCOL = null
 	var sfile ArrayByValue<EFI_FILE_PROTOCOL, 1> = []
 
-	let status EFI_STATUS = root.open(
+	var status EFI_STATUS = root.open(
 		root,
 		sfile.ref,
 		// TODO Hexa: auto-cast String to Const-pointers (all utf16, utf8 pre-validate literals)
@@ -95,7 +96,25 @@ fun loadRamDiskFromVolume(
 	file = sfile[0]
 
 	if status == EFI_STATUS.EFI_NOT_FOUND {
-		serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status EFI_NOT_FOUND\n")
+		serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status EFI_NOT_FOUND, retrying\n")
+
+		status = root.open(
+			root,
+			sfile.ref,
+			// TODO Hexa: auto-cast String to Const-pointers (all utf16, utf8 pre-validate literals)
+			assetsStorageFileNameLowerCase.utf16() as! ArrayPointer<UInt16>,
+			EFI_OpenMode.EFI_FILE_MODE_READ,
+			(
+				EFI_FileAttribute.EFI_FILE_READ_ONLY as! UInt64 | // TODO and
+				EFI_FileAttribute.EFI_FILE_HIDDEN as! UInt64 | // TODO and
+				EFI_FileAttribute.EFI_FILE_SYSTEM as! UInt64
+			) as! EFI_FileAttribute
+			// TODO `and not` operator to disable flags
+		)
+	}
+
+	if status == EFI_STATUS.EFI_NOT_FOUND {
+		serialPrintf("[[[uefi.loadRamDiskFromVolume]]] status EFI_NOT_FOUND (lowercase)\n")
 		return status
 	}
 
@@ -144,6 +163,7 @@ fun loadRamDiskFromDiscDrive(
 	lba UInt64,
 	lbaLength UInt64,
 	ramdisk RamDisk,
+	blockSize UInt64,
 	framebuffer FrameBuffer
 ) EFI_STATUS {
 	// TODO Ensure proper alignment for DMA transfers (use `AllocateAlignedPages`)
@@ -152,8 +172,7 @@ fun loadRamDiskFromDiscDrive(
 		return EFI_STATUS.EFI_NOT_FOUND
 	}
 
-	let blockSize = 2048u64
-	let numberOfBlocks = (lbaLength + blockSize - 1) / blockSize
+	let numberOfBlocks = (lbaLength + blockSize - 1u64) / blockSize
 	let at ArrayPointer<UInt8> = address as! ArrayPointer<UInt8>
 	serialPrintf("[[[uefi.loadRamDiskFromDiscDrive]]] readBlocks: %d (%8) as %d blocks at %8\n", lbaLength, lbaLength, numberOfBlocks, lba)
 	let status = fileSystem.readBlocks(fileSystem, fileSystem.media.mediaId, lba, numberOfBlocks * blockSize, at)
@@ -247,15 +266,19 @@ fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk, framebuffer Frame
 
 		serialPrintln("[[[uefi.scanDiscDrives]]] success handleProtocol found a file system")
 
-		// ISO 9660 uses 2048-byte sectors
-		if fileSystem.media.blockSize != 2048 {
-			serialPrintf("[[[uefi.scanDiscDrives]]] blockSize != 2048, actual value is %d\n", fileSystem.media.blockSize)
+		// Typical ISO 9660 sector size
+		let blockSize = 2048u64
+
+		// Validate byte sectors
+		if fileSystem.media.blockSize != blockSize {
+			serialPrintf("[[[uefi.scanDiscDrives]]] blockSize != %d, actual value is %d\n", blockSize, fileSystem.media.blockSize)
 			continue
 		}
 
 		// Read Primary Volume Descriptor (LBA 16)
+		// TODO Hexa: accept `<blockSize>`
 		var pvd ArrayByValue<UInt8, 2048> = [0]
-		status = fileSystem.readBlocks(fileSystem, fileSystem.media.mediaId, 16, 2048, pvd.ref)
+		status = fileSystem.readBlocks(fileSystem, fileSystem.media.mediaId, 16, blockSize, pvd.ref)
 
 		// TODO add field `EFI_STATUS.isBad()` so can just `if status.isBad()`
 		if status != EFI_STATUS.EFI_SUCCESS {
@@ -280,8 +303,9 @@ fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk, framebuffer Frame
 		serialPrintf("[[[uefi.scanDiscDrives]]] rootLba is %d\n", rootLba)
 
 		// Read root directory (+2 bytes for null terminator)
+		// TODO Hexa: `<blockSize + 2>` (preserving `u64`)
 		var rootDir ArrayByValue<UInt8, 2050> = [0]
-		status = fileSystem.readBlocks(fileSystem, fileSystem.media.mediaId, rootLba, 2048, rootDir.ref)
+		status = fileSystem.readBlocks(fileSystem, fileSystem.media.mediaId, rootLba, blockSize, rootDir.ref)
 
 		if status != EFI_STATUS.EFI_SUCCESS {
 			serialPrintf("[[[uefi.scanDiscDrives]]] readBlocks(rootDir) failed, status %d\n", status)
@@ -293,7 +317,7 @@ fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk, framebuffer Frame
 		var lba UInt64 = 0
 
 		var lbaLength UInt64 = 0
-		while offset < 2048 {
+		while offset < blockSize {
 			var entry = rootDir.ref.offsetItems(offset) as! IsoDirectoryEntry
 			serialPrintf("[[[uefi.scanDiscDrives]]] Found file: %s, nameLength: %d\n", entry.name.ref, entry.nameLength)
 
@@ -305,19 +329,40 @@ fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk, framebuffer Frame
 				serialPrintf("[[[uefi.scanDiscDrives]]] Skipping empty entry, lengthOfDirRecord is %d\n", entry.lengthOfDirRecord)
 				offset += entry.lengthOfDirRecord
 				continue
-				// break
 			}
 
-			// Including `;1`
-			if entry.nameLength != (assetsStorageFileName.length + 2) {
+			// Including and excluding `;1`
+			if
+				entry.nameLength != (assetsStorageFileName.length + 2), // and
+				entry.nameLength != assetsStorageFileName.length
+			{
 				serialPrintf("[[[uefi.scanDiscDrives]]] Skipping not needed entry\n")
 				offset += entry.lengthOfDirRecord
 				continue
 			}
 
 			var found = true
+			// Check only the part before `;1` relying on unique-ity of the name
 			for i in assetsStorageFileName.length {
+				if entry.name[i] == 0 {
+					// End of string
+					break
+				}
+
 				found = found and (entry.name[i] == assetsStorageFileName.utf16()[i] as! UInt8)
+			}
+
+			// Retry with lowercase just in case
+			if not found {
+				found = true
+				for i in assetsStorageFileNameLowerCase.length {
+					if entry.name[i] == 0 {
+						// End of string
+						break
+					}
+
+					found = found and (entry.name[i] == assetsStorageFileNameLowerCase.utf16()[i] as! UInt8)
+				}
 			}
 
 			if found {
@@ -335,7 +380,7 @@ fun scanDiscDrives(bootsvc EFI_BOOT_SERVICES, ramdisk RamDisk, framebuffer Frame
 			continue
 		}
 
-		return loadRamDiskFromDiscDrive(bootsvc, fileSystem, lba, lbaLength, ramdisk)
+		return loadRamDiskFromDiscDrive(bootsvc, fileSystem, lba, lbaLength, ramdisk, blockSize, framebuffer)
 	}
 
 	return EFI_STATUS.EFI_NOT_FOUND
