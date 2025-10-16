@@ -44,6 +44,7 @@ let engine_reserved_pages UInt64 = 4096u64
 // TODO rename to just Physical?
 class PhysicalAllocator {
 	// Approx. 1 megabyte per each 4 gigabyte of RAM
+	// TODO can be a lazy-allocated section to avoid indirection (done by bootloader)
 	static var buffer ArrayPointer<UInt8> // TODO use bits, not bytes
 	static var count UInt64 // TODO Hexa: require default values
 	static var countUser UInt64 // count - engine_reserved_pages
@@ -87,7 +88,10 @@ class PhysicalAllocator {
 				let where = down_bytes_to_pages(descriptor.physicalStart)
 				let steps = descriptor.numberOfPages
 
-				if kind == page_reserved {
+				if
+					kind == page_reserved,
+					false // Turning this off cause bit bloating logs
+				{
 					serialPrintf("[physical] Reserve %u pages from %u page\n", steps, where)
 				}
 
@@ -243,8 +247,10 @@ class PhysicalAllocator {
 
 			// TODO Hexa: `meta.moduleName` instead of `"physical"`
 			// ^ `fun log(text, moduleName = meta.callerModuleName)` `log(x, _)` <- assume default arg value
-			serialPrintf("[physical] allocatePages current %u\n", current)
-			serialPrintf("[physical] allocatePages currentAt %u\n", currentAt)
+			if false { // Turning this off cause bit bloating logs
+				serialPrintf("[physical] allocatePages current %u\n", current)
+				serialPrintf("[physical] allocatePages currentAt %u\n", currentAt)
+			}
 		}
 
 		// TODO just iterate while checking FIRST and LATEST page for being free
@@ -266,6 +272,10 @@ class PhysicalAllocator {
 	// Current granularity: 4096 bytes
 	// TODO rename to allocateBytesRoundedToPages
 	static fun allocateBytes(bytes UInt64) UInt64 {
+		if false { // Turning this off cause bit bloating logs
+			serialPrintf("[physical] allocateBytes %u\n", bytes)
+		}
+
 		return allocatePages(down_bytes_to_pages(bytes) + 1u64)
 	}
 
