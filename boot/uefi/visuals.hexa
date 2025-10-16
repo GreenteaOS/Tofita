@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -145,9 +145,16 @@ fun drawCleanup(y Int16, framebuffer FrameBuffer) {
 // Calculated from screen size
 var errorY Int16 = 0
 
+/// NOTE Hangs forever after drawing
 fun drawError(text String, framebuffer FrameBuffer) {
 	drawCleanup(errorY, framebuffer)
-	drawText(text, errorY, framebuffer)
+	drawText(text, errorY, framebuffer) // TODO drawVerbose
+
+	// Hang -> but not halt, to allow repaint
+	while framebuffer.base != 0 {
+		pause()
+		__sync_synchronize()
+	}
 }
 
 // TODO Hexa: outline infer `true` (for let) or `Bool` (for var)
