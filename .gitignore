@@ -17,3 +17,7 @@ $*
 !.hexa
 !.vscode
 kernel-diff
+
+# Re-enable some for AI
+!build.bat
+!.gitignore
