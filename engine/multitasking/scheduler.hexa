@@ -225,8 +225,11 @@ fun timerInterruptHandler(@volatile frame InterruptFrame) {
 			payload.wParam = timer.nIDEvent
 			payload.lParam = timer.timerProc
 			let process TofitaProcess = processes[timer.processId]
+			// TODO post `if timer.processed` - only post WM_TIMER if timer hasn't been processed yet to prevent duplicate messages
 			postMessage(process, payload)
-			quakePrintf("T!%8!".utf16(), timer.interval)
+			// Mark timer as processed to prevent the scheduler from posting duplicate WM_TIMER messages
+			// The timer event has been acknowledged and won't be posted again until the message is handled
+			timer.processed = false
 
 			// Update next fire time
 			// TODO in future when using list, ensure that when `interval == 0` it does not get inf. looped
