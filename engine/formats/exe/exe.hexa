@@ -236,7 +236,12 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 			imageDataDirectory[image_directory_entry_basereloc].ref as! IMAGE_DATA_DIRECTORY
 
 		// TODO there may be a situation when no relocation table present but PE is moved (malformed .dll)
-		if delta != 0, directory.size != 0 {
+		if
+			delta != 0, // Implies that we need to relocate
+			(peHeader.characteristics & image_file_relocs_stripped) == 0, // Relocation supposedly not removed
+			directory.size != 0, // Check relocation table presence
+			directory.virtualAddress != 0 // Ensure the directory is actually mapped
+		{
 			let codeBase ArrayPointer<UInt8> = buffer as! ArrayPointer<UInt8>
 
 			var relocation = (codeBase + directory.virtualAddress) as! IMAGE_BASE_RELOCATION
@@ -253,25 +258,43 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 					switch type as! ImageRelocationType {
 						case IMAGE_REL_BASED_ABSOLUTE:
 							// Skip relocation
-							// TODO `break` will not work here?
+							// TODO Hexa: `break` will not work here for `for`
 
-							// TODO rename to HIGH_LOW
+						case IMAGE_REL_BASED_SECTION: // Skip
+
+							// TODO This must not happen on x64 images
 						case IMAGE_REL_BASED_HIGH_LOW:
 							// Change complete 32 bit address
 							{
+								// TODO Hexa: use `ArrayPointer<UInt32>.fromAddress(dest + offset)`
 								let patchAddrHL ArrayPointer<UInt32> = (dest + offset) as! ArrayPointer<UInt32>
 								patchAddrHL[0] += delta as! UInt32
 							}
-							// break
 
-							// TODO `#ifdef _WIN64`
+						case IMAGE_REL_BASED_HIGH:
+							// Adjust high 16 bits of a 32-bit address.
+							// target = (dest + offset) points to a WORD that contains the high 16 bits
+							{
+								let wordPtr = (dest + offset) as! ArrayPointer<UInt16>
+								// Add high 16 of delta (signed)
+								let highDelta Int32 = (delta as! Int32) >> 16
+								wordPtr[0] = (wordPtr[0] + (highDelta as! UInt16)) as! UInt16
+							}
+
+						case IMAGE_REL_BASED_LOW:
+							// Adjust low 16 bits of a 32-bit address.
+							{
+								let wordPtr = (dest + offset) as! ArrayPointer<UInt16>
+								let lowDelta UInt16 = (delta as! UInt32) & 0xFFFFu16
+								wordPtr[0] = (wordPtr[0] + lowDelta) as! UInt16
+							}
+
+							// TODO `#ifdef _WIN64` or `case if is64bit:`
 						case IMAGE_REL_BASED_DIR64: {
 								// TODO should be no-op on 32 bit
 								let patchAddr64 = (dest + offset) as! ArrayPointer<Int64>
 								patchAddr64[0] += delta as! Int64
 							}
-							// break
-							// TODO `#endif`
 
 						case _:
 							// TODO loader should fail
@@ -280,7 +303,7 @@ class ExeLoader<SIZE, HEADER, TIB, PEB> {
 					}
 
 					// Next step
-					// TODO must error `relInfo++`
+					// TODO Hexa: must error `relInfo++` and use `.offsetOneItem()`
 					relInfo++
 				}
 

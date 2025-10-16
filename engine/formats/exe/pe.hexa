@@ -284,6 +284,7 @@ enum ImageRelocationType : Int32 {
 	IMAGE_REL_BASED_HIGH3ADJ = 11
 }
 
+let image_file_relocs_stripped = 0x0001u16
 let image_sizeof_base_relocation = 8u64
 let image_rel_based_absolute = 0
 let image_rel_based_dir64 = 10
