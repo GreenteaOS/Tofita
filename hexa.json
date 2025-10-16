@@ -45,6 +45,7 @@
 		"engine/formats/lnk/lnk",
 		"engine/formats/lnk/lnk.header",
 		"devices/amd64/gdt",
+		"devices/amd64/amd64.features",
 		"devices/acpi/apic",
 		"devices/acpi/acpi",
 		"devices/efi/efi",

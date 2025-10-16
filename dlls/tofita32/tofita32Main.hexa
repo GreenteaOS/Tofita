@@ -93,6 +93,7 @@ fun tofitaDebugLog(message ConstArrayPointer<ClangWideChar>, extra UInt64 = 0, m
     #define HEXA_UNREACHABLE(z) {}
     #define stdout ((void*)0)
     int64_t _fltused = 0;
+	#define malloc(z) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, z)
 
     #ifdef bit64
 	void _memset() asm("memset");
