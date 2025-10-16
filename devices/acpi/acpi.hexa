@@ -255,7 +255,7 @@ class ACPIParser {
 		// TODO `Physical.toVirtual()` helper
 		var xsdt = (acpiTable.acpi20.ref.xsdtAddress as! UInt64 + wholePhysicalStart) as! XSDT
 
-		loadXsdt(xsdt)
+		loadXsdt(xsdt, cpuid)
 
 		serialPrintln("[ACPI] loaded")
 		return true
@@ -281,7 +281,7 @@ class ACPIParser {
 		serialPrint("\n")
 	}
 
-	static fun loadXsdt(xsdt XSDT) {
+	static fun loadXsdt(xsdt XSDT, cpuid CPUID) {
 		if xsdt == null {
 			serialPrintln("[ACPI] XSDT is null")
 			return
@@ -356,23 +356,50 @@ class ACPIParser {
 	// TODO test volatile
 	@volatile static var coresAp UInt64 = 1
 
+	/// APs start here after trampoline sets stack, paging, GDT/TSS; init per-core state.
+	// Pitfall: Assuming uniform CPU features (e.g., x2APIC support);
+	// TODO on heterogeneous HW (rare), check CPUID per-AP.
+	// TODO Edge-case: In NUMA, local APIC base may differ per-socket—read from MSR, map per-core if needed;
+	// for simple SMP assume shared.
 	static fun apStart() {
+		// Safety measure
+		disableAllInterrupts()
+
+		// Get own CPU index in the OS CPUs array TODO create one
 		let core = coresAp + 1
 		serialPrintf("[ACPI] apStart(%d)\n", core)
+
 		// TODO seems useless, cause main CPU waits for SIPIs anyway
 		// apLock.lock()
 
+		// CPU features
+		let cpuid CPUID = getCPUID()
 		// TODO IDT
 		// TODO GDT
-		// TODO NX
+		// NX bit
+		enableNX(cpuid)
+
+		// TODO APIC
+
+		// ALL DONE //
+
+		// In case of success we can now report that CPU is usable
 		quakePrintf("CPU #%u initialized, ".utf16(), core)
-		disableAllInterrupts()
+		// Counter is watched in the SMP startup code -> incrementing is a trigger
 		coresAp++
-		// apLock.unlock()
+
+		// TODO apLock.unlock()
 
 		// TODO start another AP in chain (if applicable) to speed-up the SMP initialization
 
+		// NOW CAN EXECUTE THREADS AND SYSCALLS //
+
+		// Enable interrupts for timer/IPIs
+		// TODO Edge-case: If NMI/SError, handle via IST.
+		// TODO enableAllInterrupts()
+
 		while true {
+			// TODO execute "thread-safe" syscalls from the event-loop
 			halt()
 			pause()
 		}

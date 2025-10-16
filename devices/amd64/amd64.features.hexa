@@ -1,0 +1,28 @@
+// The Tofita Engine
+// Copyright (C) 2022-2025 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+/// NX (No-eXecute) via EFER MSR
+fun enableNX(cpuid CPUID) Void {
+	if cpuid.nxBitSupported {
+		serialPrintln("<Tofita> enable NX bit")
+		let efer = 0xC0000080u32
+		// TODO Hexa: bug can `var v = functionThatReturnsVoid()`
+		var msr = rdmsr(efer)
+		msr |= (1 << 11u64) // Set the NXE bit (bit 11)
+		wrmsr(efer, msr)
+	} else {
+		serialPrintln("<Tofita> NX bit unsupported")
+	}
+}

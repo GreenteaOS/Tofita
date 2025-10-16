@@ -139,6 +139,8 @@ longModeApStart:
 
     mov rax, [arguments.code]
     o64 call rax
+    cli ; Disable interrupts
+    hlt ; Halt if ap_main returns (should not happen)
 
 gdtr:
     .size uint16_t 127

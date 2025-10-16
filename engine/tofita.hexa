@@ -162,16 +162,7 @@ fun engineInit(params UefiPayload) {
 	}
 
 	// NX bit
-	if cpuid.nxBitSupported {
-		serialPrintln("<Tofita> enable NX bit")
-		let efer = 0xC0000080u32
-		// TODO Hexa: bug can `var v = functionThatReturnsVoid()`
-		var msr = rdmsr(efer)
-		msr |= (1 << 11u64) // Set the NXE bit (bit 11)
-		wrmsr(efer, msr)
-	} else {
-		serialPrintln("<Tofita> NX bit unsupported")
-	}
+	enableNX(cpuid)
 
 	// SMP trapeze
 	{
