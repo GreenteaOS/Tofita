@@ -314,8 +314,8 @@ fun runTasks() {
 		phase2.push(
 			[
 				clang + ' ',
-				useCpp ? '-x c++ -std=c++2a': '-x c -std=gnu17',
 				'-target ' + target + ' -fno-stack-protector',
+				'-x c -std=gnu17',
 				'-fshort-wchar -mno-red-zone -w',
 				'-fomit-frame-pointer',
 				'-fno-stack-check',
