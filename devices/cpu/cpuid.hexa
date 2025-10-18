@@ -116,7 +116,6 @@ class CPUID {
 	var sse41Supported = false
 	var sse42Supported = false
 	var avxSupported = false
-	var fmaSupported = false
 	var fsgsbaseSupported = false
 	var bmi1Supported = false
 	var hleSupported = false
@@ -133,6 +132,13 @@ class CPUID {
 	var oneGbPagesSupported = false
 	var rdtscpSupported = false
 	var threedNowSupported = false
+	var threedNowExtSupported = false
+	var amdMmxExtSupported = false
+	var fullThreedNowSupported = false
+	var fma3Supported = false
+	var fma4Supported = false
+	var sse4aSupported = false
+	var xopSupported = false
 	var x2apicSupported = false
 }
 
@@ -247,7 +253,7 @@ fun getCPUID() CPUID {
 	result.sseSupported = 0 != (result.standardEDX[0] & (1u32 << 25)) // SSE (bit 25)
 	result.sse2Supported = 0 != (result.standardEDX[0] & (1u32 << 26)) // SSE2 (bit 26)
 	result.ssSupported = 0 != (result.standardEDX[0] & (1u32 << 27)) // SS (bit 27)
-	result.hyperthreadingSupported = 0 != (result.standardEDX[0] & (1u32 << 28)) // HT Technology (bit 28)
+	result.hyperthreadingSupported = (0 != (result.standardEDX[0] & (1u32 << 28))) and (result.logicalProcessorCount > 1) // HT Technology (bit 28) + count >1
 	result.tmSupported = 0 != (result.standardEDX[0] & (1u32 << 29)) // TM (bit 29)
 	result.ia64Supported = 0 != (result.standardEDX[0] & (1u32 << 30)) // IA64 (bit 30)
 	result.pbeSupported = 0 != (result.standardEDX[0] & (1u32 << 31)) // PBE (bit 31)
@@ -280,8 +286,13 @@ fun getCPUID() CPUID {
 	result.avxSupported = 0 != (result.standardECX[0] & (1u32 << 28)) // AVX (bit 28)
 	result.f16cSupported = 0 != (result.standardECX[0] & (1u32 << 29)) // F16C (bit 29)
 	result.rdrandSupported = 0 != (result.standardECX[0] & (1u32 << 30)) // RDRND (bit 30)
-	result.fmaSupported = 0 != (result.standardECX[0] & (1u32 << 12)) // FMA (bit 12)
+	result.fma3Supported = 0 != (result.standardECX[0] & (1u32 << 12)) // FMA3 (bit 12)
 	result.x2apicSupported = 0 != (result.standardECX[0] & (1u32 << 21)) // x2APIC (bit 21)
+
+	// Extended ECX features (AMD-specific)
+	result.fma4Supported = 0 != (result.extendedECX[0] & (1u32 << 16)) // FMA4 (bit 16)
+	result.sse4aSupported = 0 != (result.extendedECX[0] & (1u32 << 6)) // SSE4a (bit 6)
+	result.xopSupported = 0 != (result.extendedECX[0] & (1u32 << 11)) // XOP (bit 11)
 
 	// Extract numeric CPU specifications
 	if result.maxStandardFunction[0] >= 0x00000001 {
@@ -325,6 +336,7 @@ fun getCPUID() CPUID {
 			cpuid(
 				0x0000000B,
 				0,
+				// TODO expand to separate values
 				result.leafBTopologyLevel.ref,
 				result.leafBTopologyLevel.ref,
 				result.leafBTopologyLevel.ref,
@@ -418,7 +430,12 @@ fun getCPUID() CPUID {
 		result.longModeSupported = 0 != (result.extendedEDX[0] & (1u32 << 29)) // Long Mode (bit 29)
 		result.oneGbPagesSupported = 0 != (result.extendedEDX[0] & (1u32 << 26)) // 1GB Pages (bit 26)
 		result.rdtscpSupported = 0 != (result.extendedEDX[0] & (1u32 << 27)) // RDTSCP (bit 27)
-		result.threedNowSupported = 0 != (result.extendedEDX[0] & (1u32 << 31)) // 3DNow! (bit 31)
+
+		// AMD-specific features (extendedEDX)
+		result.threedNowSupported = 0 != (result.extendedEDX[0] & (1u32 << 31)) // Base 3DNow! (bit 31)
+		result.threedNowExtSupported = 0 != (result.extendedEDX[0] & (1u32 << 30)) // 3DNow! Extensions (bit 30)
+		result.amdMmxExtSupported = 0 != (result.extendedEDX[0] & (1u32 << 22)) // AMD MMX Extensions (bit 22)
+		result.fullThreedNowSupported = result.threedNowSupported and result.threedNowExtSupported and result.amdMmxExtSupported
 
 		// Read CPU temperature via MSR if supported
 		if result.msrSupported {
