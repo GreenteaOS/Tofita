@@ -17,19 +17,15 @@ if not exist "%ISO%" (
 	echo !ISO!
 )
 
-set QEMU="C:\Program Files\qemu\qemu-system-x86_64.exe"
-set OVMF="..\..\Teapot\OVMF.fd"
+set QEMU="C:\Program Files\qemu\qemu-system-aarch64.exe"
+set OVMF="C:\Program Files\qemu\share\edk2-aarch64-code.fd"
 
 %QEMU% -accel tcg -bios %OVMF% -m 2048 ^
-    -vga std -machine pc-q35-2.10 ^
-    -serial file:!DRIVE!:\Tea\qemu.log -cpu max,x2apic=off ^
-    -smp 4 ^
+    -device ramfb -machine virt ^
+    -cpu cortex-a72 ^
+    -serial file:!DRIVE!:\Tea\qemu-aarch64.log ^
+    -smp 8 ^
     -cdrom !ISO! ^
     -name "Greentea QEMU" -monitor stdio
 ::    -drive format=raw,file=fat:rw:%DRIVE%:\Tea\spin-off ^
 ::pause
-
-:: Possible settings
-:: -accel tcg
-:: -accel whpx
-:: -accel whpx,kernel-irqchip=off
