@@ -30,6 +30,14 @@ var isoTask = false
 var useCpp = false
 // TODO ^ update readme if it calls build script
 
+enum CPUTarget: UInt8 {
+	X86_64 = 0
+	ARM64 = 1
+	RISC_V64 = 2
+}
+
+var cpuTarget CPUTarget = CPUTarget.X86_64
+
 // Removes folder recursively
 fun deleteFolderRecursive(path, noRemoveSelf Bool = false) {
 	if fs.existsSync(path) {
@@ -192,8 +200,10 @@ for task in tasks {
 			ramDiskTask = true
 		case 'iso':
 			isoTask = true
-		case 'risc64': // TODO
+		case 'risc64':
+			cpuTarget = CPUTarget.RISC_V64
 		case 'arm64': // TODO
+			cpuTarget = CPUTarget.ARM64
 			// TODO Hexa: disallow doc comment on non expr
 			{
 				/// TODO like this one
@@ -286,12 +296,26 @@ fun runTasks() {
 		// Hexa
 		phase1.push('cmd /c hexa --output-folder ' + config.tempFolder + '/' + teaFolder + ' boot\\hexa.json')
 
+		var target = 'x86_64-pc-win32-coff'
+		switch cpuTarget {
+			case X86_64:
+				target = 'x86_64-pc-win32-coff'
+			case ARM64:
+				target = 'aarch64-pc-win32-coff'
+				// TODO alternatively
+				// aarch64-windows
+			case RISC_V64:
+				target = 'riscv64-pc-win32-coff -mno-relax'
+				// TODO alternatively
+				// target = 'riscv64-unknown-windows -mno-relax'
+		}
+
 		// EFI
 		phase2.push(
 			[
 				clang + ' ',
-				'-target x86_64-pc-win32-coff -fno-stack-protector',
 				useCpp ? '-x c++ -std=c++2a': '-x c -std=gnu17',
+				'-target ' + target + ' -fno-stack-protector',
 				'-fshort-wchar -mno-red-zone -w',
 				'-fomit-frame-pointer',
 				'-fno-stack-check',
@@ -319,6 +343,13 @@ fun runTasks() {
 			].join(' ')
 		)
 
+		var efi = 'BOOTX64.EFI'
+		if cpuTarget == CPUTarget.ARM64 {
+			efi = 'BOOTAA64.EFI'
+		} else if cpuTarget == CPUTarget.RISC_V64 {
+			efi = 'BOOTRISCV64.EFI'
+		}
+
 		// Note: this is also depends on `asm`
 		phase3.push(
 			[
@@ -328,7 +359,7 @@ fun runTasks() {
 				config.tempFolder + '/' + teaFolder + '/trampoline.o ',
 				config.tempFolder + '/' + teaFolder + '/miniefi.o ',
 				' -out:',
-				config.tempFolder + '/' + teaFolder + '/spin-off/EFI/BOOT/BOOTX64.EFI'
+				config.tempFolder + '/' + teaFolder + '/spin-off/EFI/BOOT/' + efi
 			].join('')
 		)
 	}
@@ -569,6 +600,13 @@ fun runTasks() {
 					versionName
 				)
 
+				var efi = 'BOOTX64.EFI'
+				if cpuTarget == CPUTarget.ARM64 {
+					efi = 'BOOTAA64.EFI'
+				} else if cpuTarget == CPUTarget.RISC_V64 {
+					efi = 'BOOTRISCV64.EFI'
+				}
+
 				// Create floppy image
 				fs.copyFileSync(
 					'\(teapot)\\mtools\\disk-template.img',
@@ -576,8 +614,8 @@ fun runTasks() {
 				for cmd in [
 					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI',
 					mmd + ' -i ' + folder + '\\DISK.IMG ::/EFI/BOOT',
-					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\EFI\\BOOT\\BOOTX64.EFI ::/EFI/BOOT/BOOTx64.EFI',
 					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\TOFITA.DAT ::/TOFITA.DAT',
+					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\EFI\\BOOT\\' + efi + ' ::/EFI/BOOT/' + efi,
 					mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\version.txt ::/version.txt',
 					mcopy + ' -i ' + folder + '\\DISK.IMG LICENSE ::/LICENSE.txt',
 					mcopy + ' -i ' + folder + '\\DISK.IMG ..\\Greentea\\assets\\autorun.ico ::/autorun.ico',
