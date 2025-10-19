@@ -162,6 +162,12 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 	]
 
 	var status EFI_STATUS = EFI_STATUS.EFI_NOT_FOUND
+
+	if destination[0] != 0 {
+		// Dest non-zero mandates AllocateAddress; Any ignores it.
+		return EFI_STATUS.EFI_NOT_FOUND
+	}
+
 	for allocationType in fallbackTypes {
 		status = bootServices.allocatePages(
 			EFI_ALLOCATE_TYPE.AllocateAnyPages,
@@ -172,6 +178,25 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 
 		if status == EFI_STATUS.EFI_SUCCESS {
 			break
+		}
+	}
+
+	if status != EFI_STATUS.EFI_SUCCESS {
+		// Set to whole RAM
+		// saddr[0] = 0xFFFF_FFFF_FFFF_FFFFu64 TODO Hexa `_` in numerics
+		saddr[0] = 0xFFFFFFFFFFFFFFFFu64
+
+		for allocationType in fallbackTypes {
+			status = bootServices.allocatePages(
+				EFI_ALLOCATE_TYPE.AllocateMaxAddress,
+				allocationType,
+				pages,
+				saddr.ref
+			)
+
+			if status == EFI_STATUS.EFI_SUCCESS {
+				break
+			}
 		}
 	}
 
