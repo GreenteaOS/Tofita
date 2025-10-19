@@ -216,6 +216,7 @@ for task in tasks {
 			secureBoot = true
 		case _: // TODO capture as `case task:`
 			console.log('[Unknown task \(task)]')
+			process.exit(0)
 	}
 }
 
