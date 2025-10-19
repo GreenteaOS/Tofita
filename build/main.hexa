@@ -28,6 +28,7 @@ var engineTask = false
 var ramDiskTask = false
 var isoTask = false
 var useCpp = false
+var secureBoot Bool = false
 // TODO ^ update readme if it calls build script
 
 enum CPUTarget: UInt8 {
@@ -210,6 +211,9 @@ for task in tasks {
 			}
 		case 'cxx':
 			useCpp = true
+		case 'secure-boot':
+			// Enable Secure Boot
+			secureBoot = true
 		case _: // TODO capture as `case task:`
 			console.log('[Unknown task \(task)]')
 	}
@@ -607,6 +611,28 @@ fun runTasks() {
 					efi = 'BOOTRISCV64.EFI'
 				}
 
+				// If Secure Boot is requested for x86, prepare files:
+				// - Keep original BOOTX64.EFI as grubx64.efi
+				// - Place shimx64.efi as BOOTX64.EFI
+				if secureBoot, cpuTarget == CPUTarget.X86_64 {
+					let bootPath = folder + '\\spin-off\\EFI\\BOOT\\'
+
+					// Copy original loader as grubx64.efi
+					if fs.existsSync(bootPath + 'grubx64.efi') {
+						// Delete existing so copy does not fail
+						fs.unlinkSync(bootPath + 'grubx64.efi')
+					}
+
+					fs.copyFileSync(bootPath + 'BOOTX64.EFI', bootPath + 'grubx64.efi')
+
+					// Replace BOOTX64.EFI with shim
+					if fs.existsSync(bootPath + 'BOOTX64.EFI') {
+						fs.unlinkSync(bootPath + 'BOOTX64.EFI')
+					}
+
+					fs.copyFileSync('\(teapot)\\blobs\\shimx64.efi', bootPath + 'BOOTX64.EFI')
+				}
+
 				// Create floppy image
 				fs.copyFileSync(
 					'\(teapot)\\mtools\\disk-template.img',
@@ -623,6 +649,14 @@ fun runTasks() {
 				] {
 					child_process.execSync(
 						cmd, { stdio: 'inherit' }
+					)
+				}
+
+				// Also include grubx64.efi when Secure Boot is enabled (x86 only)
+				if secureBoot, cpuTarget == CPUTarget.X86_64 {
+					child_process.execSync(
+						mcopy + ' -i ' + folder + '\\DISK.IMG ' + folder + '\\spin-off\\EFI\\BOOT\\grubx64.efi ::/EFI/BOOT/grubx64.efi',
+						{ stdio: 'inherit' }
 					)
 				}
 
