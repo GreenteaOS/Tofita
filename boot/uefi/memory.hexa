@@ -132,6 +132,7 @@ fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
 	fb.width = gop.mode.info.horizontalResolution
 	fb.height = gop.mode.info.verticalResolution
 	fb.pixelsPerScanLine = gop.mode.info.pixelsPerScanLine
+	// TODO PixelBlueGreenRedReserved8BitPerColor -> handle non-4bytes pp?
 
 	serialPrintf("[[[uefi.uefiSetFrameBufferMode]]] width=%d height=%d pixelsPerScanLine=%d size=%d\n",
 		fb.width, fb.height, fb.pixelsPerScanLine, fb.size)
@@ -154,12 +155,25 @@ fun uefiAllocate(bootServices EFI_BOOT_SERVICES, bytes ArrayPointer<UInt64>, des
 	var addr EFI_PHYSICAL_ADDRESS = destination[0] as! EFI_PHYSICAL_ADDRESS
 	var saddr ArrayByValue<EFI_PHYSICAL_ADDRESS, 1> = [addr]
 
-	let status = bootServices.allocatePages(
-		EFI_ALLOCATE_TYPE.AllocateAnyPages,
-		allocationType,
-		pages,
-		saddr.ref
-	)
+	let fallbackTypes = [
+		EFI_MEMORY_TYPE.EfiLoaderCode, // Primary: Executable, for code safety
+		EFI_MEMORY_TYPE.EfiLoaderData // Fallback: Writable data, non-exec default
+		// EFI_MEMORY_TYPE.EfiConventionalMemory // Last: Free mem, most available
+	]
+
+	var status EFI_STATUS = EFI_STATUS.EFI_NOT_FOUND
+	for allocationType in fallbackTypes {
+		status = bootServices.allocatePages(
+			EFI_ALLOCATE_TYPE.AllocateAnyPages,
+			allocationType,
+			pages,
+			saddr.ref
+		)
+
+		if status == EFI_STATUS.EFI_SUCCESS {
+			break
+		}
+	}
 
 	addr = saddr[0]
 
