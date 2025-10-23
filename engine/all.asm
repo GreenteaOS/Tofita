@@ -17,3 +17,12 @@ bits 64
 default rel
 section .head
 %include "devices/cpu/cpu.asm"
+
+; Those fonts used before having access to the disk
+global binFont
+binFont:
+incbin "./boot/loader/ascii.tofita"
+
+global binFontBitmap
+binFontBitmap:
+incbin "./boot/loader/font.bmp"

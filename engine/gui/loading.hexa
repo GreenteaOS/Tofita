@@ -1,0 +1,155 @@
+// The Tofita Engine
+// Copyright (C) 2022-2025 Oleh Petrenko
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, version 3 of the License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+// Highly simplistic drawing functions, same as `visuals.hexa`
+// The ONLY purpose is to draw a loading text after bootloader but *before* GUI
+
+// .asm -> incbin
+@extern @rename('binFont') declare let binFont ConstArrayPointer<UInt8>
+@extern @rename('binFontBitmap') declare let binFontBitmap ConstArrayPointer<UInt8>
+let fontWidth UInt32 = 512
+let fontHeight UInt32 = 32
+
+@struct @packed @sizeOf(4)
+@stack
+class UefiPixel {
+	var b UInt8
+	var g UInt8
+	var r UInt8
+	var a UInt8
+}
+
+fun drawPixel(framebuffer FrameBuffer, x UInt32, y UInt32, color UInt32) {
+	var pixels = framebuffer.base as! ArrayPointer<UInt32>
+	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color
+}
+
+fun getBitmapPixel(bmp ConstArrayPointer<UInt8>, x UInt32, y UInt32, width UInt32, height UInt32) UInt32 {
+	let bmpHeaderSize = 54u64
+	let colors ConstArrayPointer<UInt8> = (bmp as! UInt64 + bmpHeaderSize) as! ConstArrayPointer<UInt8>
+	var pixel ByValue<UefiPixel> = new ByValue<UefiPixel>()
+	pixel.ref.b = colors[((height - y - 1) * width + x) * 3 + 0]
+	pixel.ref.g = colors[((height - y - 1) * width + x) * 3 + 1]
+	pixel.ref.r = colors[((height - y - 1) * width + x) * 3 + 2]
+	pixel.ref.a = 0xFF
+	// TODO cache .ref
+	var color = pixel.ref as! ArrayPointer<UInt32>
+	// TODO `@union`
+	return color[0]
+}
+
+@struct @packed @sizeOf(12)
+class LoadingTextFontList {
+	var x UInt16
+	var y UInt16
+	var width Float
+}
+
+var loadingTextFontList = null as! ArrayPointer<ByValue<LoadingTextFontList>>
+// TODO `ConstArrayPointer<TextFontList>` + `@const @struct { let }`
+
+fun initLoadingText() {
+	loadingTextFontList = binFont as! ArrayPointer<ByValue<LoadingTextFontList>> // TODO as! _
+}
+
+fun getLoadingTextCharAdvance(c UInt8) {
+	var textChar LoadingTextFontList = loadingTextFontList[c as! UInt64].ref
+	return textChar.width
+}
+
+fun drawLoadingChar(c UInt8, x Float, y Int16, framebuffer FrameBuffer) {
+	var textChar LoadingTextFontList = loadingTextFontList[c as! UInt64].ref
+
+	var xx Int16 = (x + 0.5) as! Int32 as! Int16
+	var w UInt16 = (textChar.width + 0.5) as! Int32 as! UInt16
+
+	var yi UInt16 = 0
+	while yi < 12 {
+		var xi UInt16 = 0
+		while xi < w {
+			let atx UInt32 = xx + xi
+			let aty UInt32 = y + yi
+
+			// TODO well, re-parsing BMP for every pixel is not fast
+			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight)
+
+			drawPixel(framebuffer, atx, aty, font)
+
+			xi++
+		}
+
+		yi++
+	}
+
+	return textChar.width
+}
+
+fun drawLoadingText(text String, y Int16, framebuffer FrameBuffer) {
+	let text ConstArrayPointer<ClangWideChar> = text.utf16()
+	var i UInt16 = 0
+
+	// Get width to center text on screen
+	var width Float = 0
+
+	while (text[i] as! UInt16) != 0 and i < 255 * 255 {
+		width += getLoadingTextCharAdvance((text[i] as! UInt16) & 0xFF as! UInt8)
+		i++
+	}
+
+	var xx Float = (framebuffer.width / 2) - (width / 2)
+
+	i = 0
+	while (text[i] as! UInt16) != 0 and i < 255 * 255 {
+		xx += drawLoadingChar((text[i] as! UInt16) & 0xFF as! UInt8, xx, y, framebuffer)
+		i++
+	}
+}
+
+fun drawLoadingCleanup(y Int16, framebuffer FrameBuffer) {
+	let leftOrigin Int16 = (framebuffer.width / 2) - 128i16
+
+	for yy in 31u16 {
+		for x in 256u16 {
+			drawPixel(framebuffer, leftOrigin + x, y + yy, 0)
+		}
+	}
+}
+
+// Calculated from screen size
+var loadingErrorY Int16 = 0
+
+/// NOTE Hangs forever after drawing
+fun drawLoadingError(text String, framebuffer FrameBuffer) {
+	drawLoadingCleanup(loadingErrorY, framebuffer)
+	drawLoadingText(text, loadingErrorY, framebuffer)
+	serialPrintf("<Tofita> ERROR: %S\n", text.utf16())
+
+	// Hang -> but not halt, to allow repaint
+	while framebuffer.base != 0 {
+		pause()
+		__sync_synchronize()
+	}
+}
+
+fun drawLoadingVerbose(text String, framebuffer FrameBuffer) {
+	serialPrintln(text)
+	drawLoadingCleanup(loadingErrorY + 32i16, framebuffer)
+
+	drawLoadingText(text, loadingErrorY + 32i16, framebuffer)
+
+	// Ensure it goes into framebuffer before hang
+	__sync_synchronize()
+	pause()
+}

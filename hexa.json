@@ -19,6 +19,7 @@
 		"engine/syscalls/njraa/njraaCall",
 		"engine/syscalls/user32/userCall",
 		"engine/syscalls/syscalls",
+		"engine/gui/loading",
 		"engine/gui/window",
 		"engine/gui/windows",
 		"engine/gui/collider",

@@ -31,10 +31,21 @@ fun chkstkStub() Void {
 @extern @rename('versionMinor') declare let versionMinor Int
 @extern @rename('versionTag') declare let versionTag Int
 
-/// Entry point from trampoline.asm
+/// Initialization pseudo-thread that spawns actual engine threads
 fun engineInit(params UefiPayload) {
 	serialPrintln("<Tofita> Greentea OS " + versionMajor + "." + versionMinor + "." + versionTag + " engine loaded and operational")
 	serialPrintf("<Tofita> CR3 points to: %8\n", params.pml4 as! UInt64)
+
+	// Initialize loading text -> before everything else
+	{
+		initLoadingText()
+		// Same logic as in `boot.hexa`
+		let versionY = (params.framebuffer.ref.height / 4) * 3 + 64 as! Int16
+		loadingErrorY = versionY + 32i16
+		// Prompt that we are alive at higher-half
+		drawLoadingVerbose("Engine ready...", params.framebuffer.ref)
+	}
+
 	// TODO `anyPtrOrObj as! UInt32` -> error precision lost on 64-bit
 	paramsCache = params
 	PhysicalAllocator.init(params)
@@ -328,7 +339,9 @@ fun engineInit(params UefiPayload) {
 @rename('__sync_synchronize')
 declare fun __sync_synchronize() Void
 
+/// Entry point of the project
 fun engineMain(params UefiPayload) {
+	// Initialization pseudo-thread
 	engineInit(params)
 
 	// This is probably useless but looks cool
@@ -351,5 +364,5 @@ fun engineMain(params UefiPayload) {
 // Data passed from UEFI
 @rename('engineParams') declare let engineParams UefiPayload
 
-// Entry point of the project
+// Entry point from trampoline.asm -> note that Hexa runtime runs before this code
 engineMain(engineParams)
