@@ -1,5 +1,5 @@
 // The Tofita Engine
-// Copyright (C) 2022-2024 Oleh Petrenko
+// Copyright (C) 2022-2025 Oleh Petrenko
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -19,6 +19,8 @@
 @rename('systemTable') declare let systemTable EFI_SYSTEM_TABLE
 
 fun heapOverflow() Void {
+	serialPrintln("Heap overflow. Halt.")
+
 	if let fb = conventionalFramebufferForErrors {
 		drawError("[ERROR] Heap overflow [ERROR]", fb)
 	}
@@ -33,6 +35,7 @@ fun heapOverflow() Void {
     extern const uint8_t binFontBitmap[];
     extern const uint8_t binLeavesBitmap[];
     int64_t _fltused = 0; // @keep
+    extern void pause();
 
     void* imageHandle = NULL;
     struct EFI_SYSTEM_TABLE_;
@@ -59,18 +62,17 @@ fun heapOverflow() Void {
     #define HEAP_C 655360
     static uint8_t heap[HEAP_C] = {0};
     static uint64_t heapOffset = 0;
-    static void* HeapAlloc(int8_t x,int8_t u, uint64_t size) {
+    static size_t HeapAlloc(int8_t x,int8_t u, uint64_t size) {
         // size = ((size - 1) | 7) + 1; // Align by 8
         size = ((size - 1) | 15) + 1; // Align by 16
         if (size < 16) size = 16;
         heapOffset += 8;
         heapOffset += size;
         if (heapOffset >= HEAP_C) {
-            serialPrint_(L"Heap overflow (HeapAlloc). Halt.\n");
             heapOverflow_();
             while (1) {};
         }
-        return &heap[heapOffset - size];
+        return (size_t)&heap[heapOffset - size];
     }
 
     #define WriteFile(x,y,z,t,r) {}
@@ -112,7 +114,7 @@ fun heapOverflow() Void {
     // Entry point
     uint64_t efi_main(void* imageHandle__, void *systemTable__) {
         imageHandle = imageHandle__;
-        systemTable = systemTable__;
+        systemTable = (struct EFI_SYSTEM_TABLE_ *)systemTable__;
         for (uint64_t i = 0; i < HEAP_C; i++) heap[i] = 0;
         HEXA_MAIN(0, NULL);
         return 0;

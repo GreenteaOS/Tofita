@@ -41,6 +41,7 @@ fun mallocEfi(bytes UInt64) SizeOfPointer {
 @keep
 @rename('__chkstk')
 fun chkstkStub() Void { }
+let _fltused Int64 = 0
 
 // Stubs for the `log.hexa`
 fun probeForReadOkay(at UInt64, bytes UInt64) Bool { return true }

@@ -23,8 +23,6 @@ let fontHeight UInt32 = 32
 let leavesWidth UInt32 = 36
 let leavesHeight UInt32 = 25
 
-let _fltused Int64 = 0
-
 fun drawPixel(framebuffer FrameBuffer, x UInt32, y UInt32, color UInt32) {
 	var pixels = framebuffer.base as! ArrayPointer<UInt32>
 	pixels[(y * framebuffer.pixelsPerScanLine) + x] = color

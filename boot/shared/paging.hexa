@@ -116,7 +116,7 @@ var conventionalOffset UInt64 = 0u64
 var conventionalPages UInt64 = 0u64
 var conventionalPagesAvailable UInt64 = 0u64
 var conventionalFramebufferForErrors FrameBuffer? = null
-var conventionalServices UInt64 = null // TODO Hexa: use `EFI_BOOT_SERVICES`
+var conventionalServices UInt64 = 0 // null // TODO Hexa: use `EFI_BOOT_SERVICES`
 
 /// Simplistic memory allocator
 // TODO use `uefiAllocate` or other UEFI mechanism, so can freely update the memory map in `exitBootServices` loop

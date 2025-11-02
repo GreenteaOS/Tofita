@@ -22,6 +22,7 @@ fun allocateRamDisk(
 	framebuffer FrameBuffer
 ) UInt64 {
 	// TODO must error `size /` at `var sizeAlloc ArrayByValue<UInt64, 1> = [(size / pageSize + 1) * pageSize]`
+	// ^ that kinda why `= [0]` syntax is not the best one
 	var sizeAlloc ArrayByValue<UInt64, 2> = [(sizeOfFile / pageSize + 1) * pageSize]
 
 	// Combined allocation for mem map

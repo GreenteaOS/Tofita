@@ -685,7 +685,7 @@ class EFI_BOOT_SERVICES {
 	@noCapture let locateProtocol (
 		protocol EFI_GUID,
 		registration EFI_PHYSICAL_ADDRESS,
-		interfaceStorage ArrayPointer<EFI_VOID>
+		interfaceStorage ArrayPointer<UInt64> // Use address storage instead of plain EFI_VOID
 	) => EFI_STATUS
 
 	let installMultipleProtocolInterfaces EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES
