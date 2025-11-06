@@ -47,7 +47,7 @@ declare fun tofitaFastSystemCall(rcx TofitaSyscalls,
 declare fun tofitaDebugLogREAL(message ConstArrayPointer<ClangWideChar>, extra SizeOfPointer = 0, more SizeOfPointer = 0) Void
 
 @customHeader('
-	#define tofitaDebugLog_(m, e, mo) tofitaDebugLogREAL_(m, (size_t)(e), (size_t)(mo))
+	#define tofitaDebugLog_(m, e, mo) tofitaDebugLogREAL_((wchar_t *)m, (size_t)(e), (size_t)(mo))
 ')
 declare fun tofitaDebugLog(message ConstArrayPointer<ClangWideChar>, extra UInt64 = 0, more UInt64 = 0) Void
 

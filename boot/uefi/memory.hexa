@@ -112,7 +112,7 @@ fun uefiGetMemoryMap(efiMemoryMap UefiMemoryMap, systemTable EFI_SYSTEM_TABLE) {
 	return EFI_STATUS.EFI_SUCCESS
 }
 
-fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
+fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) EFI_STATUS {
 	var gopGuid EFI_GUID = new EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID()
 	var igop ArrayByValue<UInt64, 1> = [] // TODO must error: should'nt be empty
 	// TODO ^ also `<..., 1> = [1,2,3, too much]` error
@@ -139,6 +139,8 @@ fun uefiSetFrameBufferMode(fb FrameBuffer, systemTable EFI_SYSTEM_TABLE) {
 
 	// TODO https://forum.osdev.org/viewtopic.php?f=1&t=37201
 	gop.setMode(gop, gop.mode.mode)
+
+	return EFI_STATUS.EFI_SUCCESS
 }
 
 /// `destination` can be zero for allocation at any address chosen by UEFI

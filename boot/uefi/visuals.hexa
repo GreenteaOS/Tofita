@@ -83,6 +83,7 @@ fun drawChar(c UInt8, x Float, y Int16, framebuffer FrameBuffer) {
 			let atx UInt32 = xx + xi
 			let aty UInt32 = y + yi
 
+			// TODO well, re-parsing BMP for every pixel is not fast
 			let font = getBitmapPixel(binFontBitmap, textChar.x + xi, textChar.y + yi, fontWidth, fontHeight)
 
 			drawPixel(framebuffer, atx, aty, font)

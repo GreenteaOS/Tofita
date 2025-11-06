@@ -496,6 +496,8 @@ fun getCPUID() CPUID {
 			}
 		}
 
-		return result
+		// return result // TODO Hexa: keep this, remove return below, and make it checked by typer to always return
 	}
+
+	return result
 }

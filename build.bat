@@ -23,7 +23,7 @@ IF %ERRORLEVEL% NEQ 0 (
 :: we can compare dates for cashes and rebuild only required projects
 
 ::debug
-..\Teapot\node-v18.1.0-win-x64\node build.js init-or-clean asm efi dll engine ramdisk iso
+..\Teapot\node-v18.1.0-win-x64\node build.js init-or-clean cxx asm efi dll engine ramdisk iso
 ::
 IF %ERRORLEVEL% NEQ 0 (
   goto somethingbad
