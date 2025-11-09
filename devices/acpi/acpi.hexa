@@ -186,7 +186,7 @@ class PciGroup {
 
 // TODO move acpiParser.hexa
 class ACPIParser {
-	static fun parse(acpiVendorTable UInt64, cpuid CPUID) Bool {
+	static fun parse(acpiVendorTable UInt64, cpuid CPUID, framebuffer FrameBuffer) Bool {
 		serialPrint("[ACPI] parsing started at physical ")
 		serialPrintHex(acpiVendorTable as! UInt64)
 		serialPrint("\n")
@@ -256,7 +256,7 @@ class ACPIParser {
 		// TODO `Physical.toVirtual()` helper
 		var xsdt = (acpiTable.acpi20.ref.xsdtAddress as! UInt64 + wholePhysicalStart) as! XSDT
 
-		loadXsdt(xsdt, cpuid)
+		loadXsdt(xsdt, cpuid, framebuffer)
 
 		serialPrintln("[ACPI] loaded")
 		return true
@@ -282,7 +282,9 @@ class ACPIParser {
 		serialPrint("\n")
 	}
 
-	static fun loadXsdt(xsdt XSDT, cpuid CPUID) {
+	static fun loadXsdt(xsdt XSDT, cpuid CPUID, framebuffer FrameBuffer) {
+		drawLoadingVerbose("Loading XSDT...", framebuffer)
+
 		if xsdt == null {
 			serialPrintln("[ACPI] XSDT is null")
 			return
@@ -322,12 +324,12 @@ class ACPIParser {
 			switch header.type {
 				case APIC:
 					serialPrintf("[ACPI] header.type == APIC\n")
-					loadApic(header as! AcpiApic, cpuid)
+					loadApic(header as! AcpiApic, cpuid, framebuffer)
 					// break // TODO breaks `for` not `switch`
 
 				case MCFG:
 					serialPrintf("[ACPI] header.type == MCFG\n")
-					// TODO crashes loadMcfg(header as! AcpiMcfg)
+					// TODO crashes loadMcfg(header as! AcpiMcfg, framebuffer)
 					// break
 
 				case FADT:
@@ -469,7 +471,9 @@ class ACPIParser {
 		delayMicroseconds(ms * 1000)
 	}
 
-	static fun loadApic(apic AcpiApic, cpuid CPUID) {
+	static fun loadApic(apic AcpiApic, cpuid CPUID, framebuffer FrameBuffer) {
+		drawLoadingVerbose("Loading APIC...", framebuffer)
+
 		serialPrintf("[ACPI] loadApic begin SMP\n")
 		// TODO Delay between IPI-SIPI + disable PIC
 		// TODO Hexa: ensure `if not boolean` generates `!= true_` instead of `c-style != 0` cause null-bool is `2`
@@ -493,9 +497,11 @@ class ACPIParser {
 		// Turns the Local APIC on
 		if x2 {
 			// Enable x2APIC mode (bit 10 and 11)
+			drawLoadingVerbose("Enable x2APIC...", framebuffer)
 			wrmsr(ia32_apic_base, (apic.localAddress & apic_base_flag) | apic_enable_flag | apic_x2apic_enable_flag)
 		} else {
 			// Enable xAPIC mode
+			drawLoadingVerbose("Enable xAPIC...", framebuffer)
 			wrmsr(ia32_apic_base, (apic.localAddress & apic_base_flag) | apic_enable_flag)
 		}
 
@@ -525,6 +531,8 @@ class ACPIParser {
 		let lapic_dfr = 0x00e0u64 // Destination Format
 		let lapic_ldr = 0x00d0u64 // Logical Destination
 		let lapic_svr = 0x00f0u64 // Spurious Interrupt Vector
+
+		drawLoadingVerbose("Enable LAPIC...", framebuffer)
 
 		// TODO is 1 page enough?
 		mapMemory(pml4entries, virtualLocalApic, physicalLocalApic, 1)
@@ -562,6 +570,8 @@ class ACPIParser {
 
 			data = data.offsetItems(length)
 		}
+
+		drawLoadingVerbose("Enable IO APIC...", framebuffer)
 
 		// Map memory, 1 page
 		// TODO supposedly may be not enoungh for some HW?
@@ -646,6 +656,8 @@ class ACPIParser {
 
 
 		// SMP goes here //
+		drawLoadingVerbose("Enable SMP...", framebuffer)
+
 		// TODO extract to separate function
 		// We will fill trapeze arguments dynamically by updating it's binary directly
 		let trapezeIdenityAddress = 0x8000u64
@@ -744,6 +756,8 @@ class ACPIParser {
 					// TODO disableAllInterrupts()?
 
 					// Send INIT IPI
+					drawLoadingVerbose("Send INIT SMP...", framebuffer)
+
 					let icr = 0x4500
 					if x2 {
 						// TODO
@@ -777,6 +791,8 @@ class ACPIParser {
 					var icr = 0x4600u64 | ap_segment
 
 					// Send START IPI (SIPI)
+					drawLoadingVerbose("Send SIPI SMP...", framebuffer)
+
 					if x2 {
 						// TODO
 					} else {
@@ -823,6 +839,7 @@ class ACPIParser {
 						}
 					}
 
+					drawLoadingVerbose("Waiting for SMP AP...", framebuffer)
 					// TODO `[ERROR] SMP hardware failure [ERROR]`
 					while currentCoresAp == coresAp {
 						__sync_synchronize()
@@ -840,7 +857,8 @@ class ACPIParser {
 		serialPrintf("[ACPI] loadApic done\n")
 	}
 
-	static fun loadMcfg(mcfg AcpiMcfg) {
+	static fun loadMcfg(mcfg AcpiMcfg, framebuffer FrameBuffer) {
+		drawLoadingVerbose("Loading MCFG...", framebuffer)
 		serialPrintf("[ACPI] loadMcfg\n")
 		var count UInt64 = acpiTableEntriesAcpiMcfg(mcfg, sizeOf<AcpiMcfgEntry>()) // TODO sizeOf must error
 		var mPci [PciGroup] = []

@@ -71,6 +71,7 @@ fun engineInit(params UefiPayload) {
 	let cpuid CPUID = getCPUID()
 
 	{
+		drawLoadingVerbose("Initializing CPU features...", params.framebuffer.ref)
 		// Page Attribute Table (PAT)
 		// TODO SMP enable PAT for each AP
 		// TODO would make sense to put it into `AMD64.initializePAT(cpuid)` namespace ig
@@ -142,11 +143,13 @@ fun engineInit(params UefiPayload) {
 		// TODO QSOD
 	}
 
+	drawLoadingVerbose("Initializing interrupts...", params.framebuffer.ref)
 	// disablePic() TODO should be disabled after APIC
 	setupInterruptsAndExceptions()
 	// TODO rename to initializeInterrupts()
 	enablePS2Mouse()
 
+	drawLoadingVerbose("Initializing GUI...", params.framebuffer.ref)
 	initText()
 	versionText = "Development copy. Build " + versionMajor + "." + versionMinor + "." + versionTag
 	initializeCompositor()
@@ -184,8 +187,9 @@ fun engineInit(params UefiPayload) {
 		tmemcpy(trapeze as! ArrayPointer<UInt8>, asset.data as! ConstArrayPointer<UInt8>, asset.size)
 	}
 
+	drawLoadingVerbose("Initializing ACPI...", params.framebuffer.ref)
 	// disablePic() TODO may be required before activation
-	if not ACPIParser.parse(params.acpiTablePhysical, cpuid) {
+	if not ACPIParser.parse(params.acpiTablePhysical, cpuid, params.framebuffer.ref) {
 		quakePrintf("ACPI is *not* loaded, probably incompatible motherboard or outdated BIOS\n".utf16())
 	} else {
 		quakePrintf("ACPI 2.0 is loaded and ready\n".utf16())
@@ -204,8 +208,10 @@ fun engineInit(params UefiPayload) {
 	}
 
 	// TODO var sandbox = sandbox.createSandbox()
+	drawLoadingVerbose("Initializing DWM...", params.framebuffer.ref)
 	initDwm()
 
+	drawLoadingVerbose("Initializing scheduler...", params.framebuffer.ref)
 	// Setup scheduling
 	currentThread = ThreadKind.THREAD_INIT
 	// FSBase is MSR 0xC0000100, GSBase is 0xC0000101, and EngineGSBase is 0xC0000102
@@ -321,6 +327,7 @@ fun engineInit(params UefiPayload) {
 	}
 
 	// Auto run
+	drawLoadingVerbose("Starting apps...", params.framebuffer.ref)
 	autoRun()
 
 	startupMilliseconds =
